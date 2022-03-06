@@ -1,6 +1,7 @@
 image: node:14-alpine
 
 stages:
+  - .pre
   - build
 
 variables:
@@ -11,7 +12,7 @@ variables:
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
 
 codeartifactlogin:
-  stage: build
+  stage: .pre
   script:
     # - apk add --update curl && rm -rf /var/cache/apk/*
     # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install
@@ -22,4 +23,13 @@ codeartifactlogin:
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
+
+build:
+  stage: build
+  script:
+    - node common/scripts/install-run-rush.js git-secrets-scan
+    # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
+    - node common/scripts/install-run-rush.js check
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${CODEARIFACT_PACKAGE_NAME}" -v
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${CODEARIFACT_PACKAGE_NAME}" -v
  
