@@ -1,12 +1,9 @@
 image: node:14-alpine
 
-include:
-  template: Jobs/SAST.gitlab-ci.yml
-
 stages:
   - .pre
   - build
-  # - test
+  - test
 
 variables:
   CODEARTIFACT_DOMAIN_NAME: 'amazon'
@@ -58,4 +55,5 @@ build:
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
 
-
+include:
+  template: Jobs/SAST.gitlab-ci.yml
