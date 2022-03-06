@@ -12,7 +12,7 @@ variables:
   REGION: 'us-west-2'
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
 
-code-artifact-login:
+codeartifactlogin:
   stage: .pre
   script:
     - npm install -g aws-cli
