@@ -36,7 +36,7 @@ codeartifactlogin:
     # - apk add py3-pip
     # - apk add bash
     - which bash
-    - pip3 install PIP_PACKAGES
+    - pip3 install $PIP_PACKAGES
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
