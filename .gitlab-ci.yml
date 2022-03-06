@@ -20,6 +20,7 @@ codeartifactlogin:
     - apk add python3
     - apk add py3-pip
     - apk add bash
+    - which bash
     - pip3 install awscli
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
