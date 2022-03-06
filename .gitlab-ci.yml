@@ -44,7 +44,8 @@ codeartifactlogin:
 build:
   stage: build
   script:
-    - apk add --cache-dir $APK_CACHE_DIR bash
+    - pwd && ls -la /bin
+    - apk add --cache-dir $APK_CACHE_DIR bash git
     - pwd && ls -la /bin
     - node common/scripts/install-run-rush.js git-secrets-scan
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
