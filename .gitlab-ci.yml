@@ -39,6 +39,7 @@ codeartifactlogin:
 scanAndCheck:
   stage: build
   script:
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - apk add --cache-dir $APK_CACHE_DIR bash git
     - npm config list
     - node common/scripts/install-run-rush.js git-secrets-scan
@@ -52,6 +53,7 @@ build-environments:
     changes:
       - "**/environments/**/*"
   script:
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
@@ -62,6 +64,7 @@ build-swb-app:
     changes:
       - "**/swb-app/**/*"
   script:
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
@@ -72,6 +75,7 @@ build-swb-reference:
     changes:
       - "**/swb-app/**/*"
   script:
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
