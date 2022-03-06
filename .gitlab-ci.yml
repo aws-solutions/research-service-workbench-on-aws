@@ -31,6 +31,7 @@ codeartifactlogin:
     # - apk add --update curl && rm -rf /var/cache/apk/*
     # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install
     # - /usr/local/bin/aws --version
+    - mkdir -p $APK_CACHE_DIR
     - apk update
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
     # - apk add py3-pip
