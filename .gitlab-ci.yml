@@ -1,4 +1,4 @@
-image: node:14-alpine
+image: node14-awscliv2:latest
 
 stages:
   - .pre
@@ -31,18 +31,18 @@ cache:
     # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 .base:
   before_script:
-    - mkdir -p $APK_CACHE_DIR && mkdir -p $PIP_CACHE_DIR
-    - apk update
-    - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
-    - pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
+    #- mkdir -p $APK_CACHE_DIR && mkdir -p $PIP_CACHE_DIR
+    #- apk update
+    #- apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
+    #- pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - npm config list
 
 rush-check:
   extends: 
     - .base
   stage: .pre
   script:
-    - npm config list
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
 
