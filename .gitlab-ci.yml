@@ -20,10 +20,9 @@ variables:
     bash
     
 cache:
-  key: $CI_COMMIT_REF_SLUG
+  key: one-key-to-rule-them-all
   paths:
     - $APK_CACHE_DIR
-    - /bin
 
 codeartifactlogin:
   stage: .pre
