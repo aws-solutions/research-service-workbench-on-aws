@@ -40,7 +40,9 @@ scanAndCheck:
   stage: build
   script:
     - apk add --cache-dir $APK_CACHE_DIR bash git
+    - npm config list
     - node common/scripts/install-run-rush.js git-secrets-scan
+    - npm config list
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
 
