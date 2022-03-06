@@ -12,6 +12,8 @@ variables:
   REGION: 'us-west-2'
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
   CODEARTIFACT_NAMESPACE: 'amzn'
+  AWS_CREDS_TARGET_ROLE: 'arn:aws:iam::570848053562:role/GitLab'
+  AWS_DEFAULT_REGION: 'us-west-2'
   APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
   PIP_PACKAGES:
     awscli
@@ -27,17 +29,9 @@ cache:
 codeartifactlogin:
   stage: .pre
   script:
-    # - apk add --update curl && rm -rf /var/cache/apk/*
-    # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install
-    # - /usr/local/bin/aws --version
     - mkdir -p $APK_CACHE_DIR
     - apk update
-    - ls -la 
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
-    - ls -lrt $APK_CACHE_DIR && ls -la $CI_PROJECT_DIR
-    # - apk add py3-pip
-    # - apk add bash
-    - pwd && ls -la /bin
     - pip3 install $PIP_PACKAGES
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
@@ -46,9 +40,7 @@ codeartifactlogin:
 scanAndCheck:
   stage: build
   script:
-    - pwd && ls -la /bin
     - apk add --cache-dir $APK_CACHE_DIR bash git
-    - pwd && ls -la /bin
     - node common/scripts/install-run-rush.js git-secrets-scan
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
@@ -62,12 +54,4 @@ build:
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
-
-# test:
-#   stage: test
-#   only:
-#     changes:
-#       - "**/environments/**/*"
-#   script:  
-#     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
  
