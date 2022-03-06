@@ -10,6 +10,19 @@ variables:
   CODEARTIFACT_REPO_NAME: 'dmmadse-test'
   REGION: 'us-west-2'
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
+  # PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
+  APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
+  PIP_PACKAGES:
+    awscli
+  APK_PACKAGES:
+    python3
+    py3-pip
+    bash
+
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - $APK_CACHE_DIR
 
 codeartifactlogin:
   stage: .pre
@@ -17,11 +30,12 @@ codeartifactlogin:
     # - apk add --update curl && rm -rf /var/cache/apk/*
     # - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install
     # - /usr/local/bin/aws --version
-    - apk add python3
-    - apk add py3-pip
-    - apk add bash
+    - apk update
+    - apk add --cache-dir $CI_PROJECT_DIR/.cache/apk $APK_PACKAGES
+    # - apk add py3-pip
+    # - apk add bash
     - which bash
-    - pip3 install awscli
+    - pip3 install PIP_PACKAGES
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
