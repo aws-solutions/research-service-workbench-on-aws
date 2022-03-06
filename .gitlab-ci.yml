@@ -13,8 +13,6 @@ variables:
   APK_PACKAGES:
     python3
     py3-pip
-    bash 
-    git
     
 cache:
   key: one-key-to-rule-them-all
@@ -32,7 +30,7 @@ cache:
     # - aws --version
     # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 .base:
-  script:
+  before_script:
     - mkdir -p $APK_CACHE_DIR && mkdir -p $PIP_CACHE_DIR
     - apk update
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
