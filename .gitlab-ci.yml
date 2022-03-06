@@ -1,5 +1,8 @@
 image: node:14-alpine
 
+include:
+  template: Security/SAST.gitlab-ci.yml
+  
 stages:
   - .pre
   - build
@@ -55,5 +58,4 @@ build:
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
+
