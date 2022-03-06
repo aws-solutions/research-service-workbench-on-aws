@@ -4,10 +4,16 @@ stages:
   - .pre
   - build
   - test
+
+variables:
+  CODEARTIFACT_DOMAIN_NAME: 'amazon'
+  CODEARTIFACT_DOMAIN_OWNER: 'dmmadse'
+  CODEARTIFACT_REPO_NAME: 'dmmadse-test'
+  REGION: 'us-west-2'
+  CODEARIFACT_PACKAGE_FORMAT: 'npm'
+
 code-artifact-login:
   stage: .pre
-  only:
-  - main
   script:
     - npm install -g aws-cli
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
