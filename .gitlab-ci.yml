@@ -32,13 +32,14 @@ codeartifactlogin:
     - mkdir -p $APK_CACHE_DIR
     - apk update
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
-    - pip3 install $PIP_PACKAGES
-    - aws --version
+    # - pip3 install $PIP_PACKAGES
+    # - aws --version
     # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 
 scanAndCheck:
   stage: build
   script:
+    - pip3 install $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - apk add --cache-dir $APK_CACHE_DIR bash git
     - npm config list
@@ -53,6 +54,7 @@ build-environments:
     changes:
       - "**/environments/**/*"
   script:
+    - pip3 install $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
@@ -64,6 +66,7 @@ build-swb-app:
     changes:
       - "**/swb-app/**/*"
   script:
+    - pip3 install $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
@@ -75,6 +78,7 @@ build-swb-reference:
     changes:
       - "**/swb-app/**/*"
   script:
+    - pip3 install $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
