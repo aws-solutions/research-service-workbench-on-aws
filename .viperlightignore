@@ -10,3 +10,4 @@ node_modules
 solutions/swb-reference/src/api.ts
 solutions/swb-reference/lib/api.js
 publish-buildspec.yml
+.gitlab-ci.yml
