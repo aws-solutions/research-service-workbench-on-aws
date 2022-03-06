@@ -1,9 +1,7 @@
 image: node:latest
 
 stages:
-  - .pre
   - build
-  - test
 
 variables:
   CODEARTIFACT_DOMAIN_NAME: 'amazon'
@@ -13,7 +11,7 @@ variables:
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
 
 codeartifactlogin:
-  stage: .pre
+  stage: build
   script:
     - npm install -g aws-cli
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
