@@ -5,38 +5,10 @@ stages:
   - build
   - test
 
-variables:
-  APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
-  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
-  PIP_PACKAGES:
-    awscli
-  APK_PACKAGES:
-    python3
-    py3-pip
-    
-cache:
-  key: one-key-to-rule-them-all
-  paths:
-    - $APK_CACHE_DIR
-    - $PIP_CACHE_DIR
-
-# codeartifactlogin:
-#   stage: .pre
-#   script:
-#     - mkdir -p $APK_CACHE_DIR
-#     - apk update
-    # - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
-    # - pip3 install $PIP_PACKAGES
-    # - aws --version
-    # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 .base:
   before_script:
-    #- mkdir -p $APK_CACHE_DIR && mkdir -p $PIP_CACHE_DIR
-    #- apk update
-    #- apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
-    #- pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-    # - npm config list
+
 
 rush-check:
   extends: 
