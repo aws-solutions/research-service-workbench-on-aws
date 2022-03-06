@@ -1,4 +1,4 @@
-image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscliv2:latest
+image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli:latest
 
 stages:
   - .pre
