@@ -3,6 +3,7 @@ image: node:14-alpine
 stages:
   - .pre
   - build
+  - test
 
 variables:
   CODEARTIFACT_DOMAIN_NAME: 'amazon'
@@ -10,6 +11,7 @@ variables:
   CODEARTIFACT_REPO_NAME: 'dmmadse-test'
   REGION: 'us-west-2'
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
+  CODEARTIFACT_NAMESPACE: 'amzn'
   APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
   PIP_PACKAGES:
     awscli
@@ -41,7 +43,7 @@ codeartifactlogin:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
 
-build:
+scanAndCheck:
   stage: build
   script:
     - pwd && ls -la /bin
@@ -50,6 +52,20 @@ build:
     - node common/scripts/install-run-rush.js git-secrets-scan
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${CODEARIFACT_PACKAGE_NAME}" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${CODEARIFACT_PACKAGE_NAME}" -v
+
+build:
+  stage: build
+  only:
+    changes:
+      - "**/environments/**/*"
+  script:
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
+
+test:
+  stage: test
+  only:
+    changes:
+      - "**/environments/**/*"
+  script:  
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
  
