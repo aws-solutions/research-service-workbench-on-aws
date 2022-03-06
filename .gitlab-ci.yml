@@ -6,25 +6,21 @@ stages:
   - test
 
 variables:
-  CODEARTIFACT_DOMAIN_NAME: 'amazon'
-  CODEARTIFACT_DOMAIN_OWNER: '149122183214'
-  CODEARTIFACT_REPO_NAME: 'dmmadse-test'
-  REGION: 'us-west-2'
-  CODEARIFACT_PACKAGE_FORMAT: 'npm'
-  CODEARTIFACT_NAMESPACE: 'amzn'
-  AWS_CREDS_TARGET_ROLE: 'arn:aws:iam::570848053562:role/GitLab'
-  AWS_DEFAULT_REGION: 'us-west-2'
   APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
   PIP_PACKAGES:
     awscli
   APK_PACKAGES:
     python3
     py3-pip
+    bash 
+    git
     
 cache:
   key: one-key-to-rule-them-all
   paths:
     - $APK_CACHE_DIR
+    - $PIP_CACHE_DIR
 
 # codeartifactlogin:
 #   stage: .pre
@@ -35,55 +31,50 @@ cache:
     # - pip3 install $PIP_PACKAGES
     # - aws --version
     # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-
-scanAndCheck:
-  stage: build
+.base:
   script:
-    - apk add --cache-dir $APK_CACHE_DIR bash git $APK_PACKAGES
-    - pip3 install $PIP_PACKAGES
+    - apk update
+    - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
+    - pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-    - apk add --cache-dir $APK_CACHE_DIR bash git
-    - npm config list
-    - node common/scripts/install-run-rush.js git-secrets-scan
+
+rush-check:
+  stage: .pre
+  extends: .base
+  script:
     - npm config list
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
 
 build-environments:
   stage: build
+  extends: .base
   only:
     changes:
       - "**/environments/**/*"
   script:
-    - apk add --cache-dir $APK_CACHE_DIR bash git $APK_PACKAGES
-    - pip3 install $PIP_PACKAGES
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
 
 build-swb-app:
   stage: build
+  extends: .base
   only:
     changes:
       - "**/swb-app/**/*"
   script:
-    - apk add --cache-dir $APK_CACHE_DIR bash git $APK_PACKAGES
-    - pip3 install $PIP_PACKAGES
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
 
 build-swb-reference:
   stage: build
+  extends: .base
   only:
     changes:
-      - "**/swb-app/**/*"
+      - "**/swb-reference/**/*" 
   script:
-    - apk add --cache-dir $APK_CACHE_DIR bash git $APK_PACKAGES
-    - pip3 install $PIP_PACKAGES
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
