@@ -33,13 +33,15 @@ cache:
     # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 .base:
   script:
+    - mkdir -p $APK_CACHE_DIR && mkdir -p $PIP_CACHE_DIR
     - apk update
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
     - pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 
 rush-check:
-  extends: .base
+  extends: 
+    - .base
   stage: .pre
   script:
     - npm config list
@@ -47,7 +49,8 @@ rush-check:
     - node common/scripts/install-run-rush.js check
 
 build-environments:
-  extends: .base
+  extends: 
+    - .base
   stage: build
   only:
     changes:
@@ -58,7 +61,8 @@ build-environments:
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
 
 build-swb-app:
-  extends: .base
+  extends: 
+    - .base
   stage: build
   only:
     changes:
@@ -69,7 +73,8 @@ build-swb-app:
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
 
 build-swb-reference:
-  extends: .base
+  extends: 
+    - .base
   stage: build
   only:
     changes:
