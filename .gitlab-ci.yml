@@ -39,16 +39,16 @@ cache:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 
 rush-check:
-  stage: .pre
   extends: .base
+  stage: .pre
   script:
     - npm config list
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
 
 build-environments:
-  stage: build
   extends: .base
+  stage: build
   only:
     changes:
       - "**/environments/**/*"
@@ -58,8 +58,8 @@ build-environments:
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
 
 build-swb-app:
-  stage: build
   extends: .base
+  stage: build
   only:
     changes:
       - "**/swb-app/**/*"
@@ -69,8 +69,8 @@ build-swb-app:
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
 
 build-swb-reference:
-  stage: build
   extends: .base
+  stage: build
   only:
     changes:
       - "**/swb-reference/**/*" 
