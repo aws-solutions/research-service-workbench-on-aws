@@ -10,7 +10,6 @@ variables:
   CODEARTIFACT_REPO_NAME: 'dmmadse-test'
   REGION: 'us-west-2'
   CODEARIFACT_PACKAGE_FORMAT: 'npm'
-  # PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
   APK_CACHE_DIR: $CI_PROJECT_DIR/.cache/apk
   PIP_PACKAGES:
     awscli
@@ -35,7 +34,8 @@ codeartifactlogin:
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
     # - apk add py3-pip
     # - apk add bash
-    - which bash
+    - ls -lrt /bin
+    - pwd
     - pip3 install $PIP_PACKAGES
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
