@@ -1,8 +1,8 @@
 image: node:14-alpine
 
 include:
-  template: Security/SAST.gitlab-ci.yml
-  
+  template: Jobs/SAST.gitlab-ci.yml
+
 stages:
   - .pre
   - build
