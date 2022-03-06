@@ -32,6 +32,7 @@ codeartifactlogin:
     - mkdir -p $APK_CACHE_DIR
     - apk update
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
+    - ls -lrt $APK_CACHE_DIR && ls -la $CI_PROJECT_DIR
     # - apk add py3-pip
     # - apk add bash
     - ls -lrt /bin
