@@ -34,8 +34,7 @@ codeartifactlogin:
     - apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
     - pip3 install $PIP_PACKAGES
     - aws --version
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-    # - node common/scripts/install-run-rush.js update
+    # - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
 
 scanAndCheck:
   stage: build
@@ -45,7 +44,7 @@ scanAndCheck:
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
 
-build:
+build-environments:
   stage: build
   only:
     changes:
@@ -54,6 +53,26 @@ build:
     - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
+
+build-swb-app:
+  stage: build
+  only:
+    changes:
+      - "**/swb-app/**/*"
+  script:
+    - node common/scripts/install-run-rush.js update
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
+
+build-swb-reference:
+  stage: build
+  only:
+    changes:
+      - "**/swb-app/**/*"
+  script:
+    - node common/scripts/install-run-rush.js update
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
 
 include:
   template: Jobs/SAST.gitlab-ci.yml
