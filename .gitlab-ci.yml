@@ -35,7 +35,7 @@ cache:
     #- apk update
     #- apk add --cache-dir $APK_CACHE_DIR $APK_PACKAGES
     #- pip3 install --cache-dir $PIP_CACHE_DIR $PIP_PACKAGES
-    - awsv2 codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     # - npm config list
 
 rush-check:
