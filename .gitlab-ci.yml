@@ -15,7 +15,7 @@ variables:
 codeartifactlogin:
   stage: .pre
   script:
-    - npm install -g aws-cli
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js update
  
