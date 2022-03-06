@@ -3,7 +3,7 @@ image: node:14-alpine
 stages:
   - .pre
   - build
-  - test
+  # - test
 
 variables:
   CODEARTIFACT_DOMAIN_NAME: 'amazon'
@@ -59,13 +59,15 @@ build:
     changes:
       - "**/environments/**/*"
   script:
+    - node common/scripts/install-run-rush.js update
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
-
-test:
-  stage: test
-  only:
-    changes:
-      - "**/environments/**/*"
-  script:  
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
+
+# test:
+#   stage: test
+#   only:
+#     changes:
+#       - "**/environments/**/*"
+#   script:  
+#     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
  
