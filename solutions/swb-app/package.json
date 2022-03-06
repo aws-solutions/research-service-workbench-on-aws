@@ -1,0 +1,38 @@
+{
+  "name": "@amzn/swb-app",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "start": "heft start --clean",
+    "serve": "node lib/dev-launch.js",
+    "_phase:build": "heft build --clean"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "~3.27.1",
+    "fastify-plugin": "^3.0.1",
+    "fastify-autoload": "^3.11.0",
+    "fastify-sensible": "^3.1.2",
+    "@amzn/environments": "workspace:*"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@types/node": "^12",
+    "concurrently": "^7.0.0",
+    "nodemon": "^2.0.15",
+    "typescript": "~4.5.2",
+    "eslint": "~8.7.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3"
+  }
+}

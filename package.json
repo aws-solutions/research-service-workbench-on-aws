@@ -1,0 +1,25 @@
+{
+  "name": "@amzn/ma-mono",
+  "version": "0.1.0",
+  "description": "NOT NEEDED JUST HERE TO KEEP BRAZIL HAPPY",
+  "author": "",
+  "license": "UNLICENSED",
+  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "scripts": {
+    "build": "rush build",
+    "prepublishOnly": "rush update && rush build"
+  },
+  "dependencies": {
+    "@microsoft/rush": "^5.62.1",
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "pnpm": "6.30.0"
+  },
+  "files": [],
+  "npm-pretty-much": {
+    "runTest": "never",
+    "ciBuild": "always"
+  }
+}

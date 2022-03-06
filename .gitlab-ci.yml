@@ -1,0 +1,14 @@
+image: node:latest
+stages:
+  - .pre
+  - build
+  - test
+code-artifact-login:
+  stage: .pre
+  only:
+  - main
+  script:
+    - npm install -g aws-cli
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - node common/scripts/install-run-rush.js update
+ 

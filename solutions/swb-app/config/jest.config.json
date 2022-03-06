@@ -1,0 +1,12 @@
+{
+  "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
+  "collectCoverage": true,
+  "coverageThreshold": {
+    "global": {
+      "branches": 0,
+      "functions": 70,
+      "lines": 70,
+      "statements": 70
+    }
+  }
+}

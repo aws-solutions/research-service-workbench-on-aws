@@ -1,0 +1,28 @@
+version: 0.2
+env:
+  variables:
+    CODEARTIFACT_PACKAGE_REGISTRY: "amazon-${CODEARTIFACT_DOMAIN_OWNER}.d.codeartifact.${REGION}.amazonaws.com/${CODEARIFACT_PACKAGE_FORMAT}/${CODEARTIFACT_REPO_NAME}/"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - git config --global credential.helper '!aws codecommit credential-helper $@'
+      - git config --global credential.UseHttpPath true
+  pre_build:
+    commands:
+      - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+      - 'CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain amazon --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --query authorizationToken --output text`'
+      - git checkout ${CODECOMMIT_BRANCH_NAME}
+      - node common/scripts/install-run-rush.js update
+  build:
+    commands:
+      - |
+        publish_param="--publish"
+        publish_cmd="--add-commit-details --apply --registry https://${CODEARTIFACT_PACKAGE_REGISTRY} --npm-auth-token ${CODEARTIFACT_AUTH_TOKEN} --add-commit-details --ignore-git-hooks --include-all"
+        if [ ${PUBLISH_FLAG} = true ]; then
+          publish_cmd="${publish_cmd} ${publish_param}"
+        fi
+        node common/scripts/install-run-rush.js publish ${publish_cmd}
+

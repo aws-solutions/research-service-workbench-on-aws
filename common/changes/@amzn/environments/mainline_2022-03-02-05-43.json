@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/environments",
+      "comment": "test changes",
+      "type": "none"
+    }
+  ],
+  "packageName": "@amzn/environments"
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@amzn/swb-reference-lambda",
+  "version": "0.0.1",
+  "description": "Lambdas to do CRUD operations on DynamoDB",
+  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "_phase:build": "heft build --clean"
+  },
+  "dependencies": {
+    "@amzn/swb-app": "workspace:*",
+    "aws-sdk": "^2.617.0",
+    "aws-lambda-fastify": "~2.1.0"
+  },
+  "devDependencies": {
+    "aws-lambda": "^1.0.7",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@types/node": "^12",
+    "@types/aws-lambda": "~8.10.92",
+    "typescript": "~4.5.2",
+    "eslint": "~8.7.0"
+  }
+}

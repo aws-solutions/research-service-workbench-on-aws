@@ -1,0 +1,17 @@
+{
+  "cacheVersion": "8.7.0_90b70d38551e7ad5a0a6b2735d550e8c8d8e148a",
+  "fileVersions": [
+    [
+      "greeter.ts",
+      ""
+    ],
+    [
+      "greeter.test.ts",
+      ""
+    ],
+    [
+      "index.ts",
+      ""
+    ]
+  ]
+}

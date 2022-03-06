@@ -1,0 +1,118 @@
+// DO NOT ADD COMMENTS IN THIS FILE.  They will be lost when the Rush tool resaves it.
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
+  "packages": [
+    {
+      "name": "@amzn/environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/jest-reporter",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/swb-app",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/eslint-config",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft-jest-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-node-rig",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "aws-cdk",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "aws-cdk-lib",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "aws-lambda",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "aws-lambda-fastify",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "aws-sdk",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "concurrently",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "constructs",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "esbuild",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "fastify",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-autoload",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-cli",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-sensible",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-tsconfig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "swb-app",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "tap",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-node",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "typescript",
+      "allowedCategories": [ "production", "prototypes" ]
+    }
+  ]
+}

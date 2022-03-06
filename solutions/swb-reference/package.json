@@ -1,0 +1,43 @@
+{
+  "name": "@amzn/swb-reference",
+  "version": "0.0.5",
+  "author": "rsmayda <smayda44@gmail.com>",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "private": true,
+  "scripts": {
+    "build": "heft build --clean",
+    "test": "heft test --clean",
+    "_phase:build": "heft build --clean",
+    "cdk": "cdk",
+    "package": "cd lambda && npm install && cd .. && cdk synth",
+    "cdk:synth": "rushx package",
+    "cdk-synth": "rushx cdk-build && cdk synth",
+    "cdk-deploy": "rushx cdk-build && cdk deploy --all"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.0.0",
+    "constructs": "^10.0.0",
+    "@amzn/swb-app": "workspace:*",
+    "aws-sdk": "^2.617.0",
+    "aws-lambda-fastify": "~2.1.0"
+  },
+  "devDependencies": {
+    "aws-lambda": "^1.0.7",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@types/node": "^12",
+    "typescript": "~4.5.2",
+    "eslint": "~8.7.0",
+    "aws-cdk": "*",
+    "esbuild": "*",
+    "ts-node": "^10.4.0",
+    "@types/aws-lambda": "~8.10.92",
+    "@rushstack/heft-jest-plugin": "^0.2.3"
+  }
+}

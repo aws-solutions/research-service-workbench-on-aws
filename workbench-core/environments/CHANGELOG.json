@@ -1,0 +1,197 @@
+{
+  "name": "@amzn/environments",
+  "entries": [
+    {
+      "version": "0.0.22",
+      "tag": "@amzn/environments_v0.0.22",
+      "date": "Tue, 01 Mar 2022 20:45:39 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.21",
+      "tag": "@amzn/environments_v0.0.21",
+      "date": "Tue, 01 Mar 2022 19:22:29 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.20",
+      "tag": "@amzn/environments_v0.0.20",
+      "date": "Tue, 01 Mar 2022 19:08:02 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.19",
+      "tag": "@amzn/environments_v0.0.19",
+      "date": "Tue, 01 Mar 2022 17:55:24 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.18",
+      "tag": "@amzn/environments_v0.0.18",
+      "date": "Tue, 01 Mar 2022 08:04:00 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.17",
+      "tag": "@amzn/environments_v0.0.17",
+      "date": "Tue, 01 Mar 2022 07:23:55 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.16",
+      "tag": "@amzn/environments_v0.0.16",
+      "date": "Tue, 01 Mar 2022 07:07:25 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.15",
+      "tag": "@amzn/environments_v0.0.15",
+      "date": "Tue, 01 Mar 2022 06:13:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.14",
+      "tag": "@amzn/environments_v0.0.14",
+      "date": "Tue, 01 Mar 2022 04:44:55 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.13",
+      "tag": "@amzn/environments_v0.0.13",
+      "date": "Tue, 01 Mar 2022 00:09:24 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.12",
+      "tag": "@amzn/environments_v0.0.12",
+      "date": "Mon, 28 Feb 2022 23:11:30 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.11",
+      "tag": "@amzn/environments_v0.0.11",
+      "date": "Mon, 28 Feb 2022 19:57:50 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.10",
+      "tag": "@amzn/environments_v0.0.10",
+      "date": "Sun, 27 Feb 2022 23:02:19 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.9",
+      "tag": "@amzn/environments_v0.0.9",
+      "date": "Sun, 27 Feb 2022 21:19:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test change"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.8",
+      "tag": "@amzn/environments_v0.0.8",
+      "date": "Sun, 27 Feb 2022 21:01:42 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "version update"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.0.7",
+      "tag": "@amzn/environments_v0.0.7",
+      "date": "Sun, 27 Feb 2022 20:05:07 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "patch update test"
+          }
+        ]
+      }
+    }
+  ]
+}
