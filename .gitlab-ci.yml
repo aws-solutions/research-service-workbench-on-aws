@@ -16,7 +16,6 @@ variables:
   APK_PACKAGES:
     python3
     py3-pip
-    bash
     
 cache:
   key: one-key-to-rule-them-all
@@ -36,7 +35,7 @@ codeartifactlogin:
     - ls -lrt $APK_CACHE_DIR && ls -la $CI_PROJECT_DIR
     # - apk add py3-pip
     # - apk add bash
-    - pwd && ls -la 
+    - pwd && ls -la /bin
     - pip3 install $PIP_PACKAGES
     - aws --version
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
@@ -45,7 +44,8 @@ codeartifactlogin:
 build:
   stage: build
   script:
-    - pwd && ls -la 
+    - apk add --cache-dir $APK_CACHE_DIR bash
+    - pwd && ls -la /bin
     - node common/scripts/install-run-rush.js git-secrets-scan
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
