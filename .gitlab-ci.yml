@@ -1,5 +1,23 @@
 image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli:latest
 
+variables:
+  PACKAGE_NAME: ''
+
+workflow:
+  rules:
+    - changes:
+      - "**/environments/**/*"
+      variables:
+        PACKAGE_NAME: 'environments'
+    - changes:
+      - "**/swb-app/**/*"
+      variables:
+        PACKAGE_NAME: 'swb-app'
+    - changes:
+      - "**/swb-reference/**/*"
+      variables:
+        PACKAGE_NAME: 'swb-reference'
+
 stages:
   - .pre
   - build
@@ -20,38 +38,17 @@ rush-check:
     - node common/scripts/install-run-rush.js check
     
 
-build-environments:
+build:
   extends: 
     - .base
-  stage: build
   rules:
-    - changes:
-      - "**/environments/**/*"
-  script:
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
-
-build-swb-app:
-  extends: 
-    - .base
+    - if: $PACKAGE_NAME
+      when: on_success
   stage: build
-  rules:
-    - changes:
-      - "**/swb-app/**/*"
   script:
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
-
-build-swb-reference:
-  extends: 
-    - .base
-  stage: build
-  rules:
-    - changes:
-      - "**/swb-reference/**/*" 
-  script:
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
+    - echo "Building package ${PACKAGE_NAME}"
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
 
 include:
   template: Jobs/SAST.gitlab-ci.yml
