@@ -46,9 +46,7 @@ build:
   extends: 
     - .base
   rules:
-    - if: $PACKAGE_NAME
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH =~ /^feature/'
+    - if: $PACKAGE_NAME && '$CI_COMMIT_BRANCH =~ /^feature/'
       when: on_success
   stage: build
   script:
@@ -60,7 +58,7 @@ build_main_branch:
   extends: 
     - .base
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME != $CI_DEFAULT_BRANCH'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
       when: on_success
   stage: build
   script:
