@@ -60,8 +60,6 @@ build_main_branch:
   rules:
     - if: $CI_PIPELINE_SOURCE && \
           $CI_MERGE_REQUEST_TARGET_BRANCH_NAME && \
-          $CI_PIPELINE_SOURCE == 'merge_request_event' && \
-          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
       when: on_success
   stage: build
   script:
