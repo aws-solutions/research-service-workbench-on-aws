@@ -11,7 +11,8 @@ stages:
     - apk add groff
     - aws help && aws codeartifact help 
     - env
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - echo $AWS_REGION
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region $REGION --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
 
 rush-check:
