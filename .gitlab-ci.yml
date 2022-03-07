@@ -49,6 +49,8 @@ feature:
   rules:
     - if: $PACKAGE_NAME && '$CI_COMMIT_BRANCH =~ /^feature/'
       when: on_success
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: never
   stage: build
   script:
     - echo "Building package ${PACKAGE_NAME}"
