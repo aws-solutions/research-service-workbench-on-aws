@@ -6,21 +6,23 @@ variables:
 workflow:
   rules:
     - changes:
-      - "*/environments/**/*"
+      - "*/environments/**/*.ts"
       variables:
         PACKAGE_NAME: 'environments'
     - changes:
-      - "*/swb-app/**/*"
+      - "*/swb-app/**/*.ts"
       variables:
         PACKAGE_NAME: 'swb-app'
     - changes:
-      - "*/swb-reference/**/*"
+      - "*/swb-reference/**/*.ts"
       variables:
         PACKAGE_NAME: 'swb-reference'
     - changes:
-      - "*/swb-reference/lambda/**/*"
+      - "*/swb-reference/lambda/**/*.ts"
       variables:
         PACKAGE_NAME: 'swb-reference/lambda'
+    - changes:
+      - "*"
 
 stages:
   - .pre
@@ -42,12 +44,11 @@ rush-check:
     - node common/scripts/install-run-rush.js check
     - env
     
-
 feature:
   extends: 
     - .base
   rules:
-    - if: $PACKAGE_NAME && '$CI_COMMIT_BRANCH =~ /^feature/' && $CI_PIPELINE_SOURCE == 'push'
+    - if: $PACKAGE_NAME =~ /^./ && $CI_COMMIT_BRANCH =~ /^feature/ && $CI_PIPELINE_SOURCE == 'push'
       when: on_success
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: never
@@ -61,9 +62,9 @@ main:
   extends: 
     - .base
   rules:
-    - if: $CI_PIPELINE_SOURCE && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME && $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE =~ /^./ && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^./ && $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: on_success
-    - if: $CI_COMMIT_BRANCH == 'main'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
   stage: build
   script:
