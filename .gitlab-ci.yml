@@ -54,15 +54,9 @@ build:
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
 
-build main branch:
+main:
   extends: 
     - .base
-  rules:
-    - if: $CI_PIPELINE_SOURCE && \
-          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME && \
-          $CI_PIPELINE_SOURCE == 'merge_request_event' && \
-          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
-      when: on_success
   stage: build
   script:
     - echo "Build all packages"
