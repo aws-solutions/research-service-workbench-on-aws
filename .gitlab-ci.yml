@@ -9,6 +9,7 @@ stages:
   before_script:
     - aws --version
     - apk add groff
+    - aws help && aws codeartifact help
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
 
