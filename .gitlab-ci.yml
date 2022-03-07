@@ -7,12 +7,7 @@ stages:
 
 .base:
   before_script:
-    - aws --version
-    - apk add groff
-    - aws help && aws codeartifact help 
-    - env
-    - echo $AWS_REGION
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region 'us-west-2' --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
 
 rush-check:
