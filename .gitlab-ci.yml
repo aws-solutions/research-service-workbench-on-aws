@@ -57,10 +57,6 @@ build:
 build_main_branch:
   extends: 
     - .base
-  rules:
-    - if: $CI_PIPELINE_SOURCE && \
-          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME && \
-      when: on_success
   stage: build
   script:
     - echo "Build all packages"
