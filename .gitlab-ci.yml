@@ -58,13 +58,16 @@ build_main_branch:
   extends: 
     - .base
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
+    - if: $CI_PIPELINE_SOURCE && \
+          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME && \
+          $CI_PIPELINE_SOURCE == 'merge_request_event' && \
+          $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH'
       when: on_success
   stage: build
   script:
     - echo "Build all packages"
     - node common/scripts/install-run-rush.js build -v
-    - node common/scripts/install-run-rush.js test-v
+    - node common/scripts/install-run-rush.js test -v
 
 include:
   template: Jobs/SAST.gitlab-ci.yml
