@@ -1,5 +1,23 @@
 image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli:latest
 
+variables:
+  PACKAGE_NAME: ''
+
+workflow:
+  rules:
+    - changes:
+      - "**/environments/**/*"
+      variables:
+        PACKAGE_NAME: 'environments'
+    - changes:
+      - "**/swb-app/**/*"
+      variables:
+        PACKAGE_NAME: 'swb-app'
+    - changes:
+      - "**/swb-reference/**/*"
+      variables:
+        PACKAGE_NAME: 'swb-reference'
+
 stages:
   - .pre
   - build
@@ -9,6 +27,7 @@ stages:
   before_script:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
+    - node common/scripts/install-run-rush.js update
 
 rush-check:
   extends: 
@@ -17,42 +36,16 @@ rush-check:
   script:
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
+    
 
 build-environments:
   extends: 
     - .base
   stage: build
-  only:
-    changes:
-      - "**/environments/**/*"
   script:
-    - node common/scripts/install-run-rush.js update
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/environments" -v
+    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
+    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
 
-build-swb-app:
-  extends: 
-    - .base
-  stage: build
-  only:
-    changes:
-      - "**/swb-app/**/*"
-  script:
-    - node common/scripts/install-run-rush.js update
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-app" -v
-
-build-swb-reference:
-  extends: 
-    - .base
-  stage: build
-  only:
-    changes:
-      - "**/swb-reference/**/*" 
-  script:
-    - node common/scripts/install-run-rush.js update
-    - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
-    - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/swb-reference" -v
 
 include:
   template: Jobs/SAST.gitlab-ci.yml
