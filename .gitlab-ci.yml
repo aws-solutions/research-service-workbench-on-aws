@@ -38,9 +38,11 @@ rush-check:
     - node common/scripts/install-run-rush.js check
     
 
-build-environments:
+build-${PACKAGE_NAME}:
   extends: 
     - .base
+  rules:
+    - if: ${PACKAGE_NAME} != ''
   stage: build
   script:
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
