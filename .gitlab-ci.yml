@@ -42,8 +42,8 @@ build:
   extends: 
     - .base
   rules:
-    - if: $PACKAGE_NAME == ''
-      when: never
+    - if: $PACKAGE_NAME
+      when: on_success
   stage: build
   script:
     - echo "Building package ${PACKAGE_NAME}"
