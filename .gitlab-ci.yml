@@ -38,13 +38,14 @@ rush-check:
     - node common/scripts/install-run-rush.js check
     
 
-build-${PACKAGE_NAME}:
+build:
   extends: 
     - .base
   rules:
     - if: ${PACKAGE_NAME} != ''
   stage: build
   script:
+    - echo "Building package ${PACKAGE_NAME}"
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
 
