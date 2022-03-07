@@ -17,6 +17,10 @@ workflow:
       - "**/swb-reference/**/*"
       variables:
         PACKAGE_NAME: 'swb-reference'
+    - changes:
+      - "**/swb-reference/lambda/**/*"
+      variables:
+        PACKAGE_NAME: 'swb-reference/lambda'
 
 stages:
   - .pre
@@ -36,13 +40,14 @@ rush-check:
   script:
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
+    - env
     
 
-build:
+feature:
   extends: 
     - .base
   rules:
-    - if: $PACKAGE_NAME
+    - if: $PACKAGE_NAME && '$CI_COMMIT_BRANCH =~ /^feature/'
       when: on_success
   stage: build
   script:
@@ -50,6 +55,19 @@ build:
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
 
+main:
+  extends: 
+    - .base
+  rules:
+    - if: $CI_PIPELINE_SOURCE && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: on_success
+  stage: build
+  script:
+    - echo "Build all packages"
+    - node common/scripts/install-run-rush.js build -v
+    - node common/scripts/install-run-rush.js test -v
 
 include:
   template: Jobs/SAST.gitlab-ci.yml
