@@ -6,19 +6,19 @@ variables:
 workflow:
   rules:
     - changes:
-      - "**/environments/**/*"
+      - "*/environments/**/*"
       variables:
         PACKAGE_NAME: 'environments'
     - changes:
-      - "**/swb-app/**/*"
+      - "*/swb-app/**/*"
       variables:
         PACKAGE_NAME: 'swb-app'
     - changes:
-      - "**/swb-reference/**/*"
+      - "*/swb-reference/**/*"
       variables:
         PACKAGE_NAME: 'swb-reference'
     - changes:
-      - "**/swb-reference/lambda/**/*"
+      - "*/swb-reference/lambda/**/*"
       variables:
         PACKAGE_NAME: 'swb-reference/lambda'
 
