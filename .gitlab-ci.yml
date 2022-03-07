@@ -40,6 +40,7 @@ rush-check:
   script:
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
+    - env
     
 
 feature:
@@ -53,7 +54,6 @@ feature:
     - echo "Building package ${PACKAGE_NAME}"
     - node common/scripts/install-run-rush.js build --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
     - node common/scripts/install-run-rush.js test --to "@${CODEARTIFACT_NAMESPACE}/${PACKAGE_NAME}" -v
-    - env
 
 main:
   extends: 
