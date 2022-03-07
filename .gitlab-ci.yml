@@ -42,7 +42,8 @@ build:
   extends: 
     - .base
   rules:
-    - if: ${PACKAGE_NAME} =~ /^./'
+    - if: ${PACKAGE_NAME} == ''
+      when: never
   stage: build
   script:
     - echo "Building package ${PACKAGE_NAME}"
