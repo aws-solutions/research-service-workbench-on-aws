@@ -1,11 +1,5 @@
 image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli:latest
 
-workflow:
-  rules:
-    - changes:
-      - "*/**/*"
-      - "*"
-
 stages:
   - .pre
   - build
@@ -20,81 +14,20 @@ stages:
 rush-check:
   extends: 
     - .base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: on_success
   stage: .pre
   script:
     # Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
     - node common/scripts/install-run-rush.js check
     - env
 
-.feature-base:
-  script:
-    - echo "Building package $PACKAGE_NAME"
-    - node common/scripts/install-run-rush.js build --from "@$CODEARTIFACT_NAMESPACE/$PACKAGE_NAME" -v
-    - node common/scripts/install-run-rush.js test --from "@$CODEARTIFACT_NAMESPACE/$PACKAGE_NAME" -v
-
-feature-environment:
-  extends: 
-    - .base
-    - .feature-base
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: never
-    - changes:
-      - "*/environments/**/*.ts"
-      variables:
-        PACKAGE_NAME: 'environments'
-      when: on_success
-  stage: build
-
-feature-swb-app:
-  extends: 
-    - .base
-    - .feature-base
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: never
-    - changes:
-      - "*/swb-app/**/*.ts"
-      variables:
-        PACKAGE_NAME: 'swb-app'
-      when: on_success
-  stage: build
-
-feature-swb-reference:
-  extends: 
-    - .base
-    - .feature-base
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: never
-    - changes:
-      - "*/swb-reference/**/*.ts"
-      variables:
-        PACKAGE_NAME: 'swb-reference'
-      when: on_success
-  stage: build
-
-feature-swb-reference-lambda:
-  extends: 
-    - .base
-    - .feature-base
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: never
-    - changes:
-      - "*/swb-reference/lambda/**/*.ts"
-      variables:
-        PACKAGE_NAME: 'swb-reference/lambda'
-      when: on_success
-  stage: build
-
-main:
+build-and-test:
   extends: 
     - .base
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: on_success
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: on_success
   stage: build
   script:
