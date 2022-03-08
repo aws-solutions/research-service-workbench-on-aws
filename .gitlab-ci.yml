@@ -3,7 +3,8 @@ image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli:latest
 workflow:
   rules:
     - changes:
-        - "*"
+      - "*/**/*"
+      - "*"
 
 stages:
   - .pre

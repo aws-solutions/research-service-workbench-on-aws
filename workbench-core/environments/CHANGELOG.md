@@ -1,5 +1,4 @@
 # Change Log - @amzn/environments
-
 This log was last generated on Tue, 01 Mar 2022 20:45:39 GMT and should not be manually modified.
 
 ## 0.0.22
