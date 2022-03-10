@@ -36,7 +36,7 @@ are of the same version throughout the repository.)
 10. If the above commands are successful, you can push your changes: 
     > `git add <updated files>; git commit -m "<Your commit message>"; git push`
 11. Git-hooks:
-    - Pre-commit git-hook: prettier is configured to automatically format your code on commit. Additionally, if you want to format your code manually you can just do: 
+    - Pre-commit git-hook: Prettier is configured to automatically format your code on commit. Additionally, if you want to format your code manually you can just do: 
         > `git add <updated files>; rush prettier`
 
     - A check has been added for commit messages: `The message must contain at least 3 words`
@@ -48,13 +48,13 @@ are of the same version throughout the repository.)
     - Add reviewers ([See limitations](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo#temp:C:XHKd59c38e62a0c4e2c94800bcf7)).
     
 2. Opening a Merge Request triggers build with 2 stages:
-    - rush_build_and_test** ([Reference](https://rushjs.io/pages/maintainer/enabling_ci_builds/))
+    - **build-and-test** ([Reference](https://rushjs.io/pages/maintainer/enabling_ci_builds/))
         - `Performs AWS CodeArtifact Login` we are using codeArtifact to download NPM packages
         - > `rush install` (you will notice that we are using `rush install` instead of `rush update` here. The difference is that `rush install` won't update any files. Instead, it will fail your MR build if something is out of date, to let you know that you forgot to run `rush update` or forgot to commit the result)
         - > `rush check`
         - > `rush rebuild`
         - > `rush test`
-    - **test** - Performs security scanning:
+    - **secret-scan** - Performs security scanning:
         - [Container-Scanning](https://docs.gitlab.com/ee/user/application_security/container_scanning/)
         - [SAST](https://docs.gitlab.com/ee/user/application_security/sast/)
         - [Secret-Detection](https://docs.gitlab.com/ee/user/application_security/secret_detection/)

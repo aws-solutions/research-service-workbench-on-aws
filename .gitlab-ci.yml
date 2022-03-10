@@ -1,8 +1,8 @@
-image: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli-git:latest
+image: $CI_REGISTRY_IMAGE/node14-awscli-git:latest
 
 stages:
-  - rush_build_and_test
-  - test
+  - build-and-test
+  - secret-scan
 
 .base:
   script:
@@ -22,7 +22,7 @@ build-and-test:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: on_success
-  stage: rush_build_and_test
+  stage: build-and-test
 
 include:
   - template: Security/Container-Scanning.gitlab-ci.yml
@@ -32,86 +32,43 @@ include:
   - template: Jobs/License-Scanning.gitlab-ci.yml
 
 # Overrides for Security and Jobs templates to run during merge request
+container_scanning:
+  stage: secret-scan
+  rules: 
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  variables:
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE/node14-awscli-git:latest
+
 license_scanning:
-  script:
-    - /run.sh analyze .
-  rules:
+  stage: secret-scan
+  rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
+sast:
+  stage: secret-scan
+
 eslint-sast:
-  script: 
-    - /analyzer run
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 nodejs-scan-sast:
-  script: 
-    - /analyzer run
-  rules: 
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
-secret_detection:
-  script:
-    - if [ -n "$CI_COMMIT_TAG" ]; then echo "Skipping Secret Detection for tags. No code changes have occurred."; exit 0; fi
-    # Historic scan
-    - |
-      if [ "$SECRET_DETECTION_HISTORIC_SCAN" == "true" ]
-      then
-        echo "historic scan"
-        git fetch --unshallow origin $CI_COMMIT_REF_NAME
-        /analyzer run
-        exit
-      fi
-    # Default branch scan
-    - if [ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]; then echo "Running Secret Detection on default branch."; /analyzer run; exit; fi
-    # Push event
-    - |
-      if [ "$CI_COMMIT_BEFORE_SHA" == "0000000000000000000000000000000000000000" ];
-      then
-        # first commit on a new branch
-        echo ${CI_COMMIT_SHA} >${CI_COMMIT_SHA}_commit_list.txt
-        git fetch --depth=2 origin $CI_COMMIT_REF_NAME
-      else
-        # determine commit range so that we can fetch the appropriate depth
-        # check the exit code to determine if we need to limit the commit_list.txt to CI_COMMIT_SHA.
-        if ! git log --no-merges --pretty=format:"%H" ${CI_COMMIT_BEFORE_SHA}..${CI_COMMIT_SHA} >${CI_COMMIT_SHA}_commit_list.txt;
-        then
-          echo "unable to determine commit range, limiting to ${CI_COMMIT_SHA}"
-          echo ${CI_COMMIT_SHA} >${CI_COMMIT_SHA}_commit_list.txt
-        else
-          # append newline to to list since `git log` does not end with a
-          # newline, this is to keep the log messages consistent
-          echo >> ${CI_COMMIT_SHA}_commit_list.txt
-        fi
-
-        # we need to extend the git fetch depth to the number of commits + 1 for the following reasons:
-        # to include the parent commit of the base commit in this MR/Push event. This is needed because
-        # `git diff -p` needs something to compare changes in that commit against
-        git fetch --depth=$(($(wc -l <${CI_COMMIT_SHA}_commit_list.txt) + 1)) origin $CI_COMMIT_REF_NAME
-      fi
-      echo "scanning $(($(wc -l <${CI_COMMIT_SHA}_commit_list.txt))) commits for a push event"
-      export SECRET_DETECTION_COMMITS_FILE=${CI_COMMIT_SHA}_commit_list.txt
-    - /analyzer run
-    - rm "$CI_COMMIT_SHA"_commit_list.txt
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 semgrep-sast:
-  script:
-    - /analyzer run
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+.secret-analyzer:
+  stage: secret-scan
+    
+secret_detection:
+  rules: 
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+iac-sast:
+  stage: secret-scan
 
 kics-iac-sast:
-  script:
-    - /analyzer run
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-
-container_scanning:
-  script:
-    - gtcs scan
-  rules: 
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  variables:
-    DOCKER_IMAGE: registry.gitlab.aws.dev/ma-foundation/ma-mono/node14-awscli-git:latest

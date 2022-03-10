@@ -18,8 +18,8 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "ssh://git.amazon.com:2222/pkg/Ma-mono",
-    "defaultBranch": "mainline"
+    "url": "git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git",
+    "defaultBranch": "main"
   },
   "eventHooks": {
     "preRushInstall": [],

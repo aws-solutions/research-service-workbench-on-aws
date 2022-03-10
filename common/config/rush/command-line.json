@@ -167,26 +167,6 @@
     //   // "autoinstallerName": "my-task"
     // }
     {
-      "name": "git-secrets-scan",
-      "commandKind": "global",
-      "summary": "Used to perform a git-secrets scan on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "/bin/bash bin/git-secrets-scan.sh"
-    },{
-      "name": "viperlight-scan",
-      "commandKind": "global",
-      "summary": "Used to perform a viperlight scan on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "/bin/bash bin/viperlight-scan.sh"
-    },
-    {
-      "name": "rush-repo-url-update",
-      "commandKind": "global",
-      "summary": "Used to update the repo URL, Keep GitFarm url in local rush.json and CodeCommit url on git commit ",
-      "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "./bin/rush-repo-url-update.sh"
-    },
-    {
       "name": "test",
       "commandKind": "bulk",
       "summary": "Used to perform a tests on the packages",
@@ -216,38 +196,6 @@
    * For example, you might define a "--production" parameter for the "rush build" command.
    */
   "parameters": [
-    {
-      "parameterKind": "flag",
-      "longName": "--staged",
-      "shortName": "-s",
-      "description": "Run git-secret scan only on staged files",
-      "associatedCommands": ["git-secrets-scan"]
-    },
-    {
-      "parameterKind": "choice",
-      "longName": "--url",
-      "shortName": "-u",
-      "description": "Repo URL to update",
-      "associatedCommands": ["rush-repo-url-update"],
-      "required": true,
-      "alternatives": [
-        {
-          "name": "ssh://git.amazon.com:2222/pkg/Ma-mono",
-          "description": "local-url(GitFarm)"
-        },
-        {
-          "name": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/Ma-mono",
-          "description": "url-to-commit(CodeCommit)"
-        }
-      ]
-    },
-    {
-      "parameterKind": "flag",
-      "longName": "--add",
-      "shortName": "-a",
-      "description": "git add rush.json",
-      "associatedCommands": ["rush-repo-url-update"]
-    }
     // {
     //   /**
     //    * (Required) Determines the type of custom parameter.
