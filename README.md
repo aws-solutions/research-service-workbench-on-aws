@@ -7,53 +7,58 @@ Please read through this document before submitting any issues or pull requests 
 ## Code development and testing
 
 ### Prerequisites for development
-Code for Ma-Mono is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly
 
-> https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461
+Code for Ma-Mono is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+
+This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
 [Ma-mono](https://gitlab.aws.dev/ma-foundation/ma-mono) is hosted on Gitlab ([Decision: Repository for Monorepo](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo)). In order to start developement please follow the below steps:
+
 1. [Join MA-Foundation Group](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HJoiningaTeamGroup) in [GitLab](https://gitlab.aws.dev/ma-foundation)
 2. [Setup git access](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HSettingupgitAccess)
-3. Clone the repo: 
-    > `git clone git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git`
+3. Clone the repo: `git clone git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git`
+4. Move to the correct directory: `cd ma-mono`
+5. Install rush: `npm install -g @microsoft/rush`
+6. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as needed
 
-This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager.
+### Local Development Flow
 
-Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
+1. Set up your repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
+2. Create a feature branch from main: `git pull; git checkout -b feature/<feature>`
+3. Run: [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependenciesare of the same version throughout the repository.
+4. Run:
+   1. [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
+   2. [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
+5. Run tests: `rush test` - See `rush test -h` for more options
 
-### Local Developer Usecase
-1. Clone the repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
-2. cd ma-mono
-3. Create a feature branch from main: 
-    > `git pull; git checkout -b feature/xxx`
-4. > `npm install -g @microsoft/rush`
-5. > [rush update](https://rushjs.io/pages/commands/rush_update/) (Install NPM packages as needed)
-6. Make changes to the package you are working on 
-7. > [rush check](https://rushjs.io/pages/commands/rush_check/) (Checks each project's package.json files and ensures that all dependencies
-are of the same version throughout the repository.)
-8. > [rush build](https://rushjs.io/pages/commands/rush_build/) (performs incremental build) See `rush build -h` for more options or [rush rebuild](https://rushjs.io/pages/commands/rush_rebuild/) (performs a full clean build) See `rush rebuild -h` for more options
-9. > `rush test` See `rush test -h` for more options
-10. If the above commands are successful, you can push your changes: 
-    > `git add <updated files>; git commit -m "<Your commit message>"; git push`
-11. Git-hooks:
-    - Pre-commit git-hook: Prettier is configured to automatically format your code on commit. Additionally, if you want to format your code manually you can just do: 
-        > `git add <updated files>; rush prettier`
+### Merge Request Flow
 
+1. Make changes locally ([Follow Local Development Flow](#Local-Development-Flow))
+2. Ensure you are on a feature branch; from `main` branch: `git pull; git checkout -b feature/<feature>`
+3. If you are happy with your code and they are passing tests, you can push your changes to your feature branch: `git add -A; git commit -m "<Your commit message>"; git push`
+4. We have pre-commit git-hooks. These are used to inspect the snapshot that's about to be committed, to see if you've forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. We currently support:
+    - prettier is configured to automatically format your code on commit. Additionally, if you want to format your code manually you can just do: `rush prettier`
     - A check has been added for commit messages: `The message must contain at least 3 words`
-12. Builds are not triggered on push, instead builds are triggered when you open a Merge Request. Please refer the [Contributing via Merge Requests](#contributing-via-merge-requests) section
+5. Further checks are triggered on a Merge Request. Please refer the [Merge Requests Process](#merge-requests-process) section for how to manage the MR on GitLab
 
-## Contributing via Merge Requests
+## Merge Requests Process
 
 1. Open a Merge Request in GitLab:
+    - Go to [create new MR](https://gitlab.aws.dev/ma-foundation/ma-mono/-/merge_requests/new)
+    - For the source branch select your recently pushed feature branch
+    - As your target branch choose `main`
+    - Choose a proper title
+    - Choose a proper description
+    - Assign yourself as the assignee
     - Add reviewers ([See limitations](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo#temp:C:XHKd59c38e62a0c4e2c94800bcf7)).
-    
+    - Click `Create merge request`
 2. Opening a Merge Request triggers build with 2 stages:
     - **build-and-test** ([Reference](https://rushjs.io/pages/maintainer/enabling_ci_builds/))
         - `Performs AWS CodeArtifact Login` we are using codeArtifact to download NPM packages
-        - > `rush install` (you will notice that we are using `rush install` instead of `rush update` here. The difference is that `rush install` won't update any files. Instead, it will fail your MR build if something is out of date, to let you know that you forgot to run `rush update` or forgot to commit the result)
-        - > `rush check`
-        - > `rush rebuild`
-        - > `rush test`
+        - `rush install` (you will notice that we are using `rush install` instead of `rush update` here. The difference is that `rush install` won't update any files. Instead, it will fail your MR build if something is out of date, to let you know that you forgot to run `rush update` or forgot to commit the result)
+        - `rush check`
+        - `rush rebuild`
+        - `rush test`
     - **secret-scan** - Performs security scanning:
         - [Container-Scanning](https://docs.gitlab.com/ee/user/application_security/container_scanning/)
         - [SAST](https://docs.gitlab.com/ee/user/application_security/sast/)
