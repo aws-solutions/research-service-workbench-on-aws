@@ -16,10 +16,11 @@
 # an appropriate message if it wants to stop the commit.  The hook is allowed to edit
 # the commit message file.
 
-# This example enforces that commit message should contain a minimum amount of
-# description text.
-if [ `cat $1 | wc -w` -lt 3 ]; then
-  echo ""
-  echo "Invalid commit message: The message must contain at least 3 words."
-	exit 1
+# enforce conventional commits 
+INPUT_FILE=$1
+START_LINE=`head -n1 $INPUT_FILE`
+PATTERN="^(BREAKING CHANGE)|(feat)|(fix)|(build)|(chore)|(ci)|(docs)|(style)|(refactor)|(perf)|(test)(\(\w+\))?!?: .+"
+if ! [[ "$START_LINE" =~ $PATTERN ]]; then
+  echo "Bad commit message, see example conventional commits: https://www.conventionalcommits.org/en/v1.0.0/"
+  exit 1
 fi
