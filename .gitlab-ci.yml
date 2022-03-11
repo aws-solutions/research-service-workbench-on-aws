@@ -1,8 +1,13 @@
-image: $CI_REGISTRY_IMAGE/node14-awscli-git:latest
+
+image: $CI_REGISTRY_IMAGE/node14-awscli-git-jq:latest
+
+variables:
+  SECRET_DETECTION_REPORT_FILE: gl-secret-detection-report.json
 
 stages:
   - build-and-test
-  - secret-scan
+  - security-scan
+  - secret-scan-eval
 
 .base:
   script:
@@ -33,19 +38,19 @@ include:
 
 # Overrides for Security and Jobs templates to run during merge request
 container_scanning:
-  stage: secret-scan
+  stage: security-scan
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   variables:
-    DOCKER_IMAGE: $CI_REGISTRY_IMAGE/node14-awscli-git:latest
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE/node14-awscli-git-jq:latest
 
 license_scanning:
-  stage: secret-scan
+  stage: security-scan
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 sast:
-  stage: secret-scan
+  stage: security-scan
 
 eslint-sast:
   rules: 
@@ -60,15 +65,42 @@ semgrep-sast:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 .secret-analyzer:
-  stage: secret-scan
+  stage: security-scan
     
 secret_detection:
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  artifacts:
+    paths:
+      # in the "parent" job this file is declared as a report artifact, but
+      # we also need it as a regular artifact for the subsequent job
+      - $SECRET_DETECTION_REPORT_FILE
 
 iac-sast:
-  stage: secret-scan
+  stage: security-scan
 
 kics-iac-sast:
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
+## Fail on Secret
+secret-scan-eval:
+  stage: secret-scan-eval
+  dependencies:
+    - secret_detection
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  variables:
+    # this job only requires the $SECRET_DETECTION_REPORT_FILE
+    GIT_STRATEGY: none
+  script:
+    # check if '{ "vulnerabilities": [], ..' is empty in the report file if it exists
+    - |
+      if [ -f "$SECRET_DETECTION_REPORT_FILE" ]; then
+        if [ "$(jq ".vulnerabilities | length" $SECRET_DETECTION_REPORT_FILE)" -gt 0 ]; then
+          echo "Vulnerabilities detected. Please analyze the artifact $SECRET_DETECTION_REPORT_FILE produced by the 'secret-detection' job."
+          exit 1
+        fi
+      else
+        echo "Artifact $SECRET_DETECTION_REPORT_FILE does not exist. The 'secret-detection' job likely didn't create one. Hence, no evaluation can be performed."
+      fi
