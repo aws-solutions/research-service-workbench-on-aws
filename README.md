@@ -26,19 +26,20 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 1. Set up your repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
 2. Create a feature branch from main: `git pull; git checkout -b feature/<feature>`
 3. Run: [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependenciesare of the same version throughout the repository.
-4. Run:
-   1. [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
-   2. [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
+4. Run either of the two:
+   - [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
+   - [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
 5. Run tests: `rush test` - See `rush test -h` for more options
 
-### Merge Request Flow
+### Staging a Merge Request
 
 1. Make changes locally ([Follow Local Development Flow](#Local-Development-Flow))
 2. Ensure you are on a feature branch; from `main` branch: `git pull; git checkout -b feature/<feature>`
 3. If you are happy with your code and they are passing tests, you can push your changes to your feature branch: `git add -A; git commit -m "<Your commit message>"; git push`
+    - Note: the commit must be in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format
 4. We have pre-commit git-hooks. These are used to inspect the snapshot that's about to be committed, to see if you've forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. We currently support:
-    - prettier is configured to automatically format your code on commit. Additionally, if you want to format your code manually you can just do: `rush prettier`
-    - A check has been added for commit messages: `The message must contain at least 3 words`
+    - prettier is configured to automatically format your code on commit. If you want to format your code manually you can just do: `git add -A; rush prettier`
+    - A check has been added for commit messages to ensure they are in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
 5. Further checks are triggered on a Merge Request. Please refer the [Merge Requests Process](#merge-requests-process) section for how to manage the MR on GitLab
 
 ## Merge Requests Process
