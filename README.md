@@ -24,6 +24,9 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 4. Move to the correct directory: `cd ma-mono`
 5. Install rush: `npm install -g @microsoft/rush`
 6. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as needed
+7. NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be updated in 2 ways:
+   - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
+   - Update the package.json in your package and run `rush update`.
 
 ### Local Development Flow
 

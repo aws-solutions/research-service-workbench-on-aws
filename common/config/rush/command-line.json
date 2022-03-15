@@ -193,7 +193,7 @@
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the status in root README.md",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage"
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage && git add README.md coverage/coverage-summary.json"
     },
     {
       "name": "common-coverage-ci",
