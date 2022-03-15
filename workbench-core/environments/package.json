@@ -8,7 +8,9 @@
   "homepage": "https://code.amazon.com/packages/Ma-mono",
   "scripts": {
     "build": "heft build --clean",
-    "test": "heft test --clean"
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "test": "heft test --clean && rushx make-badges",
+    "test:only": "heft test --clean"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^2.5.1",
@@ -18,6 +20,7 @@
     "@types/heft-jest": "1.0.2",
     "@types/node": "^12",
     "eslint": "~8.7.0",
-    "typescript": "~4.5.2"
+    "typescript": "~4.5.2",
+    "istanbul-badges-readme": "1.8.1"
   }
 }

@@ -8,5 +8,6 @@
       "lines": 70,
       "statements": 70
     }
-  }
+  },
+  "coverageReporters": ["json-summary", "json"]
 }

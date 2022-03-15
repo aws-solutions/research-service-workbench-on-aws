@@ -1,3 +1,7 @@
+# Code Coverage
+| Statements                  | Branches                | Functions                 | Lines             |
+| --------------------------- | ----------------------- | ------------------------- | ----------------- |
+| ![Statements](https://img.shields.io/badge/statements-76.67%25-red.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-66.67%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-80%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-78.18%25-red.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -29,7 +33,8 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 4. Run either of the two:
    - [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
    - [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
-5. Run tests: `rush test` - See `rush test -h` for more options
+5. Run tests and update coverage summary in README.md file for each package: `rush test` - See `rush test -h` for more options
+6. Update root README file with Coverage report: `rush common-coverage-report`
 
 ### Staging a Merge Request
 

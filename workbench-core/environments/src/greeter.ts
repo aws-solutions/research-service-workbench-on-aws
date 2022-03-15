@@ -8,7 +8,6 @@ export class Greeter {
   }
 
   public sayHello(name: string): string {
-    console.log('test change again');
     return this._salutation + name;
   }
   public sayGoodbye(name: string): string {

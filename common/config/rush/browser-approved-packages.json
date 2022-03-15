@@ -95,6 +95,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "istanbul-badges-readme",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "istanbul-merge",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
     },

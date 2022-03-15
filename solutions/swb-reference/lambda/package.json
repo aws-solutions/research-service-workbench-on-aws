@@ -8,7 +8,9 @@
   "license": "MIT",
   "scripts": {
     "build": "heft build --clean",
-    "test": "heft test --clean",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "test": "heft test --clean && rushx make-badges",
+    "test:only": "heft test --clean",
     "_phase:build": "heft build --clean"
   },
   "dependencies": {
@@ -25,6 +27,7 @@
     "@types/node": "^12",
     "@types/aws-lambda": "~8.10.92",
     "typescript": "~4.5.2",
-    "eslint": "~8.7.0"
+    "eslint": "~8.7.0",
+    "istanbul-badges-readme": "1.8.1"
   }
 }

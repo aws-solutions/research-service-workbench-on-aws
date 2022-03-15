@@ -4,7 +4,6 @@ const g = new Greeter();
 const name = 'Bob';
 describe('Hello tests', () => {
   it('test', () => {
-    console.log('--aws-provider');
     expect(g.sayHello(name)).toStrictEqual('Hello, Bob');
   });
 });
