@@ -169,28 +169,35 @@
     {
       "name": "test",
       "commandKind": "bulk",
-      "summary": "Used to perform a tests on the packages and update coverage summary in README",
+      "summary": "Used to perform tests on the packages and update code coverage report in README file",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "build:test",
+      "commandKind": "bulk",
+      "summary": "Runs rush build and rush test using a single command",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
     {
       "name": "test:only",
       "commandKind": "bulk",
-      "summary": "Used to perform a tests on the packages",
+      "summary": "Used to perform tests on the packages",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
     {
       "name": "make-badges",
       "commandKind": "bulk",
-      "summary": "Used to update README file with Coverage badges for the packages",
+      "summary": "Used to update README file with code coverage report for the packages",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
     {
       "name": "common-coverage-report",
       "commandKind": "global",
-      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the status in root README.md",
+      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage && git add README.md coverage/coverage-summary.json"
@@ -198,7 +205,7 @@
     {
       "name": "common-coverage-ci",
       "commandKind": "global",
-      "summary": "The --ci argument will throw an error if the badges generated do not match what is already in the README.md",
+      "summary": "[To be used in the Pipeline] The --ci argument will throw an error if the badges generated do not match what is already in the README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"

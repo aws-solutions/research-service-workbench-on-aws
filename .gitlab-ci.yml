@@ -20,10 +20,9 @@ stages:
     - node common/scripts/install-run-rush.js check
     - node common/scripts/install-run-rush.js rebuild --verbose
     - node common/scripts/install-run-rush.js test:only --verbose
-    # Throw an error if the badges generated do not match what is already in each package README.md
+    # Throw an error if the generated code coverage badges do not match what is already in each package README file
     - node common/scripts/install-run-rush.js make-badges --ci
-    - node common/scripts/install-run-rush.js common-coverage-report
-    # Throw an error if the badges generated do not match what is already in the root README.md
+    # Throw an error if the generated code coverage badges do not match what is already in the root README file
     - node common/scripts/install-run-rush.js common-coverage-ci
 
 build-and-test:

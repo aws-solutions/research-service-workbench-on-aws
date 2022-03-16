@@ -18,12 +18,12 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 
 [Ma-mono](https://gitlab.aws.dev/ma-foundation/ma-mono) is hosted on Gitlab ([Decision: Repository for Monorepo](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo)). In order to start developement please follow the below steps:
 
-1. [Join MA-Foundation Group](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HJoiningaTeamGroup) in [GitLab](https://gitlab.aws.dev/ma-foundation)
+1. Follow the instructions [here](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HJoiningaTeamGroup) to join [MA-Foundation Group](https://gitlab.aws.dev/ma-foundation) in GitLab
 2. [Setup git access](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HSettingupgitAccess)
 3. Clone the repo: `git clone git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git`
 4. Move to the correct directory: `cd ma-mono`
 5. Install rush: `npm install -g @microsoft/rush`
-6. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as needed
+6. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files
 7. NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be updated in 2 ways:
    - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
    - Update the package.json in your package and run `rush update`.
@@ -36,8 +36,10 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 4. Run either of the two:
    - [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
    - [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
-5. Run tests and update coverage summary in README.md file for each package: `rush test` - See `rush test -h` for more options
-6. Update root README file with Coverage report: `rush common-coverage-report`
+5. `rush test` - runs test and updates code coverage summary in README file for each package. See `rush test -h` for more options
+6. Alternatively you can use:
+   - `rush build:test` - single command to perform `rush build && rush test` for each package. See `rush build:test -h` for more options
+6. `rush common-coverage-report` - updates root README file with code coverage summary
 
 ### Staging a Merge Request
 
@@ -47,6 +49,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
     - Note: the commit must be in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format
 4. We have pre-commit git-hooks. These are used to inspect the snapshot that's about to be committed, to see if you've forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. We currently support:
     - prettier is configured to automatically format your code on commit. If you want to format your code manually you can just do: `git add -A; rush prettier`
+    - generate code coverage summary in the root README file
     - A check has been added for commit messages to ensure they are in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
 5. Further checks are triggered on a Merge Request. Please refer the [Merge Requests Process](#merge-requests-process) section for how to manage the MR on GitLab
 
@@ -68,6 +71,8 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
         - `rush check`
         - `rush rebuild`
         - `rush test`
+        - `rush make-badges --ci` (throws an error if the generated code coverage badges do not match what is already in each package README file)
+        - `rush common-coverage-ci` (throws an error if the generated code coverage badges do not match what is already in the root README file)
     - **security-scan** - Performs security scanning:
         - [Container-Scanning](https://docs.gitlab.com/ee/user/application_security/container_scanning/)
         - [SAST](https://docs.gitlab.com/ee/user/application_security/sast/)
