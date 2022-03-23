@@ -60,6 +60,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
     - For the source branch select your recently pushed feature branch
     - As your target branch choose `main`
     - Choose a proper title
+        - Note: the title will appear as the commit message when the MR is merged, please make sure the title adheres to the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format, 
     - Choose a proper description
     - Assign yourself as the assignee
     - Add reviewers ([See limitations](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo#temp:C:XHKd59c38e62a0c4e2c94800bcf7)).
