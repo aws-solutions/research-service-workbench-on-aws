@@ -1,13 +1,28 @@
-
-image: $CI_REGISTRY_IMAGE/node14-awscli-git-jq:latest
+image: $CI_REGISTRY_IMAGE
 
 variables:
   SECRET_DETECTION_REPORT_FILE: gl-secret-detection-report.json
+  CONTAINER_SCANNING_REPORT_FILE: gl-container-scanning-report.json
 
 stages:
+  - build-image
   - build-and-test
   - security-scan
-  - secret-scan-eval
+  - security-scan-eval
+
+build_image:
+  stage: build-image
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_BUILD_TOKEN} | base64)\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists:
+        - Dockerfile
 
 .base:
   script:
@@ -44,9 +59,10 @@ include:
 container_scanning:
   stage: security-scan
   rules: 
+    - if: $CI_PIPELINE_SOURCE == 'schedule'
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   variables:
-    DOCKER_IMAGE: $CI_REGISTRY_IMAGE/node14-awscli-git-jq:latest
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE
 
 license_scanning:
   stage: security-scan
@@ -89,7 +105,7 @@ kics-iac-sast:
 
 ## Fail on Secret
 secret-scan-eval:
-  stage: secret-scan-eval
+  stage: security-scan-eval
   dependencies:
     - secret_detection
   rules:
@@ -107,4 +123,27 @@ secret-scan-eval:
         fi
       else
         echo "Artifact $SECRET_DETECTION_REPORT_FILE does not exist. The 'secret-detection' job likely didn't create one. Hence, no evaluation can be performed."
+      fi
+
+## Fail on Container Vulnerability
+container-scan-eval:
+  stage: security-scan-eval
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'schedule'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  dependencies:
+    - container_scanning
+  variables:
+    # this job only requires the $CONTAINER_SCANNING_REPORT_FILE
+    GIT_STRATEGY: none
+  script:
+    # check if '{ "vulnerabilities": [], ..' is empty in the report file if it exists
+    - |
+      if [ -f "$CONTAINER_SCANNING_REPORT_FILE" ]; then
+        if [ "$(jq ".vulnerabilities | length" $CONTAINER_SCANNING_REPORT_FILE)" -gt 0 ]; then
+          echo "Vulnerabilities detected. Please analyze the artifact $CONTAINER_SCANNING_REPORT_FILE produced by the 'secret-detection' job."
+          exit 1
+        fi
+      else
+        echo "Artifact $CONTAINER_SCANNING_REPORT_FILE does not exist. The 'container_scanning' job likely didn't create one. Hence, no evaluation can be performed."
       fi
