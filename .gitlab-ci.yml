@@ -61,6 +61,9 @@ container_scanning:
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'schedule'
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  script:
+    - env
+    - gtcs scan
   variables:
     DOCKER_IMAGE: $CI_REGISTRY_IMAGE
 
