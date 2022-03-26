@@ -13,7 +13,8 @@ yarn-error.log*
 lib-cov
 
 # Coverage directory used by tools like istanbul
-# coverage
+coverage
+**/temp/coverage
 
 # nyc test coverage
 .nyc_output
@@ -76,11 +77,3 @@ cdk.out
 .vscode
 .heft
 .tools
-
-
-# rush backup
-backup_rush.json
-rush_copy.json
-
-#viperlight scan
-./bin/viperlight-scan.sh
