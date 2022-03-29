@@ -121,6 +121,10 @@
     {
       "name": "typescript",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "winston",
+      "allowedCategories": [ "production" ]
     }
   ]
 }

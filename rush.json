@@ -52,6 +52,12 @@
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/logging",
+      "projectFolder": "workbench-core/logging",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
