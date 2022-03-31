@@ -37,6 +37,7 @@
     "typescript": "~4.5.2",
     "eslint": "~8.7.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
-    "istanbul-badges-readme": "1.8.1"
+    "istanbul-badges-readme": "1.8.1",
+    "eslint-plugin-security": "~1.4.0"
   }
 }
