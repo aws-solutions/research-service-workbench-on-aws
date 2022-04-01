@@ -95,6 +95,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "ts-node",
       "allowedCategories": [ "production" ]
     },
