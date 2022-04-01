@@ -111,6 +111,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
     },
