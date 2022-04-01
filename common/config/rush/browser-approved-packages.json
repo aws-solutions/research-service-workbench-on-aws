@@ -19,6 +19,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@rushstack/eslint-plugin-security",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@rushstack/heft",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -68,6 +72,10 @@
     },
     {
       "name": "eslint",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-security",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {

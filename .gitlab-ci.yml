@@ -8,9 +8,9 @@ variables:
 stages:
   - docker-image-update
   - build-and-test
+  - update-stable-docker-image
   - security-scan
   - security-scan-eval
-  - update-stable-docker-image
 
 docker-image-update:
   stage: docker-image-update
@@ -32,12 +32,8 @@ docker-image-update:
 
 .base:
   script:
-    - which node
-    - node --version
-    - npm config list
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
-    - env
     - echo "Fetch the main branch"
     - git fetch origin main:refs/remotes/origin/main -a
     - echo "Install NPM packages in the common folder"
@@ -162,6 +158,7 @@ eslint-sast-eval:
     GIT_STRATEGY: none
     REPORT_FILE: $SAST_SCAN_REPORT_FILE
     JOB: 'eslint-sast'
+  allow_failure: true
 
 nodejs-scan-sast-eval:
   extends:
@@ -176,6 +173,7 @@ nodejs-scan-sast-eval:
     GIT_STRATEGY: none
     REPORT_FILE: $SAST_SCAN_REPORT_FILE
     JOB: 'nodejs-scan-sast'
+  allow_failure: true
 
 semgrep-sast-eval:
   extends:
@@ -190,6 +188,7 @@ semgrep-sast-eval:
     GIT_STRATEGY: none
     REPORT_FILE: $SAST_SCAN_REPORT_FILE
     JOB: 'semgrep-sast'
+  allow_failure: true
 
 ## Fail on Secret Detection
 secret-scan-eval:
@@ -219,6 +218,7 @@ container-scan-eval:
     GIT_STRATEGY: none
     REPORT_FILE: $CONTAINER_SCAN_REPORT_FILE
     JOB: 'container_scanning'
+  allow_failure: true
 
 update-stable-docker-image:
   stage: update-stable-docker-image

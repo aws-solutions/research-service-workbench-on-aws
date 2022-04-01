@@ -6,6 +6,7 @@
 - Checklist for **Reviewer**:
 - [ ] Merge Request Title follows [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/#summary) format
 - [ ] DESCRIPTION describes the goal of the changes
+- [ ] Pipeline warnings reviewed (if any)
 
 - Checklist for **Maintainer**:
 - [ ] Merge Request Title follows [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/#summary) format
