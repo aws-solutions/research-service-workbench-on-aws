@@ -7,24 +7,20 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@amzn/jest-reporter",
+      "name": "@amzn/eslint-config-workbench-core-eslint-custom",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@amzn/swb-app",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/eslint-config",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@rushstack/eslint-plugin-security",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/heft",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/heft-jest-plugin",
@@ -32,27 +28,27 @@
     },
     {
       "name": "@rushstack/heft-node-rig",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "aws-cdk",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "aws-cdk-lib",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "aws-lambda",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "aws-lambda-fastify",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "aws-sdk",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "concurrently",
@@ -60,23 +56,19 @@
     },
     {
       "name": "constructs",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "environments",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "esbuild",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-security",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "fastify",
@@ -84,10 +76,6 @@
     },
     {
       "name": "fastify-autoload",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-cli",
       "allowedCategories": [ "production" ]
     },
     {
@@ -99,36 +87,20 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "fastify-tsconfig",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "istanbul-badges-readme",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "istanbul-merge",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "swb-app",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "tap",
+      "name": "ts-node",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "ts-node",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "typescript",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "winston",

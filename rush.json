@@ -33,19 +33,13 @@
       "packageName": "@amzn/swb-app",
       "projectFolder": "solutions/swb-app",
       "reviewCategory": "production",
-      "shouldPublish": false
+      "shouldPublish": true
     },
     {
       "packageName": "@amzn/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@amzn/swb-reference-lambda",
-      "projectFolder": "solutions/swb-reference/lambda",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
+      "shouldPublish": true
     },
     {
       "packageName": "@amzn/environments",
@@ -56,6 +50,12 @@
     {
       "packageName": "@amzn/logging",
       "projectFolder": "workbench-core/logging",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
+      "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
       "shouldPublish": true
     }
