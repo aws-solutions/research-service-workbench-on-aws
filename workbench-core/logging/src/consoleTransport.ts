@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-object-injection */
+// using info[LEVEL] and info[MESSAGE] is the only way to access those properties, so this rule must be deleted for this file
 import Transport from 'winston-transport';
 import { LEVEL, MESSAGE } from 'triple-beam';
 
