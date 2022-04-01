@@ -3,7 +3,14 @@ import { ConsoleTransport } from './consoleTransport';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface LoggerOptions {
+  /**
+   * Anything that is able to be JSON.stringified
+   */
   metadata?: any;
+
+  /**
+   * The minimum log level to log
+   */
   logLevel?: 'silly' | 'debug' | 'verbose' | 'http' | 'info' | 'warn' | 'error';
 }
 
@@ -11,6 +18,7 @@ export interface LoggerOptions {
  * Creates and returns a Winston logging instance that logs to console.
  *
  * @param options - the LoggerOptions object
+ *
  * @returns A logger instance
  *
  */
