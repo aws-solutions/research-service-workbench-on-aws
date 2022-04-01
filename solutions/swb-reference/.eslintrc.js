@@ -2,20 +2,6 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution');
 
 module.exports = {
-  plugins: ['security'],
-  extends: [
-    '@rushstack/eslint-config/profile/node',
-    '@rushstack/eslint-config/mixins/tsdoc',
-    'plugin:security/recommended'
-  ],
-  parserOptions: { tsconfigRootDir: __dirname },
-  rules: {
-    '@typescript-eslint/naming-convention': [
-      'warn',
-      {
-        selector: 'interface',
-        format: ['PascalCase']
-      }
-    ]
-  }
+  extends: ['@amzn/workbench-core-eslint-custom'],
+  parserOptions: { tsconfigRootDir: __dirname }
 };
