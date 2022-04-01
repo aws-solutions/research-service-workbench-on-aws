@@ -21,6 +21,6 @@ export function makeLogger(options?: LoggerOptions): Logger {
     level: logLevel ?? process.env.LOG_LEVEL,
     format: format.combine(format.errors({ stack: true }), format.json()),
     transports: [new ConsoleTransport()],
-    defaultMeta: { meta: metadata }
+    defaultMeta: { meta: metadata } //metadata ? { meta: metadata } : undefined
   });
 }

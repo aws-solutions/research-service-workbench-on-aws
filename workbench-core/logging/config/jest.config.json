@@ -9,5 +9,5 @@
       "statements": 70
     }
   },
-  "coverageReporters": ["json-summary", "json"]
+  "coverageReporters": ["json-summary", "json", "clover"]
 }

@@ -133,6 +133,10 @@
     {
       "name": "winston",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston-transport",
+      "allowedCategories": [ "production" ]
     }
   ]
 }
