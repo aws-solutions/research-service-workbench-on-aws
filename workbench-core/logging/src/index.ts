@@ -1,1 +1,1 @@
-export { Greeter } from './greeter';
+export { makeLogger } from './logger';

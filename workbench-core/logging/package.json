@@ -1,7 +1,7 @@
 {
   "name": "@amzn/logging",
-  "version": "0.0.22",
-  "license": "MIT",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": "ssh://git.amazon.com/pkg/Ma-mono",
@@ -14,7 +14,8 @@
     "test:only": "heft test --clean"
   },
   "dependencies": {
-    "winston": "~3.6.0"
+    "winston": "~3.6.0",
+    "winston-transport": "~4.5.0"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^2.5.1",
