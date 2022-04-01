@@ -15,12 +15,10 @@ export interface LoggerOptions {
  *
  */
 export function makeLogger(options?: LoggerOptions): Logger {
-  const { metadata, logLevel } = options || {};
-
   return createLogger({
-    level: logLevel ?? process.env.LOG_LEVEL,
+    level: options?.logLevel ?? process.env.LOG_LEVEL,
     format: format.combine(format.errors({ stack: true }), format.json()),
     transports: [new ConsoleTransport()],
-    defaultMeta: { meta: metadata } //metadata ? { meta: metadata } : undefined
+    defaultMeta: { meta: options?.metadata }
   });
 }

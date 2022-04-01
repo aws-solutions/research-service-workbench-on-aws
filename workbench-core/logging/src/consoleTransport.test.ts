@@ -1,4 +1,4 @@
-import { makeLogger } from './logger';
+import { makeLogger } from '.';
 
 describe('To console tests', () => {
   it('should default to info log level when there is no parameter specified or environment variable defined', () => {

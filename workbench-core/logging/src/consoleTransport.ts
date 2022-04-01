@@ -5,7 +5,8 @@ import Transport from 'winston-transport';
  */
 export class ConsoleTransport extends Transport {
   /* eslint-disable  @typescript-eslint/no-explicit-any */
-  public log(info: any, next: () => void): void {
+  public log(info: any, callback: () => void): void {
+    /* istanbul ignore next */
     setImmediate(() => this.emit('logged', info));
 
     // Use console here so request ID and log level can be automatically attached in CloudWatch log
@@ -27,8 +28,8 @@ export class ConsoleTransport extends Transport {
         break;
     }
 
-    if (next) {
-      next();
+    if (callback) {
+      callback();
     }
   }
 }
