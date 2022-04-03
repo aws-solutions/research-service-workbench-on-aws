@@ -4,6 +4,7 @@ variables:
   SAST_SCAN_REPORT_FILE: "gl-sast-report.json"
   SAST_EXCLUDED_PATHS: 'common/scripts/*.js, common/config/rush/pnpm-lock.yaml'
   IMAGE: $CI_REGISTRY_IMAGE/stable:latest
+  AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
 
 stages:
   - docker-image-update
@@ -243,7 +244,6 @@ deploy:
   image: $IMAGE
   script:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-    - aws configure set region $AWS_DEFAULT_REGION
     - node common/scripts/install-run-rush.js install
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
