@@ -11,7 +11,10 @@
     "build:test": "rushx build && rushx test",
     "test:only": "heft test --clean",
     "watch": "tsc -w",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "cdk:bootstrap": "rushx install && rushx cdk boostrap",
+    "cdk:synth": "rushx cdk synth",
+    "cdk-deploy": "rushx cdk deploy --all"
   },
   "devDependencies": {
     "@types/node": "^12",
@@ -24,8 +27,8 @@
     "@types/heft-jest": "1.0.2",
     "istanbul-badges-readme": "1.8.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@aws-cdk/aws-apigatewayv2-alpha": "~2.17.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "~2.17.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "2.17.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "2.17.0-alpha.0",
     "eslint": "~8.7.0",
     "eslint-plugin-security": "~1.4.0",
     "@rushstack/eslint-config": "^2.5.1",

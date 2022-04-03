@@ -12,15 +12,15 @@ export class InfrastructureStack extends Stack {
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
       handler: 'index.handler',
-      code: Code.fromAsset('../../express/archive.zip'),
+      code: Code.fromAsset('../express/archive.zip'),
       functionName: 'LambdaService'
     });
 
-    const httpLambda = new HttpLambdaIntegration('HttpLambda', lambdaService);
+    const httpLambdaIntegration = new HttpLambdaIntegration('HttpLambda', lambdaService);
 
     // eslint-disable-next-line no-new
     new HttpApi(this, 'HttpApi', {
-      defaultIntegration: httpLambda,
+      defaultIntegration: httpLambdaIntegration,
       apiName: 'HttpApiService'
     });
   }

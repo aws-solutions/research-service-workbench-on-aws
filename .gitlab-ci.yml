@@ -245,9 +245,9 @@ deploy:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js install
     - cd workbench-core/infrastructure
-    - node common/scripts/install-run-rushx.js cdk bootstrap
-    - node common/scripts/install-run-rushx.js cdk synth
-    - node common/scripts/install-run-rushx.js cdk deploy
+    - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
+    - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
+    - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   dependencies: []

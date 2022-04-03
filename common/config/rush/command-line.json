@@ -188,6 +188,34 @@
       "enableParallelism": true
     },
     {
+      "name": "cdk",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:synth",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk synth commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:bootstrap",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk bootstrap commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:deploy",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk deploy commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "make-badges",
       "commandKind": "bulk",
       "summary": "Used to update README file with code coverage report for the packages",
