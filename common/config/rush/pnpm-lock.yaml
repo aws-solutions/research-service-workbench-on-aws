@@ -61,7 +61,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       aws-cdk: '*'
-      aws-cdk-lib: ^2.17.0
+      aws-cdk-lib: 2.17.0
       aws-lambda: ^1.0.7
       aws-lambda-fastify: ~2.1.0
       aws-sdk: ^2.617.0
@@ -74,7 +74,7 @@ importers:
       typescript: ~4.5.2
     dependencies:
       '@amzn/swb-app': link:../swb-app
-      aws-cdk-lib: 2.19.0_constructs@10.0.58
+      aws-cdk-lib: 2.17.0_constructs@10.0.58
       aws-lambda-fastify: 2.1.0
       aws-sdk: 2.1072.0
       constructs: 10.0.58
@@ -161,7 +161,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       '@vendia/serverless-express': ~4.5.4
-      aws-cdk-lib: ^2.17.0
+      aws-cdk-lib: 2.17.0
       constructs: ^10.0.0
       express: ~4.17.3
       istanbul-badges-readme: 1.8.1
@@ -169,7 +169,7 @@ importers:
       typescript: ~4.5.2
     dependencies:
       '@vendia/serverless-express': 4.5.4
-      aws-cdk-lib: 2.19.0_constructs@10.0.58
+      aws-cdk-lib: 2.17.0_constructs@10.0.58
       constructs: 10.0.58
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -200,7 +200,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       aws-cdk: '*'
-      aws-cdk-lib: ^2.17.0
+      aws-cdk-lib: 2.17.0
       constructs: ^10.0.0
       eslint: ~8.7.0
       eslint-plugin-security: ~1.4.0
@@ -210,13 +210,13 @@ importers:
       typescript: ~4.5.2
     dependencies:
       '@amzn/workbench-core-express': link:../express
-      aws-cdk-lib: 2.19.0_constructs@10.0.58
+      aws-cdk-lib: 2.17.0_constructs@10.0.58
       constructs: 10.0.58
       source-map-support: 0.5.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.17.0-alpha.0_db5f58ce272391d4cedaedd41274f6d5
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_5fff42b02e39d7236fda218fdb29edd6
+      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.17.0-alpha.0_1e2b55c6245a6ee7a3f36158569e279d
       '@rushstack/eslint-config': 2.5.1_eslint@8.7.0+typescript@4.5.5
       '@rushstack/heft': 0.44.2
       '@rushstack/heft-jest-plugin': 0.2.3_3bbc58e87fc02213aeafea3893b94377
@@ -240,18 +240,18 @@ packages:
       '@jridgewell/trace-mapping': 0.3.2
     dev: true
 
-  /@aws-cdk/aws-apigatewayv2-alpha/2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5:
+  /@aws-cdk/aws-apigatewayv2-alpha/2.17.0-alpha.0_5fff42b02e39d7236fda218fdb29edd6:
     resolution: {integrity: sha512-skOShUEi+npxbg+lgGRWsjts/z0AttGxWKIylIlgVoLsWB8dLsHJaiUefCByu87Gpe5w2HOMj4shrai2nKLwOA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.19.0_constructs@10.0.58
+      aws-cdk-lib: 2.17.0_constructs@10.0.58
       constructs: 10.0.58
     dev: true
 
-  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.17.0-alpha.0_db5f58ce272391d4cedaedd41274f6d5:
+  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.17.0-alpha.0_1e2b55c6245a6ee7a3f36158569e279d:
     resolution: {integrity: sha512-KicMeXovJcxWr6+wAB7u/9Ti5AMKFz2hljeJY8FiHFEy6w+vCRhQ0EVuJWxBfRdVmJoNK0AmBU4/Y+4drxnZVg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
@@ -259,8 +259,8 @@ packages:
       aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
-      aws-cdk-lib: 2.19.0_constructs@10.0.58
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_5fff42b02e39d7236fda218fdb29edd6
+      aws-cdk-lib: 2.17.0_constructs@10.0.58
       constructs: 10.0.58
     dev: true
 
@@ -1235,10 +1235,6 @@ packages:
       '@babel/helper-validator-identifier': 7.16.7
       to-fast-properties: 2.0.0
     dev: true
-
-  /@balena/dockerignore/1.0.2:
-    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
-    dev: false
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -2520,6 +2516,7 @@ packages:
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
+    dev: true
 
   /atomic-sleep/1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
@@ -2537,22 +2534,13 @@ packages:
       - supports-color
     dev: false
 
-  /aws-cdk-lib/2.19.0_constructs@10.0.58:
-    resolution: {integrity: sha512-zt0lAsTpYfrDitjJXp1smEi4o1EYtAAj4fb0WW4GYBW+P6FqymXyAF5mUT8YWPkMJTnSP8d4FeDUyatQVWYRJA==}
+  /aws-cdk-lib/2.17.0_constructs@10.0.58:
+    resolution: {integrity: sha512-bga2HptbGx3rMdSkIKxBS13miogj/DHB2VPfQZAoKoCOAanOot+M3mHhYqe5aNdxhrppaRjG2eid2p1/MvRnvg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
-      '@balena/dockerignore': 1.0.2
-      case: 1.6.3
       constructs: 10.0.58
-      fs-extra: 9.1.0
-      ignore: 5.2.0
-      jsonschema: 1.4.0
-      minimatch: 3.1.2
-      punycode: 2.1.1
-      semver: 7.3.5
-      yaml: 1.10.2
     dev: false
     bundledDependencies:
       - '@balena/dockerignore'
@@ -2703,6 +2691,7 @@ packages:
 
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+    dev: true
 
   /base64-js/1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -2759,6 +2748,7 @@ packages:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
+    dev: true
 
   /braces/3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
@@ -2853,11 +2843,6 @@ packages:
   /caniuse-lite/1.0.30001309:
     resolution: {integrity: sha512-Pl8vfigmBXXq+/yUz1jUwULeq9xhMJznzdc/xwl4WclDAuebcTHVefpz8lE/bMI+UN7TOkSSe7B7RnZd6+dzjA==}
     dev: true
-
-  /case/1.6.3:
-    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
-    engines: {node: '>= 0.8.0'}
-    dev: false
 
   /cdk-assets/2.12.0:
     resolution: {integrity: sha512-GrOCQnGHTS6bTS/FPwFudqS2Ko7JW3FvwYo6Nb/IiWlCodrYSpi2gMjwGD+O+CatyDowJ7xXKUTsd+TIjzM0AQ==}
@@ -3035,6 +3020,7 @@ packages:
 
   /concat-map/0.0.1:
     resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    dev: true
 
   /concurrently/7.0.0:
     resolution: {integrity: sha512-WKM7PUsI8wyXpF80H+zjHP32fsgsHNQfPLw/e70Z5dYkV7hF+rf8q3D+ScWJIEr57CpkO3OWBko6hwhQLPR8Pw==}
@@ -4193,6 +4179,7 @@ packages:
       graceful-fs: 4.2.9
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: true
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
@@ -4390,6 +4377,7 @@ packages:
 
   /graceful-fs/4.2.9:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
+    dev: true
 
   /has-bigints/1.0.1:
     resolution: {integrity: sha512-LSBS2LjbNBTf6287JEbEzvJgftkF5qFkmCo9hDRpAzKhUOlJ+hx8dd4USs00SgsUNwc4617J9ki5YtEClM2ffA==}
@@ -4509,6 +4497,7 @@ packages:
   /ignore/5.2.0:
     resolution: {integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==}
     engines: {node: '>= 4'}
+    dev: true
 
   /immediate/3.0.6:
     resolution: {integrity: sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=}
@@ -5440,6 +5429,7 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.9
+    dev: true
 
   /jsonpath-plus/4.0.0:
     resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
@@ -5448,6 +5438,7 @@ packages:
 
   /jsonschema/1.4.0:
     resolution: {integrity: sha512-/YgW6pRMr6M7C+4o8kS+B/2myEpHCrxO4PEWnqJNBFMjn7EWXqlQ4tGwL6xTHeRplwuZmcAncdvfOad1nT2yMw==}
+    dev: true
 
   /jsx-ast-utils/3.2.1:
     resolution: {integrity: sha512-uP5vu8xfy2F9A6LGC22KO7e2/vGTS1MhP+18f++ZNlf0Ohaxbc9nIEwHAsejlJKyzfZzU5UIhe5ItYkitcZnZA==}
@@ -5729,12 +5720,6 @@ packages:
     dependencies:
       brace-expansion: 1.1.11
     dev: true
-
-  /minimatch/3.1.2:
-    resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
-    dependencies:
-      brace-expansion: 1.1.11
-    dev: false
 
   /minimist/1.2.5:
     resolution: {integrity: sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==}
@@ -7041,6 +7026,7 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
+    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw=}
@@ -7306,6 +7292,7 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+    dev: true
 
   /yargs-parser/20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
