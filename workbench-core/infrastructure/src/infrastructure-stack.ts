@@ -9,6 +9,8 @@ export class InfrastructureStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const GitLabRole;
+
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
       handler: 'index.handler',
