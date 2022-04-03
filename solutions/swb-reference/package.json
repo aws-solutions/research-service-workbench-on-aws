@@ -22,7 +22,7 @@
     "cdk-deploy": "rushx cdk-build && cdk deploy --all"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.0.0",
+    "aws-cdk-lib": "^2.19.0",
     "constructs": "^10.0.0",
     "@amzn/swb-app": "workspace:*",
     "aws-sdk": "^2.617.0",
@@ -41,6 +41,10 @@
     "@types/aws-lambda": "~8.10.92",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "istanbul-badges-readme": "1.8.1",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "eslint": "~8.7.0",
+    "eslint-plugin-security": "~1.4.0",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@types/jest": "~27.4.1"
   }
 }

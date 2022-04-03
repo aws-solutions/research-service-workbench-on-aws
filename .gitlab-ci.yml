@@ -11,6 +11,7 @@ stages:
   - update-stable-docker-image
   - security-scan
   - security-scan-eval
+  - deploy
 
 docker-image-update:
   stage: docker-image-update
@@ -42,6 +43,9 @@ docker-image-update:
     - node common/scripts/install-run-rush.js rebuild --verbose
     - node common/scripts/install-run-rush.js test:only --verbose
     - node common/scripts/install-run-rush.js make-badges --ci
+  artifacts:
+    paths:
+      - ./build
 
 build-and-test:
   image: $IMAGE
@@ -236,3 +240,15 @@ update-stable-docker-image:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - Dockerfile
+
+deploy:
+  stage: deploy
+  image: $IMAGE
+  script:
+    - cd workbench-core/infrastructure
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - node common/scripts/install-run-rush.js install
+    - node common/scripts/install-run-rushx.js cdk bootstrap
+    - node common/scripts/install-run-rushx.js cdk synth
+    - node common/scripts/install-run-rushx.js cdk deploy
+  

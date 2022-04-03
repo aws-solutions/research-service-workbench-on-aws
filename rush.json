@@ -52,6 +52,18 @@
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-express",
+      "projectFolder": "workbench-core/express",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-infrastructure",
+      "projectFolder": "workbench-core/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }

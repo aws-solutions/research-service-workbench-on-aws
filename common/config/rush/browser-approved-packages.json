@@ -15,6 +15,18 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },
@@ -28,6 +40,10 @@
     },
     {
       "name": "@rushstack/heft-node-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@vendia/serverless-express",
       "allowedCategories": [ "production" ]
     },
     {
@@ -71,6 +87,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "fastify",
       "allowedCategories": [ "production" ]
     },
@@ -91,7 +111,23 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lambda-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
     {
