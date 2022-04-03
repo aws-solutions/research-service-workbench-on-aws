@@ -12,9 +12,9 @@
     "test:only": "heft test --clean",
     "watch": "tsc -w",
     "cdk": "cdk",
-    "cdk:bootstrap": "rushx cdk bootstrap ${AWS_ENVIRONMENT}",
+    "cdk:bootstrap": "rushx cdk bootstrap",
     "cdk:synth": "rushx cdk synth",
-    "cdk:deploy": "rushx cdk deploy --all"
+    "cdk:deploy": "rushx cdk deploy --all --require-approval never"
   },
   "devDependencies": {
     "@types/node": "^12",
