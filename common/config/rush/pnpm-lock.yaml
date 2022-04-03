@@ -61,7 +61,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       aws-cdk: '*'
-      aws-cdk-lib: ^2.19.0
+      aws-cdk-lib: ^2.17.0
       aws-lambda: ^1.0.7
       aws-lambda-fastify: ~2.1.0
       aws-sdk: ^2.617.0
@@ -161,7 +161,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       '@vendia/serverless-express': ~4.5.4
-      aws-cdk-lib: ^2.19.0
+      aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
       express: ~4.17.3
       istanbul-badges-readme: 1.8.1
@@ -190,8 +190,8 @@ importers:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-express': workspace:*
-      '@aws-cdk/aws-apigatewayv2-alpha': ~2.19.0-alpha.0
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': ~2.19.0-alpha.0
+      '@aws-cdk/aws-apigatewayv2-alpha': ~2.17.0-alpha.0
+      '@aws-cdk/aws-apigatewayv2-integrations-alpha': ~2.17.0-alpha.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.44.2
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -200,7 +200,7 @@ importers:
       '@types/jest': ~27.4.1
       '@types/node': ^12
       aws-cdk: '*'
-      aws-cdk-lib: ^2.19.0
+      aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
       eslint: ~8.7.0
       eslint-plugin-security: ~1.4.0
@@ -215,8 +215,8 @@ importers:
       source-map-support: 0.5.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.19.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.19.0-alpha.0_0fc6b42ee308195258a55ce237b7ac18
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
+      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.17.0-alpha.0_db5f58ce272391d4cedaedd41274f6d5
       '@rushstack/eslint-config': 2.5.1_eslint@8.7.0+typescript@4.5.5
       '@rushstack/heft': 0.44.2
       '@rushstack/heft-jest-plugin': 0.2.3_3bbc58e87fc02213aeafea3893b94377
@@ -240,26 +240,26 @@ packages:
       '@jridgewell/trace-mapping': 0.3.2
     dev: true
 
-  /@aws-cdk/aws-apigatewayv2-alpha/2.19.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5:
-    resolution: {integrity: sha512-HKUJT+Dm1U9Ii+FOxMWC+b6fJFbCS1tIbVRt/j+wGDQLEaCR0oFsjzYX/8ens3XpRBiLpvg+q0EJBtA10b1lDw==}
+  /@aws-cdk/aws-apigatewayv2-alpha/2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5:
+    resolution: {integrity: sha512-skOShUEi+npxbg+lgGRWsjts/z0AttGxWKIylIlgVoLsWB8dLsHJaiUefCByu87Gpe5w2HOMj4shrai2nKLwOA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
-      aws-cdk-lib: ^2.19.0
+      aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
     dependencies:
       aws-cdk-lib: 2.19.0_constructs@10.0.58
       constructs: 10.0.58
     dev: true
 
-  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.19.0-alpha.0_0fc6b42ee308195258a55ce237b7ac18:
-    resolution: {integrity: sha512-zCZiLmmWL1Hija9O++rq+W95Sn5RW0mR4IjyMGYD/t+nDg2i1XIxJCdY2KHEJ2vhcyFsVfO4jo7dp5WfFoqFaw==}
+  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.17.0-alpha.0_db5f58ce272391d4cedaedd41274f6d5:
+    resolution: {integrity: sha512-KicMeXovJcxWr6+wAB7u/9Ti5AMKFz2hljeJY8FiHFEy6w+vCRhQ0EVuJWxBfRdVmJoNK0AmBU4/Y+4drxnZVg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.19.0-alpha.0
-      aws-cdk-lib: ^2.19.0
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0
+      aws-cdk-lib: ^2.17.0
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.19.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_520789713a7a113730ebcb5c7fc3a9b5
       aws-cdk-lib: 2.19.0_constructs@10.0.58
       constructs: 10.0.58
     dev: true
