@@ -43,9 +43,6 @@ docker-image-update:
     - node common/scripts/install-run-rush.js rebuild --verbose
     - node common/scripts/install-run-rush.js test:only --verbose
     - node common/scripts/install-run-rush.js make-badges --ci
-  artifacts:
-    paths:
-      - ./build
 
 build-and-test:
   image: $IMAGE
