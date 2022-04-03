@@ -251,4 +251,6 @@ deploy:
     - node common/scripts/install-run-rushx.js cdk bootstrap
     - node common/scripts/install-run-rushx.js cdk synth
     - node common/scripts/install-run-rushx.js cdk deploy
+  rules: 
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   
