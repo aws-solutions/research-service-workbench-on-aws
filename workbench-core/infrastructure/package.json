@@ -12,7 +12,7 @@
     "test:only": "heft test --clean",
     "watch": "tsc -w",
     "cdk": "cdk",
-    "cdk:bootstrap": "rushx install && rushx cdk boostrap",
+    "cdk:bootstrap": "rushx cdk bootstrap",
     "cdk:synth": "rushx cdk synth",
     "cdk-deploy": "rushx cdk deploy --all"
   },
