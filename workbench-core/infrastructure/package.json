@@ -14,7 +14,7 @@
     "cdk": "cdk",
     "cdk:bootstrap": "rushx cdk bootstrap",
     "cdk:synth": "rushx cdk synth",
-    "cdk-deploy": "rushx cdk deploy --all"
+    "cdk:deploy": "rushx cdk deploy --all"
   },
   "devDependencies": {
     "@types/node": "^12",
