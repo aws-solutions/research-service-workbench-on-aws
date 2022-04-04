@@ -272,4 +272,4 @@ integration_test:
     - echo $SERVICE_ENDPOINT
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - node common/scripts/install-run-rush.js install
-    - rush test -o @amzn/workbench-core-express -v
+    - node common/scripts/install-run-rush.js test -o @amzn/workbench-core-express -v
