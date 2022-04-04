@@ -17,7 +17,7 @@ export interface LoggerOptions {
 
   /**
    * The list of transports the logger will use.
-   * If undefined, the logger will log to console.
+   * If undefined, the logger will use the ConsoleTransport.
    */
   transports?: TransportStream[];
 }
