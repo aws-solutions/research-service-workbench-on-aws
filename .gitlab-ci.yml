@@ -274,5 +274,5 @@ integration_test:
     - npm config list
     - curl "https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/"
     - node common/scripts/install-run-rush.js install
-    - node common/scripts/install-run-rush.js build -o @amzn/workbench-core-express --verbose
+    - node common/scripts/install-run-rush.js build --verbose
     - node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-express --verbose
