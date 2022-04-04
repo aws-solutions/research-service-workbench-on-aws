@@ -248,7 +248,7 @@ deploy:
     - cdk bootstrap ${AWS_ENVIRONMENT}
     - cdk synth
     - cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
-    - echo "HttpEndpoint=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json`" > $CI_PROJECT_DIR/deploy.env
+    - echo "SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json`" > $CI_PROJECT_DIR/deploy.env
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
@@ -269,4 +269,7 @@ integration_test:
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
-    - echo $HttpEndpoint
+    - echo $SERVICE_ENDPOINT
+    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - node common/scripts/install-run-rush.js install
+    - rush test -o @amzn/workbench-core-express -v

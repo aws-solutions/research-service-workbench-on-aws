@@ -78,4 +78,4 @@ cdk.out
 .heft
 .tools
 .idea
-__snapshot__
+**/__snapshots__
