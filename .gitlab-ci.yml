@@ -256,7 +256,7 @@ deploy:
   dependencies: []
   artifacts:
     paths:
-      - cdk-outputs.json
+      - ./cdk-outputs.json
   
 integration_test:
   stage: integ-test
