@@ -248,7 +248,7 @@ deploy:
     - cdk bootstrap ${AWS_ENVIRONMENT}
     - cdk synth
     - cdk deploy --all --require-approval never --outputs-file ./cdk-outputs.json
-    - cat ./cdk-outputs.json
+    - echo "HttpEndpoint=`${jq \".InfrastructureStack.HttpEndpoint\" ./cdk-outputs.json}` >> build.env
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
@@ -258,17 +258,15 @@ deploy:
     - docker-image-update
   artifacts:
     reports:
-      dotenv: cdk-outputs.json
+      dotenv: build.env
   
 integration_test:
   stage: integ-test
   image: $IMAGE
-  variables:
-    CDK_OUTPUT: 'cdk-outputs.json'
   dependencies:
     - deploy
     - docker-image-update
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
-    - cat $CDK_OUTPUT
+    - echo $HttpEndpoint
