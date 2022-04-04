@@ -2,6 +2,19 @@
 
 exports[`root tests Infrastructure Test 1`] = `
 Object {
+  "Outputs": Object {
+    "HttpEndpoint": Object {
+      "Export": Object {
+        "Name": "HttpApiEndPoint",
+      },
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "HttpApiF5A9A8A7",
+          "ApiEndpoint",
+        ],
+      },
+    },
+  },
   "Resources": Object {
     "HttpApiDefaultRoute146696CE": Object {
       "Properties": Object {
@@ -103,7 +116,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "932bbc10aeb3b7f3d1e69af945ef5fe4b2bc1ff186868431172b7ef8b859a7da.zip",
+          "S3Key": "2ce7abbece771741a8770c4f32f13ad13323c5e85e2e629bc61130c98b746952.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "index.handler",

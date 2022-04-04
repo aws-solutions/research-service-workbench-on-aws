@@ -213,7 +213,6 @@ importers:
       '@aws-cdk/assert': 2.17.0
       '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.17.0-alpha.0
-      '@aws-cdk/core': ~1.151.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.44.2
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -241,7 +240,6 @@ importers:
       '@aws-cdk/assert': 2.17.0_3ad20bc34a4e07aef6a7304fb8910da1
       '@aws-cdk/aws-apigatewayv2-alpha': 2.17.0-alpha.0_5fff42b02e39d7236fda218fdb29edd6
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.17.0-alpha.0_1e2b55c6245a6ee7a3f36158569e279d
-      '@aws-cdk/core': 1.151.0
       '@rushstack/eslint-config': 2.5.1_eslint@8.7.0+typescript@4.5.5
       '@rushstack/heft': 0.44.2
       '@rushstack/heft-jest-plugin': 0.2.3_3bbc58e87fc02213aeafea3893b94377
@@ -318,14 +316,6 @@ packages:
       md5: 2.3.0
     dev: true
 
-  /@aws-cdk/cloud-assembly-schema/1.151.0:
-    resolution: {integrity: sha512-834VCEiM1nxWOxCVocmxoT5r13dkhXVmuy3HxrzdLPTFZnoz8fO+sEhocjOc5OqvinGLEFo5Pva2VK92vl4CJg==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dev: true
-    bundledDependencies:
-      - jsonschema
-      - semver
-
   /@aws-cdk/cloud-assembly-schema/2.12.0:
     resolution: {integrity: sha512-foUKTmcyEq9bV+grFff5SD9ksprTlBKdkhqpPyqIRf0oWLHpwYJYQuxkGnkOErlIwy4lgpFtKAKE5Z9SxdZDFg==}
     engines: {node: '>= 14.15.0'}
@@ -363,30 +353,6 @@ packages:
       table: 6.8.0
     dev: true
 
-  /@aws-cdk/core/1.151.0:
-    resolution: {integrity: sha512-O/0Xu+cQhpW7Z7ZW4xgjD8ZOCR9LjijpaHELjyXnIakaH+NWBX4wy317mI5MzGTUw0fpt2FWJrCcgKekuhj0Rw==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.151.0
-      '@aws-cdk/cx-api': 1.151.0
-      '@aws-cdk/region-info': 1.151.0
-      constructs: 3.3.258
-    dev: true
-    bundledDependencies:
-      - fs-extra
-      - minimatch
-      - '@balena/dockerignore'
-      - ignore
-
-  /@aws-cdk/cx-api/1.151.0:
-    resolution: {integrity: sha512-Hn7MqwlFUqOw1zD7o35eU4HuJwfXTOHjPLfiLdBMhNfXuzqCQT3IdxqQCiyjcSfg0Q3h65osAz+a6xlkDL5N2A==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.151.0
-    dev: true
-    bundledDependencies:
-      - semver
-
   /@aws-cdk/cx-api/2.12.0:
     resolution: {integrity: sha512-68xcTNGRKeL0Y6Wi1sO8h6bgiZh/sRhy+51e5ZVtnirEgBWfjWo0XDIcqH4a8oGkWJlDH46217uSwQFJGVvMvw==}
     engines: {node: '>= 14.15.0'}
@@ -396,11 +362,6 @@ packages:
     dev: true
     bundledDependencies:
       - semver
-
-  /@aws-cdk/region-info/1.151.0:
-    resolution: {integrity: sha512-rfsYmCX2hIwXuu5Rv6UEgwPXHZN111CgnNjnNg9GVpOMpbH+bKzqbeamcwOOh0ETr4Hvi1DIwvLQAOfvhYqd9g==}
-    engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dev: true
 
   /@aws-cdk/region-info/2.12.0:
     resolution: {integrity: sha512-Gy/5UunSpheW9G5UK6u3hz3Ob2Jc13MRtWgtGpzkfhGS41M6nEXQ7Qb7HmBmEuNraBjRlmHRvmtulYNnA9SuUQ==}
@@ -3325,11 +3286,6 @@ packages:
     resolution: {integrity: sha512-Eu/CSVoZBD4rQq5G+ihL54klc6SLy/Leb9EWccoh1xB+Ns3YKXlUNGCi9uEikbdG6wV9j9biw2byv+JptVFOyQ==}
     engines: {node: '>= 12.7.0'}
     dev: false
-
-  /constructs/3.3.258:
-    resolution: {integrity: sha512-Ftmvs8teETMhmoV1Uk0A0QRRbWaRTatkdyDBRVBmHvUgp/NehEFAnV220Gk7L+yoAr9gKsH+B5GSpNn0jg2YLg==}
-    engines: {node: '>= 12.7.0'}
-    dev: true
 
   /content-disposition/0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
