@@ -1,17 +1,24 @@
 import { createLogger, format, Logger } from 'winston';
+import TransportStream from 'winston-transport';
 import { ConsoleTransport } from './consoleTransport';
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface LoggerOptions {
   /**
-   * Anything that is able to be JSON.stringified
+   * Data to be passed along with each log from the logger.
+   * Anything that is unable to be JSON.stringified will be ignored
    */
-  metadata?: any;
+  metadata?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   /**
-   * The minimum log level to log
+   * The minimum log level to log. Defaults to 'info'
    */
   logLevel?: 'silly' | 'debug' | 'verbose' | 'http' | 'info' | 'warn' | 'error';
+
+  /**
+   * The list of transports the logger will use.
+   * If undefined, the logger will log to console.
+   */
+  transports?: TransportStream[];
 }
 
 /**
@@ -23,10 +30,12 @@ export interface LoggerOptions {
  *
  */
 export function makeLogger(options?: LoggerOptions): Logger {
+  const transports = options?.transports ?? new ConsoleTransport();
+
   return createLogger({
     level: options?.logLevel ?? process.env.LOG_LEVEL,
     format: format.combine(format.errors({ stack: true }), format.json()),
-    transports: [new ConsoleTransport()],
+    transports,
     defaultMeta: { meta: options?.metadata }
   });
 }

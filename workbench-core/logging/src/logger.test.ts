@@ -1,3 +1,4 @@
+import { transports } from 'winston';
 import { makeLogger } from '.';
 
 describe('makeLogger tests', () => {
@@ -33,5 +34,12 @@ describe('makeLogger tests', () => {
     const logger = makeLogger({ metadata });
 
     expect(logger.defaultMeta).toMatchObject({ meta: metadata });
+  });
+
+  it('user defined transports should be used when included', () => {
+    const userTransports = [new transports.Console(), new transports.Console(), new transports.Console()];
+    const logger = makeLogger({ transports: userTransports });
+
+    expect(logger.transports.length).toBe(3);
   });
 });
