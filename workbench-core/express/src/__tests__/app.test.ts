@@ -24,7 +24,8 @@ import request from 'request';
 
 describe('Hello World', () => {
   test("Service returns 'Hello World'", async () => {
-    const SERVICE_ENDPOINT: string = 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
+    const SERVICE_ENDPOINT: string =
+      process.env.SERVICE_ENDPOINT || 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
     request({
       uri: SERVICE_ENDPOINT,
       method: 'GET'

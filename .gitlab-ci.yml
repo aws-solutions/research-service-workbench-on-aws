@@ -248,7 +248,7 @@ deploy:
     - cdk bootstrap ${AWS_ENVIRONMENT}
     - cdk synth
     - cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
-    - echo "SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json`" > $CI_PROJECT_DIR/deploy.env
+    - echo "SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`" > $CI_PROJECT_DIR/deploy.env
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
@@ -272,7 +272,6 @@ integration_test:
     - echo $SERVICE_ENDPOINT
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
     - npm config list
-    - curl "https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/"
     - node common/scripts/install-run-rush.js install
     - node common/scripts/install-run-rush.js build --verbose
     - node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-express --verbose
