@@ -257,8 +257,8 @@ deploy:
   dependencies:
     - docker-image-update
   artifacts:
-    paths:
-      - ./cdk-outputs.json
+    reports:
+      dotenv: cdk-outputs.json
   
 integration_test:
   stage: integ-test
@@ -271,4 +271,4 @@ integration_test:
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
-    - cat $STACK_FILE
+    - cat $CDK_OUTPUT
