@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 describe('Hello World', () => {
-  test("Service returns 'Hello World!'", async () => {
+  test("Service returns 'Hello World'", async () => {
     try {
       console.log(process.env.SERVICE_ENDPOINT);
       const SERVICE_ENDPOINT: string =
