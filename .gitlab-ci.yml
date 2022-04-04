@@ -271,5 +271,8 @@ integration_test:
   script:
     - echo $SERVICE_ENDPOINT
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
+    - npm config list
     - node common/scripts/install-run-rush.js install
-    - node common/scripts/install-run-rush.js test -o @amzn/workbench-core-express -v
+    - node common/scripts/install-run-rush.js check
+    - node common/scripts/install-run-rush.js rebuild --verbose
+    - node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-express --verbose
