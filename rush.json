@@ -48,7 +48,7 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/logging",
+      "packageName": "@amzn/workbench-core-logging",
       "projectFolder": "workbench-core/logging",
       "reviewCategory": "production",
       "shouldPublish": true

@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-object-injection */
-// using info[LEVEL] and info[MESSAGE] is the only way to access those properties, so this rule must be deleted for this file
 import Transport from 'winston-transport';
 import { LEVEL, MESSAGE } from 'triple-beam';
 
@@ -22,6 +20,8 @@ export class ConsoleTransport extends Transport {
     setImmediate(() => this.emit('logged', info));
 
     // Use console here so request ID and log level can be automatically attached in CloudWatch log
+    // using info[LEVEL] and info[MESSAGE] is the only way to access those properties, so this rule must be deleted for this section
+    /* eslint-disable security/detect-object-injection */
     switch (info[LEVEL]) {
       case 'debug':
         console.debug(info[MESSAGE]);
@@ -39,6 +39,7 @@ export class ConsoleTransport extends Transport {
         console.log(info[MESSAGE]);
         break;
     }
+    /* eslint-enable security/detect-object-injection */
 
     if (callback) {
       callback();
