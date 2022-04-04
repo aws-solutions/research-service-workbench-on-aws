@@ -135,6 +135,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "request",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "source-map-support",
       "allowedCategories": [ "production" ]
     },

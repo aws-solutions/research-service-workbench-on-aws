@@ -1,9 +1,40 @@
-import request from 'supertest';
-import app from '../app';
+// import axios from 'axios';
 
-describe('/GET request', () => {
-  test('should respond with a 200 status code', async () => {
-    const response = await request(app).get('/').send({});
-    expect(response.status).toBe(200);
+// describe('Hello World', () => {
+//   test("Service returns 'Hello World'", async () => {
+//     try {
+//       console.log(process.env.SERVICE_ENDPOINT);
+//       const SERVICE_ENDPOINT: string =
+//         process.env.SERVICE_ENDPOINT || 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
+//       const response = await axios.get(SERVICE_ENDPOINT, {
+//         proxy: {
+//           host: 'localhost',
+//           port: 8080
+//         }
+//       });
+//       expect(response.data).toBe('Hello World');
+//     } catch (e) {
+//       console.error(e);
+//       throw e;
+//     }
+//   });
+// });
+
+import request from 'request';
+
+describe('Hello World', () => {
+  test("Service returns 'Hello World'", async () => {
+    const SERVICE_ENDPOINT: string =
+      process.env.SERVICE_ENDPOINT || 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
+    request
+      .get(SERVICE_ENDPOINT)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .on('response', function (response: any) {
+        expect(response.statusCode).toBe(200);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .on('error', function (error: any) {
+        console.error(error.message);
+      });
   });
 });
