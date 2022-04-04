@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
@@ -12,16 +12,21 @@ export class InfrastructureStack extends Stack {
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
       handler: 'index.handler',
-      code: Code.fromAsset('../express/archive.zip'),
+      code: Code.fromAsset('../express/lambda-build/archive.zip'),
       functionName: 'LambdaService'
     });
 
     const httpLambdaIntegration = new HttpLambdaIntegration('HttpLambda', lambdaService);
 
-    // eslint-disable-next-line no-new
-    new HttpApi(this, 'HttpApi', {
+    const httpApi = new HttpApi(this, 'HttpApi', {
       defaultIntegration: httpLambdaIntegration,
       apiName: 'HttpApiService'
+    });
+
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'HttpEndpoint', {
+      value: httpApi.apiEndpoint,
+      exportName: 'HttpApiEndPoint'
     });
   }
 }

@@ -19,6 +19,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/assert",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
       "allowedCategories": [ "production" ]
     },
@@ -67,6 +71,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "concurrently",
       "allowedCategories": [ "production" ]
     },
@@ -107,6 +115,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "fs",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "production" ]
     },
@@ -124,6 +136,10 @@
     },
     {
       "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "supertest",
       "allowedCategories": [ "production" ]
     },
     {

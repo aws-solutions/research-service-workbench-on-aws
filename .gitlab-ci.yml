@@ -13,6 +13,7 @@ stages:
   - security-scan
   - security-scan-eval
   - deploy
+  - integ-test
 
 docker-image-update:
   stage: docker-image-update
@@ -104,8 +105,6 @@ secret_detection:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   artifacts:
     paths:
-      # in the "parent" job this file is declared as a report artifact, but
-      # we also need it as a regular artifact for the subsequent job
       - $SECRET_DETECTION_REPORT_FILE
 
 iac-sast:
@@ -125,7 +124,6 @@ kics-iac-sast:
     # this job only requires the $SECRET_DETECTION_REPORT_FILE
     GIT_STRATEGY: none
   script:
-    # check if '{ "vulnerabilities": [], ..' is empty in the report file if it exists
     - |
       vulnerability_flag=false
       for file in $REPORT_FILE
@@ -249,10 +247,23 @@ deploy:
     - cd workbench-core/infrastructure
     - cdk bootstrap ${AWS_ENVIRONMENT}
     - cdk synth
-    - cdk deploy --all --require-approval never
+    - cdk deploy --all --require-approval never --outputs-file ./cdk-outputs.json
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   dependencies: []
+  artifacts:
+    paths:
+      - cdk-outputs.json
+  
+integration_test:
+  stage: integ-test
+  image: $IMAGE
+  variables:
+    CDK_OUTPUT: 'cdk-outputs.json'
+  dependencies:
+    - deploy
+  script:
+    - cat $STACK_FILE

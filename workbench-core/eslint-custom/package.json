@@ -23,11 +23,13 @@
     "@rushstack/heft-node-rig": "^1.7.1",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^12",
+    "@types/node": "^16",
     "eslint": "~8.7.0",
     "typescript": "~4.5.2",
     "istanbul-badges-readme": "1.8.1",
     "eslint-plugin-security": "~1.4.0",
-    "@rushstack/eslint-config": "^2.5.1"
+    "@rushstack/eslint-config": "^2.5.1",
+    "@types/jest": "~27.4.1",
+    "jest": "~27.5.1"
   }
 }

@@ -174,7 +174,21 @@
       "enableParallelism": true
     },
     {
+      "name": "test:update",
+      "commandKind": "bulk",
+      "summary": "Used to update snapshots",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "build:test",
+      "commandKind": "bulk",
+      "summary": "Runs rush build and rush test using a single command",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "build:local",
       "commandKind": "bulk",
       "summary": "Runs rush build and rush test using a single command",
       "safeForSimultaneousRushProcesses": true,

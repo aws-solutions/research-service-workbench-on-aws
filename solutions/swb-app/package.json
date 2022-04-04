@@ -30,7 +30,7 @@
     "@rushstack/heft": "^0.44.2",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^12",
+    "@types/node": "^16",
     "concurrently": "^7.0.0",
     "nodemon": "^2.0.15",
     "typescript": "~4.5.2",
@@ -40,6 +40,7 @@
     "eslint": "~8.7.0",
     "eslint-plugin-security": "~1.4.0",
     "@rushstack/eslint-config": "^2.5.1",
-    "@types/jest": "~27.4.1"
+    "@types/jest": "~27.4.1",
+    "jest": "~27.5.1"
   }
 }
