@@ -265,5 +265,7 @@ integration_test:
     CDK_OUTPUT: 'cdk-outputs.json'
   dependencies:
     - deploy
+  rules: 
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
     - cat $STACK_FILE
