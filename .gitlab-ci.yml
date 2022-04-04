@@ -248,12 +248,14 @@ deploy:
     - cdk bootstrap ${AWS_ENVIRONMENT}
     - cdk synth
     - cdk deploy --all --require-approval never --outputs-file ./cdk-outputs.json
+    - cat ./cdk-outputs.json
     # - node common/scripts/install-run-rush.js cdk:bootstrap -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:synth -o @amzn/workbench-core-infrastructure -v
     # - node common/scripts/install-run-rush.js cdk:deploy -o @amzn/workbench-core-infrastructure -v
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-  dependencies: []
+  dependencies:
+    - docker-image-update
   artifacts:
     paths:
       - ./cdk-outputs.json
@@ -265,6 +267,7 @@ integration_test:
     CDK_OUTPUT: 'cdk-outputs.json'
   dependencies:
     - deploy
+    - docker-image-update
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   script:
