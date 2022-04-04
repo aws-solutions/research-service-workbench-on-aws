@@ -10,7 +10,8 @@ export interface LoggerOptions {
   metadata?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   /**
-   * The minimum log level to log. Defaults to 'info'
+   * The minimum log level to log.
+   * If undefined, will fall back to process.env.LOG_LEVEL, or info if neither are defined
    */
   logLevel?: 'silly' | 'debug' | 'verbose' | 'http' | 'info' | 'warn' | 'error';
 
