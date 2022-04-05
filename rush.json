@@ -52,6 +52,12 @@
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-authorization",
+      "projectFolder": "workbench-core/authorization",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }

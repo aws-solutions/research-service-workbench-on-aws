@@ -91,6 +91,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
     },
