@@ -14,7 +14,6 @@ stages:
   - security-scan-eval
   - deploy-test
   - integ-test
-  - deploy-prod
 
 docker-image-update:
   stage: docker-image-update
@@ -239,7 +238,7 @@ update-stable-docker-image:
         - Dockerfile
 
 deploy_test:
-  stage: deploy_test
+  stage: deploy-test
   image: $IMAGE
   script:
     - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
