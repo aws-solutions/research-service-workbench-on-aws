@@ -264,7 +264,7 @@ integration_test:
   stage: integ-test
   image: $IMAGE
   dependencies:
-    - deploy
+    - deploy-test
     - docker-image-update
   rules: 
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
