@@ -237,7 +237,7 @@ update-stable-docker-image:
       changes:
         - Dockerfile
 
-deploy_test:
+deploy-test:
   stage: deploy-test
   image: $IMAGE
   script:
@@ -260,7 +260,7 @@ deploy_test:
     reports:
       dotenv: deploy.env
   
-integration_test:
+integration-test:
   stage: integ-test
   image: $IMAGE
   dependencies:
