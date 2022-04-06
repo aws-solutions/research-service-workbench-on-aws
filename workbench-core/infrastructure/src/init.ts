@@ -5,7 +5,7 @@ import { Handler } from 'aws-lambda';
 
 const app: Express = express();
 app.use('/', router);
-app.listen(8080);
+
 const handler: Handler = serverlessExpress({ app });
 
 export = handler;
