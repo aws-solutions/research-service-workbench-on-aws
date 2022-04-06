@@ -64,6 +64,7 @@ common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
 **/.rush/temp/
+workbench-core/environments/temp/
 
 # Heft
 .heft
@@ -77,4 +78,13 @@ cdk.out
 .vscode
 .heft
 .tools
+
+
 .idea
+
+# Reference package
+solutions/swb-reference/build
+solutions/swb-reference/temp
+solutions/swb-reference/src/config/*.yaml
+!solutions/swb-reference/src/config/example.yaml
+solutions/swb-reference/.aws-sam/

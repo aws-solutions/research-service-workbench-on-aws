@@ -31,6 +31,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@vendia/serverless-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "aws-cdk",
       "allowedCategories": [ "production" ]
     },
@@ -51,6 +55,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "cdk-iam-floyd",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cdk-ssm-document",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "concurrently",
       "allowedCategories": [ "production" ]
     },
@@ -68,6 +80,10 @@
     },
     {
       "name": "eslint-plugin-security",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "express",
       "allowedCategories": [ "production" ]
     },
     {
@@ -96,6 +112,10 @@
     },
     {
       "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
     {
