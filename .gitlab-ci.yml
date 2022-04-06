@@ -274,4 +274,4 @@ integration-test:
     - npm config list
     - node common/scripts/install-run-rush.js install
     - node common/scripts/install-run-rush.js build --verbose
-    - node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-express --verbose
+    - node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose

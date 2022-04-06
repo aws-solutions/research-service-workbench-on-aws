@@ -11,7 +11,7 @@ export class InfrastructureStack extends Stack {
 
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
-      handler: 'init.handler',
+      handler: 'index.handler',
       code: Code.fromAsset('../infrastructure/lambda-build/archive.zip'),
       functionName: 'LambdaService'
     });
