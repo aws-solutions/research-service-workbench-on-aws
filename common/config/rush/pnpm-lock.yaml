@@ -225,14 +225,19 @@ importers:
       '@rushstack/heft': ^0.44.2
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
+      '@types/aws-lambda': ~8.10.92
+      '@types/express': ~4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': ~27.4.1
       '@types/node': ^16
+      '@vendia/serverless-express': ~4.5.4
       aws-cdk: '*'
       aws-cdk-lib: 2.17.0
+      axios: ~0.26.1
       constructs: ^10.0.0
       eslint: ~8.7.0
       eslint-plugin-security: ~1.4.0
+      express: ~4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ~27.5.1
       source-map-support: ^0.5.16
@@ -252,12 +257,17 @@ importers:
       '@rushstack/heft': 0.44.2
       '@rushstack/heft-jest-plugin': 0.2.3_3bbc58e87fc02213aeafea3893b94377
       '@rushstack/heft-node-rig': 1.7.1_3bbc58e87fc02213aeafea3893b94377
+      '@types/aws-lambda': 8.10.92
+      '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
       '@types/node': 16.11.26
+      '@vendia/serverless-express': 4.5.4
       aws-cdk: 2.12.0
+      axios: 0.26.1
       eslint: 8.7.0
       eslint-plugin-security: 1.4.0
+      express: 4.17.3
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.5.0
       ts-node: 10.5.0_f94da96e4d78a751cdd66b59796b8fdd
@@ -2520,7 +2530,6 @@ packages:
   /@vendia/serverless-express/4.5.4:
     resolution: {integrity: sha512-Ptrp8toFPv5Py3VNXRgiJp4XO7KTK992bM1ZrHjjfKJ8ThjJr87Hqs3UpeKHW12ABZ4e062NbDmgmY9NxsYR2w==}
     engines: {node: '>=12'}
-    dev: false
 
   /abab/2.0.5:
     resolution: {integrity: sha512-9IK9EadsbHo6jLWIpxpR6pL0sazTXV6+SQv25ZB+F7Bj9mJNaOc4nCRabwd5M/JwmUa8idz6Eci6eKfJryPs6Q==}

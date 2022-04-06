@@ -116,10 +116,10 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "328ef65be692f0de30341a7d9cf24ee7690df949112f21000f812b100414b71e.zip",
+          "S3Key": "5b060297b72372592c045b605104a2b7519bfe9ee549f01e8328f747772bdb3d.zip",
         },
         "FunctionName": "LambdaService",
-        "Handler": "index.handler",
+        "Handler": "init.handler",
         "Role": Object {
           "Fn::GetAtt": Array [
             "LambdaServiceServiceRole71319041",
