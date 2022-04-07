@@ -65,6 +65,7 @@ common/temp/
 common/autoinstallers/*/.npmrc
 **/.rush/temp/
 workbench-core/environments/temp/
+workbench-core/base/temp/
 
 # Heft
 .heft

@@ -48,6 +48,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@amzn/workbench-core-base",
+      "projectFolder": "workbench-core/base",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",

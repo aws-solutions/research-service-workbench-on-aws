@@ -3,6 +3,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
   "packages": [
     {
+      "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/environments",
       "allowedCategories": [ "production" ]
     },
@@ -12,6 +16,10 @@
     },
     {
       "name": "@amzn/swb-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production" ]
     },
     {
