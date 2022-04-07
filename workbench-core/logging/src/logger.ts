@@ -6,18 +6,26 @@ export interface LoggerOptions {
   /**
    * Data to be passed along with each log from the logger.
    * Anything that is unable to be JSON.stringified will be ignored
+   *
+   * @example
+   * Here's an example of how to include the service name in each log message:
+   * ```
+   * {
+   *    metadata: {
+   *      service: "example-service"
+   *    }
+   * }
+   * ```
    */
   metadata?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   /**
    * The minimum log level to log.
-   * If undefined, will fall back to process.env.LOG_LEVEL, or info if neither are defined
    */
   logLevel?: 'silly' | 'debug' | 'verbose' | 'http' | 'info' | 'warn' | 'error';
 
   /**
    * The list of transports the logger will use.
-   * If undefined, the logger will use the ConsoleTransport.
    */
   transports?: TransportStream[];
 }
@@ -25,18 +33,25 @@ export interface LoggerOptions {
 /**
  * Creates and returns a Winston logging instance that logs to console.
  *
- * @param options - the LoggerOptions object
+ * @param options - The: {@link LoggerOptions | LoggerOptions} object
+ *
+ * default values:
+ * ```
+ * {
+ *    logLevel: "info",
+ *    transports: [ new ConsoleTransport() ]
+ * }
+ * ```
  *
  * @returns A logger instance
- *
  */
-export function makeLogger(options?: LoggerOptions): Logger {
-  const transports = options?.transports ?? new ConsoleTransport();
-
+export function makeLogger(
+  options: LoggerOptions = { logLevel: 'info', transports: [new ConsoleTransport()] }
+): Logger {
   return createLogger({
-    level: options?.logLevel ?? process.env.LOG_LEVEL,
+    level: options.logLevel,
     format: format.combine(format.errors({ stack: true }), format.json()),
-    transports,
+    transports: options.transports,
     defaultMeta: { meta: options?.metadata }
   });
 }
