@@ -3,10 +3,6 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
   "packages": [
     {
-      "name": "@amzn/workbench-core-base",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@amzn/environments",
       "allowedCategories": [ "production" ]
     },
@@ -16,6 +12,10 @@
     },
     {
       "name": "@amzn/swb-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },
     {
@@ -55,14 +55,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "aws-lambda-fastify",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "aws-sdk",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "cdk-iam-floyd",
       "allowedCategories": [ "production" ]
     },
@@ -92,22 +84,6 @@
     },
     {
       "name": "express",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-autoload",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-plugin",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-sensible",
       "allowedCategories": [ "production" ]
     },
     {

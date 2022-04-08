@@ -32,8 +32,6 @@ docker-image-update:
 
 .base:
   script:
-    - aws codeartifact login --domain ${CODEARTIFACT_DOMAIN_NAME} --domain-owner ${CODEARTIFACT_DOMAIN_OWNER} --repository ${CODEARTIFACT_REPO_NAME} --region ${REGION} --tool ${CODEARIFACT_PACKAGE_FORMAT}
-    - npm config list
     - echo "Fetch the main branch"
     - git fetch origin main:refs/remotes/origin/main -a
     - echo "Install NPM packages in the common folder"
