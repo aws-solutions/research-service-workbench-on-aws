@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.58.0",
+    "@aws-sdk/client-service-catalog": "^3.58.0",
+    "@aws-sdk/client-s3": "^3.58.0",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
   },
   "devDependencies": {

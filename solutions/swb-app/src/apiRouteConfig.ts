@@ -7,6 +7,7 @@ export interface ApiRouteConfig {
 
 export interface ApiRoute {
   path: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   service: any;
   serviceAction: string;
   httpMethod: HTTPMethod;

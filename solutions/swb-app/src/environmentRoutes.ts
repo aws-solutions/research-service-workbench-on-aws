@@ -2,7 +2,7 @@
 import { Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
 
-export function setUpEnvRoutes(router: Router, environments: { [key: string]: Environment }) {
+export function setUpEnvRoutes(router: Router, environments: { [key: string]: Environment }): void {
   const supportedEnvs = Object.keys(environments);
 
   // Launch
@@ -56,7 +56,8 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
   // Get environment connection creds
   router.get('/environments/:id/connections', async (req: Request, res: Response) => {
     // Mocked getEnvironment
-    const getEnvironment = (envId: string) => {
+    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+      console.log('envId', envId);
       return { envType: 'sagemaker', instanceName: 'abc' };
     };
     const { envType, instanceName } = getEnvironment(req.params.id);

@@ -23,6 +23,18 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/types",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },
@@ -52,6 +64,10 @@
     },
     {
       "name": "aws-lambda",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-sdk-client-mock",
       "allowedCategories": [ "production" ]
     },
     {
@@ -92,6 +108,14 @@
     },
     {
       "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "js-yaml",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "md5-file",
       "allowedCategories": [ "production" ]
     },
     {

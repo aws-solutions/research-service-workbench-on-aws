@@ -14,7 +14,9 @@
     "compile": "scripts/buildLambda.js",
     "build": "heft build --clean",
     "run-locally": "rush build && rushx compile && cdk synth && sam local start-api -t cdk.out/swb-$STAGE-api.template.json",
-    "cdk-deploy": "rush build && rushx compile && cdk deploy --all"
+    "run-postDeployment": "rush build && node lib/postDeployment.js",
+    "cdk-deploy": "rush build && rushx compile && cdk deploy --all",
+    "jest": "jest"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.0.0",
@@ -25,6 +27,7 @@
     "@vendia/serverless-express": "^4.5.4",
     "cdk-ssm-document": "^3.1.0",
     "cdk-iam-floyd": "^0.300.0",
+    "js-yaml": "^4.1.0",
     "@amzn/workbench-core-base": "workspace:*"
   },
   "devDependencies": {
@@ -34,6 +37,7 @@
     "@types/heft-jest": "1.0.2",
     "@types/node": "^12",
     "typescript": "^4.5.2",
+    "eslint": "^8.7.0",
     "aws-cdk": "^2.12.0",
     "esbuild": "^0.14.21",
     "ts-node": "^10.4.0",
@@ -45,7 +49,8 @@
     "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
     "@types/js-yaml": "^4.0.5",
-    "ts-jest": "^27.1.3"
+    "ts-jest": "^27.1.3",
+    "@rushstack/eslint-config": "^2.5.1"
   },
   "jest": {
     "moduleFileExtensions": [

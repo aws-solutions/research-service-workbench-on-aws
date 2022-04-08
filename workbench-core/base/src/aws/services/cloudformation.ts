@@ -10,6 +10,8 @@ import {
   DescribeStacksCommandOutput
 } from '@aws-sdk/client-cloudformation';
 
+// Documentation for client and methods
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-cloudformation/index.html
 export default class CloudFormation {
   private _client: CloudFormationClient;
   public constructor(options: { region: string }) {

@@ -1,16 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Runtime, Function, Code } from 'aws-cdk-lib/aws-lambda';
-import { Rule, Schedule, EventBus } from 'aws-cdk-lib/aws-events';
+import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { App, CfnOutput, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
 import Workflow from './environment/workflow';
+import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { getConstants } from './constants';
 
 export class SWBStack extends Stack {
-  public constructor(app: App, id: string) {
-    super(app, id);
+  public constructor(app: App) {
+    const { STACK_NAME, AWS_REGION, S3_ARTIFACT_BUCKET_ARN_NAME, LAUNCH_CONSTRAINT_ROLE_NAME } =
+      getConstants();
+    super(app, STACK_NAME, {
+      env: {
+        region: AWS_REGION
+      }
+    });
+
     const apiLambda: Function = this._createAPILambda();
     this._createRestApi(apiLambda);
 
@@ -21,6 +31,64 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
 
     this._createEventBridgeResources();
+    this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
+  }
+
+  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): void {
+    const sagemakerPolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: [
+            'sagemaker:DescribeNotebookInstanceLifecycleConfig',
+            'sagemaker:CreateNotebookInstanceLifecycleConfig',
+            'sagemaker:DeleteNotebookInstanceLifecycleConfig'
+          ],
+          resources: [
+            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/basicnotebookinstancelifecycleconfig-*'
+          ]
+        }),
+        new PolicyStatement({
+          actions: [
+            'sagemaker:DescribeNotebookInstance',
+            'sagemaker:CreateNotebookInstance',
+            'sagemaker:StopNotebookInstance',
+            'sagemaker:StopNotebookInstance',
+            'sagemaker:DeleteNotebookInstance'
+          ],
+          resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
+        }),
+        new PolicyStatement({
+          actions: [
+            'ec2:DescribeNetworkInterfaces',
+            'ec2:CreateNetworkInterface',
+            'ec2:DeleteNetworkInterface'
+          ],
+          resources: ['*']
+        })
+      ]
+    });
+
+    const iamRole = new Role(this, 'LaunchConstraint', {
+      assumedBy: new ServicePrincipal('servicecatalog.amazonaws.com'),
+      roleName: `${this.stackName}-LaunchConstraint`,
+      description: 'Launch constraint role for Service Catalog products',
+      inlinePolicies: {
+        sagemakerLaunchPermissions: sagemakerPolicy
+      }
+    });
+
+    new CfnOutput(this, launchConstraintRoleNameOutput, {
+      value: iamRole.roleName
+    });
+  }
+
+  private _createS3Buckets(s3ArtifactName: string): void {
+    const s3Bucket = new Bucket(this, 's3-artifacts', {});
+
+    new CfnOutput(this, s3ArtifactName, {
+      value: s3Bucket.bucketArn
+    });
   }
 
   private _createEventBridgeResources(): void {
@@ -28,8 +96,7 @@ export class SWBStack extends Stack {
       eventBusName: this.stackName
     });
 
-    new CfnOutput(this, 'EventBus', {
-      exportName: 'eventBusArn',
+    new CfnOutput(this, 'EventBusOutput', {
       value: bus.eventBusArn
     });
   }
@@ -63,8 +130,7 @@ export class SWBStack extends Stack {
       runtime: Runtime.NODEJS_14_X
     });
 
-    new CfnOutput(this, 'apiLambdaRole', {
-      exportName: 'apiLambdaRoleArn',
+    new CfnOutput(this, 'apiLambdaRoleOutput', {
       value: apiLambda.role!.roleArn
     });
 
@@ -86,8 +152,10 @@ export class SWBStack extends Stack {
         allowOrigins: ['http://localhost:3000']
       }
     });
-    // eslint-disable-next-line no-new
-    new CfnOutput(this, 'apiUrl', { value: API.url });
+
+    new CfnOutput(this, 'apiUrlOutput', {
+      value: API.url
+    });
 
     API.root.addProxy({
       defaultIntegration: new LambdaIntegration(apiLambda)

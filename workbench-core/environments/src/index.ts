@@ -4,6 +4,7 @@ import AccountHandler from './accountHandler';
 import StatusHandler from './statusHandler';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import { EnvironmentStatus } from './environmentStatus';
+import ServiceCatalogSetup from './serviceCatalogSetup';
 
 export {
   EnvironmentConnectionService,
@@ -11,5 +12,6 @@ export {
   AccountHandler,
   StatusHandler,
   EventBridgeEventToDDB,
-  EnvironmentStatus
+  EnvironmentStatus,
+  ServiceCatalogSetup
 };

@@ -9,7 +9,9 @@
     "<rootDir>/src/environment/workflow.ts",
     "<rootDir>/src/accountHandlerLambda.ts",
     "<rootDir>/src/environment/statusHandlerLambda.ts",
-    "<rootDir>/src/backendAPILambda.ts"
+    "<rootDir>/src/backendAPILambda.ts",
+    "<rootDir>/src/constants.ts",
+    "<rootDir>/src/postDeployment.ts"
   ],
   "coverageThreshold": {
     "global": {
