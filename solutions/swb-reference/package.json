@@ -13,7 +13,6 @@
     "cdk": "cdk",
     "compile": "scripts/buildLambda.js",
     "build": "heft build --clean",
-    "run-locally": "rush build && rushx compile && cdk synth && sam local start-api -t cdk.out/swb-$STAGE-api.template.json",
     "run-postDeployment": "rush build && node lib/postDeployment.js",
     "cdk-deploy": "rush build && rushx compile && cdk deploy --all",
     "jest": "jest"
