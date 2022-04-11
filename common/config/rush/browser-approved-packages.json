@@ -15,6 +15,26 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-cloudformation",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/types",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },
@@ -31,6 +51,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@vendia/serverless-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "aws-cdk",
       "allowedCategories": [ "production" ]
     },
@@ -43,11 +67,15 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "aws-lambda-fastify",
+      "name": "aws-sdk-client-mock",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "aws-sdk",
+      "name": "cdk-iam-floyd",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cdk-ssm-document",
       "allowedCategories": [ "production" ]
     },
     {
@@ -71,23 +99,23 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "fastify",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-autoload",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-plugin",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "fastify-sensible",
+      "name": "express",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "istanbul-badges-readme",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "js-yaml",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "md5-file",
       "allowedCategories": [ "production" ]
     },
     {
@@ -96,6 +124,10 @@
     },
     {
       "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
     {

@@ -1,12 +1,8 @@
+/* eslint-disable no-new */
 import * as cdk from 'aws-cdk-lib';
-
-import { ApiLambdaCrudDynamoDBStack } from './api';
+import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-
-// eslint-disable-next-line no-new
-new ApiLambdaCrudDynamoDBStack(app, 'Api');
+new SWBStack(app);
 
 app.synth();
-
-// console.log('test');
