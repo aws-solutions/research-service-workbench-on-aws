@@ -118,7 +118,7 @@ export class SWBStack extends Stack {
 
     // Run lambda function every 5 minutes
     const eventRule = new Rule(this, 'scheduleRule', {
-      schedule: Schedule.cron({ minute: '5' })
+      schedule: Schedule.cron({ minute: '0/5' })
     });
     eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
