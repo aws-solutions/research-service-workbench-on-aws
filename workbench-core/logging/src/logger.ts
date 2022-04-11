@@ -49,9 +49,9 @@ export function makeLogger(
   options: LoggerOptions = { logLevel: 'info', transports: [new ConsoleTransport()] }
 ): Logger {
   return createLogger({
-    level: options.logLevel,
+    level: options.logLevel || 'info',
     format: format.combine(format.errors({ stack: true }), format.json()),
-    transports: options.transports,
-    defaultMeta: { meta: options?.metadata }
+    transports: options.transports || new ConsoleTransport(),
+    defaultMeta: { meta: options.metadata }
   });
 }

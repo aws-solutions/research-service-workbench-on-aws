@@ -49,7 +49,7 @@ describe('ConsoleTransport tests', () => {
 
     const debugSpy = jest.spyOn(console, 'debug');
 
-    logger.debug('this shouldnt be logged');
+    logger.debug('this should be logged');
 
     expect(debugSpy).toHaveBeenCalledTimes(1);
   });
@@ -59,9 +59,9 @@ describe('ConsoleTransport tests', () => {
 
     const logSpy = jest.spyOn(console, 'log');
 
-    logger.http('this shouldnt be logged');
-    logger.verbose('this shouldnt be logged');
-    logger.silly('this shouldnt be logged');
+    logger.http('this should be logged');
+    logger.verbose('this should be logged');
+    logger.silly('this should be logged');
 
     expect(logSpy).toHaveBeenCalledTimes(3);
   });
