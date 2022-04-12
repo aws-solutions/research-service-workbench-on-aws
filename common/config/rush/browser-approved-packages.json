@@ -123,6 +123,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
@@ -132,6 +136,14 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston-transport",
       "allowedCategories": [ "production" ]
     }
   ]
