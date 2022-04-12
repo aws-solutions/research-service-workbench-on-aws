@@ -1,7 +1,9 @@
 import { AccountHandler } from '@amzn/environments';
+import { AwsService } from '@amzn/workbench-core-base';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
-  const accountHandler = new AccountHandler();
+  const mainAccountAwsService = new AwsService({ AWS_REGION: process.env.AWS_REGION! });
+  const accountHandler = new AccountHandler(mainAccountAwsService);
   await accountHandler.execute(event);
 }

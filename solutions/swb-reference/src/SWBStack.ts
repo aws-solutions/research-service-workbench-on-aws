@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
+/* eslint-disable */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -8,7 +9,7 @@ import { App, CfnOutput, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
 import Workflow from './environment/workflow';
-import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { getConstants } from './constants';
 
 export class SWBStack extends Stack {
@@ -116,11 +117,32 @@ export class SWBStack extends Stack {
       runtime: Runtime.NODEJS_14_X
     });
 
-    // Run lambda function every 5 minutes
-    const eventRule = new Rule(this, 'scheduleRule', {
-      schedule: Schedule.cron({ minute: '0/5' })
+    const createPortfolioSharePolicy = new PolicyStatement({
+      actions: ['servicecatalog:CreatePortfolioShare'],
+      resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
     });
-    eventRule.addTarget(new targets.LambdaFunction(lambda));
+    lambda.role?.attachInlinePolicy(
+      new Policy(this, 'portfolioSharePolicy', {
+        statements: [createPortfolioSharePolicy]
+      })
+    );
+
+    const assumeRolePolicy = new PolicyStatement({
+      actions: ['sts:AssumeRole'],
+      // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+      resources: [`arn:aws:iam::*:role/${this.stackName}-cross-account-role`]
+    });
+    lambda.role?.attachInlinePolicy(
+      new Policy(this, 'assumeRolePolicy', {
+        statements: [assumeRolePolicy]
+      })
+    );
+
+    // Run lambda function every 5 minutes
+    // const eventRule = new Rule(this, 'scheduleRule', {
+    //   schedule: Schedule.cron({ minute: '0/5' })
+    // });
+    // eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
 
   private _createAPILambda(): Function {

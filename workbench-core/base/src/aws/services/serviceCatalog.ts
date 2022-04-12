@@ -1,4 +1,7 @@
 import {
+  AcceptPortfolioShareCommand,
+  AcceptPortfolioShareInput,
+  AcceptPortfolioShareOutput,
   AssociateProductWithPortfolioCommand,
   AssociateProductWithPortfolioCommandInput,
   AssociateProductWithPortfolioCommandOutput,
@@ -8,6 +11,8 @@ import {
   CreatePortfolioCommand,
   CreatePortfolioCommandInput,
   CreatePortfolioCommandOutput,
+  CreatePortfolioShareCommand,
+  CreatePortfolioShareInput,
   CreateProductCommand,
   CreateProductCommandInput,
   CreateProductCommandOutput,
@@ -25,12 +30,13 @@ import {
   SearchProductsAsAdminCommandOutput,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
+import { Credentials } from '@aws-sdk/types';
 
 // Documentation for client and methods
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-service-catalog/index.html
 export default class ServiceCatalog {
   private _client: ServiceCatalogClient;
-  public constructor(options: { region: string }) {
+  public constructor(options: { region: string; credentials?: Credentials }) {
     this._client = new ServiceCatalogClient({ ...options });
   }
 
@@ -38,6 +44,16 @@ export default class ServiceCatalog {
     params: CreateConstraintCommandInput
   ): Promise<CreateConstraintCommandOutput> {
     return this._client.send(new CreateConstraintCommand(params));
+  }
+
+  public async createPortfolioShare(
+    params: CreatePortfolioShareInput
+  ): Promise<CreatePortfolioCommandOutput> {
+    return this._client.send(new CreatePortfolioShareCommand(params));
+  }
+
+  public async acceptPortfolioShare(params: AcceptPortfolioShareInput): Promise<AcceptPortfolioShareOutput> {
+    return this._client.send(new AcceptPortfolioShareCommand(params));
   }
 
   public async describeProductAsAdmin(

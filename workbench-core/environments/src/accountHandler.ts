@@ -1,4 +1,11 @@
+import { AwsService } from '@amzn/workbench-core-base';
+
 export default class AccountHandler {
+  private _mainAccountAwsService: AwsService;
+
+  public constructor(mainAccountAwsService: AwsService) {
+    this._mainAccountAwsService = mainAccountAwsService;
+  }
   /* eslint-disable-next-line */
   public async execute(event: any): Promise<void> {
     /*
@@ -11,6 +18,58 @@ export default class AccountHandler {
      * Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
      * Add hosting account VPC and Subnet ID to DDB
      */
-    console.log(`Account Handler executed with event ${JSON.stringify(event)}`);
+
+    // TODO: Get value from DDB
+    const portfolioId = 'port-4n4g66unobu34';
+    const [iamRoleArn] = await this._getHostingAccountIamRole();
+    // TODO: Get this value from the hosting accoutn role arn
+    const hostingAccountId = '750404249455';
+    const hostingAccountAwsService = await this._getAwsService(iamRoleArn);
+    await this._shareAndAcceptScPortfolio(hostingAccountAwsService, hostingAccountId, portfolioId);
+  }
+
+  /**
+   * Get list of all hosting account IAM roles
+   * @returns List of all hosting account IAM roles
+   */
+  private async _getHostingAccountIamRole(): Promise<string[]> {
+    //TODO: Get this from DDB
+
+    return Promise.resolve(['arn:aws:iam::750404249455:role/swb-dev-oh-cross-account-role']);
+  }
+
+  private async _shareAndAcceptScPortfolio(
+    hostingAccountAwsService: AwsService,
+    hostingAccountId: string,
+    portfolioId: string
+  ): Promise<void> {
+    console.log(`Sharing Service Catalog Portfolio ${portfolioId} with account ${hostingAccountId} `);
+    await this._mainAccountAwsService.serviceCatalog.createPortfolioShare({
+      PortfolioId: portfolioId,
+      AccountId: hostingAccountId
+    });
+
+    await hostingAccountAwsService.serviceCatalog.acceptPortfolioShare({ PortfolioId: portfolioId });
+  }
+
+  private async _getAwsService(roleArn: string): Promise<AwsService> {
+    const sts = this._mainAccountAwsService.sts;
+    const { Credentials: creds } = await sts.assumeRole({
+      RoleArn: roleArn,
+      RoleSessionName: 'account-handler',
+      ExternalId: 'workbench'
+    });
+    if (creds) {
+      return new AwsService({
+        AWS_REGION: process.env.AWS_REGION!,
+        credentials: {
+          accessKeyId: creds.AccessKeyId!,
+          secretAccessKey: creds.SecretAccessKey!,
+          sessionToken: creds.SessionToken,
+          expiration: creds.Expiration
+        }
+      });
+    }
+    throw new Error(`Cannot assume roleArn ${roleArn}`);
   }
 }

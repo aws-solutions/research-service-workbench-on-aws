@@ -9,6 +9,8 @@ import EventBridge from './services/eventbridge';
 import SSM from './services/ssm';
 import ServiceCatalog from './services/serviceCatalog';
 import S3 from './services/s3';
+import STS from './services/sts';
+import { Credentials } from '@aws-sdk/types';
 export default class AwsService {
   public cloudformation: CloudFormation;
   public ssm: SSM;
@@ -16,15 +18,17 @@ export default class AwsService {
   public eventBridge: EventBridge;
   public serviceCatalog: ServiceCatalog;
   public s3: S3;
+  public sts: STS;
 
-  public constructor(awsConfig: { AWS_REGION: string }) {
-    const { AWS_REGION } = awsConfig;
+  public constructor(awsConfig: { AWS_REGION: string; credentials?: Credentials }) {
+    const { AWS_REGION, credentials } = awsConfig;
 
     this.cloudformation = new CloudFormation({ region: AWS_REGION });
     this.ssm = new SSM({ region: AWS_REGION });
     this.ec2 = new EC2({ region: AWS_REGION });
     this.eventBridge = new EventBridge({ region: AWS_REGION });
-    this.serviceCatalog = new ServiceCatalog({ region: AWS_REGION });
+    this.serviceCatalog = new ServiceCatalog({ region: AWS_REGION, credentials });
     this.s3 = new S3({ region: AWS_REGION });
+    this.sts = new STS({ region: AWS_REGION });
   }
 }

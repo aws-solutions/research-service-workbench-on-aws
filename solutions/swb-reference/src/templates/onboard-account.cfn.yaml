@@ -308,7 +308,7 @@ Resources:
   CrossAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'cross-account-role']]
+      RoleName: !Join ['-', [Ref: Namespace, 'cross-account-role']]     # Confirm the suffix `cross-account-role` matches with the suffix in SWBStack
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
