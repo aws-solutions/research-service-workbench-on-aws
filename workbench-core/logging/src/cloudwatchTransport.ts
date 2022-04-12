@@ -15,12 +15,13 @@ const BASE_MESSAGE_SIZE: number = 26; // in bytes
 
 /**
  * TODO's:
- * - implement sending log batch if oldest log is >= 9 seconds old (can be configured)
+ * - implement sending log batch if oldest log is \>= 9 seconds old (can be configured)
  * - figure out how to properly configure credentialing
  * - warn that a message was truncated (not sure if required)
  * - figure out how to flush logs when process exits (if possible)
  * - handle errors related to sending logs to cloudwatch
  * - clean up _uploadLogs() function, especially in the try/catch block
+ * - look at consoleTransport.ts to see if we can do the same thing about info[MESSAGE] instead of using any in the log function
  */
 
 interface CloudwatchLogsTransportOptions extends TransportStreamOptions {
@@ -71,11 +72,11 @@ export class CloudwatchLogsTransport extends TransportStream {
   public async log(info: any, callback: () => void): Promise<void> {
     // eslint-disable-line @typescript-eslint/no-explicit-any
     /* send log batch if: (from https://sage.amazon.com/posts/950517)
-            - batch size >= MAX_BATCH_SIZE
-            - logQueue.length >= 10,000
-            - oldest log is >= 9 seconds old (can be configured) TODO how to implement
-            - process exits
-        */
+        - batch size >= MAX_BATCH_SIZE
+        - logQueue.length >= 10,000
+        - oldest log is >= 9 seconds old (can be configured) TODO how to implement
+        - process exits
+    */
 
     const now = new Date().getTime();
 
