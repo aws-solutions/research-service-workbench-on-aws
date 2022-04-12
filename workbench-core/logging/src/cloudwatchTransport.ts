@@ -69,8 +69,8 @@ export class CloudwatchLogsTransport extends TransportStream {
     this._decoder = new TextDecoder();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async log(info: any, callback: () => void): Promise<void> {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
     /* send log batch if: (from https://sage.amazon.com/posts/950517)
         - batch size >= MAX_BATCH_SIZE
         - logQueue.length >= 10,000
