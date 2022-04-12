@@ -1,8 +1,13 @@
-import { EnvironmentConnectionService, EnvironmentLifecycleService } from '@amzn/environments';
+import {
+  HostingAccountService,
+  EnvironmentConnectionService,
+  EnvironmentLifecycleService
+} from '@amzn/environments';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
+  account: HostingAccountService;
 }
 
 export interface ApiRoute {

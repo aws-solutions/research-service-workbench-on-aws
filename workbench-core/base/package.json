@@ -14,9 +14,12 @@
   },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.58.0",
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws-sdk/client-ssm": "^3.58.0",
+    "@aws-sdk/client-ec2": "^3.60.0",
+    "@aws-sdk/client-eventbridge": "^3.66.0",
     "@aws-sdk/client-service-catalog": "^3.58.0",
-    "@aws-sdk/client-s3": "^3.58.0",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@aws-sdk/client-s3": "^3.58.0"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^2.5.1",
