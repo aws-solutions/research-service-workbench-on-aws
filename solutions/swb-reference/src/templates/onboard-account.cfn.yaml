@@ -472,6 +472,7 @@ Resources:
           - SageMaker Notebook Instance State Change
       Targets:
         - Arn: !Ref MainAccountEventBusArn
+          Id: 'MainAccountRoutingRule'
           RoleArn: !GetAtt 
             - EventBridgeIAMrole
             - Arn

@@ -23,11 +23,23 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-ec2",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-eventbridge",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-service-catalog",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ssm",
       "allowedCategories": [ "production" ]
     },
     {
@@ -123,6 +135,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
@@ -132,6 +148,14 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston-transport",
       "allowedCategories": [ "production" ]
     }
   ]

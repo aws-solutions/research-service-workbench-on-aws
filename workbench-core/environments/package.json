@@ -1,7 +1,7 @@
 {
   "name": "@amzn/environments",
   "version": "0.0.22",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": "ssh://git.amazon.com/pkg/Ma-mono",
@@ -19,7 +19,10 @@
     "@aws-sdk/client-s3": "^3.58.0",
     "md5-file": "^5.0.0",
     "@aws-sdk/client-cloudformation": "^3.58.0",
-    "@amzn/workbench-core-base": "workspace:*"
+    "@amzn/workbench-core-base": "workspace:*",
+    "@aws-sdk/client-eventbridge": "^3.66.0",
+    "@aws-sdk/client-ec2": "^3.60.0",
+    "@aws-sdk/client-ssm": "^3.58.0"
   },
   "devDependencies": {
     "@rushstack/heft": "^0.44.2",
