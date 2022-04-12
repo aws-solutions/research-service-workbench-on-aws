@@ -25,23 +25,26 @@ export class ConsoleTransport extends TransportStream {
     setImmediate(() => this.emit('logged', info));
 
     // Use console here so request ID and log level can be automatically attached in CloudWatch log
+    // info[LEVEL] and info[MESSAGE] break the eslint and semgrep rules below
+    // but are where Winston stores the level and message properties, so the rule must be turned off for this section
     /* eslint-disable security/detect-object-injection */
-    // info[LEVEL] and info[MESSAGE] break the above eslint rule but are where Winston stores the level and message properties, so the rule must be turned off for this section
-    switch (info[LEVEL]) {
+    switch (
+      info[LEVEL] // nosemgrep
+    ) {
       case 'debug':
-        console.debug(info[MESSAGE]);
+        console.debug(info[MESSAGE]); // nosemgrep
         break;
       case 'info':
-        console.info(info[MESSAGE]);
+        console.info(info[MESSAGE]); // nosemgrep
         break;
       case 'warn':
-        console.warn(info[MESSAGE]);
+        console.warn(info[MESSAGE]); // nosemgrep
         break;
       case 'error':
-        console.error(info[MESSAGE]);
+        console.error(info[MESSAGE]); // nosemgrep
         break;
       default:
-        console.log(info[MESSAGE]);
+        console.log(info[MESSAGE]); // nosemgrep
         break;
     }
     /* eslint-enable security/detect-object-injection */
