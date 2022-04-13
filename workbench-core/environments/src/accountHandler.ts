@@ -24,7 +24,12 @@ export default class AccountHandler {
     const [iamRoleArn] = await this._getHostingAccountIamRole();
     // TODO: Get this value from the hosting accoutn role arn
     const hostingAccountId = '750404249455';
-    const hostingAccountAwsService = await this._getAwsService(iamRoleArn);
+    const hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
+      roleArn: iamRoleArn,
+      roleSessionName: 'account-handler',
+      externalId: 'workbench',
+      region: process.env.AWS_REGION!
+    });
     await this._shareAndAcceptScPortfolio(hostingAccountAwsService, hostingAccountId, portfolioId);
   }
 
@@ -50,26 +55,5 @@ export default class AccountHandler {
     });
 
     await hostingAccountAwsService.serviceCatalog.acceptPortfolioShare({ PortfolioId: portfolioId });
-  }
-
-  private async _getAwsService(roleArn: string): Promise<AwsService> {
-    const sts = this._mainAccountAwsService.sts;
-    const { Credentials: creds } = await sts.assumeRole({
-      RoleArn: roleArn,
-      RoleSessionName: 'account-handler',
-      ExternalId: 'workbench'
-    });
-    if (creds) {
-      return new AwsService({
-        AWS_REGION: process.env.AWS_REGION!,
-        credentials: {
-          accessKeyId: creds.AccessKeyId!,
-          secretAccessKey: creds.SecretAccessKey!,
-          sessionToken: creds.SessionToken,
-          expiration: creds.Expiration
-        }
-      });
-    }
-    throw new Error(`Cannot assume roleArn ${roleArn}`);
   }
 }

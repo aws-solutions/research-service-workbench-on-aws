@@ -31,7 +31,6 @@ import {
   ServiceCatalogClient,
   ServiceCatalogClientConfig
 } from '@aws-sdk/client-service-catalog';
-import { Credentials } from '@aws-sdk/types';
 
 // Documentation for client and methods
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-service-catalog/index.html
