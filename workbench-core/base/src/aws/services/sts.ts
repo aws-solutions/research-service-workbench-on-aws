@@ -2,13 +2,14 @@ import {
   AssumeRoleCommand,
   AssumeRoleCommandInput,
   AssumeRoleCommandOutput,
-  STSClient
+  STSClient,
+  STSClientConfig
 } from '@aws-sdk/client-sts';
 
 export default class STS {
   private _client: STSClient;
-  public constructor(options: { region: string }) {
-    this._client = new STSClient({ ...options });
+  public constructor(config: STSClientConfig) {
+    this._client = new STSClient(config);
   }
 
   public async assumeRole(params: AssumeRoleCommandInput): Promise<AssumeRoleCommandOutput> {

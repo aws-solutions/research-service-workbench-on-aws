@@ -18,7 +18,7 @@ export default class HostingAccountLifecycleService {
     AMI_IDS_TO_SHARE: string;
   }) {
     this.options = constants;
-    this.aws = new AwsService({ AWS_REGION: this.options.AWS_REGION });
+    this.aws = new AwsService({ region: this.options.AWS_REGION });
   }
 
   public async initializeAccount(accountMetadata: {

@@ -172,7 +172,7 @@ importers:
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-service-catalog': ^3.58.0
       '@aws-sdk/client-ssm': ^3.58.0
-      '@aws-sdk/client-sts': ^3.67.0
+      '@aws-sdk/client-sts': ^3.58.0
       '@aws-sdk/types': ^3.55.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.44.2
@@ -1911,6 +1911,10 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
+  /@balena/dockerignore/1.0.2:
+    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
+    dev: true
+
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
@@ -3323,7 +3327,16 @@ packages:
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.0.58
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.0
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.5
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -3639,6 +3652,11 @@ packages:
 
   /caniuse-lite/1.0.30001309:
     resolution: {integrity: sha512-Pl8vfigmBXXq+/yUz1jUwULeq9xhMJznzdc/xwl4WclDAuebcTHVefpz8lE/bMI+UN7TOkSSe7B7RnZd6+dzjA==}
+    dev: true
+
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
     dev: true
 
   /cdk-assets/2.12.0:
@@ -5044,7 +5062,7 @@ packages:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.0.5
+      minimatch: 3.1.2
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -6600,6 +6618,11 @@ packages:
     dependencies:
       brace-expansion: 1.1.11
 
+  /minimatch/3.1.2:
+    resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
+    dependencies:
+      brace-expansion: 1.1.11
+
   /minimist/1.2.5:
     resolution: {integrity: sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==}
     dev: true
@@ -7138,7 +7161,7 @@ packages:
   /readdir-glob/1.1.1:
     resolution: {integrity: sha512-91/k1EzZwDx6HbERR+zucygRFfiPl2zkIYZtv3Jjr6Mn7SkKcVct8aVO+sSRiGMc6fLf72du3d92/uY63YPdEA==}
     dependencies:
-      minimatch: 3.0.5
+      minimatch: 3.1.2
     dev: true
 
   /readdirp/3.5.0:

@@ -19,7 +19,7 @@ The requirements below are for running the lambda locally
 ## Running Code Locally
 If you have made changes to the `environment` package or the `swb-reference` package follow these steps
 1. In `ma-mono` root directory run `rush build`
-2. In `ma-mono/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> .scripts/runLocally.sh`. This will run a local lambda server.
+2. In `ma-mono/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
 
 ## Deploying Code
 Run one time to Bootstrap the CDK

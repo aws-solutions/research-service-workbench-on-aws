@@ -33,7 +33,7 @@ export default class ServiceCatalogSetup {
     this._constants = constants;
 
     const { AWS_REGION } = constants;
-    this._aws = new AwsService({ AWS_REGION });
+    this._aws = new AwsService({ region: AWS_REGION });
   }
 
   public async run(cfnFilePaths: string[]): Promise<void> {
