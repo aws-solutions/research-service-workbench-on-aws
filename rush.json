@@ -76,6 +76,12 @@
       "projectFolder": "workbench-core/authentication",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/audit",
+      "projectFolder": "workbench-core/audit",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
