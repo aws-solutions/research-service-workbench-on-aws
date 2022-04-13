@@ -23,15 +23,16 @@ import {
   SearchProductsAsAdminCommand,
   SearchProductsAsAdminCommandInput,
   SearchProductsAsAdminCommandOutput,
-  ServiceCatalogClient
+  ServiceCatalogClient,
+  ServiceCatalogClientConfig
 } from '@aws-sdk/client-service-catalog';
 
 // Documentation for client and methods
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-service-catalog/index.html
 export default class ServiceCatalog {
   private _client: ServiceCatalogClient;
-  public constructor(options: { region: string }) {
-    this._client = new ServiceCatalogClient({ ...options });
+  public constructor(config: ServiceCatalogClientConfig) {
+    this._client = new ServiceCatalogClient(config);
   }
 
   public async createConstraint(

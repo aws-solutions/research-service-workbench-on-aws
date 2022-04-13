@@ -12,7 +12,7 @@
 
 ```
 import { AwsService } from '@amzn/workbench-core-base';
-const aws = new AwsService({ AWS_REGION: 'us-east-1' });
+const aws = new AwsService({ region: 'us-east-1' });
 const params = { StackName: 'testStack' };                            // construct params
 const response = await aws.cloudformation.describeStacks(params);     // perform SDK call
 ```

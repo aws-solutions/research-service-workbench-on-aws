@@ -7,7 +7,8 @@ import {
   EC2Client,
   ModifyImageAttributeCommand,
   ModifyImageAttributeRequest,
-  ModifyImageAttributeCommandOutput
+  ModifyImageAttributeCommandOutput,
+  EC2ClientConfig
 } from '@aws-sdk/client-ec2';
 
 // Documentation for client and methods
@@ -15,8 +16,8 @@ import {
 
 export default class EC2 {
   private _client: EC2Client;
-  public constructor(options: { region: string }) {
-    this._client = new EC2Client({ ...options });
+  public constructor(config: EC2ClientConfig) {
+    this._client = new EC2Client(config);
   }
 
   public async modifyImageAttribute(

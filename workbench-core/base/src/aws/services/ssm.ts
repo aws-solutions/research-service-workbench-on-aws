@@ -7,7 +7,8 @@ import {
   SSMClient,
   ModifyDocumentPermissionCommand,
   ModifyDocumentPermissionCommandInput,
-  ModifyDocumentPermissionCommandOutput
+  ModifyDocumentPermissionCommandOutput,
+  SSMClientConfig
 } from '@aws-sdk/client-ssm';
 
 // Documentation for client and methods
@@ -15,8 +16,8 @@ import {
 
 export default class SSM {
   private _client: SSMClient;
-  public constructor(options: { region: string }) {
-    this._client = new SSMClient({ ...options });
+  public constructor(config: SSMClientConfig) {
+    this._client = new SSMClient(config);
   }
 
   public async modifyDocumentPermission(

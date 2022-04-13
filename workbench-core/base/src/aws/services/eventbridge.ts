@@ -5,6 +5,7 @@
 
 import {
   EventBridgeClient,
+  EventBridgeClientConfig,
   PutPermissionCommand,
   PutPermissionCommandInput,
   PutPermissionCommandOutput
@@ -15,8 +16,8 @@ import {
 
 export default class EventBridge {
   private _client: EventBridgeClient;
-  public constructor(options: { region: string }) {
-    this._client = new EventBridgeClient({ ...options });
+  public constructor(config: EventBridgeClientConfig) {
+    this._client = new EventBridgeClient(config);
   }
 
   public async putPermission(params: PutPermissionCommandInput): Promise<PutPermissionCommandOutput> {

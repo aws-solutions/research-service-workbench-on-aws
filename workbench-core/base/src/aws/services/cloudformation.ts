@@ -5,6 +5,7 @@
 
 import {
   CloudFormationClient,
+  CloudFormationClientConfig,
   DescribeStacksCommand,
   DescribeStacksCommandInput,
   DescribeStacksCommandOutput
@@ -15,8 +16,8 @@ import {
 
 export default class CloudFormation {
   private _client: CloudFormationClient;
-  public constructor(options: { region: string }) {
-    this._client = new CloudFormationClient({ ...options });
+  public constructor(config: CloudFormationClientConfig) {
+    this._client = new CloudFormationClient(config);
   }
 
   public async describeStacks(params: DescribeStacksCommandInput): Promise<DescribeStacksCommandOutput> {
