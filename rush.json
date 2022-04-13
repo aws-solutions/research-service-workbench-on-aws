@@ -70,6 +70,12 @@
       "projectFolder": "workbench-core/authorization",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-authentication",
+      "projectFolder": "workbench-core/authentication",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
