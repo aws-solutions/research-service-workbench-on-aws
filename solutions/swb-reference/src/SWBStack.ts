@@ -114,7 +114,8 @@ export class SWBStack extends Stack {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X
+      runtime: Runtime.NODEJS_14_X,
+      memorySize: 256
     });
 
     const createPortfolioSharePolicy = new PolicyStatement({
