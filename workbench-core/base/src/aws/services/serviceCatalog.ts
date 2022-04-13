@@ -2,6 +2,8 @@ import {
   AcceptPortfolioShareCommand,
   AcceptPortfolioShareInput,
   AcceptPortfolioShareOutput,
+  AssociatePrincipalWithPortfolioCommand,
+  AssociatePrincipalWithPortfolioInput,
   AssociateProductWithPortfolioCommand,
   AssociateProductWithPortfolioCommandInput,
   AssociateProductWithPortfolioCommandOutput,
@@ -38,6 +40,12 @@ export default class ServiceCatalog {
   private _client: ServiceCatalogClient;
   public constructor(config: ServiceCatalogClientConfig) {
     this._client = new ServiceCatalogClient(config);
+  }
+
+  public async associatePrincipalWithPortfolio(
+    params: AssociatePrincipalWithPortfolioInput
+  ): Promise<AssociateProductWithPortfolioCommandOutput> {
+    return this._client.send(new AssociatePrincipalWithPortfolioCommand(params));
   }
 
   public async createConstraint(

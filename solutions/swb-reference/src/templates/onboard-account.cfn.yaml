@@ -293,6 +293,10 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
           - Effect: Allow
             Action:
+              - iam:GetRole
+            Resource: !GetAtt EnvManagementRole.Arn
+          - Effect: Allow
+            Action:
               - ce:GetCostAndUsage
             Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
           - Effect: Allow
@@ -303,6 +307,7 @@ Resources:
           - Effect: Allow
             Action:
               - servicecatalog:AcceptPortfolioShare
+              - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
 
   CrossAccountHandlerRole:

@@ -9,9 +9,9 @@ export default class AccountHandler {
   /* eslint-disable-next-line */
   public async execute(event: any): Promise<void> {
     /*
-     * Share SC portfolio with hosting accounts that doesn't already have SC portfolio from main account
-     * Hosting account accept portfolio (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/accept-portfolio-share.html) that was shared
-     * In hosting account, associate envManagement IAM role to SC portfolio (API (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/associate-principal-with-portfolio.html))(Example code (https://github.com/awslabs/service-workbench-on-aws/blob/5afa5a68ac8fdb4939864e52a5b13cfc0b227118/addons/addon-environment-sc-api/packages/environment-sc-workflow-steps/lib/steps/share-portfolio-with-target-acc/share-portfolio-with-target-acc.js#L84) from SWBv1)
+     * [Done] Share SC portfolio with hosting accounts that doesn't already have SC portfolio from main account
+     * [Done] Hosting account accept portfolio (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/accept-portfolio-share.html) that was shared
+     * [Done] In hosting account, associate envManagement IAM role to SC portfolio (API (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/associate-principal-with-portfolio.html))(Example code (https://github.com/awslabs/service-workbench-on-aws/blob/5afa5a68ac8fdb4939864e52a5b13cfc0b227118/addons/addon-environment-sc-api/packages/environment-sc-workflow-steps/lib/steps/share-portfolio-with-target-acc/share-portfolio-with-target-acc.js#L84) from SWBv1)
      * Copy LaunchConstraint role to hosting accounts that doesn't already have the role
      * Share SSM documents with all hosting accounts that does not have the SSM document already
      * Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
@@ -19,28 +19,55 @@ export default class AccountHandler {
      * Add hosting account VPC and Subnet ID to DDB
      */
 
-    // TODO: Get value from DDB
-    const portfolioId = 'port-4n4g66unobu34';
-    const [iamRoleArn] = await this._getHostingAccountIamRole();
-    // TODO: Get this value from the hosting accoutn role arn
-    const hostingAccountId = '750404249455';
-    const hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
-      roleArn: iamRoleArn,
-      roleSessionName: 'account-handler',
-      externalId: 'workbench',
-      region: process.env.AWS_REGION!
-    });
-    await this._shareAndAcceptScPortfolio(hostingAccountAwsService, hostingAccountId, portfolioId);
+    // eslint-disable-next-line
+    const { hostingAccountArns, externalId, portfolioId, hostingAccountId } = await this._getMetadataFromDB();
+    for (const hostingAccountArn of hostingAccountArns) {
+      const hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
+        roleArn: hostingAccountArn.accountHandler,
+        roleSessionName: 'account-handler',
+        externalId: externalId as string,
+        region: process.env.AWS_REGION!
+      });
+      await this._shareAndAcceptScPortfolio(
+        hostingAccountAwsService,
+        hostingAccountId as string,
+        portfolioId as string
+      );
+      await this._associateIamRoleWithPortfolio(
+        hostingAccountAwsService,
+        hostingAccountArn.envManagement,
+        portfolioId as string
+      );
+    }
   }
 
-  /**
-   * Get list of all hosting account IAM roles
-   * @returns List of all hosting account IAM roles
-   */
-  private async _getHostingAccountIamRole(): Promise<string[]> {
-    //TODO: Get this from DDB
+  private async _associateIamRoleWithPortfolio(
+    hostingAccountAwsService: AwsService,
+    iamRole: string,
+    portfolioId: string
+  ): Promise<void> {
+    console.log(`Associating ${iamRole} with porfolio ${portfolioId}`);
+    await hostingAccountAwsService.serviceCatalog.associatePrincipalWithPortfolio({
+      PortfolioId: portfolioId,
+      PrincipalARN: iamRole,
+      PrincipalType: 'IAM'
+    });
+  }
 
-    return Promise.resolve(['arn:aws:iam::750404249455:role/swb-dev-oh-cross-account-role']);
+  // eslint-disable-next-line
+  private async _getMetadataFromDB(): Promise<{ [key: string]: any }> {
+    // TODO: Get this data from DDB
+    return Promise.resolve({
+      externalId: 'workbench',
+      hostingAccountArns: [
+        {
+          accountHandler: 'arn:aws:iam::750404249455:role/swb-dev-oh-cross-account-role',
+          envManagement: 'arn:aws:iam::750404249455:role/swb-dev-oh-xacc-env-mgmt'
+        }
+      ],
+      portfolioId: 'port-4n4g66unobu34',
+      hostingAccountId: '750404249455' // TODO: This value van be obtained from the hostingAccountIamRolArn
+    });
   }
 
   private async _shareAndAcceptScPortfolio(
