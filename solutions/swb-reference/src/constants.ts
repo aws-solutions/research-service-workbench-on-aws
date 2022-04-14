@@ -27,14 +27,15 @@ function getConstants(): {
   const AWS_REGION = config.awsRegion;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
 
+  const AMI_IDS = {
+    // Sagemaker: 'sampleSagemakerAmiId'
+  };
+
   // These are the OutputKey for the SWB Main Account CFN stack
   const MAIN_ACCOUNT_BUS_ARN_NAME = 'EventBusOutput';
   const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
-  const AMI_IDS = {
-    // Sagemaker: 'sampleSagemakerAmiId'
-  };
 
   return {
     STAGE: config.stage,

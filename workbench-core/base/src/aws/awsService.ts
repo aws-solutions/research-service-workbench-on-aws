@@ -11,6 +11,7 @@ import ServiceCatalog from './services/serviceCatalog';
 import S3 from './services/s3';
 import STS from './services/sts';
 import { Credentials } from '@aws-sdk/types';
+import IAM from './services/iam';
 
 export default class AwsService {
   public cloudformation: CloudFormation;
@@ -20,6 +21,7 @@ export default class AwsService {
   public serviceCatalog: ServiceCatalog;
   public s3: S3;
   public sts: STS;
+  public iam: IAM;
 
   public constructor(options: { region: string; credentials?: Credentials }) {
     this.cloudformation = new CloudFormation(options);
@@ -29,6 +31,7 @@ export default class AwsService {
     this.serviceCatalog = new ServiceCatalog(options);
     this.s3 = new S3(options);
     this.sts = new STS(options);
+    this.iam = new IAM(options);
   }
 
   public async getAwsServiceForRole(params: {

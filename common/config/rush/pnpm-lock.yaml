@@ -169,6 +169,7 @@ importers:
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-ec2': ^3.60.0
       '@aws-sdk/client-eventbridge': ^3.66.0
+      '@aws-sdk/client-iam': ^3.58.0
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-service-catalog': ^3.58.0
       '@aws-sdk/client-ssm': ^3.58.0
@@ -192,6 +193,7 @@ importers:
       '@aws-sdk/client-cloudformation': 3.58.0
       '@aws-sdk/client-ec2': 3.60.0
       '@aws-sdk/client-eventbridge': 3.66.0
+      '@aws-sdk/client-iam': 3.67.0
       '@aws-sdk/client-s3': 3.58.0
       '@aws-sdk/client-service-catalog': 3.58.0
       '@aws-sdk/client-ssm': 3.58.0
@@ -219,6 +221,7 @@ importers:
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-ec2': ^3.60.0
       '@aws-sdk/client-eventbridge': ^3.66.0
+      '@aws-sdk/client-iam': ^3.58.0
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-service-catalog': ^3.58.0
       '@aws-sdk/client-ssm': ^3.58.0
@@ -242,6 +245,7 @@ importers:
       '@aws-sdk/client-cloudformation': 3.58.0
       '@aws-sdk/client-ec2': 3.60.0
       '@aws-sdk/client-eventbridge': 3.66.0
+      '@aws-sdk/client-iam': 3.67.0
       '@aws-sdk/client-s3': 3.58.0
       '@aws-sdk/client-service-catalog': 3.58.0
       '@aws-sdk/client-ssm': 3.58.0
@@ -590,6 +594,48 @@ packages:
       tslib: 2.3.1
     transitivePeerDependencies:
       - '@aws-sdk/signature-v4-crt'
+    dev: false
+
+  /@aws-sdk/client-iam/3.67.0:
+    resolution: {integrity: sha512-50kgS9IlB8XSaMgCpsqu/vvCKa0jaCsvCoZKJlaEgBSN5nQglzcZMCleVNysap2f9B9JxrHCihwI+y+furZtuQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@aws-crypto/sha256-browser': 2.0.0
+      '@aws-crypto/sha256-js': 2.0.0
+      '@aws-sdk/client-sts': 3.67.0
+      '@aws-sdk/config-resolver': 3.58.0
+      '@aws-sdk/credential-provider-node': 3.67.0
+      '@aws-sdk/fetch-http-handler': 3.58.0
+      '@aws-sdk/hash-node': 3.55.0
+      '@aws-sdk/invalid-dependency': 3.55.0
+      '@aws-sdk/middleware-content-length': 3.58.0
+      '@aws-sdk/middleware-host-header': 3.58.0
+      '@aws-sdk/middleware-logger': 3.55.0
+      '@aws-sdk/middleware-retry': 3.58.0
+      '@aws-sdk/middleware-serde': 3.55.0
+      '@aws-sdk/middleware-signing': 3.58.0
+      '@aws-sdk/middleware-stack': 3.55.0
+      '@aws-sdk/middleware-user-agent': 3.58.0
+      '@aws-sdk/node-config-provider': 3.58.0
+      '@aws-sdk/node-http-handler': 3.58.0
+      '@aws-sdk/protocol-http': 3.58.0
+      '@aws-sdk/smithy-client': 3.55.0
+      '@aws-sdk/types': 3.55.0
+      '@aws-sdk/url-parser': 3.55.0
+      '@aws-sdk/util-base64-browser': 3.58.0
+      '@aws-sdk/util-base64-node': 3.55.0
+      '@aws-sdk/util-body-length-browser': 3.55.0
+      '@aws-sdk/util-body-length-node': 3.55.0
+      '@aws-sdk/util-defaults-mode-browser': 3.55.0
+      '@aws-sdk/util-defaults-mode-node': 3.58.0
+      '@aws-sdk/util-user-agent-browser': 3.58.0
+      '@aws-sdk/util-user-agent-node': 3.58.0
+      '@aws-sdk/util-utf8-browser': 3.55.0
+      '@aws-sdk/util-utf8-node': 3.55.0
+      '@aws-sdk/util-waiter': 3.55.0
+      entities: 2.2.0
+      fast-xml-parser: 3.19.0
+      tslib: 2.3.1
     dev: false
 
   /@aws-sdk/client-s3/3.58.0:

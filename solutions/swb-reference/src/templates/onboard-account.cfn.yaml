@@ -280,6 +280,7 @@ Resources:
           - Effect: Allow
             Action:
               - iam:CreateRole
+              - iam:GetRole
               - iam:TagRole
               - iam:GetRolePolicy
               - iam:PutRolePolicy

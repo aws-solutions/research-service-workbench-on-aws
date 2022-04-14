@@ -1,11 +1,13 @@
 import { AwsService } from '@amzn/workbench-core-base';
-
+import { GetRolePolicyCommandInput, IAMServiceException, Role } from '@aws-sdk/client-iam';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
   public constructor(mainAccountAwsService: AwsService) {
     this._mainAccountAwsService = mainAccountAwsService;
   }
+  // TODO: Consider moving these methods to `hostingAccountLifecycleService`
+  // TODO: Take a look at this https://quip-amazon.com/5SbZAHDcaw0m/Account-Class-Architecture
   /* eslint-disable-next-line */
   public async execute(event: any): Promise<void> {
     /*
@@ -13,8 +15,8 @@ export default class AccountHandler {
      * [Done] Hosting account accept portfolio (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/accept-portfolio-share.html) that was shared
      * [Done] In hosting account, associate envManagement IAM role to SC portfolio (API (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/associate-principal-with-portfolio.html))(Example code (https://github.com/awslabs/service-workbench-on-aws/blob/5afa5a68ac8fdb4939864e52a5b13cfc0b227118/addons/addon-environment-sc-api/packages/environment-sc-workflow-steps/lib/steps/share-portfolio-with-target-acc/share-portfolio-with-target-acc.js#L84) from SWBv1)
      * Copy LaunchConstraint role to hosting accounts that doesn't already have the role
-     * Share SSM documents with all hosting accounts that does not have the SSM document already
-     * Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
+     * (Already in `hostingAccountLifecycleService`) Share SSM documents with all hosting accounts that does not have the SSM document already
+     * (Already in `hostingAccountLifecycleService`) Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
      * Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
      * Add hosting account VPC and Subnet ID to DDB
      */
@@ -28,17 +30,163 @@ export default class AccountHandler {
         externalId: externalId as string,
         region: process.env.AWS_REGION!
       });
-      await this._shareAndAcceptScPortfolio(
-        hostingAccountAwsService,
-        hostingAccountId as string,
-        portfolioId as string
-      );
-      await this._associateIamRoleWithPortfolio(
-        hostingAccountAwsService,
-        hostingAccountArn.envManagement,
-        portfolioId as string
-      );
+      // await this._shareAndAcceptScPortfolio(
+      //   hostingAccountAwsService,
+      //   hostingAccountId as string,
+      //   portfolioId as string
+      // );
+      // await this._associateIamRoleWithPortfolio(
+      //   hostingAccountAwsService,
+      //   hostingAccountArn.envManagement,
+      //   portfolioId as string
+      // );
+      const launchConstraintRoleName = 'swb-dev-oh-LaunchConstraint';
+      await this._copyLaunchConstraintRole(launchConstraintRoleName, hostingAccountAwsService);
     }
+  }
+
+  //eslint-disable-next-line
+  private async _copyLaunchConstraintRole(
+    launchConstraintRoleName: string,
+    hostingAccountAwsService: AwsService
+  ) {
+    console.log('Copying LC');
+    const { Role: sourceRole } = await this._mainAccountAwsService.iam.getRole({
+      RoleName: launchConstraintRoleName
+    });
+
+    let targetRole: Role;
+    try {
+      const response = await hostingAccountAwsService.iam.getRole({
+        RoleName: launchConstraintRoleName
+      });
+      targetRole = response.Role!;
+    } catch (e) {
+      if (e instanceof IAMServiceException && e.name === 'NoSuchEntity') {
+        console.log('Creating target role because target role does not exist in hosting account');
+        if (sourceRole) {
+          const response = await hostingAccountAwsService.iam.createRole({
+            RoleName: launchConstraintRoleName,
+            AssumeRolePolicyDocument: sourceRole.AssumeRolePolicyDocument
+              ? decodeURIComponent(sourceRole.AssumeRolePolicyDocument)
+              : undefined,
+            Path: sourceRole.Path,
+            Description: sourceRole.Description,
+            MaxSessionDuration: sourceRole.MaxSessionDuration,
+            Tags: sourceRole.Tags
+          });
+          targetRole = response.Role!;
+        }
+      }
+    }
+
+    // Check if role's AssumeRolePolicyDocument needs to be updated
+    const sourceRoleAssumeRolePolicyDocument = sourceRole!.AssumeRolePolicyDocument
+      ? decodeURIComponent(sourceRole!.AssumeRolePolicyDocument)
+      : undefined;
+    const targetRoleAssumeRolePolicyDocument = targetRole!.AssumeRolePolicyDocument
+      ? decodeURIComponent(targetRole!.AssumeRolePolicyDocument)
+      : undefined;
+    if (sourceRoleAssumeRolePolicyDocument !== targetRoleAssumeRolePolicyDocument) {
+      console.log('Updating target role assumeRolePolicyDocument');
+      await hostingAccountAwsService.iam.updateAssumeRolePolicy({
+        RoleName: launchConstraintRoleName,
+        PolicyDocument: sourceRole!.AssumeRolePolicyDocument
+      });
+    }
+
+    console.log('Copied LC');
+
+    const inlinePoliciesToAddToTargetAccount = await this._getInlinePoliciesToAddToTargetAccount(
+      launchConstraintRoleName,
+      hostingAccountAwsService
+    );
+    console.log(
+      `Adding Inline Policies ${inlinePoliciesToAddToTargetAccount.map((policy) => {
+        return policy.policyName;
+      })}`
+    );
+    for (const policyToAdd of inlinePoliciesToAddToTargetAccount) {
+      await hostingAccountAwsService.iam.putRolePolicy({
+        RoleName: launchConstraintRoleName,
+        PolicyName: policyToAdd.policyName,
+        PolicyDocument: decodeURIComponent(policyToAdd.policyDocument)
+      });
+    }
+    console.log('Copied inline policies');
+
+    // TODO: Loop through to get all managed policies
+    // TODO: Handle customer created managed policies
+    const srcManagedPolicies = await this._mainAccountAwsService.iam.listAttachedRolePolicies({
+      RoleName: launchConstraintRoleName
+    });
+    const targetManagedPolicies = await hostingAccountAwsService.iam.listAttachedRolePolicies({
+      RoleName: launchConstraintRoleName
+    });
+    let targetPolicyArns: string[] = [];
+    if (targetManagedPolicies.AttachedPolicies) {
+      targetPolicyArns = targetManagedPolicies.AttachedPolicies.map((attachedPolicy) => {
+        return attachedPolicy.PolicyArn!;
+      });
+    }
+    if (srcManagedPolicies.AttachedPolicies) {
+      const managedPoliciesNotInTargetAccount = srcManagedPolicies.AttachedPolicies.filter(
+        (attachedPolicy) => {
+          return !targetPolicyArns.includes(attachedPolicy.PolicyArn!);
+        }
+      );
+      console.log(
+        `Adding managedPolicies ${managedPoliciesNotInTargetAccount.map((attachedPolicy) => {
+          return attachedPolicy.PolicyArn;
+        })}`
+      );
+      for (const policy of managedPoliciesNotInTargetAccount || []) {
+        await hostingAccountAwsService.iam.attachRolePolicy({
+          RoleName: launchConstraintRoleName,
+          PolicyArn: policy.PolicyArn
+        });
+      }
+    }
+
+    console.log('Copied Managed Policies');
+  }
+
+  private async _getInlinePoliciesToAddToTargetAccount(
+    launchConstraintRoleName: string,
+    hostingAccountAwsService: AwsService
+  ): Promise<Array<{ policyName: string; policyDocument: string }>> {
+    // TODO: Loop through to get all inline policies
+    const srcInlinePolicies = await this._mainAccountAwsService.iam.listRolePolicies({
+      RoleName: launchConstraintRoleName
+    });
+    const targetInlinePolicies = await hostingAccountAwsService.iam.listRolePolicies({
+      RoleName: launchConstraintRoleName
+    });
+    const inlinePoliciesToAdd: Array<{ policyName: string; policyDocument: string }> = [];
+    if (srcInlinePolicies.PolicyNames) {
+      for (const policyName of srcInlinePolicies.PolicyNames) {
+        const policyParam: GetRolePolicyCommandInput = {
+          PolicyName: policyName,
+          RoleName: launchConstraintRoleName
+        };
+        const sourcePolicyDocument = await this._mainAccountAwsService.iam.getRolePolicy(policyParam);
+        if (targetInlinePolicies.PolicyNames && !targetInlinePolicies.PolicyNames.includes(policyName)) {
+          inlinePoliciesToAdd.push({
+            policyName: policyName,
+            policyDocument: sourcePolicyDocument.PolicyDocument!
+          });
+        } else {
+          const targetPolicyDocument = await hostingAccountAwsService.iam.getRolePolicy(policyParam);
+          if (sourcePolicyDocument.PolicyDocument !== targetPolicyDocument.PolicyDocument) {
+            inlinePoliciesToAdd.push({
+              policyName: policyName,
+              policyDocument: sourcePolicyDocument.PolicyDocument!
+            });
+          }
+        }
+      }
+    }
+    return inlinePoliciesToAdd;
   }
 
   private async _associateIamRoleWithPortfolio(

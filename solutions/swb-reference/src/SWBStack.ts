@@ -26,17 +26,17 @@ export class SWBStack extends Stack {
     this._createRestApi(apiLambda);
 
     this._createStatusHandlerLambda();
-    this._createAccountHandlerLambda();
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
+    this._createAccountHandlerLambda(lcRole);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
     this._createEventBridgeResources();
     this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
   }
 
-  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): void {
+  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
     const sagemakerPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -82,6 +82,7 @@ export class SWBStack extends Stack {
     new CfnOutput(this, launchConstraintRoleNameOutput, {
       value: iamRole.roleName
     });
+    return iamRole;
   }
 
   private _createS3Buckets(s3ArtifactName: string): void {
@@ -110,7 +111,7 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createAccountHandlerLambda(): void {
+  private _createAccountHandlerLambda(launchConstraintRole: Role): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -136,6 +137,16 @@ export class SWBStack extends Stack {
     lambda.role?.attachInlinePolicy(
       new Policy(this, 'assumeRolePolicy', {
         statements: [assumeRolePolicy]
+      })
+    );
+
+    const getLaunchConstraintPolicy = new PolicyStatement({
+      actions: ['iam:GetRole', 'iam:ListRolePolicies', 'iam:ListAttachedRolePolicies'],
+      resources: [launchConstraintRole.roleArn]
+    });
+    lambda.role?.attachInlinePolicy(
+      new Policy(this, 'getLaunchConstraint', {
+        statements: [getLaunchConstraintPolicy]
       })
     );
 
