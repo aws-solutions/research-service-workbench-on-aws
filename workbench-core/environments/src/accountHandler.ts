@@ -1,5 +1,12 @@
 import { AwsService } from '@amzn/workbench-core-base';
-import { GetRolePolicyCommandInput, IAMServiceException, Role } from '@aws-sdk/client-iam';
+import {
+  AttachedPolicy,
+  GetRolePolicyCommandInput,
+  IAMServiceException,
+  ListAttachedRolePoliciesCommandOutput,
+  ListRolePoliciesCommandOutput,
+  Role
+} from '@aws-sdk/client-iam';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -40,6 +47,7 @@ export default class AccountHandler {
       //   hostingAccountArn.envManagement,
       //   portfolioId as string
       // );
+      // TODO: Get LC from CFN Stack
       const launchConstraintRoleName = 'swb-dev-oh-LaunchConstraint';
       await this._copyLaunchConstraintRole(launchConstraintRoleName, hostingAccountAwsService);
     }
@@ -115,26 +123,26 @@ export default class AccountHandler {
     }
     console.log('Copied inline policies');
 
-    // TODO: Loop through to get all managed policies
     // TODO: Handle customer created managed policies
-    const srcManagedPolicies = await this._mainAccountAwsService.iam.listAttachedRolePolicies({
-      RoleName: launchConstraintRoleName
-    });
-    const targetManagedPolicies = await hostingAccountAwsService.iam.listAttachedRolePolicies({
-      RoleName: launchConstraintRoleName
-    });
+    const srcManagedPolicies = await this._getAllManagedRolePolicies(
+      launchConstraintRoleName,
+      this._mainAccountAwsService
+    );
+    const targetManagedPolicies = await this._getAllManagedRolePolicies(
+      launchConstraintRoleName,
+      hostingAccountAwsService
+    );
+
     let targetPolicyArns: string[] = [];
-    if (targetManagedPolicies.AttachedPolicies) {
-      targetPolicyArns = targetManagedPolicies.AttachedPolicies.map((attachedPolicy) => {
+    if (targetManagedPolicies) {
+      targetPolicyArns = targetManagedPolicies.map((attachedPolicy) => {
         return attachedPolicy.PolicyArn!;
       });
     }
-    if (srcManagedPolicies.AttachedPolicies) {
-      const managedPoliciesNotInTargetAccount = srcManagedPolicies.AttachedPolicies.filter(
-        (attachedPolicy) => {
-          return !targetPolicyArns.includes(attachedPolicy.PolicyArn!);
-        }
-      );
+    if (srcManagedPolicies) {
+      const managedPoliciesNotInTargetAccount = srcManagedPolicies.filter((attachedPolicy) => {
+        return !targetPolicyArns.includes(attachedPolicy.PolicyArn!);
+      });
       console.log(
         `Adding managedPolicies ${managedPoliciesNotInTargetAccount.map((attachedPolicy) => {
           return attachedPolicy.PolicyArn;
@@ -151,26 +159,67 @@ export default class AccountHandler {
     console.log('Copied Managed Policies');
   }
 
+  private async _getAllManagedRolePolicies(
+    launchConstraintRoleName: string,
+    awsService: AwsService
+  ): Promise<AttachedPolicy[]> {
+    let allAttachedPolicies: AttachedPolicy[] = [];
+    let isTruncated = true;
+    let marker = undefined;
+    do {
+      const response: ListAttachedRolePoliciesCommandOutput = await awsService.iam.listAttachedRolePolicies({
+        RoleName: launchConstraintRoleName,
+        Marker: marker
+      });
+      if (response.AttachedPolicies) {
+        allAttachedPolicies = allAttachedPolicies.concat(response.AttachedPolicies);
+        isTruncated = response.IsTruncated ?? false;
+        marker = response.Marker;
+      }
+    } while (isTruncated);
+    return allAttachedPolicies;
+  }
+
+  private async _getAllInlineRolePoliciesName(launchConstraintRoleName: string, awsService: AwsService) {
+    let allPoliciesName: string[] = [];
+    let isTruncated = true;
+    let marker = undefined;
+    do {
+      const response: ListRolePoliciesCommandOutput = await awsService.iam.listRolePolicies({
+        RoleName: launchConstraintRoleName,
+        Marker: marker
+      });
+      if (response.PolicyNames) {
+        allPoliciesName = allPoliciesName.concat(response.PolicyNames);
+      }
+      isTruncated = response.IsTruncated ?? false;
+      marker = response.Marker;
+    } while (isTruncated);
+    return allPoliciesName;
+  }
+
   private async _getInlinePoliciesToAddToTargetAccount(
     launchConstraintRoleName: string,
     hostingAccountAwsService: AwsService
   ): Promise<Array<{ policyName: string; policyDocument: string }>> {
     // TODO: Loop through to get all inline policies
-    const srcInlinePolicies = await this._mainAccountAwsService.iam.listRolePolicies({
-      RoleName: launchConstraintRoleName
-    });
-    const targetInlinePolicies = await hostingAccountAwsService.iam.listRolePolicies({
-      RoleName: launchConstraintRoleName
-    });
+    const srcInlinePolicyNames = await this._getAllInlineRolePoliciesName(
+      launchConstraintRoleName,
+      this._mainAccountAwsService
+    );
+    const targetInlinePolicyNames = await this._getAllInlineRolePoliciesName(
+      launchConstraintRoleName,
+      hostingAccountAwsService
+    );
     const inlinePoliciesToAdd: Array<{ policyName: string; policyDocument: string }> = [];
-    if (srcInlinePolicies.PolicyNames) {
-      for (const policyName of srcInlinePolicies.PolicyNames) {
+    if (srcInlinePolicyNames) {
+      for (const policyName of srcInlinePolicyNames) {
         const policyParam: GetRolePolicyCommandInput = {
           PolicyName: policyName,
           RoleName: launchConstraintRoleName
         };
         const sourcePolicyDocument = await this._mainAccountAwsService.iam.getRolePolicy(policyParam);
-        if (targetInlinePolicies.PolicyNames && !targetInlinePolicies.PolicyNames.includes(policyName)) {
+        if (targetInlinePolicyNames && !targetInlinePolicyNames.includes(policyName)) {
           inlinePoliciesToAdd.push({
             policyName: policyName,
             policyDocument: sourcePolicyDocument.PolicyDocument!
