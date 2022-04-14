@@ -6,12 +6,24 @@ import {
   AttachRolePolicyCommand,
   AttachRolePolicyCommandInput,
   AttachRolePolicyCommandOutput,
+  CreatePolicyCommand,
+  CreatePolicyCommandInput,
+  CreatePolicyCommandOutput,
   CreateRoleCommand,
   CreateRoleCommandInput,
   CreateRoleCommandOutput,
+  DeleteRolePolicyCommand,
+  DeleteRolePolicyCommandInput,
+  DeleteRolePolicyCommandOutput,
+  DetachRolePolicyCommand,
+  DetachRolePolicyCommandInput,
+  DetachRolePolicyCommandOutput,
   GetPolicyCommand,
   GetPolicyCommandInput,
   GetPolicyCommandOutput,
+  GetPolicyVersionCommand,
+  GetPolicyVersionCommandInput,
+  GetPolicyVersionCommandOutput,
   GetRoleCommand,
   GetRoleCommandInput,
   GetRoleCommandOutput,
@@ -51,8 +63,30 @@ export default class IAM {
     return this._client.send(new CreateRoleCommand(params));
   }
 
+  public async deleteRolePolicy(
+    params: DeleteRolePolicyCommandInput
+  ): Promise<DeleteRolePolicyCommandOutput> {
+    return this._client.send(new DeleteRolePolicyCommand(params));
+  }
+
+  public async detachRolePolicy(
+    params: DetachRolePolicyCommandInput
+  ): Promise<DetachRolePolicyCommandOutput> {
+    return this._client.send(new DetachRolePolicyCommand(params));
+  }
+
   public async getPolicy(params: GetPolicyCommandInput): Promise<GetPolicyCommandOutput> {
     return this._client.send(new GetPolicyCommand(params));
+  }
+
+  public async getPolicyVersion(
+    params: GetPolicyVersionCommandInput
+  ): Promise<GetPolicyVersionCommandOutput> {
+    return this._client.send(new GetPolicyVersionCommand(params));
+  }
+
+  public async createPolicy(params: CreatePolicyCommandInput): Promise<CreatePolicyCommandOutput> {
+    return this._client.send(new CreatePolicyCommand(params));
   }
 
   public async getRolePolicy(params: GetRolePolicyCommandInput): Promise<GetRolePolicyCommandOutput> {
