@@ -78,7 +78,7 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/audit",
+      "packageName": "@amzn/workbench-core-audit",
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
       "shouldPublish": true
