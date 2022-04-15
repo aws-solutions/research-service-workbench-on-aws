@@ -56,21 +56,18 @@ jobs:
 
       - name: Deploy POC Infrastructure to Dev - cdk bootstrap
         uses: youyo/aws-cdk-github-actions@v2
-        run: cd workbench-core/infrastructure
         with:
           working_dir: workbench-core/infrastructure
           cdk_subcommand: 'bootstrap'
       
       - name: Deploy POC Infrastructure to Dev - cdk diff
         uses: youyo/aws-cdk-github-actions@v2
-        run: cd workbench-core/infrastructure
         with:
           working_dir: workbench-core/infrastructure
           cdk_subcommand: 'diff'
 
       - name: Deploy POC Infrastructure to Dev - cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
-        run: cd workbench-core/infrastructure
         with:
           working_dir: workbench-core/infrastructure
           cdk_subcommand: 'deploy --all --require-approval'
