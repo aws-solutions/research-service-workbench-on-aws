@@ -43,6 +43,9 @@ jobs:
 
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
+
+      - name: Build
+        run: node common/scripts/install-run-rush.js build -verbose
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -50,28 +53,32 @@ jobs:
           aws-region: ${{ secrets.AWS_DEV_REGION }}
           role-to-assume: ${{ secrets.ASSUME_ROLE }}
           role-session-name: OIDCSessionName
+      
+      - name: Deploy POC Infrastructure to Dev
+        run: |
+          node common/scripts/install-run-rush.js cdk:bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -o @amzn/workbench-core-infrastructure
 
       # - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
       #   run: cd workbench-core/infrastructure
 
-      - name: Deploy POC Infrastructure to Dev - cdk bootstrap
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          working_dir: workbench-core/infrastructure
-          cdk_subcommand: 'bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }}'
+      # - name: Deploy POC Infrastructure to Dev - cdk bootstrap
+      #   uses: youyo/aws-cdk-github-actions@v2
+      #   with:
+      #     working_dir: workbench-core/infrastructure
+      #     cdk_subcommand: 'bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }}'
       
-      - name: Deploy POC Infrastructure to Dev - cdk diff
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          working_dir: workbench-core/infrastructure
-          cdk_subcommand: 'diff'
+      # - name: Deploy POC Infrastructure to Dev - cdk diff
+      #   uses: youyo/aws-cdk-github-actions@v2
+      #   with:
+      #     working_dir: workbench-core/infrastructure
+      #     cdk_subcommand: 'diff'
 
-      - name: Deploy POC Infrastructure to Dev - cdk deploy
-        uses: youyo/aws-cdk-github-actions@v2
-        with:
-          working_dir: workbench-core/infrastructure
-          cdk_subcommand: 'deploy'
-          cdk_args: '--all --require-approval'
+      # - name: Deploy POC Infrastructure to Dev - cdk deploy
+      #   uses: youyo/aws-cdk-github-actions@v2
+      #   with:
+      #     working_dir: workbench-core/infrastructure
+      #     cdk_subcommand: 'deploy'
+      #     cdk_args: '--all --require-approval'
 
       # - name: Deploy POC Infrastructure to Dev - cdk diff
       #     cdk diff
