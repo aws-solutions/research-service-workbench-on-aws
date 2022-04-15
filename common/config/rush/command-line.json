@@ -211,16 +211,36 @@
     {
       "name": "cdk:synth",
       "commandKind": "bulk",
-      "summary": "Used to run cdk synth commands",
+      "summary": "Used to run cdk synth command",
+<<<<<<< HEAD
+=======
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
     {
+      "name": "cdk:diff",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk diff command",
+>>>>>>> f80d641 (Feature/init (#14))
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "cdk:diff",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk diff command",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
       "name": "cdk:bootstrap",
       "commandKind": "bulk",
-      "summary": "Used to run cdk bootstrap commands",
+      "summary": "Used to run cdk bootstrap command",
       "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true
     },
     {
       "name": "cdk:deploy",
@@ -280,6 +300,21 @@
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--diff",
+      "shortName": "-d",
+      "description": "Run cdk diff",
+      "associatedCommands": ["cdk"]
+    },
+    {
+      "parameterKind": "string",
+      "argumentName": "ENV",
+      "longName": "--env",
+      "shortName": "-e",
+      "description": "Pass environment for cdk bootstrap",
+      "associatedCommands": ["cdk:bootstrap"]
     }
     // {
     //   /**
