@@ -6,7 +6,7 @@ on:
       - "feature*"
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,8 @@ jobs:
       - name: Use Node.js 14.x
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: '14.x'
+          cache: 'pnpm'
 
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
