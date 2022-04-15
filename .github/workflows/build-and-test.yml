@@ -17,7 +17,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '14.x'
-          cache: 'pnpm'
+
+      - name: Cache Rush
+        uses: actions/cache@v2
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-${{ hashFiles('rush.json') }}
+      - name: Cache pnpm
+        uses: actions/cache@v2
+        with:
+          path: |
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
 
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
