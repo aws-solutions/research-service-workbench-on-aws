@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Mainline Protection
+name: Main branch protection
 on:
   pull_request:
     types: [opened, synchronize, edited, reopened]
