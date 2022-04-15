@@ -21,7 +21,7 @@ jobs:
           node-version: '14.x'
 
       - name: Cache Rush
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             common/temp/install-run
@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache pnpm
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             common/temp/pnpm-store
@@ -45,7 +45,7 @@ jobs:
         run: node common/scripts/install-run-rush.js install
 
       - name: Build
-        run: node common/scripts/install-run-rush.js build -verbose
+        run: node common/scripts/install-run-rush.js build --verbose
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
