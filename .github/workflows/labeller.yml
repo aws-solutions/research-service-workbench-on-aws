@@ -1,9 +1,6 @@
 name: labeler
 
-on: 
-  pull_request:
-    branches: 
-      - 'develop'
+on: ['pull_request']
 
 jobs:
   labeler:
