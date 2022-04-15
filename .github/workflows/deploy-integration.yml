@@ -1,0 +1,72 @@
+name: Build-and-test
+on:
+  push:
+    branches:
+      - testdevelop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14.x'
+
+      - name: Cache Rush
+        uses: actions/cache@v2
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v2
+        with:
+          path: |
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_DEV_REGION }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: OIDCSessionName
+
+      - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
+        run: cd workbench-core/infrastructure
+
+      - name: Deploy POC Infrastructure to Dev - cdk bootstrap
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'bootstrap'
+      
+      - name: Deploy POC Infrastructure to Dev - cdk diff
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'diff'
+
+      - name: Deploy POC Infrastructure to Dev - cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
+        with:
+          cdk_subcommand: 'deploy --all --require-approval'
+
+      # - name: Deploy POC Infrastructure to Dev - cdk diff
+      #     cdk diff
+      #     cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+      #     echo "SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`" > $CI_PROJECT_DIR/deploy.env
