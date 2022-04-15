@@ -282,6 +282,13 @@
       "associatedCommands": ["make-badges"]
     },
     {
+      "parameterKind": "flag",
+      "longName": "--diff",
+      "shortName": "-d",
+      "description": "Run cdk diff",
+      "associatedCommands": ["cdk"]
+    },
+    {
       "parameterKind": "string",
       "argumentName": "ENV",
       "longName": "--env",
