@@ -280,6 +280,14 @@
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "string",
+      "argumentName": "ENV",
+      "longName": "--env",
+      "shortName": "-e",
+      "description": "Pass environment for cdk bootstrap",
+      "associatedCommands": ["cdk:bootstrap"]
     }
     // {
     //   /**
