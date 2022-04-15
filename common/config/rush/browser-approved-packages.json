@@ -1,0 +1,162 @@
+// DO NOT ADD COMMENTS IN THIS FILE.  They will be lost when the Rush tool resaves it.
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
+  "packages": [
+    {
+      "name": "@amzn/environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/eslint-config-workbench-core-eslint-custom",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/swb-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/assert",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/eslint-config",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-jest-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-node-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@vendia/serverless-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-cdk",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-cdk-lib",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-lambda",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-lambda-fastify",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-sdk",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "concurrently",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "constructs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "esbuild",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "eslint",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "eslint-plugin-security",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-autoload",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fastify-sensible",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "istanbul-badges-readme",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lambda-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "request",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "supertest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "typescript",
+      "allowedCategories": [ "production" ]
+    }
+  ]
+}

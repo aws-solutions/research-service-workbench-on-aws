@@ -1,0 +1,35 @@
+{
+  "name": "@amzn/eslint-config-workbench-core-eslint-custom",
+  "version": "1.0.0",
+  "description": "Custom eslint rules",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.aws.dev/ma-foundation/ma-mono.git"
+  },
+  "homepage": "https://gitlab.aws.dev/ma-foundation/ma-mono",
+  "scripts": {
+    "build": "heft build --clean",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "test": "heft test --clean && rushx make-badges",
+    "build:test": "rushx build && rushx test",
+    "test:only": "heft test --clean"
+  },
+  "author": "Samir Sharan",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@types/heft-jest": "1.0.2",
+    "@types/node": "^16",
+    "eslint": "~8.7.0",
+    "typescript": "~4.5.2",
+    "istanbul-badges-readme": "1.8.1",
+    "eslint-plugin-security": "~1.4.0",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@types/jest": "~27.4.1",
+    "jest": "~27.5.1"
+  }
+}
