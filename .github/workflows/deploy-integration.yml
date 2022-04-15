@@ -1,13 +1,16 @@
-name: Build-and-test
+name: Deploy to Dev and Integration Test
 on:
   push:
     branches:
       - testdevelop
 
 jobs:
-  build-and-test:
+  deploy-integration:
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
+      contents: read
+      
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
