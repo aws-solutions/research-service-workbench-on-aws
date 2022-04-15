@@ -59,6 +59,7 @@ jobs:
         with:
           working_dir: workbench-core/infrastructure
           cdk_subcommand: 'bootstrap'
+          cdk_args: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
       
       - name: Deploy POC Infrastructure to Dev - cdk diff
         uses: youyo/aws-cdk-github-actions@v2
@@ -70,7 +71,8 @@ jobs:
         uses: youyo/aws-cdk-github-actions@v2
         with:
           working_dir: workbench-core/infrastructure
-          cdk_subcommand: 'deploy --all --require-approval'
+          cdk_subcommand: 'deploy'
+          cdk_args: '--all --require-approval'
 
       # - name: Deploy POC Infrastructure to Dev - cdk diff
       #     cdk diff
