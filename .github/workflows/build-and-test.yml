@@ -1,0 +1,34 @@
+name: Security Code Scanning
+on:
+  pull_request:
+    branches:
+      - testdevelop
+      - "feature*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14.x
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+      
+      - name: Rush check
+        run: node common/scripts/install-run-rush.js check
+
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js rebuild --verbose
+
+      - name: Rush test
+        run: node common/scripts/install-run-rush.js test:only --verbose
+
+      - name: Code Coverage badge check
+        run: node common/scripts/install-run-rush.js make-badges --ci
