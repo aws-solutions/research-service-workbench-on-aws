@@ -16,7 +16,7 @@ on:
     - cron: '0 0 * * *'
   push:
     branches:
-      - develop
+      - testdevelop
       - "feature*"
 jobs:
   CodeQL-Analyze:
