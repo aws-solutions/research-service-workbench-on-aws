@@ -51,21 +51,24 @@ jobs:
           role-to-assume: ${{ secrets.ASSUME_ROLE }}
           role-session-name: OIDCSessionName
 
-      - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
-        run: cd workbench-core/infrastructure
+      # - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
+      #   run: cd workbench-core/infrastructure
 
       - name: Deploy POC Infrastructure to Dev - cdk bootstrap
         uses: youyo/aws-cdk-github-actions@v2
+        run: cd workbench-core/infrastructure
         with:
           cdk_subcommand: 'bootstrap'
       
       - name: Deploy POC Infrastructure to Dev - cdk diff
         uses: youyo/aws-cdk-github-actions@v2
+        run: cd workbench-core/infrastructure
         with:
           cdk_subcommand: 'diff'
 
       - name: Deploy POC Infrastructure to Dev - cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
+        run: cd workbench-core/infrastructure
         with:
           cdk_subcommand: 'deploy --all --require-approval'
 
