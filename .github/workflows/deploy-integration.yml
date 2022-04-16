@@ -45,7 +45,7 @@ jobs:
         run: node common/scripts/install-run-rush.js install
 
       - name: Build
-        run: node common/scripts/install-run-rush.js build --verbose
+        run: node common/scripts/install-run-rush.js build:ci --verbose
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -61,10 +61,11 @@ jobs:
           cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
           cdk diff
           cdk deploy --all --require-approval never --outputs-file ./cdk-outputs.json
+          cat ./cdk-outputs.json
       
       - name: Display output
         run: |
-          cat ./cdk-outputs.json
+          pwd
       # - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
       #   run: cd workbench-core/infrastructure
 
