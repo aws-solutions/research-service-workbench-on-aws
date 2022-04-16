@@ -56,7 +56,7 @@ jobs:
       
       - name: Deploy POC Infrastructure to Dev
         run: |
-          node common/scripts/install-run-rush.js cdk:bootstrap -e ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -vvv --debug -o @amzn/workbench-core-infrastructure
+          node common/scripts/install-run-rush.js cdk:bootstrap -e ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -o @amzn/workbench-core-infrastructure
           node common/scripts/install-run-rush.js cdk -d
           node common/scripts/install-run-rush.js cdk:deploy
       # - name: Deploy POC Infrastructure to Dev - cd workbench-core/infrastructure
