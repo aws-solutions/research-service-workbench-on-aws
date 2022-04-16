@@ -220,7 +220,8 @@
       "commandKind": "bulk",
       "summary": "Used to run cdk bootstrap commands",
       "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true
     },
     {
       "name": "cdk:deploy",
