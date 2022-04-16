@@ -116,7 +116,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "32a6aee5167de60612cb62d2af0fa20b3e5ce6cad664e38aed16f52d1d562bbe.zip",
+          "S3Key": "65d438a49104b43e9867579fd9fcd9f4a7a8793c5827a4de13584baad9f82bc6.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "index.handler",
