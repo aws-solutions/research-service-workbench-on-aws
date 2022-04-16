@@ -220,7 +220,8 @@
       "commandKind": "bulk",
       "summary": "Used to run cdk diff command",
       "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
+      "enableParallelism": true,
+      "allowWarningsInSuccessfulBuild": true
     },
     {
       "name": "cdk:bootstrap",

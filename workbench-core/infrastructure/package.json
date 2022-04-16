@@ -14,7 +14,7 @@
     "test:only": "heft test --clean",
     "watch": "tsc -w",
     "cdk": "cdk",
-    "cdk:bootstrap": "rushx cdk bootstrap -vvv --debug",
+    "cdk:bootstrap": "rushx cdk bootstrap",
     "cdk:synth": "rushx cdk synth",
     "cdk:diff": "rushx cdk diff",
     "cdk:deploy": "rushx cdk deploy --all --require-approval never"
