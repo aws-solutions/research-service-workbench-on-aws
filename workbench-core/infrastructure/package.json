@@ -16,6 +16,7 @@
     "cdk": "cdk",
     "cdk:bootstrap": "rushx cdk bootstrap -vvv --debug",
     "cdk:synth": "rushx cdk synth",
+    "cdk:diff": "rushx cdk diff",
     "cdk:deploy": "rushx cdk deploy --all --require-approval never"
   },
   "devDependencies": {

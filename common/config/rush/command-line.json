@@ -211,14 +211,21 @@
     {
       "name": "cdk:synth",
       "commandKind": "bulk",
-      "summary": "Used to run cdk synth commands",
+      "summary": "Used to run cdk synth command",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:diff",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk diff command",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
     {
       "name": "cdk:bootstrap",
       "commandKind": "bulk",
-      "summary": "Used to run cdk bootstrap commands",
+      "summary": "Used to run cdk bootstrap command",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true,
       "allowWarningsInSuccessfulBuild": true
