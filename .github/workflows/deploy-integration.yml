@@ -60,7 +60,7 @@ jobs:
           cd workbench-core/infrastructure
           cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
           cdk diff
-          cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+          cdk deploy --all --require-approval never --outputs-file ./cdk-outputs.json
       
       - name: Display output
         run: |
