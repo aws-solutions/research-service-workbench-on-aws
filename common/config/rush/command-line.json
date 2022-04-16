@@ -212,19 +212,8 @@
       "name": "cdk:synth",
       "commandKind": "bulk",
       "summary": "Used to run cdk synth command",
-<<<<<<< HEAD
-=======
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
-    },
-    {
-      "name": "cdk:diff",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk diff command",
->>>>>>> f80d641 (Feature/init (#14))
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true,
-      "allowWarningsInSuccessfulBuild": true
     },
     {
       "name": "cdk:diff",
