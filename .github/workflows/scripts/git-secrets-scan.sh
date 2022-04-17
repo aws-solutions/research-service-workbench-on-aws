@@ -1,13 +1,7 @@
 #!/bin/bash
 
 # set -euo pipefail
-
-staged_flag=''
 return_code=0
-
-if [ $# -gt 0 ] && [ $1 ]; then
-    staged_flag='true'
-fi
 
 echo 'Git-secrets artifact path not set. Using ./.tools'
 mkdir -p .tools && {
@@ -29,14 +23,9 @@ git secrets --add 'us-iso|aws-iso' --global
 git secrets --add 'smil\.mil' --global
 
 # Run git-secrets only on staged files
-if [ $staged_flag ]; then
-    echo "Running git-secrets-scan on staged files"
-    git secrets --scan --cached
-else
-    git secrets --scan
-    return_code=$?
-    echo "RETURN_CODE=$return_code"
-fi
+git secrets --scan
+return_code=$?
+echo "RETURN_CODE=$return_code"
 
 if [ -d .tools/git-secrets ]; then
     rm -rf .tools && echo ".tools/git-secrets deleted !"
