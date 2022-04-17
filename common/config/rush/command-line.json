@@ -210,6 +210,13 @@
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
     },
+    {
+      "name": "git-secrets-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a git-secrets scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "/bin/bash .github/workflows/scripts/git-secrets-scan.sh"
+    },
     // {
     //   "name": "heft:build",
     //   "commandKind": "bulk",
@@ -233,6 +240,12 @@
    * For example, you might define a "--production" parameter for the "rush build" command.
    */
   "parameters": [
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Option to run make install in ci jobs",
+      "associatedCommands": ["git-secrets-scan"]
+    },
     {
       "parameterKind": "flag",
       "longName": "--ci",
