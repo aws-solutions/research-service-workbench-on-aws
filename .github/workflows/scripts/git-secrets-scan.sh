@@ -28,6 +28,7 @@ if [ $staged_flag ]; then
     ${GIT_SECRETS_DIR}/git-secrets --scan --cached
 else
     return_code=`${GIT_SECRETS_DIR}/git-secrets --scan`
+    echo "RETURN_CODE $return_code"
 fi
 
 if [ -d .tools/git-secrets ]; then
