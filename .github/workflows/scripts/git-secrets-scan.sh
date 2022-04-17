@@ -3,6 +3,7 @@
 # set -euo pipefail
 
 staged_flag=''
+return_code=0
 
 if [ $# -gt 0 ] && [ $1 ]; then
     staged_flag='true'
