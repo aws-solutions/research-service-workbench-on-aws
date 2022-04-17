@@ -27,7 +27,7 @@ if [ $staged_flag ]; then
     echo "Running git-secrets-scan on staged files"
     ${GIT_SECRETS_DIR}/git-secrets --scan --cached
 else
-    return_code=`${GIT_SECRETS_DIR}/git-secrets --scan`
+    return_code=`${GIT_SECRETS_DIR}/git-secrets --scan | echo $?`
     echo "RETURN_CODE $return_code"
 fi
 
@@ -35,7 +35,7 @@ if [ -d .tools/git-secrets ]; then
     rm -rf .tools/git-secrets && echo ".tools/git-secrets deleted !"
 fi
 
-if [[ $return_code ]]; then
+if [$return_code ]; then
     echo "git-secrets scan detected secrets"
     exit 1
 else
