@@ -14,30 +14,37 @@ mkdir -p .tools && {
     if [[ ! -d .tools/git-secrets ]] ; then
         echo "======================================================================"
         echo "Downloading git-secrets"
-        (cd .tools && git clone --depth 1 https://github.com/awslabs/git-secrets.git)
+        cd .tools && git clone https://github.com/awslabs/git-secrets.git
+        cd git-secrets && make install
     fi
 }
-export GIT_SECRETS_DIR=./.tools/git-secrets
 
-export PATH=$PATH:${GIT_SECRETS_DIR}
-${GIT_SECRETS_DIR}/git-secrets --register-aws
+git secrets --register-aws --global
+# Prevent leakage of internal tools
+git secrets --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
+git secrets --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
+# Prevent leakage of aws-iso
+git secrets --add 'ic\.gov|sgov\.gov' --global
+git secrets --add 'us-iso|aws-iso' --global
+git secrets --add 'smil\.mil' --global
 
 # Run git-secrets only on staged files
 if [ $staged_flag ]; then
     echo "Running git-secrets-scan on staged files"
-    ${GIT_SECRETS_DIR}/git-secrets --scan --cached
+    git secrets --scan --cached
 else
-    return_code=`${GIT_SECRETS_DIR}/git-secrets --scan | echo $?`
-    echo "RETURN_CODE $return_code"
+    git secrets --scan
+    return_code=$?
+    echo "RETURN_CODE=$return_code"
 fi
 
 if [ -d .tools/git-secrets ]; then
-    rm -rf .tools/git-secrets && echo ".tools/git-secrets deleted !"
+    rm -rf .tools && echo ".tools/git-secrets deleted !"
 fi
 
-if [$return_code ]; then
-    echo "git-secrets scan detected secrets"
+if [[ $return_code -ne 0 ]]; then
+    echo "git secrets scan detected secrets"
     exit 1
 else
-    echo "git-secrets scan ok !"
+    echo "git secrets scan ok !"
 fi
