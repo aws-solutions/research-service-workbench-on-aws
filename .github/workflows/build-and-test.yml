@@ -48,7 +48,7 @@ jobs:
         run: node common/scripts/install-run-rush.js check
 
       - name: Rush build
-        run: node common/scripts/install-run-rush.js build:ci --verbose
+        run: node common/scripts/install-run-rush.js build --verbose
 
       - name: Rush test
         run: node common/scripts/install-run-rush.js test:only --verbose
