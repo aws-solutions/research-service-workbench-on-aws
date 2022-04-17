@@ -35,6 +35,7 @@ fi
 
 if [[ $return_code ]]; then
     echo "git-secrets scan detected secrets"
+    exit 1
 else
     echo "git-secrets scan ok !"
 fi
