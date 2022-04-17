@@ -31,7 +31,7 @@ export PATH=$PATH:${GIT_SECRETS_DIR}
 
 # Run git-secrets only on staged files
 echo "Running git-secrets-scan"
-return_code=`${GIT_SECRETS_DIR}/git-secrets --scan | echo $?`
+return_code=`${GIT_SECRETS_DIR}/git-secrets --scan`
 
 if [ -d .tools/git-secrets ]; then
     rm -rf .tools/git-secrets && echo ".tools/git-secrets deleted !"
@@ -42,4 +42,5 @@ then
     echo "git-secrets scan ok"
 else
     echo "Secrets detected please check the logs"
+    exit $return_code
 fi
