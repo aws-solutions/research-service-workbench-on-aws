@@ -63,6 +63,7 @@ jobs:
       - name: Deploy SWB-Reference to Dev
         run: |
           cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
           STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
           STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
           STAGE='dev' node ../../common/scripts/install-run-rushx.js run-postDeployment
