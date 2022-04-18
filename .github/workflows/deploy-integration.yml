@@ -66,6 +66,7 @@ jobs:
   merge-develop-to-main:
     name: Merge develop to main
     runs-on: ubuntu-latest
+    needs: [deploy-integration]
     steps:
       - uses: actions/checkout@v3
         with:

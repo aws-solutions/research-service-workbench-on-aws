@@ -1,7 +1,7 @@
-# build-and-test Worflow
-![](https://github.com/awslabs/monorepo-for-service-workbench/actions/workflows/build-and-test.yml/badge.svg?branch=develop&event=pull-request)
+# Worflow Status
+![Actions Status](https://github.com/awslabs/monorepo-for-service-workbench/actions/workflows/build-and-test.yml/badge.svg?branch=develop)
 
-![](https://github.com/awslabs/monorepo-for-service-workbench/actions/workflows/deploy-integration.yml/badge.svg?branch=develop&event=push)
+![Actions Status](https://github.com/awslabs/monorepo-for-service-workbench/actions/workflows/deploy-integration.yml/badge.svg?branch=develop)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
