@@ -112,11 +112,16 @@ export class SWBStack extends Stack {
   }
 
   private _createAccountHandlerLambda(launchConstraintRole: Role): void {
+    const { STACK_NAME, LAUNCH_CONSTRAINT_ROLE_NAME } = getConstants();
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      memorySize: 256
+      memorySize: 256,
+      environment: {
+        STACK_NAME,
+        LAUNCH_CONSTRAINT_ROLE_NAME
+      }
     });
 
     const createPortfolioSharePolicy = new PolicyStatement({

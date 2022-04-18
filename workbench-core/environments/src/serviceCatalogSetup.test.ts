@@ -26,15 +26,42 @@ describe('ServiceCatalogSetup', () => {
     LAUNCH_CONSTRAINT_ROLE_NAME: 'LaunchConstraintIamRoleNameOutput',
     STACK_NAME: 'swb-dev-va'
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
+    cfMock.on(DescribeStacksCommand).resolves({
+      Stacks: [
+        {
+          StackName: 'swb-dev-va',
+          StackStatus: 'CREATE_COMPLETE',
+          CreationTime: new Date(),
+          Outputs: [
+            {
+              OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_NAME,
+              OutputValue: 'arn:aws:s3:::swb-dev-va-s3artifacts'
+            },
+            {
+              OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_NAME,
+              OutputValue: 'swb-dev-va-LaunchConstraint'
+            }
+          ]
+        }
+      ]
+    });
+  }
+  const cfMock = mockClient(CloudFormationClient);
+  beforeAll(() => {
+    mockCloudformationOutputs(cfMock);
+  });
+
+  afterAll(() => {
+    cfMock.reset();
+  });
+
   describe('Mocked private methods', () => {
     test('run: Create new portfolio, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       sc['_getPortfolioId'] = jest.fn().mockResolvedValue(undefined);
       sc['_createSCPortfolio'] = jest.fn().mockResolvedValue('port-abc');
-      sc['_getCfnOutputs'] = jest.fn().mockResolvedValue({
-        s3ArtifactBucketName: 'swb-dev-va-s3artifacts',
-        launchConstraintRoleName: 'swb-dev-va-LaunchConstraint'
-      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
@@ -84,7 +111,6 @@ describe('ServiceCatalogSetup', () => {
     test('run: Create new portfolio, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       const scMock = mockClient(ServiceCatalogClient);
-      const cfMock = mockClient(CloudFormationClient);
       const s3Mock = mockClient(S3Client);
 
       // Mock no portfolio
@@ -96,8 +122,6 @@ describe('ServiceCatalogSetup', () => {
           Id: 'port-abc'
         }
       });
-
-      mockCloudformationOutputs(cfMock);
 
       // Mock Get S3 files
       s3Mock.on(ListObjectsCommand).resolves({
@@ -133,33 +157,9 @@ describe('ServiceCatalogSetup', () => {
       await expect(sc.run(['./environments/sagemaker.cfn.yaml'])).resolves.not.toThrowError();
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
-      cfMock.on(DescribeStacksCommand).resolves({
-        Stacks: [
-          {
-            StackName: 'swb-dev-va',
-            StackStatus: 'CREATE_COMPLETE',
-            CreationTime: new Date(),
-            Outputs: [
-              {
-                OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_NAME,
-                OutputValue: 'arn:aws:s3:::swb-dev-va-s3artifacts'
-              },
-              {
-                OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_NAME,
-                OutputValue: 'swb-dev-va-LaunchConstraint'
-              }
-            ]
-          }
-        ]
-      });
-    }
-
     test('run: Create new portfolio, update product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       const scMock = mockClient(ServiceCatalogClient);
-      const cfMock = mockClient(CloudFormationClient);
       const s3Mock = mockClient(S3Client);
 
       // Mock no portfolio
@@ -171,8 +171,6 @@ describe('ServiceCatalogSetup', () => {
           Id: 'port-abc'
         }
       });
-
-      mockCloudformationOutputs(cfMock);
 
       // Mock Get S3 files
       s3Mock.on(ListObjectsCommand).resolves({
@@ -219,7 +217,6 @@ describe('ServiceCatalogSetup', () => {
     test('run: Portfolio already exist, product does not need to be updated, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       const scMock = mockClient(ServiceCatalogClient);
-      const cfMock = mockClient(CloudFormationClient);
       const s3Mock = mockClient(S3Client);
 
       // Mock portfolio already exist
@@ -231,8 +228,6 @@ describe('ServiceCatalogSetup', () => {
           }
         ]
       });
-
-      mockCloudformationOutputs(cfMock);
 
       // Mock Get S3 files
       s3Mock.on(ListObjectsCommand).resolves({

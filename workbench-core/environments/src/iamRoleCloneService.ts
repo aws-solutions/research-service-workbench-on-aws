@@ -126,7 +126,6 @@ export default class IamRoleCloneService {
   }
 
   private async _copyManagedPolicies(roleName: string): Promise<void> {
-    // TODO: Handle customer created managed policies
     console.log('Copying managed policies');
     const srcManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._sourceAccount);
     const targetManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._targetAccount);

@@ -1,5 +1,6 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import IamRoleCloneService from './iamRoleCloneService';
+import { getCfnOutput } from './cloudformationUtil';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -14,7 +15,7 @@ export default class AccountHandler {
      * [Done] Share SC portfolio with hosting accounts that doesn't already have SC portfolio from main account
      * [Done] Hosting account accept portfolio (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/accept-portfolio-share.html) that was shared
      * [Done] In hosting account, associate envManagement IAM role to SC portfolio (API (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/associate-principal-with-portfolio.html))(Example code (https://github.com/awslabs/service-workbench-on-aws/blob/5afa5a68ac8fdb4939864e52a5b13cfc0b227118/addons/addon-environment-sc-api/packages/environment-sc-workflow-steps/lib/steps/share-portfolio-with-target-acc/share-portfolio-with-target-acc.js#L84) from SWBv1)
-     * Copy LaunchConstraint role to hosting accounts that doesn't already have the role
+     * [Done] Copy LaunchConstraint role to hosting accounts that doesn't already have the role
      * (Already in `hostingAccountLifecycleService`) Share SSM documents with all hosting accounts that does not have the SSM document already
      * (Already in `hostingAccountLifecycleService`) Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
      * Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
@@ -23,6 +24,11 @@ export default class AccountHandler {
 
     // eslint-disable-next-line
     const { hostingAccountArns, externalId, portfolioId, hostingAccountId } = await this._getMetadataFromDB();
+    const { [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName } = await getCfnOutput(
+      this._mainAccountAwsService,
+      process.env.STACK_NAME!,
+      [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]
+    );
     for (const hostingAccountArn of hostingAccountArns) {
       const hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
         roleArn: hostingAccountArn.accountHandler,
@@ -40,8 +46,7 @@ export default class AccountHandler {
       //   hostingAccountArn.envManagement,
       //   portfolioId as string
       // );
-      // TODO: Get LC from CFN Stack
-      const launchConstraintRoleName = 'swb-dev-oh-LaunchConstraint';
+
       const iamRoleCloneService = new IamRoleCloneService(
         this._mainAccountAwsService,
         hostingAccountAwsService

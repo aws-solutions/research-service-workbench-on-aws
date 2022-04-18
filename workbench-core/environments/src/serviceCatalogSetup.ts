@@ -10,6 +10,7 @@ import {
   PortfolioDetail,
   ProductViewDetail
 } from '@aws-sdk/client-service-catalog';
+import { getCfnOutput } from './cloudformationUtil';
 
 export default class ServiceCatalogSetup {
   private _aws: AwsService;
@@ -37,7 +38,13 @@ export default class ServiceCatalogSetup {
   }
 
   public async run(cfnFilePaths: string[]): Promise<void> {
-    const { S3_ARTIFACT_BUCKET_SC_PREFIX, PORTFOLIO_NAME } = this._constants;
+    const {
+      S3_ARTIFACT_BUCKET_SC_PREFIX,
+      PORTFOLIO_NAME,
+      STACK_NAME,
+      LAUNCH_CONSTRAINT_ROLE_NAME,
+      S3_ARTIFACT_BUCKET_ARN_NAME
+    } = this._constants;
     const portfolioName = PORTFOLIO_NAME;
 
     // Create SC portfolio if portfolio doesn't exist
@@ -47,7 +54,12 @@ export default class ServiceCatalogSetup {
       portfolioId = await this._createSCPortfolio(portfolioName);
     }
     console.log('PortfolioId', portfolioId);
-    const { s3ArtifactBucketName, launchConstraintRoleName } = await this._getCfnOutputs();
+    // const { s3ArtifactBucketName, launchConstraintRoleName } = await this._getCfnOutputs();
+    const {
+      [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketName,
+      [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
+    } = await getCfnOutput(this._aws, STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
+
     const prefix = S3_ARTIFACT_BUCKET_SC_PREFIX;
 
     // Upload environment's CFN templates to S3 if current template is different from template in S3
