@@ -8,7 +8,7 @@ mkdir -p ./.tools && {
     if [[ ! -d ./.tools/git-secrets ]] ; then
         echo "======================================================================"
         echo "Downloading git-secrets"
-        cd .tools && git clone https://github.com/awslabs/git-secrets.git
+        cd .tools && git clone https://github.com/awslabs/git-secrets.git && sleep 2
     fi
 }
 
