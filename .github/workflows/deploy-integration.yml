@@ -58,6 +58,6 @@ jobs:
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
-          dev node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
-          dev node ../../common/scripts/install-run-rushx.js cdk-deploy --require-approval never
-          dev node ../../common/scripts/install-run-rushx.js run-postDeployment
+          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
+          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy --require-approval never
+          STAGE='dev' node ../../common/scripts/install-run-rushx.js run-postDeployment
