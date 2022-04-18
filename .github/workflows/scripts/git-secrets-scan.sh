@@ -12,6 +12,7 @@ mkdir -p ./.tools && {
     fi
 }
 
+ls -lrt ${GIT_SECRETS_DIR}
 export GIT_SECRETS_DIR=./.tools/git-secrets
 export PATH=$PATH:${GIT_SECRETS_DIR}
 
