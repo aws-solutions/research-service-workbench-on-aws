@@ -225,6 +225,13 @@
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "/bin/bash .github/workflows/scripts/git-secrets-scan.sh"
     },
+    {
+      "name": "viperlight-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a viperlight scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "/bin/bash .github/workflows/scripts/viperlight-scan.sh"
+    },
     // {
     //   "name": "heft:build",
     //   "commandKind": "bulk",
