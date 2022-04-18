@@ -8,12 +8,12 @@ mkdir -p ./.tools && {
     if [[ ! -d ./.tools/git-secrets ]] ; then
         echo "======================================================================"
         echo "Downloading git-secrets"
-        git clone https://github.com/awslabs/git-secrets.git ./.tools/ && sleep 2
+        git clone https://github.com/awslabs/git-secrets.git ./.tools/git-secrets && sleep 2
     fi
 }
 pwd
 export GIT_SECRETS_DIR=./.tools/git-secrets
-ls -lrt ${GIT_SECRETS_DIR}
+ls -lrt .tools/git-secrets
 export PATH=$PATH:${GIT_SECRETS_DIR}
 
 ${GIT_SECRETS_DIR}/git-secrets --register-aws --global
