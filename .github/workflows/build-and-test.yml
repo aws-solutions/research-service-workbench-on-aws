@@ -79,3 +79,17 @@ jobs:
       - name: Print remediation message
         if: failure()
         run: echo "git secrets found potential leaked credentials. If ANY credentials were committed, they MUST be immediately revoked."
+  
+  viperlight-scan:
+    name: Viperlight scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run viperlight scan
+        run: node common/scripts/install-run-rush.js viperlight-scan
+
+      - name: Print remediation message
+        if: failure()
+        run: echo "viperlight scan failed, potential vulnerability. Please review the logs"
