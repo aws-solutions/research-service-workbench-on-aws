@@ -47,10 +47,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/sts",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws-sdk/types",
       "allowedCategories": [ "production" ]
     },

@@ -1,0 +1,3 @@
+.github/workflows/*
+.gitallowed
+**/*.test.ts
