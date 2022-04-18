@@ -211,6 +211,14 @@
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
     },
     {
+      "name": "commitlint",
+      "commandKind": "global",
+      "summary": "Conventional commit check on commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitlint",
+      "shellCommand": "commitlint"
+    },
+    {
       "name": "git-secrets-scan",
       "commandKind": "global",
       "summary": "Used to perform a git-secrets scan on the packages",
