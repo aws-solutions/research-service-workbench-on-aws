@@ -3,33 +3,33 @@
 # set -euo pipefail
 return_code=0
 
-if [ $1 ]; then
-    ci_flag='true'
-fi
-
 echo 'Cloning git-secrets scan in ./.tools'
-mkdir -p .tools && {
-    if [[ ! -d .tools/git-secrets ]] ; then
+mkdir -p ./.tools && {
+    if [[ ! -d ./.tools/git-secrets ]] ; then
         echo "======================================================================"
         echo "Downloading git-secrets"
         cd .tools && git clone https://github.com/awslabs/git-secrets.git
-        export GIT_SECRETS_DIR=./.tools/git-secrets
+        # export GIT_SECRETS_DIR=./.tools/git-secrets
     fi
 }
 
-export GIT_SECRETS_DIR=./.tools/git-secrets
+export GIT_SECRETS_DIR=.tools/git-secrets
+export PATH=$PATH:${GIT_SECRETS_DIR}
 
-${GIT_SECRETS_DIR}/git-secrets --register-aws --global
+
+git-secrets --register-aws --global
+
 # Prevent leakage of internal tools
-${GIT_SECRETS_DIR}/git-secrets --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
-${GIT_SECRETS_DIR}/git-secrets --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
+git-secrets --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global || echo $?
+git-secrets --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
 # Prevent leakage of aws-iso
-${GIT_SECRETS_DIR}/git-secrets --add 'ic\.gov|sgov\.gov' --global
-${GIT_SECRETS_DIR}/git-secrets --add 'us-iso|aws-iso' --global
-${GIT_SECRETS_DIR}/git-secrets --add 'smil\.mil' --global
+git-secrets --add 'ic\.gov|sgov\.gov' --global
+git-secrets --add 'us-iso|aws-iso' --global
+git-secrets --add 'smil\.mil' --global
 
+echo "bye"
 # Run git-secrets only on staged files
-${GIT_SECRETS_DIR}/git-secrets --scan
+git-secrets --scan
 return_code=$?
 echo "RETURN_CODE=$return_code"
 
