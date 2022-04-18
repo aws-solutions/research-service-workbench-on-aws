@@ -14,7 +14,7 @@ mkdir -p ./.tools && {
 
 export GIT_SECRETS_DIR=./.tools/git-secrets
 export PATH=$PATH:${GIT_SECRETS_DIR}
-echo $PATH
+
 ${GIT_SECRETS_DIR}/git-secrets --register-aws --global
 # Prevent leakage of internal tools
 ${GIT_SECRETS_DIR}/git-secrets  --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
