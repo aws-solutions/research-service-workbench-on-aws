@@ -11,9 +11,9 @@ mkdir -p ./.tools && {
         cd .tools && git clone https://github.com/awslabs/git-secrets.git && sleep 2
     fi
 }
-
-ls -lrt ${GIT_SECRETS_DIR}
+pwd
 export GIT_SECRETS_DIR=./.tools/git-secrets
+ls -lrt ${GIT_SECRETS_DIR}
 export PATH=$PATH:${GIT_SECRETS_DIR}
 
 ${GIT_SECRETS_DIR}/git-secrets --register-aws --global
