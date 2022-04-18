@@ -24,10 +24,10 @@
     "@amzn/environments": "workspace:*",
     "express": "^4.17.3",
     "@vendia/serverless-express": "^4.5.4",
-    "cdk-ssm-document": "^3.1.0",
-    "cdk-iam-floyd": "^0.300.0",
     "js-yaml": "^4.1.0",
-    "@amzn/workbench-core-base": "workspace:*"
+    "@amzn/workbench-core-base": "workspace:*",
+    "cdk-ssm-document": "^3.1.0",
+    "cdk-iam-floyd": "^0.300.0"
   },
   "devDependencies": {
     "aws-lambda": "^1.0.7",
