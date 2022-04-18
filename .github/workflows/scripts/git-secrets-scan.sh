@@ -3,7 +3,7 @@
 # set -euo pipefail
 return_code=0
 
-echo 'Git-secrets artifact path not set. Using ./.tools'
+echo 'Cloning git-secrets scan in ./.tools'
 mkdir -p .tools && {
     if [[ ! -d .tools/git-secrets ]] ; then
         echo "======================================================================"
