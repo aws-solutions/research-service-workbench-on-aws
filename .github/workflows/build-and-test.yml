@@ -7,7 +7,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -57,24 +56,11 @@ jobs:
     name: Scan for secrets
     runs-on: ubuntu-latest
     steps:
-      - name: Install Git Secrets
-        run: |
-          cd ~
-          git clone https://github.com/awslabs/git-secrets.git && cd git-secrets
-          sudo make install
-          git secrets --register-aws --global
-          # Prevent leakage of internal tools
-          git secrets --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
-          git secrets --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
-          # Prevent leakage of aws-iso
-          git secrets --add 'ic\.gov|sgov\.gov' --global
-          git secrets --add 'us-iso|aws-iso' --global
-          git secrets --add 'smil\.mil' --global
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Run Git Secrets
-        run: git secrets --scan
+        run: node common/scripts/install-run-rush.js git-secrets-scan
 
       - name: Print remediation message
         if: failure()

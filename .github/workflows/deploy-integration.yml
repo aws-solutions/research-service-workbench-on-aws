@@ -45,9 +45,6 @@ jobs:
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
 
-      - name: Build
-        run: node common/scripts/install-run-rush.js build --verbose
-      
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
