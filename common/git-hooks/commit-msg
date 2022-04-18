@@ -25,8 +25,4 @@
 #   exit 1
 # fi
 INPUT_FILE=$1
-echo $1
-START_LINE=`head -n1 $INPUT_FILE`
-echo $START_LINE
-# npx --no -- echo "commitlint --edit "$START_LINE"
-# node common/scripts/install-run-rush.js commitlint --edit $1
+node common/scripts/install-run-rush.js commitlint --edit "$INPUT_FILE"

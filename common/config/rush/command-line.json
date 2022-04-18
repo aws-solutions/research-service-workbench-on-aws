@@ -249,6 +249,13 @@
    */
   "parameters": [
     {
+      "parameterKind": "string",
+      "argumentName": "FILE",
+      "longName": "--edit",
+      "description": "read last commit message from the specified file or fallbacks to ./.git/COMMIT_EDITMSG",
+      "associatedCommands": ["commitlint"]
+    },
+    {
       "parameterKind": "flag",
       "longName": "--ci",
       "description": "Option to run make install in ci jobs",
