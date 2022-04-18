@@ -42,11 +42,11 @@ jobs:
       #       ${{ runner.os }}-pnpm-
       #       ${{ runner.os }}-
 
-      - name: Install dependecies
-        run: node common/scripts/install-run-rush.js install
+      # - name: Install dependecies
+      #   run: node common/scripts/install-run-rush.js install
 
-      - name: Build
-        run: node common/scripts/install-run-rush.js build --verbose
+      # - name: Build
+      #   run: node common/scripts/install-run-rush.js build --verbose
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -57,6 +57,8 @@ jobs:
       
       - name: Deploy SWB-Reference to Dev
         run: |
+          node common/scripts/install-run-rush.js install
+          node common/scripts/install-run-rush.js build --verbose
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v

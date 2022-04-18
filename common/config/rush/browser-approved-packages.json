@@ -51,6 +51,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@commitlint/cli",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@commitlint/config-conventional",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },

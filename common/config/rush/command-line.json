@@ -211,6 +211,14 @@
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
     },
     {
+      "name": "commitlint",
+      "commandKind": "global",
+      "summary": "Conventional commit check on commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitlint",
+      "shellCommand": "commitlint"
+    },
+    {
       "name": "git-secrets-scan",
       "commandKind": "global",
       "summary": "Used to perform a git-secrets scan on the packages",
@@ -240,6 +248,13 @@
    * For example, you might define a "--production" parameter for the "rush build" command.
    */
   "parameters": [
+    {
+      "parameterKind": "string",
+      "argumentName": "FILE",
+      "longName": "--edit",
+      "description": "read last commit message from the specified file or fallbacks to ./.git/COMMIT_EDITMSG",
+      "associatedCommands": ["commitlint"]
+    },
     {
       "parameterKind": "flag",
       "longName": "--ci",
