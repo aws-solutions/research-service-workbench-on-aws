@@ -44,7 +44,7 @@ export default class HostingAccountLifecycleService {
   }
 
   public async shareAMIs(accountId: string): Promise<void> {
-    const amisToShare: string[] = Object.values(JSON.parse(this.options.AMI_IDS_TO_SHARE));
+    const amisToShare: string[] = JSON.parse(this.options.AMI_IDS_TO_SHARE);
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {

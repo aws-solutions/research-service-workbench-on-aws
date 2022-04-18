@@ -39,7 +39,7 @@ describe('HostingAccountLifecycleService', () => {
       STACK_NAME: 'swb-swbv2-va',
       SSM_DOC_NAME_SUFFIX: 'sampleSSMDocOutput',
       MAIN_ACCOUNT_BUS_ARN_NAME: 'SampleMainAccountBusArn',
-      AMI_IDS_TO_SHARE: '{}'
+      AMI_IDS_TO_SHARE: '[]'
     });
 
     const ebMock = mockClient(EventBridgeClient);
