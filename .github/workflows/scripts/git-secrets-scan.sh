@@ -14,18 +14,18 @@ mkdir -p ./.tools && {
 
 export GIT_SECRETS_DIR=./.tools/git-secrets
 export PATH=$PATH:${GIT_SECRETS_DIR}
-
-git-secrets --register-aws --global
+echo $PATH
+${GIT_SECRETS_DIR}/git-secrets --register-aws --global
 # Prevent leakage of internal tools
-git-secrets --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
-git-secrets --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
+${GIT_SECRETS_DIR}/git-secrets  --add '[aA]pollo|[bB]razil|[cC]oral|[oO]din' --global
+${GIT_SECRETS_DIR}/git-secrets  --add 'tt\.amazon\.com|issues\.amazon\.com|cr\.amazon\.com' --global
 # Prevent leakage of aws-iso
-git-secrets --add 'ic\.gov|sgov\.gov' --global
-git-secrets --add 'us-iso|aws-iso' --global
-git-secrets --add 'smil\.mil' --global
+${GIT_SECRETS_DIR}/git-secrets  --add 'ic\.gov|sgov\.gov' --global
+${GIT_SECRETS_DIR}/git-secrets  --add 'us-iso|aws-iso' --global
+${GIT_SECRETS_DIR}/git-secrets  --add 'smil\.mil' --global
 
 # Run git-secrets only on staged files
-git-secrets --scan
+${GIT_SECRETS_DIR}/git-secrets  --scan
 return_code=$?
 echo "RETURN_CODE = $return_code"
 
