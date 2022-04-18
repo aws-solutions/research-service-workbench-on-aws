@@ -1,5 +1,5 @@
 # build-and-test Worflow
-![](https://github.com/insignias/awslabs/monorepo-for-service-workbench/Build-and-test/badge.svg?branch=develop&event=push)
+![](https://github.com/awslabs/monorepo-for-service-workbench/actions/workflows/build-and-test.yml/badge.svg?branch=develop&event=push)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
