@@ -6,7 +6,6 @@ on:
 
 jobs:
   deploy-integration:
-    needs: [build-and-test]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
