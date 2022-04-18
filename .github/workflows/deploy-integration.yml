@@ -21,26 +21,26 @@ jobs:
         with:
           node-version: '14.x'
 
-      - name: Cache Rush
-        uses: actions/cache@v3
-        with:
-          path: |
-            common/temp/install-run
-            ~/.rush
-          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
-          restore-keys: |
-            ${{ runner.os }}-rush-
-            ${{ runner.os }}-
+      # - name: Cache Rush
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       common/temp/install-run
+      #       ~/.rush
+      #     key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-rush-
+      #       ${{ runner.os }}-
 
-      - name: Cache pnpm
-        uses: actions/cache@v3
-        with:
-          path: |
-            common/temp/pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-            ${{ runner.os }}-
+      # - name: Cache pnpm
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       common/temp/pnpm-store
+      #     key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pnpm-
+      #       ${{ runner.os }}-
 
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
@@ -60,5 +60,5 @@ jobs:
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy --require-approval never
+          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
           STAGE='dev' node ../../common/scripts/install-run-rushx.js run-postDeployment
