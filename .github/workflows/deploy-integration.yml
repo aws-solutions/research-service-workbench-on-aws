@@ -1,4 +1,4 @@
-name: Deploy-to-dev-and-integration-test
+name: Dev-deploy-and-integration-test
 on:
   push:
     branches:
