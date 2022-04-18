@@ -112,7 +112,7 @@ export class SWBStack extends Stack {
   }
 
   private _createAccountHandlerLambda(launchConstraintRole: Role): void {
-    const { STACK_NAME, LAUNCH_CONSTRAINT_ROLE_NAME } = getConstants();
+    const { STACK_NAME, LAUNCH_CONSTRAINT_ROLE_NAME, SSM_DOC_NAME_SUFFIX, AMI_IDS_TO_SHARE } = getConstants();
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -120,7 +120,9 @@ export class SWBStack extends Stack {
       memorySize: 256,
       environment: {
         STACK_NAME,
-        LAUNCH_CONSTRAINT_ROLE_NAME
+        LAUNCH_CONSTRAINT_ROLE_NAME,
+        SSM_DOC_NAME_SUFFIX,
+        AMI_IDS_TO_SHARE
       }
     });
 
@@ -128,33 +130,47 @@ export class SWBStack extends Stack {
       actions: ['servicecatalog:CreatePortfolioShare'],
       resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
     });
-    lambda.role?.attachInlinePolicy(
-      new Policy(this, 'portfolioSharePolicy', {
-        statements: [createPortfolioSharePolicy]
-      })
-    );
 
     const assumeRolePolicy = new PolicyStatement({
       actions: ['sts:AssumeRole'],
       // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
       resources: [`arn:aws:iam::*:role/${this.stackName}-cross-account-role`]
     });
-    lambda.role?.attachInlinePolicy(
-      new Policy(this, 'assumeRolePolicy', {
-        statements: [assumeRolePolicy]
-      })
-    );
 
     const getLaunchConstraintPolicy = new PolicyStatement({
-      actions: ['iam:GetRole', 'iam:ListRolePolicies', 'iam:ListAttachedRolePolicies'],
+      actions: ['iam:GetRole', 'iam:GetRolePolicy', 'iam:ListRolePolicies', 'iam:ListAttachedRolePolicies'],
       resources: [launchConstraintRole.roleArn]
     });
+
+    const shareAmiPolicy = new PolicyStatement({
+      actions: ['ec2:ModifyImageAttribute'],
+      resources: ['*']
+    });
+
+    const shareSSMPolicy = new PolicyStatement({
+      actions: ['ssm:ModifyDocumentPermission'],
+      resources: [
+        this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+      ]
+    });
+
+    const cloudformationPolicy = new PolicyStatement({
+      actions: ['cloudformation:DescribeStacks'],
+      // resources: [this.formatArn({service: 'cloudformation', resource: 'stack', resourceName: `${this.stackName}/${this.stackId}`})]  // TODO: Can scope be narrowed?
+      resources: [this.stackId]
+    });
     lambda.role?.attachInlinePolicy(
-      new Policy(this, 'getLaunchConstraint', {
-        statements: [getLaunchConstraintPolicy]
+      new Policy(this, 'accountHandlerPolicy', {
+        statements: [
+          createPortfolioSharePolicy,
+          assumeRolePolicy,
+          getLaunchConstraintPolicy,
+          shareAmiPolicy,
+          shareSSMPolicy,
+          cloudformationPolicy
+        ]
       })
     );
-
     // Run lambda function every 5 minutes
     // const eventRule = new Rule(this, 'scheduleRule', {
     //   schedule: Schedule.cron({ minute: '0/5' })

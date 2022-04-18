@@ -54,7 +54,7 @@ export default class ServiceCatalogSetup {
       portfolioId = await this._createSCPortfolio(portfolioName);
     }
     console.log('PortfolioId', portfolioId);
-    // const { s3ArtifactBucketName, launchConstraintRoleName } = await this._getCfnOutputs();
+
     const {
       [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketName,
       [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
@@ -117,49 +117,6 @@ export default class ServiceCatalogSetup {
       cfnFilePaths.push(join(envFolderPath, directory, cfnFileNames[0]));
     }
     return cfnFilePaths;
-  }
-
-  protected async _getCfnOutputs(): Promise<{
-    s3ArtifactBucketName: string;
-    launchConstraintRoleName: string;
-  }> {
-    const { S3_ARTIFACT_BUCKET_ARN_NAME, LAUNCH_CONSTRAINT_ROLE_NAME, STACK_NAME } = this._constants;
-    const describeStackParam = {
-      StackName: STACK_NAME
-    };
-
-    const stackOutput = await this._aws.cloudformation.describeStacks(describeStackParam);
-
-    const s3BucketNameExport = stackOutput.Stacks![0].Outputs!.find((output) => {
-      return output.OutputKey && output.OutputKey === S3_ARTIFACT_BUCKET_ARN_NAME;
-    });
-
-    let s3ArtifactBucketName = '';
-    if (s3BucketNameExport && s3BucketNameExport.OutputValue) {
-      const arn = s3BucketNameExport.OutputValue;
-      const bucketName = arn.split(':').pop();
-      if (bucketName) {
-        s3ArtifactBucketName = bucketName;
-      } else {
-        throw new Error(`Cannot get bucket name from arn ${arn}`);
-      }
-    } else {
-      throw new Error(`Cannot find output value for S3 Bucket with name: ${S3_ARTIFACT_BUCKET_ARN_NAME}`);
-    }
-
-    let launchConstraintRoleName = '';
-    const lcRoleNameExport = stackOutput.Stacks![0].Outputs!.find((output) => {
-      return output.OutputKey && output.OutputKey.includes(LAUNCH_CONSTRAINT_ROLE_NAME);
-    });
-    if (lcRoleNameExport && lcRoleNameExport.OutputValue) {
-      launchConstraintRoleName = lcRoleNameExport.OutputValue;
-    } else {
-      throw new Error(
-        `Cannot find output value for Launch Contraint role name with name: ${LAUNCH_CONSTRAINT_ROLE_NAME}`
-      );
-    }
-
-    return { s3ArtifactBucketName, launchConstraintRoleName };
   }
 
   private async _createLaunchConstraint(

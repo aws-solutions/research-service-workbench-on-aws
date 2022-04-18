@@ -1,36 +1,34 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
+import { getCfnOutput } from './cloudformationUtil';
 
 export default class HostingAccountLifecycleService {
   public aws: AwsService;
-  public options: {
-    AWS_REGION: string;
-    STACK_NAME: string;
-    SSM_DOC_NAME_SUFFIX: string;
-    MAIN_ACCOUNT_BUS_ARN_NAME: string;
-    AMI_IDS_TO_SHARE: string;
-  };
-  public constructor(constants: {
-    AWS_REGION: string;
-    STACK_NAME: string;
-    SSM_DOC_NAME_SUFFIX: string;
-    MAIN_ACCOUNT_BUS_ARN_NAME: string;
-    AMI_IDS_TO_SHARE: string;
-  }) {
-    this.options = constants;
-    this.aws = new AwsService({ region: this.options.AWS_REGION });
+  private _stackName: string;
+  public constructor(awsRegion: string, stackName: string) {
+    this.aws = new AwsService({ region: awsRegion });
+    this._stackName = stackName;
   }
 
-  public async initializeAccount(accountMetadata: {
-    accountId: string;
-    envManagementRoleArn: string;
-    accountHandlerRoleArn: string;
-  }): Promise<void> {
-    const cfnOutputs = await this.getCfnOutputs();
-    await this.shareSSMDocument(cfnOutputs.ssmDocuments, accountMetadata.accountId);
-    await this.shareAMIs(accountMetadata.accountId);
-    await this.updateEventBridgePermissions(cfnOutputs.mainAccountBusName, accountMetadata.accountId);
+  public async initializeAccount(
+    accountMetadata: {
+      accountId: string;
+      envManagementRoleArn: string;
+      accountHandlerRoleArn: string;
+    },
+    mainAccountBusArnName: string
+  ): Promise<void> {
+    const { [mainAccountBusArnName]: mainAccountBusName } = await getCfnOutput(this.aws, this._stackName, [
+      mainAccountBusArnName
+    ]);
+    await this.updateEventBridgePermissions(mainAccountBusName, accountMetadata.accountId);
     await this.storeToDdb(accountMetadata);
+  }
+
+  public async updateAccount(targetAccountId: string, ssmDocNameSuffix: string): Promise<void> {
+    const ssmDocuments = await this.getSSMDocuments(this._stackName, ssmDocNameSuffix);
+    await this.shareSSMDocument(ssmDocuments, targetAccountId);
+    await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
   }
 
   public async updateEventBridgePermissions(mainAccountBusName: string, accountId: string): Promise<void> {
@@ -43,14 +41,13 @@ export default class HostingAccountLifecycleService {
     await this.aws.eventBridge.putPermission(params);
   }
 
-  public async shareAMIs(accountId: string): Promise<void> {
-    const amisToShare: string[] = JSON.parse(this.options.AMI_IDS_TO_SHARE);
+  public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {
           ImageId: amiId,
           Attribute: 'LaunchPermission',
-          LaunchPermission: { Add: [{ UserId: accountId }] }
+          LaunchPermission: { Add: [{ UserId: targetAccountId }] }
         };
         await this.aws.ec2.modifyImageAttribute(params);
       }
@@ -67,49 +64,36 @@ export default class HostingAccountLifecycleService {
     }
   }
 
-  public async getCfnOutputs(): Promise<{
-    ssmDocuments: string[];
-    mainAccountBusName: string;
-  }> {
+  private _getNameFromArn(params: { output?: Output; outputName?: string }): string {
+    let currOutputVal;
+    if (params.output && params.output.OutputValue) {
+      const arn = params.output.OutputValue;
+      const resourceName = arn.split('/').pop();
+      if (resourceName) {
+        currOutputVal = resourceName;
+      } else {
+        throw new Error(`Cannot get name from arn ${arn}`);
+      }
+    } else {
+      throw new Error(`Cannot find output name: ${params.outputName}`);
+    }
+    return currOutputVal;
+  }
+
+  public async getSSMDocuments(stackName: string, ssmDocNameSuffix: string): Promise<string[]> {
     const describeStackParam = {
-      StackName: this.options.STACK_NAME
+      StackName: stackName
     };
 
     const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
 
-    const getNameFromArn = (params: { output?: Output; outputName?: string }): string => {
-      let currOutputVal;
-      if (params.output && params.output.OutputValue) {
-        const arn = params.output.OutputValue;
-        const resourceName = arn.split('/').pop();
-        if (resourceName) {
-          currOutputVal = resourceName;
-        } else {
-          throw new Error(`Cannot get name from arn ${arn}`);
-        }
-      } else {
-        throw new Error(`Cannot find output name: ${params.outputName}`);
-      }
-      return currOutputVal;
-    };
-
-    const eventBusArnOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
-      return output.OutputKey && output.OutputKey === this.options.MAIN_ACCOUNT_BUS_ARN_NAME;
-    });
-    const mainAccountBusName = getNameFromArn({
-      output: eventBusArnOutput,
-      outputName: this.options.MAIN_ACCOUNT_BUS_ARN_NAME
-    });
-
     const ssmDocOutputs = stackDetails.Stacks![0].Outputs!.filter((output: Output) => {
-      return output.OutputKey && output.OutputKey.endsWith(this.options.SSM_DOC_NAME_SUFFIX);
+      return output.OutputKey && output.OutputKey.endsWith(ssmDocNameSuffix);
     });
 
-    const ssmDocuments = ssmDocOutputs.map((output: Output) => {
-      return getNameFromArn({ output, outputName: output.OutputKey });
+    return ssmDocOutputs.map((output: Output) => {
+      return this._getNameFromArn({ output, outputName: output.OutputKey });
     });
-
-    return { ssmDocuments, mainAccountBusName };
   }
 
   /*

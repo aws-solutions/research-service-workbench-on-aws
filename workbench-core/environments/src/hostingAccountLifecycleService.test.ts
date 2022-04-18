@@ -34,13 +34,13 @@ describe('HostingAccountLifecycleService', () => {
     });
   }
   test('execute does not return an error', async () => {
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService({
-      AWS_REGION: 'us-east-1',
-      STACK_NAME: 'swb-swbv2-va',
-      SSM_DOC_NAME_SUFFIX: 'sampleSSMDocOutput',
-      MAIN_ACCOUNT_BUS_ARN_NAME: 'SampleMainAccountBusArn',
-      AMI_IDS_TO_SHARE: '[]'
-    });
+    // const hostingAccountLifecycleService = new HostingAccountLifecycleService({
+    //   AWS_REGION: 'us-east-1',
+    //   STACK_NAME: 'swb-swbv2-va',
+    //   SSM_DOC_NAME_SUFFIX: 'sampleSSMDocOutput',
+    //   AMI_IDS_TO_SHARE: '[]'
+    // });
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
 
     const ebMock = mockClient(EventBridgeClient);
     const ec2Mock = mockClient(EC2Client);
@@ -60,11 +60,14 @@ describe('HostingAccountLifecycleService', () => {
     mockCloudformationOutputs(cfnMock);
 
     await expect(
-      hostingAccountLifecycleService.initializeAccount({
-        accountId: '123456789012',
-        envManagementRoleArn: 'sampleEnvManagementRoleArn',
-        accountHandlerRoleArn: 'sampleAccountHandlerRoleArn'
-      })
+      hostingAccountLifecycleService.initializeAccount(
+        {
+          accountId: '123456789012',
+          envManagementRoleArn: 'sampleEnvManagementRoleArn',
+          accountHandlerRoleArn: 'sampleAccountHandlerRoleArn'
+        },
+        'SampleMainAccountBusArn'
+      )
     ).resolves.not.toThrowError();
   });
 });

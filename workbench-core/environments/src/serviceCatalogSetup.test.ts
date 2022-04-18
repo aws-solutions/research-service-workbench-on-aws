@@ -75,10 +75,6 @@ describe('ServiceCatalogSetup', () => {
     test('run: Porfolio already exist, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
-      sc['_getCfnOutputs'] = jest.fn().mockResolvedValue({
-        s3ArtifactBucketName: 'swb-dev-va-s3artifacts',
-        launchConstraintRoleName: 'swb-dev-va-LaunchConstraint'
-      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
@@ -92,10 +88,6 @@ describe('ServiceCatalogSetup', () => {
     test('run: Porfolio already exist, product already exist, updating product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
       sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
-      sc['_getCfnOutputs'] = jest.fn().mockResolvedValue({
-        s3ArtifactBucketName: 'swb-dev-va-s3artifacts',
-        launchConstraintRoleName: 'swb-dev-va-LaunchConstraint'
-      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
