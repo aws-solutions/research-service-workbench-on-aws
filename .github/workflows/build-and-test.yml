@@ -111,4 +111,5 @@ jobs:
       - name: Run cfn-nag on onboarding template
         uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/src/templates --fail-on-warnings
+          input_path: solutions/swb-reference/src/templates
+          extra_args: --fail-on-warnings
