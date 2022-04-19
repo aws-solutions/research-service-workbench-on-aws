@@ -97,19 +97,31 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
 
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build --verbose
+
       - name: cdk synth
         run: |
           cd solutions/swb-reference
           STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb cdk.out
+        id: cdk
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out
           extra_args: --template-pattern="..*\.template.json" --fail-on-warnings
 
       - name: Run cfn-nag on onboarding template
+        id: template
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/src/templates
           extra_args: --fail-on-warnings
+
+      - name: Fail if cdk_nag fails
+        if: steps.cdk.outcome != 'success' || steps.template.outcome != 'success'
+        run: echo "cdk_nag scan failed. Please review the templates"
