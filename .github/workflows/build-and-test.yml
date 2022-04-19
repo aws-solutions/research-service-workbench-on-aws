@@ -84,3 +84,27 @@ jobs:
       - name: Print remediation message
         if: failure()
         run: echo "viperlight scan failed, potential vulnerability. Please review the logs"
+
+  cfn-nag-scan:
+    name: Run cfn-nag scan
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      # scan swb cdk.out
+      - name: Run cfn-nag
+        uses: stelligent/cfn-nag-sarif-action@v1
+        with:
+          input_path: solutions/swb-reference/cdk.out
+
+      # scan onboarding template
+      - name: Run cfn-nag
+        uses: stelligent/cfn-nag-sarif-action@v1
+        with:
+          input_path: solutions/swb-reference/src/templates
