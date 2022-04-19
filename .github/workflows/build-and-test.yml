@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: echo github events
         run: |
-          echo "${{ github.event.pull_request.paths }}"
-          
+          echo "${{ github.event.pull_request }}"
+
   build-and-test:
     runs-on: ubuntu-latest
     steps:
