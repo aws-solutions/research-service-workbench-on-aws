@@ -101,10 +101,10 @@ jobs:
       - name: Run cfn-nag
         uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/cdk.out/swb*.json
+          input_path: solutions/swb-reference/cdk.out
 
       # scan onboarding template
       - name: Run cfn-nag
         uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/src/templates/*.yaml
+          input_path: solutions/swb-reference/src/templates
