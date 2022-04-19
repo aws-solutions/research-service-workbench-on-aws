@@ -135,15 +135,11 @@ jobs:
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out
-          extra_args: --template-pattern="..*\.template.json" --fail-on-warnings
+          extra_args: --template-pattern="..*\.template.json" --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
         id: template
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/src/templates
-          extra_args: --fail-on-warnings
-
-      - name: Fail if cdk_nag fails
-        if: steps.cdk.outcome != 'success' || steps.template.outcome != 'success'
-        run: echo "cdk_nag scan failed. Please review the templates"
+          extra_args: --fail-on-warnings -o json
