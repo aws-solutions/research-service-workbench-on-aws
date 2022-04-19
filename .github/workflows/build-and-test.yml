@@ -97,10 +97,10 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
 
-      - name: pwd
+      - name: cdk synth
         run: |
-          pwd
-          ls -lrt
+          cd solutions/swb-reference
+          STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb cdk.out
         uses: stelligent/cfn_nag@master
@@ -113,7 +113,3 @@ jobs:
         with:
           input_path: solutions/swb-reference/src/templates
           extra_args: --fail-on-warnings
-      
-      - name: Print remediation message
-        if: failure()
-        run: echo "cfn_nag scan failed. Please review the templates"
