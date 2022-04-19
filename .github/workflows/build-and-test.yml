@@ -10,6 +10,13 @@ on:
       - develop
 
 jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo github events
+        run: |
+          echo "${{ github.event.pull_request.paths }}"
+          
   build-and-test:
     runs-on: ubuntu-latest
     steps:
