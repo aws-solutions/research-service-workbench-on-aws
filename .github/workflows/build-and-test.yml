@@ -113,3 +113,7 @@ jobs:
         with:
           input_path: solutions/swb-reference/src/templates
           extra_args: --fail-on-warnings
+      
+      - name: Print remediation message
+        if: failure()
+        run: echo "cfn_nag scan failed. Please review the templates"
