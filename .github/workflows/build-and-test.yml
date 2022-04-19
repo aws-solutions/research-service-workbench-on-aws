@@ -141,6 +141,7 @@ jobs:
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out/swb-dev-va.template.json
+          extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
         id: template
