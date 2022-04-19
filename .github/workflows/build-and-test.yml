@@ -129,6 +129,7 @@ jobs:
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
+          cd ../../
 
       - name: Run cfn-nag on swb cdk.out
         id: cdk
