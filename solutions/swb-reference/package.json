@@ -28,7 +28,8 @@
     "cdk-ssm-document": "^3.1.0",
     "cdk-iam-floyd": "^0.300.0",
     "js-yaml": "^4.1.0",
-    "@amzn/workbench-core-base": "workspace:*"
+    "@amzn/workbench-core-base": "workspace:*",
+    "@aws-sdk/client-dynamodb": "~3.67.0"
   },
   "devDependencies": {
     "aws-lambda": "^1.0.7",

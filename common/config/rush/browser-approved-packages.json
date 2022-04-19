@@ -19,7 +19,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-dynamodb",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-dynamodb",
       "allowedCategories": [ "production" ]
     },
     {
