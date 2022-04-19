@@ -7,9 +7,10 @@ package.json
 bin
 common
 node_modules
-workbench-core/environments/src/hostingAccountLifecycleService.test.ts
-workbench-core/environments/lib/hostingAccountLifecycleService.test.js
 build
 coverage
 README.md
 cdk.out
+
+#Fake account id used
+123456789012
