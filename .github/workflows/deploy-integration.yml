@@ -17,7 +17,7 @@ jobs:
       id-token: write
       contents: read
       
-    steps:
+    steps:        
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -26,7 +26,17 @@ jobs:
         with:
           node-version: '14.x'
 
+      - name: Get specific changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v18.7
+        with:
+          files: |
+            solutions/**/*
+            workbench-core/base/**/*
+            workbench-core/environments/**/*
+
       - name: Cache Rush
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -38,6 +48,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Cache pnpm
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -48,12 +59,15 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install dependecies
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: node common/scripts/install-run-rush.js install
 
       - name: Rush build
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: node common/scripts/install-run-rush.js build --verbose
 
       - name: Configure AWS Credentials
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.AWS_DEV_REGION }}
@@ -61,6 +75,7 @@ jobs:
           role-session-name: OIDCSessionName
       
       - name: Deploy SWB-Reference to Dev
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
