@@ -13,13 +13,12 @@
     "cdk": "cdk",
     "compile": "scripts/buildLambda.js",
     "build": "heft build --clean",
-    "run-locally": "rush build && rushx compile && cdk synth && sam local start-api -t cdk.out/swb-$STAGE-api.template.json",
     "run-postDeployment": "rush build && node lib/postDeployment.js",
     "cdk-deploy": "rush build && rushx compile && cdk deploy --all",
     "jest": "jest"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.0.0",
+    "aws-cdk-lib": "2.19.0",
     "constructs": "^10.0.0",
     "@amzn/swb-app": "workspace:*",
     "@amzn/environments": "workspace:*",
@@ -29,7 +28,7 @@
     "cdk-iam-floyd": "^0.300.0",
     "js-yaml": "^4.1.0",
     "@amzn/workbench-core-base": "workspace:*",
-    "@aws-sdk/client-dynamodb": "~3.67.0"
+    "@aws-sdk/client-dynamodb": "^3.67.0"
   },
   "devDependencies": {
     "aws-lambda": "^1.0.7",

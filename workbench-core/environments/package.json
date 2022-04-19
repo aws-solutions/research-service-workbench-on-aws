@@ -1,7 +1,7 @@
 {
   "name": "@amzn/environments",
   "version": "0.0.22",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": "ssh://git.amazon.com/pkg/Ma-mono",
@@ -20,8 +20,13 @@
     "md5-file": "^5.0.0",
     "@aws-sdk/client-cloudformation": "^3.58.0",
     "@amzn/workbench-core-base": "workspace:*",
-    "@aws-sdk/client-dynamodb": "~3.67.0",
-    "@types/lodash": "~4.14.181"
+    "@aws-sdk/client-dynamodb": "^3.67.0",
+    "@types/lodash": "^4.14.181",
+    "@aws-sdk/client-eventbridge": "^3.66.0",
+    "@aws-sdk/client-ec2": "^3.60.0",
+    "@aws-sdk/client-ssm": "^3.58.0",
+    "generate-password": "^1.7.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.67.0"
   },
   "devDependencies": {
     "@rushstack/heft": "^0.44.2",

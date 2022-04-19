@@ -48,6 +48,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@amzn/workbench-core-logging",
+      "projectFolder": "workbench-core/logging",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@amzn/workbench-core-base",
       "projectFolder": "workbench-core/base",
       "reviewCategory": "production",
@@ -62,6 +68,18 @@
     {
       "packageName": "@amzn/workbench-core-authorization",
       "projectFolder": "workbench-core/authorization",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-authentication",
+      "projectFolder": "workbench-core/authentication",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-audit",
+      "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
       "shouldPublish": true
     }

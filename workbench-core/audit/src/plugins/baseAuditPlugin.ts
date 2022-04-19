@@ -1,0 +1,39 @@
+import AuditPlugin from '../auditPlugin';
+import Writer from './writer';
+import AuditEntry from '../auditEntry';
+import Metadata from '../metadata';
+
+/**
+ *  This is the base audit plugin that utilizes {@link Writer} to output
+ */
+class BaseAuditPlugin implements AuditPlugin {
+  private writer: Writer;
+  public constructor(writer: Writer) {
+    this.writer = writer;
+  }
+  /**
+   * Modifies the audit entry to add audit as the logEventType and prepares the {@link AuditEntry} for output.
+   *
+   * @param metadata - {@link Metadata}
+   * @param auditEntry - {@link AuditEntry}
+   */
+  public async prepare(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
+    if (!auditEntry.logEventType) {
+      auditEntry.logEventType = 'audit';
+    }
+    if (this.writer.prepare !== undefined) {
+      await this.writer.prepare(metadata, auditEntry);
+    }
+  }
+  /**
+   * Writes the audit entry using the writer
+   *
+   * @param metadata - {@link Metadata}
+   * @param auditEntry - {@link AuditEntry}
+   */
+  public async write(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
+    await this.writer.write(metadata, auditEntry);
+  }
+}
+
+export default BaseAuditPlugin;

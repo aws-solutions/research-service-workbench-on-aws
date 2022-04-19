@@ -27,7 +27,19 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-cognito-identity-provider",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-dynamodb",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ec2",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-eventbridge",
       "allowedCategories": [ "production" ]
     },
     {
@@ -36,6 +48,18 @@
     },
     {
       "name": "@aws-sdk/client-service-catalog",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ssm",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-sts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/sts",
       "allowedCategories": [ "production" ]
     },
     {
@@ -111,6 +135,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "generate-password",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "production" ]
     },
@@ -131,6 +159,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "ts-jest",
       "allowedCategories": [ "production" ]
     },
@@ -140,6 +172,14 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston-transport",
       "allowedCategories": [ "production" ]
     }
   ]

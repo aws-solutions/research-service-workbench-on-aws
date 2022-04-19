@@ -4,18 +4,58 @@
  */
 
 import CloudFormation from './services/cloudformation';
+import Cognito from './services/cognito';
+import EC2 from './services/ec2';
+import EventBridge from './services/eventbridge';
+import SSM from './services/ssm';
 import ServiceCatalog from './services/serviceCatalog';
 import S3 from './services/s3';
+import STS from './services/sts';
+import { Credentials } from '@aws-sdk/types';
 
 export default class AwsService {
   public cloudformation: CloudFormation;
+  public cognito: Cognito;
+  public ssm: SSM;
+  public ec2: EC2;
+  public eventBridge: EventBridge;
   public serviceCatalog: ServiceCatalog;
   public s3: S3;
-  public constructor(awsConfig: { AWS_REGION: string }) {
-    const { AWS_REGION } = awsConfig;
+  public sts: STS;
 
-    this.cloudformation = new CloudFormation({ region: AWS_REGION });
-    this.serviceCatalog = new ServiceCatalog({ region: AWS_REGION });
-    this.s3 = new S3({ region: AWS_REGION });
+  public constructor(options: { region: string; credentials?: Credentials }) {
+    this.cloudformation = new CloudFormation(options);
+    this.cognito = new Cognito(options);
+    this.ssm = new SSM(options);
+    this.ec2 = new EC2(options);
+    this.eventBridge = new EventBridge(options);
+    this.serviceCatalog = new ServiceCatalog(options);
+    this.s3 = new S3(options);
+    this.sts = new STS(options);
+  }
+
+  public async getAwsServiceForRole(params: {
+    roleArn: string;
+    roleSessionName: string;
+    externalId?: string;
+    region: string;
+  }): Promise<AwsService> {
+    const { Credentials } = await this.sts.assumeRole({
+      RoleArn: params.roleArn,
+      RoleSessionName: params.roleSessionName,
+      ExternalId: params.externalId
+    });
+    if (Credentials) {
+      return new AwsService({
+        region: params.region,
+        credentials: {
+          accessKeyId: Credentials.AccessKeyId!,
+          secretAccessKey: Credentials.SecretAccessKey!,
+          sessionToken: Credentials.SessionToken!
+        }
+      });
+    } else {
+      throw new Error(`Unable to assume role with params: ${params}`);
+    }
   }
 }

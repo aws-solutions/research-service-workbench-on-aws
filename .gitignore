@@ -64,6 +64,7 @@ common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
 **/.rush/temp/
+**/temp/
 workbench-core/environments/temp/
 workbench-core/base/temp/
 

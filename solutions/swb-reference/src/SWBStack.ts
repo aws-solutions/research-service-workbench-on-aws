@@ -127,10 +127,23 @@ export class SWBStack extends Stack {
   }
 
   private _createAPILambda(): Function {
+    // We extract a subset of constants required to be set on Lambda
+    // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const { STAGE, STACK_NAME, SSM_DOC_NAME_SUFFIX, MAIN_ACCOUNT_BUS_ARN_NAME, AMI_IDS_TO_SHARE } =
+      getConstants();
+    const envVariables = {
+      STAGE,
+      STACK_NAME,
+      SSM_DOC_NAME_SUFFIX,
+      MAIN_ACCOUNT_BUS_ARN_NAME,
+      AMI_IDS_TO_SHARE
+    };
+
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
       handler: 'backendAPILambda.handler',
-      runtime: Runtime.NODEJS_14_X
+      runtime: Runtime.NODEJS_14_X,
+      environment: envVariables
     });
 
     new CfnOutput(this, 'apiLambdaRoleOutput', {
