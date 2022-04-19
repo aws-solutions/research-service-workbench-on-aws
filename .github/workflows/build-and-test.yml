@@ -97,15 +97,34 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
 
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
-
-      - name: Rush build
-        run: node common/scripts/install-run-rush.js build --verbose
 
       - name: cdk synth
         run: |
           cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
           STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb cdk.out
