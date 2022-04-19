@@ -7,8 +7,10 @@ package.json
 bin
 common
 node_modules
-123456789012
 build
 coverage
 README.md
 cdk.out
+
+#Fake account id used
+123456789012
