@@ -1,5 +1,5 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { ServiceCatalogSetup } from '@amzn/environments';
+import { CognitoSetup, ServiceCatalogSetup } from '@amzn/environments';
 import { getConstants } from './constants';
 import { join } from 'path';
 async function run(): Promise<void> {
@@ -9,7 +9,9 @@ async function run(): Promise<void> {
     PORTFOLIO_NAME,
     S3_ARTIFACT_BUCKET_ARN_NAME,
     LAUNCH_CONSTRAINT_ROLE_NAME,
-    STACK_NAME
+    STACK_NAME,
+    ROOT_USER_EMAIL,
+    USER_POOL_NAME
   } = getConstants();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
@@ -19,9 +21,15 @@ async function run(): Promise<void> {
     LAUNCH_CONSTRAINT_ROLE_NAME,
     STACK_NAME
   });
+  const cognitoSetup = new CognitoSetup({
+    AWS_REGION,
+    ROOT_USER_EMAIL,
+    USER_POOL_NAME
+  });
 
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../src/environment'));
   await scSetup.run(cfnFilePaths);
+  await cognitoSetup.run();
 }
 
 /* eslint-disable-next-line @typescript-eslint/no-floating-promises*/

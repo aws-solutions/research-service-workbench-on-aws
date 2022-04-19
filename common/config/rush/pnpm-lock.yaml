@@ -64,7 +64,7 @@ importers:
       '@types/node': ^12
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
-      aws-cdk-lib: ^2.0.0
+      aws-cdk-lib: 2.19.0
       aws-lambda: ^1.0.7
       cdk-iam-floyd: ^0.300.0
       cdk-ssm-document: ^3.1.0
@@ -83,9 +83,9 @@ importers:
       '@amzn/swb-app': link:../swb-app
       '@amzn/workbench-core-base': link:../../workbench-core/base
       '@vendia/serverless-express': 4.5.4
-      aws-cdk-lib: 2.20.0_constructs@10.0.113
-      cdk-iam-floyd: 0.300.0_5bfc5cce064c9b4331456f870179dd22
-      cdk-ssm-document: 3.1.0_a52d794f7249af1af99accbcc38bac1f
+      aws-cdk-lib: 2.19.0_constructs@10.0.113
+      cdk-iam-floyd: 0.300.0_59c080b3810909ef845565b240eaac08
+      cdk-ssm-document: 3.1.0_21c2ffd0a28bd1c0309b3dba2bd8ceab
       constructs: 10.0.113
       express: 4.17.3
       js-yaml: 4.1.0
@@ -187,6 +187,7 @@ importers:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
+      '@aws-sdk/client-cognito-identity-provider': ^3.67.0
       '@aws-sdk/client-ec2': ^3.60.0
       '@aws-sdk/client-eventbridge': ^3.66.0
       '@aws-sdk/client-s3': ^3.58.0
@@ -210,6 +211,7 @@ importers:
     dependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/client-cloudformation': 3.67.0
+      '@aws-sdk/client-cognito-identity-provider': 3.67.0
       '@aws-sdk/client-ec2': 3.69.0
       '@aws-sdk/client-eventbridge': 3.67.0
       '@aws-sdk/client-s3': 3.67.0
@@ -237,6 +239,7 @@ importers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
+      '@aws-sdk/client-cognito-identity-provider': ^3.67.0
       '@aws-sdk/client-ec2': ^3.60.0
       '@aws-sdk/client-eventbridge': ^3.66.0
       '@aws-sdk/client-s3': ^3.58.0
@@ -252,6 +255,7 @@ importers:
       '@types/node': ^12
       aws-sdk-client-mock: ^0.6.2
       eslint: ^8.7.0
+      generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       md5-file: ^5.0.0
@@ -260,11 +264,13 @@ importers:
     dependencies:
       '@amzn/workbench-core-base': link:../base
       '@aws-sdk/client-cloudformation': 3.67.0
+      '@aws-sdk/client-cognito-identity-provider': 3.67.0
       '@aws-sdk/client-ec2': 3.69.0
       '@aws-sdk/client-eventbridge': 3.67.0
       '@aws-sdk/client-s3': 3.67.0
       '@aws-sdk/client-service-catalog': 3.67.0
       '@aws-sdk/client-ssm': 3.67.0
+      generate-password: 1.7.0
       md5-file: 5.0.0
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -476,6 +482,45 @@ packages:
       fast-xml-parser: 3.19.0
       tslib: 2.3.1
       uuid: 8.3.2
+    dev: false
+
+  /@aws-sdk/client-cognito-identity-provider/3.67.0:
+    resolution: {integrity: sha512-/hIlbektTdsCd4H6aIpo6+qyRVVhRmE+o+qZs/HYNxBP9QQq6LWQ4sbYGZsoQYkOtiGv5T9UaX4VxW0frdIY5g==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@aws-crypto/sha256-browser': 2.0.0
+      '@aws-crypto/sha256-js': 2.0.0
+      '@aws-sdk/client-sts': 3.67.0
+      '@aws-sdk/config-resolver': 3.58.0
+      '@aws-sdk/credential-provider-node': 3.67.0
+      '@aws-sdk/fetch-http-handler': 3.58.0
+      '@aws-sdk/hash-node': 3.55.0
+      '@aws-sdk/invalid-dependency': 3.55.0
+      '@aws-sdk/middleware-content-length': 3.58.0
+      '@aws-sdk/middleware-host-header': 3.58.0
+      '@aws-sdk/middleware-logger': 3.55.0
+      '@aws-sdk/middleware-retry': 3.58.0
+      '@aws-sdk/middleware-serde': 3.55.0
+      '@aws-sdk/middleware-signing': 3.58.0
+      '@aws-sdk/middleware-stack': 3.55.0
+      '@aws-sdk/middleware-user-agent': 3.58.0
+      '@aws-sdk/node-config-provider': 3.58.0
+      '@aws-sdk/node-http-handler': 3.58.0
+      '@aws-sdk/protocol-http': 3.58.0
+      '@aws-sdk/smithy-client': 3.55.0
+      '@aws-sdk/types': 3.55.0
+      '@aws-sdk/url-parser': 3.55.0
+      '@aws-sdk/util-base64-browser': 3.58.0
+      '@aws-sdk/util-base64-node': 3.55.0
+      '@aws-sdk/util-body-length-browser': 3.55.0
+      '@aws-sdk/util-body-length-node': 3.55.0
+      '@aws-sdk/util-defaults-mode-browser': 3.55.0
+      '@aws-sdk/util-defaults-mode-node': 3.58.0
+      '@aws-sdk/util-user-agent-browser': 3.58.0
+      '@aws-sdk/util-user-agent-node': 3.58.0
+      '@aws-sdk/util-utf8-browser': 3.55.0
+      '@aws-sdk/util-utf8-node': 3.55.0
+      tslib: 2.3.1
     dev: false
 
   /@aws-sdk/client-ec2/3.69.0:
@@ -2987,8 +3032,8 @@ packages:
     resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=}
     dev: true
 
-  /aws-cdk-lib/2.20.0_constructs@10.0.113:
-    resolution: {integrity: sha512-jACK/1UJxtWWl6QH+I1V8Oc8F1EEL6aFQYk24DIrzNyB1Aj9LIs9/NyDu5zN00QFKrR6aDE7WAv1VG3sa6wWdg==}
+  /aws-cdk-lib/2.19.0_constructs@10.0.113:
+    resolution: {integrity: sha512-zt0lAsTpYfrDitjJXp1smEi4o1EYtAAj4fb0WW4GYBW+P6FqymXyAF5mUT8YWPkMJTnSP8d4FeDUyatQVWYRJA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       constructs: ^10.0.0
@@ -3266,28 +3311,28 @@ packages:
     resolution: {integrity: sha512-Y1xk6paHpUXKP/P6YjQv1xqyTbgAP05ycHBcRdQjTcyXlWol868sJJPlmk5ylOekw2BrucWes5jk+LvVd7WZ5Q==}
     dev: true
 
-  /cdk-iam-floyd/0.300.0_5bfc5cce064c9b4331456f870179dd22:
+  /cdk-iam-floyd/0.300.0_59c080b3810909ef845565b240eaac08:
     resolution: {integrity: sha512-BPHzbC8NSpqAB89vP+QxSuF6vhAbKo+3yGc/G5W1R2znN35t9lQJKDysILZ7iXGbwGAQSrB/IYt6ilePtctoaQ==}
     peerDependencies:
       aws-cdk-lib: ^2.0.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.20.0_constructs@10.0.113
+      aws-cdk-lib: 2.19.0_constructs@10.0.113
       constructs: 10.0.113
     dev: false
     bundledDependencies:
       - '@udondan/common-substrings'
       - regex-parser
 
-  /cdk-ssm-document/3.1.0_a52d794f7249af1af99accbcc38bac1f:
+  /cdk-ssm-document/3.1.0_21c2ffd0a28bd1c0309b3dba2bd8ceab:
     resolution: {integrity: sha512-h33LoKWU41pefwvfjPBgGFKRMuWniNDGTTOIlk6GqOGHg6qO5R27AOudk2pukQ4ItjW2Mt0/c2uJI9kQBpWQOA==}
     peerDependencies:
       aws-cdk-lib: ^2.0.0
       cdk-iam-floyd: ^0.300.0
       constructs: ^10.0.0
     dependencies:
-      aws-cdk-lib: 2.20.0_constructs@10.0.113
-      cdk-iam-floyd: 0.300.0_5bfc5cce064c9b4331456f870179dd22
+      aws-cdk-lib: 2.19.0_constructs@10.0.113
+      cdk-iam-floyd: 0.300.0_59c080b3810909ef845565b240eaac08
       constructs: 10.0.113
     dev: false
     bundledDependencies:
@@ -4435,6 +4480,10 @@ packages:
 
   /functional-red-black-tree/1.0.1:
     resolution: {integrity: sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=}
+
+  /generate-password/1.7.0:
+    resolution: {integrity: sha512-WPCtlfy0jexf7W5IbwxGUgpIDvsZIohbI2DAq2Q6TSlKKis+G4GT9sxvPxrZUGL8kP6WUXMWNqYnxY6DDKAdFA==}
+    dev: false
 
   /gensync/1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}

@@ -7,6 +7,7 @@ import StatusHandler from './statusHandler';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import { EnvironmentStatus } from './environmentStatus';
 import ServiceCatalogSetup from './serviceCatalogSetup';
+import CognitoSetup from './cognitoSetup';
 
 export {
   HostingAccountService,
@@ -17,5 +18,6 @@ export {
   StatusHandler,
   EventBridgeEventToDDB,
   EnvironmentStatus,
-  ServiceCatalogSetup
+  ServiceCatalogSetup,
+  CognitoSetup
 };

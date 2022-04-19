@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-cognito-identity-provider",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-ec2",
       "allowedCategories": [ "production" ]
     },
@@ -120,6 +124,10 @@
     },
     {
       "name": "express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "generate-password",
       "allowedCategories": [ "production" ]
     },
     {

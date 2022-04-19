@@ -4,6 +4,7 @@
  */
 
 import CloudFormation from './services/cloudformation';
+import Cognito from './services/cognito';
 import EC2 from './services/ec2';
 import EventBridge from './services/eventbridge';
 import SSM from './services/ssm';
@@ -14,6 +15,7 @@ import { Credentials } from '@aws-sdk/types';
 
 export default class AwsService {
   public cloudformation: CloudFormation;
+  public cognito: Cognito;
   public ssm: SSM;
   public ec2: EC2;
   public eventBridge: EventBridge;
@@ -23,6 +25,7 @@ export default class AwsService {
 
   public constructor(options: { region: string; credentials?: Credentials }) {
     this.cloudformation = new CloudFormation(options);
+    this.cognito = new Cognito(options);
     this.ssm = new SSM(options);
     this.ec2 = new EC2(options);
     this.eventBridge = new EventBridge(options);
