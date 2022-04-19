@@ -56,11 +56,13 @@ export default class ServiceCatalogSetup {
     console.log('PortfolioId', portfolioId);
 
     const {
-      [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketName,
+      [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn,
       [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
     } = await getCfnOutput(this._aws, STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
 
     const prefix = S3_ARTIFACT_BUCKET_SC_PREFIX;
+
+    const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
 
     // Upload environment's CFN templates to S3 if current template is different from template in S3
     const envTypeToFilePath = await this._getEnvTypeToUpdate(s3ArtifactBucketName, prefix, cfnFilePaths);

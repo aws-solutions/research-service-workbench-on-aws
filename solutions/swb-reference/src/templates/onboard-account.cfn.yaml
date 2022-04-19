@@ -265,6 +265,11 @@ Resources:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/initial-stack*'
           - Effect: Allow
             Action:
+              - cloudformation:GetTemplate
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
+          - Effect: Allow
+            Action:
               - sagemaker:ListNotebookInstances
             Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
           - Effect: Allow

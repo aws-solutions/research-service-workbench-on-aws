@@ -8,6 +8,7 @@ describe('AccountHandler', () => {
     process.env.STACK_NAME = 'swb-dev-oh';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
     process.env.AMI_IDS_TO_SHARE = JSON.stringify([]);
+    process.env.S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
     const mainAccountAwsService = new AwsService({ region: 'us-east-2' });
     const accountHandler = new AccountHandler(mainAccountAwsService);
     await expect(accountHandler.execute({})).resolves.not.toThrowError();

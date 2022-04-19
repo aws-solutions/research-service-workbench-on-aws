@@ -22,6 +22,8 @@ async function run(): Promise<void> {
 
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../src/environment'));
   await scSetup.run(cfnFilePaths);
+
+  //TODO: Upload `onboard-account.cfn.yml` to S3
 }
 
 /* eslint-disable-next-line @typescript-eslint/no-floating-promises*/

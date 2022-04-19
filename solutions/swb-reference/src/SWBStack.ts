@@ -112,7 +112,13 @@ export class SWBStack extends Stack {
   }
 
   private _createAccountHandlerLambda(launchConstraintRole: Role): void {
-    const { STACK_NAME, LAUNCH_CONSTRAINT_ROLE_NAME, SSM_DOC_NAME_SUFFIX, AMI_IDS_TO_SHARE } = getConstants();
+    const {
+      STACK_NAME,
+      LAUNCH_CONSTRAINT_ROLE_NAME,
+      SSM_DOC_NAME_SUFFIX,
+      AMI_IDS_TO_SHARE,
+      S3_ARTIFACT_BUCKET_ARN_NAME
+    } = getConstants();
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -122,7 +128,8 @@ export class SWBStack extends Stack {
         STACK_NAME,
         LAUNCH_CONSTRAINT_ROLE_NAME,
         SSM_DOC_NAME_SUFFIX,
-        AMI_IDS_TO_SHARE
+        AMI_IDS_TO_SHARE,
+        S3_ARTIFACT_BUCKET_ARN_NAME
       }
     });
 
@@ -156,7 +163,6 @@ export class SWBStack extends Stack {
 
     const cloudformationPolicy = new PolicyStatement({
       actions: ['cloudformation:DescribeStacks'],
-      // resources: [this.formatArn({service: 'cloudformation', resource: 'stack', resourceName: `${this.stackName}/${this.stackId}`})]  // TODO: Can scope be narrowed?
       resources: [this.stackId]
     });
     lambda.role?.attachInlinePolicy(

@@ -26,6 +26,7 @@ export default class HostingAccountLifecycleService {
   }
 
   public async updateAccount(targetAccountId: string, ssmDocNameSuffix: string): Promise<void> {
+    console.log('Sharing SSM Document and AMIs');
     const ssmDocuments = await this.getSSMDocuments(this._stackName, ssmDocNameSuffix);
     await this.shareSSMDocument(ssmDocuments, targetAccountId);
     await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
