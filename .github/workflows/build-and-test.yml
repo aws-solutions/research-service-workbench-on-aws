@@ -99,12 +99,12 @@ jobs:
 
       # scan swb cdk.out
       - name: Run cfn-nag
-        uses: stelligent/cfn-nag-sarif-action@v1
+        uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/cdk.out
+          input_path: solutions/swb-reference/cdk.out/swb*.json
 
       # scan onboarding template
       - name: Run cfn-nag
-        uses: stelligent/cfn-nag-sarif-action@v1
+        uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/src/templates
+          input_path: solutions/swb-reference/src/templates/*.yaml
