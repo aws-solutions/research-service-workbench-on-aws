@@ -121,6 +121,9 @@ jobs:
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
 
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build --verbose
+
       - name: cdk synth
         run: |
           cd solutions/swb-reference
