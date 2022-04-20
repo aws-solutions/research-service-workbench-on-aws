@@ -9,6 +9,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Label the PR size
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14.x'
+        
     - name: Create a Release
       run: npx semantic-release
       env:
