@@ -9,5 +9,6 @@ export async function handler(event: any) {
     status: 'PENDING',
     metaData: {}
   };
+
   await statusHandler.execute(ebToDDB);
 }
