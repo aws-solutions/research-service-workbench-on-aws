@@ -28,6 +28,7 @@ export default class Workflow {
         .readFileSync(join(__dirname, `../../src/environment/sagemaker/sagemakerLaunchSSM.yaml`), 'utf8')
         .toString()
     });
+
     new CfnOutput(this._stack, 'SagemakerLaunchSSMDocOutput', {
       value: this._stack.formatArn({
         service: 'ssm',

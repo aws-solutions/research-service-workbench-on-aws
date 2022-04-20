@@ -6,9 +6,9 @@
   "typings": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.aws.dev/ma-foundation/ma-mono.git"
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench"
   },
-  "homepage": "https://gitlab.aws.dev/ma-foundation/ma-mono",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "author": "rsmayda <smayda44@gmail.com>",
   "license": "Apache-2.0",
-  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "repository": "https://github.com/awslabs/monorepo-for-service-workbench",
   "private": true,
   "scripts": {
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
