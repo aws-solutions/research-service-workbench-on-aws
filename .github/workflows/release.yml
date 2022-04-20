@@ -1,0 +1,16 @@
+name: Semantic-release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    name: Label the PR size
+    steps:
+    - name: Create a Release
+      run: npx semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      

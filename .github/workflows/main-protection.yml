@@ -5,6 +5,8 @@
 
 name: Main branch protection
 on:
+  pull_request_target:
+    types: [opened, synchronize, edited, reopened]
   pull_request:
     types: [opened, synchronize, edited, reopened]
 # The purpose of this workflow is to create a failing Status check on pull request against main. This will prevent
@@ -12,7 +14,7 @@ on:
 jobs:
   main-protection:
     name: Only create PR against develop branch, not main branch
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Get branch name
         id: branch-name
