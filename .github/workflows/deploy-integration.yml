@@ -91,7 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
@@ -103,7 +103,7 @@ jobs:
           repo: monorepo-for-service-workbench
           branch: main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Merge to main
         run: |
@@ -124,4 +124,4 @@ jobs:
           repo: monorepo-for-service-workbench
           branch: main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
