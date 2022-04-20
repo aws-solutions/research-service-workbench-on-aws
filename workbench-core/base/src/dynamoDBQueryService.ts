@@ -251,7 +251,6 @@ class Query {
     return this;
   }
   public async query(): Promise<QueryCommandOutput> {
-    console.log(this._params);
     return await this._ddb.query(this._params);
   }
 }
