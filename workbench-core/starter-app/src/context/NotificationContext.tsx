@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, Context, useState } from 'react';
 import { FlashbarProps } from '@awsui/components-react/flashbar';
 
 export interface Notifications {

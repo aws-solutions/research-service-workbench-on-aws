@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, Context, useState } from 'react';
 import { User, unkownUser } from '../models/User';
 
 export interface AuthenticationProps {
