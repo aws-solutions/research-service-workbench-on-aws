@@ -10,7 +10,7 @@ on:
 # The purpose of this workflow is to create a failing Status check on pull request against main. This will prevent
 # PR from being merged into main.
 jobs:
-  mainline-protection:
+  main-protection:
     name: Only create PR against develop branch, not main branch
     runs-on: ubuntu-18.04
     steps:
