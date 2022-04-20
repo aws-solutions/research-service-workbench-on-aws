@@ -83,4 +83,4 @@ jobs:
           cmd: jq '.[].file_results.violations | length' cfn_nag.out
 
       - name: Fail if violations detected in cfn-nag
-        run: exit ${{ steps.cfn-nag.outputs.value }}`
+        run: exit ${{ steps.cfn-nag.outputs.value }}
