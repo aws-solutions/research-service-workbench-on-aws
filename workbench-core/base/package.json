@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "main": "lib/index.js",
-  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
+  "repository": "https://github.com/awslabs/monorepo-for-service-workbench",
   "private": true,
   "scripts": {
     "build": "heft build --clean",
