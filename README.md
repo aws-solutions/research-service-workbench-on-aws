@@ -1,6 +1,7 @@
 # Worflow Status
 [![Build-and-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg?branch=develop)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg?branch=develop)
 [![Dev-deploy-and-integration-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg?branch=develop)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg?branch=develop)
+[![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg?branch=develop)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg?branch=develop)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
