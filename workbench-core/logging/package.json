@@ -8,7 +8,9 @@
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "test": "heft test --clean && rushx make-badges",
+    "testQuiet": "heft test --clean --silent && rushx make-badges",
     "build:test": "rushx build && rushx test",
+    "build:testQuiet": "rushx build && rushx testQuiet",
     "test:only": "heft test --clean"
   },
   "dependencies": {
@@ -24,7 +26,10 @@
     "@types/heft-jest": "1.0.2",
     "@types/node": "^12",
     "@types/triple-beam": "^1.3.2",
+    "fast-check": "^2.24.0",
     "istanbul-badges-readme": "1.8.1",
+    "jest": "^27.5.1",
+    "jest-fast-check": "^1.0.2",
     "typescript": "^4.5.2"
   }
 }

@@ -127,6 +127,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "fast-check",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "generate-password",
       "allowedCategories": [ "production" ]
     },
@@ -136,6 +140,10 @@
     },
     {
       "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest-fast-check",
       "allowedCategories": [ "production" ]
     },
     {
