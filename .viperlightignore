@@ -4,7 +4,6 @@ rush.json
 package.json
 .tools
 .vscode
-bin
 common
 node_modules
 build
