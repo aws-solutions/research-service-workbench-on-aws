@@ -144,7 +144,7 @@
     },
     {
       "name": "jest",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jest-fast-check",

@@ -17,13 +17,11 @@ export interface HomeProps {
   locale: string;
 }
 
-export async function getServerSideProps({ locale }: HomeProps): Promise<unknown> {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common', 'footer']))
-    }
-  };
-}
+export const getServerSideProps = async ({ locale }: HomeProps): Promise<unknown> => ({
+  props: {
+    ...(await serverSideTranslations(locale, ['common']))
+  }
+});
 
 const Home: NextPage = () => {
   const { settings } = useSettings();

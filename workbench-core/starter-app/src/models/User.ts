@@ -1,4 +1,4 @@
-import Icon, { IconProps } from '@awsui/components-react/icon';
+import { IconProps } from '@awsui/components-react/icon';
 
 export interface User {
   id: string;
