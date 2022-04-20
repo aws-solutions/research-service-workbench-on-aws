@@ -7,8 +7,8 @@ name: Main branch protection
 on:
   pull_request:
     types: [opened, synchronize, edited, reopened]
-# The purpose of this workflow is to create a failing Status check on pull request against mainline. This will prevent
-# PR from being merged into mainline.
+# The purpose of this workflow is to create a failing Status check on pull request against main. This will prevent
+# PR from being merged into main.
 jobs:
   mainline-protection:
     name: Only create PR against develop branch, not main branch
@@ -17,7 +17,7 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.1
-      - name: mainline protection
+      - name: main protection
         if: steps.branch-name.outputs.base_ref_branch == 'main'
         run: |
           echo "PR has target branch ${{ steps.branch-name.outputs.base_ref_branch }}. Failing workflow..."
