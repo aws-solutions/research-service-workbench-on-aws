@@ -81,9 +81,6 @@ jobs:
         # sum cfn_nag failures, warnigns and return it as exit code
         with:
           cmd: jq '.[].file_results.violations | length' cfn_nag.out
-      
-      - name: Fail if violations detected in cfn-nag
-        run: echo `${{ steps.cfn-nag.outputs.value }}`
 
       - name: Fail if violations detected in cfn-nag
-        run: exit `${{ steps.cfn-nag.outputs.value }}`
+        run: exit ${{ steps.cfn-nag.outputs.value }}`
