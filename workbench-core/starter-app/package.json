@@ -1,0 +1,40 @@
+{
+  "name": "@amzn/workbench-core-starter-app",
+  "version": "0.0.1",
+  "license": "APACHE-2.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "test": "heft test --clean && rushx make-badges",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "12.0.10",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "next-global-css": "~1.2.0",
+    "next-transpile-modules": "~9.0.0",
+    "next-i18next": "~10.3.0"
+  },
+  "devDependencies": {
+    "sass": "~1.49.8",
+    "@types/node": "^12",
+    "@types/react": "17.0.39",
+    "eslint": "^8.7.0",
+    "eslint-config-next": "12.0.10",
+    "typescript": "^4.5.2",
+    "@awsui/design-tokens": "^3.0.0",
+    "@awsui/global-styles": "^1.0.0",
+    "@awsui/components-react": "^3.0.0",
+    "@awsui/collection-hooks": "^1.0.0",
+    "@awsui/test-utils-core": "^1.0.0",
+    "istanbul-badges-readme": "1.8.1",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+  }
+}

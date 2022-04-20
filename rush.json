@@ -82,6 +82,12 @@
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-starter-app",
+      "projectFolder": "workbench-core/starter-app",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
     }
   ]
 }
