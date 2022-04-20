@@ -80,7 +80,7 @@ jobs:
         id: cfn-nag
         # sum cfn_nag failures, warnigns and return it as exit code
         with:
-          cmd: jq ".violations | length" cfn_nag.out
+          cmd: jq '.[].file_results.violations | length' cfn_nag.out
 
       - name: Fail if violations detected in cfn-nag
-        run: exit steps.cfn-nag.output.value
+        run: exit ${{ steps.cfn-nag.output.value }}
