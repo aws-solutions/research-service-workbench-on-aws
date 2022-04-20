@@ -147,6 +147,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "semantic-release",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "triple-beam",
       "allowedCategories": [ "production" ]
     },
