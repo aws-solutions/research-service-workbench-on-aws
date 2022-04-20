@@ -1,5 +1,5 @@
 module.exports = {
-  branches: 'master',
+  branches: 'main',
   repositoryUrl: 'https://github.com/awslabs/monorepo-for-service-workbench',
   plugins: [
     '@semantic-release/commit-analyzer',
