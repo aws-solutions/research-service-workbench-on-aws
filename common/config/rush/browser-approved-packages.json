@@ -79,6 +79,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@testing-library/jest-dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@vendia/serverless-express",
       "allowedCategories": [ "production" ]
     },
