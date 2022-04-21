@@ -24,6 +24,9 @@ import {
   DescribeProductAsAdminCommand,
   DescribeProductAsAdminCommandOutput,
   DescribeProductAsAdminInput,
+  ListLaunchPathsCommand,
+  ListLaunchPathsCommandInput,
+  ListLaunchPathsCommandOutput,
   ListPortfoliosCommand,
   ListPortfoliosCommandInput,
   ListPortfoliosCommandOutput,
@@ -98,5 +101,9 @@ export default class ServiceCatalog {
     params: AssociateProductWithPortfolioCommandInput
   ): Promise<AssociateProductWithPortfolioCommandOutput> {
     return this._client.send(new AssociateProductWithPortfolioCommand(params));
+  }
+
+  public async listLaunchPaths(params: ListLaunchPathsCommandInput): Promise<ListLaunchPathsCommandOutput> {
+    return this._client.send(new ListLaunchPathsCommand(params));
   }
 }

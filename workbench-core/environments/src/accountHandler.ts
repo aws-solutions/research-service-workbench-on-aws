@@ -1,8 +1,10 @@
+/* eslint-disable */
 import { AwsService } from '@amzn/workbench-core-base';
 import IamRoleCloneService from './iamRoleCloneService';
 import { getCfnOutput } from './cloudformationUtil';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import { Readable } from 'stream';
+import { Output } from '@aws-sdk/client-cloudformation';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -21,8 +23,8 @@ export default class AccountHandler {
      * [Done] Copy LaunchConstraint role to hosting accounts that doesn't already have the role
      * [Done] Share SSM documents with all hosting accounts that does not have the SSM document already
      * [Done] Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
-     * Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
-     * Add hosting account VPC and Subnet ID to DDB. This is needed when launching environments
+     * [Done] Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
+     * [Done] Add hosting account VPC and Subnet ID to DDB. This is needed when launching environments
      */
 
     // eslint-disable-next-line
@@ -60,7 +62,7 @@ export default class AccountHandler {
         hostingAccountId as string,
         portfolioId as string
       );
-      await this._associateIamRoleWithPortfolio(
+      await this._associatePrincipalIamRoleWithPortfolio(
         hostingAccountAwsService,
         hostingAccount.arns.envManagement,
         portfolioId as string
@@ -86,9 +88,6 @@ export default class AccountHandler {
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
   ): Promise<void> {
-    // TODO: Check whether stack is in `UPDATE_COMPLETE` or `CREATE_COMPLETE` or `FAILED`
-    // Possible final state: UP_TO_DATE, NEEDS_UPDATE, PENDING, ERRORED
-    // https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/cloudformation/model/StackStatus.html
     const getObjResponse = await this._mainAccountAwsService.s3.getObject({
       Bucket: s3ArtifactBucketName,
       Key: 'onboard-account.cfn.yaml'
@@ -109,17 +108,43 @@ export default class AccountHandler {
       return template.replace(/#.*/g, '').replace(/\s+/g, '');
     };
 
-    // TODO: Write result to DDB
-    if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-      console.log('Same template');
-    } else {
-      console.log('Different template');
-    }
+    const describeStackResponse = await hostingAccountAwsService.cloudformation.describeStacks({
+      StackName: hostingAccountStackName
+    });
+    let vpcId: string | undefined;
+    let subnetId: string | undefined;
+    const describeCfResponse = await hostingAccountAwsService.cloudformation.describeStacks({
+      StackName: hostingAccountStackName
+    });
+    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
+      const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
+      vpcId = outputs.find((output) => {
+        return output.OutputKey === 'VPC';
+      })!.OutputValue;
+      subnetId = outputs.find((output) => {
+        return output.OutputKey === 'VpcPublicSubnet';
+      })!.OutputValue;
 
-    // Check out sample code in sampleJsCode project, file compareTemplate.js
+      if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
+        await this._writeAccountStatusToDDB({ status: 'UP_TO_DATE', vpcId, subnetId });
+      } else {
+        await this._writeAccountStatusToDDB({ status: 'NEEDS_UPDATE', vpcId, subnetId });
+      }
+    } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
+      await this._writeAccountStatusToDDB({ status: 'ERRORED', vpcId, subnetId });
+    }
   }
 
-  private async _associateIamRoleWithPortfolio(
+  private async _writeAccountStatusToDDB(param: {
+    status: 'UP_TO_DATE' | 'NEEDS_UPDATE' | 'ERRORED';
+    vpcId: string | undefined;
+    subnetId: string | undefined;
+  }): Promise<void> {
+    console.log('_writeAccountStatusToDDB param', param);
+    // TODO: Write above values to DDB. If vpcId or subnetId is undefined, don't write those 2 values to DDB
+  }
+
+  private async _associatePrincipalIamRoleWithPortfolio(
     hostingAccountAwsService: AwsService,
     iamRole: string,
     portfolioId: string
