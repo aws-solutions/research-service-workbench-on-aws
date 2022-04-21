@@ -16,10 +16,10 @@ const customJestConfig = {
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
 module.exports = {
-  extends: '@rushstack/heft-node-rig/profiles/default/config/jest.config.json',
   collectCoverage: true,
-  collectCoverageFrom: ['!./**/*.d.ts', './src/**/*.spec.ts', './src/**/*.test.ts', './src/setup/**'],
+  collectCoverageFrom: ['!./**/*.d.ts', './src/**/*.spec.ts', './src/**/*.test.ts', './src/setup/**/*'],
   moduleDirectories: ['node_modules', 'src'],
+  coverageDirectory: 'temp/coverage',
   coverageThreshold: {
     global: {
       branches: 0,
@@ -29,7 +29,9 @@ module.exports = {
     }
   },
   coverageReporters: ['json-summary', 'json'],
-  setupFilesAfterEnv: ['<rootDir>/setup/jestTests.js'],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  modulePaths: ['<rootDir>/src'],
 
   ...createJestConfig(customJestConfig)
 };
