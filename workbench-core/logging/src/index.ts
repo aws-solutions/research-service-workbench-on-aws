@@ -1,1 +1,6 @@
-export { makeLogger } from './logger';
+export { LogLevel } from './logLevel';
+export { LoggingPlugin } from './loggingPlugin';
+export { LoggingService, LoggingServiceConfig } from './loggingService';
+export { WinstonPlugin } from './plugins/winstonPlugin';
+export { ConsoleTransport } from './plugins/winstonTransports/consoleTransport';
+export { LogMessage, LogMessageArray, LogMessageObject, LogMessagePrimitive } from './logMessage';

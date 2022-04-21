@@ -15,6 +15,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authentication",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },
@@ -127,6 +131,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "fast-check",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "generate-password",
       "allowedCategories": [ "production" ]
     },
@@ -136,6 +144,10 @@
     },
     {
       "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest-fast-check",
       "allowedCategories": [ "production" ]
     },
     {
