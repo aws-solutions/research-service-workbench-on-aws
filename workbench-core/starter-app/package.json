@@ -7,7 +7,10 @@
     "build": "next build",
     "test": "heft test --clean && rushx make-badges",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "build:test": "rushx build && rushx test",
+    "test:only": "heft test --clean",
     "start": "next start",
+    "serve": "node .next/server/webpack-runtime.js",
     "lint": "next lint"
   },
   "dependencies": {
