@@ -219,6 +219,14 @@
       "shellCommand": "commitlint"
     },
     {
+      "name": "commitizen",
+      "commandKind": "global",
+      "summary": "Prepare conventional commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitizen",
+      "shellCommand": ".github/workflows/scripts/commitizen.sh"
+    },
+    {
       "name": "git-secrets-scan",
       "commandKind": "global",
       "summary": "Used to perform a git-secrets scan on the packages",

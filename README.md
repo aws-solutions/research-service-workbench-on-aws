@@ -7,6 +7,7 @@
 [![Semantic-release](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Semantic-release/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Semantic-release/badge.svg)
 [![Lint-PR](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
