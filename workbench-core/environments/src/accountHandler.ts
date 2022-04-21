@@ -1,7 +1,6 @@
 /* eslint-disable */
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
 import IamRoleCloneService from './iamRoleCloneService';
-import { getCfnOutput } from './cloudformationUtil';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import { Readable } from 'stream';
 import { Output } from '@aws-sdk/client-cloudformation';
@@ -33,10 +32,12 @@ export default class AccountHandler {
       process.env.AWS_REGION!,
       process.env.STACK_NAME!
     );
+
+    const cfService = new CloudformationService(this._mainAccountAwsService.cloudformation);
     const {
       [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName,
       [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: s3ArtifactBucketArn
-    } = await getCfnOutput(this._mainAccountAwsService, process.env.STACK_NAME!, [
+    } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
       process.env.LAUNCH_CONSTRAINT_ROLE_NAME!,
       process.env.S3_ARTIFACT_BUCKET_ARN_NAME!
     ]);

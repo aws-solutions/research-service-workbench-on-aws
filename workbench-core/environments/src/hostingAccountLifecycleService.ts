@@ -1,12 +1,11 @@
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
-import { getCfnOutput } from './cloudformationUtil';
 
 export default class HostingAccountLifecycleService {
-  public aws: AwsService;
+  private _aws: AwsService;
   private _stackName: string;
   public constructor(awsRegion: string, stackName: string) {
-    this.aws = new AwsService({ region: awsRegion });
+    this._aws = new AwsService({ region: awsRegion });
     this._stackName = stackName;
   }
 
@@ -18,7 +17,8 @@ export default class HostingAccountLifecycleService {
     },
     mainAccountBusArnName: string
   ): Promise<void> {
-    const { [mainAccountBusArnName]: mainAccountBusName } = await getCfnOutput(this.aws, this._stackName, [
+    const cfService = new CloudformationService(this._aws.cloudformation);
+    const { [mainAccountBusArnName]: mainAccountBusName } = await cfService.getCfnOutput(this._stackName, [
       mainAccountBusArnName
     ]);
     await this.updateEventBridgePermissions(mainAccountBusName, accountMetadata.accountId);
@@ -39,7 +39,7 @@ export default class HostingAccountLifecycleService {
       Principal: accountId,
       StatementId: 'Allow-main-account-to-receive-host-account-events'
     };
-    await this.aws.eventBridge.putPermission(params);
+    await this._aws.eventBridge.putPermission(params);
   }
 
   public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
@@ -50,7 +50,7 @@ export default class HostingAccountLifecycleService {
           Attribute: 'LaunchPermission',
           LaunchPermission: { Add: [{ UserId: targetAccountId }] }
         };
-        await this.aws.ec2.modifyImageAttribute(params);
+        await this._aws.ec2.modifyImageAttribute(params);
       }
     }
   }
@@ -61,7 +61,7 @@ export default class HostingAccountLifecycleService {
   public async shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
     for (const ssmDoc of ssmDocuments) {
       const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
-      await this.aws.ssm.modifyDocumentPermission(params);
+      await this._aws.ssm.modifyDocumentPermission(params);
     }
   }
 
@@ -86,7 +86,7 @@ export default class HostingAccountLifecycleService {
       StackName: stackName
     };
 
-    const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this._aws.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutputs = stackDetails.Stacks![0].Outputs!.filter((output: Output) => {
       return output.OutputKey && output.OutputKey.endsWith(ssmDocNameSuffix);

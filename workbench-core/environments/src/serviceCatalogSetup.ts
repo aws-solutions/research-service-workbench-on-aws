@@ -1,5 +1,5 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
 
 import fs from 'fs';
 import md5File from 'md5-file';
@@ -10,7 +10,6 @@ import {
   PortfolioDetail,
   ProductViewDetail
 } from '@aws-sdk/client-service-catalog';
-import { getCfnOutput } from './cloudformationUtil';
 
 export default class ServiceCatalogSetup {
   private _aws: AwsService;
@@ -55,10 +54,11 @@ export default class ServiceCatalogSetup {
     }
     console.log('PortfolioId', portfolioId);
 
+    const cfService = new CloudformationService(this._aws.cloudformation);
     const {
       [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn,
       [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
-    } = await getCfnOutput(this._aws, STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
+    } = await cfService.getCfnOutput(STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
 
     const prefix = S3_ARTIFACT_BUCKET_SC_PREFIX;
 
