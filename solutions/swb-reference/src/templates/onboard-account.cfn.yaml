@@ -259,7 +259,7 @@ Resources:
   PolicyCrossAccountHandler:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows main account to perform critical analytics on workspaces provisioned in member accounts
+      Description: Allows main account to setup hosting account with required resources for launch environment
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -276,6 +276,7 @@ Resources:
           - Effect: Allow
             Action:
               - cloudformation:GetTemplate
+              - cloudformation:DescribeStacks
             Resource:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
           - Effect: Allow

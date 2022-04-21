@@ -243,12 +243,12 @@ export class SWBStack extends Stack {
             new PolicyStatement({
               actions: ['dynamodb:*'],
               resources: ['*'],
-              sid: 'DynamoDB-Access'
+              sid: 'DynamoDbAccess'
             }),
             new PolicyStatement({
               actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
               resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}`],
-              sid: 'CfN-Access'
+              sid: 'CfnAccess'
             }),
             new PolicyStatement({
               actions: ['sts:AssumeRole'],

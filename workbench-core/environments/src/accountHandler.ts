@@ -188,7 +188,7 @@ export default class AccountHandler {
         {
           arns: {
             accountHandler: 'arn:aws:iam::750404249455:role/swb-dev-oh-account-1-cross-account-role',
-            envManagement: 'arn:aws:iam::750404249455:role/swb-dev-oh-account-1-xacc-env-mgmt'
+            envManagement: 'arn:aws:iam::750404249455:role/swb-dev-oh-account-1-env-mgmt'
           },
           stackName: `swb-dev-oh-account-1`
         }
