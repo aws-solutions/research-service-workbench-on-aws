@@ -1,17 +1,13 @@
 /* eslint-disable */
 import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
-import IamRoleCloneService from './iamRoleCloneService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import { Readable } from 'stream';
-import { Output } from '@aws-sdk/client-cloudformation';
+import IamRoleCloneService from './iamRoleCloneService';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
   public constructor(mainAccountAwsService: AwsService) {
     this._mainAccountAwsService = mainAccountAwsService;
   }
-  // TODO: Consider moving these methods to `hostingAccountLifecycleService`
-  // TODO: Take a look at this https://quip-amazon.com/5SbZAHDcaw0m/Account-Class-Architecture
   // TODO: Write unit tests
   /* eslint-disable-next-line */
   public async execute(event: any): Promise<void> {
@@ -58,118 +54,18 @@ export default class AccountHandler {
         continue;
       }
 
-      await this._shareAndAcceptScPortfolio(
-        hostingAccountAwsService,
-        hostingAccountId as string,
-        portfolioId as string
-      );
-      await this._associatePrincipalIamRoleWithPortfolio(
-        hostingAccountAwsService,
-        hostingAccount.arns.envManagement,
-        portfolioId as string
-      );
-
-      const iamRoleCloneService = new IamRoleCloneService(
-        this._mainAccountAwsService,
-        hostingAccountAwsService
-      );
-      await iamRoleCloneService.cloneRole(launchConstraintRoleName);
-      await hostingAccountLifecycleService.updateAccount(hostingAccountId, process.env.SSM_DOC_NAME_SUFFIX!);
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
-      await this._compareHostingAccountTemplate(
-        s3ArtifactBucketName,
+      await hostingAccountLifecycleService.updateAccount(
+        hostingAccountId,
         hostingAccountAwsService,
-        hostingAccount.stackName
+        hostingAccount.stackName,
+        portfolioId,
+        process.env.SSM_DOC_NAME_SUFFIX!,
+        hostingAccount.arns.envManagement,
+        launchConstraintRoleName,
+        s3ArtifactBucketName
       );
     }
-  }
-
-  private async _compareHostingAccountTemplate(
-    s3ArtifactBucketName: string,
-    hostingAccountAwsService: AwsService,
-    hostingAccountStackName: string
-  ): Promise<void> {
-    const getObjResponse = await this._mainAccountAwsService.s3.getObject({
-      Bucket: s3ArtifactBucketName,
-      Key: 'onboard-account.cfn.yaml'
-    });
-    const streamToString = (stream: Readable): Promise<string> =>
-      new Promise((resolve, reject) => {
-        const chunks: Uint8Array[] = [];
-        stream.on('data', (chunk) => chunks.push(chunk));
-        stream.on('error', reject);
-        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-      });
-    const expectedTemplate: string = await streamToString(getObjResponse.Body! as Readable);
-    const actualTemplate = (
-      await hostingAccountAwsService.cloudformation.getTemplate({ StackName: hostingAccountStackName })
-    ).TemplateBody!;
-
-    const removeCommentsAndSpaces = (template: string): string => {
-      return template.replace(/#.*/g, '').replace(/\s+/g, '');
-    };
-
-    const describeStackResponse = await hostingAccountAwsService.cloudformation.describeStacks({
-      StackName: hostingAccountStackName
-    });
-    let vpcId: string | undefined;
-    let subnetId: string | undefined;
-    const describeCfResponse = await hostingAccountAwsService.cloudformation.describeStacks({
-      StackName: hostingAccountStackName
-    });
-    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
-      const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
-      vpcId = outputs.find((output) => {
-        return output.OutputKey === 'VPC';
-      })!.OutputValue;
-      subnetId = outputs.find((output) => {
-        return output.OutputKey === 'VpcPublicSubnet';
-      })!.OutputValue;
-
-      if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-        await this._writeAccountStatusToDDB({ status: 'UP_TO_DATE', vpcId, subnetId });
-      } else {
-        await this._writeAccountStatusToDDB({ status: 'NEEDS_UPDATE', vpcId, subnetId });
-      }
-    } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
-      await this._writeAccountStatusToDDB({ status: 'ERRORED', vpcId, subnetId });
-    }
-  }
-
-  private async _writeAccountStatusToDDB(param: {
-    status: 'UP_TO_DATE' | 'NEEDS_UPDATE' | 'ERRORED';
-    vpcId: string | undefined;
-    subnetId: string | undefined;
-  }): Promise<void> {
-    console.log('_writeAccountStatusToDDB param', param);
-    // TODO: Write above values to DDB. If vpcId or subnetId is undefined, don't write those 2 values to DDB
-  }
-
-  private async _associatePrincipalIamRoleWithPortfolio(
-    hostingAccountAwsService: AwsService,
-    iamRole: string,
-    portfolioId: string
-  ): Promise<void> {
-    console.log(`Associating ${iamRole} with porfolio ${portfolioId}`);
-    await hostingAccountAwsService.serviceCatalog.associatePrincipalWithPortfolio({
-      PortfolioId: portfolioId,
-      PrincipalARN: iamRole,
-      PrincipalType: 'IAM'
-    });
-  }
-
-  private async _shareAndAcceptScPortfolio(
-    hostingAccountAwsService: AwsService,
-    hostingAccountId: string,
-    portfolioId: string
-  ): Promise<void> {
-    console.log(`Sharing Service Catalog Portfolio ${portfolioId} with account ${hostingAccountId} `);
-    await this._mainAccountAwsService.serviceCatalog.createPortfolioShare({
-      PortfolioId: portfolioId,
-      AccountId: hostingAccountId
-    });
-
-    await hostingAccountAwsService.serviceCatalog.acceptPortfolioShare({ PortfolioId: portfolioId });
   }
 
   private _getAccountId(iamRoleArn: string): string {

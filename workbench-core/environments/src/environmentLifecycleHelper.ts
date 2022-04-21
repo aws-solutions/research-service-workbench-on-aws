@@ -27,6 +27,8 @@ export default class EnvironmentLifecycleHelper {
     envType: string;
     accountId: string;
   }): Promise<{ [id: string]: string }> {
+    // TODO: Get pathId required by that specific envType
+
     // Get SSM doc ARN from main account CfN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
