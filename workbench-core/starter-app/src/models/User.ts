@@ -8,7 +8,7 @@ export interface User {
   claims: string[];
 }
 
-export const unkownUser: User = {
+export const unknownUser: User = {
   id: 'sample-id',
   name: 'Sample User',
   email: 'sample.user@amazon.com',

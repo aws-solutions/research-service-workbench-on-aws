@@ -1,5 +1,5 @@
 import { createContext, useContext, Context, useState } from 'react';
-import { User, unkownUser } from '../models/User';
+import { User, unknownUser } from '../models/User';
 
 export interface AuthenticationProps {
   user: User;
@@ -8,15 +8,15 @@ export interface AuthenticationProps {
 }
 
 const AuthenticationContext: Context<AuthenticationProps> = createContext<AuthenticationProps>({
-  user: unkownUser,
+  user: unknownUser,
   signIn: (user: User) => {},
   signOut: () => {}
 });
 
 export function AuthenticationProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [user, setUser] = useState<User>(unkownUser);
+  const [user, setUser] = useState<User>(unknownUser);
   const signIn = (user: User): void => setUser(user);
-  const signOut = (): void => setUser(unkownUser);
+  const signOut = (): void => setUser(unknownUser);
 
   return (
     <AuthenticationContext.Provider value={{ user, signIn, signOut }}>
