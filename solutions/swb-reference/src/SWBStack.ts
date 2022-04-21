@@ -251,6 +251,11 @@ export class SWBStack extends Stack {
               sid: 'CfnAccess'
             }),
             new PolicyStatement({
+              actions: ['servicecatalog:ListLaunchPaths'],
+              resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+              sid: 'ScAccess'
+            }),
+            new PolicyStatement({
               actions: ['sts:AssumeRole'],
               resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
               sid: 'AssumeRole'

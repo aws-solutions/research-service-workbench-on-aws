@@ -15,6 +15,31 @@ export default class EnvironmentLifecycleHelper {
     this.aws = new AwsService({ region: process.env.AWS_REGION! });
   }
 
+  public async launch(payload: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ssmParameters: { [key: string]: string[] };
+    operation: Operation;
+    envType: string;
+    accountId: string;
+    productId: string;
+  }): Promise<{ [id: string]: string }> {
+    const updatedPayload = payload;
+
+    const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
+      accountId: payload.accountId,
+      operation: payload.operation,
+      envType: payload.envType
+      // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
+      // Note: empty string is not the same as undefined
+      // externalId: <accountIdDDBMetadata>.externalId
+    });
+
+    const listLaunchPathResponse = await hostAwsSdk.serviceCatalog.listLaunchPaths({
+      ProductId: payload.productId
+    });
+    updatedPayload.ssmParameters.ProductId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
+    return this.executeSSMDocument(updatedPayload);
+  }
   /**
    * Executing SSM Document in hosting account with provided envMetadata
    *
