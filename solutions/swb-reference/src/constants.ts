@@ -13,6 +13,8 @@ function getConstants(): {
   S3_ARTIFACT_BUCKET_SC_PREFIX: string;
   LAUNCH_CONSTRAINT_ROLE_NAME: string;
   AMI_IDS_TO_SHARE: string;
+  ROOT_USER_EMAIL: string;
+  USER_POOL_NAME: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -26,6 +28,8 @@ function getConstants(): {
   const PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const AWS_REGION = config.awsRegion;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
+  const ROOT_USER_EMAIL = config.rootUserEmail;
+  const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
 
   const AMI_IDS: string[] = [];
 
@@ -45,7 +49,9 @@ function getConstants(): {
     MAIN_ACCOUNT_BUS_ARN_NAME,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     LAUNCH_CONSTRAINT_ROLE_NAME,
-    AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS)
+    AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
+    ROOT_USER_EMAIL,
+    USER_POOL_NAME
   };
 }
 

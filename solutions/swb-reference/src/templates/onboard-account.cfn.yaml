@@ -10,7 +10,7 @@ Parameters:
 
   Namespace:
     Type: String
-    Description: An environment name that will be prefixed to resource names
+    Description: An environment name that will be prefixed to resource names. Make sure this matches the one declared in your constants file.
 
   MainAccountId:
     Type: String
@@ -83,7 +83,7 @@ Resources:
   EnvManagementRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'xacc-env-mgmt']]
+      RoleName: !Join ['-', [Ref: Namespace, 'env-mgmt']]
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -125,9 +125,19 @@ Resources:
             Statement:
               Effect: Allow
               Action:
+                - ssm:SendCommand
                 - ssm:StartAutomationExecution
               Resource:
-                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:document/${Namespace}'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*:*'
+        - PolicyName: iam-pass-role
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${Namespace}*'
         - PolicyName: s3-access
           PolicyDocument:
             Statement:

@@ -106,6 +106,7 @@ export default class HostingAccountLifecycleService {
     accountHandlerRoleArn: string;
   }): Promise<void> {
     // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
+    // Don't forget to store the external ID used during onboarding
     return Promise.resolve();
   }
 }

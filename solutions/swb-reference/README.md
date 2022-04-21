@@ -14,7 +14,8 @@ The requirements below are for running the lambda locally
 2. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder
 3. Uncomment the `stage` attribute and provide the correct `<STAGE>` value for the attribute
 4. Uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing.
-5. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
+5. Uncomment `rootUserEmail` and provide the main account user's email address
+6. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
 ## Running Code Locally
 If you have made changes to the `environment` package or the `swb-reference` package follow these steps

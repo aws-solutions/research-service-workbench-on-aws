@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-cognito-identity-provider",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-ec2",
       "allowedCategories": [ "production" ]
     },
@@ -127,11 +131,23 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "fast-check",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "generate-password",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "jest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jest-fast-check",
       "allowedCategories": [ "production" ]
     },
     {
@@ -160,6 +176,10 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "uuid",
       "allowedCategories": [ "production" ]
     },
     {

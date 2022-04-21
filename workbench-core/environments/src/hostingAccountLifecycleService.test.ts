@@ -22,7 +22,7 @@ describe('HostingAccountLifecycleService', () => {
           Outputs: [
             {
               OutputKey: constants.MAIN_ACCOUNT_BUS_ARN_NAME,
-              OutputValue: 'arn:aws:events:us-east-1:235778585540:event-bus/swb-swbv2-va'
+              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             },
             {
               OutputKey: constants.SAGEMAKER_LAUNCH_SSM_DOC,
