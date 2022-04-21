@@ -367,7 +367,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       next: 12.0.10
       next-global-css: ~1.2.0
-      next-i18next: ~10.3.0
+      next-i18next: ~11.0.0
       next-transpile-modules: ~9.0.0
       react: 17.0.2
       react-dom: 17.0.2
@@ -376,7 +376,7 @@ importers:
     dependencies:
       next: 12.0.10_1d117d1b6790c5e23a772164b3a3d4fc
       next-global-css: 1.2.0
-      next-i18next: 10.3.0_61390be992b634a688f7c2555547b55b
+      next-i18next: 11.0.0_61390be992b634a688f7c2555547b55b
       next-transpile-modules: 9.0.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -6702,8 +6702,8 @@ packages:
     resolution: {integrity: sha512-36EeyYTSoKN7rWyCKfhM4TScJ4VuJP8b2ThAPLmlZRiYT+DS3QVcsZWuClC55S2zwvx6eRUB1SljfUjUiPig5A==}
     dev: false
 
-  /next-i18next/10.3.0_61390be992b634a688f7c2555547b55b:
-    resolution: {integrity: sha512-glVigyij3wivFAqGYxgW0w6rQHETpAAKnN5p2Lc//XiSENCbkDRW9a8ApA/c5msAnThzrYXNVu4XcKRfSCWQzA==}
+  /next-i18next/11.0.0_61390be992b634a688f7c2555547b55b:
+    resolution: {integrity: sha512-phxbQiZGSJTTBE2FI4+BnqFZl88AI2V+6MrEQnT9aPFAXq/fATQ/F0pOUM3J7kU4nEeCfn3hjISq+ygGHlEz0g==}
     engines: {node: '>=12'}
     peerDependencies:
       next: '>= 10.0.0'

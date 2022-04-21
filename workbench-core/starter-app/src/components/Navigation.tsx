@@ -45,9 +45,9 @@ export default function Navigation({
   return (
     <SideNavigation
       activeHref={activeHref}
-      header={header ?? defaultNavHeader}
-      items={items ?? adminNavItems}
-      onFollow={onFollowHandler ?? defaultOnFollowHandler}
+      header={header ? header : defaultNavHeader}
+      items={items ? items : adminNavItems}
+      onFollow={onFollowHandler ? onFollowHandler : defaultOnFollowHandler}
     />
   );
 }

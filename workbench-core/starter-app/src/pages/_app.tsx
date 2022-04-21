@@ -8,6 +8,9 @@ import { SettingsProvider } from '../context/SettingsContext';
 import { NotificationsProvider } from '../context/NotificationContext';
 import { AuthenticationProvider } from '../context/AuthenticationContext';
 
+// eslint-disable-next-line @rushstack/typedef-var
+const nextI18NextConfig = require('../../next-i18next.config');
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   return (
@@ -25,5 +28,5 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   );
 }
 
-const App: unknown = appWithTranslation(MyApp);
+const App: unknown = appWithTranslation(MyApp, nextI18NextConfig);
 export default App;
