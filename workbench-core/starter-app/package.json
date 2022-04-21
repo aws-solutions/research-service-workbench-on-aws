@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "test": "next test",
+    "test": "heft test --clean && rushx make-badges",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "start": "next start",
     "lint": "next lint"
