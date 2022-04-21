@@ -218,6 +218,14 @@
       "autoinstallerName": "commitlint",
       "shellCommand": "commitlint"
     },
+    // {
+    //   "name": "commitizen",
+    //   "commandKind": "global",
+    //   "summary": "Prepare conventional commit messages",
+    //   "safeForSimultaneousRushProcesses": true,
+    //   "autoinstallerName": "commitizen",
+    //   "shellCommand": "commitizen"
+    // },
     {
       "name": "git-secrets-scan",
       "commandKind": "global",
