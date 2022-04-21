@@ -1,4 +1,7 @@
 import {
+  AssociatePrincipalWithPortfolioCommand,
+  AssociatePrincipalWithPortfolioCommandInput,
+  AssociatePrincipalWithPortfolioCommandOutput,
   AssociateProductWithPortfolioCommand,
   AssociateProductWithPortfolioCommandInput,
   AssociateProductWithPortfolioCommandOutput,
@@ -75,5 +78,11 @@ export default class ServiceCatalog {
     params: AssociateProductWithPortfolioCommandInput
   ): Promise<AssociateProductWithPortfolioCommandOutput> {
     return this._client.send(new AssociateProductWithPortfolioCommand(params));
+  }
+
+  public async associatePrincipalWithPortfolio(
+    params: AssociatePrincipalWithPortfolioCommandInput
+  ): Promise<AssociatePrincipalWithPortfolioCommandOutput> {
+    return this._client.send(new AssociatePrincipalWithPortfolioCommand(params));
   }
 }

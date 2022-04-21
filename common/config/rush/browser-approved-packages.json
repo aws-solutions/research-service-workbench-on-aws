@@ -175,6 +175,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "uuid",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "winston",
       "allowedCategories": [ "production" ]
     },

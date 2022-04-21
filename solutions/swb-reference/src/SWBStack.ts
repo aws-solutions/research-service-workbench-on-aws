@@ -12,16 +12,45 @@ import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk
 import { getConstants } from './constants';
 
 export class SWBStack extends Stack {
+  // We extract a subset of constants required to be set on Lambda
+  // Note: AWS_REGION cannot be set since it's a reserved env variable
+  public lambdaEnvVars: {
+    STAGE: string;
+    STACK_NAME: string;
+    SSM_DOC_NAME_SUFFIX: string;
+    MAIN_ACCOUNT_BUS_ARN_NAME: string;
+    AMI_IDS_TO_SHARE: string;
+  };
   public constructor(app: App) {
-    const { STACK_NAME, AWS_REGION, S3_ARTIFACT_BUCKET_ARN_NAME, LAUNCH_CONSTRAINT_ROLE_NAME } =
-      getConstants();
+    const {
+      STAGE,
+      AWS_REGION,
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      LAUNCH_CONSTRAINT_ROLE_NAME,
+      STACK_NAME,
+      SSM_DOC_NAME_SUFFIX,
+      MAIN_ACCOUNT_BUS_ARN_NAME,
+      AMI_IDS_TO_SHARE
+    } = getConstants();
+
     super(app, STACK_NAME, {
       env: {
         region: AWS_REGION
       }
     });
 
-    const apiLambda: Function = this._createAPILambda();
+    // We extract a subset of constants required to be set on Lambda
+    // Note: AWS_REGION cannot be set since it's a reserved env variable
+    this.lambdaEnvVars = {
+      STAGE,
+      STACK_NAME,
+      SSM_DOC_NAME_SUFFIX,
+      MAIN_ACCOUNT_BUS_ARN_NAME,
+      AMI_IDS_TO_SHARE
+    };
+
+    const apiLambdaRole: Role = this._createAPILambdaRole();
+    const apiLambda: Function = this._createAPILambda(apiLambdaRole);
     this._createRestApi(apiLambda);
 
     this._createStatusHandlerLambda();
@@ -57,6 +86,27 @@ export class SWBStack extends Stack {
             'sagemaker:DeleteNotebookInstance'
           ],
           resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
+        }),
+        new PolicyStatement({
+          actions: ['s3:GetObject'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: ['servicecatalog:*'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: [
+            'cloudformation:CreateStack',
+            'cloudformation:DeleteStack',
+            'cloudformation:DescribeStackEvents',
+            'cloudformation:DescribeStacks',
+            'cloudformation:GetTemplateSummary',
+            'cloudformation:SetStackPolicy',
+            'cloudformation:ValidateTemplate',
+            'cloudformation:UpdateStack'
+          ],
+          resources: ['arn:aws:cloudformation:*:*:stack/SC-*']
         }),
         new PolicyStatement({
           actions: [
@@ -102,45 +152,76 @@ export class SWBStack extends Stack {
   }
 
   private _createStatusHandlerLambda(): void {
-    new Function(this, 'statusHandlerLambda', {
+    const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X
+      runtime: Runtime.NODEJS_14_X,
+      environment: this.lambdaEnvVars
+    });
+
+    new CfnOutput(this, 'statusHandlerLambdaRoleOutput', {
+      value: statusHandlerLambda.role!.roleArn
     });
   }
 
   private _createAccountHandlerLambda(): void {
-    const lambda = new Function(this, 'accountHandlerLambda', {
+    const accountHandlerLambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
-      runtime: Runtime.NODEJS_14_X
+      runtime: Runtime.NODEJS_14_X,
+      environment: this.lambdaEnvVars
+    });
+
+    new CfnOutput(this, 'accountHandlerLambdaRoleOutput', {
+      value: accountHandlerLambda.role!.roleArn
     });
 
     // Run lambda function every 5 minutes
     const eventRule = new Rule(this, 'scheduleRule', {
       schedule: Schedule.cron({ minute: '5' })
     });
-    eventRule.addTarget(new targets.LambdaFunction(lambda));
+    eventRule.addTarget(new targets.LambdaFunction(accountHandlerLambda));
   }
 
-  private _createAPILambda(): Function {
-    // We extract a subset of constants required to be set on Lambda
-    // Note: AWS_REGION cannot be set since it's a reserved env variable
-    const { STAGE, STACK_NAME, SSM_DOC_NAME_SUFFIX, MAIN_ACCOUNT_BUS_ARN_NAME, AMI_IDS_TO_SHARE } =
-      getConstants();
-    const envVariables = {
-      STAGE,
-      STACK_NAME,
-      SSM_DOC_NAME_SUFFIX,
-      MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
-    };
+  private _createAPILambdaRole(): Role {
+    const { AWS_REGION } = getConstants();
+    const apiLambdaRole = new Role(this, 'ApiLambdaRole', {
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      roleName: `${this.stackName}-ApiLambdaRole`,
+      description: 'Role assumed by API routes',
+      inlinePolicies: {
+        adminPerms: new PolicyDocument({
+          statements: [
+            // TODO: Restrict policy permissions
+            new PolicyStatement({
+              actions: ['dynamodb:*'],
+              resources: ['*'],
+              sid: 'DynamoDB-Access'
+            }),
+            new PolicyStatement({
+              actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
+              resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}`],
+              sid: 'CfN-Access'
+            }),
+            new PolicyStatement({
+              actions: ['sts:AssumeRole'],
+              resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
+              sid: 'AssumeRole'
+            })
+          ]
+        })
+      }
+    });
+    return apiLambdaRole;
+  }
 
+  private _createAPILambda(apiLambdaRole: Role): Function {
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: envVariables
+      environment: this.lambdaEnvVars,
+      role: apiLambdaRole
     });
 
     new CfnOutput(this, 'apiLambdaRoleOutput', {
