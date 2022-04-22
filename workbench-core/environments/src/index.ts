@@ -1,4 +1,5 @@
 import EnvironmentConnectionService from './environmentConnectionService';
+import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
 import HostingAccountService from './hostingAccountService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
@@ -15,6 +16,7 @@ export {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
   AccountHandler,
+  EnvironmentLifecycleHelper,
   StatusHandler,
   EventBridgeEventToDDB,
   EnvironmentStatus,

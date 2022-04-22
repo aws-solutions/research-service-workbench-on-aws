@@ -8,7 +8,13 @@ import {
   ModifyDocumentPermissionCommand,
   ModifyDocumentPermissionCommandInput,
   ModifyDocumentPermissionCommandOutput,
-  SSMClientConfig
+  SSMClientConfig,
+  SendCommandCommand,
+  SendCommandCommandInput,
+  SendCommandCommandOutput,
+  StartAutomationExecutionCommandInput,
+  StartAutomationExecutionCommand,
+  StartAutomationExecutionCommandOutput
 } from '@aws-sdk/client-ssm';
 
 // Documentation for client and methods
@@ -24,5 +30,15 @@ export default class SSM {
     params: ModifyDocumentPermissionCommandInput
   ): Promise<ModifyDocumentPermissionCommandOutput> {
     return this._client.send(new ModifyDocumentPermissionCommand(params));
+  }
+
+  public async sendCommand(params: SendCommandCommandInput): Promise<SendCommandCommandOutput> {
+    return this._client.send(new SendCommandCommand(params));
+  }
+
+  public async startAutomationExecution(
+    params: StartAutomationExecutionCommandInput
+  ): Promise<StartAutomationExecutionCommandOutput> {
+    return this._client.send(new StartAutomationExecutionCommand(params));
   }
 }

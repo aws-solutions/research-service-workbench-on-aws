@@ -146,7 +146,6 @@ export default class ServiceCatalogSetup {
         `Cannot find output value for Launch Contraint role name with name: ${LAUNCH_CONSTRAINT_ROLE_NAME}`
       );
     }
-
     return { s3ArtifactBucketName, launchConstraintRoleName };
   }
 
