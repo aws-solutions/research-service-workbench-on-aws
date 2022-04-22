@@ -2,15 +2,20 @@ const nextJest = require('next/jest');
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: '../'
+  dir: './'
 });
 
 // Add any custom config to be passed to Jest
 const customJestConfig = {
-  // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  // if using TypeScript with a baseUrl set to the root directory then you need the below for alias' to work
-  moduleDirectories: ['node_modules', '<rootDir>/'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  moduleNameMapper: {
+    // Handle module aliases (this will be automatically configured for you soon)
+    '^@/components/(.*)$': '<rootDir>/components/$1',
+    '^@/context/(.*)$': '<rootDir>/context/$1',
+    '^@/models/(.*)$': '<rootDir>/models/$1',
+    '^@/pages/(.*)$': '<rootDir>/pages/$1',
+    '^@/styles/(.*)$': '<rootDir>/styles/$1'
+  },
   testEnvironment: 'jest-environment-jsdom'
 };
 
@@ -18,7 +23,6 @@ const customJestConfig = {
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['!./**/*.d.ts', './src/**/*.spec.ts', './src/**/*.test.ts', './src/setup/**/*'],
-  moduleDirectories: ['node_modules', 'src'],
   coverageDirectory: 'temp/coverage',
   coverageThreshold: {
     global: {
@@ -29,9 +33,6 @@ module.exports = {
     }
   },
   coverageReporters: ['json-summary', 'json'],
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  modulePaths: ['<rootDir>/src'],
 
   ...createJestConfig(customJestConfig)
 };

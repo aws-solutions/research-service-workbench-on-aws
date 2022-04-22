@@ -4,5 +4,13 @@ require('@amzn/eslint-config-workbench-core-eslint-custom/node_modules/@rushstac
 
 module.exports = {
   extends: ['@amzn/workbench-core-eslint-custom', 'next/core-web-vitals'],
-  parserOptions: { tsconfigRootDir: __dirname }
+  parserOptions: { tsconfigRootDir: __dirname },
+  plugins: ['testing-library'],
+  overrides: [
+    // Only uses Testing Library lint rules in test files
+    {
+      files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+      extends: ['plugin:testing-library/react']
+    }
+  ]
 };

@@ -8,7 +8,7 @@ import Button from '@awsui/components-react/button';
 
 import styles from '../styles/Hero.module.scss';
 
-export default function Hero(): JSX.Element {
+function Hero(): JSX.Element {
   const { t } = useTranslation();
   const { settings } = useSettings();
 
@@ -59,3 +59,5 @@ export default function Hero(): JSX.Element {
     </div>
   );
 }
+
+export default Hero;
