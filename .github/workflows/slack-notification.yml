@@ -9,4 +9,4 @@ jobs:
     steps:
       - name: Slack Message
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"New release ${{ github.event.release.tag_name }} is out, <${{ github.event.release.html_url }}|check it out now.>"}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"New release ${{ github.event.release.tag_name }} is out: ${{ github.event.release.html_url }}"}' ${{ secrets.SLACK_WEBHOOK }}
