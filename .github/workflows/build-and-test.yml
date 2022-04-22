@@ -4,10 +4,7 @@
 #
 
 name: Build-and-test
-on:
-  pull_request:
-    branches:
-      - develop
+on: ['pull_request']
 
 jobs:
   build-and-test:

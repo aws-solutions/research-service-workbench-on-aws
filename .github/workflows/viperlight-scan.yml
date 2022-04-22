@@ -4,10 +4,7 @@
 #
 
 name: Viperlight-scan
-on:
-  pull_request:
-    branches:
-      - develop
+on: ['pull_request']
 
 jobs:
   viperlight-scan:
