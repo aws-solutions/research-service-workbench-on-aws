@@ -52,6 +52,11 @@ importers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@aws-sdk/client-cloudformation': ^3.58.0
+      '@aws-sdk/client-s3': ^3.58.0
+      '@aws-sdk/client-ssm': ^3.58.0
+      '@aws-sdk/client-sts': ^3.58.0
+      '@aws-sdk/types': ^3.55.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.44.2
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -62,10 +67,12 @@ importers:
       '@types/jest': ^27.4.1
       '@types/js-yaml': ^4.0.5
       '@types/node': ^12
+      '@types/uuid': ^8.3.4
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.0.0
       aws-lambda: ^1.0.7
+      aws-sdk-client-mock: ^0.6.2
       cdk-ssm-document: ^3.1.1
       constructs: ^10.0.0
       esbuild: ^0.14.21
@@ -77,13 +84,21 @@ importers:
       ts-jest: ^27.1.3
       ts-node: ^10.4.0
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
       '@amzn/workbench-core-base': link:../../workbench-core/base
+      '@aws-sdk/client-cloudformation': 3.67.0
+      '@aws-sdk/client-s3': 3.67.0
+      '@aws-sdk/client-ssm': 3.67.0
+      '@aws-sdk/client-sts': 3.67.0
+      '@aws-sdk/types': 3.55.0
       '@vendia/serverless-express': 4.5.4
+      aws-sdk-client-mock: 0.6.2_83b300005ac703d176183847d4fbc4fc
       express: 4.17.3
       js-yaml: 4.1.0
+      uuid: 8.3.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 2.5.3_eslint@8.13.0+typescript@4.6.3
@@ -96,6 +111,7 @@ importers:
       '@types/jest': 27.4.1
       '@types/js-yaml': 4.0.5
       '@types/node': 12.20.47
+      '@types/uuid': 8.3.4
       aws-cdk: 2.20.0
       aws-cdk-lib: 2.19.0_constructs@10.0.113
       aws-lambda: 1.0.7
@@ -243,6 +259,7 @@ importers:
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-service-catalog': ^3.58.0
       '@aws-sdk/client-ssm': ^3.58.0
+      '@aws-sdk/client-sts': ^3.58.0
       '@aws-sdk/types': ^3.55.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.44.2
@@ -268,6 +285,7 @@ importers:
       '@aws-sdk/client-s3': 3.67.0
       '@aws-sdk/client-service-catalog': 3.67.0
       '@aws-sdk/client-ssm': 3.67.0
+      '@aws-sdk/client-sts': 3.67.0
       generate-password: 1.7.0
       md5-file: 5.0.0
     devDependencies:
@@ -3714,19 +3732,16 @@ packages:
     resolution: {integrity: sha512-xkNcLAn/wZaX14RPlwizcKicDk9G3F8m2nU3L7Ukm5zBgTwiT0wsoFAHx9Jq56fJA1z/7uKGtCRu16sOUCLIHQ==}
     dependencies:
       type-detect: 4.0.8
-    dev: true
 
   /@sinonjs/fake-timers/7.1.2:
     resolution: {integrity: sha512-iQADsW4LBMISqZ6Ci1dupJL9pprqwcVFTcOsEmQOEhW+KLCVn/Y4Jrvg2k19fIHCp+iFprriYPTdRcQR8NbUPg==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: true
 
   /@sinonjs/fake-timers/8.1.0:
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-    dev: true
 
   /@sinonjs/samsam/6.1.1:
     resolution: {integrity: sha512-cZ7rKJTLiE7u7Wi/v9Hc2fs3Ucc3jrWeMgPHbbTCeVAB2S0wOBbYlkJVeNSL04i7fdhT8wIbDq1zhC/PXTD2SA==}
@@ -3734,11 +3749,9 @@ packages:
       '@sinonjs/commons': 1.8.3
       lodash.get: 4.4.2
       type-detect: 4.0.8
-    dev: true
 
   /@sinonjs/text-encoding/0.7.1:
     resolution: {integrity: sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==}
-    dev: true
 
   /@szmarczak/http-timer/1.1.2:
     resolution: {integrity: sha512-XIB2XbzHTN6ieIjfIMV9hlVcfPU26s2vafYWQcZHWXHOxiaRZYEDKEwdl129Zyg50+foYV2jCgtrqSA6qNuNSA==}
@@ -3992,7 +4005,6 @@ packages:
     resolution: {integrity: sha512-US5E539UfeL2DiWALzCyk0c4zKh6sCv86V/0lpda/afMJJ0oEm2SrKgedH5optvFWstnJ8e1MNYhLmPhAy4rvQ==}
     dependencies:
       '@sinonjs/fake-timers': 7.1.2
-    dev: true
 
   /@types/stack-utils/2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
@@ -4010,6 +4022,10 @@ packages:
 
   /@types/triple-beam/1.3.2:
     resolution: {integrity: sha512-txGIh+0eDFzKGC25zORnswy+br1Ha7hj5cMVwKIU7+s0U2AxxJru/jZSMU6OC9MJWP6+pc/hc6ZjyZShpsyY2g==}
+    dev: true
+
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
     dev: true
 
   /@types/yargs-parser/21.0.0:
@@ -4400,7 +4416,6 @@ packages:
       '@types/sinon': 10.0.10
       sinon: 11.1.2
       tslib: 2.3.1
-    dev: true
 
   /aws-sdk/2.1114.0:
     resolution: {integrity: sha512-LB3q0aHK37GccvNZ4HKtA+0YF94GWYDbJMz3XYoNSEVFOFnLj2DfpkoWlBSnBEJlG9m8GRNssDWs65gQ3MVzDQ==}
@@ -5228,7 +5243,6 @@ packages:
   /diff/5.0.0:
     resolution: {integrity: sha512-/VTCrvm5Z0JGty/BWHljh+BAiw3IK+2j87NGMu8Nwc/f48WoDAC395uomO9ZD117ZOBaHmkX1oyLvkVM/aIT3w==}
     engines: {node: '>=0.3.1'}
-    dev: true
 
   /dir-glob/3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
@@ -6737,7 +6751,6 @@ packages:
 
   /isarray/0.0.1:
     resolution: {integrity: sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8=}
-    dev: true
 
   /isarray/1.0.0:
     resolution: {integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=}
@@ -7649,7 +7662,6 @@ packages:
 
   /just-extend/4.2.1:
     resolution: {integrity: sha512-g3UB796vUFIY90VIv/WX3L2c8CS2MdWUww3CNrYmqza1Fg0DURc2K/O4YrnklBdQarSJ/y8JnJYDGc+1iumQjg==}
-    dev: true
 
   /keyv/3.1.0:
     resolution: {integrity: sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA==}
@@ -7728,7 +7740,6 @@ packages:
 
   /lodash.get/4.4.2:
     resolution: {integrity: sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=}
-    dev: true
 
   /lodash.isequal/4.5.0:
     resolution: {integrity: sha1-QVxEePK8wwEgwizhDtMib30+GOA=}
@@ -7996,11 +8007,10 @@ packages:
     resolution: {integrity: sha512-yr5kW2THW1AkxVmCnKEh4nbYkJdB3I7LUkiUgOvEkOp414mc2UMaHMA7pjq1nYowhdoJZGwEKGaQVbxfpWj10A==}
     dependencies:
       '@sinonjs/commons': 1.8.3
-      '@sinonjs/fake-timers': 7.1.2
+      '@sinonjs/fake-timers': 8.1.0
       '@sinonjs/text-encoding': 0.7.1
       just-extend: 4.2.1
       path-to-regexp: 1.8.0
-    dev: true
 
   /node-abi/3.15.0:
     resolution: {integrity: sha512-Ic6z/j6I9RLm4ov7npo1I48UQr2BEyFCqh6p7S1dhEx9jPO0GPGq/e2Rb7x7DroQrmiVMz/Bw1vJm9sPAl2nxA==}
@@ -8286,7 +8296,6 @@ packages:
     resolution: {integrity: sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==}
     dependencies:
       isarray: 0.0.1
-    dev: true
 
   /path-type/4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
@@ -8973,7 +8982,6 @@ packages:
       diff: 5.0.0
       nise: 5.1.1
       supports-color: 7.2.0
-    dev: true
 
   /sisteransi/1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
@@ -9509,7 +9517,6 @@ packages:
   /type-detect/4.0.8:
     resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
     engines: {node: '>=4'}
-    dev: true
 
   /type-fest/0.20.2:
     resolution: {integrity: sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==}
