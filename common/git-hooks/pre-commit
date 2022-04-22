@@ -7,5 +7,7 @@
 # are committed. The command is defined in common/config/rush/command-line.json
 # and uses the "rush-prettier" autoinstaller.
 
+node common/scripts/install-run-rush.js git-secrets-scan || exit $?
+# node common/scripts/install-run-rush.js viperlight-scan || exit $?
 node common/scripts/install-run-rush.js prettier || exit $?
 node common/scripts/install-run-rush.js common-coverage-report || exit $?

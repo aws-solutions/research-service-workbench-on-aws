@@ -1,0 +1,15 @@
+Config
+glob-parent
+rush.json
+package.json
+.tools
+.vscode
+common
+node_modules
+build
+coverage
+README.md
+cdk.out
+
+#Fake account id used
+123456789012

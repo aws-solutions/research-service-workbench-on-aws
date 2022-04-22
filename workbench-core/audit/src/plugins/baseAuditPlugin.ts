@@ -7,9 +7,9 @@ import Metadata from '../metadata';
  *  This is the base audit plugin that utilizes {@link Writer} to output
  */
 class BaseAuditPlugin implements AuditPlugin {
-  private writer: Writer;
+  private _writer: Writer;
   public constructor(writer: Writer) {
-    this.writer = writer;
+    this._writer = writer;
   }
   /**
    * Modifies the audit entry to add audit as the logEventType and prepares the {@link AuditEntry} for output.
@@ -21,8 +21,8 @@ class BaseAuditPlugin implements AuditPlugin {
     if (!auditEntry.logEventType) {
       auditEntry.logEventType = 'audit';
     }
-    if (this.writer.prepare !== undefined) {
-      await this.writer.prepare(metadata, auditEntry);
+    if (this._writer.prepare !== undefined) {
+      await this._writer.prepare(metadata, auditEntry);
     }
   }
   /**
@@ -32,7 +32,7 @@ class BaseAuditPlugin implements AuditPlugin {
    * @param auditEntry - {@link AuditEntry}
    */
   public async write(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
-    await this.writer.write(metadata, auditEntry);
+    await this._writer.write(metadata, auditEntry);
   }
 }
 
