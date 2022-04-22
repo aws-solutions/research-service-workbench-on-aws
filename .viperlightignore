@@ -13,3 +13,9 @@ cdk.out
 
 #Fake account id used
 123456789012
+
+#Fake access key id used
+solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.js
+solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.ts
+workbench-core/environments/lib/environmentLifecycleHelper.test.js
+workbench-core/environments/src/environmentLifecycleHelper.test.ts 
