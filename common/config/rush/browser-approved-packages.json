@@ -51,11 +51,15 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/sts",
+      "name": "@aws-sdk/types",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/types",
+      "name": "@commitlint/cli",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@commitlint/config-conventional",
       "allowedCategories": [ "production" ]
     },
     {
@@ -156,6 +160,10 @@
     },
     {
       "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "semantic-release",
       "allowedCategories": [ "production" ]
     },
     {
