@@ -148,7 +148,7 @@ class Updater {
     return this;
   }
   // helps with setting up UpdateExpression
-  public item(item: { [key: string]: string | string[] }): Updater {
+  public item(item: { [key: string]: AttributeValue }): Updater {
     if (!item) return this;
 
     // we loop through all the properties that are defined and add them to the
@@ -174,10 +174,8 @@ class Updater {
 
       if (this._marked[key] && _.isEmpty(value)) {
         values[`:${key}`] = { NULL: true };
-      } else if (this._marked[key] && Array.isArray(value)) {
-        values[`:${key}`] = this._createSet(value);
-      } else if (typeof value === 'string') {
-        values[`:${key}`] = { S: value };
+      } else {
+        values[`:${key}`] = value;
       }
     });
 
