@@ -63,6 +63,18 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@babel/core",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-env",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },
@@ -79,11 +91,23 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@rushstack/heft-web-rig",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@testing-library/jest-dom",
       "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/user-event",
       "allowedCategories": [ "prototypes" ]
     },
     {
@@ -105,6 +129,10 @@
     {
       "name": "aws-sdk-client-mock",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "babel-jest",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-iam-floyd",
@@ -133,6 +161,10 @@
     {
       "name": "eslint-plugin-security",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "eslint-plugin-testing-library",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "express",
@@ -175,12 +207,16 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "sharp",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "triple-beam",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "ts-jest",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "ts-node",
