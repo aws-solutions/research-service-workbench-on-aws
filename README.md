@@ -1,7 +1,18 @@
+# Worflow Status
+[![Build-and-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
+[![Dev-deploy-and-integration-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg?)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg)
+[![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
+[![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
+[![Viperlight-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)
+[![Semantic-release](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Semantic-release/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Semantic-release/badge.svg)
+[![Lint-PR](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-85.91%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-77.07%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.98%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-85.92%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-97.78%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-96.55%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.82%25-brightgreen.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.

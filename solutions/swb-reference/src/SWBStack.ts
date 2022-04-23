@@ -243,7 +243,7 @@ export class SWBStack extends Stack {
             new PolicyStatement({
               actions: ['dynamodb:*'],
               resources: ['*'],
-              sid: 'DynamoDbAccess'
+              sid: 'DynamoDBAccess'
             }),
             new PolicyStatement({
               actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
