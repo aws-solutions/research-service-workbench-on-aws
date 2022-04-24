@@ -18,22 +18,28 @@ export default class Workflow {
   }
 
   private _createSagemakerSSMDocuments(): void {
-    const cfnDoc = new Document(this._stack, 'SagemakerLaunch', {
-      name: `${this._stack.stackName}-SagemakerLaunch`,
-      documentType: 'Automation',
-      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-      // correct file
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      content: fs // nosemgrep
-        .readFileSync(join(__dirname, `../../src/environment/sagemaker/sagemakerLaunchSSM.yaml`), 'utf8')
-        .toString()
-    });
-    new CfnOutput(this._stack, 'SagemakerLaunchSSMDocOutput', {
-      value: this._stack.formatArn({
-        service: 'ssm',
-        resource: 'document',
-        resourceName: cfnDoc.name
-      })
+    const docTypes = ['Launch', 'Terminate'];
+    docTypes.forEach((docType) => {
+      const cfnDoc = new Document(this._stack, `Sagemaker${docType}`, {
+        name: `${this._stack.stackName}-Sagemaker${docType}`,
+        documentType: 'Automation',
+        // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+        // correct file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        content: fs // nosemgrep
+          .readFileSync(
+            join(__dirname, `../../src/environment/sagemaker/sagemaker${docType}SSM.yaml`),
+            'utf8'
+          )
+          .toString()
+      });
+      new CfnOutput(this._stack, `Sagemaker${docType}SSMDocOutput`, {
+        value: this._stack.formatArn({
+          service: 'ssm',
+          resource: 'document',
+          resourceName: cfnDoc.name
+        })
+      });
     });
   }
 }

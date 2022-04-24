@@ -55,11 +55,15 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/sts",
+      "name": "@aws-sdk/types",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/types",
+      "name": "@commitlint/cli",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@commitlint/config-conventional",
       "allowedCategories": [ "production" ]
     },
     {
@@ -163,6 +167,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "semantic-release",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "triple-beam",
       "allowedCategories": [ "production" ]
     },
@@ -176,6 +184,10 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "uuid",
       "allowedCategories": [ "production" ]
     },
     {

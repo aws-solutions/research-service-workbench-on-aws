@@ -5,6 +5,8 @@ import {
   PutObjectCommand,
   PutObjectCommandInput,
   PutObjectCommandOutput,
+  ListBucketsCommandInput,
+  ListBucketsCommand,
   S3Client,
   S3ClientConfig
 } from '@aws-sdk/client-s3';
@@ -24,5 +26,10 @@ export default class S3 {
 
   public listObject(params: ListObjectsCommandInput): Promise<ListObjectsCommandOutput> {
     return this._client.send(new ListObjectsCommand(params));
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public listBuckets(params: ListBucketsCommandInput): Promise<any> {
+    return this._client.send(new ListBucketsCommand(params));
   }
 }

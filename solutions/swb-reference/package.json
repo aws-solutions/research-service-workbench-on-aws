@@ -23,7 +23,14 @@
     "express": "^4.17.3",
     "@vendia/serverless-express": "^4.5.4",
     "js-yaml": "^4.1.0",
-    "@amzn/workbench-core-base": "workspace:*"
+    "@amzn/workbench-core-base": "workspace:*",
+    "@aws-sdk/client-cloudformation": "^3.58.0",
+    "@aws-sdk/client-ssm": "^3.58.0",
+    "aws-sdk-client-mock": "^0.6.2",
+    "@aws-sdk/client-s3": "^3.58.0",
+    "@aws-sdk/types": "^3.55.0",
+    "@aws-sdk/client-sts": "^3.58.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.0.0",
@@ -48,7 +55,8 @@
     "jest": "^27.5.1",
     "@types/js-yaml": "^4.0.5",
     "ts-jest": "^27.1.3",
-    "@rushstack/eslint-config": "^2.5.1"
+    "@rushstack/eslint-config": "^2.5.1",
+    "@types/uuid": "^8.3.4"
   },
   "jest": {
     "moduleFileExtensions": [
