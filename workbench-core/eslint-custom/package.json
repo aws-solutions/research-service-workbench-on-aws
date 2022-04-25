@@ -19,7 +19,7 @@
   "author": "Samir Sharan",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft": "^0.44.2",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@types/heft-jest": "1.0.2",
