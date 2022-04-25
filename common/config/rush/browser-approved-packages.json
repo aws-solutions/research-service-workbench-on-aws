@@ -59,14 +59,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@commitlint/cli",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@commitlint/config-conventional",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production" ]
     },
@@ -100,10 +92,6 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "cdk-iam-floyd",
       "allowedCategories": [ "production" ]
     },
     {
@@ -164,10 +152,6 @@
     },
     {
       "name": "nodemon",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "semantic-release",
       "allowedCategories": [ "production" ]
     },
     {
