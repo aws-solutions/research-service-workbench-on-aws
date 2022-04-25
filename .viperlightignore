@@ -19,3 +19,6 @@ solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentLifecycleS
 solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.ts
 workbench-core/environments/lib/environmentLifecycleHelper.test.js
 workbench-core/environments/src/environmentLifecycleHelper.test.ts 
+
+#Fake email used
+solutions/example-ui-app/src/models/User.ts
