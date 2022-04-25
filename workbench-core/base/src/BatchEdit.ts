@@ -15,13 +15,13 @@ import DynamoDB from './aws/services/dynamoDB';
 /**
  * This class helps with batch writes or deletes.
  */
-class BatchWriteOrDeleter {
+class BatchEdit {
   private _ddb: DynamoDB;
   private _params: BatchWriteItemCommandInput;
   private _tableName: string;
-  public constructor(ddb: DynamoDB, table: string) {
-    this._ddb = ddb;
-    this._tableName = table;
+  public constructor(options: { region: string; table: string }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._tableName = options.table;
     this._params = { RequestItems: {} };
     this._params.RequestItems = {};
     this._params.RequestItems[this._tableName] = [];
@@ -34,54 +34,41 @@ class BatchWriteOrDeleter {
   //     this._params.TableName = name;
   //     return this;
   // }
-  public addDeleteRequest(key: { [key: string]: AttributeValue }): BatchWriteOrDeleter {
+  public addDeleteRequest(key: { [key: string]: AttributeValue }): BatchEdit {
     if (!this._params.RequestItems) {
-      throw new Error(
-        'BatchWriteOrDeleter<==need to initialize the RequestItems property before adding new request'
-      );
+      throw new Error('BatchEdit<==need to initialize the RequestItems property before adding new request');
     }
     const deleteRequest: DeleteRequest = { Key: key };
     this._params.RequestItems[this._tableName].push({ DeleteRequest: deleteRequest });
     return this;
   }
 
-  public addWriteRequest(item: { [key: string]: AttributeValue }): BatchWriteOrDeleter {
+  public addWriteRequest(item: { [key: string]: AttributeValue }): BatchEdit {
     if (!this._params.RequestItems) {
-      throw new Error(
-        'BatchWriteOrDeleter<==need to initialize the RequestItems property before adding new request'
-      );
+      throw new Error('BatchEdit<==need to initialize the RequestItems property before adding new request');
     }
     const writeRequest: PutRequest = { Item: item };
     this._params.RequestItems[this._tableName].push({ PutRequest: writeRequest });
     return this;
   }
 
-  public addDeleteRequests(keys: { [key: string]: AttributeValue }[]): BatchWriteOrDeleter {
+  public addDeleteRequests(keys: { [key: string]: AttributeValue }[]): BatchEdit {
     keys.forEach((key) => {
       this.addDeleteRequest(key);
     });
     return this;
   }
 
-  public addWriteRequests(items: { [key: string]: AttributeValue }[]): BatchWriteOrDeleter {
+  public addWriteRequests(items: { [key: string]: AttributeValue }[]): BatchEdit {
     items.forEach((item) => {
       this.addWriteRequest(item);
     });
     return this;
   }
 
-  public async batchWriteOrDelete(): Promise<BatchWriteItemCommandOutput> {
+  public async batchEdit(): Promise<BatchWriteItemCommandOutput> {
     return await this._ddb.batchWriteOrDelete(this._params);
   }
 }
 
-class DynamoDBBatchWriteOrDeleteService {
-  private _ddb: DynamoDB;
-  public batchWriteOrDelete: BatchWriteOrDeleter;
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.batchWriteOrDelete = new BatchWriteOrDeleter(this._ddb, options.table);
-  }
-}
-
-export default DynamoDBBatchWriteOrDeleteService;
+export default BatchEdit;

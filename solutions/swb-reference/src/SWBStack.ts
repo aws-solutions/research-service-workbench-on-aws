@@ -262,8 +262,8 @@ export class SWBStack extends Stack {
   // DynamoDB Table
   private _createDDBTable(apiLambda: Function): void {
     // Ideally, this needs to involve the solution name
-    const tableName: string = `${this.stackName}-table`;
-    const table = new Table(this, 'Table', {
+    const tableName: string = `${this.stackName}`;
+    const table = new Table(this, tableName, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       tableName: tableName
@@ -282,7 +282,6 @@ export class SWBStack extends Stack {
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
-    // eslint-disable-next-line no-new
-    new CfnOutput(this, 'dynamoDBTable', { value: table.tableArn });
+    new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
   }
 }

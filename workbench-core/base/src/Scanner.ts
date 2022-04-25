@@ -13,9 +13,9 @@ import DynamoDB from './aws/services/dynamoDB';
 class Scanner {
   private _ddb: DynamoDB;
   private _params: ScanCommandInput;
-  public constructor(ddb: DynamoDB, table: string) {
-    this._ddb = ddb;
-    this._params = { TableName: table };
+  public constructor(options: { region: string; table: string }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._params = { TableName: options.table };
   }
   // same as TableName
   public table(name: string): Scanner {
@@ -143,13 +143,4 @@ class Scanner {
   }
 }
 
-class DynamoDBScannerService {
-  private _ddb: DynamoDB;
-  public scanner: Scanner;
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.scanner = new Scanner(this._ddb, options.table);
-  }
-}
-
-export default DynamoDBScannerService;
+export default Scanner;

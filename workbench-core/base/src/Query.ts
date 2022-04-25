@@ -14,9 +14,9 @@ class Query {
   private _ddb: DynamoDB;
   private _params: QueryCommandInput;
   private _sortKeyName: string | undefined;
-  public constructor(ddb: DynamoDB, table: string) {
-    this._ddb = ddb;
-    this._params = { TableName: table };
+  public constructor(options: { region: string; table: string }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._params = { TableName: options.table };
     this._sortKeyName = undefined;
   }
   // same as TableName
@@ -255,13 +255,4 @@ class Query {
   }
 }
 
-class DynamoDBQueryService {
-  private _ddb: DynamoDB;
-  public query: Query;
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.query = new Query(this._ddb, options.table);
-  }
-}
-
-export default DynamoDBQueryService;
+export default Query;

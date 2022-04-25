@@ -3,22 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import DynamoDBBatchWriteOrDeleteService from './dynamoDBBatchWriteOrDeleteService';
-import DynamoDBDeleterService from './dynamoDBDeleterService';
-import DynamoDBGetterService from './dynamoDBGetterService';
-import DynamoDBQueryService from './dynamoDBQueryService';
-import DynamoDBScannerService from './dynamoDBScannerService';
-import DynamoDBUpdaterService from './dynamoDBUpdaterService';
+import BatchEdit from './BatchEdit';
+import Deleter from './Deleter';
+import Getter from './Getter';
+import Query from './Query';
+import Scanner from './Scanner';
+import Updater from './Updater';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 export default class DynamoDBHelperService {
-  private _ddbScanner?: DynamoDBScannerService;
-  private _ddbGetter?: DynamoDBGetterService;
-  private _ddbQuery?: DynamoDBQueryService;
-  private _ddbUpdater?: DynamoDBUpdaterService;
-  private _ddbDeleter?: DynamoDBDeleterService;
-  private _ddbBatchWriteOrDeleter?: DynamoDBBatchWriteOrDeleteService;
   private _awsRegion: string;
   private _tableName: string;
 
@@ -28,33 +22,27 @@ export default class DynamoDBHelperService {
     this._tableName = table;
   }
 
-  public scan(): DynamoDBScannerService {
-    return new DynamoDBScannerService({ region: this._awsRegion, table: this._tableName });
+  public scan(): Scanner {
+    return new Scanner({ region: this._awsRegion, table: this._tableName });
   }
 
-  public get(
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[]
-  ): DynamoDBGetterService {
-    return new DynamoDBGetterService({ region: this._awsRegion, table: this._tableName, key: key });
+  public get(key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[]): Getter {
+    return new Getter({ region: this._awsRegion, table: this._tableName, key: key });
   }
 
-  public query(): DynamoDBQueryService {
-    return new DynamoDBQueryService({ region: this._awsRegion, table: this._tableName });
+  public query(): Query {
+    return new Query({ region: this._awsRegion, table: this._tableName });
   }
 
-  public update(key: { [key: string]: AttributeValue }): DynamoDBUpdaterService {
-    return new DynamoDBUpdaterService({ region: this._awsRegion, table: this._tableName, key: key });
+  public update(key: { [key: string]: AttributeValue }): Updater {
+    return new Updater({ region: this._awsRegion, table: this._tableName, key: key });
   }
 
-  public delete(key: { [key: string]: AttributeValue }): DynamoDBDeleterService {
-    return new DynamoDBDeleterService({ region: this._awsRegion, table: this._tableName, key: key });
+  public delete(key: { [key: string]: AttributeValue }): Deleter {
+    return new Deleter({ region: this._awsRegion, table: this._tableName, key: key });
   }
 
-  public batchWrite(): DynamoDBBatchWriteOrDeleteService {
-    return new DynamoDBBatchWriteOrDeleteService({ region: this._awsRegion, table: this._tableName });
-  }
-
-  public batchDelete(): DynamoDBBatchWriteOrDeleteService {
-    return new DynamoDBBatchWriteOrDeleteService({ region: this._awsRegion, table: this._tableName });
+  public batchEdit(): BatchEdit {
+    return new BatchEdit({ region: this._awsRegion, table: this._tableName });
   }
 }

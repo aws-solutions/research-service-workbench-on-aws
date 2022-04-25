@@ -26,9 +26,9 @@ class Updater {
     setConditionExpression: (expr: string, seperator?: string) => void;
     toParams: () => UpdateItemCommandInput;
   };
-  public constructor(ddb: DynamoDB, table: string, key: { [key: string]: AttributeValue }) {
-    this._ddb = ddb;
-    this._params = { TableName: table, Key: key, ReturnValues: 'ALL_NEW' };
+  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._params = { TableName: options.table, Key: options.key, ReturnValues: 'ALL_NEW' };
     this._marked = {};
     this._createdAtState = { enabled: true, processed: false, value: '' };
     this._updatedAtState = { enabled: true, processed: false, value: '' };
@@ -313,13 +313,4 @@ class Updater {
   }
 }
 
-class DynamoDBUpdaterService {
-  private _ddb: DynamoDB;
-  public updater: Updater;
-  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.updater = new Updater(this._ddb, options.table, options.key);
-  }
-}
-
-export default DynamoDBUpdaterService;
+export default Updater;

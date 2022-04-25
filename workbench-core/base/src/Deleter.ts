@@ -13,9 +13,9 @@ import DynamoDB from './aws/services/dynamoDB';
 class Deleter {
   private _ddb: DynamoDB;
   private _params: DeleteItemCommandInput;
-  public constructor(ddb: DynamoDB, table: string, key: { [key: string]: AttributeValue }) {
-    this._ddb = ddb;
-    this._params = { TableName: table, Key: key };
+  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._params = { TableName: options.table, Key: options.key };
   }
   public table(name: string): Deleter {
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
@@ -102,13 +102,4 @@ class Deleter {
   }
 }
 
-class DynamoDBDeleterService {
-  private _ddb: DynamoDB;
-  public deleter: Deleter;
-  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.deleter = new Deleter(this._ddb, options.table, options.key);
-  }
-}
-
-export default DynamoDBDeleterService;
+export default Deleter;

@@ -18,20 +18,19 @@ class Getter {
   private _paramsItem: GetItemCommandInput | undefined;
   private _paramsBatch: BatchGetItemCommandInput | undefined;
   private _tableName: string;
-  public constructor(
-    ddb: DynamoDB,
-    table: string,
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[]
-  ) {
-    this._ddb = ddb;
-    this._tableName = table;
-    if (Array.isArray(key)) {
+  public constructor(options: {
+    region: string;
+    table: string;
+    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[];
+  }) {
+    this._ddb = new DynamoDB({ ...options });
+    this._tableName = options.table;
+    if (Array.isArray(options.key)) {
       this._paramsBatch = { RequestItems: {} };
       this._paramsBatch.RequestItems = {};
-      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(key) };
-      console.log(this._paramsBatch);
+      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(options.key) };
     } else {
-      this._paramsItem = { TableName: table, Key: key };
+      this._paramsItem = { TableName: options.table, Key: options.key };
     }
   }
   // only for get item
@@ -213,17 +212,4 @@ class Getter {
   }
 }
 
-class DynamoDBGetterService {
-  private _ddb: DynamoDB;
-  public getter: Getter;
-  public constructor(options: {
-    region: string;
-    table: string;
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[];
-  }) {
-    this._ddb = new DynamoDB({ ...options });
-    this.getter = new Getter(this._ddb, options.table, options.key);
-  }
-}
-
-export default DynamoDBGetterService;
+export default Getter;
