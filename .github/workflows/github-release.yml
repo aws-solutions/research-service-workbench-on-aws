@@ -1,8 +1,5 @@
-name: Semantic-release
-on:
-  push:
-    branches:
-      - main
+name: GitHub-release
+on: workflow_dispatch
 
 jobs:
   github-release:
