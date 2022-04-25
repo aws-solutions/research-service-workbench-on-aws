@@ -70,7 +70,7 @@ export default class EnvironmentService {
 
   public async getEnvironment(envId: string): Promise<GetItemCommandOutput | BatchGetItemCommandOutput> {
     const envKey = this._createEnvKey(envId);
-    const data = await this._ddbHelperService.get({ pk: envKey, sk: envKey }).getter.get();
+    const data = await this._ddbHelperService.get({ pk: envKey, sk: envKey }).get();
     // data should be of type GetItemCommandOutput
     if ('Item' in data && data.Item) {
       // convert to Environment type
@@ -78,7 +78,7 @@ export default class EnvironmentService {
       console.log(item);
       const env: Environment = {
         envId: item.id.S,
-        instanceId: item.instanceId.S,
+        instanceId: item.instanceId ? item.instanceId.S : undefined,
         cidr: item.cidr.S ? item.cidr.S : '',
         description: item.description.S ? item.description.S : '',
         error: item.error.S ? item.error.S : '',
@@ -88,7 +88,7 @@ export default class EnvironmentService {
         rev: item.rev.N ? +item.rev.N : NaN,
         status: item.status.N ? statusMapping[+item.status.N] : 'Unknown status',
         studyIds: item.studyIds.L
-          ? item.studyIds.L.map((attributeV) => (attributeV.S ? attributeV.S : ''))
+          ? item.studyIds.L.map((attributeV: AttributeValue) => (attributeV.S ? attributeV.S : ''))
           : [],
         envType: item.envType.S ? item.envType.S : 'Unknown Env Type',
         envTypeId: item.envTypeId.S ? item.envTypeId.S : 'Unknown Env Type Id',
@@ -131,14 +131,14 @@ export default class EnvironmentService {
     // })
     // this._ddbGetter = new DynamoDBGetterService({region: this._awsRegion, table: this._tableName, key: keys});
     // const data = await this._ddbGetter.getter.get();
-    const data = await this._ddbHelperService.get(keys).getter.get();
+    const data = await this._ddbHelperService.get(keys).get();
     // console.log(data);
     return data;
   }
 
   public async getEnvironmentAndMetadata(envId: string): Promise<QueryCommandOutput> {
     // const data = await this._ddbQuery.query.key('pk', {S: envId}).query();
-    const data = await this._ddbHelperService.query().query.key('pk', { S: envId }).query();
+    const data = await this._ddbHelperService.query().key('pk', { S: envId }).query();
     return data;
   }
 
@@ -146,7 +146,7 @@ export default class EnvironmentService {
     // const data = await this._ddbQuery.query.key('pk', {S: envId}).projection(['pk', 'sk']).query();
     const data = await this._ddbHelperService
       .query()
-      .query.key('pk', { S: envId })
+      .key('pk', { S: envId })
       .projection(['pk', 'sk'])
       .query();
     return data;
@@ -154,7 +154,7 @@ export default class EnvironmentService {
 
   public async getEnvironments(): Promise<ScanCommandOutput> {
     // const data = await this._ddbScanner.scanner.scan();
-    const data = await this._ddbHelperService.scan().scanner.scan();
+    const data = await this._ddbHelperService.scan().scan();
     return data;
   }
 
@@ -166,7 +166,7 @@ export default class EnvironmentService {
     // const data = await this._ddbUpdater.updater.item({'mutable': 'second value'}).update();
     const data = this._ddbHelperService
       .update({ pk: { S: envId }, sk: { S: envId } })
-      .updater.item(updatedValues)
+      .item(updatedValues)
       .update();
     return data;
   }
@@ -174,7 +174,7 @@ export default class EnvironmentService {
   public async deleteEnvironment(envId: string): Promise<DeleteItemCommandOutput> {
     // this._ddbDeleter = new DynamoDBDeleterService({region: this._awsRegion, table: this._tableName, key: {'pk': {S: envId}, 'sk': {S: envId}}});
     // const data = await this._ddbDeleter.deleter.delete();
-    const data = await this._ddbHelperService.delete({ pk: { S: envId }, sk: { S: envId } }).deleter.delete();
+    const data = await this._ddbHelperService.delete({ pk: { S: envId }, sk: { S: envId } }).delete();
     return data;
   }
 
@@ -189,13 +189,13 @@ export default class EnvironmentService {
       throw new Error('EnvironmentService<==no environment and metadata found');
     }
     console.log('before batchget');
-    const getItems = await this._ddbHelperService.get(envAndMetadataPrimaryKeys).getter.get();
+    const getItems = await this._ddbHelperService.get(envAndMetadataPrimaryKeys).get();
     console.log(getItems);
     console.log('after batchget');
     const data = await this._ddbHelperService
-      .batchDelete()
-      .batchWriteOrDelete.addDeleteRequests(envAndMetadataPrimaryKeys)
-      .batchWriteOrDelete();
+      .batchEdit()
+      .addDeleteRequests(envAndMetadataPrimaryKeys)
+      .batchEdit();
     // const data = await this._ddbBatchWriteOrDeleter.batchWriteOrDelete.addDeleteRequests(envAndMetadataPrimaryKeys).batchWriteOrDelete();
     console.log(data);
     return data;
@@ -257,12 +257,9 @@ export default class EnvironmentService {
     });
     // add metadata stores in environment variable
     items.push(...this._environmentToMetadataItems(newEnv));
-    // console.log(items);
+    console.log(items);
     // const data = await this._ddbBatchWriteOrDeleter.batchWriteOrDelete.addWriteRequests(items).batchWriteOrDelete();
-    const data = await this._ddbHelperService
-      .batchWrite()
-      .batchWriteOrDelete.addWriteRequests(items)
-      .batchWriteOrDelete();
+    const data = await this._ddbHelperService.batchEdit().addWriteRequests(items).batchEdit();
     // console.log(data);
     return data;
   }
@@ -271,6 +268,7 @@ export default class EnvironmentService {
     const item: { [key: string]: AttributeValue } = {};
     const envId = env.envId;
     Object.entries(env).forEach(([key, value]) => {
+      console.log(`looking for ${key}`);
       if (key === 'envId') {
         key = 'id';
       }
@@ -281,13 +279,21 @@ export default class EnvironmentService {
         // const map = value.forEach((object: {id: string, value: string, description: string}) => {
         //     return {id: {S: object.id}, value: {S: object.value}, description: {S: object.description}};
         // })
-        item[key] = {
-          L: value.forEach((object: { id: string; value: string; description: string }) => {
-            return {
-              M: { id: { S: object.id }, value: { S: object.value }, description: { S: object.description } }
-            };
-          })
-        };
+        if (_.isEmpty(value)) {
+          item[key] = { L: [] };
+        } else {
+          item[key] = {
+            L: value.forEach((object: { id: string; value: string; description: string }) => {
+              return {
+                M: {
+                  id: { S: object.id },
+                  value: { S: object.value },
+                  description: { S: object.description }
+                }
+              };
+            })
+          };
+        }
       } else if (typeof value === 'string') {
         item[key] = { S: value };
       } else if (typeof value === 'number') {
