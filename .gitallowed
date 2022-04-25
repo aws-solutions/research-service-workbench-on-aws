@@ -1,0 +1,5 @@
+.github/workflows/*
+.gitallowed
+
+# Fake Account id used
+123456789012
