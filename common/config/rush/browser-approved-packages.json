@@ -8,7 +8,7 @@
     },
     {
       "name": "@amzn/eslint-config-workbench-core-eslint-custom",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/swb-app",
@@ -55,12 +55,24 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@commitlint/cli",
-      "allowedCategories": [ "production" ]
+      "name": "@awsui/collection-hooks",
+      "allowedCategories": [ "prototypes" ]
     },
     {
-      "name": "@commitlint/config-conventional",
-      "allowedCategories": [ "production" ]
+      "name": "@awsui/components-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/design-tokens",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/global-styles",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/test-utils-core",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/core",
@@ -79,12 +91,20 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
-      "name": "@rushstack/eslint-config",
+      "name": "@commitlint/cli",
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@rushstack/heft",
+      "name": "@commitlint/config-conventional",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/eslint-config",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/heft-jest-plugin",
@@ -160,7 +180,11 @@
     },
     {
       "name": "eslint",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-config-next",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "eslint-plugin-security",
@@ -184,7 +208,7 @@
     },
     {
       "name": "istanbul-badges-readme",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jest",
@@ -203,8 +227,36 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-global-css",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-i18next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-transpile-modules",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "react-dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "sass",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "semantic-release",
@@ -228,7 +280,7 @@
     },
     {
       "name": "typescript",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "uuid",
