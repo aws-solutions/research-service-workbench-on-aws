@@ -1,0 +1,77 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Cfn-nag-scan
+on: ['pull_request']
+
+jobs:
+  cfn-nag-scan:
+    name: Run cfn-nag scan
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Rush build
+        run: node common/scripts/install-run-rush.js build --verbose
+
+      - name: cdk synth
+        run: |
+          cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
+          STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
+
+      - name: Run cfn-nag on swb cdk.out
+        id: cdk
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: solutions/swb-reference/cdk.out/swb-dev-va.template.json
+          extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on onboarding template
+        id: template
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: solutions/swb-reference/src/templates
+          extra_args: --fail-on-warnings -o json
+      
+      - name: Grep cfn-nag for violations
+        uses: sergeysova/jq-action@v2
+        id: cfn-nag
+        # No. of violations: warnings + errors
+        with:
+          cmd: jq '.[].file_results.violations | length' cfn_nag.out
+
+      # - name: Fail if violations detected in cfn-nag
+      #   run: exit ${{ steps.cfn-nag.outputs.value }}

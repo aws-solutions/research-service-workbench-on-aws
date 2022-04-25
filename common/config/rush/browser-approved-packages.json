@@ -55,10 +55,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/sts",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws-sdk/types",
       "allowedCategories": [ "production" ]
     },
@@ -96,10 +92,6 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "cdk-iam-floyd",
       "allowedCategories": [ "production" ]
     },
     {
@@ -176,6 +168,10 @@
     },
     {
       "name": "typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "uuid",
       "allowedCategories": [ "production" ]
     },
     {
