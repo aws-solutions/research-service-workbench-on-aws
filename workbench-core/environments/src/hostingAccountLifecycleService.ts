@@ -27,14 +27,25 @@ export default class HostingAccountLifecycleService {
     await this.storeToDdb(accountMetadata);
   }
 
+  /**
+   * Update target account with resources required for launching environments in the account
+   * @param targetAccountId - Account where resources should be set up
+   * @param targetAccountAwsService - awsService used for setting up the account
+   * @param targetAccountStackName - StackName of Cloudformation Stack used to set up account's base resources
+   * @param portfolioId - Service Catalog portfolio that main account should share with target account
+   * @param ssmDocNameSuffix - Suffix of SSM docs that should be shared with target account
+   * @param principalArnForScPortfolio - Arn that should be associated with Service Catalog portfolio
+   * @param roleToCopyToTargetAccount - IAM role that should be copied from main account to target account
+   * @param s3ArtifactBucketName - S3 bucket that contains CFN Template for target account
+   */
   public async updateAccount(
     targetAccountId: string,
     targetAccountAwsService: AwsService,
     targetAccountStackName: string,
     portfolioId: string,
     ssmDocNameSuffix: string,
-    envManagementArn: string,
-    launchConstraintRoleName: string,
+    principalArnForScPortfolio: string,
+    roleToCopyToTargetAccount: string,
     s3ArtifactBucketName: string
   ): Promise<void> {
     console.log('Updating account');
@@ -49,12 +60,12 @@ export default class HostingAccountLifecycleService {
 
     await this._associatePrincipalIamRoleWithPortfolio(
       targetAccountAwsService,
-      envManagementArn,
+      principalArnForScPortfolio,
       portfolioId as string
     );
 
     const iamRoleCloneService = new IamRoleCloneService(this._aws, targetAccountAwsService);
-    await iamRoleCloneService.cloneRole(launchConstraintRoleName);
+    await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
 
     await this._compareHostingAccountTemplate(
       s3ArtifactBucketName,

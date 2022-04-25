@@ -7,6 +7,14 @@ export default class CloudformationService {
     this._cloudformation = cloudformation;
   }
 
+  /**
+   * Get Cloudformation output from a stack
+   * @example
+   * stackName: = stack123    outputKey = ['lambdaRoleArn']       returns: \{ 'lambdaRoleArn': "ExampleRoleArn" \}
+   * @param stackName - Stack name of CFN stack to get cloudformation output from
+   * @param outputKeys - Output keys to get value for
+   * @returns An object where the key is the output key and the value is the cloudformation output of that key.
+   */
   public async getCfnOutput(stackName: string, outputKeys: string[]): Promise<{ [key: string]: string }> {
     const outputValues: { [key: string]: string } = {};
     for (const outputKey of outputKeys) {

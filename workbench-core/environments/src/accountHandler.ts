@@ -1,7 +1,5 @@
-/* eslint-disable */
 import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import IamRoleCloneService from './iamRoleCloneService';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -9,19 +7,8 @@ export default class AccountHandler {
     this._mainAccountAwsService = mainAccountAwsService;
   }
   // TODO: Write unit tests
-  /* eslint-disable-next-line */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
   public async execute(event: any): Promise<void> {
-    /*
-     * [Done] Share SC portfolio with hosting accounts that doesn't already have SC portfolio from main account
-     * [Done] Hosting account accept portfolio (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/accept-portfolio-share.html) that was shared
-     * [Done] In hosting account, associate envManagement IAM role to SC portfolio (API (https://docs.aws.amazon.com/cli/latest/reference/servicecatalog/associate-principal-with-portfolio.html))(Example code (https://github.com/awslabs/service-workbench-on-aws/blob/5afa5a68ac8fdb4939864e52a5b13cfc0b227118/addons/addon-environment-sc-api/packages/environment-sc-workflow-steps/lib/steps/share-portfolio-with-target-acc/share-portfolio-with-target-acc.js#L84) from SWBv1)
-     * [Done] Copy LaunchConstraint role to hosting accounts that doesn't already have the role
-     * [Done] Share SSM documents with all hosting accounts that does not have the SSM document already
-     * [Done] Share all AMIs in this https://quip-amazon.com/HOa9A1K99csF/Environment-Management-Design#temp:C:HDIfa98490bd9047f0d9bfd43ee0 with all hosting account
-     * [Done] Check if all hosting accounts have updated onboard-account.cfn.yml template. If the hosting accounts does not, update hosting account status to be Needs Update
-     * [Done] Add hosting account VPC and Subnet ID to DDB. This is needed when launching environments
-     */
-
     // eslint-disable-next-line
     const { hostingAccounts, externalId, portfolioId } = await this._getMetadataFromDB();
     const hostingAccountLifecycleService = new HostingAccountLifecycleService(
@@ -84,8 +71,8 @@ export default class AccountHandler {
       hostingAccounts: [
         {
           arns: {
-            accountHandler: 'arn:aws:iam::750404249455:role/swb-dev-oh-account-1-cross-account-role',
-            envManagement: 'arn:aws:iam::750404249455:role/swb-dev-oh-account-1-env-mgmt'
+            accountHandler: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-cross-account-role',
+            envManagement: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-env-mgmt'
           },
           stackName: `swb-dev-oh-account-1`
         }

@@ -7,8 +7,8 @@ export default class S3Service {
   }
 
   /**
-   *
-   * @param s3BucketArn - The arn of the S3 bucket to place the file in
+   * Upload files to S3
+   * @param s3BucketArn - The arn of the S3 bucket to place the files in
    * @param files -
    *    fileContent: the file buffer of what you want to upload,
    *    s3Prefix: where you want to upload the file within  the s3 bucket,

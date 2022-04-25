@@ -16,7 +16,6 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
-    console.log('Inside Launch');
     // Check if launch operation is valid for request body
     if (envMetadata.envId) {
       throw new Error('envId cannot be passed in the request body when trying to launch a new environment');

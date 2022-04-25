@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-/* eslint-disable */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -224,10 +223,10 @@ export class SWBStack extends Stack {
     });
 
     // Run lambda function every 5 minutes
-    // const eventRule = new Rule(this, 'scheduleRule', {
-    //   schedule: Schedule.cron({ minute: '0/5' })
-    // });
-    // eventRule.addTarget(new targets.LambdaFunction(lambda));
+    const eventRule = new Rule(this, 'scheduleRule', {
+      schedule: Schedule.cron({ minute: '0/5' })
+    });
+    eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
 
   private _createAPILambdaRole(): Role {

@@ -37,7 +37,7 @@ export default class EnvironmentLifecycleHelper {
     const listLaunchPathResponse = await hostAwsSdk.serviceCatalog.listLaunchPaths({
       ProductId: payload.productId
     });
-    updatedPayload.ssmParameters.ProductId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
+    updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
     return this.executeSSMDocument(updatedPayload);
   }
   /**
@@ -52,9 +52,7 @@ export default class EnvironmentLifecycleHelper {
     envType: string;
     accountId: string;
   }): Promise<{ [id: string]: string }> {
-    // TODO: Get pathId required by that specific envType
-
-    // Get SSM doc ARN from main account CfN stack (shared documents need to send ARN)
+    // Get SSM doc ARN from main account CFN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
     // Assume hosting account EnvMgmt role
