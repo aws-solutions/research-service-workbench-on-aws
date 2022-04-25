@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/starter-app",
+  "name": "@amzn/example-ui-app",
   "version": "0.0.1",
   "license": "APACHE-2.0",
   "scripts": {

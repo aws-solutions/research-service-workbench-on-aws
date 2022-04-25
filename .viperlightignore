@@ -21,4 +21,4 @@ workbench-core/environments/lib/environmentLifecycleHelper.test.js
 workbench-core/environments/src/environmentLifecycleHelper.test.ts 
 
 #Fake email used
-solutions/starter-app/src/models/User.ts
+solutions/example-ui-app/src/models/User.ts
