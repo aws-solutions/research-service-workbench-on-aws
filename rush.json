@@ -84,8 +84,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-starter-app",
-      "projectFolder": "workbench-core/starter-app",
+      "packageName": "@amzn/starter-app",
+      "projectFolder": "solutions/starter-app",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     }

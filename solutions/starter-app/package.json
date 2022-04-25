@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-starter-app",
+  "name": "@amzn/starter-app",
   "version": "0.0.1",
   "license": "APACHE-2.0",
   "scripts": {
