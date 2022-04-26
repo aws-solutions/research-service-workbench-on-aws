@@ -1,5 +1,0 @@
-# Stage Name
-stage: dev
-awsRegion: us-east-2
-awsRegionShortName: oh
-rootUserEmail: root@amazon.com
