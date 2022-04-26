@@ -1,5 +1,6 @@
 import { User } from '@amzn/workbench-core-authentication';
 import { Action } from './action';
+
 /**
  * Represents what a Permission contains.
  */
@@ -14,13 +15,80 @@ export interface Permission {
   subject: string;
   /**
    * Used to restrict a {@link User}'s action to a specific field.
+   *
+   * @example
+   * Allows User update access to only 'method';
+   * ```
+   *  class Article {
+   *    method() {
+   *    }
+   *    methodTwo() {
+   *    }
+   *  }
+   *
+   * const permission:Permission = {
+   *  action: Action.UPDATE,
+   *  subject: 'Article',
+   *  fields: ['method']
+   * };
+   * ```
    */
-  field?: string[];
+  fields?: string[];
   /**
    * An object used to restrict a {@link User}'s {@link Action} only to matched subjects.
+   *
+   * @example
+   * Allows User read access to only an article with the name 'Article Title'.
+   * ```
+   * class Article {
+   *    name: string;
+   *    method() {
+   *    }
+   *    methodTwo() {
+   *    }
+   *  }
+   *
+   * const permission: Permission = {
+   *  action: Action.READ,
+   *  subject: 'Article',
+   *  condition: {name: 'Article Title'}
+   * }
+   *
+   * ```
    */
-  condition?: object;
+  conditions?: object;
+
+  /**
+   * States whether this should be forbidden or allowed.
+   */
+  inverted?: boolean;
+
+  /**
+   * Reason for why this is forbidden.
+   */
+  reason?: string;
 }
+
+/**
+ * The operation a {@link User} wants to perform.
+ */
+export interface Operation {
+  /**
+   * The {@link Action} a {@link User} wants to perform.
+   */
+  action: Action;
+
+  /**
+   * The subject that the {@link Action} acts on.
+   */
+  subject: string;
+
+  /**
+   * The field a {@link User} wants access to.
+   */
+  field?: string;
+}
+
 /**
  * A map that represents the mapping of a role to a set of {@link Permission}.
  */
