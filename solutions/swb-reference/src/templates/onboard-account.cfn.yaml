@@ -534,7 +534,7 @@ Outputs:
     Description: VPC ID
     Value: !Ref VPC
 
-  VpcPublicSubnet:
+  VpcSubnet:
     Description: A reference to the public subnet in the 1st Availability Zone
     Value: !Ref PublicSubnet
 

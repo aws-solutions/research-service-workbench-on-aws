@@ -74,7 +74,7 @@ export default class HostingAccountLifecycleService {
     );
   }
 
-  private async _compareHostingAccountTemplate(
+  public async _compareHostingAccountTemplate(
     s3ArtifactBucketName: string,
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
@@ -92,6 +92,7 @@ export default class HostingAccountLifecycleService {
         stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
       });
     const expectedTemplate: string = await streamToString(getObjResponse.Body! as Readable);
+    console.log('expectedTemplate', expectedTemplate);
     const actualTemplate = (
       await hostingAccountAwsService.cloudformation.getTemplate({ StackName: hostingAccountStackName })
     ).TemplateBody!;
@@ -114,7 +115,7 @@ export default class HostingAccountLifecycleService {
         return output.OutputKey === 'VPC';
       })!.OutputValue;
       subnetId = outputs.find((output) => {
-        return output.OutputKey === 'VpcPublicSubnet';
+        return output.OutputKey === 'VpcSubnet';
       })!.OutputValue;
 
       if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {

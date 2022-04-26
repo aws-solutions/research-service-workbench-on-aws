@@ -2,8 +2,15 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { EventBridgeClient, PutPermissionCommand } from '@aws-sdk/client-eventbridge';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
-import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import {
+  CloudFormationClient,
+  DescribeStacksCommand,
+  GetTemplateCommand
+} from '@aws-sdk/client-cloudformation';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+import { AwsService } from '@amzn/workbench-core-base';
+import { Readable } from 'stream';
 
 const constants = {
   MAIN_ACCOUNT_BUS_ARN_NAME: 'SampleMainAccountBusArn',
@@ -33,13 +40,11 @@ describe('HostingAccountLifecycleService', () => {
       ]
     });
   }
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
   test('execute does not return an error', async () => {
-    // const hostingAccountLifecycleService = new HostingAccountLifecycleService({
-    //   AWS_REGION: 'us-east-1',
-    //   STACK_NAME: 'swb-swbv2-va',
-    //   SSM_DOC_NAME_SUFFIX: 'sampleSSMDocOutput',
-    //   AMI_IDS_TO_SHARE: '[]'
-    // });
     const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
 
     const ebMock = mockClient(EventBridgeClient);
@@ -69,5 +74,57 @@ describe('HostingAccountLifecycleService', () => {
         'SampleMainAccountBusArn'
       )
     ).resolves.not.toThrowError();
+  });
+
+  test('matches: _compareHostingAccountTemplate', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
+    const readableStream = new Readable({
+      read() {}
+    });
+
+    readableStream.push('ABC');
+    readableStream.push(null);
+
+    const s3Mock = mockClient(S3Client);
+    // Mocking expected template pulled from S3
+    s3Mock.on(GetObjectCommand).resolves({
+      Body: readableStream
+    });
+
+    const cfnMock = mockClient(CloudFormationClient);
+    // Mocking actual template pulled from CFN Stack
+    cfnMock.on(GetTemplateCommand).resolves({ TemplateBody: 'ABC' });
+
+    cfnMock.on(DescribeStacksCommand).resolves({
+      Stacks: [
+        {
+          StackName: 'ExampleStack',
+          CreationTime: new Date(),
+          StackStatus: 'CREATE_COMPLETE',
+          Outputs: [
+            { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
+            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' }
+          ]
+        }
+      ]
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const writeAccountStatusSpy = jest.spyOn<HostingAccountLifecycleService, any>(
+      hostingAccountLifecycleService,
+      '_writeAccountStatusToDDB'
+    );
+    await expect(
+      hostingAccountLifecycleService._compareHostingAccountTemplate(
+        'fakeBucketName',
+        new AwsService({ region: 'us-east-1' }),
+        'fakeStack'
+      )
+    ).resolves.not.toThrowError();
+    expect(writeAccountStatusSpy).toHaveBeenCalledWith({
+      status: 'UP_TO_DATE',
+      vpcId: 'fakeVPC',
+      subnetId: 'FakeSubnet'
+    });
   });
 });
