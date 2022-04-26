@@ -100,7 +100,7 @@ describe('HostingAccountLifecycleService', () => {
           Outputs: [
             {
               OutputKey: 'SagemakerLaunchSSMDocOutput',
-              OutputValue: 'arn:aws:ssm:us-east-2:987654321012:document/swb-dev-oh-SagemakerLaunch'
+              OutputValue: 'arn:aws:ssm:us-east-2:0123456789012:document/swb-dev-oh-SagemakerLaunch'
             },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
             { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' }

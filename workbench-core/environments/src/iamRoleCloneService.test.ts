@@ -127,7 +127,7 @@ describe('iamRoleCloneService', () => {
           PolicyVersion: { Document: '' }
         })
         .on(CreatePolicyCommand)
-        .resolves({ Policy: { Arn: ' arn:aws:iam::987654321012:policy/CustomerManagedPolicy' } })
+        .resolves({ Policy: { Arn: ' arn:aws:iam::0123456789012:policy/CustomerManagedPolicy' } })
         .on(AttachRolePolicyCommand)
         .resolves({});
       await expect(service.cloneRole(roleName)).resolves.not.toThrowError();
