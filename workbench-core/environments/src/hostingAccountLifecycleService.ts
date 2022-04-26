@@ -64,6 +64,7 @@ export default class HostingAccountLifecycleService {
       portfolioId as string
     );
 
+    console.log('associate IAM role');
     const iamRoleCloneService = new IamRoleCloneService(this._aws, targetAccountAwsService);
     await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
 
@@ -74,7 +75,7 @@ export default class HostingAccountLifecycleService {
     );
   }
 
-  public async _compareHostingAccountTemplate(
+  private async _compareHostingAccountTemplate(
     s3ArtifactBucketName: string,
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
@@ -92,7 +93,6 @@ export default class HostingAccountLifecycleService {
         stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
       });
     const expectedTemplate: string = await streamToString(getObjResponse.Body! as Readable);
-    console.log('expectedTemplate', expectedTemplate);
     const actualTemplate = (
       await hostingAccountAwsService.cloudformation.getTemplate({ StackName: hostingAccountStackName })
     ).TemplateBody!;
