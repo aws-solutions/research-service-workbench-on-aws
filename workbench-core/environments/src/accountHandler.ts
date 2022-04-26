@@ -6,7 +6,6 @@ export default class AccountHandler {
   public constructor(mainAccountAwsService: AwsService) {
     this._mainAccountAwsService = mainAccountAwsService;
   }
-  // TODO: Write unit tests
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
   public async execute(event: any): Promise<void> {
     // eslint-disable-next-line
