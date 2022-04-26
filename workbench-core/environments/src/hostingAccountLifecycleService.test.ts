@@ -27,6 +27,10 @@ const constants = {
 };
 
 describe('HostingAccountLifecycleService', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(cfMock: AwsStub<any, any>): void {
     cfMock.on(DescribeStacksCommand).resolves({
@@ -49,10 +53,6 @@ describe('HostingAccountLifecycleService', () => {
       ]
     });
   }
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
   test('execute does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
 

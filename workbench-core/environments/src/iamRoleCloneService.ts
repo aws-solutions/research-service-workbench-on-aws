@@ -25,6 +25,7 @@ export default class IamRoleCloneService {
   }
 
   private async _detachPoliciesThatAreNotMatching(roleName: string): Promise<void> {
+    console.log(`Detaching policies that are not matching for role ${roleName}`);
     const sourceManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._sourceAccount);
     const targetManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._targetAccount);
 
@@ -63,7 +64,7 @@ export default class IamRoleCloneService {
   }
 
   private async _copyRole(roleName: string): Promise<void> {
-    console.log('Copying LC');
+    console.log(`Copying role ${roleName} to target account`);
     const { Role: sourceRole } = await this._sourceAccount.iam.getRole({
       RoleName: roleName
     });
@@ -108,8 +109,9 @@ export default class IamRoleCloneService {
       });
     }
   }
+
   private async _copyInlinePolicies(roleName: string): Promise<void> {
-    console.log('Copying inline policies');
+    console.log(`Copying inline policies for role ${roleName}`);
     const inlinePoliciesToAddToTargetAccount = await this._getInlinePoliciesToAddToTargetAccount(roleName);
     console.log(
       `Adding Inline Policies ${inlinePoliciesToAddToTargetAccount.map((policy) => {
@@ -126,7 +128,7 @@ export default class IamRoleCloneService {
   }
 
   private async _copyManagedPolicies(roleName: string): Promise<void> {
-    console.log('Copying managed policies');
+    console.log(`Copying managed policies for role ${roleName}`);
     const srcManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._sourceAccount);
     const targetManagedPolicies = await this._getAllManagedRolePolicies(roleName, this._targetAccount);
 
@@ -192,28 +194,26 @@ export default class IamRoleCloneService {
     const targetInlinePolicyNames = await this._getAllInlineRolePoliciesName(roleName, this._targetAccount);
 
     const policiesToAddToTargetAccount: Array<{ policyName: string; policyDocument: string }> = [];
-    if (srcInlinePolicyNames) {
-      for (const srcPolicyName of srcInlinePolicyNames) {
-        const policyParam: GetRolePolicyCommandInput = {
-          PolicyName: srcPolicyName,
-          RoleName: roleName
-        };
-        const sourcePolicyDocument = await this._sourceAccount.iam.getRolePolicy(policyParam);
-        // Add policies that are not in target role, but is in source role
-        if (targetInlinePolicyNames && !targetInlinePolicyNames.includes(srcPolicyName)) {
+    for (const srcPolicyName of srcInlinePolicyNames) {
+      const policyParam: GetRolePolicyCommandInput = {
+        PolicyName: srcPolicyName,
+        RoleName: roleName
+      };
+      const sourcePolicyDocument = await this._sourceAccount.iam.getRolePolicy(policyParam);
+      // Add policies that are not in target role, but is in source role
+      if (!targetInlinePolicyNames.includes(srcPolicyName)) {
+        policiesToAddToTargetAccount.push({
+          policyName: srcPolicyName,
+          policyDocument: sourcePolicyDocument.PolicyDocument!
+        });
+      } else {
+        const targetPolicyDocument = await this._targetAccount.iam.getRolePolicy(policyParam);
+        // Update policies that are in both account but target account policy is different from source account
+        if (sourcePolicyDocument.PolicyDocument !== targetPolicyDocument.PolicyDocument) {
           policiesToAddToTargetAccount.push({
             policyName: srcPolicyName,
             policyDocument: sourcePolicyDocument.PolicyDocument!
           });
-        } else {
-          const targetPolicyDocument = await this._targetAccount.iam.getRolePolicy(policyParam);
-          // Update policies that are in both account but target account policy is different from source account
-          if (sourcePolicyDocument.PolicyDocument !== targetPolicyDocument.PolicyDocument) {
-            policiesToAddToTargetAccount.push({
-              policyName: srcPolicyName,
-              policyDocument: sourcePolicyDocument.PolicyDocument!
-            });
-          }
         }
       }
     }
@@ -254,6 +254,8 @@ export default class IamRoleCloneService {
         allAttachedPolicies = allAttachedPolicies.concat(response.AttachedPolicies);
         isTruncated = response.IsTruncated ?? false;
         marker = response.Marker;
+      } else {
+        isTruncated = false;
       }
     } while (isTruncated);
     return allAttachedPolicies;
