@@ -1,0 +1,70 @@
+description: SSM document to terminate a Sagemaker instance
+schemaVersion: '0.3'
+parameters:
+  InstanceName:
+    type: String
+    description: 'The name of the Sagemaker instance being terminated.'
+    default: ''
+  ProvisionedProductId:
+    type: String
+    description: 'The ID of the Sagemaker provisioned product being terminated.'
+    default: ''
+  TerminateToken:
+    type: String
+    description: '(Required) The unique token ID assigned to this request.'
+    default: ''
+  EventBusName:
+    type: String
+    description: 'The main account event bridge bus name.'
+    default: ''
+mainSteps:
+  - name: TerminateSagemaker
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: TerminateProvisionedProduct
+      ProvisionedProductId: '{{ ProvisionedProductId }}'
+      TerminateToken: '{{ TerminateToken }}'
+    outputs:
+      - Name: RecordId
+        Type: String
+        Selector: '$.RecordDetail.RecordId'
+    nextStep: WaitForTerminating
+  - name: WaitForTerminating
+    action: 'aws:waitForAwsResourceProperty'
+    timeoutSeconds: 600
+    inputs:
+      Service: servicecatalog
+      Api: DescribeProvisionedProduct
+      Id: '{{ ProvisionedProductId }}'
+      DesiredValues:
+        - SUCCEEDED
+      PropertySelector: '$.ProvisionedProductDetail.Status'
+    outputs:
+      - Name: ProvisionedProductDetail
+        Type: StringMap
+        Selector: '$.ProvisionedProductDetail'
+    onFailure: step:PushFailureStatusToEventBridge
+    nextStep: PushMetadataToEventBridge
+  - name: PushMetadataToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
+          DetailType: 'Success'
+          EventBusName: '{{ EventBusName }}'
+          Source: 'TerminateSagemaker'
+    isEnd: true
+  - name: PushFailureStatusToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
+          DetailType: 'Failure'
+          EventBusName: '{{ EventBusName }}'
+          Source: 'TerminateSagemaker'
+    isEnd: true

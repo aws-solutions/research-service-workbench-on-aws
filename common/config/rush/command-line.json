@@ -252,6 +252,36 @@
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
     },
+    {
+      "name": "commitlint",
+      "commandKind": "global",
+      "summary": "Conventional commit check on commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitlint",
+      "shellCommand": "commitlint"
+    },
+    {
+      "name": "commitizen",
+      "commandKind": "global",
+      "summary": "Prepare conventional commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitizen",
+      "shellCommand": ".github/workflows/scripts/commitizen.sh"
+    },
+    {
+      "name": "git-secrets-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a git-secrets scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "/bin/bash .github/workflows/scripts/git-secrets-scan.sh"
+    },
+    {
+      "name": "viperlight-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a viperlight scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "/bin/bash .github/workflows/scripts/viperlight-scan.sh"
+    },
     // {
     //   "name": "heft:build",
     //   "commandKind": "bulk",
@@ -275,6 +305,19 @@
    * For example, you might define a "--production" parameter for the "rush build" command.
    */
   "parameters": [
+    {
+      "parameterKind": "string",
+      "argumentName": "FILE",
+      "longName": "--edit",
+      "description": "read last commit message from the specified file or fallbacks to ./.git/COMMIT_EDITMSG",
+      "associatedCommands": ["commitlint"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Option to run make install in ci jobs",
+      "associatedCommands": ["git-secrets-scan"]
+    },
     {
       "parameterKind": "flag",
       "longName": "--ci",

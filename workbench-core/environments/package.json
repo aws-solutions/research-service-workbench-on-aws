@@ -1,7 +1,7 @@
 {
   "name": "@amzn/environments",
   "version": "0.0.22",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": "ssh://git.amazon.com/pkg/Ma-mono",
@@ -11,21 +11,47 @@
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "test": "heft test --clean && rushx make-badges",
     "build:test": "rushx build && rushx test",
-    "test:only": "heft test --clean"
+    "test:only": "heft test --clean",
+    "jest": "jest"
+  },
+  "dependencies": {
+    "@aws-sdk/client-service-catalog": "^3.58.0",
+    "@aws-sdk/client-s3": "^3.58.0",
+    "md5-file": "^5.0.0",
+    "@aws-sdk/client-cloudformation": "^3.58.0",
+    "@amzn/workbench-core-base": "workspace:*",
+    "@aws-sdk/client-eventbridge": "^3.66.0",
+    "@aws-sdk/client-ec2": "^3.60.0",
+    "@aws-sdk/client-ssm": "^3.58.0",
+    "generate-password": "^1.7.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.67.0",
+    "@aws-sdk/client-sts": "^3.58.0"
   },
   "devDependencies": {
     "@rushstack/heft": "^0.44.2",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^16",
-    "typescript": "~4.5.2",
+    "@types/node": "^12",
+    "eslint": "^8.7.0",
+    "typescript": "^4.5.2",
     "istanbul-badges-readme": "1.8.1",
+    "@types/jest": "^27.4.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "eslint": "~8.7.0",
-    "eslint-plugin-security": "~1.4.0",
-    "@rushstack/eslint-config": "^2.5.1",
-    "@types/jest": "~27.4.1",
-    "jest": "~27.5.1"
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3",
+    "aws-sdk-client-mock": "^0.6.2",
+    "@aws-sdk/types": "^3.55.0",
+    "@rushstack/eslint-config": "^2.5.1"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    },
+    "testRegex": ".test.ts"
   }
 }
