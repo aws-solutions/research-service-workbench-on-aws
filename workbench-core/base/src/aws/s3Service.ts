@@ -13,7 +13,6 @@ export default class S3Service {
    *    fileContent: the file buffer of what you want to upload,
    *    s3Prefix: where you want to upload the file within  the s3 bucket,
    *    fileName: the name you want to give the file in s3
-   *
    */
   public async uploadFiles(
     s3BucketArn: string,

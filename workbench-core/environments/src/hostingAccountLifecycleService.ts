@@ -29,26 +29,37 @@ export default class HostingAccountLifecycleService {
 
   /**
    * Update target account with resources required for launching environments in the account
-   * @param targetAccountId - Account where resources should be set up
-   * @param targetAccountAwsService - awsService used for setting up the account
-   * @param targetAccountStackName - StackName of Cloudformation Stack used to set up account's base resources
-   * @param portfolioId - Service Catalog portfolio that main account should share with target account
-   * @param ssmDocNameSuffix - Suffix of SSM docs that should be shared with target account
-   * @param principalArnForScPortfolio - Arn that should be associated with Service Catalog portfolio
-   * @param roleToCopyToTargetAccount - IAM role that should be copied from main account to target account
-   * @param s3ArtifactBucketName - S3 bucket that contains CFN Template for target account
+   * @param params - Listed below
+   * targetAccountId - Account where resources should be set up.
+   * targetAccountAwsService - awsService used for setting up the account.
+   * targetAccountStackName - StackName of Cloudformation Stack used to set up account's base resources.
+   * portfolioId - Service Catalog portfolio that main account should share with target account.
+   * ssmDocNameSuffix - Suffix of SSM docs that should be shared with target account.
+   * principalArnForScPortfolio - Arn that should be associated with Service Catalog portfolio.
+   * roleToCopyToTargetAccount - IAM role that should be copied from main account to target account.
+   * s3ArtifactBucketName - S3 bucket that contains CFN Template for target account.
    */
-  public async updateAccount(
-    targetAccountId: string,
-    targetAccountAwsService: AwsService,
-    targetAccountStackName: string,
-    portfolioId: string,
-    ssmDocNameSuffix: string,
-    principalArnForScPortfolio: string,
-    roleToCopyToTargetAccount: string,
-    s3ArtifactBucketName: string
-  ): Promise<void> {
+  public async updateAccount(params: {
+    targetAccountId: string;
+    targetAccountAwsService: AwsService;
+    targetAccountStackName: string;
+    portfolioId: string;
+    ssmDocNameSuffix: string;
+    principalArnForScPortfolio: string;
+    roleToCopyToTargetAccount: string;
+    s3ArtifactBucketName: string;
+  }): Promise<void> {
     console.log('Updating account');
+    const {
+      targetAccountId,
+      targetAccountAwsService,
+      targetAccountStackName,
+      portfolioId,
+      ssmDocNameSuffix,
+      principalArnForScPortfolio,
+      roleToCopyToTargetAccount,
+      s3ArtifactBucketName
+    } = params;
     const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
     await this._shareSSMDocument(ssmDocuments, targetAccountId);
     await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
@@ -64,23 +75,23 @@ export default class HostingAccountLifecycleService {
       portfolioId as string
     );
 
-    console.log('associate IAM role');
     const iamRoleCloneService = new IamRoleCloneService(this._aws, targetAccountAwsService);
     await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
 
-    await this._compareHostingAccountTemplate(
+    await this._updateHostingAccountStatus(
       s3ArtifactBucketName,
       targetAccountAwsService,
       targetAccountStackName
     );
   }
 
-  private async _compareHostingAccountTemplate(
+  private async _updateHostingAccountStatus(
     s3ArtifactBucketName: string,
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
   ): Promise<void> {
-    console.log('Begin compare hosting account template');
+    console.log('Check and update hosting account status');
+    // Check if hosting account stack has the latest CFN template
     const getObjResponse = await this._aws.s3.getObject({
       Bucket: s3ArtifactBucketName,
       Key: 'onboard-account.cfn.yaml'

@@ -259,7 +259,7 @@ Resources:
   PolicyCrossAccountHandler:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows main account to setup hosting account with required resources for launch environment
+      Description: Allows main account to setup hosting account with required resources for launching environments
       PolicyDocument:
         Version: '2012-10-17'
         Statement:

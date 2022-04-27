@@ -23,6 +23,7 @@ export default class AccountHandler {
       process.env.LAUNCH_CONSTRAINT_ROLE_NAME!,
       process.env.S3_ARTIFACT_BUCKET_ARN_NAME!
     ]);
+
     for (const hostingAccount of hostingAccounts) {
       const hostingAccountId = this._getAccountId(hostingAccount.arns.accountHandler);
       let hostingAccountAwsService: AwsService;
@@ -41,16 +42,16 @@ export default class AccountHandler {
       }
 
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
-      await hostingAccountLifecycleService.updateAccount(
-        hostingAccountId,
-        hostingAccountAwsService,
-        hostingAccount.stackName,
+      await hostingAccountLifecycleService.updateAccount({
+        targetAccountId: hostingAccountId,
+        targetAccountAwsService: hostingAccountAwsService,
+        targetAccountStackName: hostingAccount.stackName,
         portfolioId,
-        process.env.SSM_DOC_NAME_SUFFIX!,
-        hostingAccount.arns.envManagement,
-        launchConstraintRoleName,
+        ssmDocNameSuffix: process.env.SSM_DOC_NAME_SUFFIX!,
+        principalArnForScPortfolio: hostingAccount.arns.envManagement,
+        roleToCopyToTargetAccount: launchConstraintRoleName,
         s3ArtifactBucketName
-      );
+      });
     }
   }
 
