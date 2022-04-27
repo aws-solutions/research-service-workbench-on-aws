@@ -15,6 +15,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authentication",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },
@@ -95,14 +99,6 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
-      "name": "@commitlint/cli",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@commitlint/config-conventional",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -157,10 +153,6 @@
     {
       "name": "babel-jest",
       "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "cdk-iam-floyd",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -257,10 +249,6 @@
     {
       "name": "sass",
       "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "semantic-release",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "sharp",
