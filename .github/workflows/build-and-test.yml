@@ -52,7 +52,9 @@ jobs:
         run: node common/scripts/install-run-rush.js test:only --verbose
 
       - name: Code Coverage badge check
-        run: node common/scripts/install-run-rush.js make-badges --ci
+        run: |
+          echo $GITHUB_REF
+          node common/scripts/install-run-rush.js make-badges --ci
 
       - name: Configure AWS Credentials
         if: github.ref == 'refs/heads/feature/code-deployment-cleanup'
