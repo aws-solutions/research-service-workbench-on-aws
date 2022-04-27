@@ -1,0 +1,318 @@
+// DO NOT ADD COMMENTS IN THIS FILE.  They will be lost when the Rush tool resaves it.
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
+  "packages": [
+    {
+      "name": "@amzn/environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/eslint-config-workbench-core-eslint-custom",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@amzn/swb-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/assert",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-cloudformation",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-cognito-identity-provider",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ec2",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-eventbridge",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-service-catalog",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-ssm",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-sts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/types",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@awsui/collection-hooks",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/components-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/design-tokens",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/global-styles",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@awsui/test-utils-core",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/core",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-env",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-typescript",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@rushstack/eslint-config",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft-jest-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-node-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@testing-library/dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/jest-dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@testing-library/user-event",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@vendia/serverless-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-cdk",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-cdk-lib",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-lambda",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws-sdk-client-mock",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "babel-jest",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "cdk-nag",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cdk-ssm-document",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "concurrently",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "constructs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "esbuild",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "eslint",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-config-next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-security",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "eslint-plugin-testing-library",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "fast-check",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "generate-password",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "istanbul-badges-readme",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "jest",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "jest-fast-check",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "js-yaml",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lambda-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "md5-file",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-global-css",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-i18next",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "next-transpile-modules",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "nodemon",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "react",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "react-dom",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "request",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "sass",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "sharp",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "supertest",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "triple-beam",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "ts-jest",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "ts-node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "typescript",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "uuid",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "winston-transport",
+      "allowedCategories": [ "production" ]
+    }
+  ]
+}

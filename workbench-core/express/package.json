@@ -16,11 +16,11 @@
     "start": "node lib/index.js"
   },
   "devDependencies": {
-    "@rushstack/heft": "^0.44.2",
+    "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^12",
+    "@types/node": "^14",
     "typescript": "^4.5.2",
     "istanbul-badges-readme": "1.8.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -30,7 +30,7 @@
     "lambda-build": "^1.0.6",
     "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
-    "axios": "^0.26.1",
+    "axios": "^0.27.1",
     "@types/supertest": "^2.0.12",
     "supertest": "^6.2.2",
     "request": "^2.88.2",

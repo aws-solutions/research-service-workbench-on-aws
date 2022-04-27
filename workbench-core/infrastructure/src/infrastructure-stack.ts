@@ -1,10 +1,8 @@
-import { Stack, StackProps, CfnOutput, aws_logs } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
-import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
-import { CfnStage } from 'aws-cdk-lib/aws-apigatewayv2';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
@@ -51,12 +49,12 @@ export class InfrastructureStack extends Stack {
     //   stageName: "$default"
     // })
 
-    const defaultStage = httpApi.defaultStage?.node.defaultChild as CfnStage;
+    // const defaultStage = httpApi.defaultStage?.node.defaultChild as CfnStage;
 
-    defaultStage.accessLogSettings = {
-      destinationArn: logGroup.logGroupArn,
-      format: `$context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId`
-    };
+    // defaultStage.accessLogSettings = {
+    //   destinationArn: logGroup.logGroupArn,
+    //   format: `$context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId`
+    // };
 
     // eslint-disable-next-line no-new
     new CfnOutput(this, 'HttpEndpoint', {
