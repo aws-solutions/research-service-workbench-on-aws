@@ -146,16 +146,16 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     await expect(
-      hostingAccountLifecycleService.updateAccount(
-        '0123456789012',
-        new AwsService({ region: 'us-east-1' }),
-        'swb-dev-va-hosting-account',
-        'port-1234',
-        'SSMDocOutput',
-        'arn:aws:iam::0123456789012:role/swb-dev-va-hosting-account-env-mgmt',
-        'swb-dev-va-LaunchConstraint',
-        'artifactBucket'
-      )
+      hostingAccountLifecycleService.updateAccount({
+        targetAccountId: '0123456789012',
+        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountStackName: 'swb-dev-va-hosting-account',
+        portfolioId: 'port-1234',
+        ssmDocNameSuffix: 'SSMDocOutput',
+        principalArnForScPortfolio: 'arn:aws:iam::0123456789012:role/swb-dev-va-hosting-account-env-mgmt',
+        roleToCopyToTargetAccount: 'swb-dev-va-LaunchConstraint',
+        s3ArtifactBucketName: 'artifactBucket'
+      })
     ).resolves.not.toThrowError();
 
     expect(IamRoleCloneService).toBeCalled();
