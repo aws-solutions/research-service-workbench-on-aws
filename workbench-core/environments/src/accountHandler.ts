@@ -1,4 +1,4 @@
-import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
+import { AwsService } from '@amzn/workbench-core-base';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
@@ -15,7 +15,8 @@ export default class AccountHandler {
       process.env.STACK_NAME!
     );
 
-    const cfService = new CloudformationService(this._mainAccountAwsService.cloudformation);
+    // const cfService = new CloudformationService(this._mainAccountAwsService.clients.cloudformation);
+    const cfService = this._mainAccountAwsService.helpers.cloudformation;
     const {
       [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName,
       [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: s3ArtifactBucketArn

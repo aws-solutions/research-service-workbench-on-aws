@@ -34,7 +34,7 @@ export default class EnvironmentLifecycleHelper {
       // externalId: <accountIdDDBMetadata>.externalId
     });
 
-    const listLaunchPathResponse = await hostAwsSdk.serviceCatalog.listLaunchPaths({
+    const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
       ProductId: payload.productId
     });
     updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
@@ -67,7 +67,7 @@ export default class EnvironmentLifecycleHelper {
 
     // Execute SSM document in hosting account
     if (hostAwsSdk) {
-      await hostAwsSdk.ssm.startAutomationExecution({
+      await hostAwsSdk.clients.ssm.startAutomationExecution({
         DocumentName: ssmDocArn,
         Parameters: payload.ssmParameters
       });
@@ -80,7 +80,7 @@ export default class EnvironmentLifecycleHelper {
     const describeStackParam = {
       StackName: process.env.STACK_NAME!
     };
-    const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
       return output.OutputKey && output.OutputKey === ssmDocOutputName;
@@ -131,7 +131,7 @@ export default class EnvironmentLifecycleHelper {
       StackName: process.env.STACK_NAME!
     };
 
-    const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const eventBusArnOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
       return output.OutputKey && output.OutputKey === process.env.MAIN_ACCOUNT_BUS_ARN_NAME!;

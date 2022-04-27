@@ -1,4 +1,4 @@
-import S3 from './services/s3';
+import S3 from '../clients/s3';
 
 export default class S3Service {
   private _s3: S3;

@@ -1,5 +1,5 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
+import { AwsService } from '@amzn/workbench-core-base';
 
 import fs from 'fs';
 import md5File from 'md5-file';
@@ -54,7 +54,7 @@ export default class ServiceCatalogSetup {
     }
     console.log('PortfolioId', portfolioId);
 
-    const cfService = new CloudformationService(this._aws.cloudformation);
+    const cfService = this._aws.helpers.cloudformation;
     const {
       [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn,
       [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
@@ -134,7 +134,7 @@ export default class ServiceCatalogSetup {
     };
 
     try {
-      await this._aws.serviceCatalog.createConstraint(lcParam);
+      await this._aws.clients.serviceCatalog.createConstraint(lcParam);
     } catch (e) {
       if (
         e instanceof InvalidParametersException &&
@@ -158,7 +158,7 @@ export default class ServiceCatalogSetup {
         Body: fileContent
       };
 
-      await this._aws.s3.putObject(putObjectParam);
+      await this._aws.clients.s3.putObject(putObjectParam);
     }
   }
 
@@ -175,7 +175,7 @@ export default class ServiceCatalogSetup {
       Prefix: prefix
     };
 
-    const listObjectOutput = await this._aws.s3.listObject(listS3ObjectsParam);
+    const listObjectOutput = await this._aws.clients.s3.listObject(listS3ObjectsParam);
 
     const S3FileNameToEtag: { [key: string]: string } = {};
     if (listObjectOutput.Contents) {
@@ -215,7 +215,7 @@ export default class ServiceCatalogSetup {
       Id: productId
     };
 
-    const product = await this._aws.serviceCatalog.describeProductAsAdmin(describeProductParam);
+    const product = await this._aws.clients.serviceCatalog.describeProductAsAdmin(describeProductParam);
 
     if (product.ProvisioningArtifactSummaries) {
       const names: string[] = product.ProvisioningArtifactSummaries.map((artifact) => {
@@ -249,7 +249,7 @@ export default class ServiceCatalogSetup {
         }
       };
 
-      await this._aws.serviceCatalog.createProvisioningArtifact(provisioningArtifactParam);
+      await this._aws.clients.serviceCatalog.createProvisioningArtifact(provisioningArtifactParam);
       console.log('Successfully created new version of product');
     }
   }
@@ -259,7 +259,7 @@ export default class ServiceCatalogSetup {
       PortfolioId: portfolioId
     };
 
-    const productsResponse = await this._aws.serviceCatalog.searchProductsAsAdmin(searchProductParam);
+    const productsResponse = await this._aws.clients.serviceCatalog.searchProductsAsAdmin(searchProductParam);
     let product: ProductViewDetail | undefined = undefined;
     if (productsResponse.ProductViewDetails) {
       product = productsResponse.ProductViewDetails.find((detail: ProductViewDetail) => {
@@ -277,7 +277,7 @@ export default class ServiceCatalogSetup {
         PageToken: pageToken,
         PageSize: 20
       };
-      const listPortfolioOutput = await this._aws.serviceCatalog.listPortfolios(listPortfolioInput);
+      const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
       pageToken = listPortfolioOutput.NextPageToken;
       if (listPortfolioOutput.PortfolioDetails) {
         portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
@@ -297,7 +297,7 @@ export default class ServiceCatalogSetup {
       Description: 'Portfolio for managing SWB environments'
     };
 
-    const response = await this._aws.serviceCatalog.createPortfolio(portfolioToCreateParam);
+    const response = await this._aws.clients.serviceCatalog.createPortfolio(portfolioToCreateParam);
     return response.PortfolioDetail!.Id!;
   }
 
@@ -322,7 +322,7 @@ export default class ServiceCatalogSetup {
         Description: 'Auto-created by post deployment script'
       }
     };
-    const response = await this._aws.serviceCatalog.createProduct(productToCreateParam);
+    const response = await this._aws.clients.serviceCatalog.createProduct(productToCreateParam);
     await this._associateProductWithPortfolio(
       response.ProductViewDetail!.ProductViewSummary!.ProductId!,
       portfolioId
@@ -336,6 +336,6 @@ export default class ServiceCatalogSetup {
       ProductId: productId
     };
 
-    await this._aws.serviceCatalog.associateProductWithPorfolio(associateProductParam);
+    await this._aws.clients.serviceCatalog.associateProductWithPorfolio(associateProductParam);
   }
 }

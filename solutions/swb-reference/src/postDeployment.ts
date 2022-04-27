@@ -3,7 +3,7 @@ import { CognitoSetup, ServiceCatalogSetup } from '@amzn/environments';
 import { getConstants } from './constants';
 import { join } from 'path';
 import fs from 'fs';
-import { AwsService, CloudformationService, S3Service } from '@amzn/workbench-core-base';
+import { AwsService } from '@amzn/workbench-core-base';
 async function run(): Promise<void> {
   const {
     AWS_REGION,
@@ -39,13 +39,13 @@ async function uploadOnboardAccountCfnToS3(): Promise<void> {
   console.log('Uploading onboard-account.cfn.yaml to S3');
   const { AWS_REGION, S3_ARTIFACT_BUCKET_ARN_NAME, STACK_NAME } = getConstants();
   const awsService = new AwsService({ region: AWS_REGION });
-  const cfService = new CloudformationService(awsService.cloudformation);
+  const cfService = awsService.helpers.cloudformation;
   const { [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn } = await cfService.getCfnOutput(STACK_NAME, [
     S3_ARTIFACT_BUCKET_ARN_NAME
   ]);
   const onboardAccountFilePath = join(__dirname, '../src/templates/onboard-account.cfn.yaml');
   const onboardAccountFile = fs.readFileSync(onboardAccountFilePath);
-  const s3Service = new S3Service(awsService.s3);
+  const s3Service = awsService.helpers.s3;
   await s3Service.uploadFiles(s3ArtifactBucketArn, [
     { fileContent: onboardAccountFile, fileName: 'onboard-account.cfn.yaml', s3Prefix: '' }
   ]);

@@ -1,4 +1,4 @@
-import { AwsService, CloudformationService } from '@amzn/workbench-core-base';
+import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
 import { Readable } from 'stream';
@@ -19,7 +19,7 @@ export default class HostingAccountLifecycleService {
     },
     mainAccountBusArnName: string
   ): Promise<void> {
-    const cfService = new CloudformationService(this._aws.cloudformation);
+    const cfService = this._aws.helpers.cloudformation;
     const { [mainAccountBusArnName]: mainAccountBusName } = await cfService.getCfnOutput(this._stackName, [
       mainAccountBusArnName
     ]);
@@ -92,7 +92,7 @@ export default class HostingAccountLifecycleService {
   ): Promise<void> {
     console.log('Check and update hosting account status');
     // Check if hosting account stack has the latest CFN template
-    const getObjResponse = await this._aws.s3.getObject({
+    const getObjResponse = await this._aws.clients.s3.getObject({
       Bucket: s3ArtifactBucketName,
       Key: 'onboard-account.cfn.yaml'
     });
@@ -105,19 +105,21 @@ export default class HostingAccountLifecycleService {
       });
     const expectedTemplate: string = await streamToString(getObjResponse.Body! as Readable);
     const actualTemplate = (
-      await hostingAccountAwsService.cloudformation.getTemplate({ StackName: hostingAccountStackName })
+      await hostingAccountAwsService.clients.cloudformation.getTemplate({
+        StackName: hostingAccountStackName
+      })
     ).TemplateBody!;
 
     const removeCommentsAndSpaces = (template: string): string => {
       return template.replace(/#.*/g, '').replace(/\s+/g, '');
     };
 
-    const describeStackResponse = await hostingAccountAwsService.cloudformation.describeStacks({
+    const describeStackResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
     let vpcId: string | undefined;
     let subnetId: string | undefined;
-    const describeCfResponse = await hostingAccountAwsService.cloudformation.describeStacks({
+    const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
     if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
@@ -154,12 +156,12 @@ export default class HostingAccountLifecycleService {
     portfolioId: string
   ): Promise<void> {
     console.log(`Sharing Service Catalog Portfolio ${portfolioId} with account ${hostingAccountId} `);
-    await this._aws.serviceCatalog.createPortfolioShare({
+    await this._aws.clients.serviceCatalog.createPortfolioShare({
       PortfolioId: portfolioId,
       AccountId: hostingAccountId
     });
 
-    await hostingAccountAwsService.serviceCatalog.acceptPortfolioShare({ PortfolioId: portfolioId });
+    await hostingAccountAwsService.clients.serviceCatalog.acceptPortfolioShare({ PortfolioId: portfolioId });
   }
 
   private async _associatePrincipalIamRoleWithPortfolio(
@@ -168,7 +170,7 @@ export default class HostingAccountLifecycleService {
     portfolioId: string
   ): Promise<void> {
     console.log(`Associating ${iamRole} with porfolio ${portfolioId}`);
-    await hostingAccountAwsService.serviceCatalog.associatePrincipalWithPortfolio({
+    await hostingAccountAwsService.clients.serviceCatalog.associatePrincipalWithPortfolio({
       PortfolioId: portfolioId,
       PrincipalARN: iamRole,
       PrincipalType: 'IAM'
@@ -182,7 +184,7 @@ export default class HostingAccountLifecycleService {
       Principal: accountId,
       StatementId: 'Allow-main-account-to-receive-host-account-events'
     };
-    await this._aws.eventBridge.putPermission(params);
+    await this._aws.clients.eventBridge.putPermission(params);
   }
 
   public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
@@ -193,7 +195,7 @@ export default class HostingAccountLifecycleService {
           Attribute: 'LaunchPermission',
           LaunchPermission: { Add: [{ UserId: targetAccountId }] }
         };
-        await this._aws.ec2.modifyImageAttribute(params);
+        await this._aws.clients.ec2.modifyImageAttribute(params);
       }
     }
   }
@@ -204,7 +206,7 @@ export default class HostingAccountLifecycleService {
   private async _shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
     for (const ssmDoc of ssmDocuments) {
       const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
-      await this._aws.ssm.modifyDocumentPermission(params);
+      await this._aws.clients.ssm.modifyDocumentPermission(params);
     }
   }
 
@@ -229,7 +231,7 @@ export default class HostingAccountLifecycleService {
       StackName: stackName
     };
 
-    const stackDetails = await this._aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this._aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutputs = stackDetails.Stacks![0].Outputs!.filter((output: Output) => {
       return output.OutputKey && output.OutputKey.endsWith(ssmDocNameSuffix);

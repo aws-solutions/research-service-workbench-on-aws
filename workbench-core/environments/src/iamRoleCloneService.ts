@@ -42,7 +42,7 @@ export default class IamRoleCloneService {
     );
 
     for (const policy of extraPoliciesInTargetAccount) {
-      await this._targetAccount.iam.detachRolePolicy({
+      await this._targetAccount.clients.iam.detachRolePolicy({
         RoleName: roleName,
         PolicyArn: policy.PolicyArn
       });
@@ -56,7 +56,7 @@ export default class IamRoleCloneService {
     });
 
     for (const policyName of extraInlinePoliciesInTargetAccount) {
-      await this._targetAccount.iam.deleteRolePolicy({
+      await this._targetAccount.clients.iam.deleteRolePolicy({
         PolicyName: policyName,
         RoleName: roleName
       });
@@ -65,13 +65,13 @@ export default class IamRoleCloneService {
 
   private async _copyRole(roleName: string): Promise<void> {
     console.log(`Copying role ${roleName} to target account`);
-    const { Role: sourceRole } = await this._sourceAccount.iam.getRole({
+    const { Role: sourceRole } = await this._sourceAccount.clients.iam.getRole({
       RoleName: roleName
     });
 
     let targetRole: Role;
     try {
-      const response = await this._targetAccount.iam.getRole({
+      const response = await this._targetAccount.clients.iam.getRole({
         RoleName: roleName
       });
       targetRole = response.Role!;
@@ -79,7 +79,7 @@ export default class IamRoleCloneService {
       if (e instanceof IAMServiceException && e.name === 'NoSuchEntity') {
         console.log('Creating target role because target role does not exist in hosting account');
         if (sourceRole) {
-          const response = await this._targetAccount.iam.createRole({
+          const response = await this._targetAccount.clients.iam.createRole({
             RoleName: roleName,
             AssumeRolePolicyDocument: sourceRole.AssumeRolePolicyDocument
               ? decodeURIComponent(sourceRole.AssumeRolePolicyDocument)
@@ -103,7 +103,7 @@ export default class IamRoleCloneService {
       : undefined;
     if (sourceRoleAssumeRolePolicyDocument !== targetRoleAssumeRolePolicyDocument) {
       console.log('Updating target role assumeRolePolicyDocument');
-      await this._targetAccount.iam.updateAssumeRolePolicy({
+      await this._targetAccount.clients.iam.updateAssumeRolePolicy({
         RoleName: roleName,
         PolicyDocument: sourceRole!.AssumeRolePolicyDocument
       });
@@ -119,7 +119,7 @@ export default class IamRoleCloneService {
       })}`
     );
     for (const policyToAdd of inlinePoliciesToAddToTargetAccount) {
-      await this._targetAccount.iam.putRolePolicy({
+      await this._targetAccount.clients.iam.putRolePolicy({
         RoleName: roleName,
         PolicyName: policyToAdd.policyName,
         PolicyDocument: decodeURIComponent(policyToAdd.policyDocument)
@@ -157,28 +157,30 @@ export default class IamRoleCloneService {
       });
 
       for (const policy of awsManagedPolicies) {
-        await this._targetAccount.iam.attachRolePolicy({
+        await this._targetAccount.clients.iam.attachRolePolicy({
           RoleName: roleName,
           PolicyArn: policy.PolicyArn
         });
       }
 
       for (const policy of customerManagedPolicies) {
-        const { Policy: policyInfo } = await this._sourceAccount.iam.getPolicy({
+        const { Policy: policyInfo } = await this._sourceAccount.clients.iam.getPolicy({
           PolicyArn: policy.PolicyArn
         });
         if (policyInfo) {
-          const { PolicyVersion: policyVersionInfo } = await this._sourceAccount.iam.getPolicyVersion({
-            PolicyArn: policy.PolicyArn,
-            VersionId: policyInfo.DefaultVersionId
-          });
-          const { Policy: targetPolicy } = await this._targetAccount.iam.createPolicy({
+          const { PolicyVersion: policyVersionInfo } = await this._sourceAccount.clients.iam.getPolicyVersion(
+            {
+              PolicyArn: policy.PolicyArn,
+              VersionId: policyInfo.DefaultVersionId
+            }
+          );
+          const { Policy: targetPolicy } = await this._targetAccount.clients.iam.createPolicy({
             PolicyName: policyInfo.PolicyName,
             Description: policyInfo.Description,
             Path: policyInfo.Path,
             PolicyDocument: decodeURIComponent(policyVersionInfo!.Document!)
           });
-          await this._targetAccount.iam.attachRolePolicy({
+          await this._targetAccount.clients.iam.attachRolePolicy({
             RoleName: roleName,
             PolicyArn: targetPolicy!.Arn
           });
@@ -199,7 +201,7 @@ export default class IamRoleCloneService {
         PolicyName: srcPolicyName,
         RoleName: roleName
       };
-      const sourcePolicyDocument = await this._sourceAccount.iam.getRolePolicy(policyParam);
+      const sourcePolicyDocument = await this._sourceAccount.clients.iam.getRolePolicy(policyParam);
       // Add policies that are not in target role, but is in source role
       if (!targetInlinePolicyNames.includes(srcPolicyName)) {
         policiesToAddToTargetAccount.push({
@@ -207,7 +209,7 @@ export default class IamRoleCloneService {
           policyDocument: sourcePolicyDocument.PolicyDocument!
         });
       } else {
-        const targetPolicyDocument = await this._targetAccount.iam.getRolePolicy(policyParam);
+        const targetPolicyDocument = await this._targetAccount.clients.iam.getRolePolicy(policyParam);
         // Update policies that are in both account but target account policy is different from source account
         if (sourcePolicyDocument.PolicyDocument !== targetPolicyDocument.PolicyDocument) {
           policiesToAddToTargetAccount.push({
@@ -225,7 +227,7 @@ export default class IamRoleCloneService {
     let isTruncated = true;
     let marker = undefined;
     do {
-      const response: ListRolePoliciesCommandOutput = await awsService.iam.listRolePolicies({
+      const response: ListRolePoliciesCommandOutput = await awsService.clients.iam.listRolePolicies({
         RoleName: roleName,
         Marker: marker
       });
@@ -246,10 +248,11 @@ export default class IamRoleCloneService {
     let isTruncated = true;
     let marker = undefined;
     do {
-      const response: ListAttachedRolePoliciesCommandOutput = await awsService.iam.listAttachedRolePolicies({
-        RoleName: roleName,
-        Marker: marker
-      });
+      const response: ListAttachedRolePoliciesCommandOutput =
+        await awsService.clients.iam.listAttachedRolePolicies({
+          RoleName: roleName,
+          Marker: marker
+        });
       if (response.AttachedPolicies) {
         allAttachedPolicies = allAttachedPolicies.concat(response.AttachedPolicies);
         isTruncated = response.IsTruncated ?? false;
