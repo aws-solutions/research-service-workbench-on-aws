@@ -81,6 +81,7 @@ jobs:
       - name: Integration test
         if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
         env: 
-          SERVICE_ENDPOINT: "${{ steps.outputs.endpoint.SERVICE_ENDPOINT }}"
+          SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |
           echo "$SERVICE_ENDPOINT"
+          node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose
