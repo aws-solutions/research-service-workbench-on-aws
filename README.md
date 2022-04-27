@@ -12,18 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-88.89%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.85%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-95.06%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.02%25-yellow.svg?style=flat) |
-# Contributing Guidelines
-
-Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
-
-Please read through this document before submitting any issues or pull requests to ensure we have all the necessary information to effectively respond to your bug report or contribution.
-
-## Code development and testing
-
-### Prerequisites for development
-
-Code for Ma-Mono is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+| ![Statements](https://img.shields.io/badge/statements-88.89%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.85%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-95.06%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.02%25-yellow.svg?style=flat)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 

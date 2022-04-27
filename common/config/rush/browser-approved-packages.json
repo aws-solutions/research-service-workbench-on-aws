@@ -15,6 +15,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authentication",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },

@@ -25,5 +25,8 @@
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+  },
+  "dependencies": {
+    "@amzn/workbench-core-authentication": "workspace:*"
   }
 }
