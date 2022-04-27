@@ -22,3 +22,4 @@ workbench-core/environments/src/environmentLifecycleHelper.test.ts
 
 #Fake email used
 solutions/example-ui-app/src/models/User.ts
+solutions/swb-reference/src/config/testEnv.yaml
