@@ -10,7 +10,11 @@ export default class CloudformationService {
   /**
    * Get Cloudformation output from a stack
    * @example
-   * getCfnOutput('stack123', ['lambdaRoleArn']) will return \{ 'lambdaRoleArn': "ExampleRoleArn" \}
+   * ```
+   * // returns { 'lambdaRoleArn': "ExampleRoleArn" }
+   * getCfnOutput('stack123', ['lambdaRoleArn'])
+   * ```
+   *
    * @param stackName - Stack name of CFN stack to get cloudformation output from
    * @param outputKeys - Output keys to get value for
    * @returns An object where the key is the output key and the value is the cloudformation output of that key.
