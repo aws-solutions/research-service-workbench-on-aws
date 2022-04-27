@@ -34,7 +34,7 @@ describe('Hello World', () => {
     try {
       console.log(process.env.SERVICE_ENDPOINT);
       const SERVICE_ENDPOINT: string =
-        process.env.SERVICE_ENDPOINT || 'https://22pd7hck1l.execute-api.us-east-1.amazonaws.com/';
+        process.env.SERVICE_ENDPOINT || 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
       const response = await axios.get(SERVICE_ENDPOINT, {});
       expect(response.data).toBe('Hello World');
     } catch (e) {

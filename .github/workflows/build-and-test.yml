@@ -75,7 +75,7 @@ jobs:
           cd workbench-core/infrastructure
           node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
           node ../../common/scripts/install-run-rushx.js cdk:deploy
-          echo "SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`"
+          SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
           echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
       
       - name: Integration test
