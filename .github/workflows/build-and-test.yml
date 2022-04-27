@@ -53,11 +53,11 @@ jobs:
 
       - name: Code Coverage badge check
         run: |
-          echo $GITHUB_REF
+          echo $GITHUB_HEAD_REF
           node common/scripts/install-run-rush.js make-badges --ci
 
       - name: Configure AWS Credentials
-        if: github.ref == 'refs/heads/feature/code-deployment-cleanup'
+        if: ${{ github.head_ref == 'refs/heads/feature/code-deployment-cleanup' }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.AWS_DEV_REGION }}
@@ -65,7 +65,7 @@ jobs:
           role-session-name: OIDCSessionName
       
       - name: Deploy POC to Dev
-        if: github.ref == 'refs/heads/feature/code-deployment-cleanup'
+        if: ${{ github.head_ref == 'refs/heads/feature/code-deployment-cleanup' }}
         run: |
           cd workbench-core/infrastructure
           node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
