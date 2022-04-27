@@ -1,5 +1,5 @@
 # Stage Name
-stage: dev
+stage: testEnv
 awsRegion: us-east-1
 awsRegionShortName: va
 rootUserEmail: aws-chamonix-dev+testEnvRoot@amazon.com
