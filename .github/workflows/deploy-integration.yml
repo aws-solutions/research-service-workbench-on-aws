@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Dev-deploy-and-integration-test
+name: deploy-and-integration-test
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
 
 jobs:
 # deploy only when files specific to swb package changed
-  deploy-swb-dev:
+  deploy-swb:
     runs-on: ubuntu-latest
     environment: dev
     permissions:
@@ -75,19 +75,19 @@ jobs:
           role-to-assume: ${{ secrets.ASSUME_ROLE }}
           role-session-name: OIDCSessionName
       
-      - name: Deploy SWB-Reference to Dev
+      - name: Deploy SWB-Reference
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js run-postDeployment
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
   merge-develop-to-main:
     name: Merge develop to main
     runs-on: ubuntu-latest
-    needs: [deploy-swb-dev]
+    needs: [deploy-swb]
     steps:
       - uses: actions/checkout@v3
         with:

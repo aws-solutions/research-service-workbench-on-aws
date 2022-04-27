@@ -50,13 +50,13 @@ jobs:
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
-          STAGE=dev node ../../common/scripts/install-run-rushx.js cdk synth
+          STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb cdk.out
         id: cdk
         uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/cdk.out/swb-dev-va.template.json
+          input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
