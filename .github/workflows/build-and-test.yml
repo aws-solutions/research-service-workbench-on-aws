@@ -70,7 +70,15 @@ jobs:
       
       - name: Deploy POC to Dev
         if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
+        id: endpoint
         run: |
           cd workbench-core/infrastructure
           node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
           node ../../common/scripts/install-run-rushx.js cdk:deploy
+          echo '::set-output name=SERVICE_ENDPOINT::`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`'
+      
+      - name: Integration test
+        if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
+        env: 
+          SERVICE_ENDPOINT: "${{ steps.outputs.endpoint.SERVICE_ENDPOINT }}"
+        run: echo "${{ SERVICE_ENDPOINT }}"
