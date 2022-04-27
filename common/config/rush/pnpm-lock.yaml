@@ -67,6 +67,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
       '@types/js-yaml': ^4.0.5
+      '@types/lodash': ^4.14.181
       '@types/node': ^12
       '@types/uuid': ^8.3.4
       '@vendia/serverless-express': ^4.5.4
@@ -82,6 +83,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       js-yaml: ^4.1.0
+      lodash: ~4.17.21
       ts-jest: ^27.1.3
       ts-node: ^10.4.0
       typescript: ^4.5.2
@@ -100,6 +102,7 @@ importers:
       aws-sdk-client-mock: 0.6.2_e17ddbd257ca49d065beb268d35d0203
       express: 4.17.3
       js-yaml: 4.1.0
+      lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
@@ -112,6 +115,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
       '@types/js-yaml': 4.0.5
+      '@types/lodash': 4.14.182
       '@types/node': 12.20.48
       '@types/uuid': 8.3.4
       aws-cdk: 2.20.0
@@ -242,7 +246,6 @@ importers:
       '@aws-sdk/client-ssm': 3.72.0
       '@aws-sdk/client-sts': 3.72.0
       '@aws-sdk/types': 3.55.0
-      '@types/lodash': 4.14.182
     devDependencies:
       '@rushstack/eslint-config': 2.5.4_eslint@8.13.0+typescript@4.6.3
       '@rushstack/heft': 0.44.13
@@ -251,6 +254,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
       '@types/js-yaml': 4.0.5
+      '@types/lodash': 4.14.182
       '@types/node': 12.20.48
       eslint: 8.13.0
       istanbul-badges-readme: 1.8.1
@@ -299,7 +303,6 @@ importers:
       '@aws-sdk/client-service-catalog': 3.72.0
       '@aws-sdk/client-ssm': 3.72.0
       '@aws-sdk/client-sts': 3.72.0
-      '@types/lodash': 4.14.182
       generate-password: 1.7.0
       md5-file: 5.0.0
     devDependencies:
@@ -311,6 +314,7 @@ importers:
       '@rushstack/heft-node-rig': 1.8.11_@rushstack+heft@0.44.13
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
+      '@types/lodash': 4.14.182
       '@types/node': 12.20.48
       aws-sdk-client-mock: 0.6.2_e17ddbd257ca49d065beb268d35d0203
       eslint: 8.13.0
@@ -679,6 +683,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.153.1:
     resolution: {integrity: sha512-H55godDvuC0AxHQYujgsuQsszP+TD3HqQdMoaMuZkGCpaIC25Mj6bdgLeryliCzQarahzEm/o5NGvrH7RfjGqw==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
+    dependencies:
+      jsonschema: 1.4.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - jsonschema
@@ -691,7 +698,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.153.1
       '@aws-cdk/cx-api': 1.153.1
       '@aws-cdk/region-info': 1.153.1
+      '@balena/dockerignore': 1.0.2
       constructs: 3.3.272
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -718,6 +729,7 @@ packages:
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.153.1
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - semver
@@ -2443,7 +2455,6 @@ packages:
 
   /@balena/dockerignore/1.0.2:
     resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
-    dev: true
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -3358,7 +3369,7 @@ packages:
 
   /@types/lodash/4.14.182:
     resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
-    dev: false
+    dev: true
 
   /@types/mime/1.3.2:
     resolution: {integrity: sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==}
@@ -3688,7 +3699,6 @@ packages:
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
-    dev: true
 
   /aws-cdk-lib/2.19.0_constructs@10.0.118:
     resolution: {integrity: sha512-zt0lAsTpYfrDitjJXp1smEi4o1EYtAAj4fb0WW4GYBW+P6FqymXyAF5mUT8YWPkMJTnSP8d4FeDUyatQVWYRJA==}
@@ -5131,7 +5141,6 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
-    dev: true
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
@@ -5304,7 +5313,6 @@ packages:
 
   /graceful-fs/4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
-    dev: true
 
   /has-bigints/1.0.1:
     resolution: {integrity: sha512-LSBS2LjbNBTf6287JEbEzvJgftkF5qFkmCo9hDRpAzKhUOlJ+hx8dd4USs00SgsUNwc4617J9ki5YtEClM2ffA==}
@@ -6507,7 +6515,6 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
-    dev: true
 
   /jsonpath-plus/4.0.0:
     resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
@@ -6516,7 +6523,6 @@ packages:
 
   /jsonschema/1.4.0:
     resolution: {integrity: sha512-/YgW6pRMr6M7C+4o8kS+B/2myEpHCrxO4PEWnqJNBFMjn7EWXqlQ4tGwL6xTHeRplwuZmcAncdvfOad1nT2yMw==}
-    dev: true
 
   /jsx-ast-utils/3.2.2:
     resolution: {integrity: sha512-HDAyJ4MNQBboGpUnHAVUNJs6X0lh058s6FuixsFGP7MgJYpD6Vasd6nzSG5iIfXu1zAYlHJ/zsOKNlrenTUBnw==}
@@ -6597,7 +6603,6 @@ packages:
 
   /lodash/4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /logform/2.4.0:
     resolution: {integrity: sha512-CPSJw4ftjf517EhXZGGvTHHkYobo7ZCc0kvwUoOYcjfR2UVrI66RHj8MCrfAdEitdmFqbu2BYdYs8FHHZSb6iw==}
@@ -7868,7 +7873,6 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw=}

@@ -5,7 +5,7 @@
 
 import { ScanCommandInput, AttributeValue, ScanCommandOutput } from '@aws-sdk/client-dynamodb';
 import _ = require('lodash');
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 /**
  * This class helps with scans of an entire table in DDB
@@ -111,13 +111,14 @@ class Scanner {
   }
   // same as Limit
   public limit(num: number): Scanner {
-    // check param type
     this._params.Limit = num;
     return this;
   }
   // same as Segment
   public segment(num: number): Scanner {
-    // check param type
+    if (!this._params.TotalSegments) {
+      throw new Error('Cannot provide segment without totalSegment. Call .totalSegment() before .segment()');
+    }
     this._params.Segment = num;
     return this;
   }
@@ -138,7 +139,19 @@ class Scanner {
     this._params.ReturnConsumedCapacity = upper;
     return this;
   }
-  public async scan(): Promise<ScanCommandOutput> {
+  // for testing purposes
+  public getParams(): ScanCommandInput {
+    return this._params;
+  }
+  public async execute(): Promise<ScanCommandOutput> {
+    // check either neither or both segment and totalSegments are defined (XOR)
+    //( foo || bar ) && !( foo && bar )
+    if (
+      !(_.isUndefined(this._params.Segment) && _.isUndefined(this._params.TotalSegments)) &&
+      (_.isUndefined(this._params.Segment) || _.isUndefined(this._params.TotalSegments))
+    ) {
+      throw new Error('Must declare both Segment and TotalSegment if using either.');
+    }
     return await this._ddb.scan(this._params);
   }
 }

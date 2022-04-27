@@ -10,7 +10,7 @@ import {
   DeleteRequest,
   PutRequest
 } from '@aws-sdk/client-dynamodb';
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 /**
  * This class helps with batch writes or deletes.
@@ -26,14 +26,6 @@ class BatchEdit {
     this._params.RequestItems = {};
     this._params.RequestItems[this._tableName] = [];
   }
-  // same as TableName -- could be implemented later
-  // public table(name: string): Scanner {
-  //     if(_.isEmpty(_.trim(name))) {
-  //         throw new Error(`DbScanner.table("${name}" <== must be a non-empty string).`)
-  //     }
-  //     this._params.TableName = name;
-  //     return this;
-  // }
   public addDeleteRequest(key: { [key: string]: AttributeValue }): BatchEdit {
     if (!this._params.RequestItems) {
       throw new Error('BatchEdit<==need to initialize the RequestItems property before adding new request');
@@ -66,7 +58,12 @@ class BatchEdit {
     return this;
   }
 
-  public async batchEdit(): Promise<BatchWriteItemCommandOutput> {
+  // for testing purposes
+  public getParams(): BatchWriteItemCommandInput {
+    return this._params;
+  }
+
+  public async execute(): Promise<BatchWriteItemCommandOutput> {
     return await this._ddb.batchWriteOrDelete(this._params);
   }
 }

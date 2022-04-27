@@ -163,6 +163,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "lodash",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "md5-file",
       "allowedCategories": [ "production" ]
     },

@@ -6,7 +6,7 @@
 
 import { AttributeValue, UpdateItemCommandInput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import _ = require('lodash');
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 /**
  * This class helps with writes or updates to single items in DDB
@@ -147,6 +147,7 @@ class Updater {
 
     return this;
   }
+  // This is the recommended method for adding new items or updating entire methods
   // helps with setting up UpdateExpression
   public item(item: { [key: string]: AttributeValue }): Updater {
     if (!item) return this;
@@ -207,9 +208,9 @@ class Updater {
     return this;
   }
   // replaces an old SDK V1 built in method
-  private _createSet(value: string[]): AttributeValue {
-    return { SS: value };
-  }
+  // private _createSet(value: string[]): AttributeValue {
+  //   return { SS: value };
+  // }
   // same as using UpdateExpression with the SET clause. IMPORTANT: your expression should NOT include the 'SET' keyword
   public set(expression: string): Updater {
     if (!_.isEmpty(expression)) {
@@ -218,6 +219,7 @@ class Updater {
     return this;
   }
   // same as using UpdateExpression with the ADD clause. IMPORTANT: your expression should NOT include the 'ADD' keyword
+  // use to add a number to a numerical attribute, add a new attribute, or add an element to a set
   public add(expression: string): Updater {
     if (!_.isEmpty(expression)) {
       this._internals.add.push(expression);
@@ -225,6 +227,7 @@ class Updater {
     return this;
   }
   // same as using UpdateExpression with the REMOVE clause. IMPORTANT: your expression should NOT include the 'REMOVE' keyword
+  // use to remove attribute(s) from an item that exists
   public remove(expression: string | string[]): Updater {
     if (!_.isEmpty(expression)) {
       if (_.isArray(expression)) {
@@ -236,6 +239,7 @@ class Updater {
     return this;
   }
   // same as using UpdateExpression with the DELETE clause. IMPORTANT: your expression should NOT include the 'DELETE' keyword
+  // use to delete an item from a set that is the value of an attribute
   public delete(expression: string): Updater {
     if (!_.isEmpty(expression)) {
       this._internals.delete.push(expression);
@@ -256,7 +260,7 @@ class Updater {
   // same as ExpressionAttributeValues
   public values(obj: { [key: string]: AttributeValue } = {}): Updater {
     if (!_.isObject(obj)) {
-      throw new Error(`DbScanner.values("${obj}" <== must be an object).`);
+      throw new Error(`DbUpdater.values("${obj}" <== must be an object).`);
     }
     this._params.ExpressionAttributeValues = {
       ...this._params.ExpressionAttributeValues,
@@ -308,7 +312,11 @@ class Updater {
     this._params.ReturnConsumedCapacity = upper;
     return this;
   }
-  public async update(): Promise<UpdateItemCommandOutput> {
+  // for testing purposes
+  public getParams(): UpdateItemCommandInput {
+    return this._internals.toParams();
+  }
+  public async execute(): Promise<UpdateItemCommandOutput> {
     return await this._ddb.update(this._internals.toParams());
   }
 }

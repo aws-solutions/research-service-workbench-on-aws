@@ -11,7 +11,7 @@ import {
   BatchGetItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import _ = require('lodash');
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 class Getter {
   private _ddb: DynamoDB;
@@ -181,12 +181,9 @@ class Getter {
 
     return this;
   }
-  // only for get item
+  // for both batch and single get item
   // same as ReturnConsumedCapacity
   public capacity(str: string = ''): Getter {
-    if (!this._paramsItem) {
-      return this;
-    }
     const upper = str.toUpperCase();
     const allowed = ['INDEXES', 'TOTAL', 'NONE'];
     if (!allowed.includes(upper)) {
@@ -194,10 +191,22 @@ class Getter {
         `DbGetter.capacity("${upper}" <== is not a valid value). Only ${allowed.join(',')} are allowed.`
       );
     }
-    this._paramsItem.ReturnConsumedCapacity = upper;
+    if (this._paramsItem) {
+      this._paramsItem.ReturnConsumedCapacity = upper;
+    } else if (this._paramsBatch) {
+      this._paramsBatch.ReturnConsumedCapacity = upper;
+    }
     return this;
   }
-  public async get(): Promise<GetItemCommandOutput | BatchGetItemCommandOutput> {
+  // used for testing purposes
+  public getItemParams(): GetItemCommandInput | undefined {
+    return this._paramsItem;
+  }
+  // used for testing purposes
+  public getBatchParams(): BatchGetItemCommandInput | undefined {
+    return this._paramsBatch;
+  }
+  public async execute(): Promise<GetItemCommandOutput | BatchGetItemCommandOutput> {
     if (this._paramsItem && this._paramsBatch) {
       throw new Error('dynamoDBGetterService <== only key() or keys() may be called, not both');
     }

@@ -5,7 +5,7 @@
 
 import { AttributeValue, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import _ = require('lodash');
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 /**
  * This class helps with building queries to a DDB table
@@ -225,6 +225,11 @@ class Query {
         `Query.select("${upper}" <== is not a valid value). Only ${allowed.join(',')} are allowed.`
       );
     }
+    if (this._params.ProjectionExpression && upper !== 'ALL_PROJECTED_ATTRIBUTES') {
+      throw new Error(
+        `You cannot select values except ALL_PROJECTED_ATTRIBUTES when using projectionExpression`
+      );
+    }
     this._params.Select = upper;
     return this;
   }
@@ -250,7 +255,11 @@ class Query {
     this._params.ReturnConsumedCapacity = upper;
     return this;
   }
-  public async query(): Promise<QueryCommandOutput> {
+  // for testing purposes
+  public getParams(): QueryCommandInput {
+    return this._params;
+  }
+  public async execute(): Promise<QueryCommandOutput> {
     return await this._ddb.query(this._params);
   }
 }

@@ -5,7 +5,7 @@
 
 import { AttributeValue, DeleteItemCommandInput, DeleteItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import _ = require('lodash');
-import DynamoDB from './aws/services/dynamoDB';
+import DynamoDB from '../aws/services/dynamoDB';
 
 /**
  * This class helps with deleting a single item from a DDB table.
@@ -97,7 +97,11 @@ class Deleter {
     this._params.ReturnItemCollectionMetrics = upper;
     return this;
   }
-  public async delete(): Promise<DeleteItemCommandOutput> {
+  // for testing purposes
+  public getParams(): DeleteItemCommandInput {
+    return this._params;
+  }
+  public async execute(): Promise<DeleteItemCommandOutput> {
     return await this._ddb.delete(this._params);
   }
 }
