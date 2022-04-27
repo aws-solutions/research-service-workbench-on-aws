@@ -2,9 +2,18 @@ import { User } from '@amzn/workbench-core-authentication';
 import { Action } from './action';
 
 /**
+ * States whether a {@link Permission} should be ALLOW or DENY.
+ */
+type Effect = 'ALLOW' | 'DENY';
+
+/**
  * Represents what a Permission contains.
  */
 export interface Permission {
+  /**
+   * The {@link Effect} of a Permission.
+   */
+  effect: Effect;
   /**
    * {@link Action}.
    */
@@ -57,11 +66,6 @@ export interface Permission {
    * ```
    */
   conditions?: object;
-
-  /**
-   * States whether this should be forbidden or allowed.
-   */
-  inverted?: boolean;
 
   /**
    * Reason for why this is forbidden.
