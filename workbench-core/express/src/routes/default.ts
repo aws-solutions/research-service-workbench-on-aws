@@ -5,6 +5,8 @@ import express, { Request, Response, Router } from 'express';
 import { AuditLogger } from '../auditLogger';
 
 const logger: LoggingService = new LoggingService({
+  maxLogLevel: 'info',
+  includeLocation: true,
   defaultMetadata: {
     serviceName: 'express'
   }
