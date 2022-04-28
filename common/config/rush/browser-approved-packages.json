@@ -39,6 +39,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-iam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
       "allowedCategories": [ "production" ]
     },

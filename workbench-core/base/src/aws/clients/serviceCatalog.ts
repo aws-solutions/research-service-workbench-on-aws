@@ -1,7 +1,9 @@
 import {
+  AcceptPortfolioShareCommand,
+  AcceptPortfolioShareInput,
+  AcceptPortfolioShareOutput,
   AssociatePrincipalWithPortfolioCommand,
-  AssociatePrincipalWithPortfolioCommandInput,
-  AssociatePrincipalWithPortfolioCommandOutput,
+  AssociatePrincipalWithPortfolioInput,
   AssociateProductWithPortfolioCommand,
   AssociateProductWithPortfolioCommandInput,
   AssociateProductWithPortfolioCommandOutput,
@@ -11,6 +13,8 @@ import {
   CreatePortfolioCommand,
   CreatePortfolioCommandInput,
   CreatePortfolioCommandOutput,
+  CreatePortfolioShareCommand,
+  CreatePortfolioShareInput,
   CreateProductCommand,
   CreateProductCommandInput,
   CreateProductCommandOutput,
@@ -20,6 +24,9 @@ import {
   DescribeProductAsAdminCommand,
   DescribeProductAsAdminCommandOutput,
   DescribeProductAsAdminInput,
+  ListLaunchPathsCommand,
+  ListLaunchPathsCommandInput,
+  ListLaunchPathsCommandOutput,
   ListPortfoliosCommand,
   ListPortfoliosCommandInput,
   ListPortfoliosCommandOutput,
@@ -38,10 +45,26 @@ export default class ServiceCatalog {
     this._client = new ServiceCatalogClient(config);
   }
 
+  public async associatePrincipalWithPortfolio(
+    params: AssociatePrincipalWithPortfolioInput
+  ): Promise<AssociateProductWithPortfolioCommandOutput> {
+    return this._client.send(new AssociatePrincipalWithPortfolioCommand(params));
+  }
+
   public async createConstraint(
     params: CreateConstraintCommandInput
   ): Promise<CreateConstraintCommandOutput> {
     return this._client.send(new CreateConstraintCommand(params));
+  }
+
+  public async createPortfolioShare(
+    params: CreatePortfolioShareInput
+  ): Promise<CreatePortfolioCommandOutput> {
+    return this._client.send(new CreatePortfolioShareCommand(params));
+  }
+
+  public async acceptPortfolioShare(params: AcceptPortfolioShareInput): Promise<AcceptPortfolioShareOutput> {
+    return this._client.send(new AcceptPortfolioShareCommand(params));
   }
 
   public async describeProductAsAdmin(
@@ -80,9 +103,7 @@ export default class ServiceCatalog {
     return this._client.send(new AssociateProductWithPortfolioCommand(params));
   }
 
-  public async associatePrincipalWithPortfolio(
-    params: AssociatePrincipalWithPortfolioCommandInput
-  ): Promise<AssociatePrincipalWithPortfolioCommandOutput> {
-    return this._client.send(new AssociatePrincipalWithPortfolioCommand(params));
+  public async listLaunchPaths(params: ListLaunchPathsCommandInput): Promise<ListLaunchPathsCommandOutput> {
+    return this._client.send(new ListLaunchPathsCommand(params));
   }
 }

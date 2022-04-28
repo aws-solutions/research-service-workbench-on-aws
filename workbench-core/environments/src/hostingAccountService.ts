@@ -23,8 +23,11 @@ export default class HostingAccountService {
     envManagementRoleArn: string;
     accountHandlerRoleArn: string;
   }): Promise<string> {
-    const lifecycleService = new HostingAccountLifecycleService(this.constants);
-    await lifecycleService.initializeAccount(accountMetadata);
+    const lifecycleService = new HostingAccountLifecycleService(
+      this.constants.AWS_REGION,
+      this.constants.STACK_NAME
+    );
+    await lifecycleService.initializeAccount(accountMetadata, this.constants.MAIN_ACCOUNT_BUS_ARN_NAME);
 
     return Promise.resolve(`Hosting account ${accountMetadata.accountId} has been successfully provisioned`);
   }

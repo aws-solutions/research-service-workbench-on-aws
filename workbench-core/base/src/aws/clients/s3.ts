@@ -1,4 +1,7 @@
 import {
+  GetObjectCommand,
+  GetObjectCommandInput,
+  GetObjectCommandOutput,
   ListObjectsCommand,
   ListObjectsCommandInput,
   ListObjectsCommandOutput,
@@ -18,6 +21,10 @@ export default class S3 {
   private _client: S3Client;
   public constructor(config: S3ClientConfig) {
     this._client = new S3Client(config);
+  }
+
+  public getObject(params: GetObjectCommandInput): Promise<GetObjectCommandOutput> {
+    return this._client.send(new GetObjectCommand(params));
   }
 
   public putObject(params: PutObjectCommandInput): Promise<PutObjectCommandOutput> {
