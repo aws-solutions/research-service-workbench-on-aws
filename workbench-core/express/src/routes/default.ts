@@ -38,6 +38,21 @@ router.get('/', async (req: Request, res: Response) => {
   res.send('Hello World');
 });
 
-// router.get('/user', (req: Request, res: Response) => {
-//   res.send('Hello User');
-// });
+router.get('/user', async (req: Request, res: Response) => {
+  const responsebody: AuditEntry = {
+    body: { message: 'Hello User' }
+  };
+  const metadata: Metadata = {
+    statusCode: res.statusCode,
+    action: req.method + ' ' + req.path
+  };
+  await auditService
+    .write(metadata, responsebody)
+    .then(() => {
+      console.log('Success');
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  res.send('Hello User');
+});
