@@ -49,6 +49,7 @@ jobs:
       - name: Rush check
         run: node common/scripts/install-run-rush.js check
 
+      
       - name: Rush build
         run: node common/scripts/install-run-rush.js build --verbose
 

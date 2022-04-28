@@ -84,8 +84,6 @@ cdk.out
 
 .idea
 
-lambda-build
-
 # Reference package
 solutions/swb-reference/build
 solutions/swb-reference/temp

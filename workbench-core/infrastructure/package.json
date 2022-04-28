@@ -17,7 +17,7 @@
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
     "cdk:synth": "cdk synth",
-    "cdk:deploy": "rushx build:local && cdk deploy --all --require-approval never --outputs-file cdk-outputs.json"
+    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file cdk-outputs.json"
   },
   "devDependencies": {
     "@types/node": "^14",
