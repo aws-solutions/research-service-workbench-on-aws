@@ -8,7 +8,10 @@ import {
   CloudFormationClientConfig,
   DescribeStacksCommand,
   DescribeStacksCommandInput,
-  DescribeStacksCommandOutput
+  DescribeStacksCommandOutput,
+  GetTemplateCommand,
+  GetTemplateCommandInput,
+  GetTemplateCommandOutput
 } from '@aws-sdk/client-cloudformation';
 
 // Documentation for client and methods
@@ -22,5 +25,9 @@ export default class CloudFormation {
 
   public async describeStacks(params: DescribeStacksCommandInput): Promise<DescribeStacksCommandOutput> {
     return this._client.send(new DescribeStacksCommand(params));
+  }
+
+  public async getTemplate(params: GetTemplateCommandInput): Promise<GetTemplateCommandOutput> {
+    return this._client.send(new GetTemplateCommand(params));
   }
 }

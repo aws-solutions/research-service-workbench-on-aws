@@ -37,7 +37,13 @@ export default class ServiceCatalogSetup {
   }
 
   public async run(cfnFilePaths: string[]): Promise<void> {
-    const { S3_ARTIFACT_BUCKET_SC_PREFIX, PORTFOLIO_NAME } = this._constants;
+    const {
+      S3_ARTIFACT_BUCKET_SC_PREFIX,
+      PORTFOLIO_NAME,
+      STACK_NAME,
+      LAUNCH_CONSTRAINT_ROLE_NAME,
+      S3_ARTIFACT_BUCKET_ARN_NAME
+    } = this._constants;
     const portfolioName = PORTFOLIO_NAME;
 
     // Create SC portfolio if portfolio doesn't exist
@@ -47,8 +53,16 @@ export default class ServiceCatalogSetup {
       portfolioId = await this._createSCPortfolio(portfolioName);
     }
     console.log('PortfolioId', portfolioId);
-    const { s3ArtifactBucketName, launchConstraintRoleName } = await this._getCfnOutputs();
+
+    const cfService = this._aws.helpers.cloudformation;
+    const {
+      [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn,
+      [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
+    } = await cfService.getCfnOutput(STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
+
     const prefix = S3_ARTIFACT_BUCKET_SC_PREFIX;
+
+    const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
 
     // Upload environment's CFN templates to S3 if current template is different from template in S3
     const envTypeToFilePath = await this._getEnvTypeToUpdate(s3ArtifactBucketName, prefix, cfnFilePaths);
@@ -107,48 +121,6 @@ export default class ServiceCatalogSetup {
     return cfnFilePaths;
   }
 
-  protected async _getCfnOutputs(): Promise<{
-    s3ArtifactBucketName: string;
-    launchConstraintRoleName: string;
-  }> {
-    const { S3_ARTIFACT_BUCKET_ARN_NAME, LAUNCH_CONSTRAINT_ROLE_NAME, STACK_NAME } = this._constants;
-    const describeStackParam = {
-      StackName: STACK_NAME
-    };
-
-    const stackOutput = await this._aws.cloudformation.describeStacks(describeStackParam);
-
-    const s3BucketNameExport = stackOutput.Stacks![0].Outputs!.find((output) => {
-      return output.OutputKey && output.OutputKey === S3_ARTIFACT_BUCKET_ARN_NAME;
-    });
-
-    let s3ArtifactBucketName = '';
-    if (s3BucketNameExport && s3BucketNameExport.OutputValue) {
-      const arn = s3BucketNameExport.OutputValue;
-      const bucketName = arn.split(':').pop();
-      if (bucketName) {
-        s3ArtifactBucketName = bucketName;
-      } else {
-        throw new Error(`Cannot get bucket name from arn ${arn}`);
-      }
-    } else {
-      throw new Error(`Cannot find output value for S3 Bucket with name: ${S3_ARTIFACT_BUCKET_ARN_NAME}`);
-    }
-
-    let launchConstraintRoleName = '';
-    const lcRoleNameExport = stackOutput.Stacks![0].Outputs!.find((output) => {
-      return output.OutputKey && output.OutputKey.includes(LAUNCH_CONSTRAINT_ROLE_NAME);
-    });
-    if (lcRoleNameExport && lcRoleNameExport.OutputValue) {
-      launchConstraintRoleName = lcRoleNameExport.OutputValue;
-    } else {
-      throw new Error(
-        `Cannot find output value for Launch Contraint role name with name: ${LAUNCH_CONSTRAINT_ROLE_NAME}`
-      );
-    }
-    return { s3ArtifactBucketName, launchConstraintRoleName };
-  }
-
   private async _createLaunchConstraint(
     portfolioId: string,
     productId: string,
@@ -162,7 +134,7 @@ export default class ServiceCatalogSetup {
     };
 
     try {
-      await this._aws.serviceCatalog.createConstraint(lcParam);
+      await this._aws.clients.serviceCatalog.createConstraint(lcParam);
     } catch (e) {
       if (
         e instanceof InvalidParametersException &&
@@ -186,7 +158,7 @@ export default class ServiceCatalogSetup {
         Body: fileContent
       };
 
-      await this._aws.s3.putObject(putObjectParam);
+      await this._aws.clients.s3.putObject(putObjectParam);
     }
   }
 
@@ -203,7 +175,7 @@ export default class ServiceCatalogSetup {
       Prefix: prefix
     };
 
-    const listObjectOutput = await this._aws.s3.listObject(listS3ObjectsParam);
+    const listObjectOutput = await this._aws.clients.s3.listObject(listS3ObjectsParam);
 
     const S3FileNameToEtag: { [key: string]: string } = {};
     if (listObjectOutput.Contents) {
@@ -243,7 +215,7 @@ export default class ServiceCatalogSetup {
       Id: productId
     };
 
-    const product = await this._aws.serviceCatalog.describeProductAsAdmin(describeProductParam);
+    const product = await this._aws.clients.serviceCatalog.describeProductAsAdmin(describeProductParam);
 
     if (product.ProvisioningArtifactSummaries) {
       const names: string[] = product.ProvisioningArtifactSummaries.map((artifact) => {
@@ -277,7 +249,7 @@ export default class ServiceCatalogSetup {
         }
       };
 
-      await this._aws.serviceCatalog.createProvisioningArtifact(provisioningArtifactParam);
+      await this._aws.clients.serviceCatalog.createProvisioningArtifact(provisioningArtifactParam);
       console.log('Successfully created new version of product');
     }
   }
@@ -287,7 +259,7 @@ export default class ServiceCatalogSetup {
       PortfolioId: portfolioId
     };
 
-    const productsResponse = await this._aws.serviceCatalog.searchProductsAsAdmin(searchProductParam);
+    const productsResponse = await this._aws.clients.serviceCatalog.searchProductsAsAdmin(searchProductParam);
     let product: ProductViewDetail | undefined = undefined;
     if (productsResponse.ProductViewDetails) {
       product = productsResponse.ProductViewDetails.find((detail: ProductViewDetail) => {
@@ -305,7 +277,7 @@ export default class ServiceCatalogSetup {
         PageToken: pageToken,
         PageSize: 20
       };
-      const listPortfolioOutput = await this._aws.serviceCatalog.listPortfolios(listPortfolioInput);
+      const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
       pageToken = listPortfolioOutput.NextPageToken;
       if (listPortfolioOutput.PortfolioDetails) {
         portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
@@ -325,7 +297,7 @@ export default class ServiceCatalogSetup {
       Description: 'Portfolio for managing SWB environments'
     };
 
-    const response = await this._aws.serviceCatalog.createPortfolio(portfolioToCreateParam);
+    const response = await this._aws.clients.serviceCatalog.createPortfolio(portfolioToCreateParam);
     return response.PortfolioDetail!.Id!;
   }
 
@@ -350,7 +322,7 @@ export default class ServiceCatalogSetup {
         Description: 'Auto-created by post deployment script'
       }
     };
-    const response = await this._aws.serviceCatalog.createProduct(productToCreateParam);
+    const response = await this._aws.clients.serviceCatalog.createProduct(productToCreateParam);
     await this._associateProductWithPortfolio(
       response.ProductViewDetail!.ProductViewSummary!.ProductId!,
       portfolioId
@@ -364,6 +336,6 @@ export default class ServiceCatalogSetup {
       ProductId: productId
     };
 
-    await this._aws.serviceCatalog.associateProductWithPorfolio(associateProductParam);
+    await this._aws.clients.serviceCatalog.associateProductWithPorfolio(associateProductParam);
   }
 }
