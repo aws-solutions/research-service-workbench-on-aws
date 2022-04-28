@@ -12,7 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-88.89%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.85%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-95.06%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.02%25-yellow.svg?style=flat)
+| ![Statements](https://img.shields.io/badge/statements-89.89%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-84.73%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-96.43%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.78%25-yellow.svg?style=flat)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
