@@ -3,38 +3,34 @@ import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { Effect, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+// import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+// import { Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class InfrastructureStack extends Stack {
   // eslint-disable-next-line @typescript-eslint/explicit-member-accessibility
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const logGroup = new LogGroup(this, 'LogGroup', {
-      retention: RetentionDays.ONE_WEEK,
-      logGroupName: 'HttpApiLogGroup'
-    });
+    // const logGroup = new LogGroup(this, 'LogGroup', {
+    //   retention: RetentionDays.ONE_WEEK,
+    //   logGroupName: 'HttpApiLogGroup'
+    // });
 
-    const lambdaPolicy = new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-      resources: [logGroup.logGroupArn],
-      principals: [new ServicePrincipal('lambda.amazonaws.com')]
-    });
+    // const lambdaPolicy = new PolicyStatement({
+    //   effect: Effect.ALLOW,
+    //   actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+    //   resources: [logGroup.logGroupArn],
+    //   // principals: [new ServicePrincipal('lambda.amazonaws.com')]
+    // });
 
-    logGroup.addToResourcePolicy(lambdaPolicy);
+    // logGroup.addToResourcePolicy(lambdaPolicy);
 
     // const lambdaRole = new Role(this, 'LambdaRole', {
     //   assumedBy: new ServicePrincipal('lambda.amazonaws.com')
     // });
 
     // lambdaRole.addToPolicy(
-    //   new PolicyStatement({
-    //     effect: Effect.ALLOW,
-    //     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-    //     resources: [logGroup.logGroupArn]
-    //   })
+    //   lambdaPolicy
     // );
 
     const lambdaService = new Function(this, 'LambdaService', {

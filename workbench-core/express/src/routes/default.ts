@@ -20,15 +20,18 @@ const auditService: AuditService = new AuditService(baseAuditPlugin, true);
 export const router: Router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
-  const responsebody: AuditEntry = {
-    body: { message: 'Hello World' }
+  const auditEntry: AuditEntry = {
+    body: { message: 'Hello World' },
+    source: {
+      ip: req.ip
+    }
   };
   const metadata: Metadata = {
     statusCode: res.statusCode,
     action: req.method + ' ' + req.path
   };
   await auditService
-    .write(metadata, responsebody)
+    .write(metadata, auditEntry)
     .then(() => {
       console.log('Success');
     })

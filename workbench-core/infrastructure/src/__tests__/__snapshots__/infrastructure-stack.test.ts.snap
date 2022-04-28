@@ -116,7 +116,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "5047d700a76f251b0f45f73208da7f932cc7a9df52fd184896d8f5eb81d4c233.zip",
+          "S3Key": "ec691465c7039768c95af4838b5d928227b18cc59f6791d8a5d12bab22726599.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "index.handler",
@@ -160,36 +160,6 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Role",
-    },
-    "LogGroupF5B46931": Object {
-      "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "LogGroupName": "HttpApiLogGroup",
-        "RetentionInDays": 7,
-      },
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "LogGroupPolicyResourcePolicy6FA18555": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "{\\"Statement\\":[{\\"Action\\":[\\"logs:CreateLogGroup\\",\\"logs:CreateLogStream\\",\\"logs:PutLogEvents\\"],\\"Effect\\":\\"Allow\\",\\"Principal\\":{\\"Service\\":\\"lambda.amazonaws.com\\"},\\"Resource\\":\\"",
-              Object {
-                "Fn::GetAtt": Array [
-                  "LogGroupF5B46931",
-                  "Arn",
-                ],
-              },
-              "\\"}],\\"Version\\":\\"2012-10-17\\"}",
-            ],
-          ],
-        },
-        "PolicyName": "InfrastructureStackLogGroupPolicy10F45DBD",
-      },
-      "Type": "AWS::Logs::ResourcePolicy",
     },
   },
 }
