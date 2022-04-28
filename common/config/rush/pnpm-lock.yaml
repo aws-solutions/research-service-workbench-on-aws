@@ -506,6 +506,7 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      lambda-build: ^1.0.6
       source-map-support: ^0.5.16
       ts-node: ^10.4.0
       typescript: ^4.5.2
@@ -537,6 +538,7 @@ importers:
       express: 4.18.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.7.0
+      lambda-build: 1.0.6
       ts-node: 10.7.0_2bdaecf545f082851b1b44d411115ce2
       typescript: 4.6.3
 
