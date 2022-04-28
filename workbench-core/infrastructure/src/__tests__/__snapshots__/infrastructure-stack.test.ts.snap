@@ -107,7 +107,30 @@ Object {
       },
       "Type": "AWS::ApiGatewayV2::Api",
     },
-    "LambdaRole3A44B857": Object {
+    "LambdaService68B9B9DF": Object {
+      "DependsOn": Array [
+        "LambdaServiceServiceRole71319041",
+      ],
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "a41a1077ea23f76d5d772457a02d9daa1b516d436a1bf08db885864dddc21929.zip",
+        },
+        "FunctionName": "LambdaService",
+        "Handler": "index.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "LambdaServiceServiceRole71319041",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "LambdaServiceServiceRole71319041": Object {
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -121,71 +144,22 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "LambdaRoleDefaultPolicy75625A82": Object {
-      "Properties": Object {
-        "PolicyDocument": Object {
-          "Statement": Array [
-            Object {
-              "Action": Array [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-              ],
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "LogGroupF5B46931",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "LambdaRoleDefaultPolicy75625A82",
-        "Roles": Array [
+        "ManagedPolicyArns": Array [
           Object {
-            "Ref": "LambdaRole3A44B857",
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
           },
         ],
       },
-      "Type": "AWS::IAM::Policy",
-    },
-    "LambdaService68B9B9DF": Object {
-      "DependsOn": Array [
-        "LambdaRoleDefaultPolicy75625A82",
-        "LambdaRole3A44B857",
-      ],
-      "Properties": Object {
-        "Code": Object {
-          "S3Bucket": Object {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "a41a1077ea23f76d5d772457a02d9daa1b516d436a1bf08db885864dddc21929.zip",
-        },
-        "FunctionName": "LambdaService",
-        "Handler": "index.handler",
-        "Role": Object {
-          "Fn::GetAtt": Array [
-            "LambdaRole3A44B857",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs14.x",
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "LogGroupF5B46931": Object {
-      "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "LogGroupName": "HttpApiLogGroup",
-        "RetentionInDays": 7,
-      },
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
+      "Type": "AWS::IAM::Role",
     },
   },
 }
