@@ -8,7 +8,7 @@ const logger: LoggingService = new LoggingService({
   maxLogLevel: 'info',
   includeLocation: true,
   defaultMetadata: {
-    serviceName: 'express'
+    serviceName: 'LoggerService'
   }
 });
 

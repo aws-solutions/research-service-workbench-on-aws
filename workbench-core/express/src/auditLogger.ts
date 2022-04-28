@@ -8,13 +8,7 @@ export class AuditLogger implements Writer {
     this._logger = logger;
   }
   public async write(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
-    const message =
-      'Test Message ' +
-      metadata?.statusCode +
-      ' ' +
-      metadata?.action +
-      ' ' +
-      JSON.stringify(auditEntry, null, 2);
+    const message = JSON.stringify(auditEntry, null, 2);
     this._logger.info(message);
   }
 }
