@@ -1,12 +1,10 @@
-import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
+import { AuditEntry, AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
 import Metadata from '@amzn/workbench-core-audit/lib/metadata';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import express, { Request, Response, Router } from 'express';
 import { AuditLogger } from '../auditLogger';
 
 const logger: LoggingService = new LoggingService({
-  maxLogLevel: 'warn',
-  includeLocation: false,
   defaultMetadata: {
     serviceName: 'express'
   }
@@ -20,8 +18,8 @@ const auditService: AuditService = new AuditService(baseAuditPlugin, true);
 export const router: Router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
-  const responsebody: object = {
-    message: 'Hello World'
+  const responsebody: AuditEntry = {
+    body: { message: 'Hello World' }
   };
   const metadata: Metadata = {
     statusCode: res.statusCode,
