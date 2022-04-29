@@ -22,13 +22,14 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     }
     const mainEventBusArn = await this.helper.getMainEventBusArn();
 
+    const productId = 'prod-q4zwyzxpt5c7c';
     // TODO: All these values will be pulled from DDB for the given hosting account and for the given envTypeConfig
     const ssmParameters = {
       InstanceName: ['basicnotebookinstance-sampleInstanceName'],
       VPC: ['vpc-028df59e55564dccd'],
       Subnet: ['subnet-0dee693d27b04fe37'],
       ProvisioningArtifactId: ['pa-3lex77o7ju3qw'],
-      ProductId: ['prod-q4zwyzxpt5c7c'],
+      ProductId: [productId],
       Namespace: ['swbv2-test'],
       EncryptionKeyArn: ['sampleEncryptionKeyArn'],
       CIDR: ['1.1.1.1/32'],
@@ -36,11 +37,12 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       EventBusName: [mainEventBusArn]
     };
 
-    const responseHost = await this.helper.executeSSMDocument({
+    const responseHost = await this.helper.launch({
       ssmParameters,
       operation: 'Launch',
       envType: 'Sagemaker',
-      accountId: envMetadata.accountId
+      accountId: envMetadata.accountId,
+      productId
     });
     return Promise.resolve(responseHost);
   }

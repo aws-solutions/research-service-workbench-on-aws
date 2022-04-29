@@ -3,35 +3,60 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import CloudFormation from './services/cloudformation';
-import Cognito from './services/cognito';
-import EC2 from './services/ec2';
-import EventBridge from './services/eventbridge';
-import SSM from './services/ssm';
-import ServiceCatalog from './services/serviceCatalog';
-import S3 from './services/s3';
-import STS from './services/sts';
+import CloudFormation from './clients/cloudformation';
+import Cognito from './clients/cognito';
+import EC2 from './clients/ec2';
+import EventBridge from './clients/eventbridge';
+import SSM from './clients/ssm';
+import ServiceCatalog from './clients/serviceCatalog';
+import S3 from './clients/s3';
+import STS from './clients/sts';
 import { Credentials } from '@aws-sdk/types';
+import IAM from './clients/iam';
+import CloudformationService from './helpers/cloudformationService';
+import S3Service from './helpers/s3Service';
+import DynamoDB from './clients/dynamoDB';
+import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 
 export default class AwsService {
-  public cloudformation: CloudFormation;
-  public cognito: Cognito;
-  public ssm: SSM;
-  public ec2: EC2;
-  public eventBridge: EventBridge;
-  public serviceCatalog: ServiceCatalog;
-  public s3: S3;
-  public sts: STS;
+  public clients: {
+    cloudformation: CloudFormation;
+    cognito: Cognito;
+    ssm: SSM;
+    ec2: EC2;
+    eventBridge: EventBridge;
+    serviceCatalog: ServiceCatalog;
+    s3: S3;
+    sts: STS;
+    iam: IAM;
+    ddb: DynamoDB;
+  };
+  public helpers: {
+    cloudformation: CloudformationService;
+    s3: S3Service;
+    ddb: DynamoDBService;
+  };
 
-  public constructor(options: { region: string; credentials?: Credentials }) {
-    this.cloudformation = new CloudFormation(options);
-    this.cognito = new Cognito(options);
-    this.ssm = new SSM(options);
-    this.ec2 = new EC2(options);
-    this.eventBridge = new EventBridge(options);
-    this.serviceCatalog = new ServiceCatalog(options);
-    this.s3 = new S3(options);
-    this.sts = new STS(options);
+  public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
+    const { region, ddbTableName } = options;
+    this.clients = {
+      cloudformation: new CloudFormation(options),
+      cognito: new Cognito(options),
+      ssm: new SSM(options),
+      ec2: new EC2(options),
+      eventBridge: new EventBridge(options),
+      serviceCatalog: new ServiceCatalog(options),
+      s3: new S3(options),
+      sts: new STS(options),
+      iam: new IAM(options),
+      ddb: new DynamoDB({ region, table: ddbTableName || '' })
+    };
+
+    this.helpers = {
+      cloudformation: new CloudformationService(this.clients.cloudformation),
+      s3: new S3Service(this.clients.s3),
+      ddb: new DynamoDBService({ region, table: ddbTableName || '' })
+    };
   }
 
   public async getAwsServiceForRole(params: {
@@ -40,7 +65,7 @@ export default class AwsService {
     externalId?: string;
     region: string;
   }): Promise<AwsService> {
-    const { Credentials } = await this.sts.assumeRole({
+    const { Credentials } = await this.clients.sts.assumeRole({
       RoleArn: params.roleArn,
       RoleSessionName: params.roleSessionName,
       ExternalId: params.externalId

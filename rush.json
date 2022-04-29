@@ -82,6 +82,12 @@
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/example-ui-app",
+      "projectFolder": "solutions/example-ui-app",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
     }
   ]
 }
