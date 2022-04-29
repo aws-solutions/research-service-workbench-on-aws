@@ -5,6 +5,7 @@
     "infrastructure": "lib/index.js"
   },
   "scripts": {
+    "compile": "scripts/buildLambda.js",
     "lambda-build": "lambda-build",
     "build:local": "heft build --clean && rushx lambda-build -e src/init.ts && mkdir -p ./lambda-build && mv archive.zip ./lambda-build",
     "build": "heft build --clean",
@@ -17,7 +18,7 @@
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
     "cdk:synth": "cdk synth",
-    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file cdk-outputs.json"
+    "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file cdk-outputs.json"
   },
   "devDependencies": {
     "@types/node": "^14",
@@ -44,7 +45,8 @@
     "@types/aws-lambda": "^8.10.92",
     "axios": "^0.27.1",
     "cdk-nag": "^2.12.25",
-    "lambda-build": "^1.0.6"
+    "lambda-build": "^1.0.6",
+    "esbuild": "^0.14.21"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.0.0",

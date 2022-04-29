@@ -3,6 +3,7 @@ import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import { join } from 'path';
 // import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 // import { Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
@@ -35,8 +36,8 @@ export class InfrastructureStack extends Stack {
 
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
-      handler: 'index.handler',
-      code: Code.fromAsset('../infrastructure/lambda-build/archive.zip'),
+      handler: 'buildLambda.handler',
+      code: Code.fromAsset(join(__dirname, '../build')),
       functionName: 'LambdaService'
       // role: lambdaRole
     });

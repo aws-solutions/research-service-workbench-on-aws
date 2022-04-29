@@ -62,7 +62,7 @@ jobs:
           node common/scripts/install-run-rush.js make-badges --ci
 
       - name: Configure AWS Credentials
-        if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
+        if: ${{ github.head_ref == 'feature/example-logging-auditing' }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ secrets.AWS_DEV_REGION }}
@@ -70,17 +70,17 @@ jobs:
           role-session-name: OIDCSessionName
       
       - name: Deploy POC to Dev
-        if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
+        if: ${{ github.head_ref == 'feature/example-logging-auditing' }}
         id: endpoint
         run: |
-          cd workbench-core/infrastructure
+          cd workbench-core/example/infrastructure
           node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
           node ../../common/scripts/install-run-rushx.js cdk:deploy
           SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
           echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
       
       - name: Integration test
-        if: ${{ github.head_ref == 'feature/code-deployment-cleanup' }}
+        if: ${{ github.head_ref == 'feature/example-logging-auditing' }}
         env: 
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |

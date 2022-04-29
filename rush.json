@@ -91,13 +91,13 @@
     },
     {
       "packageName": "@amzn/workbench-core-express",
-      "projectFolder": "workbench-core/express",
+      "projectFolder": "workbench-core/example/express",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
-      "projectFolder": "workbench-core/infrastructure",
+      "projectFolder": "workbench-core/example/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

@@ -420,7 +420,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       typescript: 4.6.3
 
-  ../../workbench-core/express:
+  ../../workbench-core/example/express:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-audit': workspace:*
@@ -450,13 +450,13 @@ importers:
       supertest: ^6.2.2
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-audit': link:../audit
-      '@amzn/workbench-core-logging': link:../logging
+      '@amzn/workbench-core-audit': link:../../audit
+      '@amzn/workbench-core-logging': link:../../logging
       '@vendia/serverless-express': 4.8.0
       aws-cdk-lib: 2.22.0_constructs@10.0.127
       constructs: 10.0.127
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
@@ -479,7 +479,7 @@ importers:
       supertest: 6.2.3
       typescript: 4.6.3
 
-  ../../workbench-core/infrastructure:
+  ../../workbench-core/example/infrastructure:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-express': workspace:*
@@ -501,6 +501,7 @@ importers:
       axios: ^0.27.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
+      esbuild: ^0.14.21
       eslint: ^8.7.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
@@ -516,7 +517,7 @@ importers:
       constructs: 10.0.127
       source-map-support: 0.5.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@aws-cdk/assert': 2.22.0_bf549c69c82131477ffbcebf5b19deb3
       '@aws-cdk/aws-apigatewayv2-alpha': 2.12.0-alpha.0_1260576a55dac16a31347a1ec12d5059
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.12.0-alpha.0_99736a072eabf73ccd8e2abed7a94d54
@@ -533,6 +534,7 @@ importers:
       aws-cdk: 2.22.0
       axios: 0.27.2
       cdk-nag: 2.12.39_1260576a55dac16a31347a1ec12d5059
+      esbuild: 0.14.38
       eslint: 8.14.0
       eslint-plugin-security: 1.5.0
       express: 4.18.0

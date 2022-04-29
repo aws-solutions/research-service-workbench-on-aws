@@ -91,3 +91,7 @@ solutions/swb-reference/temp
 !solutions/swb-reference/src/config/testEnv.yaml
 solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/.aws-sam/
+
+
+# example package
+workbench/example/infrastructure/build
