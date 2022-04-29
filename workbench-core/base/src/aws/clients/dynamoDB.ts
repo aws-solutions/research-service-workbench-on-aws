@@ -30,8 +30,8 @@ import {
 
 export default class DynamoDB {
   private _client: DynamoDBClient;
-  public constructor(options: { region: string; table: string }) {
-    this._client = new DynamoDBClient({ ...options });
+  public constructor(config: { region: string }) {
+    this._client = new DynamoDBClient({ ...config });
   }
   public async scan(params: ScanCommandInput): Promise<ScanCommandOutput> {
     return await this._client.send(new ScanCommand(params));

@@ -15,9 +15,9 @@ class Query {
   private _params: QueryCommandInput;
   private _sortKeyName: string | undefined;
 
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._params = { TableName: options.table };
+  public constructor(config: { region: string }, table: string) {
+    this._ddb = new DynamoDB({ ...config });
+    this._params = { TableName: table };
     this._sortKeyName = undefined;
   }
 
@@ -30,7 +30,7 @@ class Query {
    */
   public table(name: string): Query {
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`TableName must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty.`);
     }
     this._params.TableName = name;
     return this;
@@ -44,7 +44,7 @@ class Query {
    */
   public index(name: string): Query {
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`IndexName must be a string and can not be empty).`);
+      throw new Error(`IndexName must be a string and can not be empty.`);
     }
     this._params.IndexName = name;
     return this;
@@ -238,7 +238,7 @@ class Query {
    * @param key - primary key of the element to start with (exclusive) in a query
    * @returns Query with populated params
    */
-  public start(key: { [key: string]: AttributeValue }): Query {
+  public start(key: { [key: string]: AttributeValue } | undefined): Query {
     if (!key) {
       delete this._params.ExclusiveStartKey;
     } else {
@@ -301,9 +301,6 @@ class Query {
    * ```
    */
   public names(obj: { [key: string]: string } = {}): Query {
-    if (!_.isObject(obj)) {
-      throw new Error(`Names must be an object).`);
-    }
     this._params.ExpressionAttributeNames = {
       ...this._params.ExpressionAttributeNames,
       ...obj
@@ -325,9 +322,6 @@ class Query {
    * ```
    */
   public values(obj: { [key: string]: AttributeValue } = {}): Query {
-    if (!_.isObject(obj)) {
-      throw new Error(`Values must be an object).`);
-    }
     this._params.ExpressionAttributeValues = {
       ...this._params.ExpressionAttributeValues,
       ...obj

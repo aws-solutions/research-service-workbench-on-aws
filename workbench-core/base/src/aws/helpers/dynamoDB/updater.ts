@@ -27,9 +27,9 @@ class Updater {
     toParams: () => UpdateItemCommandInput;
   };
 
-  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._params = { TableName: options.table, Key: options.key, ReturnValues: 'ALL_NEW' };
+  public constructor(config: { region: string }, table: string, key: { [key: string]: AttributeValue }) {
+    this._ddb = new DynamoDB({ ...config });
+    this._params = { TableName: table, Key: key, ReturnValues: 'ALL_NEW' };
     this._marked = {};
     this._createdAtState = { enabled: true, processed: false, value: '' };
     this._updatedAtState = { enabled: true, processed: false, value: '' };
@@ -70,7 +70,7 @@ class Updater {
    */
   public table(name: string): Updater {
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`TableName must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty.`);
     }
     this._params.TableName = name;
     return this;
@@ -87,7 +87,7 @@ class Updater {
   public mark(arr: string[] = []): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.mark() after you called DbUpdater.update(). Call mark() before calling update().'
+        'You tried to call Updater.mark() after you called Updater.execute(). Call mark() before calling execute().'
       );
     }
     arr.forEach((key) => {
@@ -105,7 +105,7 @@ class Updater {
   public key(key: { [key: string]: AttributeValue }): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.key() after you called DbUpdater.update(). Call key() before calling update().'
+        'You tried to call Updater.key() after you called Updater.execute(). Call key() before calling execute().'
       );
     }
     if (!this._params.Key) {
@@ -123,7 +123,7 @@ class Updater {
   public disableCreatedAt(): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.disableCreatedAt() after you called DbUpdater.update(). Call disableCreatedAt() before calling update().'
+        'You tried to call Updater.disableCreatedAt() after you called Updater.execute(). Call disableCreatedAt() before calling execute().'
       );
     }
     this._createdAtState.enabled = false;
@@ -139,11 +139,13 @@ class Updater {
   public createdAt(str: string | Date): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.createdAt() after you called DbUpdater.update(). Call createdAt() before calling update().'
+        'You tried to call Updater.createdAt() after you called Updater.execute(). Call createdAt() before calling execute().'
       );
     }
     if (!_.isDate(str) && (!_.isString(str) || _.isEmpty(_.trim(str)))) {
-      throw new Error(`Updater.createdAt("${str}" <== must be a string or Date and can not be empty).`);
+      throw new Error(
+        `"${str}" <== must be a string or Date and can not be empty to assign to createdAt attribute.`
+      );
     }
     this._createdAtState.enabled = true;
     this._createdAtState.value = _.isDate(str) ? str.toISOString() : str;
@@ -158,7 +160,7 @@ class Updater {
   public disableUpdatedAt(): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.disableUpdatedAt() after you called DbUpdater.update(). Call disableUpdatedAt() before calling update().'
+        'You tried to call Updater.disableUpdatedAt() after you called Updater.execute(). Call disableUpdatedAt() before calling execute().'
       );
     }
     this._updatedAtState.enabled = false;
@@ -174,11 +176,13 @@ class Updater {
   public updatedAt(str: string | Date): Updater {
     if (this._params.UpdateExpression) {
       throw new Error(
-        'You tried to call Updater.updatedAt() after you called DbUpdater.update(). Call updatedAt() before calling update().'
+        'You tried to call Updater.updatedAt() after you called Updater.execute(). Call updatedAt() before calling execute().'
       );
     }
     if (!_.isDate(str) && (!_.isString(str) || _.isEmpty(_.trim(str)))) {
-      throw new Error(`Updater.updatedAt("${str}" <== must be a string or Date and can not be empty).`);
+      throw new Error(
+        `"${str}" <== must be a string or Date and can not be empty to assign to updatedAt attribute.`
+      );
     }
     this._updatedAtState.enabled = true;
     this._updatedAtState.value = _.isDate(str) ? str.toISOString() : str;
@@ -375,9 +379,6 @@ class Updater {
    * ```
    */
   public names(obj: { [key: string]: string } = {}): Updater {
-    if (!_.isObject(obj)) {
-      throw new Error(`Names must be an object).`);
-    }
     this._params.ExpressionAttributeNames = {
       ...this._params.ExpressionAttributeNames,
       ...obj
@@ -399,9 +400,6 @@ class Updater {
    * ```
    */
   public values(obj: { [key: string]: AttributeValue } = {}): Updater {
-    if (!_.isObject(obj)) {
-      throw new Error(`Values must be an object).`);
-    }
     this._params.ExpressionAttributeValues = {
       ...this._params.ExpressionAttributeValues,
       ...obj
@@ -427,7 +425,7 @@ class Updater {
    */
   public condition(str: string, separator: string = 'AND'): Updater {
     if (!_.isString(str) || _.isEmpty(_.trim(str))) {
-      throw new Error(`You already called condition() before .condition(${str}). Cannot set two conditions.`);
+      throw new Error(`Condition cannot be empty`);
     }
     this._internals.setConditionExpression(str, separator);
     return this;

@@ -19,48 +19,52 @@ class Getter {
   private _paramsBatch: BatchGetItemCommandInput | undefined;
   private _tableName: string;
 
-  public constructor(options: {
-    region: string;
-    table: string;
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[];
-  }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._tableName = options.table;
-    if (Array.isArray(options.key)) {
+  public constructor(
+    config: {
+      region: string;
+    },
+    table: string,
+    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[]
+  ) {
+    this._ddb = new DynamoDB({ ...config });
+    this._tableName = table;
+    if (Array.isArray(key)) {
       this._paramsBatch = { RequestItems: {} };
       this._paramsBatch.RequestItems = {};
-      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(options.key) };
+      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(key) };
     } else {
-      this._paramsItem = { TableName: options.table, Key: options.key };
+      this._paramsItem = { TableName: table, Key: key };
     }
   }
 
   /**
-   * Sets the TableName value of the command input for GetItem. Currently, this is only supported for single get item commands. This method is not required if the Getter is initialized with a table name.
+   * Sets the TableName value of the command input for GetItem. Currently, this is only supported for single get item commands.
+   * This method is not required if the Getter is initialized with a table name.
    *
    * @param name - name of the table containing the requested item
    * @returns Getter with populated params
    */
   public table(name: string): Getter {
     if (!this._paramsItem) {
-      return this;
+      throw new Error('Cannot change the table of batch get request after initialization. Start over.');
     }
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`TableName must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty.`);
     }
     this._paramsItem.TableName = name;
     return this;
   }
 
   /**
-   * Sets the Key value of the command input for GetItem. This is only for single get item commands. This method is not required if the Getter is initialized with a key.
+   * Sets the Key value of the command input for GetItem. This is only for single get item commands.
+   * This method is not required if the Getter is initialized with a key.
    *
    * @param key - object of the key of the item to get
    * @returns Getter with populated params
    */
   public key(key: { [key: string]: AttributeValue }): Getter {
     if (!this._paramsItem) {
-      return this;
+      throw new Error('Cannot use .key() on a batch get request.');
     }
     if (!this._paramsItem.Key) {
       this._paramsItem.Key = {};
@@ -77,7 +81,7 @@ class Getter {
    */
   public keys(keys: { [key: string]: AttributeValue }[]): Getter {
     if (!this._paramsBatch || !this._paramsBatch.RequestItems) {
-      return this;
+      throw new Error('Cannot use .keys() on a single get request.');
     }
     this._paramsBatch.RequestItems[this._tableName].Keys = Object.assign(keys);
     return this;
@@ -97,7 +101,9 @@ class Getter {
       this._paramsBatch.RequestItems[this._tableName].ConsistentRead = true;
       return this;
     }
-    return this;
+    throw new Error(
+      'Neither parameters for single get nor parameters for batch get are initialized. Cannot set ConsistentRead.'
+    );
   }
 
   /**
@@ -118,9 +124,6 @@ class Getter {
    * ```
    */
   public names(obj: { [key: string]: string } = {}): Getter {
-    if (!_.isObject(obj)) {
-      throw new Error(`Names must be an object).`);
-    }
     if (this._paramsItem) {
       this._paramsItem.ExpressionAttributeNames = {
         ...this._paramsItem.ExpressionAttributeNames,
@@ -135,7 +138,9 @@ class Getter {
       };
       return this;
     }
-    return this;
+    throw new Error(
+      'Neither parameters for single get nor parameters for batch get are initialized. Cannot set ExpressionAttributeNames.'
+    );
   }
 
   /**

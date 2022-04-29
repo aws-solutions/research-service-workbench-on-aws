@@ -55,7 +55,7 @@ export default class DynamoDBService {
     totalSegment?: number;
     capacity?: string;
   }): Scanner {
-    let scanner = new Scanner({ region: this._awsRegion, table: this._tableName });
+    let scanner = new Scanner({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.index) {
         scanner = scanner.index(params.index);
@@ -122,7 +122,7 @@ export default class DynamoDBService {
       capacity?: string;
     }
   ): Getter {
-    let getter = new Getter({ region: this._awsRegion, table: this._tableName, key: key });
+    let getter = new Getter({ region: this._awsRegion }, this._tableName, key);
     if (params) {
       if (params.strong === true) {
         getter = getter.strong();
@@ -180,7 +180,7 @@ export default class DynamoDBService {
     forward?: boolean;
     capacity?: string;
   }): Query {
-    let query = new Query({ region: this._awsRegion, table: this._tableName });
+    let query = new Query({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.index) {
         query = query.index(params.index);
@@ -302,7 +302,7 @@ export default class DynamoDBService {
       capacity?: string;
     }
   ): Updater {
-    let updater = new Updater({ region: this._awsRegion, table: this._tableName, key: key });
+    let updater = new Updater({ region: this._awsRegion }, this._tableName, key);
     if (params) {
       if (params.disableCreatedAt) {
         updater = updater.disableCreatedAt();
@@ -374,7 +374,7 @@ export default class DynamoDBService {
       metrics?: string;
     }
   ): Deleter {
-    let deleter = new Deleter({ region: this._awsRegion, table: this._tableName, key: key });
+    let deleter = new Deleter({ region: this._awsRegion }, this._tableName, key);
     if (params) {
       if (params.condition) {
         deleter = deleter.condition(params.condition);
@@ -422,7 +422,7 @@ export default class DynamoDBService {
     addDeleteRequests?: { [key: string]: AttributeValue }[];
     addWriteRequests?: { [key: string]: AttributeValue }[];
   }): BatchEdit {
-    let batchEdit = new BatchEdit({ region: this._awsRegion, table: this._tableName });
+    let batchEdit = new BatchEdit({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.addDeleteRequest) {
         batchEdit = batchEdit.addDeleteRequest(params.addDeleteRequest);

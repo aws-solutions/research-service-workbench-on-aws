@@ -14,9 +14,9 @@ class Scanner {
   private _ddb: DynamoDB;
   private _params: ScanCommandInput;
 
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._params = { TableName: options.table };
+  public constructor(config: { region: string }, table: string) {
+    this._ddb = new DynamoDB({ ...config });
+    this._params = { TableName: table };
   }
 
   /**
@@ -28,7 +28,7 @@ class Scanner {
    */
   public table(name: string): Scanner {
     if (_.isEmpty(_.trim(name))) {
-      throw new Error(`TableName must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty.`);
     }
     this._params.TableName = name;
     return this;
@@ -42,7 +42,7 @@ class Scanner {
    */
   public index(name: string): Scanner {
     if (_.isEmpty(_.trim(name))) {
-      throw new Error(`IndexName must be a string and can not be empty).`);
+      throw new Error(`IndexName must be a string and can not be empty.`);
     }
     this._params.IndexName = name;
     return this;
@@ -114,9 +114,6 @@ class Scanner {
    * ```
    */
   public names(obj: { [key: string]: string }): Scanner {
-    if (!_.isObject(obj)) {
-      throw new Error(`Names must be an object).`);
-    }
     this._params.ExpressionAttributeNames = {
       ...this._params.ExpressionAttributeNames,
       ...obj
@@ -138,9 +135,6 @@ class Scanner {
    * ```
    */
   public values(obj: { [key: string]: AttributeValue }): Scanner {
-    if (!_.isObject(obj)) {
-      throw new Error(`Values must be an object).`);
-    }
     this._params.ExpressionAttributeValues = {
       ...this._params.ExpressionAttributeValues,
       ...obj

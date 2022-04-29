@@ -49,7 +49,7 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region, table: ddbTableName || '' })
+      ddb: new DynamoDB({ region })
     };
 
     this.helpers = {

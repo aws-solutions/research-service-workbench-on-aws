@@ -14,9 +14,9 @@ class Deleter {
   private _ddb: DynamoDB;
   private _params: DeleteItemCommandInput;
 
-  public constructor(options: { region: string; table: string; key: { [key: string]: AttributeValue } }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._params = { TableName: options.table, Key: options.key };
+  public constructor(config: { region: string }, table: string, key: { [key: string]: AttributeValue }) {
+    this._ddb = new DynamoDB({ ...config });
+    this._params = { TableName: table, Key: key };
   }
 
   /**
@@ -28,7 +28,7 @@ class Deleter {
    */
   public table(name: string): Deleter {
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`TableName must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty.`);
     }
     this._params.TableName = name;
     return this;
@@ -94,9 +94,6 @@ class Deleter {
    * ```
    */
   public names(obj: { [key: string]: string } = {}): Deleter {
-    if (!_.isObject(obj)) {
-      throw new Error(`Names must be an object).`);
-    }
     this._params.ExpressionAttributeNames = {
       ...this._params.ExpressionAttributeNames,
       ...obj
@@ -117,9 +114,6 @@ class Deleter {
    * ```
    */
   public values(obj: { [key: string]: AttributeValue } = {}): Deleter {
-    if (!_.isObject(obj)) {
-      throw new Error(`Values must be an object).`);
-    }
     this._params.ExpressionAttributeValues = {
       ...this._params.ExpressionAttributeValues,
       ...obj

@@ -20,9 +20,9 @@ class BatchEdit {
   private _params: BatchWriteItemCommandInput;
   private _tableName: string;
 
-  public constructor(options: { region: string; table: string }) {
-    this._ddb = new DynamoDB({ ...options });
-    this._tableName = options.table;
+  public constructor(config: { region: string }, table: string) {
+    this._ddb = new DynamoDB({ ...config });
+    this._tableName = table;
     this._params = { RequestItems: {} };
     this._params.RequestItems = {};
     this._params.RequestItems[this._tableName] = [];
