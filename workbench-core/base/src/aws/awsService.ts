@@ -15,6 +15,8 @@ import { Credentials } from '@aws-sdk/types';
 import IAM from './clients/iam';
 import CloudformationService from './helpers/cloudformationService';
 import S3Service from './helpers/s3Service';
+import DynamoDB from './clients/dynamoDB';
+import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 
 export default class AwsService {
   public clients: {
@@ -27,13 +29,16 @@ export default class AwsService {
     s3: S3;
     sts: STS;
     iam: IAM;
+    ddb: DynamoDB;
   };
   public helpers: {
     cloudformation: CloudformationService;
     s3: S3Service;
+    ddb: DynamoDBService;
   };
 
-  public constructor(options: { region: string; credentials?: Credentials }) {
+  public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
+    const { region, ddbTableName } = options;
     this.clients = {
       cloudformation: new CloudFormation(options),
       cognito: new Cognito(options),
@@ -43,12 +48,14 @@ export default class AwsService {
       serviceCatalog: new ServiceCatalog(options),
       s3: new S3(options),
       sts: new STS(options),
-      iam: new IAM(options)
+      iam: new IAM(options),
+      ddb: new DynamoDB({ region })
     };
 
     this.helpers = {
       cloudformation: new CloudformationService(this.clients.cloudformation),
-      s3: new S3Service(this.clients.s3)
+      s3: new S3Service(this.clients.s3),
+      ddb: new DynamoDBService({ region, table: ddbTableName || '' })
     };
   }
 
