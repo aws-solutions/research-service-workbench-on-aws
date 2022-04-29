@@ -85,4 +85,4 @@ jobs:
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |
           echo "$SERVICE_ENDPOINT"
-          node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose
+          node common/scripts/install-run-rush.js test:update -o @amzn/workbench-core-infrastructure --verbose
