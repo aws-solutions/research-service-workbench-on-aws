@@ -74,8 +74,8 @@ jobs:
         id: endpoint
         run: |
           cd workbench-core/example/infrastructure
-          rushx cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
-          rushx cdk:deploy
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy
           SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
           echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
       
@@ -85,4 +85,4 @@ jobs:
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |
           echo "$SERVICE_ENDPOINT"
-          rush test:only -o @amzn/workbench-core-infrastructure --verbose
+          node ../../../common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose
