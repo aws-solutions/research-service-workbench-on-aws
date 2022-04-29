@@ -13,7 +13,7 @@ import Updater from './updater';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import _ from 'lodash';
 
-export default class DynamoDBHelperService {
+export default class DynamoDBService {
   private _awsRegion: string;
   private _tableName: string;
 
@@ -23,6 +23,24 @@ export default class DynamoDBHelperService {
     this._tableName = table;
   }
 
+  /**
+   * Creates a Scanner to do scan operations on a Dynamo DB table.
+   *
+   * @param params - optional object of optional properties to generate a scan request
+   * @returns A Scanner
+   *
+   * @example Only use this method to set up the Scanner in an external file
+   * ```ts
+   * const scanner = dynamoDBService.scan({index: 'some-index'});
+   * const dataFromScanOnIndex = await scanner.execute();
+   * ```
+   *
+   * @example Use this method to set up the Scanner and then manually edit params with scanner methods
+   * ```ts
+   * const scanner = dynamoDBService.scan().index({index: 'some-index'});
+   * const dataFromScanOnIndex = await scanner.execute();
+   * ```
+   */
   public scan(params?: {
     index?: string;
     start?: { [key: string]: AttributeValue };
@@ -76,6 +94,25 @@ export default class DynamoDBHelperService {
     return scanner;
   }
 
+  /**
+   * Creates a Getter to do single get item or batch get item operations on a DynamoDB table.
+   *
+   * @param key - single object of key to get for single get item or list of objects of keys to get for batch get item
+   * @param params - optional object of optional properties to generate a get item request
+   * @returns A Getter
+   *
+   * @example Only use this method to set up the Getter in an external file
+   * ```ts
+   * const getter = dynamoDBService.get({'pk': {S: 'pk'}, 'sk': {S: 'sk'}}, {projection: 'valueIWant'});
+   * const dataFromGetValueIWant = await getter.execute();
+   * ```
+   *
+   * @example Use this method to set up the Getter and then manually edit params with getter methods
+   * ```ts
+   * const getter = dynamoDBService.get({'pk': {S: 'pk'}, 'sk': {S: 'sk'}});
+   * const dataFromGetValueIWant = await getter.projection({projection: 'valueIWant'}).execute();
+   * ```
+   */
   public get(
     key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[],
     params?: {
@@ -103,6 +140,24 @@ export default class DynamoDBHelperService {
     return getter;
   }
 
+  /**
+   * Creates a Query to do query operations on a DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a query request
+   * @returns A Query
+   *
+   * @example Only use this method to set up the Query in an external file
+   * ```ts
+   * const query = dynamoDBService.query({sortKey: 'value', eq: {N: '5'}});
+   * const queryValueEq5 = await query.execute();
+   * ```
+   *
+   * @example Use this method to set up the Query and then manually edit params with query methods
+   * ```ts
+   * const query = dynamoDBService.query();
+   * const queryValueEq5 = await query.sortKey('value').eq({N: '5'}).execute();
+   * ```
+   */
   public query(params?: {
     index?: string;
     key?: { name: string; value: AttributeValue };
@@ -211,6 +266,25 @@ export default class DynamoDBHelperService {
     return query;
   }
 
+  /**
+   * Creates an Updater to do update item operations on a DynamoDB table.
+   *
+   * @param key - object of key to update
+   * @param params - optional object of optional properties to generate an update request
+   * @returns A Updater
+   *
+   * @example Only use this method to set up the Updater in an external file
+   * ```ts
+   * const updater = dynamoDBService.update({'pk': {S: 'pk'}, 'sk': {S: 'sk}}, {item: {'newAttribute': {S: 'newValue'}}});
+   * const dataFromUpdate = await updater.execute();
+   * ```
+   *
+   * @example Use this method to set up the Updater and then manually edit params with updater methods
+   * ```ts
+   * const updater = dynamoDBService.update({'pk': {S: 'pk'}, 'sk': {S: 'sk}});
+   * const dataFromUpdate = await updater.item({'newAttribute': {S: 'newValue'}}).execute();
+   * ```
+   */
   public update(
     key: { [key: string]: AttributeValue },
     params?: {
@@ -270,6 +344,25 @@ export default class DynamoDBHelperService {
     return updater;
   }
 
+  /**
+   * Creates a Deleter to do single delete item operations on a DynamoDB table.
+   *
+   * @param key - object of key to delete
+   * @param params - optional object of optional properties to generate a delete request
+   * @returns A Deleter
+   *
+   * @example Only use this method to set up the Deleter in an external file
+   * ```ts
+   * const deleter = dynamoDBService.delete({'pk': {S: 'pk'}, 'sk': {S: 'sk}}, {condition: 'attribute_not_exists(DONOTDELETE)'});
+   * const dataFromCondDelete = await deleter.execute();
+   * ```
+   *
+   * @example Use this method to set up the Deleter and then manually edit params with deleter methods
+   * ```ts
+   * const deleter = dynamoDBService.delete({'pk': {S: 'pk'}, 'sk': {S: 'sk}});
+   * const dataFromCondDelete = await deleter.condition('attribute_not_exists(DONOTDELETE)').execute();
+   * ```
+   */
   public delete(
     key: { [key: string]: AttributeValue },
     params?: {
@@ -305,6 +398,24 @@ export default class DynamoDBHelperService {
     return deleter;
   }
 
+  /**
+   * Creates a BatchEdit to do batch write or delete operations on a DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a batch edit request
+   * @returns A BatchEdit
+   *
+   * @example Only use this method to set up the BatchEdit in an external file
+   * ```ts
+   * const batchEdit = dynamoDBService.batchEdit({addDeleteRequest: {'pk': {S: 'pk'}, 'sk': {S: 'sk'}}});
+   * const dataFromBatchEditSingleDelete = await batchEdit.execute();
+   * ```
+   *
+   * @example Use this method to set up the BatchEdit and then manually edit params with batch edit methods
+   * ```ts
+   * const batchEdit = dynamoDBService.batchEdit();
+   * const dataFromBatchEditSingleDelete = await batchEdit.addDeleteRequest({'pk': {S: 'pk'}, 'sk': {S: 'sk'}}).execute();
+   * ```
+   */
   public batchEdit(params?: {
     addDeleteRequest?: { [key: string]: AttributeValue };
     addWriteRequest?: { [key: string]: AttributeValue };

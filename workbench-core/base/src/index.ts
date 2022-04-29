@@ -1,4 +1,4 @@
 import AwsService from './aws/awsService';
-import DynamoDBHelperService from './dynamoDB/dynamoDBHelperService';
+import DynamoDBService from './dynamoDB/DynamoDBService';
 
-export { AwsService, DynamoDBHelperService };
+export { AwsService, DynamoDBService };

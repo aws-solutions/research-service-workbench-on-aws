@@ -18,6 +18,7 @@ class Getter {
   private _paramsItem: GetItemCommandInput | undefined;
   private _paramsBatch: BatchGetItemCommandInput | undefined;
   private _tableName: string;
+
   public constructor(options: {
     region: string;
     table: string;
@@ -33,41 +34,60 @@ class Getter {
       this._paramsItem = { TableName: options.table, Key: options.key };
     }
   }
-  // only for get item
+
+  /**
+   * Sets the TableName value of the command input for GetItem. Currently, this is only supported for single get item commands. This method is not required if the Getter is initialized with a table name.
+   *
+   * @param name - name of the table containing the requested item
+   * @returns Getter with populated params
+   */
   public table(name: string): Getter {
     if (!this._paramsItem) {
       return this;
     }
     if (!_.isString(name) || _.isEmpty(_.trim(name))) {
-      throw new Error(`DbGetter.table("${name}" <== must be a string and can not be empty).`);
+      throw new Error(`TableName must be a string and can not be empty).`);
     }
     this._paramsItem.TableName = name;
     return this;
   }
-  // only for get item
-  // can be either key(key, value) or key({ key1: value1, key2: value2, ...})
-  public key(args: { [key: string]: AttributeValue }): Getter {
+
+  /**
+   * Sets the Key value of the command input for GetItem. This is only for single get item commands. This method is not required if the Getter is initialized with a key.
+   *
+   * @param key - object of the key of the item to get
+   * @returns Getter with populated params
+   */
+  public key(key: { [key: string]: AttributeValue }): Getter {
     if (!this._paramsItem) {
       return this;
     }
     if (!this._paramsItem.Key) {
       this._paramsItem.Key = {};
     }
-    this._paramsItem.Key = args;
+    this._paramsItem.Key = key;
     return this;
   }
-  // only for BATCH get item
-  //   must be keys([{ key1: value1, key2: value2, ... }, { keyA: valueA, keyB, valueB, ...}, ...])
-  //   uses batchGet() API instead of just get()
-  public keys(args: AttributeValue[]): Getter {
+
+  /**
+   * Sets the Keys balue of the command input for BatchGetItem. This is only for batch get item commands. This method is not required if the Getter is initialized with keys.
+   *
+   * @param keys - the list of objects of the keys of the items to get
+   * @returns Getter with populated params
+   */
+  public keys(keys: { [key: string]: AttributeValue }[]): Getter {
     if (!this._paramsBatch || !this._paramsBatch.RequestItems) {
       return this;
     }
-    this._paramsBatch.RequestItems[this._tableName].Keys = Object.assign(args);
+    this._paramsBatch.RequestItems[this._tableName].Keys = Object.assign(keys);
     return this;
   }
-  // for both BATCH get item and get item
-  // same as ConsistentRead = true
+
+  /**
+   * Sets ConsistentRead to be true for BatchGetItem or GetItem input. If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   *
+   * @returns Getter with populated params
+   */
   public strong(): Getter {
     if (this._paramsItem) {
       this._paramsItem.ConsistentRead = true;
@@ -79,10 +99,27 @@ class Getter {
     }
     return this;
   }
-  // same as ExpressionAttributeNames
+
+  /**
+   * Sets the ExpressionAttributeNames of the command input for BatchGetItem or GetItem.
+   * The following are some use cases for using ExpressionAttributeNames:
+   *  To access an attribute whose name conflicts with a DynamoDB reserved word: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html
+   *  To create a placeholder for repeating occurrences of an attribute name in an expression.
+   *  To prevent special characters in an attribute name from being misinterpreted in an expression.
+   * Use the # character in an expression to dereference an attribute name.
+   *
+   * @param obj - object of one or more substitution tokens for attribute names in an expression
+   * @returns Getter with populated params
+   *
+   * @example Using the reserved word 'Percentile' in your request
+   * ```ts
+   * # Usage
+   * Getter.names({"#P":"Percentile"}).condition("#P = 50");
+   * ```
+   */
   public names(obj: { [key: string]: string } = {}): Getter {
     if (!_.isObject(obj)) {
-      throw new Error(`DbGetter.names("${obj}" <== must be an object).`);
+      throw new Error(`Names must be an object).`);
     }
     if (this._paramsItem) {
       this._paramsItem.ExpressionAttributeNames = {
@@ -101,7 +138,15 @@ class Getter {
     return this;
   }
 
-  // same as ProjectionExpression
+  /**
+   * Sets ProjectionExpression of the command input for BatchGetItem or GetItem.
+   * A string or list of strings that identifies one or more attributes to retrieve from the table.
+   * If no attribute names are specified, then all attributes are returned.
+   * If any of the requested attributes are not found, they do not appear in the result.
+   *
+   * @param expr - string or list of strings of the attributes to retrieve
+   * @returns Getter with populated params
+   */
   public projection(expr: string | string[]): Getter {
     if (this._paramsItem) {
       return this._assignProjectionExressionToSingle(expr);
@@ -109,6 +154,12 @@ class Getter {
     return this._assignProjectionExressionToBatch(expr);
   }
 
+  /**
+   * Helper method to assign projection expression values to single get item command input.
+   *
+   * @param expr - string or list of strings of the attributes to retrieve
+   * @returns Getter with populated params
+   */
   private _assignProjectionExressionToSingle(expr: string | string[]): Getter {
     if (!this._paramsItem) {
       return this;
@@ -138,11 +189,18 @@ class Getter {
         ...names
       };
     } else {
-      throw new Error(`DbGetter.projection("${expr}" <== must be a string or an array).`);
+      throw new Error(`"${expr}" must be a string or an array to generate the projection expression.`);
     }
 
     return this;
   }
+
+  /**
+   * Helper method to assign projection expression values to batch get item command input.
+   *
+   * @param expr - string or list of strings of the attributes to retrieve
+   * @returns Getter with populated params
+   */
   private _assignProjectionExressionToBatch(expr: string | string[]): Getter {
     if (!this._paramsBatch || !this._paramsBatch.RequestItems) {
       return this;
@@ -176,19 +234,30 @@ class Getter {
         ...names
       };
     } else {
-      throw new Error(`DbGetter.projection("${expr}" <== must be a string or an array).`);
+      throw new Error(`"${expr}" must be a string or an array to generate the projection expression.`);
     }
 
     return this;
   }
-  // for both batch and single get item
-  // same as ReturnConsumedCapacity
+
+  /**
+   * Sets the ReturnConsumedCapacity of the command input for BatchGetItem or GetItem.
+   * Determines the level of detail about either provisioned or on-demand throughput consumption that is returned in the response:
+   *  INDEXES - The response includes the aggregate ConsumedCapacity for the operation, together with ConsumedCapacity for each table and secondary index that was accessed.
+   *  TOTAL - The response includes only the aggregate ConsumedCapacity for the operation.
+   *  NONE - No ConsumedCapacity details are included in the response.
+   *
+   * @param str - indexes, total, or none (non case sensitive strings)
+   * @returns Getter with populated params
+   */
   public capacity(str: string = ''): Getter {
     const upper = str.toUpperCase();
     const allowed = ['INDEXES', 'TOTAL', 'NONE'];
     if (!allowed.includes(upper)) {
       throw new Error(
-        `DbGetter.capacity("${upper}" <== is not a valid value). Only ${allowed.join(',')} are allowed.`
+        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
+          ','
+        )} are allowed.`
       );
     }
     if (this._paramsItem) {
@@ -198,17 +267,85 @@ class Getter {
     }
     return this;
   }
-  // used for testing purposes
+
+  /**
+   * Gets the internal _paramsItems value of the command input. For single get only, obviously.
+   *
+   * @returns The parameters for the GetItemCommandInput
+   *
+   * @example Returning command input
+   * ```ts
+   * # Result
+   * {
+   *  Key: {},
+   *  TableName: string,
+   *  ConsistentRead?: boolean,
+   *  ExpressionAttributeNames?: {},
+   *  ProjectionExpression?: string,
+   *  ReturnConsumedCapacity?: 'INDEXES' | 'TOTAL' | 'NONE'
+   * }
+   * ```
+   */
   public getItemParams(): GetItemCommandInput | undefined {
     return this._paramsItem;
   }
-  // used for testing purposes
+
+  /**
+   * Gets the internal _paramsBatch value of the command input. For batch get only, obviously.
+   *
+   * @returns The parameters for the BatchGetItemCommandInput
+   *
+   * @example Returning command input
+   * ```ts
+   * # Result
+   * {
+   *  RequestItems: {
+   *    <TableName> : {
+   *      Keys: [],
+   *      ConsistentRead?: boolean,
+   *      ExpressionAttributeNames?: {},
+   *      ProjectionExpression?: string
+   *    },...
+   *  },
+   *  ReturnConsumedCapacity?: 'INDEXES' | 'TOTAL' | 'NONE'
+   * }
+   * ```
+   */
   public getBatchParams(): BatchGetItemCommandInput | undefined {
     return this._paramsBatch;
   }
+
+  /**
+   * Sends the internal parameters as input to the DynamoDB table to execute the GetItem or BatchGetItem request.
+   * Call this after populating the command input params with the above methods.
+   * Each object in Responses consists of a table name, along with a map of attribute data consisting of the data type and attribute value
+   * If UnproccessedKeys is non empty, some request failed.
+   *
+   * @returns The output from the get item command or the batch get item command
+   *
+   * @example GetItemCommandOutput
+   * ```ts
+   * # Result
+   * {
+   *  ConsumedCapacity?: [],
+   *  Item?: {}
+   * }
+   * ```
+   *
+   * @example BatchGetItemCommandOutput
+   * ```ts
+   * # Result
+   * {
+   *  ConsumedCapacity?: [],
+   *  Responses?: {},
+   *  UnprocessedKeys: {}
+   * }
+   * ```
+   *
+   */
   public async execute(): Promise<GetItemCommandOutput | BatchGetItemCommandOutput> {
     if (this._paramsItem && this._paramsBatch) {
-      throw new Error('dynamoDBGetterService <== only key() or keys() may be called, not both');
+      throw new Error('Getter <== only key() or keys() may be called, not both');
     }
 
     if (this._paramsItem) {
@@ -217,7 +354,7 @@ class Getter {
       return await this._ddb.batchGet(this._paramsBatch);
     }
 
-    throw new Error('dynamoDBGetterService <== neither parameters were initialized');
+    throw new Error('Getter <== neither parameters were initialized');
   }
 }
 

@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import DynamoDBHelperService from './dynamoDBHelperService';
+import DynamoDBService from './DynamoDBService';
 
-describe('DynamoDBHelperService', () => {
-  const dbHelperService = new DynamoDBHelperService({ region: 'some-region', table: 'some-table' });
+describe('DynamoDBService', () => {
+  const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
   describe('batchEdit', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
@@ -17,7 +17,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.batchEdit().getParams();
+      const generatedParams = dbService.batchEdit().getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -41,7 +41,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.batchEdit(developerParams).getParams();
+      const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -65,7 +65,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.batchEdit(developerParams).getParams();
+      const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -102,7 +102,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.batchEdit(developerParams).getParams();
+      const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -139,7 +139,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.batchEdit(developerParams).getParams();
+      const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -155,7 +155,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key).getParams();
+      const generatedParams = dbService.delete(key).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -171,7 +171,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -187,7 +187,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -203,7 +203,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -219,7 +219,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -235,7 +235,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -246,8 +246,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { return: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.delete(key, developerParams)).toThrow(
-        `Deleter.return("SOME" <== is not a valid value). Only NONE,ALL_OLD are allowed.`
+      expect(() => dbService.delete(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for DeleteItem ReturnValues. Only NONE,ALL_OLD are allowed.`
       );
     });
     test('should populate params with optional param: capacity = indexes', async () => {
@@ -261,7 +261,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -277,7 +277,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -293,7 +293,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -304,8 +304,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { capacity: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.delete(key, developerParams)).toThrow(
-        `Deleter.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`
+      expect(() => dbService.delete(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
     test('should populate params with optional param: metrics = none', async () => {
@@ -319,7 +319,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -335,7 +335,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.delete(key, developerParams).getParams();
+      const generatedParams = dbService.delete(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -346,8 +346,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { metrics: 'lightyears' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.delete(key, developerParams)).toThrow(
-        `Deleter.metrics("LIGHTYEARS" <== is not a valid value). Only NONE,SIZE are allowed.`
+      expect(() => dbService.delete(key, developerParams)).toThrow(
+        `"LIGHTYEARS" <== is not a valid value for ReturnItemCollectionMetrics. Only NONE,SIZE are allowed.`
       );
     });
   });
@@ -359,8 +359,8 @@ describe('DynamoDBHelperService', () => {
       const expectedParams = { Key: { pk: { S: 'testId' }, sk: { S: 'testId' } }, TableName: 'some-table' };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key).getBatchParams();
+      const generatedItemParams = dbService.get(key).getItemParams();
+      const generatedBatchParams = dbService.get(key).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -377,8 +377,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -391,8 +391,8 @@ describe('DynamoDBHelperService', () => {
       const expectedParams = { Key: { pk: { S: 'testId' }, sk: { S: 'testId' } }, TableName: 'some-table' };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -409,8 +409,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -427,8 +427,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -446,8 +446,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -464,8 +464,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -482,8 +482,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -500,8 +500,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -513,8 +513,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { capacity: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.get(key, developerParams)).toThrowError(
-        new Error(`DbGetter.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`)
+      expect(() => dbService.get(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
     test('single get should populate params with all optional params', async () => {
@@ -536,8 +536,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedItemParams).toEqual(expectedParams);
@@ -562,8 +562,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key).getBatchParams();
+      const generatedItemParams = dbService.get(key).getItemParams();
+      const generatedBatchParams = dbService.get(key).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -589,8 +589,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -615,8 +615,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -642,8 +642,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -669,8 +669,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -697,8 +697,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -724,8 +724,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -751,8 +751,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -778,8 +778,8 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedItemParams = dbHelperService.get(key, developerParams).getItemParams();
-      const generatedBatchParams = dbHelperService.get(key, developerParams).getBatchParams();
+      const generatedItemParams = dbService.get(key, developerParams).getItemParams();
+      const generatedBatchParams = dbService.get(key, developerParams).getBatchParams();
 
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
@@ -796,8 +796,8 @@ describe('DynamoDBHelperService', () => {
       // OPERATE
 
       // CHECK
-      expect(() => dbHelperService.get(key, developerParams)).toThrow(
-        `DbGetter.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`
+      expect(() => dbService.get(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
   });
@@ -809,7 +809,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query().getParams();
+      const generatedParams = dbService.query().getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -823,7 +823,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECL
       expect(generatedParams).toEqual(expectedParams);
@@ -839,7 +839,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -855,7 +855,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -871,7 +871,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -887,7 +887,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -903,7 +903,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -919,7 +919,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -941,7 +941,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -957,7 +957,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -980,7 +980,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -990,7 +990,7 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { eq: { S: 'sortKeyEqValue' } };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.query(developerParams)).toThrow(
+      expect(() => dbService.query(developerParams)).toThrow(
         'You cannot query on sortKey without providing a sortKey name'
       );
     });
@@ -1003,7 +1003,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.query(developerParams)).toThrow(
+      expect(() => dbService.query(developerParams)).toThrow(
         'You cannot query on two conditions seperately for sortKey'
       );
     });
@@ -1016,7 +1016,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1030,7 +1030,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1044,7 +1044,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1057,7 +1057,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1071,7 +1071,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1085,7 +1085,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1099,7 +1099,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1114,7 +1114,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1128,7 +1128,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1142,7 +1142,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1156,7 +1156,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1170,7 +1170,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1180,17 +1180,17 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { select: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.query(developerParams)).toThrow(
-        `Query.select("SOME" <== is not a valid value). Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
+      expect(() => dbService.query(developerParams)).toThrow(
+        `"SOME" <== is not a valid value for Select. Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
       );
     });
-    test('should fail with invalid optional params: projection but select != all_projected_attributes', async () => {
+    test('should fail with invalid optional params: projection but select != specific_attributes', async () => {
       // BUILD
       const developerParams = { projection: 'status', select: 'all_attributes' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.query(developerParams)).toThrow(
-        `You cannot select values except ALL_PROJECTED_ATTRIBUTES when using projectionExpression`
+      expect(() => dbService.query(developerParams)).toThrow(
+        `You cannot select values except SPECIFIC_ATTRIBUTES when using projectionExpression`
       );
     });
     test('should populate params with optional param: limit', async () => {
@@ -1202,7 +1202,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1216,7 +1216,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1230,7 +1230,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1244,7 +1244,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1258,7 +1258,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1272,7 +1272,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.query(developerParams).getParams();
+      const generatedParams = dbService.query(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1282,8 +1282,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { capacity: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.query(developerParams)).toThrow(
-        `Query.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`
+      expect(() => dbService.query(developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
   });
@@ -1295,7 +1295,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan().getParams();
+      const generatedParams = dbService.scan().getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1309,7 +1309,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1323,7 +1323,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1337,7 +1337,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1351,7 +1351,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1364,7 +1364,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1378,7 +1378,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1392,7 +1392,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1406,7 +1406,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1421,7 +1421,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1435,7 +1435,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1449,7 +1449,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1463,7 +1463,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1477,7 +1477,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1487,8 +1487,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { select: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.scan(developerParams)).toThrow(
-        `Scanner.select("SOME" <== is not a valid value). Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
+      expect(() => dbService.scan(developerParams)).toThrow(
+        `"SOME" <== is not a valid value for Select. Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
       );
     });
     test('should populate params with optional param: limit', async () => {
@@ -1500,7 +1500,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1515,7 +1515,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1529,7 +1529,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1543,7 +1543,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1557,7 +1557,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.scan(developerParams).getParams();
+      const generatedParams = dbService.scan(developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1567,8 +1567,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { capacity: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.scan(developerParams)).toThrow(
-        `Scanner.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`
+      expect(() => dbService.scan(developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
   });
@@ -1583,7 +1583,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key).getParams();
+      const generatedParams = dbService.update(key).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1609,7 +1609,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1637,7 +1637,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1665,7 +1665,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1689,7 +1689,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1717,7 +1717,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1733,7 +1733,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1749,7 +1749,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1765,7 +1765,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1781,7 +1781,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1797,7 +1797,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1808,8 +1808,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { return: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.update(key, developerParams)).toThrow(
-        `DbUpdater.return("SOME" <== is not a valid value). Only NONE,ALL_OLD,UPDATED_OLD,ALL_NEW,UPDATED_NEW are allowed.`
+      expect(() => dbService.update(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnValues. Only NONE,ALL_OLD,UPDATED_OLD,ALL_NEW,UPDATED_NEW are allowed.`
       );
     });
     test('should populate params with optional param: metrics = none', async () => {
@@ -1824,7 +1824,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1841,7 +1841,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1852,8 +1852,8 @@ describe('DynamoDBHelperService', () => {
       const developerParams = { metrics: 'lightyears' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.update(key, developerParams)).toThrow(
-        `DbUpdater.metrics("LIGHTYEARS" <== is not a valid value). Only NONE,SIZE are allowed.`
+      expect(() => dbService.update(key, developerParams)).toThrow(
+        `"LIGHTYEARS" <== is not a valid value for ReturnItemCollectionMetrics. Only NONE,SIZE are allowed.`
       );
     });
     test('should populate params with optional param: capacity = indexes', async () => {
@@ -1868,7 +1868,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1885,7 +1885,7 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1902,19 +1902,19 @@ describe('DynamoDBHelperService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbHelperService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update(key, developerParams).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should fail with optional param: capacity is invalid', async () => {
+    test('should fail zwith optional param: capacity is invalid', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
       const developerParams = { capacity: 'some' };
 
       // OPERATE n CHECK
-      expect(() => dbHelperService.update(key, developerParams)).toThrow(
-        `DbUpdater.capacity("SOME" <== is not a valid value). Only INDEXES,TOTAL,NONE are allowed.`
+      expect(() => dbService.update(key, developerParams)).toThrow(
+        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
       );
     });
   });
