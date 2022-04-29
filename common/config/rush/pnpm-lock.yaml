@@ -143,7 +143,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
       '@types/js-yaml': ^4.0.5
-      '@types/lodash': ^4.14.181
       '@types/node': ^12
       '@types/uuid': ^8.3.4
       '@vendia/serverless-express': ^4.5.4
@@ -159,7 +158,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       js-yaml: ^4.1.0
-      lodash: ^4.17.21
       ts-jest: ^27.1.3
       ts-node: ^10.4.0
       typescript: ^4.5.2
@@ -179,7 +177,6 @@ importers:
       aws-sdk-client-mock: 0.6.2_3fb008a70ba24880f14732bae32e5553
       express: 4.18.0
       js-yaml: 4.1.0
-      lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
@@ -192,7 +189,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
       '@types/js-yaml': 4.0.5
-      '@types/lodash': 4.14.182
       '@types/node': 12.20.50
       '@types/uuid': 8.3.4
       aws-cdk: 2.21.1
@@ -367,14 +363,12 @@ importers:
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
-      '@types/lodash': ^4.14.181
       '@types/node': ^12
       aws-sdk-client-mock: ^0.6.2
       eslint: ^8.7.0
       generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lodash: ^4.17.21
       md5-file: ^5.0.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
@@ -391,7 +385,6 @@ importers:
       '@aws-sdk/client-ssm': 3.78.0
       '@aws-sdk/client-sts': 3.78.0
       generate-password: 1.7.0
-      lodash: 4.17.21
       md5-file: 5.0.0
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -402,7 +395,6 @@ importers:
       '@rushstack/heft-node-rig': 1.9.1_@rushstack+heft@0.45.0
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.4.1
-      '@types/lodash': 4.14.182
       '@types/node': 12.20.50
       aws-sdk-client-mock: 0.6.2_3fb008a70ba24880f14732bae32e5553
       eslint: 8.14.0
@@ -771,6 +763,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.154.0:
     resolution: {integrity: sha512-ujMVD0P/V3qwAjANiwm6zVeDRCihuAq1D4ch2HUyusyHiG1r3/fxT/7as6F6y4fbxElhtUxNdskbPBEZiGyxTA==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
+    dependencies:
+      jsonschema: 1.4.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - jsonschema
@@ -783,7 +778,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.154.0
       '@aws-cdk/cx-api': 1.154.0
       '@aws-cdk/region-info': 1.154.0
+      '@balena/dockerignore': 1.0.2
       constructs: 3.3.280
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -810,6 +809,7 @@ packages:
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.154.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - semver
@@ -3765,7 +3765,6 @@ packages:
 
   /@balena/dockerignore/1.0.2:
     resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
-    dev: true
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -5433,7 +5432,6 @@ packages:
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
-    dev: true
 
   /atob/2.1.2:
     resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
@@ -7310,7 +7308,6 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
-    dev: true
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
@@ -8769,7 +8766,6 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
-    dev: true
 
   /jsonpath-plus/4.0.0:
     resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
@@ -8778,7 +8774,6 @@ packages:
 
   /jsonschema/1.4.0:
     resolution: {integrity: sha512-/YgW6pRMr6M7C+4o8kS+B/2myEpHCrxO4PEWnqJNBFMjn7EWXqlQ4tGwL6xTHeRplwuZmcAncdvfOad1nT2yMw==}
-    dev: true
 
   /jsx-ast-utils/3.2.2:
     resolution: {integrity: sha512-HDAyJ4MNQBboGpUnHAVUNJs6X0lh058s6FuixsFGP7MgJYpD6Vasd6nzSG5iIfXu1zAYlHJ/zsOKNlrenTUBnw==}
@@ -10737,7 +10732,6 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw=}
