@@ -253,7 +253,7 @@ describe('DynamoDBService', () => {
     test('should populate params with optional param: capacity = indexes', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -269,7 +269,7 @@ describe('DynamoDBService', () => {
     test('should populate params with optional param: capacity = total', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -285,7 +285,7 @@ describe('DynamoDBService', () => {
     test('should populate params with optional param: capacity = none', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -297,16 +297,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: capacity is invalid', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.delete(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
     });
     test('should populate params with optional param: metrics = none', async () => {
       // BUILD
@@ -456,7 +446,7 @@ describe('DynamoDBService', () => {
     test('single get should populate params with optional param: capacity = indexes', async () => {
       // BUILD
       const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' };
       const expectedParams = {
         Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
         TableName: 'some-table',

@@ -370,7 +370,7 @@ export default class DynamoDBService {
       names?: { [key: string]: string };
       values?: { [key: string]: AttributeValue };
       return?: string;
-      capacity?: string;
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
       metrics?: string;
     }
   ): Deleter {

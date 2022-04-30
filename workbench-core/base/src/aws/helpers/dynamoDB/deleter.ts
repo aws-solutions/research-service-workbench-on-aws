@@ -153,17 +153,8 @@ class Deleter {
    * @param str - indexes, total, or none (non case sensitive strings)
    * @returns Deleter with populated params
    */
-  public capacity(str: string = ''): Deleter {
-    const upper = str.toUpperCase();
-    const allowed = ['INDEXES', 'TOTAL', 'NONE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnConsumedCapacity = upper;
+  public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Deleter {
+    this._params.ReturnConsumedCapacity = str;
     return this;
   }
 
