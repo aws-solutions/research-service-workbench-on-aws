@@ -10,6 +10,7 @@ import { join } from 'path';
 import Workflow from './environment/workflow';
 import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { getConstants } from './constants';
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -62,6 +63,8 @@ export class SWBStack extends Stack {
 
     this._createEventBridgeResources();
     this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+
+    this._createDDBTable(apiLambda);
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -305,5 +308,31 @@ export class SWBStack extends Stack {
     API.root.addProxy({
       defaultIntegration: new LambdaIntegration(apiLambda)
     });
+  }
+
+  // DynamoDB Table
+  private _createDDBTable(apiLambda: Function): void {
+    // Ideally, this needs to involve the solution name
+    const tableName: string = `${this.stackName}`;
+    const table = new Table(this, tableName, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      tableName: tableName
+    });
+    // Add GSI for get resource by status
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByStatus',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'status', type: AttributeType.NUMBER }
+    });
+    // Add GSI for get resource by owner
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByOwner',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'owner', type: AttributeType.NUMBER }
+    });
+    // Grant the Lambda Function read access to the DynamoDB table
+    table.grantReadWriteData(apiLambda);
+    new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
   }
 }
