@@ -83,18 +83,4 @@ describe('EnvironmentLifecycleHelper', () => {
     const helper = new EnvironmentLifecycleHelper();
     await expect(helper.storeToDdb({})).resolves.not.toThrowError();
   });
-
-  test('getMainEventBusArn returns the expected OutputValue', async () => {
-    // BUILD
-    const cfnMock = mockClient(CloudFormationClient);
-    // Mock Cloudformation describeStacks
-    mockCloudformationOutputs(cfnMock);
-    const helper = new EnvironmentLifecycleHelper();
-
-    // EXECUTE
-    const resultArn = await helper.getMainEventBusArn();
-
-    // CHECK
-    expect(resultArn).toBe('arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va');
-  });
 });

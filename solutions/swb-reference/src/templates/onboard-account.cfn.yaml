@@ -101,6 +101,14 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess
       Policies:
+        - PolicyName: eventbus-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !GetAtt [HostEventBus, Arn]
         - PolicyName: cfn-access
           PolicyDocument:
             Version: '2012-10-17'
@@ -129,7 +137,7 @@ Resources:
                 - ssm:StartAutomationExecution
               Resource:
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
-                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*:*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*'
         - PolicyName: iam-pass-role
           PolicyDocument:
             Statement:
@@ -194,6 +202,10 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource: !GetAtt [HostEventBus, Arn]
           - Effect: Allow
             Action:
               - s3:*

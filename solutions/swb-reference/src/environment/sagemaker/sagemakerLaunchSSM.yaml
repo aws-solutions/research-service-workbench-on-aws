@@ -46,6 +46,14 @@ parameters:
     type: String
     description: 'The main account event bridge bus name.'
     default: ''
+  EnvironmentInstanceFiles:
+    type: String
+    description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
+    default: ''
+  AutoStopIdleTimeInMinutes:
+    type: String
+    description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
+    default: '0'
 mainSteps:
   - name: LaunchSagemaker
     action: 'aws:executeAwsApi'
@@ -73,16 +81,20 @@ mainSteps:
           Value: ml.t3.medium
         - Key: Subnet
           Value: '{{ Subnet }}'
+        - Key: EnvironmentInstanceFiles
+          Value: '{{ EnvironmentInstanceFiles }}'
+        - Key: AutoStopIdleTimeInMinutes
+          Value: '{{ AutoStopIdleTimeInMinutes }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'
-      outputs:
-        - Name: ProvisionedProductId
-          Type: String
-          Selector: '$.RecordDetail.ProvisionedProductId'
-        - Name: RecordId
-          Type: String
-          Selector: '$.RecordDetail.RecordId'
+    outputs:
+      - Name: ProvisionedProductId
+        Type: String
+        Selector: '$.RecordDetail.ProvisionedProductId'
+      - Name: RecordId
+        Type: String
+        Selector: '$.RecordDetail.RecordId'
     description: Launch Sagemaker
     nextStep: WaitForProvisioning
   - name: WaitForProvisioning
@@ -107,7 +119,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ LaunchSagemaker.ProvisionedProductId }}\", \"RecordId\": \"{{ LaunchSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Launch\" }'
+        - Detail: '{ "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch" }'
           DetailType: 'Success'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'
@@ -118,7 +130,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ LaunchSagemaker.ProvisionedProductId }}\", \"RecordId\": \"{{ LaunchSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Launch\" }'
+        - Detail: '{ "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch" }'
           DetailType: 'Failure'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'

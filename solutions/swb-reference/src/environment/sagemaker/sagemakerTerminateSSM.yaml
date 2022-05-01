@@ -1,10 +1,6 @@
 description: SSM document to terminate a Sagemaker instance
 schemaVersion: '0.3'
 parameters:
-  InstanceName:
-    type: String
-    description: 'The name of the Sagemaker instance being terminated.'
-    default: ''
   ProvisionedProductId:
     type: String
     description: 'The ID of the Sagemaker provisioned product being terminated.'
@@ -35,11 +31,11 @@ mainSteps:
     timeoutSeconds: 600
     inputs:
       Service: servicecatalog
-      Api: DescribeProvisionedProduct
-      Id: '{{ ProvisionedProductId }}'
+      Api: DescribeRecord
+      Id: '{{ TerminateSagemaker.RecordId }}'
       DesiredValues:
         - SUCCEEDED
-      PropertySelector: '$.ProvisionedProductDetail.Status'
+      PropertySelector: '$.RecordDetail.Status'
     outputs:
       - Name: ProvisionedProductDetail
         Type: StringMap
@@ -52,7 +48,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
+        - Detail: '{ "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate" }'
           DetailType: 'Success'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'
@@ -63,7 +59,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
+        - Detail: '{ "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate" }'
           DetailType: 'Failure'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'

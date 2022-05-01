@@ -19,10 +19,15 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Terminate
   router.delete('/environments/:id', async (req: Request, res: Response) => {
-    if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+      console.log('envId', envId);
+      return { envType: 'sagemaker', instanceName: 'abc' };
+    };
+    const { envType } = getEnvironment(req.params.id);
+    if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
-      const response = await environments[req.body.envType].lifecycle.terminate(req.params.id);
+      // eslint-disable-next-line security/detect-object-injection
+      const response = await environments[envType].lifecycle.terminate(req.params.id); // nosemgrep
       res.send(response);
     } else {
       res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -31,10 +36,15 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Start
   router.put('/environments/:id/start', async (req: Request, res: Response) => {
-    if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+      console.log('envId', envId);
+      return { envType: 'sagemaker', instanceName: 'abc' };
+    };
+    const { envType } = getEnvironment(req.params.id);
+    if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
-      const response = await environments[req.body.envType].lifecycle.start(req.params.id);
+      // eslint-disable-next-line security/detect-object-injection
+      const response = await environments[envType].lifecycle.start(req.params.id); // nosemgrep
       res.send(response);
     } else {
       res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -43,10 +53,15 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Stop
   router.put('/environments/:id/stop', async (req: Request, res: Response) => {
-    if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+      console.log('envId', envId);
+      return { envType: 'sagemaker', instanceName: 'abc' };
+    };
+    const { envType } = getEnvironment(req.params.id);
+    if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
-      const response = await environments[req.body.envType].lifecycle.stop(req.params.id);
+      // eslint-disable-next-line security/detect-object-injection
+      const response = await environments[envType].lifecycle.stop(req.params.id); // nosemgrep
       res.send(response);
     } else {
       res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);

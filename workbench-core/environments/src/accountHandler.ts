@@ -72,13 +72,13 @@ export default class AccountHandler {
       hostingAccounts: [
         {
           arns: {
-            accountHandler: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-cross-account-role',
-            envManagement: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-env-mgmt'
+            accountHandler: 'arn:aws:iam::0123456789012:role/abcdh-cross-account-role',
+            envManagement: 'arn:aws:iam::0123456789012:role/abcdh-env-mgmt'
           },
-          stackName: `swb-dev-oh-account-1`
+          stackName: `hosting-account-abcdh`
         }
       ],
-      portfolioId: 'port-4n4g66unobu34'
+      portfolioId: 'port-abcdh'
     });
   }
 }

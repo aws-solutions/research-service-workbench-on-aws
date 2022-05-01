@@ -20,21 +20,25 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     if (envMetadata.envId) {
       throw new Error('envId cannot be passed in the request body when trying to launch a new environment');
     }
-    const mainEventBusArn = await this.helper.getMainEventBusArn();
+    // TODO: Get value from aws-accounts in DDB
+    const hostingAccountEventBusArn = 'arn:aws:events:us-east-2:123456789012:event-bus/bus-123';
 
-    const productId = 'prod-q4zwyzxpt5c7c';
+    const productId = 'prod-abc';
     // TODO: All these values will be pulled from DDB for the given hosting account and for the given envTypeConfig
     const ssmParameters = {
-      InstanceName: ['basicnotebookinstance-sampleInstanceName'],
-      VPC: ['vpc-028df59e55564dccd'],
-      Subnet: ['subnet-0dee693d27b04fe37'],
-      ProvisioningArtifactId: ['pa-3lex77o7ju3qw'],
+      InstanceName: [`basicnotebookinstance-${Date.now()}`],
+      VPC: ['vpc-abcd'],
+      Subnet: ['subnet-abcd'],
+      ProvisioningArtifactId: ['pa-abcd'],
       ProductId: [productId],
-      Namespace: ['swbv2-test'],
-      EncryptionKeyArn: ['sampleEncryptionKeyArn'],
+      Namespace: [`sagemaker-${Date.now()}`],
+      EncryptionKeyArn: ['arn:aws:kms:us-east-2:123456789012:key/abc'],
       CIDR: ['1.1.1.1/32'],
       PathId: ['samplePathId'],
-      EventBusName: [mainEventBusArn]
+      EventBusName: [hostingAccountEventBusArn],
+      EnvId: ['sampleEnvId'],
+      EnvironmentInstanceFiles: ['s3://s3-artifact-123/environment-files'],
+      AutoStopIdleTimeInMinutes: ['0']
     };
 
     const responseHost = await this.helper.launch({
@@ -49,16 +53,16 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
 
   public async terminate(envId: string): Promise<{ [id: string]: string }> {
     // TODO: Get envMetadata for the given envId from DDB
-    const envMetadata = { envId, accountId: 'placeholderAccountId' };
+    const envMetadata = { envId, accountId: '123456789012', provisionedProductId: 'pp-abcd' };
 
-    const mainEventBusArn = await this.helper.getMainEventBusArn();
+    // TODO: Get value from aws-accounts in DDB
+    const hostingAccountEventBusArn = 'arn:aws:events:us-east-2:123456789012:event-bus/bus-123';
 
     // TODO: All these values will be pulled from DDB for the given hosting account
     const ssmParameters = {
-      ProvisionedProductId: ['sampleProvisionedProductId'],
+      ProvisionedProductId: [envMetadata.provisionedProductId],
       TerminateToken: [uuidv4()],
-      InstanceName: ['basicnotebookinstance-sampleInstanceName'],
-      EventBusName: [mainEventBusArn]
+      EventBusName: [hostingAccountEventBusArn]
     };
 
     const responseHost = await this.helper.executeSSMDocument({

@@ -28,7 +28,8 @@ export default class EnvironmentLifecycleHelper {
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
       accountId: payload.accountId,
       operation: payload.operation,
-      envType: payload.envType
+      envType: payload.envType,
+      externalId: 'workbench'
       // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
       // Note: empty string is not the same as undefined
       // externalId: <accountIdDDBMetadata>.externalId
@@ -59,7 +60,8 @@ export default class EnvironmentLifecycleHelper {
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
       accountId: payload.accountId,
       operation: payload.operation,
-      envType: payload.envType
+      envType: payload.envType,
+      externalId: 'workbench'
       // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
       // Note: empty string is not the same as undefined
       // externalId: <accountIdDDBMetadata>.externalId
@@ -94,7 +96,7 @@ export default class EnvironmentLifecycleHelper {
 
   public async getEnvMgmtRoleArn(accountId: string): Promise<string> {
     // TODO: Get metadata from DDB for the given hosting account ID, and return its EnvMgmtRoleArn
-    return Promise.resolve(`arn:aws:iam::${accountId}:role/EnvMgmtRole`);
+    return Promise.resolve(`arn:aws:iam::${accountId}:role/swb-dev-oh-env-mgmt`);
   }
 
   public async getAwsSdkForEnvMgmtRole(payload: {
@@ -104,12 +106,13 @@ export default class EnvironmentLifecycleHelper {
     externalId?: string;
   }): Promise<AwsService> {
     const envMgmtRoleArn = await this.getEnvMgmtRoleArn(payload.accountId);
-    const hostAwsSdk = await this.aws.getAwsServiceForRole({
+    const params = {
       roleArn: envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
       region: process.env.AWS_REGION!,
       externalId: payload.externalId
-    });
+    };
+    const hostAwsSdk = await this.aws.getAwsServiceForRole(params);
 
     return hostAwsSdk;
   }
@@ -121,21 +124,5 @@ export default class EnvironmentLifecycleHelper {
   public async storeToDdb(envMetadata: any): Promise<void> {
     // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
     return Promise.resolve();
-  }
-
-  /*
-   * Get main account's EventBridge bus arn
-   */
-  public async getMainEventBusArn(): Promise<string> {
-    const describeStackParam = {
-      StackName: process.env.STACK_NAME!
-    };
-
-    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
-
-    const eventBusArnOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
-      return output.OutputKey && output.OutputKey === process.env.MAIN_ACCOUNT_BUS_ARN_NAME!;
-    });
-    return eventBusArnOutput?.OutputValue!;
   }
 }

@@ -180,7 +180,7 @@ export default class HostingAccountLifecycleService {
   public async updateEventBridgePermissions(mainAccountBusName: string, accountId: string): Promise<void> {
     const params = {
       Action: 'events:PutEvents',
-      EventBusName: mainAccountBusName,
+      EventBusName: mainAccountBusName.split('/')[1],
       Principal: accountId,
       StatementId: 'Allow-main-account-to-receive-host-account-events'
     };
