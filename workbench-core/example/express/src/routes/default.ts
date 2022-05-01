@@ -34,13 +34,6 @@ router.get('/user', async (req: Request, res: Response) => {
     statusCode: res.statusCode,
     action: req.method + ' ' + req.path
   };
-  await auditService
-    .write(metadata, responsebody)
-    .then(() => {
-      console.log('Success');
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  await auditService.write(metadata, responsebody);
   res.send('Hello User');
 });
