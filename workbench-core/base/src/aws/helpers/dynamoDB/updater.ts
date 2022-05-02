@@ -444,15 +444,8 @@ class Updater {
    * @param str - NONE, ALL_OLD, UPDATED_OLD, ALL_NEW, or UPDATED_NEW (not case sensitive)
    * @returns Updater with populated params
    */
-  public return(str: string): Updater {
-    const upper = str.toUpperCase();
-    const allowed = ['NONE', 'ALL_OLD', 'UPDATED_OLD', 'ALL_NEW', 'UPDATED_NEW'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnValues. Only ${allowed.join(',')} are allowed.`
-      );
-    }
-    this._params.ReturnValues = upper;
+  public return(str: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW'): Updater {
+    this._params.ReturnValues = str;
     return this;
   }
 
@@ -465,17 +458,8 @@ class Updater {
    * @returns Updater with populated params
    */
   // same as ReturnItemCollectionMetrics
-  public metrics(str: string): Updater {
-    const upper = str.toUpperCase();
-    const allowed = ['NONE', 'SIZE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnItemCollectionMetrics. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnItemCollectionMetrics = upper;
+  public metrics(str: 'NONE' | 'SIZE'): Updater {
+    this._params.ReturnItemCollectionMetrics = str;
     return this;
   }
 
@@ -489,17 +473,8 @@ class Updater {
    * @returns Updater with populated params
    */
   // same as ReturnConsumedCapacity
-  public capacity(str: string = ''): Updater {
-    const upper = str.toUpperCase();
-    const allowed = ['INDEXES', 'TOTAL', 'NONE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnConsumedCapacity = upper;
+  public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Updater {
+    this._params.ReturnConsumedCapacity = str;
     return this;
   }
 
