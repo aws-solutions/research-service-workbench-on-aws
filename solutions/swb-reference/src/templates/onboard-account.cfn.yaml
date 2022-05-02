@@ -259,7 +259,7 @@ Resources:
   PolicyCrossAccountHandler:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows main account to perform critical analytics on workspaces provisioned in member accounts
+      Description: Allows main account to setup hosting account with required resources for launching environments
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -273,6 +273,12 @@ Resources:
             Resource:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SC-*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/initial-stack*'
+          - Effect: Allow
+            Action:
+              - cloudformation:GetTemplate
+              - cloudformation:DescribeStacks
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
           - Effect: Allow
             Action:
               - sagemaker:ListNotebookInstances
@@ -290,6 +296,7 @@ Resources:
           - Effect: Allow
             Action:
               - iam:CreateRole
+              - iam:GetRole
               - iam:TagRole
               - iam:GetRolePolicy
               - iam:PutRolePolicy
@@ -303,6 +310,10 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
           - Effect: Allow
             Action:
+              - iam:GetRole
+            Resource: !GetAtt EnvManagementRole.Arn
+          - Effect: Allow
+            Action:
               - ce:GetCostAndUsage
             Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
           - Effect: Allow
@@ -313,12 +324,13 @@ Resources:
           - Effect: Allow
             Action:
               - servicecatalog:AcceptPortfolioShare
+              - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
 
   CrossAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'cross-account-role']]
+      RoleName: !Join ['-', [Ref: Namespace, 'cross-account-role']]     # Confirm the suffix `cross-account-role` matches with the suffix in SWBStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -522,7 +534,7 @@ Outputs:
     Description: VPC ID
     Value: !Ref VPC
 
-  VpcPublicSubnet:
+  VpcSubnet:
     Description: A reference to the public subnet in the 1st Availability Zone
     Value: !Ref PublicSubnet
 

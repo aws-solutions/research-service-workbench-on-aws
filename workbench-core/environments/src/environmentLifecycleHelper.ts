@@ -15,6 +15,31 @@ export default class EnvironmentLifecycleHelper {
     this.aws = new AwsService({ region: process.env.AWS_REGION! });
   }
 
+  public async launch(payload: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ssmParameters: { [key: string]: string[] };
+    operation: Operation;
+    envType: string;
+    accountId: string;
+    productId: string;
+  }): Promise<{ [id: string]: string }> {
+    const updatedPayload = payload;
+
+    const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
+      accountId: payload.accountId,
+      operation: payload.operation,
+      envType: payload.envType
+      // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
+      // Note: empty string is not the same as undefined
+      // externalId: <accountIdDDBMetadata>.externalId
+    });
+
+    const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
+      ProductId: payload.productId
+    });
+    updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
+    return this.executeSSMDocument(updatedPayload);
+  }
   /**
    * Executing SSM Document in hosting account with provided envMetadata
    *
@@ -27,7 +52,7 @@ export default class EnvironmentLifecycleHelper {
     envType: string;
     accountId: string;
   }): Promise<{ [id: string]: string }> {
-    // Get SSM doc ARN from main account CfN stack (shared documents need to send ARN)
+    // Get SSM doc ARN from main account CFN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
     // Assume hosting account EnvMgmt role
@@ -42,7 +67,7 @@ export default class EnvironmentLifecycleHelper {
 
     // Execute SSM document in hosting account
     if (hostAwsSdk) {
-      await hostAwsSdk.ssm.startAutomationExecution({
+      await hostAwsSdk.clients.ssm.startAutomationExecution({
         DocumentName: ssmDocArn,
         Parameters: payload.ssmParameters
       });
@@ -55,7 +80,7 @@ export default class EnvironmentLifecycleHelper {
     const describeStackParam = {
       StackName: process.env.STACK_NAME!
     };
-    const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
       return output.OutputKey && output.OutputKey === ssmDocOutputName;
@@ -106,7 +131,7 @@ export default class EnvironmentLifecycleHelper {
       StackName: process.env.STACK_NAME!
     };
 
-    const stackDetails = await this.aws.cloudformation.describeStacks(describeStackParam);
+    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const eventBusArnOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
       return output.OutputKey && output.OutputKey === process.env.MAIN_ACCOUNT_BUS_ARN_NAME!;

@@ -2,6 +2,7 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { SSMClient, SendCommandCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { ServiceCatalogClient, ListLaunchPathsCommand } from '@aws-sdk/client-service-catalog';
 import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
 describe('SagemakerEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
@@ -50,6 +51,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     const stsMock = mockClient(STSClient);
     const ssmMock = mockClient(SSMClient);
     const cfnMock = mockClient(CloudFormationClient);
+    const scMock = mockClient(ServiceCatalogClient);
     // Mock Modify Doc Permission
     ssmMock.on(SendCommandCommand).resolves({});
     // Mock Modify Doc Permission
@@ -60,6 +62,13 @@ describe('SagemakerEnvironmentLifecycleService', () => {
         SessionToken: 'blah',
         Expiration: undefined
       }
+    });
+    scMock.on(ListLaunchPathsCommand).resolves({
+      LaunchPathSummaries: [
+        {
+          Id: 'mockedLaunchPathId'
+        }
+      ]
     });
     // Mock Cloudformation describeStacks
     mockCloudformationOutputs(cfnMock);
