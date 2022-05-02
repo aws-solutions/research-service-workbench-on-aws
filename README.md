@@ -23,19 +23,17 @@ Please read through this document before submitting any issues or pull requests 
 
 ### Prerequisites for development
 
-Code for Ma-Mono is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+Code for monorepo-for-service-workbench is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
-[Ma-mono](https://gitlab.aws.dev/ma-foundation/ma-mono) is hosted on Gitlab ([Decision: Repository for Monorepo](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo)). In order to start developement please follow the below steps:
+[monorepo-for-service-workbench](https://github.com/awslabs/monorepo-for-service-workbench) is hosted on GitHub. In order to start developement please follow the steps below:
 
-1. Follow the instructions [here](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HJoiningaTeamGroup) to join [MA-Foundation Group](https://gitlab.aws.dev/ma-foundation) in GitLab
-2. [Setup git access](https://w.amazon.com/bin/view/AWS/Teams/WWPS/TSD/GitLab/#HSettingupgitAccess)
-3. Clone the repo: `git clone git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git`
-4. Move to the correct directory: `cd ma-mono`
-5. Install rush: `npm install -g @microsoft/rush`
-6. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files
-7. NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be updated in 2 ways:
+1. Clone the repo: `https://github.com/awslabs/monorepo-for-service-workbench.git`
+2. Move to the correct directory: `cd monorepo-for-service-workbench`
+3. Install rush: `npm install -g @microsoft/rush`
+4. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files
+5. NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be updated in 2 ways:
    - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
    - Update the package.json in your package and run `rush update`.
 
@@ -43,7 +41,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 
 1. Set up your repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
 2. Create a feature branch from main: `git pull; git checkout -b feature/<feature>`
-3. Run: [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependenciesare of the same version throughout the repository.
+3. Run: [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
 4. Run either of the two:
    - [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
    - [`rush rebuild`](https://rushjs.io/pages/commands/rush_rebuild/) - performs a full clean build. See `rush rebuild -h` for more options
@@ -52,31 +50,34 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
    - `rush build:test` - single command to perform `rush build && rush test` for each package. See `rush build:test -h` for more options
 7. `rush common-coverage-report` - updates root README file with code coverage summary
 
-### Staging a Merge Request
+### Staging a Pull Request
 
 1. Make changes locally ([Follow Local Development Flow](#Local-Development-Flow))
-2. Ensure you are on a feature branch; from `main` branch: `git pull; git checkout -b feature/<feature>`
-3. If you are happy with your code and they are passing tests, you can push your changes to your feature branch: `git add -A; git commit -m "<Your commit message>"; git push`
+2. Ensure you are on a feature branch; from `develop` branch: `git pull; git checkout -b feature/<feature>`
+3. If you are happy with your code and they are passing tests, you can push your changes to your feature branch: `git add -A; git commit`
     - Note: the commit must be in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format
-4. We have pre-commit git-hooks. These are used to inspect the snapshot that's about to be committed, to see if you've forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. We currently support:
+4. `git commit` will trigger [commitizen](https://github.com/commitizen/cz-cli) and you'll be prompted to fill out any required commit fields at commit time.
+5. We have pre-commit git-hooks. These are used to inspect the snapshot that's about to be committed, to see if you've forgotten something, to make sure tests run, or to examine whatever you need to inspect in the code. We currently support:
+    - [git-secrets](https://github.com/awslabs/git-secrets) prevents you from committing passwords and other sensitive information to a git repository
     - prettier is configured to automatically format your code on commit. If you want to format your code manually you can just do: `git add -A; rush prettier`
     - generate code coverage summary in the root README file
+6. We have commit-msg git-hook:
     - A check has been added for commit messages to ensure they are in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
-5. Further checks are triggered on a Merge Request. Please refer the [Merge Requests Process](#merge-requests-process) section for how to manage the MR on GitLab
+7. Further checks are triggered on a Pull Request. Please refer the [Pull Requests Process](#pull-requests-process) section for how to manage the MR on GitLab
 
-## Merge Requests Process
+## Pull Requests Process
 
-1. Open a Merge Request in GitLab:
-    - Go to [create new MR](https://gitlab.aws.dev/ma-foundation/ma-mono/-/merge_requests/new)
+1. Open a Pull Request in GitHub:
+    - Go to [create new PR](https://github.com/awslabs/monorepo-for-service-workbench/compare)
     - For the source branch select your recently pushed feature branch
-    - As your target branch choose `main`
+    - As your target branch choose `develop`
     - Choose a proper title
         - Note: the title will appear as the commit message when the MR is merged, please make sure the title adheres to the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format, 
     - Choose a proper description
     - Assign yourself as the assignee
     - Add reviewers ([See limitations](https://quip-amazon.com/jBvNAvWbpq6V/Decision-Repository-for-Monorepo#temp:C:XHKd59c38e62a0c4e2c94800bcf7)).
-    - Click `Create merge request`
-2. Opening a Merge Request triggers build with 3 stages:
+    - Click `Create pull request`
+2. Opening a Pull Request triggers build with 3 stages:
     - **build-and-test** ([Reference](https://rushjs.io/pages/maintainer/enabling_ci_builds/))
         - `Performs AWS CodeArtifact Login` we are using codeArtifact to download NPM packages
         - `rush install` (you will notice that we are using `rush install` instead of `rush update` here. The difference is that `rush install` won't update any files. Instead, it will fail your MR build if something is out of date, to let you know that you forgot to run `rush update` or forgot to commit the result)
