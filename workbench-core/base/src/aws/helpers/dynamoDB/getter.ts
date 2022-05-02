@@ -255,20 +255,11 @@ class Getter {
    * @param str - indexes, total, or none (non case sensitive strings)
    * @returns Getter with populated params
    */
-  public capacity(str: string = ''): Getter {
-    const upper = str.toUpperCase();
-    const allowed = ['INDEXES', 'TOTAL', 'NONE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
+  public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Getter {
     if (this._paramsItem) {
-      this._paramsItem.ReturnConsumedCapacity = upper;
+      this._paramsItem.ReturnConsumedCapacity = str;
     } else if (this._paramsBatch) {
-      this._paramsBatch.ReturnConsumedCapacity = upper;
+      this._paramsBatch.ReturnConsumedCapacity = str;
     }
     return this;
   }

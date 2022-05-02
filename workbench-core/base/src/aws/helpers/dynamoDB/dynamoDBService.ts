@@ -49,11 +49,11 @@ export default class DynamoDBService {
     names?: { [key: string]: string };
     values?: { [key: string]: AttributeValue };
     projection?: string | string[];
-    select?: string;
+    select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
     limit?: number;
     segment?: number;
     totalSegment?: number;
-    capacity?: string;
+    capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
   }): Scanner {
     let scanner = new Scanner({ region: this._awsRegion }, this._tableName);
     if (params) {
@@ -119,7 +119,7 @@ export default class DynamoDBService {
       strong?: boolean;
       names?: { [key: string]: string };
       projection?: string | string[];
-      capacity?: string;
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
     }
   ): Getter {
     let getter = new Getter({ region: this._awsRegion }, this._tableName, key);
@@ -175,10 +175,10 @@ export default class DynamoDBService {
     names?: { [key: string]: string };
     values?: { [key: string]: AttributeValue };
     projection?: string | string[];
-    select?: string;
+    select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
     limit?: number;
     forward?: boolean;
-    capacity?: string;
+    capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
   }): Query {
     let query = new Query({ region: this._awsRegion }, this._tableName);
     if (params) {
@@ -297,9 +297,9 @@ export default class DynamoDBService {
       delete?: string;
       names?: { [key: string]: string };
       values?: { [key: string]: AttributeValue };
-      return?: string;
-      metrics?: string;
-      capacity?: string;
+      return?: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW';
+      metrics?: 'NONE' | 'SIZE';
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
     }
   ): Updater {
     let updater = new Updater({ region: this._awsRegion }, this._tableName, key);
@@ -369,9 +369,9 @@ export default class DynamoDBService {
       condition?: string;
       names?: { [key: string]: string };
       values?: { [key: string]: AttributeValue };
-      return?: string;
-      capacity?: string;
-      metrics?: string;
+      return?: 'NONE' | 'ALL_OLD';
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+      metrics?: 'NONE' | 'SIZE';
     }
   ): Deleter {
     let deleter = new Deleter({ region: this._awsRegion }, this._tableName, key);
