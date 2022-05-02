@@ -197,15 +197,10 @@ class Scanner {
    * @param str - ALL_ATTRIBUTES, ALL_PROJECTED_ATTRIBUTES, SPECIFIC_ATTRIBUTES, or COUNT (not case sensitive)
    * @returns Scanner with populated params
    */
-  public select(str: string): Scanner {
-    const upper = str.toUpperCase();
-    const allowed = ['ALL_ATTRIBUTES', 'ALL_PROJECTED_ATTRIBUTES', 'SPECIFIC_ATTRIBUTES', 'COUNT'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for Select. Only ${allowed.join(',')} are allowed.`
-      );
-    }
-    this._params.Select = upper;
+  public select(
+    str: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT'
+  ): Scanner {
+    this._params.Select = str;
     return this;
   }
 
@@ -267,17 +262,8 @@ class Scanner {
    * @param str - indexes, total, or none (non case sensitive strings)
    * @returns Scanner with populated params
    */
-  public capacity(str: string = ''): Scanner {
-    const upper = str.toUpperCase();
-    const allowed = ['INDEXES', 'TOTAL', 'NONE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnConsumedCapacity = upper;
+  public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Scanner {
+    this._params.ReturnConsumedCapacity = str;
     return this;
   }
 

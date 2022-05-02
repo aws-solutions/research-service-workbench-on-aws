@@ -130,17 +130,8 @@ class Deleter {
    * @param str - none or all_old (non case sensitive strings)
    * @returns Deleter with populated params
    */
-  public return(str: string): Deleter {
-    const upper = str.toUpperCase();
-    const allowed = ['NONE', 'ALL_OLD'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for DeleteItem ReturnValues. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnValues = upper;
+  public return(str: 'NONE' | 'ALL_OLD'): Deleter {
+    this._params.ReturnValues = str;
     return this;
   }
 
@@ -166,17 +157,8 @@ class Deleter {
    * @param str - size or none (non case sensitive)
    * @returns Deleter with populated params
    */
-  public metrics(str: string): Deleter {
-    const upper = str.toUpperCase();
-    const allowed = ['NONE', 'SIZE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnItemCollectionMetrics. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnItemCollectionMetrics = upper;
+  public metrics(str: 'NONE' | 'SIZE'): Deleter {
+    this._params.ReturnItemCollectionMetrics = str;
     return this;
   }
 

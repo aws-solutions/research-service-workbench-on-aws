@@ -208,10 +208,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = none', async () => {
+    test('should populate params with optional param: return = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'none' };
+      const developerParams = { return: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -224,10 +224,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = all_old', async () => {
+    test('should populate params with optional param: return = ALL_OLD', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'all_old' };
+      const developerParams = { return: 'ALL_OLD' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -239,16 +239,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: return is invalid', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.delete(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for DeleteItem ReturnValues. Only NONE,ALL_OLD are allowed.`
-      );
     });
     test('should populate params with optional param: capacity = indexes', async () => {
       // BUILD
@@ -298,10 +288,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: metrics = none', async () => {
+    test('should populate params with optional param: metrics = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'none' };
+      const developerParams = { metrics: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -314,10 +304,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: metrics = size', async () => {
+    test('should populate params with optional param: metrics = SIZE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'size' };
+      const developerParams = { metrics: 'SIZE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -329,16 +319,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: metrics is invalid', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'lightyears' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.delete(key, developerParams)).toThrow(
-        `"LIGHTYEARS" <== is not a valid value for ReturnItemCollectionMetrics. Only NONE,SIZE are allowed.`
-      );
     });
   });
   describe('getter', () => {
@@ -443,10 +423,10 @@ describe('DynamoDBService', () => {
       expect(generatedItemParams).toEqual(expectedParams);
       expect(generatedBatchParams).toBeUndefined();
     });
-    test('single get should populate params with optional param: capacity = indexes', async () => {
+    test('single get should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
       const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const developerParams = { capacity: 'INDEXES' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
         TableName: 'some-table',
@@ -461,10 +441,10 @@ describe('DynamoDBService', () => {
       expect(generatedItemParams).toEqual(expectedParams);
       expect(generatedBatchParams).toBeUndefined();
     });
-    test('single get should populate params with optional param: capacity = total', async () => {
+    test('single get should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
       const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
         TableName: 'some-table',
@@ -479,10 +459,10 @@ describe('DynamoDBService', () => {
       expect(generatedItemParams).toEqual(expectedParams);
       expect(generatedBatchParams).toBeUndefined();
     });
-    test('single get should populate params with optional param: capacity = none', async () => {
+    test('single get should populate params with optional param: capacity = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
         TableName: 'some-table',
@@ -497,16 +477,6 @@ describe('DynamoDBService', () => {
       expect(generatedItemParams).toEqual(expectedParams);
       expect(generatedBatchParams).toBeUndefined();
     });
-    test('single get should fail with optional param: capacity is invalid', async () => {
-      // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.get(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
-    });
     test('single get should populate params with all optional params', async () => {
       // BUILD
       const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
@@ -514,7 +484,7 @@ describe('DynamoDBService', () => {
         strong: true,
         names: { '#P': 'Percentile' },
         projection: ['status', 'createdBy'],
-        capacity: 'none'
+        capacity: 'NONE' as const
       };
       const expectedParams = {
         Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
@@ -694,13 +664,13 @@ describe('DynamoDBService', () => {
       expect(generatedBatchParams).toEqual(expectedParams);
       expect(generatedItemParams).toBeUndefined();
     });
-    test('batch get should populate params with optional param: capacity = indexes', async () => {
+    test('batch get should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
       const key = [
         { pk: { S: 'testId' }, sk: { S: 'testId' } },
         { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
       ];
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         RequestItems: {
           'some-table': {
@@ -721,13 +691,13 @@ describe('DynamoDBService', () => {
       expect(generatedBatchParams).toEqual(expectedParams);
       expect(generatedItemParams).toBeUndefined();
     });
-    test('batch get should populate params with optional param: capacity = total', async () => {
+    test('batch get should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
       const key = [
         { pk: { S: 'testId' }, sk: { S: 'testId' } },
         { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
       ];
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         RequestItems: {
           'some-table': {
@@ -748,13 +718,13 @@ describe('DynamoDBService', () => {
       expect(generatedBatchParams).toEqual(expectedParams);
       expect(generatedItemParams).toBeUndefined();
     });
-    test('batch get should populate params with optional param: capacity = none', async () => {
+    test('batch get should populate params with optional param: capacity = NONE', async () => {
       // BUILD
       const key = [
         { pk: { S: 'testId' }, sk: { S: 'testId' } },
         { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
       ];
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         RequestItems: {
           'some-table': {
@@ -774,21 +744,6 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedBatchParams).toEqual(expectedParams);
       expect(generatedItemParams).toBeUndefined();
-    });
-    test('batch get should fail with optional param: capacity is invalid', async () => {
-      // BUILD
-      const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
-      ];
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE
-
-      // CHECK
-      expect(() => dbService.get(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
     });
   });
   describe('query', () => {
@@ -1109,9 +1064,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = all_attributes', async () => {
+    test('should populate params with optional param: select = ALL_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'all_attributes' };
+      const developerParams = { select: 'ALL_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'ALL_ATTRIBUTES'
@@ -1123,9 +1078,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = all_projected_attributes', async () => {
+    test('should populate params with optional param: select = ALL_PROJECTED_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'all_projected_attributes' };
+      const developerParams = { select: 'ALL_PROJECTED_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'ALL_PROJECTED_ATTRIBUTES'
@@ -1137,9 +1092,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = count', async () => {
+    test('should populate params with optional param: select = COUNT', async () => {
       // BUILD
-      const developerParams = { select: 'count' };
+      const developerParams = { select: 'COUNT' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'COUNT'
@@ -1151,9 +1106,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = specific_attributes', async () => {
+    test('should populate params with optional param: select = SPECIFIC_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'specific_attributes' };
+      const developerParams = { select: 'SPECIFIC_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'SPECIFIC_ATTRIBUTES'
@@ -1165,18 +1120,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should fail with optional param: invalid select options', async () => {
-      // BUILD
-      const developerParams = { select: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.query(developerParams)).toThrow(
-        `"SOME" <== is not a valid value for Select. Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
-      );
-    });
     test('should fail with invalid optional params: projection but select != specific_attributes', async () => {
       // BUILD
-      const developerParams = { projection: 'status', select: 'all_attributes' };
+      const developerParams = { projection: 'status', select: 'ALL_ATTRIBUTES' as const };
 
       // OPERATE n CHECK
       expect(() => dbService.query(developerParams)).toThrow(
@@ -1225,9 +1171,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = indexes', async () => {
+    test('should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'INDEXES'
@@ -1239,9 +1185,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = total', async () => {
+    test('should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'TOTAL'
@@ -1253,9 +1199,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = none', async () => {
+    test('should populate params with optional param: capacity = NONE', async () => {
       // BUILD
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'NONE'
@@ -1266,15 +1212,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: capacity is invalid', async () => {
-      // BUILD
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.query(developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
     });
   });
   describe('scanner', () => {
@@ -1416,9 +1353,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = all_attributes', async () => {
+    test('should populate params with optional param: select = ALL_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'all_attributes' };
+      const developerParams = { select: 'ALL_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'ALL_ATTRIBUTES'
@@ -1430,9 +1367,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = all_projected_attributes', async () => {
+    test('should populate params with optional param: select = ALL_PROJECTED_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'all_projected_attributes' };
+      const developerParams = { select: 'ALL_PROJECTED_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'ALL_PROJECTED_ATTRIBUTES'
@@ -1444,9 +1381,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = count', async () => {
+    test('should populate params with optional param: select = COUNT', async () => {
       // BUILD
-      const developerParams = { select: 'count' };
+      const developerParams = { select: 'COUNT' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'COUNT'
@@ -1458,9 +1395,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: select = specific_attributes', async () => {
+    test('should populate params with optional param: select = SPECIFIC_ATTRIBUTES', async () => {
       // BUILD
-      const developerParams = { select: 'specific_attributes' };
+      const developerParams = { select: 'SPECIFIC_ATTRIBUTES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Select: 'SPECIFIC_ATTRIBUTES'
@@ -1471,15 +1408,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: invalid select options', async () => {
-      // BUILD
-      const developerParams = { select: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.scan(developerParams)).toThrow(
-        `"SOME" <== is not a valid value for Select. Only ALL_ATTRIBUTES,ALL_PROJECTED_ATTRIBUTES,SPECIFIC_ATTRIBUTES,COUNT are allowed.`
-      );
     });
     test('should populate params with optional param: limit', async () => {
       // BUILD
@@ -1510,9 +1438,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = indexes', async () => {
+    test('should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'INDEXES'
@@ -1524,9 +1452,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = total', async () => {
+    test('should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'TOTAL'
@@ -1538,9 +1466,9 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = none', async () => {
+    test('should populate params with optional param: capacity = NONE', async () => {
       // BUILD
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
         ReturnConsumedCapacity: 'NONE'
@@ -1551,15 +1479,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail with optional param: capacity is invalid', async () => {
-      // BUILD
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.scan(developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
     });
   });
   describe('updater', () => {
@@ -1712,10 +1631,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = none', async () => {
+    test('should populate params with optional param: return = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'none' };
+      const developerParams = { return: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1728,10 +1647,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = all_old', async () => {
+    test('should populate params with optional param: return = ALL_OLD', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'all_old' };
+      const developerParams = { return: 'ALL_OLD' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1744,10 +1663,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = updated_old', async () => {
+    test('should populate params with optional param: return = UPDATED_OLD', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'updated_old' };
+      const developerParams = { return: 'UPDATED_OLD' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1760,10 +1679,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = all_new', async () => {
+    test('should populate params with optional param: return = ALL_NEW', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'all_new' };
+      const developerParams = { return: 'ALL_NEW' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1776,10 +1695,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: return = updated_new', async () => {
+    test('should populate params with optional param: return = UPDATED_NEW', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'updated_new' };
+      const developerParams = { return: 'UPDATED_NEW' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1792,20 +1711,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should fail with optional param: return is invalid', async () => {
+    test('should populate params with optional param: metrics = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { return: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.update(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnValues. Only NONE,ALL_OLD,UPDATED_OLD,ALL_NEW,UPDATED_NEW are allowed.`
-      );
-    });
-    test('should populate params with optional param: metrics = none', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'none' };
+      const developerParams = { metrics: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1819,10 +1728,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: metrics = size', async () => {
+    test('should populate params with optional param: metrics = SIZE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'size' };
+      const developerParams = { metrics: 'SIZE' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1836,20 +1745,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should fail with optional param: metrics is invalid', async () => {
+    test('should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { metrics: 'lightyears' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.update(key, developerParams)).toThrow(
-        `"LIGHTYEARS" <== is not a valid value for ReturnItemCollectionMetrics. Only NONE,SIZE are allowed.`
-      );
-    });
-    test('should populate params with optional param: capacity = indexes', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'indexes' };
+      const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1863,10 +1762,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = total', async () => {
+    test('should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'total' };
+      const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1880,10 +1779,10 @@ describe('DynamoDBService', () => {
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
     });
-    test('should populate params with optional param: capacity = none', async () => {
+    test('should populate params with optional param: capacity = NONE', async () => {
       // BUILD
       const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'none' };
+      const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1896,16 +1795,6 @@ describe('DynamoDBService', () => {
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
-    });
-    test('should fail zwith optional param: capacity is invalid', async () => {
-      // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { capacity: 'some' };
-
-      // OPERATE n CHECK
-      expect(() => dbService.update(key, developerParams)).toThrow(
-        `"SOME" <== is not a valid value for ReturnConsumedCapacity. Only INDEXES,TOTAL,NONE are allowed.`
-      );
     });
   });
 });

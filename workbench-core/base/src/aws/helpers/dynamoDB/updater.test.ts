@@ -238,7 +238,6 @@ describe('updater', () => {
       .key({ pk: { S: 'pk' } })
       .remove(['attr1ToRemove', 'attr2ToRemove'])
       .getParams();
-    console.log(generatedParams);
 
     // CHECK
     expect(generatedParams.UpdateExpression).toEqual(expectedParams.UpdateExpression);

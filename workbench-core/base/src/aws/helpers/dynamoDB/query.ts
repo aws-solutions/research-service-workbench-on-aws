@@ -388,18 +388,11 @@ class Query {
    * @param str - ALL_ATTRIBUTES, ALL_PROJECTED_ATTRIBUTES, SPECIFIC_ATTRIBUTES, or COUNT (not case sensitive)
    * @returns Query with populated params
    */
-  public select(str: string): Query {
-    const upper = str.toUpperCase();
-    const allowed = ['ALL_ATTRIBUTES', 'ALL_PROJECTED_ATTRIBUTES', 'SPECIFIC_ATTRIBUTES', 'COUNT'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for Select. Only ${allowed.join(',')} are allowed.`
-      );
-    }
-    if (this._params.ProjectionExpression && upper !== 'SPECIFIC_ATTRIBUTES') {
+  public select(str: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT'): Query {
+    if (this._params.ProjectionExpression && str !== 'SPECIFIC_ATTRIBUTES') {
       throw new Error(`You cannot select values except SPECIFIC_ATTRIBUTES when using projectionExpression`);
     }
-    this._params.Select = upper;
+    this._params.Select = str;
     return this;
   }
 
@@ -438,17 +431,8 @@ class Query {
    * @param str - indexes, total, or none (non case sensitive strings)
    * @returns Query with populated params
    */
-  public capacity(str: string = ''): Query {
-    const upper = str.toUpperCase();
-    const allowed = ['INDEXES', 'TOTAL', 'NONE'];
-    if (!allowed.includes(upper)) {
-      throw new Error(
-        `"${upper}" <== is not a valid value for ReturnConsumedCapacity. Only ${allowed.join(
-          ','
-        )} are allowed.`
-      );
-    }
-    this._params.ReturnConsumedCapacity = upper;
+  public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Query {
+    this._params.ReturnConsumedCapacity = str;
     return this;
   }
 
