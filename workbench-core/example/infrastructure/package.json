@@ -2,6 +2,11 @@
   "name": "@amzn/workbench-core-infrastructure",
   "version": "0.0.1",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "bin": {
     "infrastructure": "lib/index.js"
   },
