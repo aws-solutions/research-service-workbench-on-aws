@@ -101,7 +101,8 @@ jobs:
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |
           echo "$SERVICE_ENDPOINT"
-          node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js test:integration --verbose
 
   merge-develop-to-main:
     name: Merge develop to main
