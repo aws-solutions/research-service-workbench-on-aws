@@ -7,10 +7,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@amzn/eslint-config-workbench-core-eslint-custom",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "@amzn/swb-app",
       "allowedCategories": [ "production" ]
     },
