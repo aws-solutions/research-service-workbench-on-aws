@@ -1,7 +1,7 @@
 {
   "name": "@amzn/workbench-core-express",
-  "version": "0.0.22",
-  "license": "MIT",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": "ssh://git.amazon.com/pkg/Ma-mono",
