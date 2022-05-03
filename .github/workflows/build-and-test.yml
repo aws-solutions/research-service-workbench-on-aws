@@ -69,6 +69,14 @@ jobs:
       - name: Code Coverage badge check
         run: node common/scripts/install-run-rush.js make-badges --ci
 
+      - name: Configure AWS Credentials
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_DEV_REGION }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: OIDCSessionName
+
       - name: Deploy example package to Dev
         if: steps.changed-example-package-files.outputs.any_changed == 'true'
         id: endpoint
