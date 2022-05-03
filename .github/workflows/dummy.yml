@@ -1,14 +1,22 @@
 name: dummy
-on: ['pull_request']
+on:
+  pull_request:
 
 jobs:
-  pre-dummy:
-    name: pre-dummy
-    runs-on: ubuntu-20.04
-    steps:
-      - name: echo
-        run: |
-          echo "pre-dummy"
+  deploy-swb-reference:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@feature/example-logging-auditing
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+  
+  deploy-example:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@feature/example-logging-auditing
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+
   dummy:
     name: dummy
     runs-on: ubuntu-20.04

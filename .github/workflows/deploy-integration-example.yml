@@ -5,10 +5,14 @@
 
 name: deploy-and-integration-test-example
 on:
-  pull_request:
-  push:
-    branches:
-      - develop
+  workflow_call:
+    secrets: 
+      aws-region:
+        required: true
+      role-to-assume:
+        required: true
+      aws-dev-account-region:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -73,8 +77,8 @@ jobs:
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ secrets.AWS_DEV_REGION }}
-          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          aws-region: ${{ secrets.aws-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
 
       - name: Deploy example package to Dev
@@ -82,7 +86,7 @@ jobs:
         id: endpoint
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
           node ../../../common/scripts/install-run-rushx.js cdk:deploy
           SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
           echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
