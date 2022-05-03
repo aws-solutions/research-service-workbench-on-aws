@@ -140,7 +140,7 @@
     },
     {
       "name": "@rushstack/heft-jest-plugin",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/heft-node-rig",

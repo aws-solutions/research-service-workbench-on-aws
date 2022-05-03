@@ -1,7 +1,7 @@
 {
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
-  "collectCoverageFrom": ["!./**/index.ts", "!./**/init.ts", "!./**/infrastructure-stack.ts"],
+  "collectCoverageFrom": ["!./**/index.ts", "!./**/init.ts"],
   "coverageThreshold": {
     "global": {
       "branches": 90,

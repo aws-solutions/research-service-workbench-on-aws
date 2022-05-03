@@ -4,42 +4,16 @@ import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import { join } from 'path';
-// import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
-// import { Effect, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class InfrastructureStack extends Stack {
-  // eslint-disable-next-line @typescript-eslint/explicit-member-accessibility
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
-
-    // const logGroup = new LogGroup(this, 'LogGroup', {
-    //   retention: RetentionDays.ONE_WEEK,
-    //   logGroupName: 'HttpApiLogGroup'
-    // });
-
-    // const lambdaPolicy = new PolicyStatement({
-    //   effect: Effect.ALLOW,
-    //   actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-    //   resources: [logGroup.logGroupArn],
-    //   // principals: [new ServicePrincipal('lambda.amazonaws.com')]
-    // });
-
-    // logGroup.addToResourcePolicy(lambdaPolicy);
-
-    // const lambdaRole = new Role(this, 'LambdaRole', {
-    //   assumedBy: new ServicePrincipal('lambda.amazonaws.com')
-    // });
-
-    // lambdaRole.addToPolicy(
-    //   lambdaPolicy
-    // );
 
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
       handler: 'buildLambda.handler',
       code: Code.fromAsset(join(__dirname, '../build')),
       functionName: 'LambdaService'
-      // role: lambdaRole
     });
 
     const httpLambdaIntegration = new HttpLambdaIntegration('HttpLambda', lambdaService);
@@ -48,19 +22,6 @@ export class InfrastructureStack extends Stack {
       defaultIntegration: httpLambdaIntegration,
       apiName: 'HttpApiService'
     });
-
-    // const httpApiStage = new HttpStage(this, 'HttpStage', {
-    //   httpApi,
-    //   autoDeploy: true,
-    //   stageName: "$default"
-    // })
-
-    // const defaultStage = httpApi.defaultStage?.node.defaultChild as CfnStage;
-
-    // defaultStage.accessLogSettings = {
-    //   destinationArn: logGroup.logGroupArn,
-    //   format: `$context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId`
-    // };
 
     // eslint-disable-next-line no-new
     new CfnOutput(this, 'HttpEndpoint', {

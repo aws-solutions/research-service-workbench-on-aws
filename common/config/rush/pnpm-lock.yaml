@@ -19,6 +19,7 @@ importers:
       '@babel/preset-typescript': ^7.16.7
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
       '@testing-library/dom': ^8.13.0
       '@testing-library/jest-dom': 5.16.1
       '@testing-library/react': 12.1.2
@@ -62,6 +63,7 @@ importers:
       '@babel/preset-typescript': 7.16.7_@babel+core@7.17.10
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.4
       '@rushstack/heft': 0.45.0
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
       '@testing-library/dom': 8.13.0
       '@testing-library/jest-dom': 5.16.1
       '@testing-library/react': 12.1.2_react-dom@17.0.2+react@17.0.2
@@ -936,6 +938,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.154.0:
     resolution: {integrity: sha512-ujMVD0P/V3qwAjANiwm6zVeDRCihuAq1D4ch2HUyusyHiG1r3/fxT/7as6F6y4fbxElhtUxNdskbPBEZiGyxTA==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
+    dependencies:
+      jsonschema: 1.4.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - jsonschema
@@ -961,7 +966,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.154.0
       '@aws-cdk/cx-api': 1.154.0
       '@aws-cdk/region-info': 1.154.0
+      '@balena/dockerignore': 1.0.2
       constructs: 3.3.283
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -988,6 +997,7 @@ packages:
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.154.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - semver
@@ -3490,6 +3500,9 @@ packages:
       '@babel/helper-validator-identifier': 7.16.7
       to-fast-properties: 2.0.0
 
+  /@balena/dockerignore/1.0.2:
+    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
+
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
@@ -3582,9 +3595,9 @@ packages:
         optional: true
     dependencies:
       '@jest/console': 27.5.1
-      '@jest/reporters': 27.4.6
+      '@jest/reporters': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.16
       ansi-escapes: 4.3.2
@@ -3593,15 +3606,15 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 27.5.1
-      jest-config: 27.4.7
+      jest-config: 27.5.1
       jest-haste-map: 27.5.1
       jest-message-util: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-resolve-dependencies: 27.5.1
       jest-runner: 27.5.1
       jest-runtime: 27.5.1
-      jest-snapshot: 27.4.6
+      jest-snapshot: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
       jest-watcher: 27.5.1
@@ -3627,9 +3640,9 @@ packages:
         optional: true
     dependencies:
       '@jest/console': 27.5.1
-      '@jest/reporters': 27.4.6
+      '@jest/reporters': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.16
       ansi-escapes: 4.3.2
@@ -3638,15 +3651,15 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 27.5.1
-      jest-config: 27.4.7_ts-node@10.7.0
+      jest-config: 27.5.1_ts-node@10.7.0
       jest-haste-map: 27.5.1
       jest-message-util: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-resolve-dependencies: 27.5.1
       jest-runner: 27.5.1
       jest-runtime: 27.5.1
-      jest-snapshot: 27.4.6
+      jest-snapshot: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
       jest-watcher: 27.5.1
@@ -3791,7 +3804,7 @@ packages:
       '@bcoe/v8-coverage': 0.2.3
       '@jest/console': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.16
       chalk: 4.1.2
@@ -3805,7 +3818,7 @@ packages:
       istanbul-lib-source-maps: 4.0.1
       istanbul-reports: 3.1.4
       jest-haste-map: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-util: 27.5.1
       jest-worker: 27.5.1
       slash: 3.0.0
@@ -5242,7 +5255,6 @@ packages:
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
-    dev: true
 
   /atob/2.1.2:
     resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
@@ -5256,7 +5268,16 @@ packages:
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.0.130
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.0
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.7
+      yaml: 1.10.2
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -5602,6 +5623,10 @@ packages:
 
   /caniuse-lite/1.0.30001335:
     resolution: {integrity: sha512-ddP1Tgm7z2iIxu6QTtbZUv6HJxSaV/PZeSrWFZtbY4JZ69tOeNhBCl3HyRQgeNZKE5AOn1kpV7fhljigy0Ty3w==}
+
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
 
   /caseless/0.12.0:
     resolution: {integrity: sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=}
@@ -7191,7 +7216,6 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
-    dev: true
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
@@ -7957,7 +7981,7 @@ packages:
       jest-get-type: 27.5.1
       jest-jasmine2: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-runner: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
@@ -7995,7 +8019,7 @@ packages:
       jest-get-type: 27.5.1
       jest-jasmine2: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-runner: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
@@ -8393,7 +8417,7 @@ packages:
       '@babel/plugin-syntax-typescript': 7.17.10_@babel+core@7.17.10
       '@babel/traverse': 7.17.10
       '@babel/types': 7.17.10
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/babel__traverse': 7.17.1
       '@types/prettier': 2.6.0
@@ -8654,12 +8678,14 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
-    dev: true
 
   /jsonpath-plus/4.0.0:
     resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
     engines: {node: '>=10.0'}
     dev: true
+
+  /jsonschema/1.4.0:
+    resolution: {integrity: sha512-/YgW6pRMr6M7C+4o8kS+B/2myEpHCrxO4PEWnqJNBFMjn7EWXqlQ4tGwL6xTHeRplwuZmcAncdvfOad1nT2yMw==}
 
   /jsprim/1.4.2:
     resolution: {integrity: sha512-P2bSOMAc/ciLz6DzgjVlGJP9+BrJWu5UDGK70C2iweC5QBIeFf0ZXRvGjEj2uYgrY2MkAAhsSWHDWlFtEroZWw==}
@@ -10724,7 +10750,6 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: true
 
   /unpipe/1.0.0:
     resolution: {integrity: sha1-sr9O6FFKrmFltIF4KdIbLvSZBOw=}
@@ -11031,6 +11056,10 @@ packages:
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
+
+  /yaml/1.10.2:
+    resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
+    engines: {node: '>= 6'}
 
   /yargs-parser/20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}

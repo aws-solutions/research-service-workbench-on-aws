@@ -22342,9 +22342,9 @@ var require_path_to_regexp = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/layer.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/layer.js
 var require_layer = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/layer.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/layer.js'(
     exports2,
     module2
   ) {
@@ -22487,9 +22487,9 @@ var require_methods = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/route.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/route.js
 var require_route = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/route.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/route.js'(
     exports2,
     module2
   ) {
@@ -22620,9 +22620,9 @@ var require_utils_merge = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/index.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/index.js
 var require_router = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/router/index.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/router/index.js'(
     exports2,
     module2
   ) {
@@ -22772,12 +22772,13 @@ var require_router = __commonJS({
         var layerPath = layer.path;
         self.process_params(layer, paramcalled, req, res, function (err2) {
           if (err2) {
-            return next(layerError || err2);
+            next(layerError || err2);
+          } else if (route) {
+            layer.handle_request(req, res, next);
+          } else {
+            trim_prefix(layer, layerError, layerPath, path);
           }
-          if (route) {
-            return layer.handle_request(req, res, next);
-          }
-          trim_prefix(layer, layerError, layerPath, path);
+          sync = 0;
         });
       }
       function trim_prefix(layer, layerError, layerPath, path) {
@@ -22805,7 +22806,6 @@ var require_router = __commonJS({
         } else {
           layer.handle_request(req, res, next);
         }
-        sync = 0;
       }
     };
     proto.process_params = function process_params(layer, called, req, res, done) {
@@ -23025,9 +23025,9 @@ var require_router = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/middleware/init.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/middleware/init.js
 var require_init = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/middleware/init.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/middleware/init.js'(
     exports2
   ) {
     'use strict';
@@ -23047,9 +23047,9 @@ var require_init = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/middleware/query.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/middleware/query.js
 var require_query = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/middleware/query.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/middleware/query.js'(
     exports2,
     module2
   ) {
@@ -23078,9 +23078,9 @@ var require_query = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/view.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/view.js
 var require_view = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/view.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/view.js'(
     exports2,
     module2
   ) {
@@ -26084,9 +26084,9 @@ var require_proxy_addr = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/utils.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/utils.js
 var require_utils2 = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/utils.js'(exports2) {
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/utils.js'(exports2) {
     'use strict';
     var Buffer2 = require_safe_buffer().Buffer;
     var contentDisposition = require_content_disposition();
@@ -26218,9 +26218,9 @@ var require_utils2 = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/application.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/application.js
 var require_application = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/application.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/application.js'(
     exports2,
     module2
   ) {
@@ -27126,9 +27126,9 @@ var require_accepts = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/request.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/request.js
 var require_request = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/request.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/request.js'(
     exports2,
     module2
   ) {
@@ -27536,9 +27536,9 @@ var require_vary = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/response.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/response.js
 var require_response = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/response.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/response.js'(
     exports2,
     module2
   ) {
@@ -28198,9 +28198,9 @@ var require_serve_static = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/express.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/express.js
 var require_express = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/lib/express.js'(
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/lib/express.js'(
     exports2,
     module2
   ) {
@@ -28274,9 +28274,9 @@ var require_express = __commonJS({
   }
 });
 
-// ../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/index.js
+// ../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/index.js
 var require_express2 = __commonJS({
-  '../../../common/temp/node_modules/.pnpm/express@4.18.0/node_modules/express/index.js'(exports2, module2) {
+  '../../../common/temp/node_modules/.pnpm/express@4.18.1/node_modules/express/index.js'(exports2, module2) {
     'use strict';
     module2.exports = require_express();
   }
@@ -39089,14 +39089,7 @@ var require_default = __commonJS({
         statusCode: res.statusCode,
         action: req.method + ' ' + req.path
       };
-      await auditService
-        .write(metadata, responsebody)
-        .then(() => {
-          console.log('Success');
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      await auditService.write(metadata, responsebody);
       res.send('Hello User');
     });
   }
