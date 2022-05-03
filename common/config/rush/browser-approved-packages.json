@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-eslint-custom",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@aws-cdk/aws-dynamodb",
       "allowedCategories": [ "production" ]
     },

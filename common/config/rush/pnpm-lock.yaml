@@ -7,7 +7,7 @@ importers:
 
   ../../solutions/example-ui-app:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@awsui/collection-hooks': ^1.0.0
       '@awsui/components-react': ^3.0.0
       '@awsui/design-tokens': ^3.0.0
@@ -50,7 +50,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@awsui/collection-hooks': 1.0.25_react@17.0.2
       '@awsui/components-react': 3.0.485_b3482aaf5744fc7c2aeb7941b0e0a78f
       '@awsui/design-tokens': 3.0.21
@@ -83,7 +83,7 @@ importers:
   ../../solutions/swb-app:
     specifiers:
       '@amzn/environments': workspace:*
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -104,7 +104,7 @@ importers:
       '@amzn/environments': link:../../workbench-core/environments
       express: 4.18.0
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
@@ -124,9 +124,9 @@ importers:
   ../../solutions/swb-reference:
     specifiers:
       '@amzn/environments': workspace:*
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-dynamodb': ^3.67.0
       '@aws-sdk/client-s3': ^3.58.0
@@ -179,7 +179,7 @@ importers:
       js-yaml: 4.1.0
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_338867186f4ad1024e99a1c6e89aa633
@@ -206,7 +206,7 @@ importers:
 
   ../../workbench-core/audit:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -217,7 +217,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       typescript: ^4.5.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
@@ -230,7 +230,7 @@ importers:
 
   ../../workbench-core/authentication:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -241,7 +241,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       typescript: ^4.5.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
@@ -254,8 +254,8 @@ importers:
 
   ../../workbench-core/authorization:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-authentication': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -269,7 +269,7 @@ importers:
     dependencies:
       '@amzn/workbench-core-authentication': link:../authentication
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
@@ -283,7 +283,7 @@ importers:
 
   ../../workbench-core/base:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@aws-cdk/aws-dynamodb': ^1.152.0
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-cognito-identity-provider': ^3.67.0
@@ -312,7 +312,7 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
     dependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@aws-cdk/aws-dynamodb': 1.154.0
       '@aws-sdk/client-cloudformation': 3.78.0
       '@aws-sdk/client-cognito-identity-provider': 3.78.0
@@ -344,8 +344,8 @@ importers:
 
   ../../workbench-core/environments:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-cognito-identity-provider': ^3.67.0
       '@aws-sdk/client-dynamodb': ^3.67.0
@@ -387,7 +387,7 @@ importers:
       generate-password: 1.7.0
       md5-file: 5.0.0
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/types': 3.78.0
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.3
       '@rushstack/heft': 0.45.0
@@ -430,7 +430,7 @@ importers:
 
   ../../workbench-core/logging:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-eslint-custom': workspace:*
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
@@ -450,7 +450,7 @@ importers:
       winston: 3.7.2
       winston-transport: 4.5.0
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.0
       '@rushstack/heft-node-rig': 1.9.1_@rushstack+heft@0.45.0

@@ -52,7 +52,7 @@
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@types/express": "^4.17.13",
     "istanbul-badges-readme": "1.8.1",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@amzn/workbench-core-eslint-custom": "workspace:*",
     "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
     "@types/js-yaml": "^4.0.5",

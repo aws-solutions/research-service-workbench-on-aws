@@ -26,6 +26,6 @@
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^12",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@amzn/workbench-core-eslint-custom": "workspace:*"
   }
 }
