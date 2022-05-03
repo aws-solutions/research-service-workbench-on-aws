@@ -18,9 +18,7 @@ function MyApp({ Component, pageProps }: AppProps): JSX.Element {
       <NotificationsProvider>
         <AuthenticationProvider>
           <Header />
-          {/* <BaseLayout> */}
           <Component {...pageProps} />
-          {/* </BaseLayout> */}
           <footer id="footer"></footer>
         </AuthenticationProvider>
       </NotificationsProvider>

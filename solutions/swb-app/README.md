@@ -23,7 +23,7 @@ yarn dev
 
 ## App
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to access the app.
+Open [http://localhost:3000](http://localhost:3000) in your browser to access the app.
 
 The environments page is at [http://localhost:3000/environments](http://localhost:3000/environments).
 

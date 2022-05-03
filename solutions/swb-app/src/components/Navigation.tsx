@@ -16,7 +16,7 @@ export default function Navigation({
 }: NavigationProps): JSX.Element {
   const { t } = useTranslation();
   // Left nav for admin
-  const admintNavHeader: SideNavigationProps.Header = {
+  const adminNavHeader: SideNavigationProps.Header = {
     text: t('Navigation.Administrator'),
     href: '#/admin'
   };

@@ -19,34 +19,7 @@ export default function Header(): JSX.Element {
     overflowMenuBackIconAriaLabel: t('Header.Back'),
     overflowMenuDismissIconAriaLabel: t('Header.CloseMenu')
   };
-  const profileActions = [
-    // { type: 'button', id: 'profile', text: t('Header.Profile') },
-    // { type: 'button', id: 'preferences', text: t('Header.Preferences') },
-    // { type: 'button', id: 'security', text: t('Header.Security') },
-    // {
-    // type: 'menu-dropdown',
-    // id: 'support-group',
-    // text: t('Header.Support'),
-    // items: [
-    //   {
-    //     id: 'documentation',
-    //     text: t('Header.Documentation'),
-    //     href: '#',
-    //     external: true,
-    //     externalIconAriaLabel: t('Header.ExternalIconLabel')
-    //   },
-    //   {
-    //     id: 'feedback',
-    //     text: t('Header.Feedback'),
-    //     href: '#',
-    //     external: true,
-    //     externalIconAriaLabel: t('Header.ExternalIconLabel')
-    //   },
-    //   { id: 'support', text: t('Header.CustomerSupport') }
-    //   ]
-    // },
-    { type: 'button', id: 'signout', text: t('Header.SignOut') }
-  ];
+  const profileActions = [{ type: 'button', id: 'signout', text: t('Header.SignOut') }];
   return (
     <TopNavigation
       id="header"

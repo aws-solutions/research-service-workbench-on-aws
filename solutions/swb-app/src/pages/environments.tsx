@@ -16,6 +16,7 @@ import {
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useSettings } from '../context/SettingsContext';
 import { useState } from 'react';
+import React from 'react';
 
 export interface EnvironmentProps {
   locale: string;
@@ -29,6 +30,9 @@ export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<
 
 const Environment: NextPage = () => {
   const { settings } = useSettings();
+  // TODO? Breadcrump group?
+  // TODO: implement state-based workspace selection
+  const [selectedItems, setSelectedItems] = React.useState();
   const [query, setQuery] = useState<PropertyFilterProps.Query>({
     tokens: [],
     operation: 'and'
@@ -43,6 +47,21 @@ const Environment: NextPage = () => {
         </Head>
 
         <Table
+          // onSelectionChange={({ detail }) =>
+          //   setSelectedItems(detail.selectedItems)
+          // }
+          selectedItems={selectedItems}
+          // ariaLabels={{
+          //   selectionGroupLabel: "Items selection",
+          //   allItemsSelectionLabel: ({ selectedItems }) =>
+          //   `${selectedItems.length} ${selectedItems.length === 1 ? "item" : "items"} selected`,
+          //   itemSelectionLabel: ({ selectedItems }, item) => {
+          //     const isItemSelected = selectedItems.filter(
+          //       i => i.workspace === item.workspace
+          //     ).length;
+          //     return `${item.workspace} is ${isItemSelected ? "" : "not"} selected`;
+          //   }
+          // }}
           columnDefinitions={[
             {
               id: 'workspace',
@@ -86,20 +105,173 @@ const Environment: NextPage = () => {
               cell: (e) => e.workspaceactions
             }
           ]}
-          items={
-            [
-              // {
-              //   workspace: '',
-              //   workspacestatus: 'Pending',
-              //   lastaccessed: '',
-              //   project: '',
-              //   owner: '',
-              //   connections: '',
-              //   workspaceactions: ''
-              // }
-            ]
-          }
+          // TODO: populate with real data
+          items={[
+            {
+              workspace: 'workspace1',
+              workspacestatus: 'Pending',
+              lastaccessed: '5/3/2022',
+              project: 'TestProject',
+              owner: 'Test User',
+              connections: 0,
+              workspaceactions: (
+                <>
+                  <Button href="/#" disabled>
+                    Connect
+                  </Button>{' '}
+                  <Button href="/#" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/#" disabled>
+                    Terminate
+                  </Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace2',
+              workspacestatus: 'Errored',
+              lastaccessed: '5/3/2022',
+              project: 'SampleProject',
+              owner: 'Test User',
+              connections: 0,
+              workspaceactions: (
+                <>
+                  <Button href="/#" disabled>
+                    Connect
+                  </Button>{' '}
+                  <Button href="/#" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/#">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace3',
+              workspacestatus: 'Available',
+              lastaccessed: '5/2/2022',
+              project: 'MyProject',
+              owner: 'Sample User',
+              connections: 3,
+              workspaceactions: (
+                <>
+                  <Button href="/#" disabled>
+                    Connect
+                  </Button>{' '}
+                  <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace4',
+              workspacestatus: 'Available',
+              lastaccessed: '5/2/2022',
+              project: 'SampleProject',
+              owner: 'Sample User',
+              connections: 8,
+              workspaceactions: (
+                <>
+                  <Button href="/#" disabled>
+                    Connect
+                  </Button>{' '}
+                  <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace5',
+              workspacestatus: 'Stopped',
+              lastaccessed: '4/29/2022',
+              project: 'MVPProject',
+              owner: 'Sample User',
+              connections: 41,
+              workspaceactions: (
+                <>
+                  <Button href="/environments">Connect</Button>{' '}
+                  <Button href="/login" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/environments2">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace6',
+              workspacestatus: 'Stopped',
+              lastaccessed: '4/29/2022',
+              project: 'TestProject',
+              owner: 'Test User',
+              connections: 7,
+              workspaceactions: (
+                <>
+                  <Button href="/environments">Connect</Button>{' '}
+                  <Button href="/login" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/environments2">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace7',
+              workspacestatus: 'Stopped',
+              lastaccessed: '4/20/2022',
+              project: 'CAProject',
+              owner: 'Intern User',
+              connections: 33,
+              workspaceactions: (
+                <>
+                  <Button href="/environments">Connect</Button>{' '}
+                  <Button href="/login" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/environments2">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace8',
+              workspacestatus: 'Stopped',
+              lastaccessed: '4/18/2022',
+              project: 'BRProject',
+              owner: 'Senior User',
+              connections: 1,
+              workspaceactions: (
+                <>
+                  <Button href="/environments">Connect</Button>{' '}
+                  <Button href="/login" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/environments2">Terminate</Button>
+                </>
+              )
+            },
+            {
+              workspace: 'workspace9',
+              workspacestatus: 'Terminated',
+              lastaccessed: '4/17/2022',
+              project: 'NYCProject',
+              owner: 'Admin User',
+              connections: 0,
+              workspaceactions: (
+                <>
+                  <Button href="/environments" disabled>
+                    Connect
+                  </Button>{' '}
+                  <Button href="/login" disabled>
+                    Stop
+                  </Button>{' '}
+                  <Button href="/environments2" disabled>
+                    Terminate
+                  </Button>
+                </>
+              )
+            }
+          ]}
           loadingText="Loading workspaces"
+          // TODO: logic for Expandable section on each row
+          selectionType="single"
           empty={
             <Box textAlign="center" color="inherit">
               <b>No workspaces</b>
@@ -143,7 +315,7 @@ const Environment: NextPage = () => {
                 removeTokenButtonAriaLabel: () => 'Remove token',
                 enteredTextLabel: (text) => `Use: "${text}"`
               }}
-              countText="25 matches"
+              countText="" // TODO: show num of matches
               // TODO: add logic to get project values, workspacetype values, and owner values for filtering
               filteringOptions={[
                 { propertyKey: 'owner', value: '' },
@@ -172,22 +344,13 @@ const Environment: NextPage = () => {
             />
           }
           header={
-            <Header counter={'(0)'}>
-              Workspaces
-              <view>
-                <Box float="right">
-                  <Button variant="primary">Create Workspace</Button>
-                </Box>
-              </view>
-              {/* <Grid gridDefinition={[{colspan: 6}, {colspan: 6}]}>
-                <div></div>
-                <div>
-                  <Box float='right'>
-                    <Button variant='primary'>Create Workspace</Button>
-                  </Box>
-                </div>               
-              </Grid> */}
-            </Header>
+            <>
+              {/* TODO: show num of workspaces */}
+              <Header counter={'()'}>Workspaces</Header>
+              <Box float="right">
+                <Button variant="primary">Create Workspace</Button>
+              </Box>
+            </>
           }
         />
       </Box>
