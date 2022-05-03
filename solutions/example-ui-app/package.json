@@ -2,6 +2,11 @@
   "name": "@amzn/example-ui-app",
   "version": "0.0.1",
   "license": "APACHE-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
