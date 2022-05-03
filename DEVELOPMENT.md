@@ -27,7 +27,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
    - `rush build:test` - single command to perform `rush build && rush test` for each package. See `rush build:test -h` for more options
 7. `rush common-coverage-report` - updates root README file with code coverage summary
 
-### Staging a Pull Request
+## Staging a Pull Request
 
 1. Make changes locally ([Follow Local Development Flow](#Local-Development-Flow))
 2. Ensure you are on a feature branch; from `develop` branch: `git pull; git checkout -b feature/<feature>`
