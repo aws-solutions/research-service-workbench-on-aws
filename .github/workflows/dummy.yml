@@ -1,13 +1,16 @@
-name: merge-develop-to-main
-on:
-  pull_request:
-  push:
-    branches:
-      - develop
-  
+name: dummy
+on: ['pull_request']
+
 jobs:
-  merge-develop-to-main:
-    name: Merge develop to main
+  pre-dummy:
+    name: pre-dummy
+    runs-on: ubuntu-20.04
+    steps:
+      - name: echo
+        run: |
+          echo "pre-dummy"
+  dummy:
+    name: dummy
     runs-on: ubuntu-20.04
     needs: [deploy-and-integration-test-swb-reference, deploy-and-integration-test-example]
     steps:
