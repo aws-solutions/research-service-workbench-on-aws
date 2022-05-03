@@ -14,7 +14,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
    - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
    - Update the package.json in your package and run `rush update`.
 
-### Local development flow
+## Local development flow
 
 1. Set up your repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
 2. Create a feature branch from `develop`: `git pull; git checkout -b feature/<feature>`
