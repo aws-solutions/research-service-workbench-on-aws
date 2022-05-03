@@ -17,7 +17,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 ## Local development flow
 
 1. Set up your repo ([Follow Prerequisites for development](#prerequisites-for-development)) on your local machine
-2. Create a feature branch from `develop`: `git pull; git checkout -b feature/<feature>`
+2. Create a feature branch from `develop`: `git pull; git checkout develop; git checkout -b feature/<feature>`
 3. Run: [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
 4. Run either of the two:
    - [`rush build`](https://rushjs.io/pages/commands/rush_build/) - performs incremental build. See `rush build -h` for more options
