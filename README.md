@@ -12,7 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-88.58%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.18%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.34%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.41%25-yellow.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -23,7 +23,7 @@ Please read through this document before submitting any issues or pull requests 
 
 ### Prerequisites for development
 
-Code for monorepo-for-service-workbench is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+Code for [monorepo-for-service-workbench](https://github.com/awslabs/monorepo-for-service-workbench) is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
@@ -63,7 +63,8 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
     - generate code coverage summary in the root README file
 6. We have commit-msg git-hook:
     - A check has been added for commit messages to ensure they are in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format.
-7. Further checks are triggered on a Pull Request. Please refer the [Pull Requests Process](#pull-requests-process) section for how to manage the MR on GitLab
+7. `git push`
+8. Further checks are triggered on a Pull Request. Please refer the [Pull Requests Process](#pull-requests-process) section for how to manage the MR on GitLab
 
 ## Pull Requests Process
 
