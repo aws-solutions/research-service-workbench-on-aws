@@ -15,11 +15,11 @@ Custom ESLint rules
 "devDependencies": {
     .
     .
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@amzn/workbench-core-eslint-custom": "workspace:*"
   }
 ```
 
-2. Update your eslintrc.js:
+2. Update your .eslintrc.js:
 
 ```
 // This is a workaround for https://github.com/eslint/eslint/issues/3458
