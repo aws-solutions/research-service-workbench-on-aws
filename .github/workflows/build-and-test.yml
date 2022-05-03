@@ -23,6 +23,16 @@ jobs:
         with:
           node-version: '14.x'
 
+      - name: Get specific changed files for example package
+        id: changed-example-package-files
+        uses: tj-actions/changed-files@v18.7
+        with:
+          files: |
+            workbench-core/audit/*
+            workbench-core/logging/**/*
+            workbench-core/example/**/*
+            !README.md
+
       - name: Cache Rush
         uses: actions/cache@v3
         with:
