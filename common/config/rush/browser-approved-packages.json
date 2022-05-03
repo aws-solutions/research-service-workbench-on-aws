@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-dynamodb",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production" ]
     },
@@ -31,11 +35,19 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-dynamodb",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-ec2",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-eventbridge",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-iam",
       "allowedCategories": [ "production" ]
     },
     {
@@ -212,6 +224,10 @@
     },
     {
       "name": "js-yaml",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "lodash",
       "allowedCategories": [ "production" ]
     },
     {

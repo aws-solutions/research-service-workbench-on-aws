@@ -63,7 +63,7 @@ export default class CognitoSetup {
       UsernameAttributes: ['email']
     };
 
-    const response = await this._aws.cognito.createUserPool(createUserPoolInput);
+    const response = await this._aws.clients.cognito.createUserPool(createUserPoolInput);
     return response?.UserPool?.Id;
   }
 
@@ -80,7 +80,7 @@ export default class CognitoSetup {
       Username: this._constants.ROOT_USER_EMAIL
     };
 
-    await this._aws.cognito.adminCreateUser(adminCreateUserInput);
+    await this._aws.clients.cognito.adminCreateUser(adminCreateUserInput);
   }
 
   /**
@@ -100,7 +100,7 @@ export default class CognitoSetup {
         NextToken: nextToken
       };
 
-      const listUserPoolsOutput = await this._aws.cognito.listUserPools(listUserPoolsInput);
+      const listUserPoolsOutput = await this._aws.clients.cognito.listUserPools(listUserPoolsInput);
       nextToken = listUserPoolsOutput.NextToken;
       if (listUserPoolsOutput.UserPools) {
         userPools = userPools.concat(listUserPoolsOutput.UserPools);

@@ -8,8 +8,9 @@ import { App, CfnOutput, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
 import Workflow from './environment/workflow';
-import { PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { getConstants } from './constants';
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -54,17 +55,19 @@ export class SWBStack extends Stack {
     this._createRestApi(apiLambda);
 
     this._createStatusHandlerLambda();
-    this._createAccountHandlerLambda();
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
+    this._createAccountHandlerLambda(lcRole);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
     this._createEventBridgeResources();
     this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
+
+    this._createDDBTable(apiLambda);
   }
 
-  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): void {
+  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
     const sagemakerPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -131,6 +134,7 @@ export class SWBStack extends Stack {
     new CfnOutput(this, launchConstraintRoleNameOutput, {
       value: iamRole.roleName
     });
+    return iamRole;
   }
 
   private _createS3Buckets(s3ArtifactName: string): void {
@@ -164,23 +168,68 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createAccountHandlerLambda(): void {
-    const accountHandlerLambda = new Function(this, 'accountHandlerLambda', {
+  private _createAccountHandlerLambda(launchConstraintRole: Role): void {
+    const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars
     });
 
+    const createPortfolioSharePolicy = new PolicyStatement({
+      actions: ['servicecatalog:CreatePortfolioShare'],
+      resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+    });
+
+    const assumeRolePolicy = new PolicyStatement({
+      actions: ['sts:AssumeRole'],
+      // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+      resources: [`arn:aws:iam::*:role/${this.stackName}-cross-account-role`]
+    });
+
+    const getLaunchConstraintPolicy = new PolicyStatement({
+      actions: ['iam:GetRole', 'iam:GetRolePolicy', 'iam:ListRolePolicies', 'iam:ListAttachedRolePolicies'],
+      resources: [launchConstraintRole.roleArn]
+    });
+
+    const shareAmiPolicy = new PolicyStatement({
+      actions: ['ec2:ModifyImageAttribute'],
+      resources: ['*']
+    });
+
+    const shareSSMPolicy = new PolicyStatement({
+      actions: ['ssm:ModifyDocumentPermission'],
+      resources: [
+        this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+      ]
+    });
+
+    const cloudformationPolicy = new PolicyStatement({
+      actions: ['cloudformation:DescribeStacks'],
+      resources: [this.stackId]
+    });
+    lambda.role?.attachInlinePolicy(
+      new Policy(this, 'accountHandlerPolicy', {
+        statements: [
+          createPortfolioSharePolicy,
+          assumeRolePolicy,
+          getLaunchConstraintPolicy,
+          shareAmiPolicy,
+          shareSSMPolicy,
+          cloudformationPolicy
+        ]
+      })
+    );
+
     new CfnOutput(this, 'accountHandlerLambdaRoleOutput', {
-      value: accountHandlerLambda.role!.roleArn
+      value: lambda.role!.roleArn
     });
 
     // Run lambda function every 5 minutes
     const eventRule = new Rule(this, 'scheduleRule', {
-      schedule: Schedule.cron({ minute: '5' })
+      schedule: Schedule.cron({ minute: '0/5' })
     });
-    eventRule.addTarget(new targets.LambdaFunction(accountHandlerLambda));
+    eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
 
   private _createAPILambdaRole(): Role {
@@ -202,6 +251,11 @@ export class SWBStack extends Stack {
               actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
               resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}`],
               sid: 'CfnAccess'
+            }),
+            new PolicyStatement({
+              actions: ['servicecatalog:ListLaunchPaths'],
+              resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+              sid: 'ScAccess'
             }),
             new PolicyStatement({
               actions: ['sts:AssumeRole'],
@@ -254,5 +308,31 @@ export class SWBStack extends Stack {
     API.root.addProxy({
       defaultIntegration: new LambdaIntegration(apiLambda)
     });
+  }
+
+  // DynamoDB Table
+  private _createDDBTable(apiLambda: Function): void {
+    // Ideally, this needs to involve the solution name
+    const tableName: string = `${this.stackName}`;
+    const table = new Table(this, tableName, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      tableName: tableName
+    });
+    // Add GSI for get resource by status
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByStatus',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'status', type: AttributeType.NUMBER }
+    });
+    // Add GSI for get resource by owner
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByOwner',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'owner', type: AttributeType.NUMBER }
+    });
+    // Grant the Lambda Function read access to the DynamoDB table
+    table.grantReadWriteData(apiLambda);
+    new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
   }
 }
