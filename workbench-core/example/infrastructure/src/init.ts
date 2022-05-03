@@ -4,5 +4,4 @@ import serverlessExpress from '@vendia/serverless-express';
 
 const app: Express = express();
 app.use('/', router);
-
 exports.handler = serverlessExpress({ app });
