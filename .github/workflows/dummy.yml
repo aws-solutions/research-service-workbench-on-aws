@@ -12,7 +12,7 @@ jobs:
   dummy:
     name: dummy
     runs-on: ubuntu-20.04
-    needs: [deploy-and-integration-test-swb-reference, deploy-and-integration-test-example]
+    needs: [deploy-swb-reference, deploy-example]
     steps:
       - name: echo
         run: |
