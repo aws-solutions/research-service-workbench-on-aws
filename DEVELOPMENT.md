@@ -30,7 +30,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 ## Staging a Pull Request
 
 1. Make changes locally ([Follow Local Development Flow](#Local-Development-Flow))
-2. Ensure you are on a feature branch; from `develop` branch: `git pull; git checkout -b feature/<feature>`
+2. Ensure you are on a feature branch; from `develop` branch: `git pull; git checkout develop; git checkout -b feature/<feature>`
 3. If you are happy with your code and they are passing tests, you can push your changes to your feature branch: `git add -A; git commit`
     - Note: the commit must be in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) format
 4. `git commit` will trigger [commitizen](https://github.com/commitizen/cz-cli) and you'll be prompted to fill out any required commit fields at commit time.
