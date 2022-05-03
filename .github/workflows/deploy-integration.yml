@@ -27,14 +27,15 @@ jobs:
         with:
           node-version: '14.x'
 
-      # - name: Get specific changed files
-      #   id: changed-swb-files
-      #   uses: tj-actions/changed-files@v18.7
-      #   with:
-      #     files: |
-      #       solutions/**/*
-      #       workbench-core/base/**/*
-      #       workbench-core/environments/**/*
+      - name: Get specific changed files for example package
+        id: changed-example-package-files
+        uses: tj-actions/changed-files@v18.7
+        with:
+          files: |
+            workbench-core/audit/*
+            workbench-core/logging/**/*
+            workbench-core/example/**/*
+            !README.md
 
       - name: Cache Rush
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
@@ -83,6 +84,24 @@ jobs:
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
+
+      - name: Deploy example package to Dev
+        if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        id: endpoint
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_DEV_ACCOUNT_REGION }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
+          echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
+      
+      - name: Example Package Integration test
+        if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        env: 
+          SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
+        run: |
+          echo "$SERVICE_ENDPOINT"
+          node common/scripts/install-run-rush.js test:only -o @amzn/workbench-core-infrastructure --verbose
 
   merge-develop-to-main:
     name: Merge develop to main
