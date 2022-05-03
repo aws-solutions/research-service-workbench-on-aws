@@ -9,10 +9,6 @@ on: ['pull_request']
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    environment: dev
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -49,7 +45,6 @@ jobs:
       - name: Rush check
         run: node common/scripts/install-run-rush.js check
 
-      
       - name: Rush build
         run: node common/scripts/install-run-rush.js build --verbose
 
@@ -57,6 +52,4 @@ jobs:
         run: node common/scripts/install-run-rush.js test:only --verbose
 
       - name: Code Coverage badge check
-        run: |
-          echo $GITHUB_HEAD_REF
-          node common/scripts/install-run-rush.js make-badges --ci
+        run: node common/scripts/install-run-rush.js make-badges --ci
