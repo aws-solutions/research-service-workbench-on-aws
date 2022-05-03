@@ -2,7 +2,7 @@
 
 ## Prerequisites for development
 
-Code for [monorepo-for-service-workbench](https://github.com/awslabs/monorepo-for-service-workbench) is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+Code for [monorepo-for-service-workbench](https://github.com/awslabs/monorepo-for-service-workbench) is written in TypeScript. It is highly recommended you configure your IDE to render TypeScript errors and warnings. To make sure your IDE displays TS properly, see this [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
