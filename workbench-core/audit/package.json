@@ -23,6 +23,6 @@
     "eslint": "^8.7.0",
     "typescript": "^4.5.2",
     "istanbul-badges-readme": "1.8.1",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@amzn/workbench-core-eslint-custom": "workspace:*"
   }
 }

@@ -22,7 +22,7 @@
     "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@amzn/workbench-core-eslint-custom": "workspace:*",
     "@awsui/collection-hooks": "^1.0.0",
     "@awsui/components-react": "^3.0.0",
     "@awsui/design-tokens": "^3.0.0",

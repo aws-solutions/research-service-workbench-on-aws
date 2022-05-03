@@ -19,7 +19,7 @@
     "winston-transport": "^4.5.0"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@amzn/workbench-core-eslint-custom": "workspace:*",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",

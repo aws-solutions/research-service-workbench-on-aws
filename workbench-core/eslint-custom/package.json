@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/eslint-config-workbench-core-eslint-custom",
+  "name": "@amzn/workbench-core-eslint-custom",
   "version": "1.0.0",
   "description": "Custom eslint rules",
   "main": "lib/index.js",
