@@ -6,8 +6,7 @@ describe('IntegrationTest', () => {
       if (process.env.SERVICE_ENDPOINT) {
         console.log(process.env.SERVICE_ENDPOINT);
       }
-      const SERVICE_ENDPOINT: string =
-        process.env.SERVICE_ENDPOINT || 'https://l51vbx69s4.execute-api.us-west-2.amazonaws.com/';
+      const SERVICE_ENDPOINT: string = process.env.SERVICE_ENDPOINT || 'dummy-api.com';
       const response = await axios.get(SERVICE_ENDPOINT, {});
       expect(response.data).toBe('Hello World');
     } catch (e) {
