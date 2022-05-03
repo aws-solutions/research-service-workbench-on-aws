@@ -27,6 +27,7 @@
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
   },
   "dependencies": {
-    "@amzn/workbench-core-authentication": "workspace:*"
+    "@amzn/workbench-core-authentication": "workspace:*",
+    "@casl/ability": "^5.4.3"
   }
 }
