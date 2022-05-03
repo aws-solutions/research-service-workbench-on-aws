@@ -12,7 +12,7 @@ on:
 
 jobs:
 # deploy only when files specific to swb package changed
-  deploy-swb:
+  deploy-example:
     runs-on: ubuntu-20.04
     environment: dev
     permissions:
@@ -27,6 +27,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '14.x'
+
+      # - name: Get specific changed files for example package
+      #   id: changed-example-package-files
+      #   uses: tj-actions/changed-files@v18.7
+      #   with:
+      #     files: |
+      #       workbench-core/audit/*
+      #       workbench-core/logging/**/*
+      #       workbench-core/example/**/*
+      #       !README.md
 
       - name: Cache Rush
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
@@ -68,7 +78,7 @@ jobs:
           role-session-name: OIDCSessionName
 
       - name: Deploy example package to Dev
-        if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        # if: steps.changed-example-package-files.outputs.any_changed == 'true'
         id: endpoint
         run: |
           cd workbench-core/example/infrastructure
@@ -78,7 +88,7 @@ jobs:
           echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
       
       - name: Example package integration test
-        if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        # if: steps.changed-example-package-files.outputs.any_changed == 'true'
         env: 
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
         run: |

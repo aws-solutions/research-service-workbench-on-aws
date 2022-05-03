@@ -1,5 +1,6 @@
 name: merge-develop-to-main
 on:
+  pull_request:
   push:
     branches:
       - develop
