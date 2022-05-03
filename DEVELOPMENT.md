@@ -10,9 +10,6 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 2. Move to the correct directory: `cd monorepo-for-service-workbench`
 3. Install rush: `npm install -g @microsoft/rush`
 4. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files
-5. NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be updated in 2 ways:
-   - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
-   - Update the package.json in your package and run `rush update`.
 
 ## Local development flow
 
@@ -26,6 +23,10 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 6. Alternatively you can use:
    - `rush build:test` - single command to perform `rush build && rush test` for each package. See `rush build:test -h` for more options
 7. `rush common-coverage-report` - updates root README file with code coverage summary
+
+NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be added/updated in 2 ways:
+   - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
+   - Update the package.json in your package and run `rush update`.
 
 ## Staging a Pull Request
 

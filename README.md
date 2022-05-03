@@ -25,18 +25,18 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 ## Packages
 
-| Folder | Package |
-| ------ | ------- |
-| [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] |
-| [solutions/swb-reference/](./solutions/swb-reference/) | [@amzn/swb-reference] |
-| [solutions/example-ui-app](./solutions/example-ui-app/) | [@amzn/example-ui-app] |
-| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] |
-| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] |
-| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] |
-| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] |
-| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] |
-| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] |
-| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] |
+| Folder | Package | README |
+| ------ | ------- | ------ |
+| [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
+| [solutions/swb-reference/](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
+| [solutions/example-ui-app](./solutions/example-ui-app/) | [@amzn/example-ui-app] | [README](./solutions/example-ui-app/README.md)
+| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
+| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
+| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
+| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
+| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 
 ## Finding contributions to work on
 

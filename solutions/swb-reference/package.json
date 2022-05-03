@@ -1,7 +1,6 @@
 {
   "name": "@amzn/swb-reference",
   "version": "0.0.1",
-  "author": "rsmayda <smayda44@gmail.com>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
