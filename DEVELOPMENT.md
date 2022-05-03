@@ -1,6 +1,6 @@
 # Monorepo for Service Workbench Development Instructions
 
-### Prerequisites for development
+## Prerequisites for development
 
 Code for [monorepo-for-service-workbench](https://github.com/awslabs/monorepo-for-service-workbench) is written in TypeScript. This requires your IDE to be able to handle and work with TypeScript. Make sure your IDE displays TS properly, [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
 
