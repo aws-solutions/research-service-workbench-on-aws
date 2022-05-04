@@ -13,4 +13,8 @@
 > auditLogger.ts: AuditLogger definition
 
 ## Documentation
-1. [Audit-Service Runbook](https://quip-amazon.com/FCAkAAw4lKpr/Audit-Service-Setup-Runbook)
+
+| Folder | Package | README |
+| ------ | ------- | ------ |
+| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)

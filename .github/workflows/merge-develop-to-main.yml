@@ -23,6 +23,7 @@ jobs:
       aws-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+      test_apigateway_id_token: "${{ secrets.TEST_APIGATEWAY_ID_TOKEN }}"
 
   merge-develop-to-main:
     name: Merge develop to main

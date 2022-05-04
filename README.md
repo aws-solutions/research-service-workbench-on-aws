@@ -37,6 +37,9 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
+| [workbench-core/example/express](./workbench-core/example/express/) | [@amzn/workbench-core-express] | [README](./workbench-core/example/express/README.md)
+| [workbench-core/example/infrastructure](./workbench-core/example/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/example/infrastructure/README.md)
+
 
 ## Finding contributions to work on
 
