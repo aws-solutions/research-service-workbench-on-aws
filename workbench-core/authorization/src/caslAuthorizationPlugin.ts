@@ -6,9 +6,6 @@ import { Operation, Permission } from './permissionsPlugin';
  *
  */
 export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
-  /**
-   * Reference {@link AuthorizationPlugin.isAuthorized | here }.
-   */
   public async isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<boolean> {
     const ability: Ability = this._defineAbilitiesFor(userPermissions);
 
@@ -27,7 +24,7 @@ export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
     const { can, cannot, rules } = new AbilityBuilder(Ability);
 
     userPermissions.forEach((permission: Permission) => {
-      const reason: string = permission.reason ? permission.reason : 'Permission Not Granted';
+      const reason: string = permission.reason ?? 'Permission Not Granted';
       if (permission.effect === 'ALLOW') can(permission.action, permission.subject, permission.fields);
       else cannot(permission.action, permission.subject, permission.fields).because(reason);
     });

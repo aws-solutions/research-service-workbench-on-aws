@@ -1,6 +1,7 @@
 import { ForbiddenError } from '@casl/ability';
 import CASLAuthorizationPlugin from './caslAuthorizationPlugin';
 import { Action, Operation, Permission } from '.';
+import { fc, itProp } from 'jest-fast-check';
 
 describe('CASL Authorization Plugin', () => {
   let caslAuthorizationPlugin: CASLAuthorizationPlugin;
@@ -105,5 +106,46 @@ describe('CASL Authorization Plugin', () => {
       const authorized = await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
       expect(authorized).toBe(true);
     });
+
+    test('unauthorized user with action and subject not listed in the permissions', async () => {
+      const testSubject = 'DoesNotExist';
+      const testAction = Action.READ;
+      mockOperations = [
+        {
+          action: testAction,
+          subject: testSubject,
+          field: 'id'
+        }
+      ];
+      try {
+        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect(err.message).toBe(`Cannot execute "${testAction}" on "${testSubject}"`);
+      }
+    });
+
+    test('authorized with no action', async () => {
+      mockOperations = [];
+      const authorized = await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
+      expect(authorized).toBe(true);
+    });
+
+    itProp(
+      'Random array should throw error',
+      [fc.uniqueArray(fc.anything()), fc.uniqueArray(fc.anything(), { minLength: 1 })],
+      async (userPermissions, operations) => {
+        try {
+          await caslAuthorizationPlugin.isAuthorized(
+            userPermissions as Permission[],
+            operations as Operation[]
+          );
+          expect.hasAssertions();
+        } catch (err) {
+          // eslint-disable-next-line no-empty
+        }
+      }
+    );
   });
 });
