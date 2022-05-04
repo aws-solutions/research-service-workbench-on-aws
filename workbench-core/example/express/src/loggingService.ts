@@ -1,9 +1,10 @@
 import { LoggingService } from '@amzn/workbench-core-logging';
 
 export const logger: LoggingService = new LoggingService({
-  maxLogLevel: 'info',
+  maxLogLevel: 'error',
   includeLocation: true,
   defaultMetadata: {
-    serviceName: 'LoggerService'
+    serviceName: 'LoggerService',
+    app: 'Sample Express App'
   }
 });

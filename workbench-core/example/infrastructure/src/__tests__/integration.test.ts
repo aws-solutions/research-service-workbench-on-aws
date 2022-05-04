@@ -6,11 +6,11 @@ describe('IntegrationTest', () => {
       if (process.env.SERVICE_ENDPOINT) {
         console.log(process.env.SERVICE_ENDPOINT);
       }
-      const SERVICE_ENDPOINT: string = process.env.SERVICE_ENDPOINT || 'dummy-api.com';
+      const SERVICE_ENDPOINT: string = process.env.SERVICE_ENDPOINT || 'xxx';
       const response = await axios.get(SERVICE_ENDPOINT, {});
       expect(response.data).toBe('Hello World');
     } catch (e) {
-      console.error(e);
+      console.error('Integration Test Error: ' + e);
       throw e;
     }
   });

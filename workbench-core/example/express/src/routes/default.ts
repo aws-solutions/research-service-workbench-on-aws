@@ -1,4 +1,4 @@
-import { AuditEntry, AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
+import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
 import Metadata from '@amzn/workbench-core-audit/lib/metadata';
 import { Request, Response, Router } from 'express';
 import AuditLogger from '../auditLogger';
@@ -12,28 +12,41 @@ const auditService: AuditService = new AuditService(baseAuditPlugin, true);
 export const router: Router = Router();
 
 router.get('/', async (req: Request, res: Response) => {
-  const auditEntry: AuditEntry = {
-    body: { message: 'Hello World' },
+  const response = {
+    body: 'Hello World'
+  };
+
+  const metadata: Metadata = {
+    statusCode: req.statusCode,
+    action: `${req.method} ${req.path}`,
     source: {
-      ip: req.ip
+      IP: req.ip
+    },
+    actor: {
+      ID: '9999'
     }
   };
-  const metadata: Metadata = {
-    statusCode: res.statusCode,
-    action: req.method + ' ' + req.path
-  };
-  await auditService.write(metadata, auditEntry);
-  res.send('Hello World');
+
+  await auditService.write(metadata, response);
+  res.send(response.body);
 });
 
-router.get('/user', async (req: Request, res: Response) => {
-  const responsebody: AuditEntry = {
-    body: { message: 'Hello User' }
+router.get('/:model/:id', async (req: Request, res: Response) => {
+  const response = {
+    body: 'Hello ' + req.params.model
   };
+
   const metadata: Metadata = {
-    statusCode: res.statusCode,
-    action: req.method + ' ' + req.path
+    statusCode: req.statusCode,
+    action: `${req.method} ${req.path}`,
+    source: {
+      IP: req.ip
+    },
+    actor: {
+      ID: req.params.id
+    }
   };
-  await auditService.write(metadata, responsebody);
-  res.send('Hello User');
+
+  await auditService.write(metadata, response);
+  res.send(response.body);
 });
