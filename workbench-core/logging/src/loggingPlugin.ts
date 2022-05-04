@@ -1,5 +1,5 @@
 import { LogLevel } from './logLevel';
-import { LogMessage, LogMessageObject } from './logMessage';
+import { LogMessage, LogMessageMeta, LogMessageObject } from './logMessage';
 
 /**
  * The interface class for all Logging Plugins.
@@ -20,7 +20,7 @@ export interface LoggingPlugin {
    * @param message - the primary message to be logged
    * @param meta - additional data to be logged
    */
-  log(level: LogLevel, message: string, meta: LogMessageObject): void;
+  log(level: LogLevel, message: string, meta: LogMessageMeta): void;
 
   /**
    * Sets the maximum {@link LogLevel} for the plugin.

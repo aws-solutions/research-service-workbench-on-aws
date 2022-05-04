@@ -1,6 +1,6 @@
 import { LoggingPlugin } from './loggingPlugin';
 import { LogLevel } from './logLevel';
-import { LogMessage, LogMessageObject } from './logMessage';
+import { LogMessage, LogMessageMeta, LogMessageObject } from './logMessage';
 import { WinstonPlugin } from './plugins/winstonPlugin';
 
 /**
@@ -84,7 +84,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public error(message: string, meta: LogMessageObject): void;
+  public error(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "error" log level
@@ -104,7 +104,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public warn(message: string, meta: LogMessageObject): void;
+  public warn(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "warn" log level
@@ -124,7 +124,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public info(message: string, meta: LogMessageObject): void;
+  public info(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "info" log level
@@ -144,7 +144,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public http(message: string, meta: LogMessageObject): void;
+  public http(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "http" log level
@@ -164,7 +164,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public verbose(message: string, meta: LogMessageObject): void;
+  public verbose(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "verbose" log level
@@ -184,7 +184,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public debug(message: string, meta: LogMessageObject): void;
+  public debug(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "debug" log level
@@ -204,7 +204,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  public silly(message: string, meta: LogMessageObject): void;
+  public silly(message: string, meta: LogMessageMeta): void;
 
   /**
    * Logs using the "silly" log level
@@ -225,7 +225,7 @@ export class LoggingService {
    * @param message - The message to be logged
    * @param meta - Any additional data to be included in the log
    */
-  private _log(level: LogLevel, message: string, meta: LogMessageObject): void;
+  private _log(level: LogLevel, message: string, meta: LogMessageMeta): void;
 
   /**
    * Takes a log message, optionally appends the calling function location and metadata, and sends to the Winston logger
