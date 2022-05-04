@@ -51,6 +51,7 @@ jobs:
         # if: steps.changed-example-package-files.outputs.any_changed == 'true'
         env: 
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
+          TEST_APIGATEWAY_ID_TOKEN: "${{ secrets.TEST_APIGATEWAY_ID_TOKEN }}"
         run: |
           echo "$SERVICE_ENDPOINT"
           cd workbench-core/example/infrastructure
