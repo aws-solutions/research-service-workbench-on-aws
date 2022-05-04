@@ -10,10 +10,24 @@ on:
       - develop
   
 jobs:
+  deploy-swb-reference:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+  
+  deploy-example:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+
   merge-develop-to-main:
     name: Merge develop to main
     runs-on: ubuntu-20.04
-    needs: [deploy-and-integration-test-swb-reference, deploy-and-integration-test-example]
+    needs: [deploy-swb-reference, deploy-example]
 
     steps:
       - uses: actions/checkout@v3

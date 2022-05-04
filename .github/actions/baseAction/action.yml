@@ -1,5 +1,10 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
 name: Base Action
-description: Generic base action used by workflows
+description: Generic base action used by workflows - Cache rush and pnpm; rush install, check and build
 
 runs:
   using: "composite"
