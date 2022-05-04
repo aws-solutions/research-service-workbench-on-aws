@@ -9,7 +9,7 @@ export default interface AuthorizationPlugin {
    * @param userPermissions - {@link Permission}.
    * @param operations - An array of {@link Operation}s that the user wants to perform.
    *
-   * @returns A promise for a boolean stating whether or not they are authorized.
+   * @returns A promise when user is authorized, otherwise throw on failure.
    */
-  isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<boolean>;
+  isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<void>;
 }

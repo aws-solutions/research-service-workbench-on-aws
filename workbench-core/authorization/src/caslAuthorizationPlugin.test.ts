@@ -69,8 +69,9 @@ describe('CASL Authorization Plugin', () => {
           subject: 'Sample'
         }
       ];
-      const authorized = await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-      expect(authorized).toBe(true);
+      expect(
+        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations)
+      ).toBeUndefined();
     });
 
     test('unauthorized user with action, subject, and field, should throw ForbiddenError', async () => {
@@ -103,8 +104,9 @@ describe('CASL Authorization Plugin', () => {
           field: 'name'
         }
       ];
-      const authorized = await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-      expect(authorized).toBe(true);
+      expect(
+        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations)
+      ).toBeUndefined();
     });
 
     test('unauthorized user with action and subject not listed in the permissions', async () => {
@@ -128,8 +130,9 @@ describe('CASL Authorization Plugin', () => {
 
     test('authorized with no action', async () => {
       mockOperations = [];
-      const authorized = await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations);
-      expect(authorized).toBe(true);
+      expect(
+        await caslAuthorizationPlugin.isAuthorized(mockAdminPermissions, mockOperations)
+      ).toBeUndefined();
     });
 
     itProp(

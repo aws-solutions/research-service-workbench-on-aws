@@ -6,14 +6,12 @@ import { Operation, Permission } from './permissionsPlugin';
  *
  */
 export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
-  public async isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<boolean> {
+  public async isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<void> {
     const ability: Ability = this._defineAbilitiesFor(userPermissions);
 
     operations.forEach((operation: Operation) => {
       ForbiddenError.from(ability).throwUnlessCan(operation.action, operation.subject, operation.field);
     });
-
-    return true;
   }
   /**
    * Given a set of a user's {@link  Permission}s, an CASL {@link Ability} is created.
