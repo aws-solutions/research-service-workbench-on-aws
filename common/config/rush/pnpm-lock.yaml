@@ -498,8 +498,9 @@ importers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-express': workspace:*
       '@aws-cdk/assert': ^2.0.0
-      '@aws-cdk/aws-apigatewayv2-alpha': ^2.12.0-alpha.0
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.12.0-alpha.0
+      '@aws-cdk/aws-apigatewayv2-alpha': ^2.22.0-alpha.0
+      '@aws-cdk/aws-apigatewayv2-authorizers-alpha': ^2.22.0-alpha.0
+      '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -532,8 +533,9 @@ importers:
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@aws-cdk/assert': 2.22.0_b445902d9d80d52fa2a3ac991dbbf407
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.12.0-alpha.0_bae347a9c403b078e1b547c8a73459de
-      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.12.0-alpha.0_bde3983ae51ba3e75a115492b9df19e3
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_bae347a9c403b078e1b547c8a73459de
+      '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_84729fed53f7996d7a8da2df9ab5c23e
+      '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_84729fed53f7996d7a8da2df9ab5c23e
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.4
       '@rushstack/heft': 0.45.0
       '@rushstack/heft-jest-plugin': 0.2.15_338867186f4ad1024e99a1c6e89aa633
@@ -623,26 +625,39 @@ packages:
       constructs: 3.3.283
     dev: false
 
-  /@aws-cdk/aws-apigatewayv2-alpha/2.12.0-alpha.0_bae347a9c403b078e1b547c8a73459de:
-    resolution: {integrity: sha512-f8zTzJ49H1ItfibJcUgYHvCnXum+Y7kE9xNmdbvQcmW/3WlZ/osI651f8qBjrrVchJY+vNZyOa8eXYEaJR/YMg==}
+  /@aws-cdk/aws-apigatewayv2-alpha/2.22.0-alpha.0_bae347a9c403b078e1b547c8a73459de:
+    resolution: {integrity: sha512-O8ZY2ny8TapdvD6iIULzBKJ4rn9JlmkwfDzfR7cYl7y+P220sLh1iJmU/m1yqtIRMLjv2022XCNBMZUJfwpVqQ==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
-      aws-cdk-lib: ^2.12.0
+      aws-cdk-lib: ^2.22.0
       constructs: ^10.0.0
     dependencies:
       aws-cdk-lib: 2.22.0_constructs@10.0.130
       constructs: 10.0.130
     dev: true
 
-  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.12.0-alpha.0_bde3983ae51ba3e75a115492b9df19e3:
-    resolution: {integrity: sha512-5UL7JL0SzyQoWYlFP4NKt3C9ewpai10hSgVgYsabtJzPlmrpWgzXGVYYMeJIE2YgITSLMwLTRiPnhDV9HK1HPg==}
+  /@aws-cdk/aws-apigatewayv2-authorizers-alpha/2.22.0-alpha.0_84729fed53f7996d7a8da2df9ab5c23e:
+    resolution: {integrity: sha512-Q2lJqF8OuhcnJ2Wx6lgycjoudwvGLGhJ55QtO6XSSuogYLyJDhABqPFFxGGS8UqSJQ2IbBfGR6Ebtg2xnbkgKQ==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.12.0-alpha.0
-      aws-cdk-lib: ^2.12.0
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0
+      aws-cdk-lib: ^2.22.0
       constructs: ^10.0.0
     dependencies:
-      '@aws-cdk/aws-apigatewayv2-alpha': 2.12.0-alpha.0_bae347a9c403b078e1b547c8a73459de
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_bae347a9c403b078e1b547c8a73459de
+      aws-cdk-lib: 2.22.0_constructs@10.0.130
+      constructs: 10.0.130
+    dev: true
+
+  /@aws-cdk/aws-apigatewayv2-integrations-alpha/2.22.0-alpha.0_84729fed53f7996d7a8da2df9ab5c23e:
+    resolution: {integrity: sha512-QVXHA8J6ECkE29aT3Rnwtgxq15eDW3SlMuX8Z9J3BVqPPAH7rLAruD3hKL//KklVFd8xke7zBxMeYJ5CGkduZA==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0
+      aws-cdk-lib: ^2.22.0
+      constructs: ^10.0.0
+    dependencies:
+      '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_bae347a9c403b078e1b547c8a73459de
       aws-cdk-lib: 2.22.0_constructs@10.0.130
       constructs: 10.0.130
     dev: true

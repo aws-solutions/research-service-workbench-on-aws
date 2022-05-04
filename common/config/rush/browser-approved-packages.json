@@ -43,6 +43,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
       "allowedCategories": [ "production" ]
     },
