@@ -13,6 +13,8 @@ on:
         required: true
       aws-dev-account-region:
         required: true
+      test_apigateway_id_token:
+        required: true
 
 jobs:
   deploy-and-integration-test-example:
@@ -51,9 +53,10 @@ jobs:
         # if: steps.changed-example-package-files.outputs.any_changed == 'true'
         env: 
           SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
-          TEST_APIGATEWAY_ID_TOKEN: "${{ secrets.TEST_APIGATEWAY_ID_TOKEN }}"
+          TEST_APIGATEWAY_ID_TOKEN: "${{ secrets.test_apigateway_id_token }}"
         run: |
           echo "$SERVICE_ENDPOINT"
+          echo "$TEST_APIGATEWAY_ID_TOKEN"
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js test:integration --verbose
 
