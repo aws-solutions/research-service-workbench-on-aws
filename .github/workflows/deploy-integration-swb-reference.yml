@@ -17,7 +17,7 @@ on:
 
 jobs:
 # deploy only when files specific to swb package changed
-  deploy-swb-reference:
+  deploy-and-integration-test-swb-reference:
     runs-on: ubuntu-20.04
     environment: dev
     permissions:

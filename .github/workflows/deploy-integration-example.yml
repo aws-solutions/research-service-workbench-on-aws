@@ -15,8 +15,7 @@ on:
         required: true
 
 jobs:
-# deploy only when files specific to swb package changed
-  deploy-example:
+  deploy-and-integration-test-example:
     runs-on: ubuntu-20.04
     environment: dev
     permissions:

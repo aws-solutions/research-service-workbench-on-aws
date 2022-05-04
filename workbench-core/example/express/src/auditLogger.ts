@@ -12,7 +12,7 @@ export default class AuditLogger implements Writer {
     this._logger.warn('Example warning message');
 
     this._logger.info('Example info message', {
-      responseStatus: auditEntry.statusCode!,
+      responseStatus: metadata.statusCode!,
       responseMessage: JSON.stringify(auditEntry.body)
     });
 
