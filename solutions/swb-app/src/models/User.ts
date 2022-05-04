@@ -6,12 +6,23 @@ export interface User {
   email: string;
   avatar: IconProps;
   claims: string[];
+  role: string;
 }
 
-export const unknownUser: User = {
-  id: 'sample-id',
-  name: 'Sample User',
+export const researcherUser: User = {
+  id: 'sample-researcher-id',
+  name: 'Researcher User',
   email: 'sample.user@amazon.com',
   avatar: { name: 'user-profile' },
-  claims: []
+  claims: [],
+  role: 'researcher'
+};
+
+export const adminUser: User = {
+  id: 'sample-admin-id',
+  name: 'Admin User',
+  email: 'sample.user@amazon.com',
+  avatar: { name: 'user-profile' },
+  claims: [],
+  role: 'admin'
 };

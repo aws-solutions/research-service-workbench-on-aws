@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }): JSX
       toolsHide
       ariaLabels={appLayoutLabels}
       navigationOpen={navigationOpen}
-      navigation={<Navigation activeHref="#/" />}
+      navigation={<Navigation />}
       notifications={<Flashbar items={Object.values(notifications)} />}
       breadcrumbs={
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
