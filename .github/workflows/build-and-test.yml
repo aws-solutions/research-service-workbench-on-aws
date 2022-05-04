@@ -56,6 +56,8 @@ jobs:
 
       # - name: Rush test
       #   run: node common/scripts/install-run-rush.js test:only --verbose
+      - name: Rush test
+        run: node common/scripts/install-run-rush.js test:only --verbose
 
       - name: Code Coverage badge check
         run: node common/scripts/install-run-rush.js make-badges --ci
