@@ -94,4 +94,4 @@ solutions/swb-reference/.aws-sam/
 
 
 # example package
-workbench/example/infrastructure/build
+workbench-core/example/infrastructure/build
