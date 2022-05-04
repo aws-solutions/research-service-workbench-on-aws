@@ -4,9 +4,6 @@ description: Generic base action used by workflows
 runs:
   using: composite
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
     - name: Use Node.js 14.x
       uses: actions/setup-node@v3
       with:
