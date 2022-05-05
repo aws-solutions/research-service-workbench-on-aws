@@ -22,17 +22,30 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: cdk synth
+      - name: cdk synth swb-reference
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: Run cfn-nag on swb cdk.out
+      - name: cdk synth example
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../common/scripts/install-run-rushx.js compile
+          node ../../common/scripts/install-run-rushx.js cdk synth
+
+      - name: Run cfn-nag on swb-reference cdk.out
         id: cdk
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
+          extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on example cdk.out
+        id: cdk
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
@@ -48,6 +61,9 @@ jobs:
         # No. of violations: warnings + errors
         with:
           cmd: jq '.[].file_results.violations | length' cfn_nag.out
+
+      - name: echo violation count
+        run: echo ${{ steps.cfn-nag.outputs.value }}
 
       # - name: Fail if violations detected in cfn-nag
       #   run: exit ${{ steps.cfn-nag.outputs.value }}
