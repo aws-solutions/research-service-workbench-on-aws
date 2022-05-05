@@ -4,7 +4,7 @@ import { Action } from './action';
 /**
  * States whether a {@link Permission} should be ALLOW or DENY.
  */
-type Effect = 'ALLOW' | 'DENY';
+export type Effect = 'ALLOW' | 'DENY';
 
 /**
  * Represents what a Permission contains.
@@ -43,30 +43,6 @@ export interface Permission {
    * ```
    */
   fields?: string[];
-  /**
-   * An object used to restrict a {@link User}'s {@link Action} only to matched subjects.
-   *
-   * @example
-   * Allows User read access to only an article with the name 'Article Title'.
-   * ```
-   * class Article {
-   *    name: string;
-   *    method() {
-   *    }
-   *    methodTwo() {
-   *    }
-   *  }
-   *
-   * const permission: Permission = {
-   *  action: Action.READ,
-   *  subject: 'Article',
-   *  condition: {name: 'Article Title'}
-   * }
-   *
-   * ```
-   */
-  conditions?: object;
-
   /**
    * Reason for why this is forbidden.
    */
