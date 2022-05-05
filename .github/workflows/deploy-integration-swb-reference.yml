@@ -7,13 +7,12 @@ name: Deploy-and-integration-test-swb-reference
 on:
   workflow_call:
     secrets: 
-      aws-region:
+      aws-dev-region:
         required: true
       role-to-assume:
         required: true
       aws-dev-account-region:
         required: true
-  
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -35,7 +34,7 @@ jobs:
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ secrets.aws-region }}
+          aws-region: ${{ secrets.aws-dev-region }}
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
       

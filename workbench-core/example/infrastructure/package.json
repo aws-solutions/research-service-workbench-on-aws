@@ -50,12 +50,14 @@
     "@types/aws-lambda": "^8.10.92",
     "axios": "^0.27.1",
     "cdk-nag": "^2.12.25",
-    "esbuild": "^0.14.21"
+    "esbuild": "^0.14.21",
+    "@types/lodash": "^4.14.181"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.16",
-    "@amzn/workbench-core-express": "workspace:*"
+    "@amzn/workbench-core-express": "workspace:*",
+    "lodash": "^4.17.21"
   }
 }

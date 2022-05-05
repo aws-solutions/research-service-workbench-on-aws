@@ -13,17 +13,19 @@ jobs:
   deploy-swb-reference:
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
     secrets:
-      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
   deploy-example:
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
     secrets:
-      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-      test_apigateway_id_token: "${{ secrets.TEST_APIGATEWAY_ID_TOKEN }}"
+      cognito-username: "${{ secrets.COGNITO_USERNAME }}"
+      cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
+      ognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
 
   merge-develop-to-main:
     name: Merge develop to main
