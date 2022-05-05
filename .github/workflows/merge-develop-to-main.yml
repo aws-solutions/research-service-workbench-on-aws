@@ -25,7 +25,7 @@ jobs:
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
       cognito-username: "${{ secrets.COGNITO_USERNAME }}"
       cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
-      ognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
+      cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
 
   merge-develop-to-main:
     name: Merge develop to main
