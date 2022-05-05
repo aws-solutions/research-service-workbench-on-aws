@@ -255,7 +255,7 @@ Object {
       "Type": "AWS::ApiGatewayV2::Authorizer",
     },
     "KMSKeyBD866E3F": Object {
-      "DeletionPolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": Object {
         "EnableKeyRotation": true,
         "KeyPolicy": Object {
@@ -281,14 +281,30 @@ Object {
                   ],
                 },
               },
+            },
+            Object {
+              "Action": Array [
+                "kms:Encrypt*",
+                "kms:Decrypt*",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:Describe*",
+              ],
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": Object {
+                  "Fn::Sub": "logs.\${AWS::Region}.amazonaws.com",
+                },
+              },
               "Resource": "*",
             },
           ],
           "Version": "2012-10-17",
         },
+        "PendingWindowInDays": 7,
       },
       "Type": "AWS::KMS::Key",
-      "UpdateReplacePolicy": "Retain",
+      "UpdateReplacePolicy": "Delete",
     },
     "LambdaService68B9B9DF": Object {
       "DependsOn": Array [

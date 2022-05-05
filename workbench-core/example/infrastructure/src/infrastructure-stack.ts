@@ -1,5 +1,14 @@
 /* eslint-disable no-new */
-import { Stack, StackProps, CfnOutput, RemovalPolicy, aws_apigatewayv2, aws_kms } from 'aws-cdk-lib';
+import {
+  Stack,
+  StackProps,
+  CfnOutput,
+  RemovalPolicy,
+  aws_apigatewayv2,
+  aws_kms,
+  Duration,
+  Fn
+} from 'aws-cdk-lib';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
@@ -14,6 +23,13 @@ import {
   UserPoolClientIdentityProvider
 } from 'aws-cdk-lib/aws-cognito';
 import { NagSuppressions } from 'cdk-nag';
+import {
+  AccountRootPrincipal,
+  Effect,
+  PolicyDocument,
+  PolicyStatement,
+  ServicePrincipal
+} from 'aws-cdk-lib/aws-iam';
 
 export class InfrastructureStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
@@ -71,19 +87,99 @@ export class InfrastructureStack extends Stack {
       apiName: 'HttpApiService'
     });
 
-    const kmsKey = new aws_kms.Key(this, 'KMSKey', {
-      enableKeyRotation: true
+    const kmsKeyPolicyDocument = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: ['kms:*'],
+          effect: Effect.ALLOW,
+          principals: [new AccountRootPrincipal()]
+        }),
+        new PolicyStatement({
+          actions: [
+            'kms:Encrypt*',
+            'kms:Decrypt*',
+            'kms:ReEncrypt*',
+            'kms:GenerateDataKey*',
+            'kms:Describe*'
+          ],
+          effect: Effect.ALLOW,
+          principals: [new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))],
+          resources: ['*']
+          // conditions: [
+          //   {
+          //     "ArnEquals": {
+          //       "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
+          //   }
+          //   }
+          // ]
+        })
+      ]
     });
 
-    const log = new LogGroup(this, 'log', {
+    const kmsKey = new aws_kms.Key(this, 'KMSKey', {
+      enableKeyRotation: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      pendingWindow: Duration.days(7),
+      policy: kmsKeyPolicyDocument
+    });
+
+    const logGroup = new LogGroup(this, 'log', {
       logGroupName: 'httpApiLogGroup',
       encryptionKey: kmsKey
     });
 
+    // kmsKeyPolicyDocument.addStatements(
+    //   new PolicyStatement({
+    //     actions: [
+    //       "kms:Encrypt*",
+    //       "kms:Decrypt*",
+    //       "kms:ReEncrypt*",
+    //       "kms:GenerateDataKey*",
+    //       "kms:Describe*"
+    //     ],
+    //     effect: Effect.ALLOW,
+    //     principals: [
+    //       new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))
+    //     ],
+    //     resources: ['*'],
+    //     conditions: [
+    //       {
+    //         "ArnEquals": {
+    //           "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
+    //         }
+    //       }
+    //     ]
+    //   })
+    // )
+
+    // kmsKey.addToResourcePolicy(
+    //   new PolicyStatement({
+    //     actions: [
+    //       "kms:Encrypt*",
+    //       "kms:Decrypt*",
+    //       "kms:ReEncrypt*",
+    //       "kms:GenerateDataKey*",
+    //       "kms:Describe*"
+    //     ],
+    //     effect: Effect.ALLOW,
+    //     principals: [
+    //       new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))
+    //     ],
+    //     resources: ['*'],
+    //     conditions: [
+    //       {
+    //         "ArnEquals": {
+    //           "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
+    //       }
+    //       }
+    //     ]
+    //   })
+    // )
+
     const defaultStage = httpApi.defaultStage!.node.defaultChild as aws_apigatewayv2.CfnStage;
 
     defaultStage.accessLogSettings = {
-      destinationArn: log.logGroupArn,
+      destinationArn: logGroup.logGroupArn,
       format: `$context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId`
     };
 
