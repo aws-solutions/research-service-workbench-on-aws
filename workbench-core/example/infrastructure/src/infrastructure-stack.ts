@@ -106,13 +106,6 @@ export class InfrastructureStack extends Stack {
           effect: Effect.ALLOW,
           principals: [new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))],
           resources: ['*']
-          // conditions: [
-          //   {
-          //     "ArnEquals": {
-          //       "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
-          //   }
-          //   }
-          // ]
         })
       ]
     });
@@ -128,54 +121,6 @@ export class InfrastructureStack extends Stack {
       logGroupName: 'httpApiLogGroup',
       encryptionKey: kmsKey
     });
-
-    // kmsKeyPolicyDocument.addStatements(
-    //   new PolicyStatement({
-    //     actions: [
-    //       "kms:Encrypt*",
-    //       "kms:Decrypt*",
-    //       "kms:ReEncrypt*",
-    //       "kms:GenerateDataKey*",
-    //       "kms:Describe*"
-    //     ],
-    //     effect: Effect.ALLOW,
-    //     principals: [
-    //       new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))
-    //     ],
-    //     resources: ['*'],
-    //     conditions: [
-    //       {
-    //         "ArnEquals": {
-    //           "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
-    //         }
-    //       }
-    //     ]
-    //   })
-    // )
-
-    // kmsKey.addToResourcePolicy(
-    //   new PolicyStatement({
-    //     actions: [
-    //       "kms:Encrypt*",
-    //       "kms:Decrypt*",
-    //       "kms:ReEncrypt*",
-    //       "kms:GenerateDataKey*",
-    //       "kms:Describe*"
-    //     ],
-    //     effect: Effect.ALLOW,
-    //     principals: [
-    //       new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))
-    //     ],
-    //     resources: ['*'],
-    //     conditions: [
-    //       {
-    //         "ArnEquals": {
-    //           "kms:EncryptionContext:aws:logs:arn": logGroup.logGroupName
-    //       }
-    //       }
-    //     ]
-    //   })
-    // )
 
     const defaultStage = httpApi.defaultStage!.node.defaultChild as aws_apigatewayv2.CfnStage;
 
@@ -197,6 +142,9 @@ export class InfrastructureStack extends Stack {
       exportName: 'HttpApiEndPoint'
     });
 
+    /**
+     * cdk-nag suppressions
+     */
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/InfrastructureStack/LambdaService/ServiceRole/Resource',
