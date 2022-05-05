@@ -31,8 +31,8 @@ jobs:
       - name: cdk synth example
         run: |
           cd workbench-core/example/infrastructure
-          node ../../common/scripts/install-run-rushx.js compile
-          node ../../common/scripts/install-run-rushx.js cdk synth
+          node ../../../common/scripts/install-run-rushx.js compile
+          node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb-reference cdk.out
         id: cdk-swb-reference
