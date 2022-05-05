@@ -35,14 +35,14 @@ jobs:
           node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb-reference cdk.out
-        id: cdk
+        id: cdk-swb-reference
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on example cdk.out
-        id: cdk
+        id: cdk-example
         uses: stelligent/cfn_nag@master
         with:
           input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
