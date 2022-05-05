@@ -92,7 +92,8 @@ export class InfrastructureStack extends Stack {
         new PolicyStatement({
           actions: ['kms:*'],
           effect: Effect.ALLOW,
-          principals: [new AccountRootPrincipal()]
+          principals: [new AccountRootPrincipal()],
+          resources: ['*']
         }),
         new PolicyStatement({
           actions: [
