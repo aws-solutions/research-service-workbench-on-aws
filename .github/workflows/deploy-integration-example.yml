@@ -59,7 +59,7 @@ jobs:
           COGNITO_USERNAME: "${{ secrets.cognito-username }}"
           COGNITO_PASSWORD: "${{ secrets.cognito-password }}"
           COGNITO_CLIENT_ID: "${{ secrets.cognito-client-id }}"
-          AWS_DEV_REGION: "${{ secrets.aws-dev-region }}
+          AWS_DEV_REGION: "${{ secrets.aws-dev-region }}"
 
         run: |
           cd workbench-core/example/infrastructure
