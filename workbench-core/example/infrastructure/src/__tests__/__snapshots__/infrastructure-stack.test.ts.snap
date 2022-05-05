@@ -14,23 +14,94 @@ Object {
         ],
       },
     },
-    "region": Object {
-      "Value": Object {
-        "Ref": "AWS::Region",
-      },
-    },
     "userPoolClientId": Object {
       "Value": Object {
-        "Ref": "UserPoolClient2F5918F7",
+        "Ref": "ExampleUserPoolClientA3BAC0B9",
       },
     },
     "userPoolId": Object {
       "Value": Object {
-        "Ref": "UserPool6BA7E5F2",
+        "Ref": "ExampleUserPoolB793288C",
       },
     },
   },
   "Resources": Object {
+    "ExampleUserPoolB793288C": Object {
+      "DeletionPolicy": "Delete",
+      "Properties": Object {
+        "AccountRecoverySetting": Object {
+          "RecoveryMechanisms": Array [
+            Object {
+              "Name": "verified_email",
+              "Priority": 1,
+            },
+          ],
+        },
+        "AdminCreateUserConfig": Object {
+          "AllowAdminCreateUserOnly": false,
+        },
+        "AliasAttributes": Array [
+          "email",
+        ],
+        "AutoVerifiedAttributes": Array [
+          "email",
+        ],
+        "EmailVerificationMessage": "The verification code to your new account is {####}",
+        "EmailVerificationSubject": "Verify your new account",
+        "Policies": Object {
+          "PasswordPolicy": Object {
+            "MinimumLength": 6,
+            "RequireLowercase": false,
+            "RequireNumbers": false,
+            "RequireSymbols": false,
+            "RequireUppercase": false,
+          },
+        },
+        "SmsVerificationMessage": "The verification code to your new account is {####}",
+        "UserPoolName": "example-user-pool",
+        "VerificationMessageTemplate": Object {
+          "DefaultEmailOption": "CONFIRM_WITH_CODE",
+          "EmailMessage": "The verification code to your new account is {####}",
+          "EmailSubject": "Verify your new account",
+          "SmsMessage": "The verification code to your new account is {####}",
+        },
+      },
+      "Type": "AWS::Cognito::UserPool",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ExampleUserPoolClientA3BAC0B9": Object {
+      "Properties": Object {
+        "AllowedOAuthFlows": Array [
+          "implicit",
+          "code",
+        ],
+        "AllowedOAuthFlowsUserPoolClient": true,
+        "AllowedOAuthScopes": Array [
+          "profile",
+          "phone",
+          "email",
+          "openid",
+          "aws.cognito.signin.user.admin",
+        ],
+        "CallbackURLs": Array [
+          "https://example.com",
+        ],
+        "ExplicitAuthFlows": Array [
+          "ALLOW_USER_PASSWORD_AUTH",
+          "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+          "ALLOW_CUSTOM_AUTH",
+          "ALLOW_USER_SRP_AUTH",
+          "ALLOW_REFRESH_TOKEN_AUTH",
+        ],
+        "SupportedIdentityProviders": Array [
+          "COGNITO",
+        ],
+        "UserPoolId": Object {
+          "Ref": "ExampleUserPoolB793288C",
+        },
+      },
+      "Type": "AWS::Cognito::UserPoolClient",
+    },
     "HttpApiDefaultRoute146696CE": Object {
       "Properties": Object {
         "ApiId": Object {
@@ -137,7 +208,7 @@ Object {
         "JwtConfiguration": Object {
           "Audience": Array [
             Object {
-              "Ref": "UserPoolClient2F5918F7",
+              "Ref": "ExampleUserPoolClientA3BAC0B9",
             },
           ],
           "Issuer": Object {
@@ -150,7 +221,7 @@ Object {
                 },
                 ".amazonaws.com/",
                 Object {
-                  "Ref": "UserPool6BA7E5F2",
+                  "Ref": "ExampleUserPoolB793288C",
                 },
               ],
             ],
@@ -169,7 +240,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "1b28602b399409e0f4d3f65b90006b764fbc83b292d3f287adeff677e8a78781.zip",
+          "S3Key": "0cbba7608888c3948fdec181048880eebc1eca58d3e2f70826988b9abfb1076a.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "buildLambda.handler",
@@ -213,82 +284,6 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Role",
-    },
-    "UserPool6BA7E5F2": Object {
-      "DeletionPolicy": "Delete",
-      "Properties": Object {
-        "AccountRecoverySetting": Object {
-          "RecoveryMechanisms": Array [
-            Object {
-              "Name": "verified_email",
-              "Priority": 1,
-            },
-          ],
-        },
-        "AdminCreateUserConfig": Object {
-          "AllowAdminCreateUserOnly": false,
-        },
-        "AliasAttributes": Array [
-          "email",
-        ],
-        "AutoVerifiedAttributes": Array [
-          "email",
-        ],
-        "EmailVerificationMessage": "The verification code to your new account is {####}",
-        "EmailVerificationSubject": "Verify your new account",
-        "Policies": Object {
-          "PasswordPolicy": Object {
-            "MinimumLength": 6,
-            "RequireLowercase": false,
-            "RequireNumbers": false,
-            "RequireSymbols": false,
-            "RequireUppercase": false,
-          },
-        },
-        "SmsVerificationMessage": "The verification code to your new account is {####}",
-        "UserPoolName": "my-user-pool",
-        "VerificationMessageTemplate": Object {
-          "DefaultEmailOption": "CONFIRM_WITH_CODE",
-          "EmailMessage": "The verification code to your new account is {####}",
-          "EmailSubject": "Verify your new account",
-          "SmsMessage": "The verification code to your new account is {####}",
-        },
-      },
-      "Type": "AWS::Cognito::UserPool",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "UserPoolClient2F5918F7": Object {
-      "Properties": Object {
-        "AllowedOAuthFlows": Array [
-          "implicit",
-          "code",
-        ],
-        "AllowedOAuthFlowsUserPoolClient": true,
-        "AllowedOAuthScopes": Array [
-          "profile",
-          "phone",
-          "email",
-          "openid",
-          "aws.cognito.signin.user.admin",
-        ],
-        "CallbackURLs": Array [
-          "https://example.com",
-        ],
-        "ExplicitAuthFlows": Array [
-          "ALLOW_USER_PASSWORD_AUTH",
-          "ALLOW_ADMIN_USER_PASSWORD_AUTH",
-          "ALLOW_CUSTOM_AUTH",
-          "ALLOW_USER_SRP_AUTH",
-          "ALLOW_REFRESH_TOKEN_AUTH",
-        ],
-        "SupportedIdentityProviders": Array [
-          "COGNITO",
-        ],
-        "UserPoolId": Object {
-          "Ref": "UserPool6BA7E5F2",
-        },
-      },
-      "Type": "AWS::Cognito::UserPoolClient",
     },
   },
 }

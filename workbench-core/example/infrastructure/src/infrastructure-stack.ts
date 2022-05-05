@@ -26,8 +26,8 @@ export class InfrastructureStack extends Stack {
 
     const httpLambdaIntegration = new HttpLambdaIntegration('HttpLambda', lambdaService);
 
-    const userPool = new UserPool(this, 'UserPool', {
-      userPoolName: `my-user-pool`,
+    const userPool = new UserPool(this, 'ExampleUserPool', {
+      userPoolName: `example-user-pool`,
       removalPolicy: RemovalPolicy.DESTROY,
       selfSignUpEnabled: true,
       signInAliases: {
@@ -47,7 +47,7 @@ export class InfrastructureStack extends Stack {
       accountRecovery: AccountRecovery.EMAIL_ONLY
     });
 
-    const userPoolClient = new UserPoolClient(this, 'UserPoolClient', {
+    const userPoolClient = new UserPoolClient(this, 'ExampleUserPoolClient', {
       userPool,
       authFlows: {
         adminUserPassword: true,
@@ -67,10 +67,6 @@ export class InfrastructureStack extends Stack {
       defaultIntegration: httpLambdaIntegration,
       defaultAuthorizer: authorizer,
       apiName: 'HttpApiService'
-    });
-
-    new CfnOutput(this, 'region', {
-      value: Stack.of(this).region
     });
 
     new CfnOutput(this, 'userPoolId', {

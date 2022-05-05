@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts src/index.ts",
+  "app": "lib/index.js",
   "watch": {
     "include": ["**"],
     "exclude": [

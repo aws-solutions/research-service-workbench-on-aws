@@ -1,0 +1,28 @@
+name: dummy
+on:
+  pull_request:
+
+jobs:
+  deploy-swb-reference:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@feature/example-logging-auditing
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+
+  deploy-example:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@feature/example-logging-auditing
+    secrets:
+      aws-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+      test_apigateway_id_token: "${{ secrets.TEST_APIGATEWAY_ID_TOKEN }}"
+
+  dummy:
+    name: dummy
+    runs-on: ubuntu-20.04
+    needs: [deploy-swb-reference, deploy-example]
+    steps:
+      - name: echo
+        run: |
+          echo "dummy" 

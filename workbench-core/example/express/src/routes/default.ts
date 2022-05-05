@@ -17,7 +17,7 @@ router.get('/', async (req: Request, res: Response) => {
   };
 
   const metadata: Metadata = {
-    statusCode: req.statusCode,
+    statusCode: res.statusCode,
     action: `${req.method} ${req.path}`,
     source: {
       IP: req.ip
@@ -37,7 +37,7 @@ router.get('/:model/:id', async (req: Request, res: Response) => {
   };
 
   const metadata: Metadata = {
-    statusCode: req.statusCode,
+    statusCode: res.statusCode,
     action: `${req.method} ${req.path}`,
     source: {
       IP: req.ip
