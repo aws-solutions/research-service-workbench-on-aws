@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: merge-develop-to-main
+name: Merge-develop-to-main
 on:
   push:
     branches:

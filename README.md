@@ -1,6 +1,8 @@
 # Worflow Status
 [![Build-and-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
-[![Dev-deploy-and-integration-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg?)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Dev-deploy-and-integration-test/badge.svg)
+[![Deploy-and-integration-test-example](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-example/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-example/badge.svg)
+[![Deploy-and-integration-test-swb-reference](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-swb-reference/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-swb-reference/badge.svg)
+[![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
 [![Viperlight-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)
@@ -12,7 +14,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-88.58%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.18%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.34%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.41%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-88.76%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.18%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.38%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.58%25-yellow.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.

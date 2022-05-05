@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: deploy-and-integration-test-swb-reference
+name: Deploy-and-integration-test-swb-reference
 on:
   workflow_call:
     secrets: 
