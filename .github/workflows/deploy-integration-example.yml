@@ -56,7 +56,6 @@ jobs:
           TEST_APIGATEWAY_ID_TOKEN: "${{ secrets.test_apigateway_id_token }}"
         run: |
           echo "$SERVICE_ENDPOINT"
-          echo "$TEST_APIGATEWAY_ID_TOKEN"
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js test:integration --verbose
 
