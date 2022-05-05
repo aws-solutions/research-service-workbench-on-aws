@@ -1,6 +1,7 @@
 /* eslint-disable no-new */
-import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput, RemovalPolicy, aws_apigatewayv2, aws_kms } from 'aws-cdk-lib';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { Construct } from 'constructs';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
@@ -12,6 +13,7 @@ import {
   UserPoolClient,
   UserPoolClientIdentityProvider
 } from 'aws-cdk-lib/aws-cognito';
+import { NagSuppressions } from 'cdk-nag';
 
 export class InfrastructureStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
@@ -38,11 +40,11 @@ export class InfrastructureStack extends Stack {
         email: true
       },
       passwordPolicy: {
-        minLength: 6,
-        requireLowercase: false,
-        requireDigits: false,
-        requireUppercase: false,
-        requireSymbols: false
+        minLength: 8,
+        requireLowercase: true,
+        requireDigits: true,
+        requireUppercase: true,
+        requireSymbols: true
       },
       accountRecovery: AccountRecovery.EMAIL_ONLY
     });
@@ -69,6 +71,22 @@ export class InfrastructureStack extends Stack {
       apiName: 'HttpApiService'
     });
 
+    const kmsKey = new aws_kms.Key(this, 'KMSKey', {
+      enableKeyRotation: true
+    });
+
+    const log = new LogGroup(this, 'log', {
+      logGroupName: 'httpApiLogGroup',
+      encryptionKey: kmsKey
+    });
+
+    const defaultStage = httpApi.defaultStage!.node.defaultChild as aws_apigatewayv2.CfnStage;
+
+    defaultStage.accessLogSettings = {
+      destinationArn: log.logGroupArn,
+      format: `$context.identity.sourceIp - - [$context.requestTime] "$context.httpMethod $context.routeKey $context.protocol" $context.status $context.responseLength $context.requestId`
+    };
+
     new CfnOutput(this, 'userPoolId', {
       value: userPool.userPoolId
     });
@@ -81,5 +99,20 @@ export class InfrastructureStack extends Stack {
       value: httpApi.apiEndpoint,
       exportName: 'HttpApiEndPoint'
     });
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/InfrastructureStack/LambdaService/ServiceRole/Resource',
+      [{ id: 'AwsSolutions-IAM4', reason: "I'm ok using managed policies for this example" }]
+    );
+    NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/ExampleUserPool/Resource', [
+      { id: 'AwsSolutions-COG2', reason: "I'm ok with not using MFA Authentication for this example" }
+    ]);
+    NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/ExampleUserPool/Resource', [
+      {
+        id: 'AwsSolutions-COG3',
+        reason: 'UserPool CDK construct does not have option to set AdvancedSecurityMode'
+      }
+    ]);
   }
 }

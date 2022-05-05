@@ -28,6 +28,20 @@ Object {
   "Resources": Object {
     "ExampleUserPoolB793288C": Object {
       "DeletionPolicy": "Delete",
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-COG2",
+              "reason": "I'm ok with not using MFA Authentication for this example",
+            },
+            Object {
+              "id": "AwsSolutions-COG3",
+              "reason": "UserPool CDK construct does not have option to set AdvancedSecurityMode",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "AccountRecoverySetting": Object {
           "RecoveryMechanisms": Array [
@@ -50,11 +64,11 @@ Object {
         "EmailVerificationSubject": "Verify your new account",
         "Policies": Object {
           "PasswordPolicy": Object {
-            "MinimumLength": 6,
-            "RequireLowercase": false,
-            "RequireNumbers": false,
-            "RequireSymbols": false,
-            "RequireUppercase": false,
+            "MinimumLength": 8,
+            "RequireLowercase": true,
+            "RequireNumbers": true,
+            "RequireSymbols": true,
+            "RequireUppercase": true,
           },
         },
         "SmsVerificationMessage": "The verification code to your new account is {####}",
@@ -181,6 +195,15 @@ Object {
     },
     "HttpApiDefaultStage3EEB07D6": Object {
       "Properties": Object {
+        "AccessLogSettings": Object {
+          "DestinationArn": Object {
+            "Fn::GetAtt": Array [
+              "log751C81CB",
+              "Arn",
+            ],
+          },
+          "Format": "$context.identity.sourceIp - - [$context.requestTime] \\"$context.httpMethod $context.routeKey $context.protocol\\" $context.status $context.responseLength $context.requestId",
+        },
         "ApiId": Object {
           "Ref": "HttpApiF5A9A8A7",
         },
@@ -231,6 +254,42 @@ Object {
       },
       "Type": "AWS::ApiGatewayV2::Authorizer",
     },
+    "KMSKeyBD866E3F": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "EnableKeyRotation": true,
+        "KeyPolicy": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Retain",
+    },
     "LambdaService68B9B9DF": Object {
       "DependsOn": Array [
         "LambdaServiceServiceRole71319041",
@@ -255,6 +314,16 @@ Object {
       "Type": "AWS::Lambda::Function",
     },
     "LambdaServiceServiceRole71319041": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM4",
+              "reason": "I'm ok using managed policies for this example",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -284,6 +353,21 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Role",
+    },
+    "log751C81CB": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "KMSKeyBD866E3F",
+            "Arn",
+          ],
+        },
+        "LogGroupName": "httpApiLogGroup",
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
     },
   },
 }
