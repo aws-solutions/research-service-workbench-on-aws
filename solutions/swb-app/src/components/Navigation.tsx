@@ -2,6 +2,7 @@ import { useTranslation } from 'next-i18next';
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
 import { User, adminUser, researcherUser } from '../models/User';
 import React from 'react';
+import { useAuthentication } from '../context/AuthenticationContext';
 
 export interface NavigationProps {
   activeHref?: string;
@@ -17,24 +18,23 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
       type: 'section',
       text: t('Dashboards'),
       items: [
-        { type: 'link', text: t('Manage Dashboards'), href: '#/dashboards/manage' },
-        { type: 'link', text: t('All Dashboards'), href: '#/dashboards' },
-        { type: 'link', text: t('Project Dashboards'), href: '#/dashboards/project' }
+        { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
+        { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
       ]
     },
-    { type: 'link', text: t('Users'), href: '#/users' },
-    { type: 'link', text: t('Workspaces'), href: '#/workspaces' },
-    { type: 'link', text: t('Datasets'), href: '#/datasets' }
+    { type: 'link', text: t('Users'), href: '/users' },
+    { type: 'link', text: t('Workspaces'), href: '/environments' },
+    { type: 'link', text: t('Datasets'), href: '/datasets' }
   ];
   const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
-    { type: 'link', text: t('Workspaces'), href: '#/workspaces' },
-    { type: 'link', text: t('Datasets'), href: '#/datasets' },
+    { type: 'link', text: t('Workspaces'), href: '/environments' },
+    { type: 'link', text: t('Datasets'), href: '/datasets' },
     {
       type: 'section',
       text: t('Dashboards'),
       items: [
-        { type: 'link', text: t('All Dashboards'), href: '#/dashboards' },
-        { type: 'link', text: t('Project Dashboards'), href: '#/dashboards/projects' }
+        { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
+        { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
       ]
     }
   ];
@@ -52,9 +52,9 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
   // Role-based navigation state
   let activeNav: typeof activeHref;
   if (userRole === 'admin') {
-    activeNav = '#/dashboards';
+    activeNav = '/dashboards';
   } else {
-    activeNav = '#/workspaces';
+    activeNav = '/environments';
   }
 
   return (
@@ -62,7 +62,7 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
       activeHref={activeNav}
       items={items ? items : navDisplay}
       onFollow={(event) => {
-        if (!event.detail.external) {
+        if (event.detail.external) {
           event.preventDefault();
           setActiveHref(event.detail.href);
         }

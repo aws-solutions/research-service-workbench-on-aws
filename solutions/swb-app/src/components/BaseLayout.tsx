@@ -19,7 +19,7 @@ const breadcrumbs: BreadcrumbGroupProps.Item[] = [
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }): JSX.Element {
-  const [navigationOpen, setNavigationOpen] = useState(false);
+  let [navigationOpen, setNavigationOpen] = useState(false);
   const { notifications } = useNotifications();
 
   const appLayoutLabels: AppLayoutProps.Labels = {
@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }): JSX
       toolsHide
       ariaLabels={appLayoutLabels}
       navigationOpen={navigationOpen}
-      navigation={<Navigation />}
+      navigation={<Navigation activeHref="#/" />}
       notifications={<Flashbar items={Object.values(notifications)} />}
       breadcrumbs={
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
@@ -48,7 +48,10 @@ export default function Layout({ children }: { children: React.ReactNode }): JSX
       contentType="table"
       content={children}
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      onNavigationChange={({ detail }) => setNavigationOpen(detail.open)}
+      onNavigationChange={({ detail }) => {
+        setNavigationOpen(detail.open);
+        navigationOpen = true;
+      }}
     />
   );
 }

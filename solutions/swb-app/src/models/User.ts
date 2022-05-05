@@ -12,7 +12,7 @@ export interface User {
 export const researcherUser: User = {
   id: 'sample-researcher-id',
   name: 'Researcher User',
-  email: 'sample.user@amazon.com',
+  email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
   role: 'researcher'
@@ -21,7 +21,7 @@ export const researcherUser: User = {
 export const adminUser: User = {
   id: 'sample-admin-id',
   name: 'Admin User',
-  email: 'sample.user@amazon.com',
+  email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
   role: 'admin'

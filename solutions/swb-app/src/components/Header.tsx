@@ -26,7 +26,7 @@ export default function Header(): JSX.Element {
       className={styles.header}
       i18nStrings={i18nStrings}
       identity={{
-        href: '#',
+        href: '/',
         title: settings.name,
         logo: { src: settings.logo, alt: settings.name }
       }}
