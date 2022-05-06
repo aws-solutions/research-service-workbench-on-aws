@@ -9,7 +9,7 @@ on: ['pull_request']
 
 jobs:
   labeler:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Label the PR size
     steps:
       - uses: codelytv/pr-size-labeler@v1
