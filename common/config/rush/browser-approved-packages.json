@@ -15,11 +15,39 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-audit",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-authentication",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-logging",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/assert",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
       "allowedCategories": [ "production" ]
     },
     {
@@ -128,7 +156,7 @@
     },
     {
       "name": "@rushstack/heft-jest-plugin",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/heft-node-rig",
@@ -171,8 +199,16 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "babel-jest",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "cdk-nag",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -235,6 +271,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "lambda-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production" ]
     },
@@ -271,12 +311,24 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
+      "name": "request",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "sass",
       "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "sharp",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "supertest",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

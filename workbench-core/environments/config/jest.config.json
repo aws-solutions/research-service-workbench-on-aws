@@ -7,6 +7,8 @@
     "<rootDir>/src/environmentLifecycleService.ts",
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
+    "<rootDir>/src/accountHandler.ts",
+    "<rootDir>/src/statusMap.ts",
     "<rootDir>/src/index.ts"
   ],
   "coverageThreshold": {
