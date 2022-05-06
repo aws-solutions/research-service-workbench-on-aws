@@ -9,16 +9,21 @@ import { useNotifications } from '../context/NotificationContext';
 
 const breadcrumbs: BreadcrumbGroupProps.Item[] = [
   {
-    text: 'Service name',
+    text: 'Service Workbench',
     href: '#'
   },
   {
-    text: 'Pages',
+    text: 'Login',
     href: '#'
   }
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }): JSX.Element {
+export interface LayoutProps {
+  navigationHide?: boolean;
+  children: React.ReactNode;
+}
+
+export default function Layout({ navigationHide, children }: LayoutProps): JSX.Element {
   let [navigationOpen, setNavigationOpen] = useState(false);
   const { notifications } = useNotifications();
 
@@ -40,6 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }): JSX
       toolsHide
       ariaLabels={appLayoutLabels}
       navigationOpen={navigationOpen}
+      navigationHide={navigationHide}
       navigation={<Navigation activeHref="#/" />}
       notifications={<Flashbar items={Object.values(notifications)} />}
       breadcrumbs={
