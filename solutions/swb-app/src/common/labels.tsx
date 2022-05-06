@@ -1,4 +1,3 @@
-// const for column sort fuction, so not exported
 const headerLabel = (title: string, sorted: boolean, descending: boolean) => {
   return `${title}, ${sorted ? `sorted ${descending ? 'descending' : 'ascending'}` : 'not sorted'}.`;
 };

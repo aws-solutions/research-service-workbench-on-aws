@@ -10,13 +10,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>
@@ -31,13 +31,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -50,10 +50,10 @@ export const allItems = [
     connections: 3,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -66,10 +66,10 @@ export const allItems = [
     connections: 8,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -82,11 +82,11 @@ export const allItems = [
     connections: 41,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -99,11 +99,11 @@ export const allItems = [
     connections: 7,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -116,11 +116,11 @@ export const allItems = [
     connections: 33,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -133,11 +133,11 @@ export const allItems = [
     connections: 1,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -150,13 +150,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/environments" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>
@@ -171,13 +171,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>
@@ -192,13 +192,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -211,10 +211,10 @@ export const allItems = [
     connections: 3,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -227,10 +227,10 @@ export const allItems = [
     connections: 8,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -243,11 +243,11 @@ export const allItems = [
     connections: 41,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -260,11 +260,11 @@ export const allItems = [
     connections: 7,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -277,11 +277,11 @@ export const allItems = [
     connections: 33,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -294,11 +294,11 @@ export const allItems = [
     connections: 1,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -311,13 +311,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/environments" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>
@@ -332,13 +332,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>
@@ -353,13 +353,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/#">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -372,10 +372,10 @@ export const allItems = [
     connections: 3,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -388,10 +388,10 @@ export const allItems = [
     connections: 8,
     workspaceActions: (
       <>
-        <Button href="/#" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/#">Stop</Button> <Button href="/#">Terminate</Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -404,11 +404,11 @@ export const allItems = [
     connections: 41,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -421,11 +421,11 @@ export const allItems = [
     connections: 7,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -438,11 +438,11 @@ export const allItems = [
     connections: 33,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -455,11 +455,11 @@ export const allItems = [
     connections: 1,
     workspaceActions: (
       <>
-        <Button href="/environments">Connect</Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#">Connect</Button>{' '}
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2">Terminate</Button>
+        <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -472,13 +472,13 @@ export const allItems = [
     connections: 0,
     workspaceActions: (
       <>
-        <Button href="/environments" disabled>
+        <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="/login" disabled>
+        <Button href="#" disabled>
           Stop
         </Button>{' '}
-        <Button href="/environments2" disabled>
+        <Button href="#" disabled>
           Terminate
         </Button>
       </>

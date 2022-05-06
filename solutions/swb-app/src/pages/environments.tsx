@@ -10,6 +10,8 @@ import {
   Pagination,
   PropertyFilter,
   PropertyFilterProps,
+  SpaceBetween,
+  SplitPanel,
   Table
 } from '@awsui/components-react';
 import { useCollection } from '@awsui/collection-hooks';
@@ -23,6 +25,7 @@ import { columnDefinitions } from '../environments-table-config/workspacesColumn
 import { getFilterCounterText } from '../common/tableCounterStrings';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
+import { relativeOptions } from '../common/dateRelativeOptions';
 
 export interface EnvironmentProps {
   locale: string;
@@ -76,8 +79,8 @@ const Environment: NextPage = () => {
             selectionGroupLabel: 'Items selection',
             allItemsSelectionLabel: ({ selectedItems }) =>
               `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`,
-            itemSelectionLabel: ({ selectedItems }, item) => {
-              const isItemSelected = selectedItems.filter((i) => i.workspace === item.workspace).length;
+            itemSelectionLabel: ({ selectedItems }, item: any) => {
+              const isItemSelected = selectedItems.filter((i: any) => i.workspace === item.workspace).length;
               return `${item.workspace} is ${isItemSelected ? '' : 'not'} selected`;
             }
           }}
@@ -89,11 +92,15 @@ const Environment: NextPage = () => {
                     ? `(${collectionProps.selectedItems.length}/${allItems.length})`
                     : `(${allItems.length})`
                 }
+                actions={
+                  <Box float="right">
+                    <SpaceBetween direction="horizontal" size="xs">
+                      <Button variant="primary">Create Workspace</Button>
+                    </SpaceBetween>
+                  </Box>
+                }
               >
                 Workspaces
-                {/* <Box float="right">
-                  <Button variant="primary">Create Workspace</Button>
-                </Box> */}
               </Header>
             </>
           }
