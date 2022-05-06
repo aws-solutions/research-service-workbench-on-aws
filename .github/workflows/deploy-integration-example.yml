@@ -1,0 +1,68 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Deploy-and-integration-test-example
+on:
+  workflow_call:
+    secrets: 
+      aws-dev-region:
+        required: true
+      role-to-assume:
+        required: true
+      aws-dev-account-region:
+        required: true
+      cognito-username:
+        required: true
+      cognito-password:
+        required: true
+      cognito-client-id:
+        required: true
+jobs:
+  deploy-and-integration-test-example:
+    runs-on: ubuntu-20.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+      
+    steps:        
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: OIDCSessionName
+
+      - name: Deploy example package to Dev
+        # if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        id: endpoint
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk:deploy
+          SERVICE_ENDPOINT=`jq ".InfrastructureStack.HttpEndpoint" cdk-outputs.json | tr -d '"'`
+          echo "::set-output name=SERVICE_ENDPOINT::$SERVICE_ENDPOINT"
+      
+      - name: Example package integration test
+        # if: steps.changed-example-package-files.outputs.any_changed == 'true'
+        env: 
+          SERVICE_ENDPOINT: "${{ steps.endpoint.outputs.SERVICE_ENDPOINT }}"
+          COGNITO_USERNAME: "${{ secrets.cognito-username }}"
+          COGNITO_PASSWORD: "${{ secrets.cognito-password }}"
+          COGNITO_CLIENT_ID: "${{ secrets.cognito-client-id }}"
+          AWS_DEV_REGION: "${{ secrets.aws-dev-region }}"
+
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js test:integration --verbose
+
+  
