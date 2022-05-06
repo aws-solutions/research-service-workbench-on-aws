@@ -246,7 +246,8 @@ export class SWBStack extends Stack {
       code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: this.lambdaEnvVars
+      environment: this.lambdaEnvVars,
+      timeout: Duration.seconds(30)
     });
 
     statusHandlerLambda.role?.attachInlinePolicy(

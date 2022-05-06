@@ -176,6 +176,7 @@ Resources:
                 - sagemaker:ListNotebookInstances
                 - sagemaker:StartNotebookInstance
                 - sagemaker:StopNotebookInstance
+                - sagemaker:DescribeNotebookInstance
               Resource: '*'
         - PolicyName: iam-role-access
           PolicyDocument:

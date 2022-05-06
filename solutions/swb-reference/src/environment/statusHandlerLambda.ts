@@ -2,7 +2,7 @@ import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
-  console.log(`StatusHandler.handler processing event ${JSON.stringify(event)}`);
+  console.log(`StatusHandler processing event ${JSON.stringify(event)}`);
 
   // We only handle environment status updates on this lambda
   if (event['detail-type'] !== process.env.ENV_STATUS_UPDATE!) return;

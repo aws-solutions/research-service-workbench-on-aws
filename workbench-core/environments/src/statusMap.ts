@@ -6,5 +6,9 @@ export const StatusMap: { [key: string]: string } = {
   STOPPING: '4',
   STOPPED: '5',
   TERMINATING: '6',
-  TERMINATED: '7'
+  TERMINATED: '7',
+  FAILED: '8',
+  TERMINATING_FAILED: '9',
+  STARTING_FAILED: '10',
+  STOPPING_FAILED: '11'
 };

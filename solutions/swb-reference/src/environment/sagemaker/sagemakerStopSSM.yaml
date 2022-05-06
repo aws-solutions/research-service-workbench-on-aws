@@ -1,0 +1,61 @@
+description: SSM document to stop a Sagemaker instance
+schemaVersion: '0.3'
+parameters:
+  NotebookInstanceName:
+    type: String
+    description: 'The Sagemaker notebook instance name being stopped.'
+    default: ''
+  EventBusName:
+    type: String
+    description: 'The main account event bridge bus name.'
+    default: ''
+  EnvId:
+    type: String
+    description: 'The ID of the environment resource stored in DDB'
+    default: ''
+  EnvStatusUpdateConstString:
+    type: String
+    description: 'The string value used by main account to filter host events'
+    default: ''
+mainSteps:
+  - name: StopSagemaker
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: sagemaker
+      Api: StopNotebookInstance
+      NotebookInstanceName: '{{ NotebookInstanceName }}'
+    nextStep: WaitForStopping
+  - name: WaitForStopping
+    action: 'aws:waitForAwsResourceProperty'
+    timeoutSeconds: 600
+    inputs:
+      Service: sagemaker
+      Api: DescribeNotebookInstance
+      NotebookInstanceName: '{{ NotebookInstanceName }}'
+      DesiredValues:
+        - Stopped
+      PropertySelector: '$.NotebookInstanceStatus'
+    onFailure: step:PushFailureStatusToEventBridge
+    nextStep: PushMetadataToEventBridge
+  - name: PushMetadataToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "NotebookInstanceName": "{{ NotebookInstanceName }}", "EnvType": "Sagemaker", "Operation": "Stop", "Status": "STOPPED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
+          EventBusName: '{{ EventBusName }}'
+          Source: 'StopSagemaker'
+    isEnd: true
+  - name: PushFailureStatusToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "NotebookInstanceName": "{{ NotebookInstanceName }}", "EnvType": "Sagemaker", "Operation": "Stop", "Status": "STOPPING_FAILED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
+          EventBusName: '{{ EventBusName }}'
+          Source: 'StopSagemaker'
+    isEnd: true

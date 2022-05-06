@@ -6,8 +6,6 @@ import { AwsService } from '@amzn/workbench-core-base';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {
-    console.log(`StatusHandler.execute processing event ${JSON.stringify(event)}`);
-
     const aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
     const envHelper = new EnvironmentLifecycleHelper();
 
@@ -33,12 +31,17 @@ export default class StatusHandler {
     await envHelper.storeToDdb(`ENV#${event.envId}`, `ENV#${event.envId}`, envDetails!);
 
     // The next few DDB updates are only needed during environment provisioning
-    if (event.operation !== 'Launch') return;
+    if (event.operation !== 'Launch') {
+      console.log(
+        `This event was a ${event.operation} operation. Only Launch operations require a few more DDB updates.`
+      );
+      return;
+    }
 
     // Get hosting account SDK instance
     const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
       accountId: envDetails!.accountId!.S!,
-      operation: `StatusHandler-${event.operation}-${Date.now()}`,
+      operation: `StatusHandler-${event.operation}`,
       envType: event.metadata.detail.EnvType
     });
 

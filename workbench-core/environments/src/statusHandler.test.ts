@@ -7,10 +7,10 @@ describe('StatusHandler', () => {
   test('execute does not return an error', async () => {
     const statusHandler = new StatusHandler();
     const ebToDDB: EventBridgeEventToDDB = {
-      eventTime: new Date().getTime(),
       envId: 'abc',
       status: 'PENDING',
-      metaData: {
+      operation: 'Terminate',
+      metadata: {
         version: '0',
         id: '80134f4a-6d5c-ddfb-8340-3f78991ff1a9',
         'detail-type': 'EnvironmentStatusUpdate',

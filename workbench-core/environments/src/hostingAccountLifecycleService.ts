@@ -35,8 +35,6 @@ export default class HostingAccountLifecycleService {
       process.env.STATUS_HANDLER_ARN_NAME!
     ]);
 
-    // console.log(`${mainAccountBusArn} ${statusHandlerArn}`);
-
     // // Update main account event bus to accept hosting account events
     await this.updateEventBridgePermissions(
       mainAccountBusArn,

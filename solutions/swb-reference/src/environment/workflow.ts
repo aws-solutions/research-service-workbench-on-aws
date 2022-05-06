@@ -18,7 +18,7 @@ export default class Workflow {
   }
 
   private _createSagemakerSSMDocuments(): void {
-    const docTypes = ['Launch', 'Terminate'];
+    const docTypes = ['Launch', 'Terminate', 'Start', 'Stop'];
     docTypes.forEach((docType) => {
       const cfnDoc = new Document(this._stack, `Sagemaker${docType}`, {
         name: `${this._stack.stackName}-Sagemaker${docType}`,

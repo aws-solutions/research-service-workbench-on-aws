@@ -23,10 +23,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     }
 
     // Get value from account in DDB
-    const accountEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ACC#${envMetadata.accountId}` }, sk: { S: `ACC#${envMetadata.accountId}` } })
-      .execute();
-    const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
+    const accountDetails = await this.helper.getAccountDDBEntry(envMetadata.accountId);
     const hostingAccountEventBusArn = accountDetails!.eventBusArn!.S!;
     const encryptionKeyArn = accountDetails!.encryptionKeyArn!.S!;
     const vpcId = accountDetails!.vpcId!.S!;
@@ -88,15 +85,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     const accountId = envDetails!.accountId!.S!;
     const provisionedProductId = envDetails!.provisionedProductId!.S!; // This is updated by status handler
 
-    // Get envMetadata for the given envId from DDB
-    const envMetadata = { envId, accountId, provisionedProductId };
-
-    // Get value from aws-accounts in DDB
-    const accountEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ACC#${accountId}` }, sk: { S: `ACC#${accountId}` } })
-      .execute();
-    const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
-    const hostingAccountEventBusArn = accountDetails!.eventBusArn!.S!;
+    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
 
     const ssmParameters = {
       ProvisionedProductId: [provisionedProductId],
@@ -111,7 +100,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       ssmParameters,
       operation: 'Terminate',
       envType: 'Sagemaker',
-      accountId: envMetadata.accountId
+      accountId
     });
 
     envDetails!.status = { N: StatusMap.TERMINATING };
@@ -134,24 +123,32 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     const key = { key: { name: 'pk', value: { S: `ENV#${envId}` } } };
     const ddbEntries = await this.aws.helpers.ddb.query(key).execute();
     const instanceRecord = _.find(ddbEntries.Items!, (entry) => {
-      return entry!.sk!.S!.startsWith('INID#');
+      return entry!.sk?.S!.startsWith('INID#');
     });
+
+    // Get value from account in DDB
+    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
+
     const instanceName = instanceRecord!.sk!.S!.split('INID#')[1];
 
-    const startParams = {
-      NotebookInstanceName: instanceName
+    const ssmParameters = {
+      EventBusName: [hostingAccountEventBusArn],
+      EnvId: [envId],
+      EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!],
+      NotebookInstanceName: [instanceName]
     };
 
-    // Start the instance on hosting account
-    const hostSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+    // Execute termination doc
+    await this.helper.executeSSMDocument({
+      ssmParameters,
       operation: 'Start',
       envType: 'Sagemaker',
       accountId
     });
-    await hostSdk.clients.sagemaker.startNotebookInstance(startParams);
+
+    envDetails!.status = { N: StatusMap.STARTING };
 
     // Store env row in DDB
-    envDetails!.status = { N: StatusMap.STARTING };
     await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails!);
 
     return { envId, status: 'STARTING' };
@@ -169,24 +166,31 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     const key = { key: { name: 'pk', value: { S: `ENV#${envId}` } } };
     const ddbEntries = await this.aws.helpers.ddb.query(key).execute();
     const instanceRecord = _.find(ddbEntries.Items!, (entry) => {
-      return entry!.sk!.S!.startsWith('INID#');
+      return entry!.sk?.S!.startsWith('INID#');
     });
     const instanceName = instanceRecord!.sk!.S!.split('INID#')[1];
 
-    const startParams = {
-      NotebookInstanceName: instanceName
+    // Get value from account in DDB
+    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
+
+    const ssmParameters = {
+      EventBusName: [hostingAccountEventBusArn],
+      EnvId: [envId],
+      EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!],
+      NotebookInstanceName: [instanceName]
     };
 
-    // Stop the instance on hosting account
-    const hostSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+    // Execute termination doc
+    await this.helper.executeSSMDocument({
+      ssmParameters,
       operation: 'Stop',
       envType: 'Sagemaker',
       accountId
     });
-    await hostSdk.clients.sagemaker.stopNotebookInstance(startParams);
+
+    envDetails!.status = { N: StatusMap.STOPPING };
 
     // Store env row in DDB
-    envDetails!.status = { N: StatusMap.STOPPING };
     await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails!);
 
     return { envId, status: 'STOPPING' };
