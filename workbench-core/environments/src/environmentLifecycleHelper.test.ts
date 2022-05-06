@@ -2,6 +2,7 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { DynamoDBClient, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { Operation } from './environmentLifecycleHelper';
 
@@ -81,5 +82,83 @@ describe('EnvironmentLifecycleHelper', () => {
 
     // EXECUTE & CHECK
     await expect(helper.executeSSMDocument(payload)).resolves.not.toThrowError();
+  });
+
+  test('storeToDdb does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const ddbMock = mockClient(DynamoDBClient);
+
+    // Mock DDB
+    ddbMock.on(UpdateItemCommand).resolves({});
+
+    await expect(helper.storeToDdb('samplePk', 'sampleSk', {})).resolves.not.toThrowError();
+  });
+
+  test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const ddbMock = mockClient(DynamoDBClient);
+    const stsMock = mockClient(STSClient);
+    stsMock.on(AssumeRoleCommand).resolves({
+      Credentials: {
+        AccessKeyId: 'sampleAccessKey',
+        SecretAccessKey: 'sampleSecretAccessKey',
+        SessionToken: 'blah',
+        Expiration: undefined
+      }
+    });
+    ddbMock.on(GetItemCommand).resolves({
+      Item: {
+        pk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        sk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        envManagementRoleArn: {
+          S: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt'
+        }
+      }
+    });
+
+    // Mock DDB
+    ddbMock.on(UpdateItemCommand).resolves({});
+
+    await expect(
+      helper.storeToDdb('a425f28d-97cd-4237-bfc2-66d7a6806a7f', 'a425f28d-97cd-4237-bfc2-66d7a6806a7f', {})
+    ).resolves.not.toThrowError();
+  });
+
+  test('getHostEventBusArn does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const ddbMock = mockClient(DynamoDBClient);
+    const stsMock = mockClient(STSClient);
+    stsMock.on(AssumeRoleCommand).resolves({
+      Credentials: {
+        AccessKeyId: 'sampleAccessKey',
+        SecretAccessKey: 'sampleSecretAccessKey',
+        SessionToken: 'blah',
+        Expiration: undefined
+      }
+    });
+    ddbMock.on(GetItemCommand).resolves({
+      Item: {
+        pk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        sk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        eventBusArn: {
+          S: 'sampleEventBusArn'
+        }
+      }
+    });
+
+    // Mock DDB
+    ddbMock.on(UpdateItemCommand).resolves({});
+
+    await expect(helper.getHostEventBusArn('a425f28d-97cd-4237-bfc2-66d7a6806a7f')).resolves.toBe(
+      'sampleEventBusArn'
+    );
   });
 });

@@ -5,7 +5,7 @@ import { EventBridgeClient, PutPermissionCommand, DescribeRuleCommand } from '@a
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda';
-import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, UpdateItemCommand, GetItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -64,7 +64,7 @@ describe('HostingAccountLifecycleService', () => {
       ]
     });
   }
-  test('execute does not return an error', async () => {
+  test('initializeAccount does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
 
     const ebMock = mockClient(EventBridgeClient);
@@ -104,6 +104,132 @@ describe('HostingAccountLifecycleService', () => {
         accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-cross-account-role'
       })
     ).resolves.not.toThrowError();
+  });
+
+  test('storeToDdb does not return an error', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+
+    await expect(
+      hostingAccountLifecycleService.storeToDdb({
+        id: 'abc-xyz',
+        accountId: 'abc-xyz',
+        awsAccountId: '123456789012',
+        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-cross-account-role',
+        eventBusArn: 'sampleEventBusArn',
+        vpcId: 'sampleVpcId',
+        subnetId: 'sampleSubnetId',
+        cidr: '1.1.1.1/32',
+        encryptionKeyArn: 'encryptionKeyArn',
+        environmentInstanceFiles: '',
+        resourceType: 'account'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('validateInput does not throw an error when id is defined and awsAccountId already onboarded', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(QueryCommand).resolves({ Count: 1 });
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        pk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        sk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        id: {
+          S: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        awsAccountId: {
+          S: '123456789012'
+        }
+      }
+    });
+    await expect(
+      hostingAccountLifecycleService.validateInput({
+        id: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
+        awsAccountId: '123456789012'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('validateInput does not throw an error when id is undefined and awsAccountId not already onboarded', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(QueryCommand).resolves({ Count: 0 });
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        pk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        sk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        id: {
+          S: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        awsAccountId: {
+          S: '123456789012'
+        }
+      }
+    });
+    await expect(
+      hostingAccountLifecycleService.validateInput({
+        id: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
+        awsAccountId: '123456789012'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('validateInput throws an error when id is undefined and awsAccountId already onboarded', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(QueryCommand).resolves({ Count: 1 });
+
+    await expect(
+      hostingAccountLifecycleService.validateInput({
+        awsAccountId: '123456789012'
+      })
+    ).rejects.toThrowError(
+      'This AWS Account was found in DDB. Please provide the correct id value in request body'
+    );
+  });
+
+  test('validateInput throws an error when id is different than DDB value and awsAccountId already onboarded', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        pk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        sk: {
+          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        id: {
+          S: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f'
+        },
+        awsAccountId: {
+          S: '123456789012'
+        }
+      }
+    });
+
+    await expect(
+      hostingAccountLifecycleService.validateInput({
+        id: 'abc-xyz',
+        awsAccountId: 'differenAwsAccountId'
+      })
+    ).rejects.toThrowError('The AWS Account mapped to this accountId is different than the one provided');
   });
 
   test('updateAccount', async () => {

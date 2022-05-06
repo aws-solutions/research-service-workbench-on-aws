@@ -147,66 +147,6 @@ describe('SagemakerEnvironmentLifecycleService', () => {
       'envId cannot be passed in the request body when trying to launch a new environment'
     );
   });
-  // test('Terminate should not throw error', async () => {
-  //   const stsMock = mockClient(STSClient);
-  //   const ssmMock = mockClient(SSMClient);
-  //   const cfnMock = mockClient(CloudFormationClient);
-  //   stsMock.on(AssumeRoleCommand).resolves({
-  //     Credentials: {
-  //       AccessKeyId: 'sampleAccessKey',
-  //       SecretAccessKey: 'sampleSecretAccessKey',
-  //       SessionToken: 'blah',
-  //       Expiration: undefined
-  //     }
-  //   });
-  //   // Mock Modify Doc Permission
-  //   ssmMock.on(SendCommandCommand).resolves({});
-  //   // Mock Cloudformation describeStacks
-  //   mockCloudformationOutputs(cfnMock);
-  //   const sm = new SagemakerEnvironmentLifecycleService();
-  //   sm.helper.getHostEventBusArn = jest.fn().mockResolvedValue('arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va');
-  //   const ddbMock = mockClient(DynamoDBClient);
-  //   ddbMock.on(UpdateItemCommand).resolves({});
-  //   ddbMock.on(GetItemCommand).resolves({
-  //     Item: {
-  //       pk: {
-  //         S: 'ENV#6e185c8c-caeb-4305-8f08-d408b316dca7'
-  //       },
-  //       sk: {
-  //         S: 'ENV#6e185c8c-caeb-4305-8f08-d408b316dca7'
-  //       },
-  //       accountId: {
-  //         S: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-  //       },
-  //       awsAccountId: {
-  //         S: '123456789012'
-  //       },
-  //       createdAt: {
-  //         S: '2022-05-05T19:39:03.023Z'
-  //       },
-  //       envTypeId: {
-  //         S: 'prod-hxwmltpkg2edy-pa-fh6spfcycydtq'
-  //       },
-  //       id: {
-  //         S: '6e185c8c-caeb-4305-8f08-d408b316dca7'
-  //       },
-  //       resourceType: {
-  //         S: 'environment'
-  //       },
-  //       provisionedProductId: {
-  //         S: 'blah'
-  //       },
-  //       status: {
-  //         N: '1'
-  //       },
-  //       updatedAt: {
-  //         S: '2022-05-05T19:43:57.143Z'
-  //       }
-  //     }
-  //   });
-
-  //   await expect(sm.terminate('sampleEnvId')).resolves.not.toThrowError();
-  // });
 
   test('Start should not throw error', async () => {
     const sm = new SagemakerEnvironmentLifecycleService();
