@@ -7,7 +7,7 @@
  * aws cognito-idp admin-confirm-sign-up --user-pool-id "********" --username "*******"
  *
  */
-export const data = {
+export const body = {
   AuthParameters: {
     USERNAME: process.env.COGNITO_USERNAME,
     PASSWORD: process.env.COGNITO_PASSWORD

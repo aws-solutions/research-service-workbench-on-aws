@@ -1,11 +1,10 @@
 import axios from 'axios';
 import _ from 'lodash';
-import { data } from './cognito-config';
+import { body } from './cognito-config';
 
 describe('IntegrationTest', () => {
   test("Service returns 'Hello World'", async () => {
     try {
-      const body = JSON.stringify(data);
       const region = process.env.AWS_DEV_REGION;
       const url = `https://cognito-idp.${region}.amazonaws.com`;
 
@@ -34,6 +33,7 @@ describe('IntegrationTest', () => {
       expect(response.data).toBe('Hello World');
     } catch (error) {
       console.log(error);
+      throw error;
     }
   });
 });
