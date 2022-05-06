@@ -96,7 +96,7 @@ describe('StatusHandler', () => {
           ProvisionedProductId: 'pp-z5bkj4vcwasi2',
           RecordId: 'rec-6xswbmafv4bny',
           EnvType: 'Sagemaker',
-          Operation: 'Launch',
+          Operation: 'Terminate',
           Status: 'COMPLETED'
         }
       }

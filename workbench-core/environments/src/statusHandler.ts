@@ -2,20 +2,11 @@ import _ = require('lodash');
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { StatusMap } from './statusMap';
-import { AwsService } from '@amzn/workbench-core-base';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {
-    const aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
     const envHelper = new EnvironmentLifecycleHelper();
-
-    const envEntry = await aws.helpers.ddb
-      .get({
-        pk: { S: `ENV#${event.envId}` },
-        sk: { S: `ENV#${event.envId}` }
-      })
-      .execute();
-    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
+    const envDetails = await envHelper.getEnvDDBEntry(event.envId);
 
     // Check if this event is outdated
     const lastDDBUpdate = envDetails!.updatedAt!.S!;

@@ -95,6 +95,26 @@ describe('EnvironmentLifecycleHelper', () => {
     await expect(helper.storeToDdb('samplePk', 'sampleSk', {})).resolves.not.toThrowError();
   });
 
+  test('getAccountDDBEntry does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const ddbMock = mockClient(DynamoDBClient);
+
+    // Mock DDB
+    ddbMock.on(GetItemCommand).resolves({ Item: {} });
+
+    await expect(helper.getAccountDDBEntry('sampleAccountId')).resolves.not.toThrowError();
+  });
+
+  test('getEnvDDBEntry does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const ddbMock = mockClient(DynamoDBClient);
+
+    // Mock DDB
+    ddbMock.on(GetItemCommand).resolves({ Item: {} });
+
+    await expect(helper.getEnvDDBEntry('sampleEnvId')).resolves.not.toThrowError();
+  });
+
   test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
     const helper = new EnvironmentLifecycleHelper();
     const ddbMock = mockClient(DynamoDBClient);

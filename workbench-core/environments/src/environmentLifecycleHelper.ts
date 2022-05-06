@@ -45,7 +45,7 @@ export default class EnvironmentLifecycleHelper {
   }
 
   /**
-   * Executing SSM Document in hosting account with provided envMetadata
+   * Get Account entry from DDB
    */
   public async getAccountDDBEntry(accountId: string): Promise<{ [id: string]: AttributeValue }> {
     // Get value from aws-accounts in DDB
@@ -54,6 +54,19 @@ export default class EnvironmentLifecycleHelper {
       .execute();
     const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
     return accountDetails!;
+  }
+
+  /**
+   * Get Env entry from DDB
+   */
+  public async getEnvDDBEntry(envId: string): Promise<{ [id: string]: AttributeValue }> {
+    // Get value from env in DDB
+    const envEntry = await this.aws.helpers.ddb
+      .get({ pk: { S: `ENV#${envId}` }, sk: { S: `ENV#${envId}` } })
+      .execute();
+
+    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
+    return envDetails!;
   }
 
   /**

@@ -78,12 +78,9 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
 
   public async terminate(envId: string): Promise<{ [id: string]: string }> {
     // Get value from env in DDB
-    const envEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ENV#${envId}` }, sk: { S: `ENV#${envId}` } })
-      .execute();
-    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
-    const accountId = envDetails!.accountId!.S!;
-    const provisionedProductId = envDetails!.provisionedProductId!.S!; // This is updated by status handler
+    const envDetails = await this.helper.getEnvDDBEntry(envId);
+    const accountId = envDetails.accountId!.S!;
+    const provisionedProductId = envDetails.provisionedProductId!.S!; // This is updated by status handler
 
     const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
 
@@ -103,22 +100,18 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       accountId
     });
 
-    envDetails!.status = { N: StatusMap.TERMINATING };
+    envDetails.status = { N: StatusMap.TERMINATING };
 
     // Store env row in DDB
-    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails!);
+    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
 
     return { envId, status: 'TERMINATING' };
   }
 
   public async start(envId: string): Promise<{ [id: string]: string }> {
     // Get value from env in DDB
-    const envEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ENV#${envId}` }, sk: { S: `ENV#${envId}` } })
-      .execute();
-
-    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
-    const accountId = envDetails!.accountId!.S!;
+    const envDetails = await this.helper.getEnvDDBEntry(envId);
+    const accountId = envDetails.accountId!.S!;
 
     const key = { key: { name: 'pk', value: { S: `ENV#${envId}` } } };
     const ddbEntries = await this.aws.helpers.ddb.query(key).execute();
@@ -146,22 +139,18 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       accountId
     });
 
-    envDetails!.status = { N: StatusMap.STARTING };
+    envDetails.status = { N: StatusMap.STARTING };
 
     // Store env row in DDB
-    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails!);
+    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
 
     return { envId, status: 'STARTING' };
   }
 
   public async stop(envId: string): Promise<{ [id: string]: string }> {
     // Get value from env in DDB
-    const envEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ENV#${envId}` }, sk: { S: `ENV#${envId}` } })
-      .execute();
-
-    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
-    const accountId = envDetails!.accountId!.S!;
+    const envDetails = await this.helper.getEnvDDBEntry(envId);
+    const accountId = envDetails.accountId!.S!;
 
     const key = { key: { name: 'pk', value: { S: `ENV#${envId}` } } };
     const ddbEntries = await this.aws.helpers.ddb.query(key).execute();
@@ -188,10 +177,10 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       accountId
     });
 
-    envDetails!.status = { N: StatusMap.STOPPING };
+    envDetails.status = { N: StatusMap.STOPPING };
 
     // Store env row in DDB
-    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails!);
+    await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
 
     return { envId, status: 'STOPPING' };
   }
