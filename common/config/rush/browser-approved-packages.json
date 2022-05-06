@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-logging",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-cdk/aws-dynamodb",
       "allowedCategories": [ "production" ]
     },
