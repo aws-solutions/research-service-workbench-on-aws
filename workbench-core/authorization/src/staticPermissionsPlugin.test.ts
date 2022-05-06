@@ -1,4 +1,5 @@
 import { User } from '@amzn/workbench-core-authentication';
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
 import { PermissionsMap } from '.';
 import { Action } from './action';
@@ -11,6 +12,7 @@ describe('StaticPermissionsPlugin', () => {
   let mockUser: User;
   let role1Permissions: Permission[];
   let role2Permissions: Permission[];
+  let logger: LoggingService;
   beforeEach(() => {
     role1Permissions = [
       {
@@ -40,8 +42,9 @@ describe('StaticPermissionsPlugin', () => {
       role1: role1Permissions,
       role2: role2Permissions
     };
-
-    staticPermissionsPlugin = new StaticPermissionsPlugin(mockPermissionsMap);
+    logger = new LoggingService();
+    jest.spyOn(logger, 'warn');
+    staticPermissionsPlugin = new StaticPermissionsPlugin(mockPermissionsMap, logger);
   });
 
   describe('getPermissionsByUser', () => {
@@ -80,13 +83,8 @@ describe('StaticPermissionsPlugin', () => {
         roles: ['role3']
       };
 
-      try {
-        await staticPermissionsPlugin.getPermissionsByUser(mockUser);
-        expect.hasAssertions();
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toBe('Trying to access unknown role');
-      }
+      await staticPermissionsPlugin.getPermissionsByUser(mockUser);
+      expect(logger.warn).toBeCalledWith('The role role3 does not have permissions mapped');
     });
 
     itProp('random inputs as user', [fc.anything()], async (user) => {

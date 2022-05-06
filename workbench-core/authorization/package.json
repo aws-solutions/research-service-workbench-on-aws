@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@amzn/workbench-core-authentication": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
     "@casl/ability": "^5.4.3"
   }
 }
