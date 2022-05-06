@@ -5,7 +5,7 @@ on:
 
 jobs:
   slack-message:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Slack Message
         run: |

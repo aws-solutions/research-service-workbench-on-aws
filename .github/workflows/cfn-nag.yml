@@ -9,7 +9,7 @@ on: ['pull_request']
 jobs:
   cfn-nag-scan:
     name: Run cfn-nag scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     permissions:
       actions: read
       contents: read
@@ -19,44 +19,33 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
 
-      - name: Cache Rush
-        uses: actions/cache@v3
-        with:
-          path: |
-            common/temp/install-run
-            ~/.rush
-          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
-          restore-keys: |
-            ${{ runner.os }}-rush-
-            ${{ runner.os }}-
+      - name: Base Action
+        uses: ./.github/actions/baseAction
 
-      - name: Cache pnpm
-        uses: actions/cache@v3
-        with:
-          path: |
-            common/temp/pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-            ${{ runner.os }}-
-
-      - name: Install dependecies
-        run: node common/scripts/install-run-rush.js install
-
-      - name: Rush build
-        run: node common/scripts/install-run-rush.js build --verbose
-
-      - name: cdk synth
+      - name: cdk synth swb-reference
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: Run cfn-nag on swb cdk.out
-        id: cdk
+      - name: cdk synth example
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js compile
+          node ../../../common/scripts/install-run-rushx.js cdk synth
+
+      - name: Run cfn-nag on swb-reference cdk.out
+        id: cdk-swb-reference
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
+          extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on example cdk.out
+        id: cdk-example
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
@@ -72,6 +61,9 @@ jobs:
         # No. of violations: warnings + errors
         with:
           cmd: jq '.[].file_results.violations | length' cfn_nag.out
+
+      - name: echo violation count
+        run: echo ${{ steps.cfn-nag.outputs.value }}
 
       # - name: Fail if violations detected in cfn-nag
       #   run: exit ${{ steps.cfn-nag.outputs.value }}
