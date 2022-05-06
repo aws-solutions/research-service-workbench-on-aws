@@ -13,6 +13,14 @@ parameters:
     type: String
     description: 'The main account event bridge bus name.'
     default: ''
+  EnvId:
+    type: String
+    description: 'The ID of the environment resource stored in DDB'
+    default: ''
+  EnvStatusUpdateConstString:
+    type: String
+    description: 'The string value used by main account to filter host events'
+    default: ''
 mainSteps:
   - name: TerminateSagemaker
     action: 'aws:executeAwsApi'
@@ -48,8 +56,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate" }'
-          DetailType: 'Success'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'
     isEnd: true
@@ -59,8 +67,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate" }'
-          DetailType: 'Failure'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'
     isEnd: true

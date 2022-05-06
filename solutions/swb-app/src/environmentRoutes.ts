@@ -19,9 +19,9 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Terminate
   router.delete('/environments/:id', async (req: Request, res: Response) => {
-    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+    const getEnvironment = (envId: string): { envType: string } => {
       console.log('envId', envId);
-      return { envType: 'sagemaker', instanceName: 'abc' };
+      return { envType: 'sagemaker' };
     };
     const { envType } = getEnvironment(req.params.id);
     if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
@@ -36,9 +36,9 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Start
   router.put('/environments/:id/start', async (req: Request, res: Response) => {
-    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+    const getEnvironment = (envId: string): { envType: string } => {
       console.log('envId', envId);
-      return { envType: 'sagemaker', instanceName: 'abc' };
+      return { envType: 'sagemaker' };
     };
     const { envType } = getEnvironment(req.params.id);
     if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
@@ -53,9 +53,9 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Stop
   router.put('/environments/:id/stop', async (req: Request, res: Response) => {
-    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+    const getEnvironment = (envId: string): { envType: string } => {
       console.log('envId', envId);
-      return { envType: 'sagemaker', instanceName: 'abc' };
+      return { envType: 'sagemaker' };
     };
     const { envType } = getEnvironment(req.params.id);
     if (supportedEnvs.includes(envType.toLocaleLowerCase())) {

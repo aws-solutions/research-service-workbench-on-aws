@@ -54,6 +54,10 @@ parameters:
     type: String
     description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
     default: '0'
+  EnvStatusUpdateConstString:
+    type: String
+    description: 'The string value used by main account to filter host events'
+    default: ''
 mainSteps:
   - name: LaunchSagemaker
     action: 'aws:executeAwsApi'
@@ -119,8 +123,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch" }'
-          DetailType: 'Success'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'
     isEnd: true
@@ -130,8 +134,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch" }'
-          DetailType: 'Failure'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
+          DetailType: '{{ EnvStatusUpdateConstString }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'
     isEnd: true

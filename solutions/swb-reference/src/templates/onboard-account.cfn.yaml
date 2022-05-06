@@ -32,6 +32,10 @@ Parameters:
   AccountHandlerRoleArn:
     Type: String
     Description: The arn of accountHandler role
+  
+  StatusHandlerRoleArn:
+    Type: String
+    Description: The arn of accountHandler role
 
   MainAccountEventBusArn:
     Type: String
@@ -93,6 +97,7 @@ Resources:
               AWS:
                 - !Join [':', ['arn:aws:iam:', Ref: MainAccountId, 'root']]
                 - !Ref ApiHandlerRoleArn
+                - !Ref StatusHandlerRoleArn
             Action:
               - 'sts:AssumeRole'
             Condition:
@@ -154,6 +159,14 @@ Resources:
                 - s3:GetObject
               Resource:
                 - 'arn:aws:s3:::cf-templates-*/*'
+        - PolicyName: servicecatalog-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicecatalog:DescribeRecord
+              Resource:
+                - '*'
         - PolicyName: sagemaker-access
           PolicyDocument:
             Statement:
@@ -500,10 +513,8 @@ Resources:
       EventBusName: !Ref HostEventBus
       State: ENABLED
       EventPattern:
-        source:
-          - aws.sagemaker
-        detail:
-          - SageMaker Notebook Instance State Change
+        account:
+          - !Ref 'AWS::AccountId'
       Targets:
         - Arn: !Ref MainAccountEventBusArn
           Id: 'MainAccountRoutingRule'
@@ -519,7 +530,11 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: !Sub events.amazonaws.com
+              Service: events.amazonaws.com
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
             Action: 'sts:AssumeRole'
       Path: /
       Policies:
@@ -529,7 +544,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'events:PutEvents'
+                  - 'events:Put*'
                 Resource:
                   - !Ref MainAccountEventBusArn
 

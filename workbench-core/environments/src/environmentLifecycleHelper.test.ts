@@ -10,7 +10,7 @@ describe('EnvironmentLifecycleHelper', () => {
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
-    process.env.STACK_NAME = 'SWB_Main_Stack';
+    process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.MAIN_ACCOUNT_BUS_ARN_NAME = 'Main_Account_Bus_Arn_Output';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
   });
@@ -72,15 +72,14 @@ describe('EnvironmentLifecycleHelper', () => {
       },
       operation,
       envType: 'Sagemaker',
-      accountId: '123456789012'
+      accountId: '123-456-789-012',
+      externalId: 'test'
     };
+
+    helper.getSSMDocArn = jest.fn();
+    helper.getAwsSdkForEnvMgmtRole = jest.fn();
 
     // EXECUTE & CHECK
     await expect(helper.executeSSMDocument(payload)).resolves.not.toThrowError();
-  });
-
-  test('storeToDdb does not throw an error', async () => {
-    const helper = new EnvironmentLifecycleHelper();
-    await expect(helper.storeToDdb({})).resolves.not.toThrowError();
   });
 });

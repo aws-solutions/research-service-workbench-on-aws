@@ -1,30 +1,53 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import _ = require('lodash');
+import { v4 as uuidv4 } from 'uuid';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
 import { Readable } from 'stream';
+import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
-  public constructor(awsRegion: string, stackName: string) {
-    this._aws = new AwsService({ region: awsRegion });
-    this._stackName = stackName;
+  public constructor() {
+    this._stackName = process.env.STACK_NAME!;
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
   }
 
-  public async initializeAccount(
-    accountMetadata: {
-      accountId: string;
-      envManagementRoleArn: string;
-      accountHandlerRoleArn: string;
-    },
-    mainAccountBusArnName: string
-  ): Promise<void> {
+  public async initializeAccount(accountMetadata: {
+    [key: string]: string;
+  }): Promise<{ [key: string]: string }> {
+    // First check if request body IDs are valid
+    await this.validateInput(accountMetadata);
+
     const cfService = this._aws.helpers.cloudformation;
-    const { [mainAccountBusArnName]: mainAccountBusName } = await cfService.getCfnOutput(this._stackName, [
-      mainAccountBusArnName
+    const {
+      [process.env.MAIN_ACCOUNT_BUS_ARN_NAME!]: mainAccountBusArn,
+      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn
+    } = await cfService.getCfnOutput(this._stackName, [
+      process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
+      process.env.STATUS_HANDLER_ARN_NAME!
     ]);
-    await this.updateEventBridgePermissions(mainAccountBusName, accountMetadata.accountId);
-    await this.storeToDdb(accountMetadata);
+
+    // console.log(`${mainAccountBusArn} ${statusHandlerArn}`);
+
+    // // Update main account event bus to accept hosting account events
+    await this.updateEventBridgePermissions(
+      mainAccountBusArn,
+      statusHandlerArn,
+      accountMetadata.awsAccountId
+    );
+
+    // Finally store the new/updated account details in DDB
+    const accountId = await this.storeToDdb(accountMetadata);
+
+    return { ...accountMetadata, accountId };
   }
 
   /**
@@ -177,14 +200,72 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateEventBridgePermissions(mainAccountBusName: string, accountId: string): Promise<void> {
+  public async updateEventBridgePermissions(
+    mainAccountBusArn: string,
+    statusHandlerArn: string,
+    awsAccountId: string
+  ): Promise<void> {
+    const mainAccountBusName = mainAccountBusArn.split('/')[1];
     const params = {
       Action: 'events:PutEvents',
-      EventBusName: mainAccountBusName.split('/')[1],
-      Principal: accountId,
-      StatementId: 'Allow-main-account-to-receive-host-account-events'
+      EventBusName: mainAccountBusName,
+      Principal: awsAccountId,
+      StatementId: `Allow-main-account-to-get-${awsAccountId}-events`
     };
+
+    // Put permission for main account to receive hosting account events
     await this._aws.clients.eventBridge.putPermission(params);
+
+    let busRule;
+    const busRuleName = 'RouteHostEvents';
+    const describeRuleParams = { Name: busRuleName, EventBusName: mainAccountBusName };
+
+    try {
+      // Describe rule to see if it exists
+      busRule = await this._aws.clients.eventBridge.describeRule(describeRuleParams);
+    } catch (e) {
+      if (e instanceof ResourceNotFoundException) {
+        console.log(
+          'Onboarding first hosting account for the main event bus. Setting up status handler lambda permissions.'
+        );
+
+        const addPermissionParams = {
+          StatementId: `AWSEvents_${busRuleName}`,
+          Action: 'lambda:InvokeFunction',
+          FunctionName: statusHandlerArn,
+          Principal: 'events.amazonaws.com'
+        };
+
+        // Add permissions on status handler lambda to get events from eventbridge
+        await this._aws.clients.lambda.addPermission(addPermissionParams);
+      } else {
+        throw e;
+      }
+    }
+
+    const putRuleParams = {
+      Name: busRuleName,
+      EventPattern: JSON.stringify({
+        account: busRule?.EventPattern
+          ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
+          : [awsAccountId],
+        // Filter out CloudTrail noise
+        'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+      }),
+      EventBusName: mainAccountBusName
+    };
+
+    // Create/update rule for main account event bus
+    await this._aws.clients.eventBridge.putRule(putRuleParams);
+
+    const putTargetsParams = {
+      EventBusName: mainAccountBusName,
+      Rule: busRuleName,
+      Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
+    };
+
+    // Create/update rule target to route events to status handler lambda
+    await this._aws.clients.eventBridge.putTargets(putTargetsParams);
   }
 
   public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
@@ -242,16 +323,80 @@ export default class HostingAccountLifecycleService {
     });
   }
 
+  public async validateInput(accountMetadata: { [key: string]: string }): Promise<void> {
+    // Check to see if accountMetadata.id exists in DDB and is mapped to another account
+    if (!_.isUndefined(accountMetadata.id) && !_.isUndefined(accountMetadata.awsAccountId)) {
+      const key = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
+      const ddbEntry = await this._aws.helpers.ddb.get(key).execute();
+      if (
+        'Item' in ddbEntry &&
+        ddbEntry.Item?.awsAccountId &&
+        ddbEntry.Item?.awsAccountId.S !== accountMetadata.awsAccountId
+      ) {
+        throw new Error('The AWS Account mapped to this accountId is different than the one provided');
+      }
+    }
+
+    // Check to see if AWS account ID already exists in DDB, when accountMetadata.id is not provided (new onboard request)
+    if (_.isUndefined(accountMetadata.id) && !_.isUndefined(accountMetadata.awsAccountId)) {
+      const key = { key: { name: 'pk', value: { S: `AWSACC#${accountMetadata.awsAccountId}` } } };
+      const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
+      // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
+      if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0)
+        throw new Error(
+          'This AWS Account was found in DDB. Please provide the correct id value in request body'
+        );
+    }
+  }
+
   /*
    * Store hosting account information in DDB
    */
-  public async storeToDdb(accountMetadata: {
-    accountId: string;
-    envManagementRoleArn: string;
-    accountHandlerRoleArn: string;
-  }): Promise<void> {
-    // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
-    // Don't forget to store the external ID used during onboarding
-    return Promise.resolve();
+  public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
+    // If id is provided then we update. If not, we create
+    if (_.isUndefined(accountMetadata.id)) accountMetadata.id = uuidv4();
+
+    // Future: Only update values that were present in accountMetadata request body (with missing keys)
+    const accountKey = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
+    const accountParams: { item: { [key: string]: AttributeValue } } = {
+      item: {
+        id: { S: accountMetadata.id },
+        accountId: { S: accountMetadata.id },
+        awsAccountId: { S: accountMetadata.awsAccountId },
+        envManagementRoleArn: { S: accountMetadata.envManagementRoleArn },
+        accountHandlerRoleArn: { S: accountMetadata.accountHandlerRoleArn },
+        eventBusArn: { S: accountMetadata.eventBusArn },
+        vpcId: { S: accountMetadata.vpcId },
+        subnetId: { S: accountMetadata.subnetId },
+        cidr: { S: accountMetadata.cidr },
+        encryptionKeyArn: { S: accountMetadata.encryptionKeyArn },
+        environmentInstanceFiles: { S: accountMetadata.environmentInstanceFiles },
+        resourceType: { S: 'account' }
+      }
+    };
+
+    // We add the only optional attribute for account
+    if (accountMetadata.externalId) accountParams.item.externalId = { S: accountMetadata.externalId };
+
+    // Store Account row in DDB
+    await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
+
+    const awsAccountKey = {
+      pk: { S: `AWSACC#${accountMetadata.awsAccountId}` },
+      sk: { S: `ACC#${accountMetadata.id}` }
+    };
+    const awsAccountParams = {
+      item: {
+        id: { S: accountMetadata.awsAccountId },
+        accountId: { S: accountMetadata.id },
+        awsAccountId: { S: accountMetadata.awsAccountId },
+        resourceType: { S: 'aws account' }
+      }
+    };
+
+    // Store AWS Account row in DDB (for easier duplicate checks later on)
+    await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+
+    return accountMetadata.id;
   }
 }

@@ -51,7 +51,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-lambda",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-sagemaker",
       "allowedCategories": [ "production" ]
     },
     {

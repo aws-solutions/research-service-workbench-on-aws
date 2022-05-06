@@ -23,6 +23,8 @@ export class SWBStack extends Stack {
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    STATUS_HANDLER_ARN_NAME: string;
+    ENV_STATUS_UPDATE: string;
   };
   public constructor(app: App) {
     const {
@@ -33,7 +35,9 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
       MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
+      AMI_IDS_TO_SHARE,
+      STATUS_HANDLER_ARN_NAME,
+      ENV_STATUS_UPDATE
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -51,7 +55,9 @@ export class SWBStack extends Stack {
       MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       LAUNCH_CONSTRAINT_ROLE_NAME,
-      S3_ARTIFACT_BUCKET_ARN_NAME
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      STATUS_HANDLER_ARN_NAME,
+      ENV_STATUS_UPDATE
     };
 
     const apiLambda: Function = this._createAPILambda();
@@ -243,8 +249,30 @@ export class SWBStack extends Stack {
       environment: this.lambdaEnvVars
     });
 
-    new CfnOutput(this, 'statusHandlerLambdaRoleOutput', {
+    statusHandlerLambda.role?.attachInlinePolicy(
+      new Policy(this, 'statusHandlerLambdaPolicy', {
+        statements: [
+          // TODO: Restrict policy permissions
+          new PolicyStatement({
+            actions: ['dynamodb:*'],
+            resources: ['*'],
+            sid: 'DynamoDBAccess'
+          }),
+          new PolicyStatement({
+            actions: ['sts:AssumeRole'],
+            resources: ['arn:aws:iam::*:role/*env-mgmt'],
+            sid: 'AssumeRole'
+          })
+        ]
+      })
+    );
+
+    new CfnOutput(this, 'StatusHandlerLambdaRoleOutput', {
       value: statusHandlerLambda.role!.roleArn
+    });
+
+    new CfnOutput(this, 'StatusHandlerLambdaArnOutput', {
+      value: statusHandlerLambda.functionArn
     });
   }
 
@@ -357,6 +385,11 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            actions: ['events:DescribeRule', 'events:Put*'],
+            resources: ['*'],
+            sid: 'EventbridgeAccess'
           }),
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],

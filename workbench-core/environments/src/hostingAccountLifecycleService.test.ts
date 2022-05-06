@@ -1,9 +1,11 @@
 jest.mock('./iamRoleCloneService');
 
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { EventBridgeClient, PutPermissionCommand } from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient, PutPermissionCommand, DescribeRuleCommand } from '@aws-sdk/client-eventbridge';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { LambdaClient, AddPermissionCommand } from '@aws-sdk/client-lambda';
+import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -21,14 +23,19 @@ import {
 
 import IamRoleCloneService from './iamRoleCloneService';
 
-const constants = {
-  MAIN_ACCOUNT_BUS_ARN_NAME: 'SampleMainAccountBusArn',
-  SAGEMAKER_LAUNCH_SSM_DOC: 'SagemakerLaunchSSMDocOutput'
-};
-
 describe('HostingAccountLifecycleService', () => {
+  const ORIGINAL_ENV = process.env;
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetModules(); // Most important - it clears the cache
+    process.env = { ...ORIGINAL_ENV }; // Make a copy
+    process.env.MAIN_ACCOUNT_BUS_ARN_NAME = 'SampleMainAccountBusArn';
+    process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
+    process.env.STACK_NAME = 'swb-swbv2-va';
+    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+  });
+
+  afterAll(() => {
+    process.env = ORIGINAL_ENV; // Restore old environment
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,12 +48,16 @@ describe('HostingAccountLifecycleService', () => {
           CreationTime: new Date(),
           Outputs: [
             {
-              OutputKey: constants.MAIN_ACCOUNT_BUS_ARN_NAME,
+              OutputKey: process.env.MAIN_ACCOUNT_BUS_ARN_NAME,
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             },
             {
-              OutputKey: constants.SAGEMAKER_LAUNCH_SSM_DOC,
+              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
+            },
+            {
+              OutputKey: process.env.STATUS_HANDLER_ARN_NAME,
+              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             }
           ]
         }
@@ -54,12 +65,19 @@ describe('HostingAccountLifecycleService', () => {
     });
   }
   test('execute does not return an error', async () => {
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
 
     const ebMock = mockClient(EventBridgeClient);
     const ec2Mock = mockClient(EC2Client);
     const ssmMock = mockClient(SSMClient);
     const cfnMock = mockClient(CloudFormationClient);
+    const lambdaMock = mockClient(LambdaClient);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+
+    hostingAccountLifecycleService.validateInput = jest.fn();
+    hostingAccountLifecycleService.updateEventBridgePermissions = jest.fn();
 
     // Mock Modify Doc Permission
     ssmMock.on(ModifyDocumentPermissionCommand).resolves({});
@@ -67,27 +85,30 @@ describe('HostingAccountLifecycleService', () => {
     // Mock Modify AMI permission attribute
     ec2Mock.on(ModifyImageAttributeCommand).resolves({});
 
-    // Mock EventBridge put permission
+    // Mock EventBridge calls
     ebMock.on(PutPermissionCommand).resolves({});
+    ebMock.on(DescribeRuleCommand).resolves({});
+
+    // Mock Lambda calls
+    lambdaMock.on(AddPermissionCommand).resolves({});
 
     // Mock Cloudformation describeStacks
     mockCloudformationOutputs(cfnMock);
 
     await expect(
-      hostingAccountLifecycleService.initializeAccount(
-        {
-          accountId: '123456789012',
-          envManagementRoleArn: 'sampleEnvManagementRoleArn',
-          accountHandlerRoleArn: 'sampleAccountHandlerRoleArn'
-        },
-        'SampleMainAccountBusArn'
-      )
+      hostingAccountLifecycleService.initializeAccount({
+        id: 'abc-xyz',
+        accountId: 'abc-xyz',
+        awsAccountId: '123456789012',
+        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-cross-account-role'
+      })
     ).resolves.not.toThrowError();
   });
 
   test('updateAccount', async () => {
     process.env.AMI_IDS_TO_SHARE = JSON.stringify(['ami-1234']);
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-dev-va');
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const cfnMock = mockClient(CloudFormationClient);
 
     // Mock for getting SSM Documents, VPC, and VpcSubnet

@@ -27,7 +27,10 @@
     "@aws-sdk/client-iam": "^3.58.0",
     "generate-password": "^1.7.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.67.0",
-    "@aws-sdk/client-sts": "^3.58.0"
+    "@aws-sdk/client-sts": "^3.58.0",
+    "lodash": "^4.17.21",
+    "uuid": "^8.3.2",
+    "@aws-sdk/client-lambda": "^3.82.0"
   },
   "devDependencies": {
     "@rushstack/heft": "^0.45.0",
@@ -44,7 +47,9 @@
     "ts-jest": "^27.1.3",
     "aws-sdk-client-mock": "^0.6.2",
     "@aws-sdk/types": "^3.55.0",
-    "@rushstack/eslint-config": "^2.5.1"
+    "@rushstack/eslint-config": "^2.5.1",
+    "@types/lodash": "^4.14.181",
+    "@types/uuid": "^8.3.4"
   },
   "jest": {
     "moduleFileExtensions": [
