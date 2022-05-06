@@ -1,14 +1,14 @@
 {
   "name": "@amzn/eslint-config-workbench-core-eslint-custom",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Custom eslint rules",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.aws.dev/ma-foundation/ma-mono.git"
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
-  "homepage": "https://gitlab.aws.dev/ma-foundation/ma-mono",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",

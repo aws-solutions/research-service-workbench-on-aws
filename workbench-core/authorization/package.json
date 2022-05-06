@@ -4,8 +4,11 @@
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
-  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
@@ -24,9 +27,12 @@
     "typescript": "^4.5.2",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "fast-check": "^2.24.0",
+    "jest-fast-check": "^1.0.2"
   },
   "dependencies": {
-    "@amzn/workbench-core-authentication": "workspace:*"
+    "@amzn/workbench-core-authentication": "workspace:*",
+    "@casl/ability": "^5.4.3"
   }
 }

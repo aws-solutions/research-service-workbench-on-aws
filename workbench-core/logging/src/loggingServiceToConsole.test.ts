@@ -12,6 +12,21 @@ const testErrorStack = `Error
   at REPLServer.Interface._onLine (readline.js:434:10)
   at REPLServer.Interface._line (readline.js:791:8)`;
 
+const stringMessage = 'test message';
+const numberMessage = 123;
+const booleanMessage = false;
+const arrayMessage = [stringMessage, numberMessage, booleanMessage];
+const objectMessage = {
+  arrayMessage,
+  booleanMessage,
+  numberMessage,
+  stringMessage
+};
+const errorMessage = new Error();
+errorMessage.stack = 'error stack';
+const errorMessage2 = new Error('this is an error');
+errorMessage2.stack = 'error stack';
+
 describe('package tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -21,17 +36,6 @@ describe('package tests', () => {
     const service = new LoggingService({
       includeLocation: false
     });
-
-    const stringMessage = 'test message';
-    const numberMessage = 123;
-    const booleanMessage = false;
-    const arrayMessage = [stringMessage, numberMessage, booleanMessage];
-    const objectMessage = {
-      arrayMessage,
-      booleanMessage,
-      numberMessage,
-      stringMessage
-    };
 
     const outputSpy = jest.spyOn(console, 'error');
 
@@ -49,6 +53,12 @@ describe('package tests', () => {
 
     service.error(objectMessage);
     expect(outputSpy).lastCalledWith(`{"level":"error","message":${JSON.stringify(objectMessage)}}`);
+
+    service.error(errorMessage);
+    expect(outputSpy).lastCalledWith(`{"level":"error","message":"","stack":"error stack"}`);
+
+    service.error(errorMessage2);
+    expect(outputSpy).lastCalledWith(`{"level":"error","message":"this is an error","stack":"error stack"}`);
   });
 
   it('should correctly log a LogMessage message with default metadata', () => {
@@ -60,17 +70,6 @@ describe('package tests', () => {
       includeLocation: false,
       defaultMetadata
     });
-
-    const stringMessage = 'test message';
-    const numberMessage = 123;
-    const booleanMessage = false;
-    const arrayMessage = [stringMessage, numberMessage, booleanMessage];
-    const objectMessage = {
-      arrayMessage,
-      booleanMessage,
-      numberMessage,
-      stringMessage
-    };
 
     const outputSpy = jest.spyOn(console, 'error');
 
@@ -98,23 +97,24 @@ describe('package tests', () => {
     expect(outputSpy).lastCalledWith(
       `{"level":"error","message":${JSON.stringify(objectMessage)},"meta":${JSON.stringify(defaultMetadata)}}`
     );
+
+    service.error(errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","message":"","meta":${JSON.stringify(defaultMetadata)},"stack":"error stack"}`
+    );
+
+    service.error(errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","message":"this is an error","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
+    );
   });
 
   it('should correctly log a LogMessage message with location', () => {
     const service = new LoggingService({
       includeLocation: true
     });
-
-    const stringMessage = 'test message';
-    const numberMessage = 123;
-    const booleanMessage = false;
-    const arrayMessage = [stringMessage, numberMessage, booleanMessage];
-    const objectMessage = {
-      arrayMessage,
-      booleanMessage,
-      numberMessage,
-      stringMessage
-    };
 
     const outputSpy = jest.spyOn(console, 'error');
 
@@ -147,6 +147,18 @@ describe('package tests', () => {
     expect(outputSpy).lastCalledWith(
       `{"level":"error","location":"bound (domain.js:421:15)","message":${JSON.stringify(objectMessage)}}`
     );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"","stack":"error stack"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"this is an error","stack":"error stack"}`
+    );
   });
 
   it('should correctly log a LogMessage message with location and default metadata', () => {
@@ -158,17 +170,6 @@ describe('package tests', () => {
       includeLocation: true,
       defaultMetadata
     });
-
-    const stringMessage = 'test message';
-    const numberMessage = 123;
-    const booleanMessage = false;
-    const arrayMessage = [stringMessage, numberMessage, booleanMessage];
-    const objectMessage = {
-      arrayMessage,
-      booleanMessage,
-      numberMessage,
-      stringMessage
-    };
 
     const outputSpy = jest.spyOn(console, 'error');
 
@@ -211,6 +212,22 @@ describe('package tests', () => {
         objectMessage
       )},"meta":${JSON.stringify(defaultMetadata)}}`
     );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"this is an error","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
+    );
   });
 
   it('should correctly log string message and log metadata', () => {
@@ -228,9 +245,16 @@ describe('package tests', () => {
     const outputSpy = jest.spyOn(console, 'error');
 
     service.error(message, logMeta);
-
     expect(outputSpy).lastCalledWith(
       `{"bool":true,"level":"error","message":"${message}","number":436234645,"string":"dgtadfhsdfh"}`
+    );
+
+    service.error(message, errorMessage);
+    expect(outputSpy).lastCalledWith(`{"level":"error","message":"${message}","stack":"error stack"}`);
+
+    service.error(message, errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","message":"${message} this is an error","stack":"error stack"}`
     );
   });
 
@@ -254,11 +278,24 @@ describe('package tests', () => {
     const outputSpy = jest.spyOn(console, 'error');
 
     service.error(message, logMeta);
-
     expect(outputSpy).lastCalledWith(
       `{"bool":true,"level":"error","message":"${message}","meta":${JSON.stringify(
         defaultMetadata
       )},"number":436234645,"string":"dgtadfhsdfh"}`
+    );
+
+    service.error(message, errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","message":"${message}","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
+    );
+
+    service.error(message, errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","message":"${message} this is an error","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
     );
   });
 
@@ -274,13 +311,24 @@ describe('package tests', () => {
       bool: true
     };
 
-    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
     const outputSpy = jest.spyOn(console, 'error');
 
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
     service.error(message, logMeta);
-
     expect(outputSpy).lastCalledWith(
       `{"bool":true,"level":"error","location":"bound (domain.js:421:15)","message":"${message}","number":436234645,"string":"dgtadfhsdfh"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(message, errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"${message}","stack":"error stack"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(message, errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"${message} this is an error","stack":"error stack"}`
     );
   });
 
@@ -301,15 +349,30 @@ describe('package tests', () => {
       bool: true
     };
 
-    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
     const outputSpy = jest.spyOn(console, 'error');
 
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
     service.error(message, logMeta);
-
     expect(outputSpy).lastCalledWith(
       `{"bool":true,"level":"error","location":"bound (domain.js:421:15)","message":"${message}","meta":${JSON.stringify(
         defaultMetadata
       )},"number":436234645,"string":"dgtadfhsdfh"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(message, errorMessage);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"${message}","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
+    );
+
+    jest.spyOn(Error, 'prepareStackTrace').mockImplementationOnce(() => testErrorStack);
+    service.error(message, errorMessage2);
+    expect(outputSpy).lastCalledWith(
+      `{"level":"error","location":"bound (domain.js:421:15)","message":"${message} this is an error","meta":${JSON.stringify(
+        defaultMetadata
+      )},"stack":"error stack"}`
     );
   });
 

@@ -115,6 +115,10 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
+      "name": "@casl/ability",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
