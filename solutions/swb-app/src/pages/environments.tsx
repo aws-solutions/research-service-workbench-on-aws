@@ -11,7 +11,6 @@ import {
   PropertyFilter,
   PropertyFilterProps,
   SpaceBetween,
-  SplitPanel,
   Table
 } from '@awsui/components-react';
 import { useCollection } from '@awsui/collection-hooks';
@@ -25,7 +24,6 @@ import { columnDefinitions } from '../environments-table-config/workspacesColumn
 import { getFilterCounterText } from '../common/tableCounterStrings';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import { relativeOptions } from '../common/dateRelativeOptions';
 
 export interface EnvironmentProps {
   locale: string;
@@ -39,15 +37,16 @@ export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<
 
 const Environment: NextPage = () => {
   const { settings } = useSettings();
-  const [preferences, setPreferences] = useState({
+  const [preferences] = useState({
     pageSize: 20
   });
   const [workspaces, setWorkspaces] = useState<PropertyFilterProps.Query>({
     tokens: [],
     operation: 'and'
   });
-  const { items, actions, filteredItemsCount, collectionProps, paginationProps, propertyFilterProps } =
-    useCollection(allItems, {
+  const { items, filteredItemsCount, collectionProps, paginationProps, propertyFilterProps } = useCollection(
+    allItems,
+    {
       propertyFiltering: {
         // TODO: replace with file
         filteringProperties: filteringProperties,
@@ -57,11 +56,12 @@ const Environment: NextPage = () => {
       pagination: { pageSize: preferences.pageSize },
       sorting: {},
       selection: {}
-    });
+    }
+  );
 
   useEffect(() => {
     setWorkspaces(workspaces);
-  }, []);
+  }, [workspaces]);
 
   return (
     <BaseLayout>
@@ -79,8 +79,8 @@ const Environment: NextPage = () => {
             selectionGroupLabel: 'Items selection',
             allItemsSelectionLabel: ({ selectedItems }) =>
               `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`,
-            itemSelectionLabel: ({ selectedItems }, item: any) => {
-              const isItemSelected = selectedItems.filter((i: any) => i.workspace === item.workspace).length;
+            itemSelectionLabel: ({ selectedItems }, item) => {
+              const isItemSelected = selectedItems.filter((i) => i.workspace === item.workspace).length;
               return `${item.workspace} is ${isItemSelected ? '' : 'not'} selected`;
             }
           }}

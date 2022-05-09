@@ -1,7 +1,7 @@
 import { Button } from '@awsui/components-react';
 import React from 'react';
 
-export const allItems = [
+export const allItems: ReadonlyArray<any> = [
   {
     workspace: 'workspace1',
     workspaceStatus: 'PENDING',
@@ -14,12 +14,7 @@ export const allItems = [
         <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -51,10 +46,7 @@ export const allItems = [
     connections: 3,
     workspaceActions: (
       <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
+        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -67,10 +59,7 @@ export const allItems = [
     connections: 8,
     workspaceActions: (
       <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
+        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -175,12 +164,7 @@ export const allItems = [
         <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -336,12 +320,7 @@ export const allItems = [
         <Button href="#" disabled>
           Connect
         </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
+        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -373,10 +352,7 @@ export const allItems = [
     connections: 3,
     workspaceActions: (
       <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
+        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
@@ -389,10 +365,7 @@ export const allItems = [
     connections: 8,
     workspaceActions: (
       <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
+        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
       </>
     )
   },
