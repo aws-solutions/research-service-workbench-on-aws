@@ -25,7 +25,6 @@ import { columnDefinitions } from '../environments-table-config/workspacesColumn
 import { getFilterCounterText } from '../common/tableCounterStrings';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import { relativeOptions } from '../common/dateRelativeOptions';
 
 export interface EnvironmentProps {
   locale: string;

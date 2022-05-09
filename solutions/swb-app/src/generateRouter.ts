@@ -1,4 +1,4 @@
-import express = require('express');
+import express from 'express';
 import { Router, Express, Request, Response } from 'express';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpEnvRoutes } from './environmentRoutes';
