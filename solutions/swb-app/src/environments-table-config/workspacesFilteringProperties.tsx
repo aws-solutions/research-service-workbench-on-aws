@@ -2,6 +2,12 @@ import { FilteringProperty } from '@awsui/collection-hooks/dist/cjs/interfaces';
 
 export const filteringProperties: readonly FilteringProperty[] = [
   {
+    key: 'workspace',
+    operators: ['=', '!=', ':', '!:'],
+    propertyLabel: 'Workspace',
+    groupValuesLabel: 'Workspace Values'
+  },
+  {
     key: 'workspaceStatus',
     operators: ['=', '!='],
     propertyLabel: 'Workspace Status',
@@ -12,5 +18,17 @@ export const filteringProperties: readonly FilteringProperty[] = [
     operators: ['=', '!=', ':', '!:'],
     propertyLabel: 'Project',
     groupValuesLabel: 'Project Values'
+  },
+  {
+    key: 'owner',
+    operators: ['=', '!=', ':', '!:'],
+    propertyLabel: 'Owner',
+    groupValuesLabel: 'Owner Values'
+  },
+  {
+    key: 'connections',
+    operators: ['=', '!=', '>=', '<=', '>', '<'],
+    propertyLabel: 'Connections',
+    groupValuesLabel: 'Connections Values'
   }
 ];

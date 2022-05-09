@@ -1,9 +1,10 @@
 import { Button } from '@awsui/components-react';
+import React from 'react';
 
 export const allItems = [
   {
     workspace: 'workspace1',
-    workspaceStatus: 'Pending',
+    workspaceStatus: 'PENDING',
     updatedAt: '5/3/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -24,7 +25,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace2',
-    workspaceStatus: 'Errored',
+    workspaceStatus: 'FAILED',
     updatedAt: '5/3/2022',
     project: 'SampleProject',
     owner: 'Test User',
@@ -43,7 +44,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace3',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'AVAILABLE',
     updatedAt: '5/2/2022',
     project: 'MyProject',
     owner: 'Sample User',
@@ -59,7 +60,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace4',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'AVAILABLE',
     updatedAt: '5/2/2022',
     project: 'SampleProject',
     owner: 'Sample User',
@@ -75,11 +76,11 @@ export const allItems = [
   },
   {
     workspace: 'workspace5',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'MVPProject',
     owner: 'Sample User',
-    connections: 41,
+    connections: 45,
     workspaceActions: (
       <>
         <Button href="#">Connect</Button>{' '}
@@ -92,7 +93,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace6',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -109,7 +110,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace7',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
@@ -126,7 +127,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace8',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
@@ -143,7 +144,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace9',
-    workspaceStatus: 'Terminated',
+    workspaceStatus: 'TERMINATED',
     updatedAt: '4/17/2022',
     project: 'NYCProject',
     owner: 'Admin User',
@@ -164,7 +165,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace10',
-    workspaceStatus: 'Pending',
+    workspaceStatus: 'PENDING',
     updatedAt: '5/3/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -185,7 +186,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace11',
-    workspaceStatus: 'Errored',
+    workspaceStatus: 'FAILED',
     updatedAt: '5/3/2022',
     project: 'SampleProject',
     owner: 'Test User',
@@ -204,7 +205,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace12',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'STARTING',
     updatedAt: '5/2/2022',
     project: 'MyProject',
     owner: 'Sample User',
@@ -220,7 +221,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace13',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'STARTING',
     updatedAt: '5/2/2022',
     project: 'SampleProject',
     owner: 'Sample User',
@@ -236,7 +237,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace14',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'MVPProject',
     owner: 'Sample User',
@@ -253,7 +254,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace15',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -270,11 +271,11 @@ export const allItems = [
   },
   {
     workspace: 'workspace16',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
-    connections: 33,
+    connections: 30,
     workspaceActions: (
       <>
         <Button href="#">Connect</Button>{' '}
@@ -287,7 +288,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace17',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
@@ -304,7 +305,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace18',
-    workspaceStatus: 'Terminated',
+    workspaceStatus: 'TERMINATED',
     updatedAt: '4/17/2022',
     project: 'NYCProject',
     owner: 'Admin User',
@@ -325,7 +326,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace19',
-    workspaceStatus: 'Pending',
+    workspaceStatus: 'PENDING',
     updatedAt: '5/3/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -346,7 +347,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace20',
-    workspaceStatus: 'Errored',
+    workspaceStatus: 'FAILED',
     updatedAt: '5/3/2022',
     project: 'SampleProject',
     owner: 'Test User',
@@ -365,7 +366,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace21',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'AVAILABLE',
     updatedAt: '5/2/2022',
     project: 'MyProject',
     owner: 'Sample User',
@@ -381,7 +382,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace22',
-    workspaceStatus: 'Available',
+    workspaceStatus: 'AVAILABLE',
     updatedAt: '5/2/2022',
     project: 'SampleProject',
     owner: 'Sample User',
@@ -397,11 +398,11 @@ export const allItems = [
   },
   {
     workspace: 'workspace23',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'MVPProject',
-    owner: 'Sample User',
-    connections: 41,
+    owner: 'My User',
+    connections: 42,
     workspaceActions: (
       <>
         <Button href="#">Connect</Button>{' '}
@@ -414,7 +415,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace24',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/29/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -431,11 +432,11 @@ export const allItems = [
   },
   {
     workspace: 'workspace25',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
-    connections: 33,
+    connections: 34,
     workspaceActions: (
       <>
         <Button href="#">Connect</Button>{' '}
@@ -448,7 +449,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace26',
-    workspaceStatus: 'Stopped',
+    workspaceStatus: 'STOPPED',
     updatedAt: '4/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
@@ -465,7 +466,7 @@ export const allItems = [
   },
   {
     workspace: 'workspace27',
-    workspaceStatus: 'Terminated',
+    workspaceStatus: 'TERMINATED',
     updatedAt: '4/17/2022',
     project: 'NYCProject',
     owner: 'Admin User',

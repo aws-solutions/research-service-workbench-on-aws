@@ -1,10 +1,15 @@
 export const filteringOptions = [
+  { propertyKey: 'connections', value: '' },
   { propertyKey: 'owner', value: '' },
   { propertyKey: 'project', value: '' },
-  { propertyKey: 'workspaceStatus', value: 'Available' },
-  { propertyKey: 'workspaceStatus', value: 'Errored' },
-  { propertyKey: 'workspaceStatus', value: 'Pending' },
-  { propertyKey: 'workspaceStatus', value: 'Stopped' },
-  { propertyKey: 'workspaceStatus', value: 'Terminated' },
+  { propertyKey: 'workspace', value: '' },
+  { propertyKey: 'workspaceStatus', value: 'AVAILABLE' },
+  { propertyKey: 'workspaceStatus', value: 'FAILED' },
+  { propertyKey: 'workspaceStatus', value: 'PENDING' },
+  { propertyKey: 'workspaceStatus', value: 'STARTING' },
+  { propertyKey: 'workspaceStatus', value: 'STOPPED' },
+  { propertyKey: 'workspaceStatus', value: 'STOPPING' },
+  { propertyKey: 'workspaceStatus', value: 'TERMINATED' },
+  { propertyKey: 'workspaceStatus', value: 'TERMINATING' },
   { propertyKey: 'workspaceType', value: '' }
 ];

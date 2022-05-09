@@ -1,8 +1,7 @@
 import { useTranslation } from 'next-i18next';
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
-import { User, adminUser, researcherUser } from '../models/User';
+import { User, researcherUser } from '../models/User';
 import React from 'react';
-import { useAuthentication } from '../context/AuthenticationContext';
 
 export interface NavigationProps {
   activeHref?: string;
@@ -40,7 +39,6 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
   ];
 
   // Role-based navigation display
-  // let user: User = adminUser;
   let user: User = researcherUser;
   let userRole: string = user.role;
   let navDisplay: typeof adminNavItems | typeof userNavItems;
