@@ -2,240 +2,151 @@ openapi: 3.0.0
 info:
   version: '1.0.0'
   title: 'Magellan'
-#   license:
-#     name: MIT
-# servers:
-#   - url: 'localhost:3000'
+  license:
+    name: Apache License
+
 paths:
   /signup:
     post:
-      summary: 'Signup endpoint: registers a patient on Magellan'
-      operationId: signup
-      tags:
-        - patient
-      parameters:
-        - name: idHash
-          in: query
-          description: Hashed ID of the user
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: consentRecordId
-          in: query
-          description: some uuid
-          required: false
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: User's consentRecordId
-          content:
-            text/plain:
-              schema:
-                type: string
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            patientLocalIdHash:
+                                type: string
+                            consentRecordId:
+                                description: required when patient has previously regustered and recieved a conseentRecordId
+                                type: string
+                        required:
+                            - patientLocalIdHash
+        responses:
+            '200':
+                description: A JSON object containing consentRecordId
+                content:
+                    text/json:
+                        schema:
+                            type: object
+                            properties:
+                                consentRecordId:
+                                    type: string
 
   /consent:
     post:
-      summary: 'Consent endpoint: user consents for specific (scope) health records to be shared from source to destination organization'
-      operationId: consent
-      tags:
-        - patient
-      parameters:
-        - name: idHash
-          in: query
-          description: Hased ID of the user
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: source
-          in: query
-          description: 'source organization'
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: dest
-          in: query
-          description: 'destination organization'
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: scope
-          in: query
-          description: 'type of behavior record'
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: OK        
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            patientLocalIdHash:
+                                type: string
+                            source:
+                                type: string
+                            dest:
+                                type: string
+                            scope:
+                                type: array
+                                items: 
+                                    type: string
+        responses:
+            '200':
+                description: OK 
+
+
   /revoke:
     post:
-      summary: 'Revoke endpoint: user revokes consent for source organization to send health records to destination organization'
-      operationId: revoke
-      tags:
-        - patient
-      parameters:
-        - name: idHash
-          in: query
-          description: Hased ID of the user
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: source
-          in: query
-          description: 'source organization'
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: dest
-          in: query
-          description: 'destination organization'
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: OK
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            patientLocalIdHash:
+                                type: string
+                            source:
+                                type: string
+                            dest:
+                                type: string    
+        responses:
+            '200':
+                description: OK
           
   /set-org:
     post:
-      summary: 'Set-org endpoint: Organization added to Magellan'
-      operationId: set-org
-      tags:
-        - organization
-      parameters:
-        - name: name
-          in: query
-          description: 'organization name'
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: url
-          in: query
-          description: 'organization url'
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: memberId
-          in: query
-          description: organization's Magellan ID
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: publicKey
-          in: query
-          description: organization's public key
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: OK 
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            name:
+                                type: string
+                            url:
+                                type: string
+                            orgId:
+                                type: string
+                            publicKey:
+                                type: string           
+        responses:
+            '200':
+                description: OK 
 
   /get-org:
     post:
-      summary: 'get-org endpoint: Organization added to Magellan'
-      operationId: get-org
-      tags:
-        - organization
-      parameters:
-        - name: orgId
-          in: query
-          description: organization's Magellan ID
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: organization's metadata
-          content:
-            text/plain:
-              schema:
-                type: string
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            orgId:
+                                type: string
+        responses:
+            '200':
+                description: organization's metadata
+                content:
+                    application/json:
+                        schema:
+                            type: object
 
   /get-consent:
     post:
-      summary: 'Get-consent endpoint: Check if source organization has consent to send health records to destination organization'
-      operationId: get-consent
-      tags:
-        - organization
-      parameters:
-        - name: idHash
-          in: query
-          description: hased ID of the user
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: source
-          in: query
-          description: source organization
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: dest
-          in: query
-          description: destination organization
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Bad request. User ID must be an integer and larger than 0.
-        '403':
-          description: Not Authorized
-        '404':
-          description: A user with the specified ID was not found.
-
-
-components:
-  schemas:
-    User:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        tag:
-          type: string
-    Error:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-security:
-  - BasicAuth: []
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                            patientLocalIdHash:
+                                type: string
+                            source:
+                                type: string
+                            dest:
+                                type: string
+        responses:
+            '200':
+                description: OK
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                scope:
+                                    type: array
+                                    items:
+                                        type: string
+                                                                
+            '400':
+                description: Bad request. User ID must be an integer and larger than 0.
+            '403':
+                description: Not Authorized
+            '404':
+                description: A user with the specified ID was not found.
