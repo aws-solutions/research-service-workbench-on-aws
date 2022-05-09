@@ -15,11 +15,39 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-audit",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-authentication",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-logging",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/assert",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
       "allowedCategories": [ "production" ]
     },
     {
@@ -72,39 +100,43 @@
     },
     {
       "name": "@awsui/collection-hooks",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/components-react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/design-tokens",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/global-styles",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@awsui/test-utils-core",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/core",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-env",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-typescript",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@casl/ability",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/eslint-config",
@@ -116,7 +148,7 @@
     },
     {
       "name": "@rushstack/heft-jest-plugin",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/heft-node-rig",
@@ -124,19 +156,19 @@
     },
     {
       "name": "@testing-library/dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/jest-dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@testing-library/user-event",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@vendia/serverless-express",
@@ -159,8 +191,16 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "babel-jest",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "cdk-nag",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -184,7 +224,7 @@
     },
     {
       "name": "eslint-config-next",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "eslint-plugin-security",
@@ -192,7 +232,7 @@
     },
     {
       "name": "eslint-plugin-testing-library",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "express",
@@ -223,6 +263,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "lambda-build",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production" ]
     },
@@ -232,19 +276,19 @@
     },
     {
       "name": "next",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next-global-css",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next-i18next",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next-transpile-modules",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "nodemon",
@@ -252,19 +296,31 @@
     },
     {
       "name": "react",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "react-dom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "request",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "sharp",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "source-map-support",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "supertest",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

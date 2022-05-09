@@ -4,8 +4,11 @@
   "description": "",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "repository": "ssh://git.amazon.com/pkg/Ma-mono",
-  "homepage": "https://code.amazon.com/packages/Ma-mono",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -52,7 +55,7 @@
     "@types/express": "^4.17.13",
     "@types/heft-jest": "1.0.2",
     "@types/jest": "^27.4.1",
-    "@types/node": "^12",
+    "@types/node": "^14",
     "@types/react": "17.0.38",
     "babel-jest": "27.5.1",
     "concurrently": "^7.0.0",

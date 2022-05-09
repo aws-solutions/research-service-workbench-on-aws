@@ -125,8 +125,18 @@ describe('WinstonPlugin tests', () => {
     }
   );
 
+  it('log() should correctly handle an Error as the message parameter', () => {
+    const logger = new WinstonPlugin();
+
+    const error = new Error();
+
+    logger.log('error', error);
+
+    expect(logger['_logger'].log).lastCalledWith('error', { message: error }); // nosemgrep
+  });
+
   itProp(
-    'log() should correctly handle a string for the message parameter and a LogMessageObject as the meta parameters',
+    'log() should correctly handle a string for the message parameter and a LogMessageObject as the meta parameter',
     [fc.string(), fc.object({ values: [fc.string(), fc.double(), fc.integer(), fc.boolean()] })],
     (message, meta) => {
       const logger = new WinstonPlugin();
@@ -134,6 +144,20 @@ describe('WinstonPlugin tests', () => {
       logger.log('error', message, meta as LogMessageObject);
 
       expect(logger['_logger'].log).lastCalledWith('error', message, meta); // nosemgrep
+    }
+  );
+
+  itProp(
+    'log() should correctly handle a string for the message parameter and an Error as the meta parameter',
+    [fc.string()],
+    (message) => {
+      const logger = new WinstonPlugin();
+
+      const error = new Error();
+
+      logger.log('error', message, error);
+
+      expect(logger['_logger'].log).lastCalledWith('error', message, error); // nosemgrep
     }
   );
 });

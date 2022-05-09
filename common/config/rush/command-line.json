@@ -174,7 +174,21 @@
       "enableParallelism": true
     },
     {
+      "name": "test:update",
+      "commandKind": "bulk",
+      "summary": "Used to update snapshots",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "build:test",
+      "commandKind": "bulk",
+      "summary": "Runs rush build and rush test using a single command",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "build:local",
       "commandKind": "bulk",
       "summary": "Runs rush build and rush test using a single command",
       "safeForSimultaneousRushProcesses": true,
@@ -184,6 +198,34 @@
       "name": "test:only",
       "commandKind": "bulk",
       "summary": "Used to perform tests on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:synth",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk synth commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:bootstrap",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk bootstrap commands",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "cdk:deploy",
+      "commandKind": "bulk",
+      "summary": "Used to run cdk deploy commands",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
@@ -224,21 +266,21 @@
       "summary": "Prepare conventional commit messages",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "commitizen",
-      "shellCommand": ".github/workflows/scripts/commitizen.sh"
+      "shellCommand": "bash .github/workflows/scripts/commitizen.sh"
     },
     {
       "name": "git-secrets-scan",
       "commandKind": "global",
       "summary": "Used to perform a git-secrets scan on the packages",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "/bin/bash .github/workflows/scripts/git-secrets-scan.sh"
+      "shellCommand": "bash .github/workflows/scripts/git-secrets-scan.sh"
     },
     {
       "name": "viperlight-scan",
       "commandKind": "global",
       "summary": "Used to perform a viperlight scan on the packages",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "/bin/bash .github/workflows/scripts/viperlight-scan.sh"
+      "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
     },
     // {
     //   "name": "heft:build",
