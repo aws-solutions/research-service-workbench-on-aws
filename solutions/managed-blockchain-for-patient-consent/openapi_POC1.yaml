@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Magellan'
+  license:
+    name: Apache License
+
+paths:
+  /signup:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patientLocalIdHash:
+                  type: string
+                consentRecordId:
+                  description: required when patient has previously regustered and recieved a conseentRecordId
+                  type: string
+              required:
+                - patientLocalIdHash
+      responses:
+        '200':
+          description: A JSON object containing consentRecordId
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  consentRecordId:
+                    type: string
+
+  /consent:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patientLocalIdHash:
+                  type: string
+                source:
+                  type: string
+                dest:
+                  type: string
+                scope:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - patientLocalIdHash
+                - source
+                - dest
+                - scope
+
+      responses:
+        '200':
+          description: OK
+
+  /revoke:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patientLocalIdHash:
+                  type: string
+                source:
+                  type: string
+                dest:
+                  type: string
+              required:
+                - patientLocalIdHash
+                - source
+                - destination
+      responses:
+        '200':
+          description: OK
+
+  /set-org:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+                orgId:
+                  type: string
+                publicKey:
+                  type: string
+              required:
+                - name
+                - url
+                - publicKey
+      responses:
+        '200':
+          description: OK
+
+  /get-org:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orgId:
+                  type: string
+              required:
+                - orgId
+      responses:
+        '200':
+          description: organization's metadata
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /get-consent:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                patientLocalIdHash:
+                  type: string
+                source:
+                  type: string
+                dest:
+                  type: string
+              required:
+                - patientLocalIdHash
+                - source
+                - dest
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scope:
+                    type: array
+                    items:
+                      type: string
+
+        '400':
+          description: Bad request. User ID must be an integer and larger than 0.
+        '403':
+          description: Not Authorized
+        '404':
+          description: A user with the specified ID was not found.

@@ -258,6 +258,7 @@ importers:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-authentication': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@casl/ability': ^5.4.3
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -273,6 +274,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/workbench-core-authentication': link:../authentication
+      '@amzn/workbench-core-logging': link:../logging
       '@casl/ability': 5.4.3
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
