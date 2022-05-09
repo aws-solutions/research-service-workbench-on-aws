@@ -60,11 +60,11 @@ export class SWBStack extends Stack {
       ENV_STATUS_UPDATE
     };
 
-    const apiLambda: Function = this._createAPILambda();
+    const statusHandler = this._createStatusHandlerLambda();
+    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
     this._createRestApi(apiLambda);
 
     const artifactS3Bucket = this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    this._createStatusHandlerLambda();
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
 
@@ -241,7 +241,7 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createStatusHandlerLambda(): void {
+  private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
@@ -275,6 +275,8 @@ export class SWBStack extends Stack {
     new CfnOutput(this, 'StatusHandlerLambdaArnOutput', {
       value: statusHandlerLambda.functionArn
     });
+
+    return statusHandlerLambda;
   }
 
   private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): void {
@@ -348,7 +350,7 @@ export class SWBStack extends Stack {
     eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
 
-  private _createAPILambda(): Function {
+  private _createAPILambda(statusHandlerLambdaArn: string): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
@@ -395,6 +397,10 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
+          }),
+          new PolicyStatement({
+            actions: ['lambda:AddPermission'],
+            resources: [statusHandlerLambdaArn]
           })
         ]
       })

@@ -53,9 +53,9 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region }),
-      lambda: new Lambda({ region }),
-      sagemaker: new SageMaker({ region })
+      ddb: new DynamoDB(options),
+      lambda: new Lambda(options),
+      sagemaker: new SageMaker(options)
     };
 
     this.helpers = {
