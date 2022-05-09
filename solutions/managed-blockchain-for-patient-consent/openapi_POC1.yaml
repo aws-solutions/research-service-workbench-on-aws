@@ -145,8 +145,8 @@ paths:
                                         type: string
                                                                 
             '400':
-                description: Bad request. User ID must be an integer and larger than 0.
+                description: User ID is not valid
             '403':
                 description: Not Authorized
             '404':
-                description: A user with the specified ID was not found.
+                description: A user with the specified ID was not found
