@@ -52,6 +52,12 @@ paths:
                                 type: array
                                 items: 
                                     type: string
+                        required:
+                            - patientLocalIdHash
+                            - source
+                            - dest
+                            - scope
+
         responses:
             '200':
                 description: OK 
@@ -71,7 +77,11 @@ paths:
                             source:
                                 type: string
                             dest:
-                                type: string    
+                                type: string
+                        required:
+                            - patientLocalIdHash
+                            - source
+                            - destination    
         responses:
             '200':
                 description: OK
@@ -92,7 +102,11 @@ paths:
                             orgId:
                                 type: string
                             publicKey:
-                                type: string           
+                                type: string 
+                        required:
+                            - name
+                            - url
+                            - publicKey          
         responses:
             '200':
                 description: OK 
@@ -108,6 +122,8 @@ paths:
                         properties:
                             orgId:
                                 type: string
+                        required:
+                            - orgId
         responses:
             '200':
                 description: organization's metadata
@@ -131,6 +147,10 @@ paths:
                                 type: string
                             dest:
                                 type: string
+                        required:
+                            - patientLocalIdHash
+                            - source
+                            - dest
         responses:
             '200':
                 description: OK
@@ -145,8 +165,8 @@ paths:
                                         type: string
                                                                 
             '400':
-                description: User ID is not valid
+                description: Bad request. User ID must be an integer and larger than 0.
             '403':
                 description: Not Authorized
             '404':
-                description: A user with the specified ID was not found
+                description: A user with the specified ID was not found.
