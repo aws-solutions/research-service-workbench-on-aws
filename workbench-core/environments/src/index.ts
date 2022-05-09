@@ -9,6 +9,7 @@ import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import { EnvironmentStatus } from './environmentStatus';
 import ServiceCatalogSetup from './serviceCatalogSetup';
 import CognitoSetup from './cognitoSetup';
+import EnvironmentService from './environmentService';
 
 export {
   HostingAccountService,
@@ -21,5 +22,6 @@ export {
   EventBridgeEventToDDB,
   EnvironmentStatus,
   ServiceCatalogSetup,
-  CognitoSetup
+  CognitoSetup,
+  EnvironmentService
 };

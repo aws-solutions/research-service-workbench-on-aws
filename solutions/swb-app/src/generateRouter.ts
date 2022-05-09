@@ -25,7 +25,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   // TODO: Enable CORS so UI can make requests to backend
 
-  setUpEnvRoutes(router, apiRouteConfig.environments);
+  setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
 
   // TODO: Add error handling: https://github.com/awslabs/fhir-works-on-aws-routing/blob/7f0681545b4f2dc18151e696a0da1e5c601ebb33/src/router/routes/errorHandling.ts

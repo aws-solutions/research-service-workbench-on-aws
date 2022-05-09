@@ -1,8 +1,13 @@
 // Environment launch
 import { Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
+import { EnvironmentService } from '@amzn/environments';
 
-export function setUpEnvRoutes(router: Router, environments: { [key: string]: Environment }): void {
+export function setUpEnvRoutes(
+  router: Router,
+  environments: { [key: string]: Environment },
+  environmentService: EnvironmentService
+): void {
   const supportedEnvs = Object.keys(environments);
 
   // Launch
@@ -77,4 +82,17 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
       res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
     }
   });
+
+  // List Environments
+  // router.get('/environments/:id', async (req: Request, res: Response) => {
+  //   const response = await
+  //   if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+  //     // We check that envType is in list of supportedEnvs before calling the environments object
+  //     // nosemgrep
+  //     const response = await ;
+  //     res.send(response);
+  //   } else {
+  //     res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+  //   }
+  // })
 }
