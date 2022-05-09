@@ -22,3 +22,6 @@ jobs:
 
       - name: Code Coverage badge check
         run: node common/scripts/install-run-rush.js make-badges --ci
+      
+      - name: Common Code Coverage badge check
+        run: node common/scripts/install-run-rush.js common-coverage-ci
