@@ -11,7 +11,7 @@
     "infrastructure": "lib/index.js"
   },
   "scripts": {
-    "compile": "scripts/buildLambda.js",
+    "compile": "node scripts/buildLambda.js",
     "build": "rushx compile && heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "test": "heft test --clean --test-name-pattern 'CDKStack' && rushx make-badges",
