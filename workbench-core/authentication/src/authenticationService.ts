@@ -19,18 +19,12 @@ export class AuthenticationService {
   }
 
   /**
-   * Validates the current token by checking:
-   *   - signature
-   *   - expiration
-   *   - audience
-   *   - issuer
-   *
-   * and returns the values on the token.
+   * Validates the jwt token and returns the values on the token.
    *
    * @param token - an Id or Access token to be validated.
    * @returns An array of Key-Values which represent the token's values.
    */
-  public validateToken(token: string): Record<string, string | string[]>[] {
+  public validateToken(token: string): Record<string, string | string[] | number | number[]>[] {
     return this._authenticationPlugin.validateToken(token);
   }
 
@@ -58,7 +52,7 @@ export class AuthenticationService {
   /**
    * Get any roles associated with a user for whom a token was issued.
    * @param token - an Id or access token form which to find the user's role(s)
-   * @returns - any role information included on the given token.
+   * @returns list of roles included in the jwt token.
    */
   public getUserRolesFromToken(token: string): string[] {
     return this._authenticationPlugin.getUserRolesFromToken(token);
@@ -66,6 +60,7 @@ export class AuthenticationService {
 
   /**
    * Take the authorization code parameter and request JWT tokens from the IdP.
+   * The authroization code grant is explained [here](https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
    * @param code - an authorization code given as a query parameter in a user request
    * @returns ID, access and refresh tokens for the given code.
    */
