@@ -1,11 +1,12 @@
 import { AuthenticationPlugin } from '../authenticationPlugin';
 
 // TODO: implement
+/* istanbul ignore next */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public isUserLoggedIn(token: string): boolean {
     throw new Error('Method not implemented.');
   }
-  public validateToken(token: string): Record<string, string | string[]>[] {
+  public validateToken(token: string): Record<string, string | string[] | number | number[]>[] {
     throw new Error('Method not implemented.');
   }
   public revokeToken(token: string): void {
