@@ -11,7 +11,7 @@ export interface NavigationProps {
 
 export default function Navigation({ items }: NavigationProps): JSX.Element {
   const { t } = useTranslation();
-  let [activeHref, setActiveHref] = React.useState('');
+  const [activeHref, setActiveHref] = React.useState('');
   const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     {
       type: 'section',
@@ -39,8 +39,8 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
   ];
 
   // Role-based navigation display
-  let user: User = researcherUser;
-  let userRole: string = user.role;
+  const user: User = researcherUser;
+  const userRole: string = user.role;
   let navDisplay: typeof adminNavItems | typeof userNavItems;
   if (userRole === 'admin') {
     navDisplay = adminNavItems;
