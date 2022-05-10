@@ -1,4 +1,4 @@
-import { User } from './User';
+import { User } from './user';
 
 /**
  * Implement the `UserManagementPlugin` interface to connect the UserRoleService
