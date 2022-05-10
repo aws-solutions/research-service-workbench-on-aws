@@ -11,7 +11,7 @@
     "dev": "next dev",
     "build": "next build",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "build:test": "rushx build && rushx test",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1",
     "start": "next start",

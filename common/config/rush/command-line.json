@@ -239,18 +239,26 @@
     {
       "name": "common-coverage-report",
       "commandKind": "global",
+      "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
+    },
+    {
+      "name": "common-coverage-make-badge",
+      "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage && git add README.md"
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
     },
     {
-      "name": "common-coverage-ci",
+      "name": "common-coverage",
       "commandKind": "global",
-      "summary": "[To be used in the Pipeline] The --ci argument will throw an error if the badges generated do not match what is already in the README file",
+      "summary": "Updates the common code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
+      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
     },
     {
       "name": "commitlint",
@@ -323,6 +331,12 @@
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Throws an error if the badges generated do not match what is already in the README.md",
+      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**
