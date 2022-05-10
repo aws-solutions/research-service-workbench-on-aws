@@ -258,7 +258,7 @@
       "summary": "[To be used in the Pipeline] The --ci argument will throw an error if the badges generated do not match what is already in the README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage"
+      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
     },
     {
       "name": "commitlint",
