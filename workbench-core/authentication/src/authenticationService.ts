@@ -8,7 +8,7 @@ export class AuthenticationService {
 
   /**
    *
-   * @param authenticationPlugin - A plugin that implements the {@link AuthenticationPlugin} inteface
+   * @param authenticationPlugin - A plugin that implements the {@link AuthenticationPlugin} interface
    */
   public constructor(authenticationPlugin: AuthenticationPlugin) {
     this._authenticationPlugin = authenticationPlugin;
