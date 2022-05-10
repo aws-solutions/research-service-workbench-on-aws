@@ -13,7 +13,7 @@
   "scripts": {
     "compile": "node scripts/buildLambda.js",
     "build": "rushx compile && heft build --clean",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "test": "heft test --clean --test-name-pattern 'CDKStack' && rushx make-badges",
     "test:only": "heft test -u --clean --test-name-pattern 'CDKStack'",
     "build:test": "rushx build && rushx test:only && rushx make-badges",

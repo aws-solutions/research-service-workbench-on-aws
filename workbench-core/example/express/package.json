@@ -12,7 +12,7 @@
   "scripts": {
     "build:local": "heft build --clean && rushx lambda-build -e src/index.ts && mkdir -p ./lambda-build && mv archive.zip ./lambda-build",
     "build": "heft build --clean",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "test": "heft test --clean && rushx make-badges",
     "build:test": "rushx build && rushx test",
     "test:only": "heft test --clean",
