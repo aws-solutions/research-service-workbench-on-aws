@@ -331,6 +331,12 @@
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Throws an error if the badges generated do not match what is already in the README.md",
+      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**
