@@ -1,10 +1,16 @@
 import { AuthenticationPlugin } from './authenticationPlugin';
-import { CognitoAuthenticationPlugin } from './plugins/cognitoAuthenticationPlugin';
 
+/**
+ * A AuthenticationService instance the is responsible for authenticatng authorization codes and jwt tokens.
+ */
 export class AuthenticationService {
   private _authenticationPlugin: AuthenticationPlugin;
 
-  public constructor(authenticationPlugin: AuthenticationPlugin = new CognitoAuthenticationPlugin()) {
+  /**
+   *
+   * @param authenticationPlugin - A plugin that implements the {@link AuthenticationPlugin} inteface
+   */
+  public constructor(authenticationPlugin: AuthenticationPlugin) {
     this._authenticationPlugin = authenticationPlugin;
   }
 
@@ -60,7 +66,7 @@ export class AuthenticationService {
 
   /**
    * Take the authorization code parameter and request JWT tokens from the IdP.
-   * The authroization code grant is explained [here](https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
+   * The authorization code grant is explained [here](https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
    * @param code - an authorization code given as a query parameter in a user request
    * @returns ID, access and refresh tokens for the given code.
    */
