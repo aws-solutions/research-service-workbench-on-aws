@@ -18,7 +18,7 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
     "defaultBranch": "main"
   },
   "eventHooks": {
@@ -92,6 +92,18 @@
     {
       "packageName": "@amzn/workbench-core-datasets",
       "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-express",
+      "projectFolder": "workbench-core/example/express",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-infrastructure",
+      "projectFolder": "workbench-core/example/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

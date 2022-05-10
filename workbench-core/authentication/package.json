@@ -11,7 +11,7 @@
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "test": "heft test --clean && rushx make-badges",
     "build:test": "rushx build && rushx test",
     "test:only": "heft test --clean"
@@ -25,7 +25,7 @@
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^12",
+    "@types/node": "^14",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
   }
 }

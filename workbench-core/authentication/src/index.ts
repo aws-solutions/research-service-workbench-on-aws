@@ -1,5 +1,5 @@
-export { AuthenticationPlugin } from './AuthenticationPlugin';
-
-export { User } from './User';
-
-export { UserManagementPlugin as UserRolePlugin } from './UserManagementPlugin';
+export { AuthenticationPlugin } from './authenticationPlugin';
+export { AuthenticationService } from './authenticationService';
+export { User } from './user';
+export { UserManagementPlugin } from './userManagementPlugin';
+export { CognitoAuthenticationPlugin } from './plugins/cognitoAuthenticationPlugin';

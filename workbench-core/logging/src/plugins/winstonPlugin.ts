@@ -2,7 +2,7 @@ import { createLogger, format, Logger } from 'winston';
 import TransportStream from 'winston-transport';
 import { LoggingPlugin } from '../loggingPlugin';
 import { LogLevel } from '../logLevel';
-import { LogMessage, LogMessageObject } from '../logMessage';
+import { LogMessage, LogMessageMeta, LogMessageObject } from '../logMessage';
 import { ConsoleTransport } from './winstonTransports/consoleTransport';
 
 /**
@@ -55,7 +55,7 @@ export class WinstonPlugin implements LoggingPlugin {
    * @param message - the primary message to be logged
    * @param meta - any other data to be logged
    */
-  public log(level: LogLevel, message: string, meta: LogMessageObject): void;
+  public log(level: LogLevel, message: string, meta: LogMessageMeta): void;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public log(level: LogLevel, message: any, meta?: any): void {
