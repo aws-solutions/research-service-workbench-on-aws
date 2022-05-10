@@ -88,6 +88,12 @@
       "projectFolder": "solutions/example-ui-app",
       "reviewCategory": "prototypes",
       "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-datasets",
+      "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
