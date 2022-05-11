@@ -26,7 +26,7 @@ jobs:
             Note this PR might be rejected due to its size.’
 
       - name: echo context
-        run: echo "$GITHUB_CONTEXT"
+        run: echo '${{ toJSON(github) }}'
 
       - name: echo pusher
-        run: echo "${{ github.event.pusher.name }}"
+        run: echo "${{ github.event }}"
