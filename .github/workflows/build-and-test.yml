@@ -4,8 +4,7 @@
 #
 
 name: Build-and-test
-on: 
-  pull_request:
+on: ['pull_request']
 
 jobs:
   build-and-test:
@@ -32,8 +31,11 @@ jobs:
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Generate Common Coverage
-        if: "!contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: node common/scripts/install-run-rush.js common-coverage-report
+
+      - name: echo git status
+        run: git status
       
       - name: Update package info in root README file
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"

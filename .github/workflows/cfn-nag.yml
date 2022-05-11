@@ -4,11 +4,7 @@
 #
 
 name: Cfn-nag-scan
-on:
-  pull_request:
-    paths-ignore:
-      - 'README.md'
-      - '**/README.md'
+on: ['pull_request']
 
 jobs:
   cfn-nag-scan:
@@ -27,6 +23,9 @@ jobs:
         id: last-commit-message
         run: |
           echo "::set-output name=msg::$(git log -1 --pretty=%s)"
+
+      - name: echo commit message
+        run: echo "${{ steps.last-commit-message.outputs.msg }}"
 
       - name: Base Action
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
