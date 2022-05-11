@@ -31,8 +31,8 @@ jobs:
       - name: Update package info in root README file
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
-          node ../../../common/scripts/install-run-rushx.js readme -v
-          if [[ $? != 0 ]]; then
+          node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
+          if [[ $exit_status != 0 ]]; then
             node ../../../common/scripts/install-run-rushx.js readme
           fi
       
