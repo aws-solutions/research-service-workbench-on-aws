@@ -16,8 +16,10 @@ jobs:
       security-events: write
 
     steps:
-      - name: Clone repo
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
 
       - name: Get last commit message
         id: last-commit-message

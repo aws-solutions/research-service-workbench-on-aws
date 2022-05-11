@@ -11,8 +11,10 @@ jobs:
     name: Viperlight scan
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
 
       - name: Get last commit message
         id: last-commit-message
