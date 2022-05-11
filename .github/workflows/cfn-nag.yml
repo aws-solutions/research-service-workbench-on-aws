@@ -23,22 +23,31 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
 
+      - name: Get last commit message
+        id: last-commit-message
+        run: |
+          echo "::set-output name=msg::$(git log -1 --pretty=%s)"
+
       - name: Base Action
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         uses: ./.github/actions/baseAction
 
       - name: cdk synth swb-reference
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
       - name: cdk synth example
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js compile
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on swb-reference cdk.out
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         id: cdk-swb-reference
         uses: stelligent/cfn_nag@master
         with:
@@ -46,6 +55,7 @@ jobs:
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on example cdk.out
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         id: cdk-example
         uses: stelligent/cfn_nag@master
         with:
@@ -53,6 +63,7 @@ jobs:
           extra_args: --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         id: template
         uses: stelligent/cfn_nag@master
         with:
@@ -60,6 +71,7 @@ jobs:
           extra_args: --fail-on-warnings -o json
       
       - name: Grep cfn-nag for violations
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         uses: sergeysova/jq-action@v2
         id: cfn-nag
         # No. of violations: warnings + errors
@@ -67,6 +79,7 @@ jobs:
           cmd: jq '.[].file_results.violations | length' cfn_nag.out
 
       - name: echo violation count
+        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: echo ${{ steps.cfn-nag.outputs.value }}
 
       # - name: Fail if violations detected in cfn-nag
