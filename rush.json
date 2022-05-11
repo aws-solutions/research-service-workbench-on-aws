@@ -90,6 +90,12 @@
       "shouldPublish": false
     },
     {
+      "packageName": "@amzn/workbench-core-datasets",
+      "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@amzn/workbench-core-express",
       "projectFolder": "workbench-core/example/express",
       "reviewCategory": "production",

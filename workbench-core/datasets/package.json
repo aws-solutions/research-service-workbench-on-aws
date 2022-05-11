@@ -1,0 +1,36 @@
+{
+  "name": "@amzn/workbench-core-datasets",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "scripts": {
+    "build": "heft build --clean",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
+    "test": "heft test --clean && rushx make-badges",
+    "testQuiet": "heft test --clean --silent && rushx make-badges",
+    "build:test": "rushx build && rushx test",
+    "build:testQuiet": "rushx build && rushx testQuiet",
+    "test:only": "heft test --clean"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@types/node": "^14",
+    "@types/triple-beam": "^1.3.2",
+    "fast-check": "^2.24.0",
+    "istanbul-badges-readme": "1.8.1",
+    "jest": "^27.5.1",
+    "jest-fast-check": "^1.0.2",
+    "typescript": "^4.5.2"
+  }
+}
