@@ -27,22 +27,22 @@ jobs:
         run: echo "${{ steps.last-commit-message.outputs.msg }}"
 
       - name: Base Action
-        if: "!contains(${{ steps.last-commit-message.outputs.msg }}, 'github-actions[bot]')"
+        if: "! contains(steps.last-commit-message.outputs.msg, 'github-actions[bot]')"
         uses: ./.github/actions/baseAction
       
       - name: Rush test
-        if: "!contains(${{ steps.last-commit-message.outputs.msg }}, 'github-actions[bot]')"
+        if: "! contains(steps.last-commit-message.outputs.msg, 'github-actions[bot]')"
         run: node common/scripts/install-run-rush.js test --verbose
 
       # - name: Code Coverage badge check
       #   run: node common/scripts/install-run-rush.js make-badges --ci
 
       - name: Generate Common Coverage
-        if: "!contains(${{ steps.last-commit-message.outputs.msg }}, 'github-actions[bot]')"
+        if: "!contains(steps.last-commit-message.outputs.msg, 'github-actions[bot]')"
         run: node common/scripts/install-run-rush.js common-coverage-report
       
       - name: Update package info in root README file
-        if: "!contains(${{ steps.last-commit-message.outputs.msg }}, 'github-actions[bot]')"
+        if: "! contains(steps.last-commit-message.outputs.msg, 'github-actions[bot]')"
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
           node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
@@ -56,7 +56,7 @@ jobs:
       #     echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Auto commit README files
-        if: "!contains(${{ steps.last-commit-message.outputs.msg }}, 'github-actions[bot]')"
+        if: "! contains(steps.last-commit-message.outputs.msg, 'github-actions[bot]')"
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "doc: README.md updates by github-actions[bot]"
