@@ -443,6 +443,34 @@ importers:
       ts-jest: 27.1.4_de3efcd1e6a6e8470860984ab19632da
       typescript: 4.6.4
 
+  ../../workbench-core/datasets:
+    specifiers:
+      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
+      '@rushstack/heft-node-rig': ^1.7.1
+      '@types/heft-jest': 1.0.2
+      '@types/node': ^14
+      '@types/triple-beam': ^1.3.2
+      fast-check: ^2.24.0
+      istanbul-badges-readme: 1.8.1
+      jest: ^27.5.1
+      jest-fast-check: ^1.0.2
+      typescript: ^4.5.2
+    devDependencies:
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@rushstack/heft': 0.45.1
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.1
+      '@rushstack/heft-node-rig': 1.9.2_@rushstack+heft@0.45.1
+      '@types/heft-jest': 1.0.2
+      '@types/node': 14.18.16
+      '@types/triple-beam': 1.3.2
+      fast-check: 2.25.0
+      istanbul-badges-readme: 1.8.1
+      jest: 27.5.1
+      jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      typescript: 4.6.4
+
   ../../workbench-core/environments:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
