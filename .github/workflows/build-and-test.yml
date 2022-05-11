@@ -40,10 +40,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: README.md updates
-          file_patter: **/README.md
-          
+          file_pattern: "**/README.md"
       
       # - name: Common Code Coverage badge check
       #   run: node common/scripts/install-run-rush.js common-coverage --ci
-      - name: Commit README.md files
 
