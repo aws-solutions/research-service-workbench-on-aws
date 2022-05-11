@@ -35,7 +35,12 @@ jobs:
           if [[ $exit_status != 0 ]]; then
             node ../../../common/scripts/install-run-rushx.js readme
           fi
-      
+
+      - name: Get git status 
+        run: |
+          git branch
+          git status
+
       - name: Auto commit README files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
