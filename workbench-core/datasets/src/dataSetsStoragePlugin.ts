@@ -14,5 +14,5 @@ export interface DataSetsStoragePlugin {
    * stroage mechanism to complete the operation.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createStroage(name: string, ...additionalParams: any[]): Promise<string>;
+  createStorage(name: string, ...additionalParams: any[]): Promise<string>;
 }
