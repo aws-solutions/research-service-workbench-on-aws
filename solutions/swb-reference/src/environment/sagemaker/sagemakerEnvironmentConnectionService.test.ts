@@ -1,11 +1,38 @@
+import { mockClient } from 'aws-sdk-client-mock';
 import SagemakerEnvironmentConnectionService from './sagemakerEnvironmentConnectionService';
+import { CreatePresignedNotebookInstanceUrlCommand, SageMakerClient } from '@aws-sdk/client-sagemaker';
+import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
+
 describe('SagemakerEnvironmentConnectionService', () => {
   test('getAuthCreds should return mocked value', async () => {
+    // BUILD
     const sm = new SagemakerEnvironmentConnectionService();
     const instanceName = 'instance-abc123';
-    await expect(sm.getAuthCreds(instanceName)).resolves.toEqual(
-      `Get auth creds for instanceName ${instanceName}`
-    );
+    const sagemakerMock = mockClient(SageMakerClient);
+    const url = 'authorized-url-123';
+    sagemakerMock.on(CreatePresignedNotebookInstanceUrlCommand).resolvesOnce({
+      AuthorizedUrl: url
+    });
+
+    const iamMock = mockClient(STSClient);
+    iamMock.on(AssumeRoleCommand).resolvesOnce({
+      Credentials: {
+        AccessKeyId: 'sampleAccessKey',
+        SecretAccessKey: 'sampleSecretAccessKey',
+        SessionToken: 'sampleSessionToken',
+        Expiration: new Date()
+      }
+    });
+
+    // OPERATE & CHECK
+    await expect(
+      sm.getAuthCreds(instanceName, {
+        roleArn: 'arn:aws:iam::<HOSTING-ACCOUNT-ID>:role/swb-dev-oh-env-mgmt',
+        externalId: 'external-id-123'
+      })
+    ).resolves.toEqual({
+      url
+    });
   });
 
   test('getConnectionInstruction should return mocked value', async () => {
