@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v3
         with: 
           ref: ${{ github.head_ref }}
+          fetch-depth: 2
 
       - name: Base Action
         uses: ./.github/actions/baseAction
@@ -36,17 +37,19 @@ jobs:
             node ../../../common/scripts/install-run-rushx.js readme
           fi
 
-      - name: Get git status 
+      - name: Get last commit message
+        id: last-commit-message
         run: |
-          git branch
-          git status
+          echo "::set-output name=msg::$(git log -1 --pretty=%s)"
 
       - name: Auto commit README files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'doc: README.md updates'
+          commit_message: ${{ steps.last-commit-message.outputs.msg }}
+          commit_options: '--amend --no-edit --no-verify'
+          push_options: '--force'
+          skip_fetch: true
           file_pattern: "README.md **/README.md"
-          commit_options: '--no-verify'
       
       # - name: Common Code Coverage badge check
       #   run: node common/scripts/install-run-rush.js common-coverage --ci
