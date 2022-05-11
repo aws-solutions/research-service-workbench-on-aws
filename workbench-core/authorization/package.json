@@ -29,11 +29,13 @@
     "jest": "^27.5.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "fast-check": "^2.24.0",
-    "jest-fast-check": "^1.0.2"
+    "jest-fast-check": "^1.0.2",
+    "@types/lodash": "^4.14.181"
   },
   "dependencies": {
     "@amzn/workbench-core-authentication": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
-    "@casl/ability": "^5.4.3"
+    "@casl/ability": "^5.4.3",
+    "lodash": "^4.17.21"
   }
 }

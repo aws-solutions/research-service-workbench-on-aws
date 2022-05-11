@@ -1,6 +1,7 @@
 import { Ability, AbilityBuilder, ForbiddenError } from '@casl/ability';
 import AuthorizationPlugin from './authorizationPlugin';
-import { Operation, Permission } from './permissionsPlugin';
+import Operation from './operation';
+import Permission from './permission';
 /**
  * {@link https://github.com/stalniy/casl | CASL } Authorization Plugin.
  *

@@ -1,10 +1,17 @@
 import { User } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
-import { PermissionsMap } from '.';
-import { Action } from './action';
-import { Permission } from './permissionsPlugin';
-import StaticPermissionsPlugin from './staticPermissionsPlugin';
+import {
+  PermissionsMap,
+  Action,
+  Permission,
+  Operation,
+  RoutesMap,
+  HTTPMethod,
+  MethodToOperations,
+  RoutesIgnored,
+  StaticPermissionsPlugin
+} from '.';
 
 describe('StaticPermissionsPlugin', () => {
   let staticPermissionsPlugin: StaticPermissionsPlugin;
@@ -13,6 +20,10 @@ describe('StaticPermissionsPlugin', () => {
   let role1Permissions: Permission[];
   let role2Permissions: Permission[];
   let logger: LoggingService;
+  let routesMap: RoutesMap;
+  let userRoute: MethodToOperations;
+  let routesIgnored: RoutesIgnored;
+  let userRouteGetOperations: Operation[];
   beforeEach(() => {
     role1Permissions = [
       {
@@ -42,9 +53,82 @@ describe('StaticPermissionsPlugin', () => {
       role1: role1Permissions,
       role2: role2Permissions
     };
+
+    userRouteGetOperations = [
+      {
+        action: Action.UPDATE,
+        subject: 'User'
+      },
+      {
+        action: Action.READ,
+        subject: 'User'
+      }
+    ];
+    userRoute = {
+      GET: userRouteGetOperations
+    };
+    routesMap = {
+      '/user': userRoute
+    };
+    routesIgnored = {
+      '/user': {
+        PUT: true
+      }
+    };
+
     logger = new LoggingService();
     jest.spyOn(logger, 'warn');
-    staticPermissionsPlugin = new StaticPermissionsPlugin(mockPermissionsMap, logger);
+    staticPermissionsPlugin = new StaticPermissionsPlugin(
+      mockPermissionsMap,
+      routesMap,
+      routesIgnored,
+      logger
+    );
+  });
+
+  describe('getPermissionsByRoute', () => {
+    test('GET user route operations', async () => {
+      const getOperations = await staticPermissionsPlugin.getOperationsByRoute('/user', HTTPMethod.GET);
+      expect(getOperations).toStrictEqual(userRouteGetOperations);
+    });
+
+    test('PUT user route operations, route is ignored', async () => {
+      const putOperations = await staticPermissionsPlugin.getOperationsByRoute('/user', HTTPMethod.PUT);
+      expect(putOperations).toHaveLength(0);
+    });
+
+    test('POST user route operations is not in routeMap and not ignored, should throw route is not secured error', async () => {
+      try {
+        await staticPermissionsPlugin.getOperationsByRoute('/user', HTTPMethod.POST);
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err.message).toBe('Route has not been secured');
+      }
+    });
+
+    test('user route operations can not be modified', async () => {
+      const modifiedGetOperations = await staticPermissionsPlugin.getOperationsByRoute(
+        '/user',
+        HTTPMethod.GET
+      );
+      expect(modifiedGetOperations).toStrictEqual(userRouteGetOperations);
+      modifiedGetOperations[0].action = Action.DELETE;
+
+      const orginalGetOperations = await staticPermissionsPlugin.getOperationsByRoute(
+        '/user',
+        HTTPMethod.GET
+      );
+      expect(orginalGetOperations).not.toStrictEqual(modifiedGetOperations);
+    });
+
+    itProp('random user inputs should throw error', [fc.anything(), fc.anything()], async (route, method) => {
+      try {
+        await staticPermissionsPlugin.getOperationsByRoute(route as string, method as HTTPMethod);
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
+    });
   });
 
   describe('getPermissionsByUser', () => {
@@ -72,6 +156,25 @@ describe('StaticPermissionsPlugin', () => {
 
       const permissions: Permission[] = await staticPermissionsPlugin.getPermissionsByUser(mockUser);
       expect(permissions).toStrictEqual(role1Permissions.concat(role2Permissions));
+    });
+
+    test('modify permissions should not be allowed', async () => {
+      mockUser = {
+        uid: '1234567890',
+        firstName: 'sampleFirst',
+        lastName: 'sampleLast',
+        email: 'sampleEmail',
+        roles: ['role1']
+      };
+
+      const modifidPermissions: Permission[] = await staticPermissionsPlugin.getPermissionsByUser(mockUser);
+      expect(modifidPermissions).toStrictEqual(role1Permissions);
+
+      modifidPermissions.forEach((permission) => {
+        permission.action = Action.CREATE;
+      });
+      const orignalPermissions: Permission[] = await staticPermissionsPlugin.getPermissionsByUser(mockUser);
+      expect(orignalPermissions).not.toStrictEqual(modifidPermissions);
     });
 
     test('invalid role user', async () => {

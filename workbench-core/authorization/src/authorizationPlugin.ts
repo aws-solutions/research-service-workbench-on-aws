@@ -1,4 +1,5 @@
-import { Operation, Permission } from './permissionsPlugin';
+import Operation from './operation';
+import Permission from './permission';
 
 /**
  * Represents an AuthorizationPlugin.
