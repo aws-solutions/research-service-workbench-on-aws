@@ -21,6 +21,7 @@ export class SWBStack extends Stack {
     SSM_DOC_NAME_SUFFIX: string;
     MAIN_ACCOUNT_BUS_ARN_NAME: string;
     AMI_IDS_TO_SHARE: string;
+    EXTERNAL_ID: string;
   };
   public constructor(app: App) {
     const {
@@ -31,7 +32,8 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
       MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
+      AMI_IDS_TO_SHARE,
+      EXTERNAL_ID
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -47,7 +49,8 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
       MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
+      AMI_IDS_TO_SHARE,
+      EXTERNAL_ID
     };
 
     const apiLambdaRole: Role = this._createAPILambdaRole();

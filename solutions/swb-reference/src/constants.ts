@@ -15,6 +15,7 @@ function getConstants(): {
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
+  EXTERNAL_ID: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -30,6 +31,9 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+
+  // external id used to establish trust relationship with hosting account
+  const EXTERNAL_ID = config.externalId;
 
   const AMI_IDS: string[] = [];
 
@@ -51,7 +55,8 @@ function getConstants(): {
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
-    USER_POOL_NAME
+    USER_POOL_NAME,
+    EXTERNAL_ID
   };
 }
 

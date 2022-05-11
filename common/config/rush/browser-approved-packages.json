@@ -83,6 +83,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-sagemaker",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production" ]
     },
@@ -92,6 +96,10 @@
     },
     {
       "name": "@aws-sdk/client-sts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/sagemaker",
       "allowedCategories": [ "production" ]
     },
     {

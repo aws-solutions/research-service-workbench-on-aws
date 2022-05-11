@@ -17,6 +17,7 @@ import CloudformationService from './helpers/cloudformationService';
 import S3Service from './helpers/s3Service';
 import DynamoDB from './clients/dynamoDB';
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
+import Sagemaker from './clients/sagemaker';
 
 export default class AwsService {
   public clients: {
@@ -30,6 +31,7 @@ export default class AwsService {
     sts: STS;
     iam: IAM;
     ddb: DynamoDB;
+    sagemaker: Sagemaker;
   };
   public helpers: {
     cloudformation: CloudformationService;
@@ -49,7 +51,8 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region })
+      ddb: new DynamoDB(options),
+      sagemaker: new Sagemaker(options)
     };
 
     this.helpers = {

@@ -58,18 +58,22 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
     // Mocked getEnvironment
     const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
       console.log('envId', envId);
-      return { envType: 'sagemaker', instanceName: 'abc' };
+      return { envType: 'sagemaker', instanceName: 'BasicNotebookInstance-juLcUavyKDQo' };
     };
     const { envType, instanceName } = getEnvironment(req.params.id);
     if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      const context = {
+        roleArn: 'arn:aws:iam::<HOSTING-ACCOUNT-ID>:role/swb-dev-oh-env-mgmt',
+        externalId: process.env.EXTERNAL_ID
+      };
       // We check that envType is in list of supportedEnvs before calling the environments object
       // eslint-disable-next-line security/detect-object-injection
-      const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName); // nosemgrep
+      const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context); // nosemgrep
       // We check that envType is in list of supportedEnvs before calling the environments object
       // eslint-disable-next-line security/detect-object-injection
       const instructionResponse = await environments[envType].connection.getConnectionInstruction(); // nosemgrep
       const response = {
-        authCredResponse,
+        ...authCredResponse,
         instructionResponse
       };
       res.send(response);
