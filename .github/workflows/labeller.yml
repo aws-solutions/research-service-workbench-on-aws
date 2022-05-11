@@ -29,7 +29,10 @@ jobs:
         run: echo '${{ toJSON(github) }}'
 
       - name: echo context
-        run: echo '${{ toJSON(github.event.head_commit) }}'
+        run: echo '${{ toJSON(github.event) }}'
 
       - name: echo commit message
         run: echo "${{ github.event.head_commit.message }}"
+
+      - name: echo payload
+        uses: hmarr/debug-action@v2
