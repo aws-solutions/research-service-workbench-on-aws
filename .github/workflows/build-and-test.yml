@@ -22,6 +22,9 @@ jobs:
         run: |
           echo "::set-output name=msg::$(git log -1 --pretty=%s)"
 
+      - name: echo commit message
+        run: echo "${{ steps.last-commit-message.outputs.msg }}"
+
       - name: Base Action
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         uses: ./.github/actions/baseAction
@@ -32,7 +35,7 @@ jobs:
 
       - name: Generate Common Coverage
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
-        run: node common/scripts/install-run-rush.js common-coverage-report
+        run: node common/scripts/install-run-rush.js common-coverage-make-badge
 
       - name: echo git status
         run: git status
