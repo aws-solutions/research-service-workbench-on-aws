@@ -28,8 +28,5 @@ jobs:
       - name: echo context
         run: echo '${{ toJSON(github) }}'
 
-      - name: echo pusher
-        run: echo "${{ toJSON(github.event) }}"
-
       - name: echo commit message
-        run: echo ${{ github.event.head_commit.message }}
+        run: echo "${{ github.event.head_commit.message }}"
