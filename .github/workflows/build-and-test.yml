@@ -8,6 +8,7 @@ on: ['pull_request']
 
 jobs:
   build-and-test:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-20.04
 
     steps:
@@ -16,7 +17,6 @@ jobs:
         with: 
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
-          # fetch-depth: 2
 
       - name: Base Action
         uses: ./.github/actions/baseAction
@@ -38,15 +38,15 @@ jobs:
             node ../../../common/scripts/install-run-rushx.js readme
           fi
 
-      - name: Get last commit sha
-        id: last-commit-sha
-        run: |
-          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      # - name: Get last commit sha
+      #   id: last-commit-sha
+      #   run: |
+      #     echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Auto commit README files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "doc: README.md updates ${{ steps.last-commit-sha.outputs.sha_short }}"
+          commit_message: "doc: README.md updates by github-actions[bot]"
           commit_options: '--no-verify'
           # push_options: '--force'
           # skip_fetch: true

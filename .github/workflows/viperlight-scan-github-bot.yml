@@ -1,0 +1,16 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Viperlight-scan
+on: ['pull_request']
+
+jobs:
+  viperlight-scan:
+    if: github.actor == 'github-actions[bot]'
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: DUMMY SUCCESS
+        run: echo "DUMMY SUCCESS !"

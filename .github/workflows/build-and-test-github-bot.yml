@@ -1,0 +1,16 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Build-and-test
+on: ['pull_request']
+
+jobs:
+  build-and-test:
+    if: github.actor == 'github-actions[bot]'
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: DUMMY SUCCESS
+        run: echo "DUMMY SUCCESS !"

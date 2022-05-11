@@ -8,6 +8,7 @@ on: ['pull_request']
 
 jobs:
   viperlight-scan:
+    if: github.actor != 'github-actions[bot]'
     name: Viperlight scan
     runs-on: ubuntu-20.04
     steps:
