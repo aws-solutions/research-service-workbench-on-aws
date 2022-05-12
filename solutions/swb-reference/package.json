@@ -57,11 +57,9 @@
     "aws-sdk-client-mock": "^0.6.2",
     "@aws-sdk/client-sagemaker": "^3.58.0",
     "@aws-sdk/client-sts": "^3.58.0",
-    "@aws-sdk/client-dynamodb": "^3.67.0",
     "@aws-sdk/client-cloudformation": "^3.58.0",
     "@aws-sdk/client-ssm": "^3.58.0",
     "@aws-sdk/client-service-catalog": "^3.58.0",
-    "@aws-sdk/client-s3": "^3.58.0",
     "@aws-sdk/types": "^3.55.0"
   },
   "jest": {
