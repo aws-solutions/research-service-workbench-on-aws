@@ -9,7 +9,7 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
   router.post('/environments', async (req: Request, res: Response) => {
     if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
+
       const response = await environments[req.body.envType].lifecycle.launch(req.body);
       res.send(response);
     } else {
@@ -21,7 +21,7 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
   router.delete('/environments/:id', async (req: Request, res: Response) => {
     if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
+
       const response = await environments[req.body.envType].lifecycle.terminate(req.params.id);
       res.send(response);
     } else {
@@ -33,7 +33,7 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
   router.put('/environments/:id/start', async (req: Request, res: Response) => {
     if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
+
       const response = await environments[req.body.envType].lifecycle.start(req.params.id);
       res.send(response);
     } else {
@@ -45,7 +45,7 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
   router.put('/environments/:id/stop', async (req: Request, res: Response) => {
     if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
-      // nosemgrep
+
       const response = await environments[req.body.envType].lifecycle.stop(req.params.id);
       res.send(response);
     } else {
@@ -68,10 +68,10 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
       };
       // We check that envType is in list of supportedEnvs before calling the environments object
       // eslint-disable-next-line security/detect-object-injection
-      const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context); // nosemgrep
+      const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context);
       // We check that envType is in list of supportedEnvs before calling the environments object
       // eslint-disable-next-line security/detect-object-injection
-      const instructionResponse = await environments[envType].connection.getConnectionInstruction(); // nosemgrep
+      const instructionResponse = await environments[envType].connection.getConnectionInstruction();
       const response = {
         ...authCredResponse,
         instructionResponse
