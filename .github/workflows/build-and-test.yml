@@ -33,9 +33,17 @@ jobs:
         if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: node common/scripts/install-run-rush.js test --verbose
 
-      - name: cfn-nag Action
+      - name: Cfn-nag Action
         if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: ./.github/actions/cfnNagAction
+
+      - name: Git-secrets Action
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        uses: ./.github/actions/gitSecretsAction
+
+      - name: Viperlight Action
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        uses: ./.github/actions/viperlightAction
 
       - name: Update root README file with common coverage badge
         if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
