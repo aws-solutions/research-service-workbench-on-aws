@@ -83,16 +83,9 @@ export function setUpEnvRoutes(
     }
   });
 
-  // List Environments
-  // router.get('/environments/:id', async (req: Request, res: Response) => {
-  //   const response = await
-  //   if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
-  //     // We check that envType is in list of supportedEnvs before calling the environments object
-  //     // nosemgrep
-  //     const response = await ;
-  //     res.send(response);
-  //   } else {
-  //     res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
-  //   }
-  // })
+  // Get Environments
+  router.get('/environments/:id', async (req: Request, res: Response) => {
+    const env = await environmentService.getEnvironment(req.params.id);
+    res.send(env);
+  });
 }

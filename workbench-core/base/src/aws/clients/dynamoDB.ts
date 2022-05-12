@@ -41,7 +41,7 @@ export default class DynamoDB {
   }
 
   public async get(params: GetItemCommandInput): Promise<GetItemCommandOutput> {
-    return await this._client.send(new GetItemCommand(params));
+    return this._client.send(new GetItemCommand(params));
   }
 
   public async batchGet(params: BatchGetItemCommandInput): Promise<BatchGetItemCommandOutput> {

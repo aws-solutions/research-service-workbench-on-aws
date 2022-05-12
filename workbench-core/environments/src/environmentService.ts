@@ -10,7 +10,8 @@
 //   DeleteItemCommandOutput,
 //   BatchWriteItemCommandOutput
 // } from '@aws-sdk/client-dynamodb';
-import { AttributeValue, BatchWriteItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, BatchWriteItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
 
 // import AccountsService from './accountsService';
@@ -22,7 +23,7 @@ interface Environment {
   instanceId: string | undefined;
   cidr: string;
   description: string;
-  error: string;
+  error: { type: string; value: string } | undefined;
   name: string;
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
@@ -34,7 +35,39 @@ interface Environment {
   envTypeConfigId: string;
   indexId: string;
   updatedAt: string;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ACC?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  EGS?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ET?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ETC?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  IND?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  INID?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  PROJ?: any;
 }
+const defaultEnv: Environment = {
+  envId: '',
+  instanceId: '',
+  cidr: '',
+  description: '',
+  error: undefined,
+  name: '',
+  outputs: [],
+  projectId: '',
+  rev: 0,
+  status: '',
+  studyIds: [],
+  envType: '',
+  envTypeId: '',
+  envTypeConfigId: '',
+  indexId: '',
+  updatedAt: ''
+};
 
 const envKeyToAbrevMapping: { [key: string]: string } = {
   envId: 'ENV',
@@ -44,7 +77,8 @@ const envKeyToAbrevMapping: { [key: string]: string } = {
   projectId: 'PROJ',
   studyIds: 'STU',
   envTypeId: 'ETI',
-  indexId: 'IND'
+  indexId: 'IND',
+  account: 'ACC'
 };
 
 const statusMapping: string[] = [
@@ -83,31 +117,47 @@ interface QueryParams {
 
 export default class EnvironmentService {
   private _aws: AwsService;
-  private _awsRegion: string;
   private _tableName: string;
 
-  public constructor(constants: { AWS_REGION: string; TABLE_NAME: string }) {
-    const { AWS_REGION, TABLE_NAME } = constants;
-    this._awsRegion = AWS_REGION;
+  public constructor(constants: { TABLE_NAME: string }) {
+    const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
-    this._aws = new AwsService({ region: AWS_REGION, ddbTableName: TABLE_NAME });
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
-  public async getEnvironment(envId: string): Promise<Environment> {
-    const envKey = this._createEnvKey(envId);
-    // const data = await this._ddbHelperService.get({ pk: envKey, sk: envKey }).get();
-    const data = await this._aws.helpers.ddb.get({ pk: envKey, sk: envKey }).execute();
-    console.log(data);
-
-    // data should be of type GetItemCommandOutput--check it is and Item exists
-    if ('Item' in data && data.Item) {
-      // convert to Environment type
-      const item = data.Item;
-      const env: Environment = this._getEnvironmentDataFromEnvironmentItem(item);
-      console.log(env);
-      return env;
+  /**
+   * Get environment
+   * @param envId - Env Id of env to retrieve
+   * @param includeMetadata - If true we get all entries where pk = envId, instead of just the entry where pk = envId and sk = envId
+   */
+  public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
+    const envAttKey = this._createEnvKey(envId);
+    const envKey = `ENV#${envId}`;
+    if (includeMetadata) {
+      const data = await this._aws.helpers.ddb.query({ key: { name: 'pk', value: envAttKey } }).execute();
+      const items = data.Items!.map((item) => {
+        return unmarshall(item);
+      });
+      console.log('items', items);
+      let envWithMetadata: Environment = { ...defaultEnv };
+      for (const item of items) {
+        if (item.sk === envKey) {
+          envWithMetadata = { ...envWithMetadata, ...item };
+        } else {
+          // @ts-ignore
+          envWithMetadata[item.sk.split('#')[0]] = item;
+        }
+      }
+      return envWithMetadata;
     } else {
-      throw new Error(`Did not get an item returned when trying to get env ${envId}`);
+      const data = await this._aws.helpers.ddb.get({ pk: envAttKey, sk: envAttKey }).execute();
+      // data should be of type GetItemCommandOutput--check it is and Item exists
+      if ('Item' in data && data.Item) {
+        const getItemOutput: GetItemCommandOutput = data;
+        return this._getEnvironmentDataFromEnvironmentItem(getItemOutput.Item!);
+      } else {
+        throw new Error(`Did not get an item returned when trying to get env ${envId}`);
+      }
     }
   }
 
@@ -137,7 +187,7 @@ export default class EnvironmentService {
       instanceId: item.instanceId ? item.instanceId.S : undefined,
       cidr: item.cidr.S ? item.cidr.S : '',
       description: item.description.S ? item.description.S : '',
-      error: item.error.S ? item.error.S : '',
+      error: undefined, // TODO: Get error value from DDB and parse it
       name: item.name.S ? item.name.S : 'Unknown name',
       outputs: item.outputs.L ? this._parseOutputs(item.outputs.L) : [],
       projectId: item.projectId.S ? item.projectId.S : 'Unknown project',
@@ -304,24 +354,7 @@ export default class EnvironmentService {
     accountItem: { [key: string]: AttributeValue }
   ): Promise<BatchWriteItemCommandOutput> {
     // create items (some of these values will likely need to be passed in by the createEnvironment method)
-    const newEnv: Environment = {
-      envId: envId,
-      instanceId: '',
-      cidr: '',
-      description: desc,
-      error: '',
-      name: name,
-      outputs: [],
-      projectId: projectId,
-      rev: 0,
-      status: 'PENDING',
-      studyIds: studyIds,
-      envType: envType,
-      envTypeId: envTypeId,
-      envTypeConfigId: envTypeConfigId,
-      indexId: indexId,
-      updatedAt: ''
-    };
+    const newEnv: Environment = { ...defaultEnv };
     const items: { [key: string]: AttributeValue }[] = [];
     // add account metadata (should not have all account attributes)
     items.push(accountItem);

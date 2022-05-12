@@ -32,7 +32,6 @@ const apiRouteConfig: ApiRouteConfig = {
     AMI_IDS_TO_SHARE: process.env.AMI_IDS_TO_SHARE!
   }),
   environmentService: new EnvironmentService({
-    AWS_REGION: process.env.AWS_REGION!,
     TABLE_NAME: process.env.STACK_NAME!
   })
 };
