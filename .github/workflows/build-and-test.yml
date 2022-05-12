@@ -36,9 +36,6 @@ jobs:
       - name: Update root README file with common coverage badge
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
-
-      - name: echo modified files
-        run: git status
       
       - name: Update package info in root README file
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
@@ -48,6 +45,9 @@ jobs:
           if [[ $exit_status != 0 ]]; then
             node ../../../common/scripts/install-run-rushx.js readme
           fi
+
+      - name: echo modified files
+        run: git status
 
       - name: Auto commit updated README files
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
