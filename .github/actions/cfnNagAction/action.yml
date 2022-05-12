@@ -19,7 +19,6 @@ runs:
         node ../../../common/scripts/install-run-rushx.js cdk synth
 
     - name: Run cfn-nag on swb-reference cdk.out
-      shell: bash
       id: cdk-swb-reference
       uses: stelligent/cfn_nag@master
       with:
@@ -27,7 +26,6 @@ runs:
         extra_args: --fail-on-warnings -o json
 
     - name: Run cfn-nag on example cdk.out
-      shell: bash
       id: cdk-example
       uses: stelligent/cfn_nag@master
       with:
@@ -35,7 +33,6 @@ runs:
         extra_args: --fail-on-warnings -o json
 
     - name: Run cfn-nag on onboarding template
-      shell: bash
       id: template
       uses: stelligent/cfn_nag@master
       with:
@@ -43,7 +40,6 @@ runs:
         extra_args: --fail-on-warnings -o json
         
     - name: Grep cfn-nag for violations
-      shell: bash
       uses: sergeysova/jq-action@v2
       id: cfn-nag
       # No. of violations: warnings + errors
