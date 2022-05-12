@@ -130,7 +130,6 @@ importers:
       '@amzn/swb-app': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
-      '@aws-sdk/client-dynamodb': ^3.67.0
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-sagemaker': ^3.58.0
       '@aws-sdk/client-service-catalog': ^3.58.0
@@ -176,7 +175,6 @@ importers:
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@aws-sdk/client-cloudformation': 3.82.0
-      '@aws-sdk/client-dynamodb': 3.82.0
       '@aws-sdk/client-s3': 3.83.0
       '@aws-sdk/client-sagemaker': 3.87.0
       '@aws-sdk/client-service-catalog': 3.82.0
@@ -1233,6 +1231,7 @@ packages:
       '@aws-sdk/util-waiter': 3.78.0
       tslib: 2.4.0
       uuid: 8.3.2
+    dev: false
 
   /@aws-sdk/client-ec2/3.83.0:
     resolution: {integrity: sha512-HQ+mA61wIU4M67muMPIdJkknKKSbMHHB3Q+5GtlwE760NellZBd02+aN9wkpv6OiCl7fOmRi0xusWIxfgIRpEA==}
@@ -1859,6 +1858,7 @@ packages:
     dependencies:
       mnemonist: 0.38.3
       tslib: 2.4.0
+    dev: false
 
   /@aws-sdk/eventstream-marshaller/3.78.0:
     resolution: {integrity: sha512-BMbRvLe6wNWQ+NO1pdPw3kGXXEdYV94BxEr3rTkKwr5yHpl8sUb/Va9sJJufUjzggpgE4vYu5nVsrT8ByMYXuA==}
@@ -1980,6 +1980,7 @@ packages:
       '@aws-sdk/protocol-http': 3.78.0
       '@aws-sdk/types': 3.78.0
       tslib: 2.4.0
+    dev: false
 
   /@aws-sdk/middleware-expect-continue/3.78.0:
     resolution: {integrity: sha512-IXfcSugFV3uNk50VQsN/Cm80iCsUSwcYJ5RzEwy7wXbZ+KM03xWXlbXzqkeTDnS74wLWSw09nKF3rkp1eyfDfg==}
@@ -9188,6 +9189,7 @@ packages:
     resolution: {integrity: sha512-2K9QYubXx/NAjv4VLq1d1Ly8pWNC5L3BrixtdkyTegXWJIqY+zLNDhhX/A+ZwWt70tB1S8H4BE8FLYEFyNoOBw==}
     dependencies:
       obliterator: 1.6.1
+    dev: false
 
   /mnth/2.0.0:
     resolution: {integrity: sha512-3ZH4UWBGpAwCKdfjynLQpUDVZWMe6vRHwarIpMdGLUp89CVR9hjzgyWERtMyqx+fPEqQ/PsAxFwvwPxLFxW40A==}
@@ -9437,6 +9439,7 @@ packages:
 
   /obliterator/1.6.1:
     resolution: {integrity: sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==}
+    dev: false
 
   /on-finished/2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
