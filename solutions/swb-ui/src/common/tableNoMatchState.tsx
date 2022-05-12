@@ -11,7 +11,7 @@ import { Box, Button } from '@awsui/components-react';
  * ```
  * @returns no match information
  */
-export function TableNoMatchDisplay(item: string) {
+export function TableNoMatchDisplay(item: string): JSX.Element {
   return (
     <Box textAlign="center" color="inherit">
       <b>No matches</b>

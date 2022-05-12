@@ -15,10 +15,15 @@ In the project directory, ensure all dependencies are installed. Run:
 rush update
 rush build
 ```
-Run the development server:
+Run the server:
 
 ```
 rushx start
+```
+
+If needed, run the development server with:
+```
+yarn dev
 ```
 
 ## App

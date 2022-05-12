@@ -1,18 +1,17 @@
-const headerLabel = (title: string, sorted: boolean, descending: boolean) => {
-  return `${title}, ${sorted ? `sorted ${descending ? 'descending' : 'ascending'}` : 'not sorted'}.`;
+import { AppLayoutProps, PaginationProps, PropertyFilterProps } from '@awsui/components-react';
+
+export const layoutLabels: AppLayoutProps.Labels = {
+  navigation: 'Navigation drawer',
+  navigationClose: 'Close navigation drawer',
+  navigationToggle: 'Open navigation drawer',
+  notifications: 'Notifications',
+  tools: 'Help panel',
+  toolsClose: 'Close help panel',
+  toolsToggle: 'Open help panel'
 };
 
-export const addColumnSortLabels = (columns: any[]) =>
-  columns.map((col) => ({
-    ariaLabel: col.sortingField
-      ? (sortState: { sorted: boolean; descending: boolean }) =>
-          headerLabel(col.header, sortState.sorted, sortState.descending)
-      : undefined,
-    ...col
-  }));
-
 // i18nStrings labels for <PropertyFilter>
-export const i18nStrings = {
+export const i18nStrings: PropertyFilterProps.I18nStrings = {
   filteringAriaLabel: 'your choice',
   dismissAriaLabel: 'Dismiss',
   filteringPlaceholder: 'Search',
@@ -40,10 +39,10 @@ export const i18nStrings = {
   tokenLimitShowFewer: 'Show fewer',
   clearFiltersText: 'Clear filters',
   removeTokenButtonAriaLabel: () => 'Remove token',
-  enteredTextLabel: (text: any) => `Use: "${text}"`
+  enteredTextLabel: (text: string) => `Use: "${text}"`
 };
 
-export const paginationLables = {
+export const paginationLables: PaginationProps.Labels = {
   nextPageLabel: 'Next page',
   previousPageLabel: 'Previous page',
   pageLabel: (pageNumber: number) => `Page ${pageNumber} of all pages`
