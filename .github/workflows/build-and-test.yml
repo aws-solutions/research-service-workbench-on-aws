@@ -26,19 +26,23 @@ jobs:
         run: echo "${{ steps.last-commit-message.outputs.msg }}"
 
       - name: Base Action
-        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: ./.github/actions/baseAction
       
       - name: Rush test and update the README file in each package with the coverage badge
-        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: node common/scripts/install-run-rush.js test --verbose
 
+      - name: cfn-nag Action
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        uses: ./.github/actions/cfnNagAction
+
       - name: Update root README file with common coverage badge
-        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
       
       - name: Update package info in root README file
-        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
           node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
@@ -47,13 +51,14 @@ jobs:
           fi
 
       - name: echo modified files
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: git status
 
       - name: Auto commit updated README files
-        if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
+        if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "doc: README.md updates by github-actions[bot]"
+          commit_message: "README.md updates by github-actions[bot]"
           commit_options: '--no-verify'
           file_pattern: "README.md **/README.md"
 
