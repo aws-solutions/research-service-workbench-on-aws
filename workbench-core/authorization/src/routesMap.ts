@@ -32,6 +32,20 @@ export interface RoutesIgnored {
 }
 /**
  * Maps a Route to a {@link MethodToOperations}
+ *
+ * @example
+ * ```
+ * const routeMap:RouteMap = {
+ *  '/sample': {
+ *      GET: [
+ *        {
+ *        action: Action.UPDATE,
+ *        subject: 'Sample'
+ *        }
+ *    ]
+ *  }
+ * }
+ * ```
  */
 export default interface RoutesMap {
   [route: string]: MethodToOperations;
