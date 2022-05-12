@@ -66,6 +66,7 @@ export default class AccountHandler {
 
   // eslint-disable-next-line
   private async _getMetadataFromDB(): Promise<{ [key: string]: any }> {
+    // TODO: Update this
     // TODO: Get this data from DDB
     return Promise.resolve({
       externalId: 'workbench',

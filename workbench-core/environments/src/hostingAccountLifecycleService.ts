@@ -147,6 +147,7 @@ export default class HostingAccountLifecycleService {
     subnetId: string | undefined;
   }): Promise<void> {
     console.log('_writeAccountStatusToDDB param', param);
+    // TODO: Update this
     // TODO: Write above values to DDB. If vpcId or subnetId is undefined, don't write those 2 values to DDB
   }
 
@@ -250,6 +251,7 @@ export default class HostingAccountLifecycleService {
     envManagementRoleArn: string;
     accountHandlerRoleArn: string;
   }): Promise<void> {
+    // TODO: Update this
     // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
     // Don't forget to store the external ID used during onboarding
     return Promise.resolve();
