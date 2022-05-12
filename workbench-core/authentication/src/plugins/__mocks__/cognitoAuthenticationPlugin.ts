@@ -1,6 +1,8 @@
 import { AuthenticationPlugin } from '../../authenticationPlugin';
+import { CognitoAuthenticationPluginOptions } from '../cognitoAuthenticationPlugin';
 
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
+  public constructor(options: CognitoAuthenticationPluginOptions) {}
   public isUserLoggedIn(token: string): boolean {
     if (token) {
       return true;

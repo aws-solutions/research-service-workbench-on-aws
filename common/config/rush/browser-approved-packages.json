@@ -183,6 +183,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "aws-jwt-verify",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "aws-lambda",
       "allowedCategories": [ "production" ]
     },
@@ -260,6 +264,10 @@
     },
     {
       "name": "js-yaml",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "jsonwebtoken",
       "allowedCategories": [ "production" ]
     },
     {

@@ -40,7 +40,7 @@ export interface AuthenticationPlugin {
 
   /**
    * Get any roles associated with a user for whom a token was issued.
-   * @param token - an Id or access token form which to find the user's role(s)
+   * @param token - an Id or access token from which to find the user's role(s)
    * @returns list of roles included in the jwt token.
    */
   getUserRolesFromToken(token: string): string[];

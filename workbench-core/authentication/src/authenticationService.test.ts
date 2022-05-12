@@ -1,16 +1,25 @@
 jest.mock('./plugins/cognitoAuthenticationPlugin');
 
-import { AuthenticationService, CognitoAuthenticationPlugin } from '.';
+import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticationPluginOptions } from '.';
+
+const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
+  region: 'us-west-2',
+  authDomain: 'test',
+  userPoolId: 'us-west-2_dgasfgdsf',
+  clientId: 'asgt435f4623',
+  clientSecret: 'fdhrtywer656etrhrtue65yfgh465',
+  redirectUri: 'https://www.example.com'
+};
 
 describe('AuthenticationService tests', () => {
   it('constructor should set the private _authenticationPlugin field to the authenticationPlugin parameter', () => {
-    const authnService = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const authnService = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     expect(authnService['_authenticationPlugin']).toBeInstanceOf(CognitoAuthenticationPlugin); // nosemgrep
   });
 
   it('isUserLoggedIn should be true when a valid token is passed in', () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = service.isUserLoggedIn('valid token');
 
@@ -18,7 +27,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('isUserLoggedIn should be false when an invalid token is passed in', () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = service.isUserLoggedIn('');
 
@@ -26,7 +35,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('validateToken should return an array of records for the given token', () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = service.validateToken('valid token');
 
@@ -36,7 +45,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('revokeToken should successfully call the plugins revokeToken() method', () => {
-    const pi = new CognitoAuthenticationPlugin();
+    const pi = new CognitoAuthenticationPlugin(cognitoPluginOptions);
     const service = new AuthenticationService(pi);
 
     const revokeSpy = jest.spyOn(pi, 'revokeToken');
@@ -46,7 +55,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('getUserIdFromToken should return the tokens user id', () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = service.getUserIdFromToken('valid token');
 
@@ -54,7 +63,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('getUserRolesFromToken should return the tokens roles', () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = service.getUserRolesFromToken('valid token');
 
@@ -62,7 +71,7 @@ describe('AuthenticationService tests', () => {
   });
 
   it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens', async () => {
-    const service = new AuthenticationService(new CognitoAuthenticationPlugin());
+    const service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
 
     const result = await service.handleAuthorizationCode('access code');
 
