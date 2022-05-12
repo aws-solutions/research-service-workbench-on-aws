@@ -22,22 +22,22 @@ jobs:
         run: |
           echo "::set-output name=msg::$(git log -1 --pretty=%s)"
 
-      - name: echo commit message
+      - name: echo commit message 
         run: echo "${{ steps.last-commit-message.outputs.msg }}"
 
       - name: Base Action
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         uses: ./.github/actions/baseAction
       
-      - name: Rush test
+      - name: Rush test and update the README file in each package with the coverage badge
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: node common/scripts/install-run-rush.js test --verbose
 
-      - name: Generate Common Coverage
+      - name: Update root README file with common coverage badge
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
 
-      - name: echo git status
+      - name: echo modified files
         run: git status
       
       - name: Update package info in root README file
@@ -49,7 +49,7 @@ jobs:
             node ../../../common/scripts/install-run-rushx.js readme
           fi
 
-      - name: Auto commit README files
+      - name: Auto commit updated README files
         if: "! contains(steps.last-commit-message.outputs.msg, 'README.md updates by github-actions[bot]')"
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
