@@ -4,56 +4,56 @@ description: runs cfn-nag
 runs:
   using: "composite"
   steps:
-  - name: cdk synth swb-reference
-    shell: bash
-    run: |
-      cd solutions/swb-reference
-      node ../../common/scripts/install-run-rushx.js compile
-      STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
+    - name: cdk synth swb-reference
+      shell: bash
+      run: |
+        cd solutions/swb-reference
+        node ../../common/scripts/install-run-rushx.js compile
+        STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
-  - name: cdk synth example
-    shell: bash
-    run: |
-      cd workbench-core/example/infrastructure
-      node ../../../common/scripts/install-run-rushx.js compile
-      node ../../../common/scripts/install-run-rushx.js cdk synth
+    - name: cdk synth example
+      shell: bash
+      run: |
+        cd workbench-core/example/infrastructure
+        node ../../../common/scripts/install-run-rushx.js compile
+        node ../../../common/scripts/install-run-rushx.js cdk synth
 
-  - name: Run cfn-nag on swb-reference cdk.out
-    shell: bash
-    id: cdk-swb-reference
-    uses: stelligent/cfn_nag@master
-    with:
-      input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
-      extra_args: --fail-on-warnings -o json
+    - name: Run cfn-nag on swb-reference cdk.out
+      shell: bash
+      id: cdk-swb-reference
+      uses: stelligent/cfn_nag@master
+      with:
+        input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
+        extra_args: --fail-on-warnings -o json
 
-  - name: Run cfn-nag on example cdk.out
-    shell: bash
-    id: cdk-example
-    uses: stelligent/cfn_nag@master
-    with:
-      input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
-      extra_args: --fail-on-warnings -o json
+    - name: Run cfn-nag on example cdk.out
+      shell: bash
+      id: cdk-example
+      uses: stelligent/cfn_nag@master
+      with:
+        input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
+        extra_args: --fail-on-warnings -o json
 
-  - name: Run cfn-nag on onboarding template
-    shell: bash
-    id: template
-    uses: stelligent/cfn_nag@master
-    with:
-      input_path: solutions/swb-reference/src/templates
-      extra_args: --fail-on-warnings -o json
-      
-  - name: Grep cfn-nag for violations
-    shell: bash
-    uses: sergeysova/jq-action@v2
-    id: cfn-nag
-    # No. of violations: warnings + errors
-    with:
-      cmd: jq '.[].file_results.violations | length' cfn_nag.out
+    - name: Run cfn-nag on onboarding template
+      shell: bash
+      id: template
+      uses: stelligent/cfn_nag@master
+      with:
+        input_path: solutions/swb-reference/src/templates
+        extra_args: --fail-on-warnings -o json
+        
+    - name: Grep cfn-nag for violations
+      shell: bash
+      uses: sergeysova/jq-action@v2
+      id: cfn-nag
+      # No. of violations: warnings + errors
+      with:
+        cmd: jq '.[].file_results.violations | length' cfn_nag.out
 
-  - name: echo violation count
-    shell: bash
-    run: echo ${{ steps.cfn-nag.outputs.value }}
+    - name: echo violation count
+      shell: bash
+      run: echo ${{ steps.cfn-nag.outputs.value }}
 
-  # - name: Fail if violations detected in cfn-nag
-  #   shell: bash
-  #   run: exit ${{ steps.cfn-nag.outputs.value }}
+    # - name: Fail if violations detected in cfn-nag
+    #   shell: bash
+    #   run: exit ${{ steps.cfn-nag.outputs.value }}
