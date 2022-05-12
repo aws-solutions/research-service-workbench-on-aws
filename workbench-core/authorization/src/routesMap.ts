@@ -3,17 +3,16 @@ import Operation from './operation';
 /**
  * HTTP methods.
  */
-export enum HTTPMethod {
-  GET = 'GET',
-  DELETE = 'DELETE',
-  CONNECT = 'CONNECT',
-  HEAD = 'HEAD',
-  OPTIONS = 'OPTIONS',
-  PATCH = 'PATCH',
-  POST = 'POST',
-  PUT = 'PUT',
-  TRACE = 'TRACE'
-}
+export type HTTPMethod =
+  | 'GET'
+  | 'DELETE'
+  | 'CONNECT'
+  | 'HEAD'
+  | 'OPTIONS'
+  | 'PATCH'
+  | 'POST'
+  | 'PUT'
+  | 'TRACE';
 
 /**
  * Maps {@link HTTPMethod} to a set of {@link Operation}s.
