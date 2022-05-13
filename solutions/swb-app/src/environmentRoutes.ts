@@ -55,16 +55,23 @@ export function setUpEnvRoutes(router: Router, environments: { [key: string]: En
 
   // Get environment connection creds
   router.get('/environments/:id/connections', async (req: Request, res: Response) => {
-    // Mocked getEnvironment
-    const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
+    // Mocked getEnvironment from DDB
+    const getEnvironment = (
+      envId: string
+    ): { envType: string; instanceName: string; roleArn: string; externalId: string } => {
       console.log('envId', envId);
-      return { envType: 'sagemaker', instanceName: 'BasicNotebookInstance-juLcUavyKDQo' };
+      return {
+        envType: 'sagemaker',
+        instanceName: 'BasicNotebookInstance-juLcUavyKDQo',
+        roleArn: 'arn:aws:iam::<HOSTING-ACCOUNT-ID>:role/swb-dev-oh-env-mgmt',
+        externalId: 'workbench'
+      };
     };
-    const { envType, instanceName } = getEnvironment(req.params.id);
+    const { envType, instanceName, roleArn, externalId } = getEnvironment(req.params.id);
     if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
       const context = {
-        roleArn: 'arn:aws:iam::<HOSTING-ACCOUNT-ID>:role/swb-dev-oh-env-mgmt',
-        externalId: process.env.EXTERNAL_ID
+        roleArn,
+        externalId
       };
       // We check that envType is in list of supportedEnvs before calling the environments object
       // eslint-disable-next-line security/detect-object-injection
