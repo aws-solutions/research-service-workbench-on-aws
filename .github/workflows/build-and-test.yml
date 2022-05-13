@@ -4,10 +4,8 @@
 #
 
 name: Build-and-test
-on:
-  pull_request:
-    paths-ignore:
-      - '**/README.md'
+on: ['pull_request']
+
 
 jobs:
   build-and-test:
@@ -20,13 +18,12 @@ jobs:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
       
-      # - name: Get last commit message
-      #   id: last-commit-message
-      #   run: |
-      #     echo "::set-output name=msg::$(git log -1 --pretty=%s)"
-
-      # - name: echo commit message 
-      #   run: echo "${{ steps.last-commit-message.outputs.msg }}"
+      - name: Get specific changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v19
+        with:
+          files: |
+            **/README.md
 
       - name: Base Action
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
@@ -37,22 +34,27 @@ jobs:
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Cfn-nag Action
+        # if: steps.changed-files-specific.outputs.only_changed == 'false'
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: ./.github/actions/cfnNagAction
 
       - name: Git-secrets Action
+        # if: steps.changed-files-specific.outputs.only_changed == 'false'
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: ./.github/actions/gitSecretsAction
 
       - name: Viperlight Action
+        # if: steps.changed-files-specific.outputs.only_changed == 'false'
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: ./.github/actions/viperlightAction
 
       - name: Update root README file with common coverage badge
+        # if: steps.changed-files-specific.outputs.only_changed == 'false'
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
       
       - name: Update package info in root README file
+        # if: steps.changed-files-specific.outputs.only_changed == 'true'
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
@@ -72,4 +74,6 @@ jobs:
           commit_message: "README.md updates by github-actions[bot]"
           commit_options: '--no-verify'
           file_pattern: "README.md **/README.md"
+
+          
 
