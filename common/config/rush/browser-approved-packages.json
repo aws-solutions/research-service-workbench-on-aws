@@ -71,6 +71,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/util-dynamodb",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
       "allowedCategories": [ "prototypes" ]
     },

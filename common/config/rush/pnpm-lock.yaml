@@ -366,6 +366,7 @@ importers:
       '@types/jest': ^27.4.1
       '@types/lodash': ^4.14.181
       '@types/node': ^12
+      '@types/uuid': ^8.3.4
       aws-sdk-client-mock: ^0.6.2
       eslint: ^8.7.0
       generate-password: ^1.7.0
@@ -375,6 +376,7 @@ importers:
       md5-file: ^5.0.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@amzn/workbench-core-base': link:../base
       '@aws-sdk/client-cloudformation': 3.78.0
@@ -391,6 +393,7 @@ importers:
       generate-password: 1.7.0
       lodash: 4.17.21
       md5-file: 5.0.0
+      uuid: 8.3.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/types': 3.78.0
@@ -402,6 +405,7 @@ importers:
       '@types/jest': 27.4.1
       '@types/lodash': 4.14.182
       '@types/node': 12.20.50
+      '@types/uuid': 8.3.4
       aws-sdk-client-mock: 0.6.2_3fb008a70ba24880f14732bae32e5553
       eslint: 8.14.0
       istanbul-badges-readme: 1.8.1
