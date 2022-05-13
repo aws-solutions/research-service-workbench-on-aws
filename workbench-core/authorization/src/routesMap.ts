@@ -38,7 +38,7 @@ export interface RoutesIgnored {
  *  '/sample': {
  *      GET: [
  *        {
- *        action: Action.UPDATE,
+ *        action: 'READ',
  *        subject: 'Sample'
  *        }
  *    ]
