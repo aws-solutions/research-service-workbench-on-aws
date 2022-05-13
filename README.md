@@ -28,8 +28,6 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
-| [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
-| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
