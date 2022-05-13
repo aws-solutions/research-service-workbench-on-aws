@@ -18,12 +18,12 @@ jobs:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
       
-      - name: Get specific changed files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v19
-        with:
-          files: |
-            **/README.md
+      # - name: Get specific changed files
+      #   id: changed-files-specific
+      #   uses: tj-actions/changed-files@v19
+      #   with:
+      #     files: |
+      #       **/README.md
 
       - name: Base Action
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
