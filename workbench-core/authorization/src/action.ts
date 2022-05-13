@@ -1,9 +1,4 @@
 /**
  * Actions that can be performed.
  */
-export enum Action {
-  CREATE = 'create',
-  READ = 'read',
-  UPDATE = 'update',
-  DELETE = 'delete'
-}
+export type Action = 'CREATE' | 'READ' | 'UPDATE' | 'DELETE';

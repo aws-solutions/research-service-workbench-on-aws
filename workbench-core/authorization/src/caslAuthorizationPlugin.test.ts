@@ -1,6 +1,5 @@
 import { ForbiddenError } from '@casl/ability';
-import CASLAuthorizationPlugin from './caslAuthorizationPlugin';
-import { Action, Operation, Permission } from '.';
+import { Operation, Permission, CASLAuthorizationPlugin } from '.';
 import { fc, itProp } from 'jest-fast-check';
 
 describe('CASL Authorization Plugin', () => {
@@ -13,12 +12,12 @@ describe('CASL Authorization Plugin', () => {
     beforeEach(() => {
       mockAdminPermissions = [
         {
-          action: Action.UPDATE,
+          action: 'UPDATE',
           subject: 'Sample',
           effect: 'ALLOW'
         },
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           effect: 'ALLOW',
           fields: ['name', 'id']
@@ -26,19 +25,19 @@ describe('CASL Authorization Plugin', () => {
       ];
       mockGuestPermissions = [
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           effect: 'ALLOW',
           fields: ['name']
         },
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           effect: 'DENY',
           fields: ['id']
         },
         {
-          action: Action.UPDATE,
+          action: 'UPDATE',
           subject: 'Sample',
           effect: 'DENY',
           reason: 'User is not capable of updating'
@@ -50,7 +49,7 @@ describe('CASL Authorization Plugin', () => {
     test('unauthorized user with action and subject should throws ForbiddenError with reason', async () => {
       mockOperations = [
         {
-          action: Action.UPDATE,
+          action: 'UPDATE',
           subject: 'Sample'
         }
       ];
@@ -65,7 +64,7 @@ describe('CASL Authorization Plugin', () => {
     test('authorized user with action and subject', async () => {
       mockOperations = [
         {
-          action: Action.UPDATE,
+          action: 'UPDATE',
           subject: 'Sample'
         }
       ];
@@ -77,7 +76,7 @@ describe('CASL Authorization Plugin', () => {
     test('unauthorized user with action, subject, and field, should throw ForbiddenError', async () => {
       mockOperations = [
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           field: 'id'
         }
@@ -94,12 +93,12 @@ describe('CASL Authorization Plugin', () => {
     test('authorized user with action, subject, and field', async () => {
       mockOperations = [
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           field: 'id'
         },
         {
-          action: Action.READ,
+          action: 'READ',
           subject: 'Sample',
           field: 'name'
         }
@@ -111,7 +110,7 @@ describe('CASL Authorization Plugin', () => {
 
     test('unauthorized user with action and subject not listed in the permissions', async () => {
       const testSubject = 'DoesNotExist';
-      const testAction = Action.READ;
+      const testAction = 'READ';
       mockOperations = [
         {
           action: testAction,

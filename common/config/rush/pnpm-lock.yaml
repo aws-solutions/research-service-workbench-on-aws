@@ -356,17 +356,20 @@ importers:
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/heft-jest': 1.0.2
+      '@types/lodash': ^4.14.181
       '@types/node': ^14
       eslint: ^8.7.0
       fast-check: ^2.24.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
+      lodash: ^4.17.21
       typescript: ^4.5.2
     dependencies:
       '@amzn/workbench-core-authentication': link:../authentication
       '@amzn/workbench-core-logging': link:../logging
       '@casl/ability': 5.4.3
+      lodash: 4.17.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.4
@@ -374,6 +377,7 @@ importers:
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.1
       '@rushstack/heft-node-rig': 1.9.2_@rushstack+heft@0.45.1
       '@types/heft-jest': 1.0.2
+      '@types/lodash': 4.14.182
       '@types/node': 14.18.16
       eslint: 8.14.0
       fast-check: 2.25.0
