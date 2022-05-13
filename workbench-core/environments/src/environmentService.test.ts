@@ -6,25 +6,35 @@ describe('EnvironmentService', () => {
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
   });
-  // test('getEnvironment', async () => {
-  //   const environmentService = new EnvironmentService({
-  //     TABLE_NAME: 'swb-dev1-va'
-  //   });
-  //   const data = await environmentService.getEnvironment('1234-test');
-  //   console.log('data', data);
-  // });
-  test('getEnvironment, getAllAttribute', async () => {
+  test('getEnvironment, includeMetadata = true', async () => {
     const environmentService = new EnvironmentService({
       TABLE_NAME
     });
     const data = await environmentService.getEnvironment('1234-test', true);
     console.log('data', data);
   });
-  // test('getEnvironments does not return an error', async () => {
-  //   const environmentService = new EnvironmentService({ TABLE_NAME });
-  //   const data = await environmentService.getEnvironments({ userRole: 'admin' });
-  //   console.log('data', data);
-  // });
+  test('getEnvironment, includeMetadata = false', async () => {
+    const environmentService = new EnvironmentService({
+      TABLE_NAME
+    });
+    const data = await environmentService.getEnvironment('1234-test', false);
+    console.log('data', data);
+  });
+  test('getEnvironments as admin', async () => {
+    const environmentService = new EnvironmentService({ TABLE_NAME });
+    const data = await environmentService.getEnvironments({ role: 'admin', ownerId: 'abc' });
+    console.log('data', data);
+  });
+  test('getEnvironments as admin, filtered by pending', async () => {
+    const environmentService = new EnvironmentService({ TABLE_NAME });
+    const data = await environmentService.getEnvironments(
+      { role: 'admin', ownerId: 'abc' },
+      {
+        status: 'PENDING'
+      }
+    );
+    console.log('data', data);
+  });
   // test('getEnvironmentAndMetadata does not return an error', async () => {
   //   const environmentService = new EnvironmentService({AWS_REGION: 'us-east-1',TABLE_NAME: 'swb-dev1-va-table'});
   //   const data = await environmentService.getEnvironmentAndMetadata('TEST');

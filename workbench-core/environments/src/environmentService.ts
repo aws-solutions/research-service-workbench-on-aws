@@ -1,20 +1,9 @@
 /* eslint-disable security/detect-object-injection */
-// import { AwsService, DynamoDBService } from '@amzn/workbench-core-base';
-// import {
-//   QueryCommandOutput,
-//   ScanCommandOutput,
-//   GetItemCommandOutput,
-//   BatchGetItemCommandOutput,
-//   AttributeValue,
-//   UpdateItemCommandOutput,
-//   DeleteItemCommandOutput,
-//   BatchWriteItemCommandOutput
-// } from '@aws-sdk/client-dynamodb';
+
 import { AttributeValue, BatchWriteItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
-
-// import AccountsService from './accountsService';
+import EnvironmentStatus from './environmentStatus';
 
 import _ from 'lodash';
 
@@ -81,17 +70,6 @@ const envKeyToAbrevMapping: { [key: string]: string } = {
   account: 'ACC'
 };
 
-const statusMapping: string[] = [
-  'PENDING',
-  'COMPLETED',
-  'STARTING',
-  'STARTED',
-  'STOPPING',
-  'STOPPED',
-  'TERMINATING',
-  'TERMINATED'
-];
-
 interface QueryParams {
   index?: string;
   key?: { name: string; value: AttributeValue };
@@ -138,7 +116,6 @@ export default class EnvironmentService {
       const items = data.Items!.map((item) => {
         return unmarshall(item);
       });
-      console.log('items', items);
       let envWithMetadata: Environment = { ...defaultEnv };
       for (const item of items) {
         if (item.sk === envKey) {
@@ -151,6 +128,7 @@ export default class EnvironmentService {
       return envWithMetadata;
     } else {
       const data = await this._aws.helpers.ddb.get({ pk: envAttKey, sk: envAttKey }).execute();
+      // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
       // data should be of type GetItemCommandOutput--check it is and Item exists
       if ('Item' in data && data.Item) {
         const getItemOutput: GetItemCommandOutput = data;
@@ -181,6 +159,7 @@ export default class EnvironmentService {
     return outputList;
   }
 
+  // TODO: Refactor this method after marshall/unmarshall has been added
   private _getEnvironmentDataFromEnvironmentItem(item: { [key: string]: AttributeValue }): Environment {
     const env: Environment = {
       envId: item.id.S,
@@ -205,59 +184,61 @@ export default class EnvironmentService {
     return env;
   }
 
-  // TODO: limit and paginationToken will be used for next task
-  // TODO: create list of supported fitlers with Tim
+  // TODO: Implement limit and paginationToken will be used for next task
+  /**
+   * Get all environments with option to filter by status
+   * @param user - User information
+   * @param filter
+   * @param limit
+   * @param paginationToken
+   */
   public async getEnvironments(
-    filter: { status?: string; userRole: string },
+    user: { role: string; ownerId: string },
+    filter?: { status?: EnvironmentStatus },
     limit?: number,
     paginationToken?: number
   ): Promise<Environment[]> {
     let environments: Environment[] = [];
-    let usedUpdatedAtToQuery: boolean = false;
     let data;
 
-    if (filter.status && filter.userRole === 'admin') {
-      // if admin and status is selected in the filter, use GSI getResourceByStatus
-      const queryParams: QueryParams = {
-        index: 'getResourceByStatus',
-        key: { name: 'resourceType', value: { S: 'environment' } },
-        sortKey: 'status',
-        eq: { N: `${statusMapping.indexOf(filter.status)}` }
-      };
-      data = await this._aws.helpers.ddb.query(queryParams).execute();
-    } else if (filter.userRole === 'admin') {
-      // if admin, use GSI getResourceByUpdatedAt--for now, use filter. TODO: use requestContext.
-      const queryParams: QueryParams = {
-        index: 'getResourceByUpdatedAt',
-        key: { name: 'resourceType', value: { S: 'environment' } }
-      };
-      data = await this._aws.helpers.ddb.query(queryParams).execute();
-      usedUpdatedAtToQuery = true;
+    if (user.role === 'admin') {
+      if (filter && filter.status) {
+        // if admin and status is selected in the filter, use GSI getResourceByStatus
+        const queryParams: QueryParams = {
+          index: 'getResourceByStatus',
+          key: { name: 'resourceType', value: { S: 'environment' } },
+          sortKey: 'status',
+          eq: { S: filter.status }
+        };
+        data = await this._aws.helpers.ddb.query(queryParams).execute();
+      } else {
+        // if admin, use GSI getResourceByUpdatedAt--for now, use filter. TODO: use requestContext.
+        const queryParams: QueryParams = {
+          index: 'getResourceByUpdatedAt',
+          key: { name: 'resourceType', value: { S: 'environment' } }
+        };
+        data = await this._aws.helpers.ddb.query(queryParams).execute();
+      }
     } else {
-      // if non admin, use GSI getResourceByOwner and pass the owner (current user/permissions/group) TODO: use requestContext
       const queryParams: QueryParams = {
         index: 'getResourceByOwner',
         key: { name: 'resourceType', value: { S: 'environment' } },
         sortKey: 'owner',
-        eq: { S: 'INSERTOWNERIDHERE' }
+        eq: { S: user.ownerId }
       };
       data = await this._aws.helpers.ddb.query(queryParams).execute();
     }
 
     // check that Items is defined
     if (data && data.Items) {
-      data.Items.forEach((item) => {
-        environments.push(this._getEnvironmentDataFromEnvironmentItem(item));
+      environments = data.Items.map((item) => {
+        return this._getEnvironmentDataFromEnvironmentItem(item);
       });
 
-      // if the query was not on getResourceByUpdatedAt, sort by UpdatedAt values of environments
-      if (!usedUpdatedAtToQuery) {
-        environments = _.sortBy(environments, [
-          function (env: Environment) {
-            return env.updatedAt;
-          }
-        ]);
-      }
+      // Always sort by UpdatedAt values for environments. Newest environment appear first
+      environments = environments.sort((envA, envB) => {
+        return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
+      });
     }
     return environments;
   }

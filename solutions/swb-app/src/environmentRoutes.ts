@@ -85,7 +85,7 @@ export function setUpEnvRoutes(
 
   // Get Environments
   router.get('/environments/:id', async (req: Request, res: Response) => {
-    const env = await environmentService.getEnvironment(req.params.id);
+    const env = await environmentService.getEnvironment(req.params.id, true);
     res.send(env);
   });
 }

@@ -1,4 +1,4 @@
-import { EnvironmentStatus } from './environmentStatus';
+import EnvironmentStatus from './environmentStatus';
 
 export default interface EventBridgeEventToDDB {
   eventTime: number;

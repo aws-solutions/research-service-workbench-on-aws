@@ -345,7 +345,6 @@ class Getter {
     }
 
     if (this._paramsItem) {
-      console.log('_paramsItem', this._paramsItem);
       return this._ddb.get(this._paramsItem);
     } else if (this._paramsBatch) {
       return this._ddb.batchGet(this._paramsBatch);
