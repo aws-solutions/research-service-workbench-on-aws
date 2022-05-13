@@ -1,0 +1,18 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Build-and-test
+on:
+  pull_request:
+    paths:
+      - 'README.md'
+      - '**/README.md'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: 'echo "No build required" '
+
