@@ -81,6 +81,8 @@ jobs:
         with:
           commit_message: "README.md updates by github-actions[bot]"
           commit_options: '--no-verify --gpg-sign'
+          commit_user_name: insignias # defaults to "github-actions[bot]"
+          commit_user_email: insignias@users.noreply.github.com
           file_pattern: "README.md **/README.md"
 
           
