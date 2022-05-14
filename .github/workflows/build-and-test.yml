@@ -24,38 +24,37 @@ jobs:
       #   with:
       #     files: |
       #       **/README.md
+      - name: Get last commit message
+        id: last-commit-message
+        run: |
+          echo "::set-output name=msg::$(git log -1 --pretty=format:'"%s" "%GS" "%GK"')"
 
       - name: Base Action
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/baseAction
       
       - name: Rush test and update the README file in each package with the coverage badge
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Cfn-nag Action
-        # if: steps.changed-files-specific.outputs.only_changed == 'false'
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/cfnNagAction
 
       - name: Git-secrets Action
-        # if: steps.changed-files-specific.outputs.only_changed == 'false'
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/gitSecretsAction
 
       - name: Viperlight Action
-        # if: steps.changed-files-specific.outputs.only_changed == 'false'
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/viperlightAction
 
       - name: Update root README file with common coverage badge
-        # if: steps.changed-files-specific.outputs.only_changed == 'false'
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
       
       - name: Update package info in root README file
-        # if: steps.changed-files-specific.outputs.only_changed == 'true'
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
           node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
@@ -64,10 +63,11 @@ jobs:
           fi
 
       - name: echo modified files
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: git status
 
       - name: Import GPG key
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -76,10 +76,10 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Auto commit updated README files
-        # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
+        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "README.md updates by github-actions[bot]"
+          commit_message: "docs: Auto README.md updates"
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: insignias # defaults to "github-actions[bot]"
           commit_user_email: insignias@users.noreply.github.com
