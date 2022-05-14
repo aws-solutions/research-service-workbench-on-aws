@@ -28,7 +28,7 @@ jobs:
       - name: Verify the auto commit message
         id: verify-commit-msg
         run: |
-          if [[ "${{ secrets.AUTO_COMMIT_MATCHER }}" != "${{ steps.last-commit-message.outputs.msg }}"]]; \
+          if [[ "${{ secrets.AUTO_COMMIT_MATCHER }}" != "${{ steps.last-commit-message.outputs.msg }}" ]];
           then
             echo "::set-output name=not-match::true"
           else
