@@ -67,12 +67,20 @@ jobs:
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         run: git status
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Auto commit updated README files
         # if: steps.last-commit-message.outputs.msg != 'README.md updates by github-actions[bot]'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "README.md updates by github-actions[bot]"
-          commit_options: '--no-verify'
+          commit_options: '--no-verify --gpg-sign'
           file_pattern: "README.md **/README.md"
 
           
