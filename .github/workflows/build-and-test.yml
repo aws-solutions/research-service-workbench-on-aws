@@ -6,7 +6,6 @@
 name: Build-and-test
 on: ['pull_request']
 
-
 jobs:
   verify-commit-msg:
     runs-on: ubuntu-20.04
@@ -38,7 +37,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-20.04
     needs: [verify-commit-msg]
-    if: needs.verify-commit-msg.outputs.not-match == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -47,24 +45,31 @@ jobs:
           token: ${{ secrets.MERGE_TOKEN }}
 
       - name: Base Action
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/baseAction
       
       - name: Rush test and update the README file in each package with the coverage badge
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Cfn-nag Action
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/cfnNagAction
 
       - name: Git-secrets Action
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/gitSecretsAction
 
       - name: Viperlight Action
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/viperlightAction
 
       - name: Update root README file with common coverage badge
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
       
       - name: Update package info in root README file
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
           node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
@@ -73,9 +78,11 @@ jobs:
           fi
 
       - name: echo modified files
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: git status
 
       - name: Import GPG key
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -84,6 +91,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Auto commit updated README files
+        if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs: Auto README.md updates"
