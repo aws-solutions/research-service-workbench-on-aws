@@ -8,53 +8,63 @@ on: ['pull_request']
 
 
 jobs:
-  build-and-test:
+  verify-commit-msg:
     runs-on: ubuntu-20.04
-
+    outputs:
+        not-match: ${{ steps.verify-commit-msg.outputs.not-match }}
+          
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with: 
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
-      
-      # - name: Get specific changed files
-      #   id: changed-files-specific
-      #   uses: tj-actions/changed-files@v19
-      #   with:
-      #     files: |
-      #       **/README.md
+
       - name: Get last commit message
         id: last-commit-message
         run: |
           echo "::set-output name=msg::$(git log -1 --pretty=format:'"%s" "%GS" "%GK"')"
 
+      - name: Verify the auto commit message
+        id: verify-commit-msg
+        run: |
+          if [[ "${{ secrets.AUTO_COMMIT_MATCHER }}" != ${{ steps.last-commit-message.outputs.msg }}]];
+          then
+            echo "::set-output name=not-match::true"
+          else
+            echo "::set-output name=not-match::false"
+          fi
+
+  build-and-test:
+    runs-on: ubuntu-20.04
+    needs: [verify-commit-msg]
+    if: needs.verify-commit-msg.outputs.not-match == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.MERGE_TOKEN }}
+
       - name: Base Action
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/baseAction
       
       - name: Rush test and update the README file in each package with the coverage badge
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Cfn-nag Action
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/cfnNagAction
 
       - name: Git-secrets Action
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/gitSecretsAction
 
       - name: Viperlight Action
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: ./.github/actions/viperlightAction
 
       - name: Update root README file with common coverage badge
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: node common/scripts/install-run-rush.js common-coverage-make-badge
       
       - name: Update package info in root README file
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: |
           cd workbench-core/repo-scripts/repo-toolbox
           node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
@@ -63,11 +73,9 @@ jobs:
           fi
 
       - name: echo modified files
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         run: git status
 
       - name: Import GPG key
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -76,7 +84,6 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Auto commit updated README files
-        if: steps.last-commit-message.outputs.msg != secrets.AUTO_COMMIT_MATCHER
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs: Auto README.md updates"
