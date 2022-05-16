@@ -2,6 +2,7 @@
 #  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #  SPDX-License-Identifier: Apache-2.0
 #
+
 name: Build-and-test
 on: ['pull_request']
 
@@ -20,15 +21,6 @@ jobs:
       
       - name: Rush test and update the README file in each package with the coverage badge
         run: node common/scripts/install-run-rush.js test --verbose
-
-      - name: Cfn-nag Action
-        uses: ./.github/actions/cfnNagAction
-
-      - name: Git-secrets Action
-        uses: ./.github/actions/gitSecretsAction
-
-      - name: Viperlight Action
-        uses: ./.github/actions/viperlightAction
 
           
 
