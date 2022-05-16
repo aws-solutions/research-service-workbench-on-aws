@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, BatchWriteItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
 import EnvironmentStatus from './environmentStatus';
@@ -16,7 +16,7 @@ interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: string;
-  studyIds: string[];
+  datasetIds: string[];
   envTypeConfigId: string;
   updatedAt: string;
   createdAt: string;
@@ -36,23 +36,19 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: '',
-  studyIds: [],
+  datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
   createdAt: '',
   owner: ''
 };
 
-const envKeyToAbrevMapping: { [key: string]: string } = {
-  envId: 'ENV',
-  user: 'USR',
-  envTypeConfigId: 'ETCI',
-  instanceId: 'INID',
-  projectId: 'PROJ',
-  studyIds: 'STU',
-  envTypeId: 'ETI',
-  indexId: 'IND',
-  account: 'ACC'
+const envKeyNameToKey: { [key: string]: string } = {
+  environment: 'ENV',
+  project: 'PROJ',
+  envType: 'ET',
+  envTypeConfig: 'ETC',
+  dataset: 'DS'
 };
 
 interface QueryParams {
@@ -94,17 +90,17 @@ export default class EnvironmentService {
    * @param includeMetadata - If true we get all entries where pk = envId, instead of just the entry where pk = envId and sk = envId
    */
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
-    const envAttKey = this._buildEnvAttKey(envId);
-    const envKey = this._buildEnvKey(envId);
     if (includeMetadata) {
-      const data = await this._aws.helpers.ddb.query({ key: { name: 'pk', value: envAttKey } }).execute();
+      const data = await this._aws.helpers.ddb
+        .query({ key: { name: 'pk', value: marshall(this._buildKey(envId, envKeyNameToKey.environment)) } })
+        .execute();
       const items = data.Items!.map((item) => {
         return unmarshall(item);
       });
       let envWithMetadata: Environment = { ...defaultEnv };
       for (const item of items) {
         // parent environment item
-        if (item.sk === envKey) {
+        if (item.sk === this._buildKey(envId, envKeyNameToKey.environment)) {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           // metadata of environment item
@@ -114,72 +110,27 @@ export default class EnvironmentService {
       }
       return envWithMetadata;
     } else {
-      const data = await this._aws.helpers.ddb.get({ pk: envAttKey, sk: envAttKey }).execute();
+      const data = await this._aws.helpers.ddb
+        .get(this._buildPkSk(envId, envKeyNameToKey.environment))
+        .execute();
       // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
       // data should be of type GetItemCommandOutput--check it is and Item exists
       if ('Item' in data && data.Item) {
         const getItemOutput: GetItemCommandOutput = data;
-        return this._getEnvironmentDataFromEnvironmentItem(getItemOutput.Item!);
+        return unmarshall(getItemOutput.Item!);
       } else {
         throw new Error(`Did not get an item returned when trying to get env ${envId}`);
       }
     }
   }
 
-  private _buildEnvAttKey(envId: string): AttributeValue {
-    return { S: this._buildEnvKey(envId) };
-  }
-
-  private _buildEnvKey(envId: string): string {
-    return `ENV#${envId}`;
-  }
-
-  private _parseOutputs(
-    attributeList: AttributeValue[]
-  ): { id: string; value: string; description: string }[] {
-    const outputList: { id: string; value: string; description: string }[] = [];
-    attributeList.forEach((attribute) => {
-      if (attribute.M) {
-        outputList.push({
-          id: attribute.M.id.S ? attribute.M.id.S : '',
-          value: attribute.M.value.S ? attribute.M.value.S : '',
-          description: attribute.M.description.S ? attribute.M.description.S : ''
-        });
-      }
-    });
-    return outputList;
-  }
-
-  // TODO: Refactor this method after marshall/unmarshall has been added
-  private _getEnvironmentDataFromEnvironmentItem(item: { [key: string]: AttributeValue }): Environment {
-    const env: Environment = {
-      id: item.id.S,
-      instance: item.instance ? item.instance.S : undefined,
-      cidr: item.cidr.S ? item.cidr.S : '',
-      description: item.description.S ? item.description.S : '',
-      error: undefined, // TODO: Get error value from DDB and parse it
-      name: item.name.S ? item.name.S : 'Unknown name',
-      outputs: item.outputs.L ? this._parseOutputs(item.outputs.L) : [],
-      projectId: item.projectId.S ? item.projectId.S : 'Unknown project',
-      status: item.status.S ? item.status.S : 'Unknown status',
-      studyIds: item.studyIds.L
-        ? item.studyIds.L.map((attributeV: AttributeValue) => (attributeV.S ? attributeV.S : ''))
-        : [],
-      envTypeConfigId: item.envTypeConfigId.S ? item.envTypeConfigId.S : 'Unknown Env Type Config',
-      updatedAt: item.updatedAt.S ? item.updatedAt.S : 'Unknown Update Date',
-      createdAt: item.createdAt.S ? item.createdAt.S : 'Unknown',
-      owner: item.owner.S ? item.owner.S : 'Unknown'
-    };
-    return env;
-  }
-
   // TODO: Implement limit and paginationToken will be used for next task
   /**
    * Get all environments with option to filter by status
    * @param user - User information
-   * @param filter
-   * @param limit
-   * @param paginationToken
+   * @param filter - Provide which attribute to filter by
+   * @param limit - Number of results per page
+   * @param paginationToken - Token used for getting specific page of results
    */
   public async getEnvironments(
     user: { role: string; ownerId: string },
@@ -221,7 +172,7 @@ export default class EnvironmentService {
     // check that Items is defined
     if (data && data.Items) {
       environments = data.Items.map((item) => {
-        return this._getEnvironmentDataFromEnvironmentItem(item);
+        return unmarshall(item);
       });
 
       // Always sort by UpdatedAt values for environments. Newest environment appear first
@@ -232,52 +183,46 @@ export default class EnvironmentService {
     return environments;
   }
 
-  //   public async getEnvironmentAndMetadataPrimaryKeys(envId: string): Promise<QueryCommandOutput> {
-  //     // const data = await this._ddbQuery.query.key('pk', {S: envId}).projection(['pk', 'sk']).query();
-  //     const data = await this._ddbHelperService
-  //       .query()
-  //       .key('pk', { S: envId })
-  //       .projection(['pk', 'sk'])
-  //       .query();
-  //     return data;
-  //   }
+  public async updateEnvironment(
+    envId: string,
+    updatedValues: { [key: string]: string }
+  ): Promise<UpdateItemCommandOutput> {
+    return this._aws.helpers.ddb
+      .update(this._buildPkSk(envId, envKeyNameToKey.environment), { item: marshall(updatedValues) })
+      .execute();
+  }
 
-  //   public async updateEnvironment(
-  //     envId: string,
-  //     updatedValues: { [key: string]: AttributeValue }
-  //   ): Promise<UpdateItemCommandOutput> {
-  //     // this._ddbUpdater = new DynamoDBUpdaterService({region: this._awsRegion, table: this._tableName, key: {'pk': {S: envId}, 'sk': {S: envId}}});
-  //     // const data = await this._ddbUpdater.updater.item({'mutable': 'second value'}).update();
-  //     const data = this._ddbHelperService
-  //       .update({ pk: { S: envId }, sk: { S: envId } })
-  //       .item(updatedValues)
-  //       .update();
-  //     return data;
-  //   }
+  private _buildPkSk(id: string, type: string): { [key: string]: AttributeValue } {
+    const key = this._buildKey(id, type);
+    return marshall({ pk: key, sk: key });
+  }
+
+  private _buildKey(id: string, type: string): string {
+    return `${type}#${id}`;
+  }
 
   public async createEnv(params: {
-    instance: string;
+    instance?: string;
     cidr: string;
     description: string;
-    error: { type: string; value: string } | undefined;
+    error?: { type: string; value: string };
     name: string;
     outputs: { id: string; value: string; description: string }[];
     projectId: string;
-    studyIds: string[];
+    datasetIds: string[];
     envTypeId: string;
     envTypeConfigId: string;
     status: EnvironmentStatus;
-  }): Promise<BatchWriteItemCommandOutput> {
-    // }): Promise<void> {
-    const buildPkSk = (id: string, type: string): { [key: string]: AttributeValue } => {
-      const key = `${type}#${id}`;
-      return marshall({ pk: key, sk: key });
-    };
+  }): Promise<Environment> {
+    // TODO: Add envIdToInstanceId service
     const itemsToGet = [
-      marshall({ pk: 'ETC', sk: `ET#${params.envTypeId}ETC#${params.envTypeConfigId}` }),
-      buildPkSk(params.projectId, 'PROJ'),
-      ...params.studyIds.map((studyId) => {
-        return buildPkSk(studyId, 'STUDY');
+      marshall({
+        pk: envKeyNameToKey.envTypeConfig,
+        sk: `${envKeyNameToKey.envType}#${params.envTypeId}${envKeyNameToKey.envTypeConfig}#${params.envTypeConfigId}`
+      }),
+      this._buildPkSk(params.projectId, envKeyNameToKey.project),
+      ...params.datasetIds.map((dsId) => {
+        return this._buildPkSk(dsId, envKeyNameToKey.dataset);
       })
     ];
     const batchGetResult = await this._aws.helpers.ddb.get(itemsToGet).execute();
@@ -290,7 +235,7 @@ export default class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-      studyIds: params.studyIds,
+      datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
@@ -298,7 +243,6 @@ export default class EnvironmentService {
       status: params.status
     };
     // GET metadata
-
     let metadata = [];
     if ('Responses' in batchGetResult) {
       if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
@@ -308,8 +252,6 @@ export default class EnvironmentService {
         return unmarshall(item);
       });
     }
-    //TODO Get instance id
-
     // WRITE metadata to DDB
     const items: { [key: string]: AttributeValue }[] = [];
     const buildEnvPkMetadataSk = (envId: string, metaDataType: string, metaDataId: string) => {
@@ -318,38 +260,13 @@ export default class EnvironmentService {
       return { pk, sk };
     };
 
-    //add account metadata
-    // const account = metadata.find((item) => {
-    //   return item.resourceType === 'account';
-    // });
-    // items.push(
-    //   marshall({
-    //     ...buildEnvPkMetadataSk(newEnv.id!, 'ACC', newEnv.accountId),
-    //     id: newEnv.accountId,
-    //     accountHandlerRoleArn: account.accountHandlerRoleArn,
-    //     envMgmtRoleArn: account.envMgmtRoleArn,
-    //     externalId: account.externalId
-    //   })
-    // );
-    //add envType
-    // const envType = metadata.find((item) => {
-    //   return item.resourceType === 'envType';
-    // });
-    // items.push(
-    //   marshall({
-    //     ...buildEnvPkMetadataSk(newEnv.id!, 'ET', newEnv.envTypeId),
-    //     type: envType.type,
-    //     id: envType.envTypeId
-    //   })
-    // );
-
     //add envTypeConfig
     const envTypeConfig = metadata.find((item) => {
       return item.resourceType === 'envTypeConfig';
     });
     items.push(
       marshall({
-        ...buildEnvPkMetadataSk(newEnv.id!, 'ETC', newEnv.envTypeConfigId),
+        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.envTypeConfig, newEnv.envTypeConfigId),
         id: newEnv.envTypeConfigId,
         productId: envTypeConfig.productId,
         provisioningArtifactId: envTypeConfig.provisioningArtifactId,
@@ -363,40 +280,29 @@ export default class EnvironmentService {
     });
     items.push(
       marshall({
-        ...buildEnvPkMetadataSk(newEnv.id!, 'PROJ', newEnv.projectId),
+        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.project, newEnv.projectId),
         id: newEnv.projectId,
         name: project.name,
         envMgmtRoleArn: project.envMgmtRoleArn,
         accountHandlerRoleArn: project.accountHandlerRoleArn,
         encryptionKeyArn: project.encryptionKeyArn,
         vpcId: project.vpcId,
+        subnetId: project.subnetId,
         externalId: project.externalId
       })
     );
 
-    //add index
-    // const index = metadata.find((item) => {
-    //   return item.resourceType === 'index';
-    // });
-    // items.push(
-    //   marshall({
-    //     ...buildEnvPkMetadataSk(newEnv.id!, 'IND', newEnv.indexId),
-    //     id: env.indexId,
-    //     name: index.name
-    //   })
-    // );
-
-    //add study
-    const studies = metadata.filter((item) => {
-      return item.resourceType === 'study';
+    //add dataset
+    const datasets = metadata.filter((item) => {
+      return item.resourceType === 'dataset';
     });
-    studies.forEach((study) => {
+    datasets.forEach((dataset) => {
       items.push(
         marshall({
-          ...buildEnvPkMetadataSk(newEnv.id!, 'STU', study.id),
-          id: study.id,
-          name: study.name,
-          resources: study.resources
+          ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.dataset, dataset.id),
+          id: dataset.id,
+          name: dataset.name,
+          resources: dataset.resources
         })
       );
     });
@@ -404,39 +310,24 @@ export default class EnvironmentService {
     // Add environment item
     items.push(
       marshall(
-        { ...newEnv, pk: this._buildEnvKey(newEnv.id!), sk: this._buildEnvKey(newEnv.id!) },
+        {
+          ...newEnv,
+          pk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
+          sk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
+          resourceType: 'environment'
+        },
         { removeUndefinedValues: true }
       )
     );
-    return await this._aws.helpers.ddb.batchEdit({ addWriteRequests: items }).execute();
-  }
 
-  public async getInstanceId(envId: string): Promise<string> {
-    const instanceRecord = await this._aws.helpers.ddb
-      .query({ key: { name: 'pk', value: { S: `ENV${envId}` } }, sortKey: 'sk', begins: { S: 'INID#' } })
-      .execute();
-    if (instanceRecord.Items) {
-      if (instanceRecord.Items.length > 1) {
-        throw new Error(`Returned too many instance IDs for envID ${envId}`);
-      } else {
-        return instanceRecord.Items[0].sk.S
-          ? instanceRecord.Items[0].sk.S.split('#')[1]
-          : 'Unknown Instance Id';
-      }
+    // TODO: Use transact write items instead
+    const batchEditResponse = await this._aws.helpers.ddb.batchEdit({ addWriteRequests: items }).execute();
+
+    //If no error are thrown and no unprocess items
+    if (Object.keys(batchEditResponse.UnprocessedItems!).length === 0) {
+      return newEnv;
+    } else {
+      throw new Error('Unable to create env');
     }
-    throw new Error(`No record found for ${envId}`);
   }
 }
-
-//   public async updateEnvironment(
-//     envId: string,
-//     updatedValues: { [key: string]: AttributeValue }
-//   ): Promise<UpdateItemCommandOutput> {
-//     // this._ddbUpdater = new DynamoDBUpdaterService({region: this._awsRegion, table: this._tableName, key: {'pk': {S: envId}, 'sk': {S: envId}}});
-//     // const data = await this._ddbUpdater.updater.item({'mutable': 'second value'}).update();
-//     const data = this._ddbHelperService
-//       .update({ pk: { S: envId }, sk: { S: envId } })
-//       .item(updatedValues)
-//       .update();
-//     return data;
-//   }
