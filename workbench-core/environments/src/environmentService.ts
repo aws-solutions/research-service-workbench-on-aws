@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from 'uuid';
 interface Environment {
   id: string | undefined;
   instance: string | undefined;
-  accountId: string;
   cidr: string;
   description: string;
   error: { type: string; value: string } | undefined;
@@ -18,30 +17,18 @@ interface Environment {
   projectId: string;
   status: string;
   studyIds: string[];
-  envType: string;
-  envTypeId: string;
   envTypeConfigId: string;
-  indexId: string;
   updatedAt: string;
   createdAt: string;
   owner: string;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ACC?: any;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  EGS?: any;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ET?: any;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   ETC?: any;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  IND?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
 }
 const defaultEnv: Environment = {
   id: '',
   instance: '',
-  accountId: '',
   cidr: '',
   description: '',
   error: undefined,
@@ -50,10 +37,7 @@ const defaultEnv: Environment = {
   projectId: '',
   status: '',
   studyIds: [],
-  envType: '',
-  envTypeId: '',
   envTypeConfigId: '',
-  indexId: '',
   updatedAt: '',
   createdAt: '',
   owner: ''
@@ -119,9 +103,11 @@ export default class EnvironmentService {
       });
       let envWithMetadata: Environment = { ...defaultEnv };
       for (const item of items) {
+        // parent environment item
         if (item.sk === envKey) {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
+          // metadata of environment item
           // @ts-ignore
           envWithMetadata[item.sk.split('#')[0]] = item;
         }
@@ -168,7 +154,6 @@ export default class EnvironmentService {
   private _getEnvironmentDataFromEnvironmentItem(item: { [key: string]: AttributeValue }): Environment {
     const env: Environment = {
       id: item.id.S,
-      accountId: item.accountId.S ? item.accountId.S : '',
       instance: item.instance ? item.instance.S : undefined,
       cidr: item.cidr.S ? item.cidr.S : '',
       description: item.description.S ? item.description.S : '',
@@ -180,10 +165,7 @@ export default class EnvironmentService {
       studyIds: item.studyIds.L
         ? item.studyIds.L.map((attributeV: AttributeValue) => (attributeV.S ? attributeV.S : ''))
         : [],
-      envType: item.envType.S ? item.envType.S : 'Unknown Env Type',
-      envTypeId: item.envTypeId.S ? item.envTypeId.S : 'Unknown Env Type Id',
       envTypeConfigId: item.envTypeConfigId.S ? item.envTypeConfigId.S : 'Unknown Env Type Config',
-      indexId: item.indexId.S ? item.indexId.S : 'Unknown Index',
       updatedAt: item.updatedAt.S ? item.updatedAt.S : 'Unknown Update Date',
       createdAt: item.createdAt.S ? item.createdAt.S : 'Unknown',
       owner: item.owner.S ? item.owner.S : 'Unknown'
@@ -282,19 +264,26 @@ export default class EnvironmentService {
     outputs: { id: string; value: string; description: string }[];
     projectId: string;
     studyIds: string[];
-    envType: string;
     envTypeId: string;
     envTypeConfigId: string;
-    indexId: string;
-    accountId: string;
     status: EnvironmentStatus;
   }): Promise<BatchWriteItemCommandOutput> {
     // }): Promise<void> {
-    // create items (some of these values will likely need to be passed in by the createEnvironment method)
+    const buildPkSk = (id: string, type: string): { [key: string]: AttributeValue } => {
+      const key = `${type}#${id}`;
+      return marshall({ pk: key, sk: key });
+    };
+    const itemsToGet = [
+      marshall({ pk: 'ETC', sk: `ET#${params.envTypeId}ETC#${params.envTypeConfigId}` }),
+      buildPkSk(params.projectId, 'PROJ'),
+      ...params.studyIds.map((studyId) => {
+        return buildPkSk(studyId, 'STUDY');
+      })
+    ];
+    const batchGetResult = await this._aws.helpers.ddb.get(itemsToGet).execute();
     const newEnv: Environment = {
       id: uuidv4(),
       instance: params.instance,
-      accountId: params.accountId,
       cidr: params.cidr,
       description: params.description,
       error: params.error,
@@ -302,31 +291,13 @@ export default class EnvironmentService {
       outputs: params.outputs,
       projectId: params.projectId,
       studyIds: params.studyIds,
-      envType: params.envType,
-      envTypeId: params.envTypeId,
       envTypeConfigId: params.envTypeConfigId,
-      indexId: params.indexId,
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       owner: 'owner-1', // TODO: Get this from request context
       status: params.status
     };
     // GET metadata
-    const buildPkSk = (id: string, type: string): { [key: string]: AttributeValue } => {
-      const key = `${type}#${id}`;
-      return marshall({ pk: key, sk: key });
-    };
-    const itemsToGet = [
-      buildPkSk(params.accountId, 'ACC'),
-      marshall({ pk: 'ETC', sk: `ET#${params.envTypeId}ETC#${params.envTypeConfigId}` }),
-      buildPkSk(params.projectId, 'PROJ'),
-      buildPkSk(params.indexId, 'IND'),
-      buildPkSk(params.envTypeId, 'ET'),
-      ...params.studyIds.map((studyId) => {
-        return buildPkSk(studyId, 'STUDY');
-      })
-    ];
-    const batchGetResult = await this._aws.helpers.ddb.get(itemsToGet).execute();
 
     let metadata = [];
     if ('Responses' in batchGetResult) {
@@ -337,6 +308,7 @@ export default class EnvironmentService {
         return unmarshall(item);
       });
     }
+    //TODO Get instance id
 
     // WRITE metadata to DDB
     const items: { [key: string]: AttributeValue }[] = [];
@@ -347,26 +319,95 @@ export default class EnvironmentService {
     };
 
     //add account metadata
-    const account = metadata.find((item) => {
-      return item.resourceType === 'account';
+    // const account = metadata.find((item) => {
+    //   return item.resourceType === 'account';
+    // });
+    // items.push(
+    //   marshall({
+    //     ...buildEnvPkMetadataSk(newEnv.id!, 'ACC', newEnv.accountId),
+    //     id: newEnv.accountId,
+    //     accountHandlerRoleArn: account.accountHandlerRoleArn,
+    //     envMgmtRoleArn: account.envMgmtRoleArn,
+    //     externalId: account.externalId
+    //   })
+    // );
+    //add envType
+    // const envType = metadata.find((item) => {
+    //   return item.resourceType === 'envType';
+    // });
+    // items.push(
+    //   marshall({
+    //     ...buildEnvPkMetadataSk(newEnv.id!, 'ET', newEnv.envTypeId),
+    //     type: envType.type,
+    //     id: envType.envTypeId
+    //   })
+    // );
+
+    //add envTypeConfig
+    const envTypeConfig = metadata.find((item) => {
+      return item.resourceType === 'envTypeConfig';
     });
     items.push(
       marshall({
-        ...buildEnvPkMetadataSk(newEnv.id!, 'ACC', newEnv.accountId),
-        accountHandlerRoleArn: account.accountHandlerRoleArn,
-        envMgmtRoleArn: account.envMgmtRoleArn,
-        externalId: account.externalId
+        ...buildEnvPkMetadataSk(newEnv.id!, 'ETC', newEnv.envTypeConfigId),
+        id: newEnv.envTypeConfigId,
+        productId: envTypeConfig.productId,
+        provisioningArtifactId: envTypeConfig.provisioningArtifactId,
+        params: envTypeConfig.params
       })
     );
 
-    // TODO: Add envTypeConfig, proj, index, envType, and study metadata
+    //add project
+    const project = metadata.find((item) => {
+      return item.resourceType === 'project';
+    });
+    items.push(
+      marshall({
+        ...buildEnvPkMetadataSk(newEnv.id!, 'PROJ', newEnv.projectId),
+        id: newEnv.projectId,
+        name: project.name,
+        envMgmtRoleArn: project.envMgmtRoleArn,
+        accountHandlerRoleArn: project.accountHandlerRoleArn,
+        encryptionKeyArn: project.encryptionKeyArn,
+        vpcId: project.vpcId,
+        externalId: project.externalId
+      })
+    );
 
+    //add index
+    // const index = metadata.find((item) => {
+    //   return item.resourceType === 'index';
+    // });
     // items.push(
-    //   marshall(
-    //     { ...newEnv, pk: this._buildEnvKey(newEnv.envId!), sk: this._buildEnvKey(newEnv.envId!) },
-    //     { removeUndefinedValues: true }
-    //   )
+    //   marshall({
+    //     ...buildEnvPkMetadataSk(newEnv.id!, 'IND', newEnv.indexId),
+    //     id: env.indexId,
+    //     name: index.name
+    //   })
     // );
+
+    //add study
+    const studies = metadata.filter((item) => {
+      return item.resourceType === 'study';
+    });
+    studies.forEach((study) => {
+      items.push(
+        marshall({
+          ...buildEnvPkMetadataSk(newEnv.id!, 'STU', study.id),
+          id: study.id,
+          name: study.name,
+          resources: study.resources
+        })
+      );
+    });
+
+    // Add environment item
+    items.push(
+      marshall(
+        { ...newEnv, pk: this._buildEnvKey(newEnv.id!), sk: this._buildEnvKey(newEnv.id!) },
+        { removeUndefinedValues: true }
+      )
+    );
     return await this._aws.helpers.ddb.batchEdit({ addWriteRequests: items }).execute();
   }
 

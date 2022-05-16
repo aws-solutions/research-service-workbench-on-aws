@@ -44,11 +44,8 @@ describe('EnvironmentService', () => {
       error: undefined,
       name: 'testEnv',
       outputs: [],
-      envType: 'jupyter-notebook',
       envTypeId: 'envType-123',
       envTypeConfigId: 'envTypeConfig-123',
-      indexId: 'index-123',
-      accountId: 'acc-123',
       projectId: 'proj-123',
       // studyIds: ['study-123'],
       studyIds: [],
@@ -58,8 +55,7 @@ describe('EnvironmentService', () => {
   });
 
   test('foo', () => {
-    const date = new Date();
-    console.log(date.toISOString());
+    const studies = [1, 2];
   });
   // test('updateEnvironment does not return an error', async () => {
   //   const environmentService = new EnvironmentService({AWS_REGION: 'us-east-1', TABLE_NAME: 'swb-dev1-va-table'});
