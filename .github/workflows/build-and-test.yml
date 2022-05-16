@@ -6,36 +6,36 @@ name: Build-and-test
 on: ['pull_request']
 
 jobs:
-  verify-commit-msg:
-    runs-on: ubuntu-20.04
-    outputs:
-        not-match: ${{ steps.verify-commit-msg.outputs.not-match }}
+  # verify-commit-msg:
+  #   runs-on: ubuntu-20.04
+  #   outputs:
+  #       not-match: ${{ steps.verify-commit-msg.outputs.not-match }}
           
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with: 
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.MERGE_TOKEN }}
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #       with: 
+  #         ref: ${{ github.head_ref }}
+  #         token: ${{ secrets.MERGE_TOKEN }}
 
-      - name: Get last commit message
-        id: last-commit-message
-        run: |
-          echo "::set-output name=msg::$(git log -1 --pretty=format:'%s %al <%ce> %GK')"
+  #     - name: Get last commit message
+  #       id: last-commit-message
+  #       run: |
+  #         echo "::set-output name=msg::$(git log -1 --pretty=format:'%s %al <%ce> %GK')"
 
-      - name: Verify the auto commit message
-        id: verify-commit-msg
-        run: |
-          if [[ "${{ secrets.AUTO_COMMIT_MATCHER }}" != "${{ steps.last-commit-message.outputs.msg }}" ]];
-          then
-            echo "::set-output name=not-match::true"
-          else
-            echo "::set-output name=not-match::false"
-          fi
+  #     - name: Verify the auto commit message
+  #       id: verify-commit-msg
+  #       run: |
+  #         if [[ "${{ secrets.AUTO_COMMIT_MATCHER }}" != "${{ steps.last-commit-message.outputs.msg }}" ]];
+  #         then
+  #           echo "::set-output name=not-match::true"
+  #         else
+  #           echo "::set-output name=not-match::false"
+  #         fi
 
   build-and-test:
     runs-on: ubuntu-20.04
-    needs: [verify-commit-msg]
+    # needs: [verify-commit-msg]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -62,42 +62,6 @@ jobs:
       - name: Viperlight Action
         if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/viperlightAction
-
-      - name: Update root README file with common coverage badge
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
-        run: node common/scripts/install-run-rush.js common-coverage-make-badge
-      
-      - name: Update package info in root README file
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
-        run: |
-          cd workbench-core/repo-scripts/repo-toolbox
-          node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
-          if [[ $exit_status != 0 ]]; then
-            node ../../../common/scripts/install-run-rushx.js readme
-          fi
-
-      - name: echo modified files
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
-        run: git status
-
-      - name: Import GPG key
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-
-      - name: Auto commit updated README files
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "docs: Auto README.md updates"
-          commit_options: '--no-verify --gpg-sign'
-          commit_user_name: insignias # defaults to "github-actions[bot]"
-          commit_user_email: insignias@users.noreply.github.com
-          file_pattern: "README.md **/README.md"
 
           
 
