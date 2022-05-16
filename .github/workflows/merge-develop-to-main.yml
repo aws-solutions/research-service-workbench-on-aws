@@ -12,7 +12,9 @@ on:
       - develop
   
 jobs:
-  readme-commit:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    name: readme-commit
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit.yml@develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -50,6 +52,7 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
+          ref: 'develop'
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
       - name: Temporarily disable branch protection on main
