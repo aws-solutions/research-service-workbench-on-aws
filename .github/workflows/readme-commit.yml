@@ -5,9 +5,12 @@
 
 name: Readme-commit
 on:
-  pull_request_target:
-    types:
-      - closed
+  workflow_call:
+    secrets: 
+      gpg_private_key:
+        required: true
+      passphrase:
+        required: true
 
 jobs:
     if_merged:

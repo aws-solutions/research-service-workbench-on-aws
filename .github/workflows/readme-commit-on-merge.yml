@@ -5,12 +5,18 @@
 
 name: Merge-to-testDevelop
 on:
-  push:
+  pull_request_target:
+    types:
+      - closed
     branches:
       - testDevelop
   
 jobs:
-
+  readme-commit:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit.yml@testDevelop
+    secrets:
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
   # deploy-swb-reference:
   #   needs: [readme-commit]
   #   uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
@@ -20,7 +26,8 @@ jobs:
   #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
   deploy-example:
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
+    needs: [readme-commit]
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@testDevelop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
