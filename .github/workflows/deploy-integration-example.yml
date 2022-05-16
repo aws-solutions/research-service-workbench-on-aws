@@ -30,6 +30,8 @@ jobs:
     steps:        
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: 'testDevelop'
 
       - name: Base Action
         uses: ./.github/actions/baseAction
