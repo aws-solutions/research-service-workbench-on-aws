@@ -83,6 +83,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-secrets-manager",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production" ]
     },
