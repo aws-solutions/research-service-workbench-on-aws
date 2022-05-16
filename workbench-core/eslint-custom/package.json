@@ -11,10 +11,10 @@
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
+    "test:only": "heft test --clean --no-build",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
-    "test": "heft test --clean && rushx make-badges",
-    "build:test": "rushx build && rushx test",
-    "test:only": "heft test --clean"
+    "test": "rushx test:only && rushx make-badges",
+    "build:test": "heft test --clean && rushx make-badges"
   },
   "author": "Samir Sharan",
   "license": "Apache-2.0",
