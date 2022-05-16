@@ -44,23 +44,23 @@ jobs:
           token: ${{ secrets.MERGE_TOKEN }}
 
       - name: Base Action
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
+        # if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/baseAction
       
       - name: Rush test and update the README file in each package with the coverage badge
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
+        # if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: node common/scripts/install-run-rush.js test --verbose
 
       - name: Cfn-nag Action
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
+        # if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/cfnNagAction
 
       - name: Git-secrets Action
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
+        # if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/gitSecretsAction
 
       - name: Viperlight Action
-        if: needs.verify-commit-msg.outputs.not-match == 'true'
+        # if: needs.verify-commit-msg.outputs.not-match == 'true'
         uses: ./.github/actions/viperlightAction
 
           
