@@ -6,18 +6,20 @@ describe('EnvironmentService', () => {
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-2';
   });
+
+  const envId = 'd13930d0-8cd0-4502-9e82-be311a8c9a32';
   test('getEnvironment, includeMetadata = true', async () => {
     const environmentService = new EnvironmentService({
       TABLE_NAME
     });
-    const data = await environmentService.getEnvironment('88a43754-4139-4786-b2cf-a037b39890fa', true);
+    const data = await environmentService.getEnvironment(envId, true);
     console.log('data', data);
   });
   test('getEnvironment, includeMetadata = false', async () => {
     const environmentService = new EnvironmentService({
       TABLE_NAME
     });
-    const data = await environmentService.getEnvironment('88a43754-4139-4786-b2cf-a037b39890fa', false);
+    const data = await environmentService.getEnvironment(envId, false);
     console.log('data', data);
   });
   test('getEnvironments as admin', async () => {
@@ -54,7 +56,7 @@ describe('EnvironmentService', () => {
   });
   test('updateEnvironment', async () => {
     const environmentService = new EnvironmentService({ TABLE_NAME });
-    const data = await environmentService.updateEnvironment('88a43754-4139-4786-b2cf-a037b39890fa', {
+    const data = await environmentService.updateEnvironment(envId, {
       instance: 'instance-124',
       status: 'COMPLETED'
     });

@@ -320,14 +320,16 @@ export default class EnvironmentService {
       )
     );
 
-    // TODO: Use transact write items instead
-    const batchEditResponse = await this._aws.helpers.ddb.batchEdit({ addWriteRequests: items }).execute();
-
-    //If no error are thrown and no unprocess items
-    if (Object.keys(batchEditResponse.UnprocessedItems!).length === 0) {
-      return newEnv;
-    } else {
-      throw new Error('Unable to create env');
+    try {
+      const transactPutResponse = await this._aws.helpers.ddb
+        .transactEdit({ addPutRequest: items })
+        .execute();
+    } catch (e) {
+      console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
+      throw new Error('Failed to create environment');
     }
+
+    //If no error are thrown then transaction was successful. If error did occur then the whole transaction will be rolled back
+    return newEnv;
   }
 }

@@ -12,6 +12,7 @@ import Updater from './updater';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import _ from 'lodash';
+import TransactEdit from './transactEdit';
 
 export default class DynamoDBService {
   private _awsRegion: string;
@@ -438,5 +439,15 @@ export default class DynamoDBService {
       }
     }
     return batchEdit;
+  }
+
+  public transactEdit(params?: { addPutRequest?: { [key: string]: AttributeValue }[] }): TransactEdit {
+    let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params) {
+      if (params.addPutRequest) {
+        transactEdit = transactEdit.addPutRequests(params.addPutRequest);
+      }
+    }
+    return transactEdit;
   }
 }
