@@ -11,6 +11,12 @@ on:
         required: true
       passphrase:
         required: true
+      merge_token:
+        required: true
+      bot_user:
+        required: true
+      bot_user_email:
+        required: true
 
 jobs:
     if_merged:
@@ -23,9 +29,9 @@ jobs:
       steps:        
         - uses: actions/checkout@v3
           with:
-            token: ${{ secrets.MERGE_TOKEN }}
+            token: ${{ secrets.merge_token }}
             fetch-depth: 0
-            ref: 'testDevelop'
+            ref: 'develop'
 
         - name: Base Action
           uses: ./.github/actions/baseAction
@@ -50,8 +56,8 @@ jobs:
         - name: Import GPG key
           uses: crazy-max/ghaction-import-gpg@v4
           with:
-            gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-            passphrase: ${{ secrets.PASSPHRASE }}
+            gpg_private_key: ${{ secrets.gpg_private_key }}
+            passphrase: ${{ secrets.passphrase }}
             git_user_signingkey: true
             git_commit_gpgsign: true
 
@@ -63,19 +69,19 @@ jobs:
             route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
             owner: awslabs
             repo: monorepo-for-service-workbench
-            branch: testDevelop
+            branch: develop
           env:
-            GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.merge_token }}
 
         - name: Auto commit updated README files
           uses: stefanzweifel/git-auto-commit-action@v4
           with:
             commit_message: "docs: Auto README.md updates"
             commit_options: '--no-verify --gpg-sign'
-            commit_user_name: ${{ secrets.BOT_USER }} # defaults to "github-actions[bot]"
-            commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
+            commit_user_name: ${{ secrets.bot_user }} # defaults to "github-actions[bot]"
+            commit_user_email: ${{ secrets.bot_user_email }}
             file_pattern: "README.md **/README.md"
-            branch: testDevelop
+            branch: develop
           
         - name: Enable branch protection
           uses: octokit/request-action@v2.x
@@ -84,8 +90,8 @@ jobs:
             route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
             owner: awslabs
             repo: monorepo-for-service-workbench
-            branch: testDevelop
+            branch: develop
           env:
-            GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.merge_token }}
 
   

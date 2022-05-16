@@ -5,12 +5,24 @@
 
 name: Merge-develop-to-main
 on:
-  push:
+  pull_request_target:
+    types:
+      - closed
     branches:
       - develop
   
 jobs:
+  readme-commit:
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit.yml@develop
+    secrets:
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      merge_token: ${{ secrets.MERGE_TOKEN }}
+      bot_user: ${{ secrets.BOT_USER }}
+      bot_user_email: ${{ secrets.BOT_USER_EMAIL }}
+
   deploy-swb-reference:
+    needs: [readme-commit]
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
@@ -18,6 +30,7 @@ jobs:
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
   deploy-example:
+    needs: [readme-commit]
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
