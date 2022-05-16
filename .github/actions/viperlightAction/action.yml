@@ -1,0 +1,19 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Viperlight Action
+description: runs viperlight scan
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run viperlight scan
+      shell: bash  
+      run: node common/scripts/install-run-rush.js viperlight-scan
+
+    - name: Print remediation message
+      shell: bash
+      if: failure()
+      run: echo "viperlight scan failed, potential vulnerability. Please review the logs"

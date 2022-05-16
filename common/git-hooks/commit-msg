@@ -25,4 +25,10 @@
 #   exit 1
 # fi
 INPUT_FILE=$1
+START_LINE=`head -n1 $INPUT_FILE`
+PATTERN="README.md updates by github-actions[bot]"
+if [[ "$START_LINE" == *"$PATTERN"* ]]; then
+  echo "This is a RESERVED COMMIT MESSAGE, not available for use. Please use a different message"
+  exit 1
+fi
 node common/scripts/install-run-rush.js commitlint --edit "$INPUT_FILE"
