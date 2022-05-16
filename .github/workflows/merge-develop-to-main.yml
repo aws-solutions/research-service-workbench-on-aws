@@ -12,9 +12,8 @@ on:
       - develop
   
 jobs:
-  if_merged:
+  readme-commit:
     if: github.event.pull_request.merged == true
-    name: readme-commit
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit.yml@develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
