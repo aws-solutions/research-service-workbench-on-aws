@@ -69,8 +69,8 @@ jobs:
           with:
             commit_message: "docs: Auto README.md updates"
             commit_options: '--no-verify --gpg-sign'
-            commit_user_name: insignias # defaults to "github-actions[bot]"
-            commit_user_email: insignias@users.noreply.github.com
+            commit_user_name: ${{ secrets.BOT_USER }} # defaults to "github-actions[bot]"
+            commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
             file_pattern: "README.md **/README.md"
             branch: testDevelop
           
