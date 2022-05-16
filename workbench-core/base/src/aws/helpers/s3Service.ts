@@ -1,4 +1,5 @@
 import S3 from '../clients/s3';
+import ReadableStream = NodeJS.ReadableStream;
 
 export default class S3Service {
   private _s3: S3;
@@ -27,5 +28,21 @@ export default class S3Service {
       };
       await this._s3.putObject(putObjectParam);
     }
+  }
+
+  /**
+   * Get an object from S3 and convert to string
+   * @param bucketName - The name of the S3 bucket to retrieve the object from
+   * @param key - Key of the object to be retrieved
+   */
+  public async getObjectAsString(bucketName: string, key: string): Promise<string> {
+    const objectData = await this._s3.getObject({ Bucket: bucketName, Key: key });
+    let data = '';
+    if (objectData.Body) {
+      for await (const chunk of objectData.Body as ReadableStream) {
+        data += chunk;
+      }
+    }
+    return data;
   }
 }

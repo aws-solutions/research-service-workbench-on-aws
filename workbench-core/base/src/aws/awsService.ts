@@ -10,6 +10,7 @@ import EventBridge from './clients/eventbridge';
 import SSM from './clients/ssm';
 import ServiceCatalog from './clients/serviceCatalog';
 import S3 from './clients/s3';
+import SecretsManager from './clients/secretsManager';
 import STS from './clients/sts';
 import { Credentials } from '@aws-sdk/types';
 import IAM from './clients/iam';
@@ -27,6 +28,7 @@ export default class AwsService {
     eventBridge: EventBridge;
     serviceCatalog: ServiceCatalog;
     s3: S3;
+    secretsManager: SecretsManager;
     sts: STS;
     iam: IAM;
     ddb: DynamoDB;
@@ -47,6 +49,7 @@ export default class AwsService {
       eventBridge: new EventBridge(options),
       serviceCatalog: new ServiceCatalog(options),
       s3: new S3(options),
+      secretsManager: new SecretsManager(options),
       sts: new STS(options),
       iam: new IAM(options),
       ddb: new DynamoDB({ region })
