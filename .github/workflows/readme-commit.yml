@@ -5,9 +5,18 @@
 
 name: Readme-commit
 on:
-  pull_request_target:
-    types:
-      - closed
+  workflow_call:
+    secrets: 
+      gpg-private-key:
+        required: true
+      passphrase:
+        required: true
+      merge-token:
+        required: true
+      bot-user:
+        required: true
+      bot-user-email:
+        required: true
 
 jobs:
     if_merged:
@@ -20,7 +29,7 @@ jobs:
       steps:        
         - uses: actions/checkout@v3
           with:
-            token: ${{ secrets.MERGE_TOKEN }}
+            token: ${{ secrets.merge-token }}
             fetch-depth: 0
             ref: 'testDevelop'
 
@@ -47,8 +56,8 @@ jobs:
         - name: Import GPG key
           uses: crazy-max/ghaction-import-gpg@v4
           with:
-            gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-            passphrase: ${{ secrets.PASSPHRASE }}
+            gpg_private_key: ${{ secrets.gpg-private-key }}
+            passphrase: ${{ secrets.passphrase }}
             git_user_signingkey: true
             git_commit_gpgsign: true
 
@@ -62,15 +71,15 @@ jobs:
             repo: monorepo-for-service-workbench
             branch: testDevelop
           env:
-            GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.merge-token }}
 
         - name: Auto commit updated README files
           uses: stefanzweifel/git-auto-commit-action@v4
           with:
             commit_message: "docs: Auto README.md updates"
             commit_options: '--no-verify --gpg-sign'
-            commit_user_name: ${{ secrets.BOT_USER }} # defaults to "github-actions[bot]"
-            commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
+            commit_user_name: ${{ secrets.bot-user }} # defaults to "github-actions[bot]"
+            commit_user_email: ${{ secrets.bot-user-email }}
             file_pattern: "README.md **/README.md"
             branch: testDevelop
           
@@ -83,6 +92,6 @@ jobs:
             repo: monorepo-for-service-workbench
             branch: testDevelop
           env:
-            GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.merge-token }}
 
   
