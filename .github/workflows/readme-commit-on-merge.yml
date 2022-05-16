@@ -20,7 +20,6 @@ jobs:
   #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
   deploy-example:
-    needs: [readme-commit]
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
