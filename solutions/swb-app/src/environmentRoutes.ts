@@ -1,7 +1,7 @@
 // Environment launch
 import { Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
-import { EnvironmentService } from '@amzn/environments';
+import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
 
 export function setUpEnvRoutes(
   router: Router,
@@ -15,8 +15,10 @@ export function setUpEnvRoutes(
     if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
       // We check that envType is in list of supportedEnvs before calling the environments object
       // nosemgrep
-      const response = await environments[req.body.envType].lifecycle.launch(req.body);
-      res.send(response);
+      await environments[req.body.envType].lifecycle.launch(req.body);
+      // TODO: Handle errors from executing SSM document
+      const env = await environmentService.createEnvironment(req.body);
+      res.send(env);
     } else {
       res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
     }
@@ -83,9 +85,29 @@ export function setUpEnvRoutes(
     }
   });
 
-  // Get Environments
+  // Get Environment
   router.get('/environments/:id', async (req: Request, res: Response) => {
     const env = await environmentService.getEnvironment(req.params.id, true);
+    res.send(env);
+  });
+
+  // Get environments
+  router.get('/environments', async (req: Request, res: Response) => {
+    // TODO: Get user information from req context once Auth has been integrated
+    const user = {
+      role: 'admin',
+      ownerId: ''
+    };
+    const { status } = req.query;
+    let filter = undefined;
+    if (isEnvironmentStatus(status)) {
+      filter = {
+        status
+      };
+    }
+    // TODO: Handle environment not found
+    // TODO: Add support for pagination with limit and pagination token
+    const env = await environmentService.getEnvironments(user, filter);
     res.send(env);
   });
 }

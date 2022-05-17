@@ -3,7 +3,7 @@
 import { AttributeValue, GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
-import EnvironmentStatus from './environmentStatus';
+import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Environment {
@@ -94,6 +94,10 @@ export default class EnvironmentService {
       const data = await this._aws.helpers.ddb
         .query({ key: { name: 'pk', value: marshall(this._buildKey(envId, envKeyNameToKey.environment)) } })
         .execute();
+      if (data.Count === 0) {
+        // TODO: Refactor to use NotFound error or hapi/boom
+        throw new Error(`Environment ${envId} not found`);
+      }
       const items = data.Items!.map((item) => {
         return unmarshall(item);
       });
@@ -201,7 +205,7 @@ export default class EnvironmentService {
     return `${type}#${id}`;
   }
 
-  public async createEnv(params: {
+  public async createEnvironment(params: {
     instance?: string;
     cidr: string;
     description: string;
@@ -332,6 +336,6 @@ export default class EnvironmentService {
     }
 
     //If no error are thrown then transaction was successful. If error did occur then the whole transaction will be rolled back
-    return newEnv;
+    return this.getEnvironment(newEnv.id!, true);
   }
 }

@@ -4,7 +4,7 @@ import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { App, CfnOutput, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
 import Workflow from './environment/workflow';
@@ -275,7 +275,8 @@ export class SWBStack extends Stack {
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      role: apiLambdaRole
+      role: apiLambdaRole,
+      timeout: Duration.seconds(29)
     });
 
     new CfnOutput(this, 'apiLambdaRoleOutput', {

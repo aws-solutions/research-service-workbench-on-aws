@@ -7,7 +7,7 @@ describe('EnvironmentService', () => {
     process.env.AWS_REGION = 'us-east-2';
   });
 
-  const envId = 'd13930d0-8cd0-4502-9e82-be311a8c9a32';
+  const envId = 'd13930d0-8cd0-4502-9e82-be311a8c9a32ZZZ';
   test('getEnvironment, includeMetadata = true', async () => {
     const environmentService = new EnvironmentService({
       TABLE_NAME
@@ -39,7 +39,7 @@ describe('EnvironmentService', () => {
   });
   test('createEnvironment', async () => {
     const environmentService = new EnvironmentService({ TABLE_NAME });
-    const data = await environmentService.createEnv({
+    const data = await environmentService.createEnvironment({
       // instance: 'instance-123',
       cidr: '0.0.0.0/0',
       description: 'test 123',
