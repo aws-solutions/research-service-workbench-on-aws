@@ -120,7 +120,7 @@ describe('Authorization Service', () => {
         expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
-        expect(err.message).toBe(`User is not authorized: ${errorMessage}`);
+        expect(err.message).toBe(`User is forbidden: ${errorMessage}`);
       }
     });
     test('admin is authorized to PUT request on /sample', async () => {
