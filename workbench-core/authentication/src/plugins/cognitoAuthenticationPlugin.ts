@@ -1,9 +1,14 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import jwt from 'jsonwebtoken';
+import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
+import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 
 import { AuthenticationPlugin } from '../authenticationPlugin';
-import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
+import { InvalidJWTError } from '../errors/invalidJwtError';
+import { InvalidAuthorizationCodeError } from '../errors/invalidAuthorizationCodeError';
+import { Tokens } from '../tokens';
+import { PluginConfigurationError } from '../errors/pluginConfigurationError';
+import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 
 export interface CognitoAuthenticationPluginOptions {
   region: string;
@@ -15,12 +20,11 @@ export interface CognitoAuthenticationPluginOptions {
 }
 
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
-  private _region: string;
-  private _authDomain: string;
   private _redirectUri: string;
   private _clientId: string;
   private _clientSecret: string;
 
+  private _oAuth2BaseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
     tokenUse: null;
@@ -35,62 +39,59 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     clientId,
     clientSecret
   }: CognitoAuthenticationPluginOptions) {
-    this._region = region;
-    this._authDomain = authDomain;
     this._redirectUri = redirectUri;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
 
-    this._verifier = CognitoJwtVerifier.create({
-      userPoolId,
-      tokenUse: null, // can check both access and ID tokens
-      clientId
-    });
+    this._oAuth2BaseUrl = `https://${authDomain}.auth.${region}.amazoncognito.com/oauth2`;
+    try {
+      this._verifier = CognitoJwtVerifier.create({
+        userPoolId,
+        tokenUse: null, // can check both access and ID tokens
+        clientId
+      });
+    } catch (error) {
+      throw new PluginConfigurationError(error.message);
+    }
+
+    // this._verifier.hydrate().catch(e => { throw e }); TODO necessary?
   }
 
-  // TODO must be access token
-  public isUserLoggedIn(token: string): boolean {
+  public isUserLoggedIn(accessToken: string): boolean {
     let loggedIn = false;
 
     // A get call to the IDP oauth2/userInfo endpoint will return the access token's user info if the token isn't expired, revoked, malformed, or invalid.
     axios
-      .get(`https://${this._authDomain}.auth.${this._region}.amazoncognito.com/oauth2/userInfo`, {
+      .get(`${this._oAuth2BaseUrl}/userInfo`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${accessToken}`
         }
       })
       .then(() => {
         loggedIn = true;
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch(() => {}); // dont need to handle errors. They all mean the user is not logged in
 
     return loggedIn;
   }
 
-  // TODO how do we want to signify that token is invalid? throw?
-  public validateToken(token: string): Record<string, string | string[] | number | number[]>[] {
+  public validateToken(token: string): CognitoJwtPayload {
     try {
       const parts = this._verifier.verifySync(token);
 
-      return Object.entries(parts).map(([key, value]) => ({
-        [key]: value as string | string[] | number | number[]
-      }));
+      return parts;
     } catch (error) {
-      return [];
+      throw new InvalidJWTError('token is invalid');
     }
   }
 
-  // TODO must be a refresh token
   public revokeToken(token: string): void {
-    // encoded the clientId and secret so it can be used for authorization in a post header.
-    const encodedClientId = Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
+    const encodedClientId = this._getEncodedClientId();
 
     // A post call to the IDP oauth2/revoke endpoint revokes the refresh token and all access tokens generated from it.
     axios
       .post(
-        `https://${this._authDomain}.auth.${this._region}.amazoncognito.com/oauth2/revoke`,
+        `${this._oAuth2BaseUrl}/revoke`,
         new URLSearchParams({
           token: token
         }),
@@ -102,60 +103,45 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       )
       .catch((error) => {
-        console.log(error);
-        /* TODO handle errors
-      If the token isn't present in the request or if the feature is disabled for the app client, you receive an HTTP 400 and error invalid_request.
-      If the token that Amazon Cognito sent in the revocation request isn't a refresh token, you receive an HTTP 400 and error unsupported_token_type.
-      If the client credentials aren't valid, you receive an HTTP 401 and error invalid_client.
-      If the token has been revoked or if the client submitted a token that isn't valid, you receive an HTTP 200 OK.
-      */
+        if ((error as AxiosError<{ error: string }>).response?.data.error === 'invalid_request') {
+          throw new PluginConfigurationError('token revocation is disabled for this app client');
+        }
+        if ((error as AxiosError<{ error: string }>).response?.data.error === 'unsupported_token_type') {
+          throw new InvalidTokenTypeError('only access tokens may be revoked');
+        }
+        if ((error as AxiosError<{ error: string }>).response?.data.error === 'invalid_client') {
+          throw new PluginConfigurationError('invalid client id or client secret');
+        }
+        throw error;
       });
   }
 
-  public getUserIdFromToken(token: string): string {
-    const parts = jwt.decode(token, { json: true });
+  public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
+    const sub = decodedToken.sub;
 
-    if (parts) {
-      if (parts.sub) {
-        return parts.sub;
-      } else {
-        // no sub claim
-        // TODO throw?
-        throw new Error();
-      }
-    } else {
-      // invalid jwt
-      // TODO throw?
-      throw new Error();
+    if (!sub) {
+      // jwt does not have a sub claim
+      throw new InvalidJWTError('no sub claim');
     }
+    return sub;
   }
 
-  public getUserRolesFromToken(token: string): string[] {
-    const parts = jwt.decode(token, { json: true });
-
-    if (parts) {
-      if (parts['cognito:roles']) {
-        return parts['cognito:roles'];
-      } else {
-        // no roles claim
-        // TODO throw?
-        throw new Error();
-      }
-    } else {
-      // invalid jwt
-      // TODO throw?
-      throw new Error();
+  public getUserRolesFromToken(decodedToken: CognitoJwtPayload): string[] {
+    const roles = decodedToken['cognito:groups'];
+    if (!roles) {
+      // jwt does not have a cognito:roles claim
+      throw new InvalidJWTError('no cognito:roles claim');
     }
+    return roles;
   }
 
-  public async handleAuthorizationCode(code: string): Promise<string[]> {
+  public async handleAuthorizationCode(code: string): Promise<Tokens> {
     try {
-      // encoded the clientId and secret so it can be used for authorization in a post header.
-      const encodedClientId = Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
+      const encodedClientId = this._getEncodedClientId();
 
       // A post call to the IDP oauth2/token endpoint trades the code for a set of tokens.
       const response = await axios.post(
-        `https://${this._authDomain}.auth.${this._region}.amazoncognito.com/oauth2/token`,
+        `${this._oAuth2BaseUrl}/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
@@ -170,20 +156,20 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const id_token = response.data.id_token;
-      const access_token = response.data.access_token;
-      const refresh_token = response.data.refresh_token;
-
-      if (!id_token || !access_token || !refresh_token) {
-        // TODO handle error
-        throw new Error();
-      }
-
-      return [id_token, access_token, refresh_token];
+      return {
+        idToken: response.data.id_token,
+        accessToken: response.data.access_token,
+        refreshToken: response.data.refresh_token,
+        tokenType: response.data.token_type,
+        expiresIn: response.data.expires_in
+      };
     } catch (error) {
-      // TODO handle error
-      console.log(error);
-      throw error;
+      throw new InvalidAuthorizationCodeError((error as AxiosError<{ error: string }>).response?.data.error);
     }
+  }
+
+  // encoded the clientId and secret so it can be used for authorization in a post header.
+  private _getEncodedClientId(): string {
+    return Buffer.from(`${this._clientId}:${this._clientSecret}`).toString('base64');
   }
 }

@@ -1,3 +1,6 @@
+import { DecodedJWT } from './decodedJWT';
+import { Tokens } from './tokens';
+
 /**
  * This interface represents the token management functions of an Identity Provider (IdP).
  * This interface should be implemented for each provider used. For instance, a plugin such
@@ -8,48 +11,59 @@ export interface AuthenticationPlugin {
   /**
    * Check to see if the user represented in the current request context is logged in.
    *
-   * @param token - the user's Id or access token from the request context.
+   * @param accessToken - the user's access token from the request context.
    * @returns true if the user represented in the request context is logged in.
    */
-  isUserLoggedIn(token: string): boolean;
+  isUserLoggedIn(accessToken: string): boolean;
 
   /**
    * Validates the jwt token and returns the values on the token.
    *
    * @param token - an Id or Access token to be validated.
-   * @returns An array of Key-Values which represent the token's values.
+   * @returns the decoded jwt.
+   *
+   * @throws {@link InvalidJWTError} if the token is invalid.
    */
-  validateToken(token: string): Record<string, string | string[] | number | number[]>[];
+  validateToken(token: string): DecodedJWT;
 
   /**
    * Tell the Identity Provider to revoke the given token.
+   *
    * @param token - the token to revoke.
+   *
+   * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked.
+   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
    */
   revokeToken(token: string): void;
 
   /**
-   * Get the Id (sub) of the user for whom the token was issued.
-   * This will return the "sub" as defined by the
-   * [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html#Claims)
-   * issued by the IdP.
+   * Get the Id of the user for whom the token was issued.
    *
-   * @param token - an Id or access token from which to extract the user Id.
-   * @returns the `sub` claim found within the token.
+   * @param decodedToken - a decoded Id or access token from which to extract the user Id.
+   * @returns the user Id found within the token.
+   *
+   * @throws {@link InvalidJWTError} if the token doesnt contain the user's Id.
    */
-  getUserIdFromToken(token: string): string;
+  getUserIdFromToken(decodedToken: DecodedJWT): string;
 
   /**
    * Get any roles associated with a user for whom a token was issued.
-   * @param token - an Id or access token from which to find the user's role(s)
+   *
+   * @param decodedToken - a decoded Id or access token from which to find the user's role(s)
    * @returns list of roles included in the jwt token.
+   *
+   * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles.
    */
-  getUserRolesFromToken(token: string): string[];
+  getUserRolesFromToken(decodedToken: DecodedJWT): string[];
 
   /**
    * Take the authorization code parameter and request JWT tokens from the IdP.
    * The authorization code grant is explained [here](https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
+   *
    * @param code - an authorization code given as a query parameter in a user request
-   * @returns ID, access and refresh tokens for the given code.
+   * @returns a {@link Tokens} object containing the id, access, and refresh tokens as well as the token type and expiration.
+   *
+   * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid.
    */
-  handleAuthorizationCode(code: string): Promise<string[]>;
+  handleAuthorizationCode(code: string): Promise<Tokens>;
 }

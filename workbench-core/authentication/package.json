@@ -26,12 +26,10 @@
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^14",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@types/jsonwebtoken": "^8.5.8"
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
   },
   "dependencies": {
     "aws-jwt-verify": "^3.0.0",
-    "axios": "^0.27.1",
-    "jsonwebtoken": "^8.5.1"
+    "axios": "^0.27.1"
   }
 }

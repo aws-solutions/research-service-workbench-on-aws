@@ -275,6 +275,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jwk-to-pem",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lambda-build",
       "allowedCategories": [ "production" ]
     },

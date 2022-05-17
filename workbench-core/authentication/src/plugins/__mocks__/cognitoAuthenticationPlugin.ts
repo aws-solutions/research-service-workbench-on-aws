@@ -1,4 +1,6 @@
+import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 import { AuthenticationPlugin } from '../../authenticationPlugin';
+import { Tokens } from '../../tokens';
 import { CognitoAuthenticationPluginOptions } from '../cognitoAuthenticationPlugin';
 
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
@@ -9,17 +11,32 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     }
     return false;
   }
-  public validateToken(token: string): Record<string, string | string[] | number | number[]>[] {
-    return [{ token }];
+  public validateToken(token: string): CognitoJwtPayload {
+    return {
+      token_use: 'access',
+      sub: 'sub',
+      iss: 'iss',
+      exp: 3600,
+      iat: 123,
+      auth_time: 456,
+      jti: 'jti',
+      origin_jti: 'origin_jti'
+    };
   }
   public revokeToken(token: string): void {}
-  public getUserIdFromToken(token: string): string {
-    return token;
+  public getUserIdFromToken(token: CognitoJwtPayload): string {
+    return 'id';
   }
-  public getUserRolesFromToken(token: string): string[] {
-    return token.split('');
+  public getUserRolesFromToken(token: CognitoJwtPayload): string[] {
+    return ['role'];
   }
-  public handleAuthorizationCode(code: string): Promise<string[]> {
-    return Promise.resolve(['id token', 'access token', 'refresh token']);
+  public handleAuthorizationCode(code: string): Promise<Tokens> {
+    return Promise.resolve({
+      idToken: 'id token',
+      accessToken: 'access token',
+      refreshToken: 'refresh token',
+      tokenType: 'Bearer',
+      expiresIn: 3600
+    });
   }
 }
