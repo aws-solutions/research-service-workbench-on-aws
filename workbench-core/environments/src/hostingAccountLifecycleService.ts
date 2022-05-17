@@ -4,13 +4,12 @@
  */
 
 import _ = require('lodash');
-import { v4 as uuidv4 } from 'uuid';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
+import AccountsService from './accountsService';
 import { Readable } from 'stream';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
@@ -23,8 +22,7 @@ export default class HostingAccountLifecycleService {
   public async initializeAccount(accountMetadata: {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
-    // First check if request body IDs are valid
-    await this.validateInput(accountMetadata);
+    const accountsService = new AccountsService();
 
     const cfService = this._aws.helpers.cloudformation;
     const {
@@ -43,9 +41,14 @@ export default class HostingAccountLifecycleService {
     );
 
     // Finally store the new/updated account details in DDB
-    const accountId = await this.storeToDdb(accountMetadata);
+    let accountDetails;
+    if (_.isUndefined(accountMetadata.id)) {
+      accountDetails = await accountsService.create(accountMetadata);
+    } else {
+      accountDetails = await accountsService.update(accountMetadata);
+    }
 
-    return { ...accountMetadata, accountId };
+    return accountDetails;
   }
 
   /**
@@ -319,82 +322,5 @@ export default class HostingAccountLifecycleService {
     return ssmDocOutputs.map((output: Output) => {
       return this._getNameFromArn({ output, outputName: output.OutputKey });
     });
-  }
-
-  public async validateInput(accountMetadata: { [key: string]: string }): Promise<void> {
-    // Check to see if accountMetadata.id exists in DDB and is mapped to another account
-    if (!_.isUndefined(accountMetadata.id) && !_.isUndefined(accountMetadata.awsAccountId)) {
-      const key = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
-      const ddbEntry = await this._aws.helpers.ddb.get(key).execute();
-      if (
-        'Item' in ddbEntry &&
-        ddbEntry.Item?.awsAccountId &&
-        ddbEntry.Item?.awsAccountId.S !== accountMetadata.awsAccountId
-      ) {
-        throw new Error('The AWS Account mapped to this accountId is different than the one provided');
-      }
-    }
-
-    // Check to see if AWS account ID already exists in DDB, when accountMetadata.id is not provided (new onboard request)
-    if (_.isUndefined(accountMetadata.id) && !_.isUndefined(accountMetadata.awsAccountId)) {
-      const key = { key: { name: 'pk', value: { S: `AWSACC#${accountMetadata.awsAccountId}` } } };
-      const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
-      // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
-      if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0)
-        throw new Error(
-          'This AWS Account was found in DDB. Please provide the correct id value in request body'
-        );
-    }
-  }
-
-  /*
-   * Store hosting account information in DDB
-   */
-  public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
-    // If id is provided then we update. If not, we create
-    if (_.isUndefined(accountMetadata.id)) accountMetadata.id = uuidv4();
-
-    // Future: Only update values that were present in accountMetadata request body (with missing keys)
-    const accountKey = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
-    const accountParams: { item: { [key: string]: AttributeValue } } = {
-      item: {
-        id: { S: accountMetadata.id },
-        accountId: { S: accountMetadata.id },
-        awsAccountId: { S: accountMetadata.awsAccountId },
-        envManagementRoleArn: { S: accountMetadata.envManagementRoleArn },
-        accountHandlerRoleArn: { S: accountMetadata.accountHandlerRoleArn },
-        eventBusArn: { S: accountMetadata.eventBusArn },
-        vpcId: { S: accountMetadata.vpcId },
-        subnetId: { S: accountMetadata.subnetId },
-        cidr: { S: accountMetadata.cidr },
-        encryptionKeyArn: { S: accountMetadata.encryptionKeyArn },
-        environmentInstanceFiles: { S: accountMetadata.environmentInstanceFiles },
-        resourceType: { S: 'account' }
-      }
-    };
-
-    // We add the only optional attribute for account
-    if (accountMetadata.externalId) accountParams.item.externalId = { S: accountMetadata.externalId };
-
-    // Store Account row in DDB
-    await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
-
-    const awsAccountKey = {
-      pk: { S: `AWSACC#${accountMetadata.awsAccountId}` },
-      sk: { S: `ACC#${accountMetadata.id}` }
-    };
-    const awsAccountParams = {
-      item: {
-        id: { S: accountMetadata.awsAccountId },
-        accountId: { S: accountMetadata.id },
-        awsAccountId: { S: accountMetadata.awsAccountId },
-        resourceType: { S: 'aws account' }
-      }
-    };
-
-    // Store AWS Account row in DDB (for easier duplicate checks later on)
-    await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
-
-    return accountMetadata.id;
   }
 }

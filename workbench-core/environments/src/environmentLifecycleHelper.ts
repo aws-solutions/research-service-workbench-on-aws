@@ -6,8 +6,9 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import AccountsService from './accountsService';
 
-export type Operation = 'Launch' | 'Terminate' | 'Start' | 'Stop';
+export type Operation = 'Launch' | 'Terminate';
 
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
@@ -37,23 +38,6 @@ export default class EnvironmentLifecycleHelper {
     });
     updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
     await this.executeSSMDocument(updatedPayload);
-  }
-
-  public async getHostEventBusArn(accountId: string): Promise<string> {
-    const accountDetails = await this.getAccountDDBEntry(accountId);
-    return accountDetails.eventBusArn!.S!;
-  }
-
-  /**
-   * Get Account entry from DDB
-   */
-  public async getAccountDDBEntry(accountId: string): Promise<{ [id: string]: AttributeValue }> {
-    // Get value from aws-accounts in DDB
-    const accountEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ACC#${accountId}` }, sk: { S: `ACC#${accountId}` } })
-      .execute();
-    const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
-    return accountDetails!;
   }
 
   /**
@@ -114,33 +98,23 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
-  private async _getEnvMgmtRoleArn(
-    accountId: string
-  ): Promise<{ envMgmtRoleArn: string; externalId?: string | undefined }> {
-    // Get metadata from DDB for the given hosting account ID, and return its EnvMgmtRoleArn
-    const accountEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ACC#${accountId}` }, sk: { S: `ACC#${accountId}` } })
-      .execute();
-    const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
-    return {
-      envMgmtRoleArn: accountDetails!.envManagementRoleArn!.S!,
-      externalId: accountDetails!.externalId?.S
-    };
-  }
-
   public async getAwsSdkForEnvMgmtRole(payload: {
     operation: string;
     accountId: string;
     envType: string;
   }): Promise<AwsService> {
     console.log(`Assuming EnvMgmt role in ${payload.accountId} account`);
-    const { envMgmtRoleArn, externalId } = await this._getEnvMgmtRoleArn(payload.accountId);
-    console.log(`Assuming EnvMgmt role ${envMgmtRoleArn} with externalId ${externalId}`);
+    const accountsService = new AccountsService();
+    const { envMgmtRoleArn, externalId } = await accountsService.get(payload.accountId, [
+      'envMgmtRoleArn',
+      'externalId'
+    ]);
+    console.log(`Assuming EnvMgmt role ${envMgmtRoleArn!.S!} with externalId ${externalId?.S}`);
     const params = {
-      roleArn: envMgmtRoleArn,
+      roleArn: envMgmtRoleArn!.S!,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
       region: process.env.AWS_REGION!,
-      externalId
+      externalId: externalId?.S
     };
 
     const hostSdk = await this.aws.getAwsServiceForRole(params);

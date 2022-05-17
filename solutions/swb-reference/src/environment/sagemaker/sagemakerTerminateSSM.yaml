@@ -4,23 +4,18 @@ parameters:
   ProvisionedProductId:
     type: String
     description: 'The ID of the Sagemaker provisioned product being terminated.'
-    default: ''
   TerminateToken:
     type: String
     description: '(Required) The unique token ID assigned to this request.'
-    default: ''
   EventBusName:
     type: String
     description: 'The main account event bridge bus name.'
-    default: ''
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    default: ''
   EnvStatusUpdateConstString:
     type: String
     description: 'The string value used by main account to filter host events'
-    default: ''
 mainSteps:
   - name: TerminateSagemaker
     action: 'aws:executeAwsApi'

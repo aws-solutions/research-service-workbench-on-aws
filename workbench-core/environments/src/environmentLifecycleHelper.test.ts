@@ -95,16 +95,6 @@ describe('EnvironmentLifecycleHelper', () => {
     await expect(helper.storeToDdb('samplePk', 'sampleSk', {})).resolves.not.toThrowError();
   });
 
-  test('getAccountDDBEntry does not throw an error', async () => {
-    const helper = new EnvironmentLifecycleHelper();
-    const ddbMock = mockClient(DynamoDBClient);
-
-    // Mock DDB
-    ddbMock.on(GetItemCommand).resolves({ Item: {} });
-
-    await expect(helper.getAccountDDBEntry('sampleAccountId')).resolves.not.toThrowError();
-  });
-
   test('getEnvDDBEntry does not throw an error', async () => {
     const helper = new EnvironmentLifecycleHelper();
     const ddbMock = mockClient(DynamoDBClient);
@@ -147,40 +137,6 @@ describe('EnvironmentLifecycleHelper', () => {
     await expect(
       helper.storeToDdb('a425f28d-97cd-4237-bfc2-66d7a6806a7f', 'a425f28d-97cd-4237-bfc2-66d7a6806a7f', {})
     ).resolves.not.toThrowError();
-  });
-
-  test('getHostEventBusArn does not throw an error', async () => {
-    const helper = new EnvironmentLifecycleHelper();
-    const ddbMock = mockClient(DynamoDBClient);
-    const stsMock = mockClient(STSClient);
-    stsMock.on(AssumeRoleCommand).resolves({
-      Credentials: {
-        AccessKeyId: 'sampleAccessKey',
-        SecretAccessKey: 'sampleSecretAccessKey',
-        SessionToken: 'blah',
-        Expiration: undefined
-      }
-    });
-    ddbMock.on(GetItemCommand).resolves({
-      Item: {
-        pk: {
-          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-        },
-        sk: {
-          S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-        },
-        eventBusArn: {
-          S: 'sampleEventBusArn'
-        }
-      }
-    });
-
-    // Mock DDB
-    ddbMock.on(UpdateItemCommand).resolves({});
-
-    await expect(helper.getHostEventBusArn('a425f28d-97cd-4237-bfc2-66d7a6806a7f')).resolves.toBe(
-      'sampleEventBusArn'
-    );
   });
 
   test('launch does not throw an error', async () => {

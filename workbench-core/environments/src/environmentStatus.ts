@@ -1,7 +1,15 @@
-export type EnvironmentStatus =
+type EnvironmentStatus =
   | 'PENDING'
-  | 'FAILED'
   | 'COMPLETED'
+  | 'STARTING'
+  | 'STARTED'
+  | 'STOPPING'
+  | 'STOPPED'
   | 'TERMINATING'
   | 'TERMINATED'
-  | 'TERMINATING_FAILED';
+  | 'FAILED'
+  | 'TERMINATING_FAILED'
+  | 'STARTING_FAILED'
+  | 'STOPPING_FAILED';
+
+export default EnvironmentStatus;

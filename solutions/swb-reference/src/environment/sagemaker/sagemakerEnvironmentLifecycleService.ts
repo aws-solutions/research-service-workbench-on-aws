@@ -3,7 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvironmentLifecycleService, EnvironmentLifecycleHelper, StatusMap } from '@amzn/environments';
+import {
+  AccountsService,
+  EnvironmentLifecycleService,
+  EnvironmentLifecycleHelper,
+  EnvironmentStatus
+} from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,8 +27,10 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       throw new Error('envId cannot be passed in the request body when trying to launch a new environment');
     }
 
+    const accountsService = new AccountsService();
+
     // Get value from account in DDB
-    const accountDetails = await this.helper.getAccountDDBEntry(envMetadata.accountId);
+    const accountDetails = await accountsService.get(envMetadata.accountId);
     const hostingAccountEventBusArn = accountDetails!.eventBusArn!.S!;
     const encryptionKeyArn = accountDetails!.encryptionKeyArn!.S!;
     const vpcId = accountDetails!.vpcId!.S!;
@@ -33,7 +40,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
 
     const envId = uuidv4();
 
-    // Future: Move some of these values to a envTypeConfig object in DDB
+    // TODO: Some of these values will come from env type config
     const ssmParameters = {
       InstanceName: [`basicnotebookinstance-${Date.now()}`],
       VPC: [vpcId],
@@ -42,7 +49,8 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       ProductId: [envMetadata.productId],
       Namespace: [`sagemaker-${Date.now()}`],
       EncryptionKeyArn: [encryptionKeyArn],
-      CIDR: [cidr],
+      CIDR: [cidr], // from env type config
+      InstanceSize: ['ml.t3.large'], // from env type config
       EventBusName: [hostingAccountEventBusArn],
       EnvId: [envId],
       EnvironmentInstanceFiles: [environmentInstanceFiles],
@@ -64,7 +72,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       awsAccountId: { S: accountDetails!.awsAccountId!.S! },
       envTypeId: { S: `${envMetadata.productId}-${envMetadata.provisioningArtifactId}` },
       resourceType: { S: 'environment' },
-      status: { N: StatusMap.PENDING }
+      status: { S: 'PENDING' as EnvironmentStatus }
     };
 
     // Store env row in DDB
@@ -82,12 +90,13 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     const accountId = envDetails.accountId!.S!;
     const provisionedProductId = envDetails.provisionedProductId!.S!; // This is updated by status handler
 
-    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
+    const accountsService = new AccountsService();
+    const { eventBusArn } = await accountsService.get(accountId, ['eventBusArn']);
 
     const ssmParameters = {
       ProvisionedProductId: [provisionedProductId],
       TerminateToken: [uuidv4()],
-      EventBusName: [hostingAccountEventBusArn],
+      EventBusName: [eventBusArn!.S!],
       EnvId: [envId],
       EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!]
     };
@@ -100,7 +109,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       accountId
     });
 
-    envDetails.status = { N: StatusMap.TERMINATING };
+    envDetails.status = { S: 'TERMINATING' as EnvironmentStatus };
 
     // Store env row in DDB
     await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
@@ -119,27 +128,18 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       return entry!.sk?.S!.startsWith('INID#');
     });
 
-    // Get value from account in DDB
-    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
-
     const instanceName = instanceRecord!.sk!.S!.split('INID#')[1];
 
-    const ssmParameters = {
-      EventBusName: [hostingAccountEventBusArn],
-      EnvId: [envId],
-      EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!],
-      NotebookInstanceName: [instanceName]
-    };
-
-    // Execute termination doc
-    await this.helper.executeSSMDocument({
-      ssmParameters,
+    // Assume hosting account EnvMgmt role
+    const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+      accountId,
       operation: 'Start',
-      envType: 'Sagemaker',
-      accountId
+      envType: 'Sagemaker'
     });
 
-    envDetails.status = { N: StatusMap.STARTING };
+    await hostAwsSdk.clients.sagemaker.startNotebookInstance({ NotebookInstanceName: instanceName });
+
+    envDetails.status = { S: 'STARTING' as EnvironmentStatus };
 
     // Store env row in DDB
     await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
@@ -159,25 +159,16 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     });
     const instanceName = instanceRecord!.sk!.S!.split('INID#')[1];
 
-    // Get value from account in DDB
-    const hostingAccountEventBusArn = await this.helper.getHostEventBusArn(accountId);
-
-    const ssmParameters = {
-      EventBusName: [hostingAccountEventBusArn],
-      EnvId: [envId],
-      EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!],
-      NotebookInstanceName: [instanceName]
-    };
-
-    // Execute termination doc
-    await this.helper.executeSSMDocument({
-      ssmParameters,
-      operation: 'Stop',
-      envType: 'Sagemaker',
-      accountId
+    // Assume hosting account EnvMgmt role
+    const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+      accountId,
+      operation: 'Start',
+      envType: 'Sagemaker'
     });
 
-    envDetails.status = { N: StatusMap.STOPPING };
+    await hostAwsSdk.clients.sagemaker.stopNotebookInstance({ NotebookInstanceName: instanceName });
+
+    envDetails.status = { S: 'STOPPING' as EnvironmentStatus };
 
     // Store env row in DDB
     await this.helper.storeToDdb(`ENV#${envId}`, `ENV#${envId}`, envDetails);
