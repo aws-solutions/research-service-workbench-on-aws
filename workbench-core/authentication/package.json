@@ -6,9 +6,9 @@
   "typings": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.aws.dev/ma-foundation/ma-mono.git"
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
-  "homepage": "https://gitlab.aws.dev/ma-foundation/ma-mono",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
@@ -25,7 +25,7 @@
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
-    "@types/node": "^12",
+    "@types/node": "^14",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
   }
 }
