@@ -19,19 +19,14 @@ on:
         required: true
 
 jobs:
-    if_merged:
-      if: github.event.pull_request.merged == true
+    readme-commit:
       runs-on: ubuntu-20.04
-      permissions:
-        id-token: write
-        contents: read
       
       steps:        
         - uses: actions/checkout@v3
           with:
             token: ${{ secrets.merge-token }}
             fetch-depth: 0
-            ref: 'testDevelop'
 
         - name: Base Action
           uses: ./.github/actions/baseAction
