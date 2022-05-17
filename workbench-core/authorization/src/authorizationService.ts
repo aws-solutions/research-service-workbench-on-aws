@@ -26,6 +26,8 @@ export default class AuthorizationService {
    * @param user - {@link User}.
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
+   *
+   * @throws Foribdden {@link Error} when {@link User} is not authorized
    */
   public async isAuthorizedOnRoute(user: User, route: string, method: HTTPMethod): Promise<void> {
     try {
@@ -34,7 +36,7 @@ export default class AuthorizationService {
 
       await this._authorizationPlugin.isAuthorized(permissions, operations);
     } catch (err) {
-      throw new Error(`User is not authorized: ${err.message}`);
+      throw new Error(`User is forbiden: ${err.message}`);
     }
   }
 }
