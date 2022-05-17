@@ -6,6 +6,9 @@
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
+  // Example iso date string 2022-05-16T21:29:23.461Z
+  const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
   describe('batchEdit', () => {
     test('should succeed with no optional params', async () => {
@@ -56,7 +59,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK' },
-                  sk: { S: 'sampleSK' }
+                  sk: { S: 'sampleSK' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             }
@@ -68,7 +73,7 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toEqual(expectedParams);
+      expect(generatedParams).toMatchObject(expectedParams);
     });
     test('should populate params with optional param: addDeleteRequests', async () => {
       // BUILD
@@ -122,7 +127,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK' },
-                  sk: { S: 'sampleSK' }
+                  sk: { S: 'sampleSK' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             },
@@ -130,7 +137,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK2' },
-                  sk: { S: 'sampleSK2' }
+                  sk: { S: 'sampleSK2' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             }
@@ -142,7 +151,7 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toEqual(expectedParams);
+      expect(generatedParams).toMatchObject(expectedParams);
     });
   });
   describe('deleter', () => {

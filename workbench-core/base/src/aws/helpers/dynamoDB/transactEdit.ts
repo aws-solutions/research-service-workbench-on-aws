@@ -13,7 +13,7 @@ import DynamoDB from '../../clients/dynamoDB';
 /**
  * This class helps with batch writes or deletes.
  */
-class BatchEdit {
+class TransactEdit {
   private _ddb: DynamoDB;
   private _params: TransactWriteItemsCommandInput;
   private _tableName: string;
@@ -29,7 +29,7 @@ class BatchEdit {
    *
    * @param items - Object of the items to add
    */
-  public addPutRequests(items: { [key: string]: AttributeValue }[]) {
+  public addPutRequests(items: { [key: string]: AttributeValue }[]): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
         'TransactEdit<==need to initialize the TransactItems property before adding new request'
@@ -79,4 +79,4 @@ class BatchEdit {
   }
 }
 
-export default BatchEdit;
+export default TransactEdit;

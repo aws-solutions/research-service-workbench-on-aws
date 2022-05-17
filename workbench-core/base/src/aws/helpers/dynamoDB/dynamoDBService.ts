@@ -4,6 +4,7 @@
  */
 
 import BatchEdit from './batchEdit';
+import TransactEdit from './transactEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
@@ -12,7 +13,6 @@ import Updater from './updater';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import _ from 'lodash';
-import TransactEdit from './transactEdit';
 
 export default class DynamoDBService {
   private _awsRegion: string;

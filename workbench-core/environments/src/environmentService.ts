@@ -254,7 +254,11 @@ export default class EnvironmentService {
     }
     // WRITE metadata to DDB
     const items: { [key: string]: AttributeValue }[] = [];
-    const buildEnvPkMetadataSk = (envId: string, metaDataType: string, metaDataId: string) => {
+    const buildEnvPkMetadataSk = (
+      envId: string,
+      metaDataType: string,
+      metaDataId: string
+    ): { pk: string; sk: string } => {
       const sk = `${metaDataType}#${metaDataId}`;
       const pk = `ENV#${envId}`;
       return { pk, sk };
@@ -321,9 +325,7 @@ export default class EnvironmentService {
     );
 
     try {
-      const transactPutResponse = await this._aws.helpers.ddb
-        .transactEdit({ addPutRequest: items })
-        .execute();
+      await this._aws.helpers.ddb.transactEdit({ addPutRequest: items }).execute();
     } catch (e) {
       console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
       throw new Error('Failed to create environment');
