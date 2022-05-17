@@ -1,5 +1,7 @@
 import { User } from '@amzn/workbench-core-authentication';
 import AuthorizationPlugin from './authorizationPlugin';
+import Operation from './operation';
+import Permission from './permission';
 import PermissionsPlugin from './permissionsPlugin';
 import { HTTPMethod } from './routesMap';
 
@@ -26,6 +28,13 @@ export default class AuthorizationService {
    * @param method - {@link HTTPMethod}.
    */
   public async isAuthorizedOnRoute(user: User, route: string, method: HTTPMethod): Promise<void> {
-    throw new Error('Method not implemented');
+    try {
+      const permissions: Permission[] = await this._permissionsPlugin.getPermissionsByUser(user);
+      const operations: Operation[] = await this._permissionsPlugin.getOperationsByRoute(route, method);
+
+      await this._authorizationPlugin.isAuthorized(permissions, operations);
+    } catch (err) {
+      throw new Error(`User is not authorized: ${err.message}`);
+    }
   }
 }
