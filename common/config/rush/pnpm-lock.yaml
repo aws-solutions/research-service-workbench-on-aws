@@ -304,6 +304,7 @@ importers:
       '@aws-sdk/client-ssm': ^3.58.0
       '@aws-sdk/client-sts': ^3.58.0
       '@aws-sdk/types': ^3.55.0
+      '@aws-sdk/util-dynamodb': ^3.87.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -333,6 +334,7 @@ importers:
       '@aws-sdk/client-ssm': 3.84.0
       '@aws-sdk/client-sts': 3.82.0
       '@aws-sdk/types': 3.78.0
+      '@aws-sdk/util-dynamodb': 3.87.0
       lodash: 4.17.21
     devDependencies:
       '@rushstack/eslint-config': 2.6.0_eslint@8.14.0+typescript@4.6.4
@@ -2156,6 +2158,13 @@ packages:
       '@aws-sdk/property-provider': 3.78.0
       '@aws-sdk/types': 3.78.0
       tslib: 2.4.0
+
+  /@aws-sdk/util-dynamodb/3.87.0:
+    resolution: {integrity: sha512-Qh6bHZdVd8+y2h2eJmfYPa5BwNaY65Q135ZbHypQCjiR87Xy50qdVlfWvVmn0EedLqvDVZMPpBrrrcPXMaqvAg==}
+    engines: {node: '>= 12.0.0'}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
 
   /@aws-sdk/util-format-url/3.78.0:
     resolution: {integrity: sha512-wdjt8ZAMyBrH/02QrQtB+S9cwtsBJ6bXRJ3XwL6z7L75nwTflKkzOQUS5Ie7HBf3j3JH0KhlqlEbf2nnM9jsPQ==}
