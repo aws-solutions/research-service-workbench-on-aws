@@ -441,11 +441,11 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
-  public transactEdit(params?: { addPutRequest?: { [key: string]: AttributeValue }[] }): TransactEdit {
+  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.addPutRequest) {
-        transactEdit = transactEdit.addPutRequests(params.addPutRequest);
+        transactEdit = transactEdit.addPutRequests(params.addPutRequest.map((request) => marshall(request)));
       }
     }
     return transactEdit;

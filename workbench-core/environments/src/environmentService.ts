@@ -1,11 +1,12 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
 import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
+import envKeyNameToKey from './environmentKeyNameToKey';
 
 interface Environment {
   id: string | undefined;
@@ -26,6 +27,8 @@ interface Environment {
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  DS?: any;
 }
 const defaultEnv: Environment = {
   id: '',
@@ -42,14 +45,6 @@ const defaultEnv: Environment = {
   updatedAt: '',
   createdAt: '',
   owner: ''
-};
-
-const envKeyNameToKey: { [key: string]: string } = {
-  environment: 'ENV',
-  project: 'PROJ',
-  envType: 'ET',
-  envTypeConfig: 'ETC',
-  dataset: 'DS'
 };
 
 export default class EnvironmentService {
@@ -70,18 +65,18 @@ export default class EnvironmentService {
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
     if (includeMetadata) {
       const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: marshall(this._buildKey(envId, envKeyNameToKey.environment)) } })
+        .query({ key: { name: 'pk', value: this._buildKey(envId, envKeyNameToKey.environment) } })
         .execute();
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
       const items = data.Items!.map((item) => {
-        return unmarshall(item);
+        return item;
       });
       let envWithMetadata: Environment = { ...defaultEnv };
       for (const item of items) {
         // parent environment item
-        if (item.sk === this._buildKey(envId, envKeyNameToKey.environment)) {
+        if ((item.sk as unknown) === this._buildKey(envId, envKeyNameToKey.environment)) {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           // metadata of environment item
@@ -97,10 +92,9 @@ export default class EnvironmentService {
       // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
       // data should be of type GetItemCommandOutput--check it is and Item exists
       if ('Item' in data && data.Item) {
-        const getItemOutput: GetItemCommandOutput = data;
-        return unmarshall(getItemOutput.Item!);
+        return data.Item! as unknown as Environment;
       } else {
-        throw new Error(`Did not get an item returned when trying to get env ${envId}`);
+        throw Boom.notFound(`Could not find environment ${envId}`);
       }
     }
   }
@@ -127,7 +121,7 @@ export default class EnvironmentService {
         // if admin and status is selected in the filter, use GSI getResourceByStatus
         const queryParams = {
           index: 'getResourceByStatus',
-          key: { name: 'resourceType', value: { S: 'environment' } },
+          key: { name: 'resourceType', value: 'environment' },
           sortKey: 'status',
           eq: { S: filter.status }
         };
@@ -136,7 +130,7 @@ export default class EnvironmentService {
         // if admin, use GSI getResourceByUpdatedAt
         const queryParams = {
           index: 'getResourceByUpdatedAt',
-          key: { name: 'resourceType', value: { S: 'environment' } }
+          key: { name: 'resourceType', value: 'environment' }
         };
         data = await this._aws.helpers.ddb.query(queryParams).execute();
       }
@@ -153,7 +147,7 @@ export default class EnvironmentService {
     // check that Items is defined
     if (data && data.Items) {
       environments = data.Items.map((item) => {
-        return unmarshall(item);
+        return item as unknown as Environment;
       });
 
       // Always sort by UpdatedAt values for environments. Newest environment appear first
@@ -169,13 +163,13 @@ export default class EnvironmentService {
     updatedValues: { [key: string]: string }
   ): Promise<UpdateItemCommandOutput> {
     return this._aws.helpers.ddb
-      .update(this._buildPkSk(envId, envKeyNameToKey.environment), { item: marshall(updatedValues) })
+      .update(this._buildPkSk(envId, envKeyNameToKey.environment), { item: updatedValues })
       .execute();
   }
 
-  private _buildPkSk(id: string, type: string): { [key: string]: AttributeValue } {
+  private _buildPkSk(id: string, type: string): { [key: string]: string } {
     const key = this._buildKey(id, type);
-    return marshall({ pk: key, sk: key });
+    return { pk: key, sk: key };
   }
 
   private _buildKey(id: string, type: string): string {
@@ -311,7 +305,8 @@ export default class EnvironmentService {
       await this._aws.helpers.ddb.transactEdit({ addPutRequest: items }).execute();
     } catch (e) {
       console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
-      throw new Error('Failed to create environment');
+      console.error('Failed to create environment', e);
+      throw Boom.internal('Failed to create environment');
     }
 
     //If no error are thrown then transaction was successful. If error did occur then the whole transaction will be rolled back
