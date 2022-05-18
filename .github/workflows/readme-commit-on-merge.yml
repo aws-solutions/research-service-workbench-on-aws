@@ -48,7 +48,7 @@ jobs:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
-      - name: exho commit id
+      - name: echo commit id
         run: |
           echo $CHANGES_DETECTED
           echo $COMMIT_HASH
