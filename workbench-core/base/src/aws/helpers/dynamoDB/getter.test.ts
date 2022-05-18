@@ -11,8 +11,8 @@ describe('getter', () => {
   test('should fail if you try to change table name on a batch get request', async () => {
     // BUILD
     const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
-      { pk: { S: 'testId' }, sk: { S: 'testId' } },
-      { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
     ]);
 
     // OPERATE n CHECK
@@ -22,14 +22,14 @@ describe('getter', () => {
   });
   test('should fail if table name is empty string for single get request', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
 
     // OPERATE n CHECK
     expect(() => getter.table('')).toThrow(`TableName must be a string and can not be empty.`);
   });
   test('should succeed in manually changing the table to single get from', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
     const expectedParams = {
       Key: { pk: { S: 'pk' } },
       TableName: 'actuallyGetFromFromThisTable'
@@ -44,8 +44,8 @@ describe('getter', () => {
   test('should fail if you call .key() on a batch get request', async () => {
     // BUILD
     const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
-      { pk: { S: 'testId' }, sk: { S: 'testId' } },
-      { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
     ]);
 
     // OPERATE n CHECK
@@ -53,21 +53,21 @@ describe('getter', () => {
   });
   test('should succeed in manually changing the key to get in single get request', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
     const expectedParams = {
       Key: { pk: { S: 'actuallyGetThisKey' } },
       TableName: 'sample-table'
     };
 
     // OPERATE
-    const generatedParams = getter.key({ pk: { S: 'actuallyGetThisKey' } }).getItemParams();
+    const generatedParams = getter.key({ pk: 'actuallyGetThisKey' }).getItemParams();
 
     // CHECK
     expect(generatedParams).toEqual(expectedParams);
   });
   test('should succeed in manually changing the key to get if the key has been made undefined beforehand', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
     const expectedParams = {
       Key: { pk: { S: 'actuallyGetThisKey' } },
       TableName: 'sample-table'
@@ -79,14 +79,14 @@ describe('getter', () => {
     if (params) {
       params.Key = undefined;
     }
-    const generatedParams = getter.key({ pk: { S: 'actuallyGetThisKey' } }).getItemParams();
+    const generatedParams = getter.key({ pk: 'actuallyGetThisKey' }).getItemParams();
 
     // CHECK
     expect(generatedParams).toEqual(expectedParams);
   });
   test('should fail if you call .keys() on a single get request', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
 
     // OPERATE n CHECK
     expect(() =>
@@ -99,8 +99,8 @@ describe('getter', () => {
   test('should succeed in manually changing the keys to get in batch get request', async () => {
     // BUILD
     const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
-      { pk: { S: 'testId' }, sk: { S: 'testId' } },
-      { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
     ]);
     const expectedParams = {
       RequestItems: {
@@ -126,7 +126,7 @@ describe('getter', () => {
   });
   test('add two single projection expressions to single get request', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
     const expectedParams = {
       Key: { pk: { S: 'pk' } },
       TableName: 'sample-table',
@@ -141,7 +141,7 @@ describe('getter', () => {
   });
   test('add a single and a list projection expressions to single get request', async () => {
     // BUILD
-    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: { S: 'pk' } });
+    const getter = new Getter({ region: 'us-east-1' }, 'sample-table', { pk: 'pk' });
     const expectedParams = {
       Key: { pk: { S: 'pk' } },
       TableName: 'sample-table',
@@ -161,8 +161,8 @@ describe('getter', () => {
   test('add two single projection expressions to batch get request', async () => {
     // BUILD
     const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
-      { pk: { S: 'testId' }, sk: { S: 'testId' } },
-      { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
     ]);
     const expectedParams = {
       RequestItems: {
@@ -185,8 +185,8 @@ describe('getter', () => {
   test('add a single and a list projection expressions to batch get request', async () => {
     // BUILD
     const getter = new Getter({ region: 'us-east-1' }, 'sample-table', [
-      { pk: { S: 'testId' }, sk: { S: 'testId' } },
-      { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+      { pk: 'testId', sk: 'testId' },
+      { pk: 'testId2', sk: 'testId2' }
     ]);
     const expectedParams = {
       RequestItems: {
