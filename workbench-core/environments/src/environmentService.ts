@@ -272,7 +272,10 @@ export default class EnvironmentService {
         encryptionKeyArn: project.encryptionKeyArn,
         vpcId: project.vpcId,
         subnetId: project.subnetId,
-        externalId: project.externalId
+        externalId: project.externalId,
+        hostingAccountEventBusArn: project.hostingAccountEventBusArn,
+        environmentInstanceFiles: project.environmentInstanceFiles,
+        awsAccountId: project.awsAccountId
       })
     );
 

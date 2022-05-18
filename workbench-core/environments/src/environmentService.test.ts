@@ -7,7 +7,7 @@
 //     process.env.AWS_REGION = 'us-east-2';
 //   });
 //
-//   const envId = 'd13930d0-8cd0-4502-9e82-be311a8c9a32';
+//   const envId = '6c514a47-1152-4f2b-bee9-5a77e0cbd1fe';
 //   test('getEnvironment, includeMetadata = true', async () => {
 //     const environmentService = new EnvironmentService({
 //       TABLE_NAME
