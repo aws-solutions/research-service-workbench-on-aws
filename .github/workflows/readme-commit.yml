@@ -69,9 +69,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.merge-token }}
 
-        - name: Auto commit updated README files
-          id: autocommit
-          uses: stefanzweifel/git-auto-commit-action@v4
+        - uses: stefanzweifel/git-auto-commit-action@v4
           with:
             commit_message: "docs: Auto README.md updates"
             commit_options: '--no-verify --gpg-sign'
@@ -79,9 +77,6 @@ jobs:
             commit_user_email: ${{ secrets.bot-user-email }}
             file_pattern: "README.md **/README.md"
             branch: testDevelop
-          outputs: 
-            commit_hash: "${{ steps.autocommit.outputs.commit_hash }}"
-            changes_detected: "${{ steps.autocommit.outputs.changes_detected }}"
           
         - name: Enable branch protection
           uses: octokit/request-action@v2.x
