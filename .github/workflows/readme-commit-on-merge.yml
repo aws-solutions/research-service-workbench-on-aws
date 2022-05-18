@@ -38,7 +38,6 @@ jobs:
   #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
   deploy-example:
-    needs: [readme-commit]
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@testDevelop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
@@ -86,18 +85,22 @@ jobs:
       - name: Merge to testMain
         run: |
           git checkout testMain
+          COMMIT_ID=''
+          if [[ ${{ needs.readme-commit.outputs.changes_detected }} ]]; then
+            COMMIT_ID=${{ needs.readme-commit.outputs.commit_hash }}
+          else
+            COMMIT_ID=$GITHUB_SHA
+          fi
+          git push origin testMain
           echo
-          echo "  Attempting to merge the 'testDevelop' branch ($(git log -1 --pretty=%H testDevelop))"
+          echo "  Attempting to merge the 'testDevelop' branch ($COMMIT_ID)"
           echo "  into the 'testMain' branch ($(git log -1 --pretty=%H testMain))"
           echo
           echo $GITHUB_SHA
           echo "${{ needs.readme-commit.outputs.commit_hash }}"
           echo "${{ needs.readme-commit.outputs.changes_detected }}"
           echo
-          if [[ "${{ needs.readme-commit.outputs.changes_detected }}" == "true"]]; then
-            git merge --ff-only --no-edit "${{ needs.readme-commit.outputs.commit_hash }}"
-          else
-            git merge --ff-only --no-edit $GITHUB_SHA
+          git merge --ff-only --no-edit $COMMIT_ID
           git push origin testMain
           
       - name: Enable branch protection
