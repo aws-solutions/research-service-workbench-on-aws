@@ -5,7 +5,7 @@ import { CognitoAuthenticationPluginOptions } from '../cognitoAuthenticationPlug
 
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public constructor(options: CognitoAuthenticationPluginOptions) {}
-  public isUserLoggedIn(token: string): boolean {
+  public async isUserLoggedIn(token: string): Promise<boolean> {
     if (token) {
       return true;
     }
@@ -23,14 +23,14 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       origin_jti: 'origin_jti'
     };
   }
-  public revokeToken(token: string): void {}
+  public async revokeToken(token: string): Promise<void> {}
   public getUserIdFromToken(token: CognitoJwtPayload): string {
     return 'id';
   }
   public getUserRolesFromToken(token: CognitoJwtPayload): string[] {
     return ['role'];
   }
-  public handleAuthorizationCode(code: string): Promise<Tokens> {
+  public async handleAuthorizationCode(code: string): Promise<Tokens> {
     return Promise.resolve({
       idToken: 'id token',
       accessToken: 'access token',

@@ -14,7 +14,7 @@ export interface AuthenticationPlugin {
    * @param accessToken - the user's access token from the request context.
    * @returns true if the user represented in the request context is logged in.
    */
-  isUserLoggedIn(accessToken: string): boolean;
+  isUserLoggedIn(accessToken: string): Promise<boolean>;
 
   /**
    * Validates the jwt token and returns the values on the token.
@@ -34,7 +34,7 @@ export interface AuthenticationPlugin {
    * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked.
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
    */
-  revokeToken(token: string): void;
+  revokeToken(token: string): Promise<void>;
 
   /**
    * Get the Id of the user for whom the token was issued.
@@ -64,6 +64,7 @@ export interface AuthenticationPlugin {
    * @returns a {@link Tokens} object containing the id, access, and refresh tokens as well as the token type and expiration.
    *
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid.
+   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
    */
   handleAuthorizationCode(code: string): Promise<Tokens>;
 }

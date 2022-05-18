@@ -3,7 +3,7 @@ import { DecodedJWT } from './decodedJWT';
 import { Tokens } from './tokens';
 
 /**
- * A AuthenticationService instance the is responsible for authenticatng authorization codes and jwt tokens.
+ * An AuthenticationService instance that is responsible for authenticatng authorization codes and jwt tokens.
  */
 export class AuthenticationService {
   private _authenticationPlugin: AuthenticationPlugin;
@@ -22,7 +22,7 @@ export class AuthenticationService {
    * @param accessToken - the user's access token from the request context.
    * @returns true if the user represented in the request context is logged in.
    */
-  public isUserLoggedIn(accessToken: string): boolean {
+  public async isUserLoggedIn(accessToken: string): Promise<boolean> {
     return this._authenticationPlugin.isUserLoggedIn(accessToken);
   }
 
@@ -46,7 +46,7 @@ export class AuthenticationService {
    * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked.
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
    */
-  public revokeToken(token: string): void {
+  public async revokeToken(token: string): Promise<void> {
     return this._authenticationPlugin.revokeToken(token);
   }
 

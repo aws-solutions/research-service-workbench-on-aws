@@ -9,5 +9,8 @@
       "statements": 100
     }
   },
-  "coverageReporters": ["json-summary", "json", "lcov"]
+  "coverageReporters": ["json-summary", "json", "lcov"],
+  "moduleNameMapper": {
+    "#node-web-compat": "./node-web-compat-node.js"
+  }
 }
