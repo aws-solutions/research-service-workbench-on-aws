@@ -1,4 +1,6 @@
 export class InvalidAuthorizationCodeError extends Error {
+  public readonly isInvalidAuthorizationCodeError: boolean;
+
   public constructor(message?: string) {
     super(message);
 
@@ -8,5 +10,10 @@ export class InvalidAuthorizationCodeError extends Error {
     }
 
     this.name = this.constructor.name;
+    this.isInvalidAuthorizationCodeError = true;
   }
+}
+
+export function isInvalidAuthorizationCodeError(error: unknown): error is InvalidAuthorizationCodeError {
+  return Boolean(error) && (error as InvalidAuthorizationCodeError).isInvalidAuthorizationCodeError === true;
 }

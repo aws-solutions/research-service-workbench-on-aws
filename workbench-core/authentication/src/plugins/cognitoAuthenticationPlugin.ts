@@ -12,12 +12,12 @@ import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 
 export interface CognitoAuthenticationPluginOptions {
   /**
-   * The Cognito domain. Follows the format: "https://<domain prefix>.auth.<region>.amazoncognito.com"
+   * The Cognito domain. Follows the format: "https://\<domain prefix\>.auth.\<region\>.amazoncognito.com"
    */
   cognitoDomain: string;
 
   /**
-   * The Cognito user pool ID. Follows the format: "<region>_<some string>"
+   * The Cognito user pool ID. Follows the format: "\<region\>_\<some string\>"
    */
   userPoolId: string;
 

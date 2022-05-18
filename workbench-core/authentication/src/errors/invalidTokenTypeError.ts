@@ -1,4 +1,6 @@
 export class InvalidTokenTypeError extends Error {
+  public readonly isInvalidTokenTypeError: boolean;
+
   public constructor(message?: string) {
     super(message);
 
@@ -8,5 +10,10 @@ export class InvalidTokenTypeError extends Error {
     }
 
     this.name = this.constructor.name;
+    this.isInvalidTokenTypeError = true;
   }
+}
+
+export function isInvalidTokenTypeError(error: unknown): error is InvalidTokenTypeError {
+  return Boolean(error) && (error as InvalidTokenTypeError).isInvalidTokenTypeError === true;
 }

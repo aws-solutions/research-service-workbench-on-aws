@@ -1,4 +1,6 @@
 export class InvalidJWTError extends Error {
+  public readonly isInvalidJWTError: boolean;
+
   public constructor(message?: string) {
     super(message);
 
@@ -8,5 +10,10 @@ export class InvalidJWTError extends Error {
     }
 
     this.name = this.constructor.name;
+    this.isInvalidJWTError = true;
   }
+}
+
+export function isInvalidJWTError(error: unknown): error is InvalidJWTError {
+  return Boolean(error) && (error as InvalidJWTError).isInvalidJWTError === true;
 }

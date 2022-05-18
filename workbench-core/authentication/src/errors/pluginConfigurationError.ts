@@ -1,4 +1,6 @@
 export class PluginConfigurationError extends Error {
+  public readonly isPluginConfigurationError: boolean;
+
   public constructor(message?: string) {
     super(message);
 
@@ -8,5 +10,10 @@ export class PluginConfigurationError extends Error {
     }
 
     this.name = this.constructor.name;
+    this.isPluginConfigurationError = true;
   }
+}
+
+export function isPluginConfigurationError(error: unknown): error is PluginConfigurationError {
+  return Boolean(error) && (error as PluginConfigurationError).isPluginConfigurationError === true;
 }

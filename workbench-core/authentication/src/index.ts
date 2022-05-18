@@ -6,9 +6,12 @@ export {
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions
 } from './plugins/cognitoAuthenticationPlugin';
-export { InvalidJWTError } from './errors/invalidJwtError';
-export { InvalidAuthorizationCodeError } from './errors/invalidAuthorizationCodeError';
-export { PluginConfigurationError } from './errors/pluginConfigurationError';
-export { InvalidTokenTypeError } from './errors/invalidTokenTypeError';
+export { InvalidJWTError, isInvalidJWTError } from './errors/invalidJwtError';
+export {
+  InvalidAuthorizationCodeError,
+  isInvalidAuthorizationCodeError
+} from './errors/invalidAuthorizationCodeError';
+export { PluginConfigurationError, isPluginConfigurationError } from './errors/pluginConfigurationError';
+export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalidTokenTypeError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
