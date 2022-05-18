@@ -43,6 +43,6 @@ runs:
       shell: bash
       run: node common/scripts/install-run-rush.js check
 
-    - name: Rush build
-      shell: bash
-      run: node common/scripts/install-run-rush.js build --verbose
+    # - name: Rush build
+    #   shell: bash
+    #   run: node common/scripts/install-run-rush.js build --verbose
