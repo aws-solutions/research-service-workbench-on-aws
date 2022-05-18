@@ -21,6 +21,7 @@ jobs:
       merge-token: ${{ secrets.MERGE_TOKEN }}
       bot-user: ${{ secrets.BOT_USER }}
       bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      
   # deploy-swb-reference:
   #   needs: [readme-commit]
   #   uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
