@@ -1,7 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
-const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+import { UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService } from '@amzn/workbench-core-base';
 import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
@@ -291,13 +290,6 @@ export default class EnvironmentService {
     });
 
     try {
-      // await this._aws.helpers.ddb
-      //   .transactEdit({
-      //     addPutRequest: items.map((item) => {
-      //       return marshall(item);
-      //     })
-      //   })
-      //   .execute();
       await this._aws.helpers.ddb
         .transactEdit({
           addPutRequest: items
