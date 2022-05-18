@@ -51,17 +51,17 @@ jobs:
         # if: needs.verify-commit-msg.outputs.not-match == 'true'
         run: node common/scripts/install-run-rush.js test --verbose
 
-      - name: Cfn-nag Action
-        # if: needs.verify-commit-msg.outputs.not-match == 'true'
-        uses: ./.github/actions/cfnNagAction
+      # - name: Cfn-nag Action
+      #   # if: needs.verify-commit-msg.outputs.not-match == 'true'
+      #   uses: ./.github/actions/cfnNagAction
 
-      - name: Git-secrets Action
-        # if: needs.verify-commit-msg.outputs.not-match == 'true'
-        uses: ./.github/actions/gitSecretsAction
+      # - name: Git-secrets Action
+      #   # if: needs.verify-commit-msg.outputs.not-match == 'true'
+      #   uses: ./.github/actions/gitSecretsAction
 
-      - name: Viperlight Action
-        # if: needs.verify-commit-msg.outputs.not-match == 'true'
-        uses: ./.github/actions/viperlightAction
+      # - name: Viperlight Action
+      #   # if: needs.verify-commit-msg.outputs.not-match == 'true'
+      #   uses: ./.github/actions/viperlightAction
 
           
 
