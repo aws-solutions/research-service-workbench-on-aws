@@ -90,6 +90,10 @@ jobs:
           echo "  Attempting to merge the 'testDevelop' branch ($(git log -1 --pretty=%H testDevelop))"
           echo "  into the 'testMain' branch ($(git log -1 --pretty=%H testMain))"
           echo
+          echo $GITHUB_SHA
+          echo "${{ needs.readme-commit.outputs.commit_hash }}"
+          echo "${{ needs.readme-commit.outputs.changes_detected }}"
+          echo
           git merge --ff-only --no-edit testDevelop
           git push origin testMain
           
