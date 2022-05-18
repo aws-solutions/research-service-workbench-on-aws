@@ -88,7 +88,7 @@ jobs:
       - name: Merge to testMain
         run: |
           COMMIT_ID=''
-          if [[ $CHANGES_DETECTED ]]; then
+          if $CHANGES_DETECTED; then
             COMMIT_ID=$COMMIT_HASH
           else
             COMMIT_ID=$GITHUB_SHA
@@ -101,7 +101,7 @@ jobs:
           echo
           echo $GITHUB_SHA
           echo "$COMMIT_HASH"
-          echo "CHANGES_DETECTED"
+          echo "$CHANGES_DETECTED"
           echo "$COMMIT_ID"
           echo
           git merge $COMMIT_ID --ff-only --no-edit 
