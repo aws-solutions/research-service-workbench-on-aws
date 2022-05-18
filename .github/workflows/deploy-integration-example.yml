@@ -36,9 +36,7 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: Rush test and update the README file in each package with the coverage badge
-        # if: needs.verify-commit-msg.outputs.not-match == 'true'
-        run: node common/scripts/install-run-rush.js test --verbose
+      
 
       - name: Configure AWS Credentials
         # if: steps.changed-swb-files.outputs.any_changed == 'true'

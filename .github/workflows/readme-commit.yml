@@ -17,6 +17,13 @@ on:
         required: true
       bot-user-email:
         required: true
+    outputs:
+      commit_hash:
+        description: 'README update commit hash'
+        value: "${{ jobs.readme-commit.outputs.commit_hash }}"
+      changes_detected:
+        description: 'changes detected flag'
+        value: "${{ jobs.readme-commit.outputs.changes_detected }}"
 
 jobs:
     readme-commit:
@@ -80,6 +87,13 @@ jobs:
             commit_user_email: ${{ secrets.bot-user-email }}
             file_pattern: "README.md **/README.md"
             branch: testDevelop
+
+        # - name: Verify the auto commit message
+        #   id: autocommit
+        #   run: |
+        #       echo "::set-output name=commit_hash::${{ steps.auto-commit-action.outputs.commit_hash }}"
+        #       echo "::set-output name=changes_detected::${{ steps.auto-commit-action.outputs.changes_detected }}"
+          
 
         - name: echo commit id
           run: |
