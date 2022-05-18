@@ -22,8 +22,8 @@ jobs:
     readme-commit:
       runs-on: ubuntu-20.04
       outputs:
-        commit_hash: "${{ steps.autocommit.outputs.commit_hash }}"
-        changes_detected: "${{ steps.autocommit.outputs.changes_detected }}"
+        commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
+        changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
       
       steps:        
         - uses: actions/checkout@v3
@@ -80,6 +80,11 @@ jobs:
             commit_user_email: ${{ secrets.bot-user-email }}
             file_pattern: "README.md **/README.md"
             branch: testDevelop
+
+        - name: echo commit id
+          run: |
+            echo "${{ steps.auto-commit-action.outputs.changes_detected }}"
+            echo "${{ steps.auto-commit-action.outputs.changes_detected }}"
           
         - name: Enable branch protection
           uses: octokit/request-action@v2.x
