@@ -14,7 +14,7 @@
     "compile": "node scripts/buildLambda.js",
     "build": "rushx compile && heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
-    "test": "heft test --clean --test-path-pattern infrastructure-stack && rushx make-badges",
+    "test": "rushx compile && heft test --clean --test-path-pattern infrastructure-stack && rushx make-badges",
     "test:only": "heft test -u --clean --test-path-pattern infrastructure-stack",
     "build:test": "rushx build && rushx test:only && rushx make-badges",
     "test:integration": "heft test -u --clean",
