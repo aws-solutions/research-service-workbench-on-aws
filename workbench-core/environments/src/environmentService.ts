@@ -5,6 +5,7 @@ const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 import { AwsService } from '@amzn/workbench-core-base';
 import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
+import Boom from '@hapi/boom';
 
 interface Environment {
   id: string | undefined;
@@ -51,6 +52,7 @@ const envKeyNameToKey: { [key: string]: string } = {
   dataset: 'DS'
 };
 
+// TODO Get params from workbench-core/base
 interface QueryParams {
   index?: string;
   key?: { name: string; value: AttributeValue };
@@ -95,8 +97,7 @@ export default class EnvironmentService {
         .query({ key: { name: 'pk', value: marshall(this._buildKey(envId, envKeyNameToKey.environment)) } })
         .execute();
       if (data.Count === 0) {
-        // TODO: Refactor to use NotFound error or hapi/boom
-        throw new Error(`Environment ${envId} not found`);
+        throw Boom.notFound(`Could not find environment ${envId}`);
       }
       const items = data.Items!.map((item) => {
         return unmarshall(item);
@@ -156,7 +157,7 @@ export default class EnvironmentService {
         };
         data = await this._aws.helpers.ddb.query(queryParams).execute();
       } else {
-        // if admin, use GSI getResourceByUpdatedAt--for now, use filter. TODO: use requestContext.
+        // if admin, use GSI getResourceByUpdatedAt
         const queryParams: QueryParams = {
           index: 'getResourceByUpdatedAt',
           key: { name: 'resourceType', value: { S: 'environment' } }
@@ -218,7 +219,6 @@ export default class EnvironmentService {
     envTypeConfigId: string;
     status: EnvironmentStatus;
   }): Promise<Environment> {
-    // TODO: Add envIdToInstanceId service
     const itemsToGet = [
       marshall({
         pk: envKeyNameToKey.envTypeConfig,

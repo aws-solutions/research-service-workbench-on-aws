@@ -86,6 +86,7 @@ importers:
     specifiers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -104,6 +105,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      '@hapi/boom': 10.0.0
       express: 4.18.1
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
@@ -366,6 +368,7 @@ importers:
       '@aws-sdk/client-sts': ^3.58.0
       '@aws-sdk/types': ^3.55.0
       '@aws-sdk/util-dynamodb': ^3.87.0
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -398,6 +401,7 @@ importers:
       '@aws-sdk/client-ssm': 3.84.0
       '@aws-sdk/client-sts': 3.82.0
       '@aws-sdk/util-dynamodb': 3.92.0
+      '@hapi/boom': 10.0.0
       generate-password: 1.7.0
       lodash: 4.17.21
       md5-file: 5.0.0
@@ -3592,6 +3596,16 @@ packages:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
+
+  /@hapi/boom/10.0.0:
+    resolution: {integrity: sha512-1YVs9tLHhypBqqinKQRqh7FUERIolarQApO37OWkzD+z6y6USi871Sv746zBPKcIOBuI6g6y4FrwX87mmJ90Gg==}
+    dependencies:
+      '@hapi/hoek': 10.0.0
+    dev: false
+
+  /@hapi/hoek/10.0.0:
+    resolution: {integrity: sha512-CeNFz1JcLZ5xE8Vc9aau37cgHw9bxXqSDK/D55GF2GAOv0n0XjyyjSodHtKahB7A1tV3FlgCpijp3zkSITmBdA==}
+    dev: false
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}
