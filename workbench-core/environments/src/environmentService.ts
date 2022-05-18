@@ -52,30 +52,6 @@ const envKeyNameToKey: { [key: string]: string } = {
   dataset: 'DS'
 };
 
-// TODO Get params from workbench-core/base
-interface QueryParams {
-  index?: string;
-  key?: { name: string; value: AttributeValue };
-  sortKey?: string;
-  eq?: AttributeValue;
-  lt?: AttributeValue;
-  lte?: AttributeValue;
-  gt?: AttributeValue;
-  gte?: AttributeValue;
-  between?: { value1: AttributeValue; value2: AttributeValue };
-  begins?: AttributeValue;
-  start?: { [key: string]: AttributeValue };
-  filter?: string;
-  strong?: boolean;
-  names?: { [key: string]: string };
-  values?: { [key: string]: AttributeValue };
-  projection?: string | string[];
-  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
-  limit?: number;
-  forward?: boolean;
-  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-}
-
 export default class EnvironmentService {
   private _aws: AwsService;
   private _tableName: string;
@@ -149,7 +125,7 @@ export default class EnvironmentService {
     if (user.role === 'admin') {
       if (filter && filter.status) {
         // if admin and status is selected in the filter, use GSI getResourceByStatus
-        const queryParams: QueryParams = {
+        const queryParams = {
           index: 'getResourceByStatus',
           key: { name: 'resourceType', value: { S: 'environment' } },
           sortKey: 'status',
@@ -158,14 +134,14 @@ export default class EnvironmentService {
         data = await this._aws.helpers.ddb.query(queryParams).execute();
       } else {
         // if admin, use GSI getResourceByUpdatedAt
-        const queryParams: QueryParams = {
+        const queryParams = {
           index: 'getResourceByUpdatedAt',
           key: { name: 'resourceType', value: { S: 'environment' } }
         };
         data = await this._aws.helpers.ddb.query(queryParams).execute();
       }
     } else {
-      const queryParams: QueryParams = {
+      const queryParams = {
         index: 'getResourceByOwner',
         key: { name: 'resourceType', value: { S: 'environment' } },
         sortKey: 'owner',
