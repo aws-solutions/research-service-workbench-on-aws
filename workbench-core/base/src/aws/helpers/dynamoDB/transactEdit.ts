@@ -6,7 +6,8 @@
 import {
   AttributeValue,
   BatchWriteItemCommandOutput,
-  TransactWriteItemsCommandInput
+  TransactWriteItemsCommandInput,
+  TransactWriteItemsCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import DynamoDB from '../../clients/dynamoDB';
 
@@ -72,9 +73,9 @@ class TransactEdit {
    * Call this after populating the command input params with the above methods.
    * If UnproccessedItems is non empty, some request failed.
    *
-   * @returns The output from the batch write item command
+   * @returns The output from the transact write item command
    */
-  public async execute(): Promise<BatchWriteItemCommandOutput> {
+  public async execute(): Promise<TransactWriteItemsCommandOutput> {
     return await this._ddb.transactWrite(this._params);
   }
 }

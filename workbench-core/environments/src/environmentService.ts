@@ -190,10 +190,10 @@ export default class EnvironmentService {
     status: EnvironmentStatus;
   }): Promise<Environment> {
     const itemsToGet = [
-      marshall({
+      {
         pk: envKeyNameToKey.envTypeConfig,
         sk: `${envKeyNameToKey.envType}#${params.envTypeId}${envKeyNameToKey.envTypeConfig}#${params.envTypeConfigId}`
-      }),
+      },
       this._buildPkSk(params.projectId, envKeyNameToKey.project),
       ...params.datasetIds.map((dsId) => {
         return this._buildPkSk(dsId, envKeyNameToKey.dataset);
@@ -217,17 +217,17 @@ export default class EnvironmentService {
       status: params.status
     };
     // GET metadata
-    let metadata = [];
+    let metadata: any[] = [];
     if ('Responses' in batchGetResult) {
       if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
         throw new Error('Unable to get metadata for all keys defined in environment');
       }
       metadata = batchGetResult.Responses![this._tableName].map((item) => {
-        return unmarshall(item);
+        return item;
       });
     }
     // WRITE metadata to DDB
-    const items: { [key: string]: AttributeValue }[] = [];
+    const items: { [key: string]: unknown }[] = [];
     const buildEnvPkMetadataSk = (
       envId: string,
       metaDataType: string,
@@ -242,67 +242,67 @@ export default class EnvironmentService {
     const envTypeConfig = metadata.find((item) => {
       return item.resourceType === 'envTypeConfig';
     });
-    items.push(
-      marshall({
-        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.envTypeConfig, newEnv.envTypeConfigId),
-        id: newEnv.envTypeConfigId,
-        productId: envTypeConfig.productId,
-        provisioningArtifactId: envTypeConfig.provisioningArtifactId,
-        params: envTypeConfig.params
-      })
-    );
+    items.push({
+      ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.envTypeConfig, newEnv.envTypeConfigId),
+      id: newEnv.envTypeConfigId,
+      productId: envTypeConfig.productId,
+      provisioningArtifactId: envTypeConfig.provisioningArtifactId,
+      params: envTypeConfig.params
+    });
 
     //add project
     const project = metadata.find((item) => {
       return item.resourceType === 'project';
     });
-    items.push(
-      marshall({
-        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.project, newEnv.projectId),
-        id: newEnv.projectId,
-        name: project.name,
-        envMgmtRoleArn: project.envMgmtRoleArn,
-        accountHandlerRoleArn: project.accountHandlerRoleArn,
-        encryptionKeyArn: project.encryptionKeyArn,
-        vpcId: project.vpcId,
-        subnetId: project.subnetId,
-        externalId: project.externalId,
-        hostingAccountEventBusArn: project.hostingAccountEventBusArn,
-        environmentInstanceFiles: project.environmentInstanceFiles,
-        awsAccountId: project.awsAccountId
-      })
-    );
+    items.push({
+      ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.project, newEnv.projectId),
+      id: newEnv.projectId,
+      name: project.name,
+      envMgmtRoleArn: project.envMgmtRoleArn,
+      accountHandlerRoleArn: project.accountHandlerRoleArn,
+      encryptionKeyArn: project.encryptionKeyArn,
+      vpcId: project.vpcId,
+      subnetId: project.subnetId,
+      externalId: project.externalId,
+      hostingAccountEventBusArn: project.hostingAccountEventBusArn,
+      environmentInstanceFiles: project.environmentInstanceFiles,
+      awsAccountId: project.awsAccountId
+    });
 
     //add dataset
     const datasets = metadata.filter((item) => {
       return item.resourceType === 'dataset';
     });
     datasets.forEach((dataset) => {
-      items.push(
-        marshall({
-          ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.dataset, dataset.id),
-          id: dataset.id,
-          name: dataset.name,
-          resources: dataset.resources
-        })
-      );
+      items.push({
+        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.dataset, dataset.id),
+        id: dataset.id,
+        name: dataset.name,
+        resources: dataset.resources
+      });
     });
 
     // Add environment item
-    items.push(
-      marshall(
-        {
-          ...newEnv,
-          pk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
-          sk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
-          resourceType: 'environment'
-        },
-        { removeUndefinedValues: true }
-      )
-    );
+    items.push({
+      ...newEnv,
+      pk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
+      sk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
+      resourceType: 'environment'
+    });
 
     try {
-      await this._aws.helpers.ddb.transactEdit({ addPutRequest: items }).execute();
+      // await this._aws.helpers.ddb
+      //   .transactEdit({
+      //     addPutRequest: items.map((item) => {
+      //       return marshall(item);
+      //     })
+      //   })
+      //   .execute();
+      await this._aws.helpers.ddb
+        .transactEdit({
+          addPutRequest: items
+        })
+        .execute();
     } catch (e) {
       console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
       console.error('Failed to create environment', e);
