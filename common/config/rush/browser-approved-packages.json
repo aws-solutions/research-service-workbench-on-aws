@@ -139,6 +139,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@microsoft/rush-lib",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -155,7 +159,11 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@rushstack/heft-webpack5-plugin",
+      "name": "@rushstack/node-core-library",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/ts-command-line",
       "allowedCategories": [ "production" ]
     },
     {
@@ -216,6 +224,10 @@
     },
     {
       "name": "constructs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "diff",
       "allowedCategories": [ "production" ]
     },
     {

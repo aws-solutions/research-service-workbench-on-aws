@@ -6,3 +6,4 @@ export { default as CASLAuthorizationPlugin } from './caslAuthorizationPlugin';
 export { default as Permission, PermissionsMap, Effect } from './permission';
 export { Action } from './action';
 export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
+export { default as AuthorizationService } from './authorizationService';
