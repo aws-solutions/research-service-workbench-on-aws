@@ -2,14 +2,14 @@
   "name": "@amzn/workbench-core-repo-toolbox",
   "description": "Used to update repo's README.md file with package information",
   "version": "0.0.1",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "private": true,
   "scripts": {
     "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
