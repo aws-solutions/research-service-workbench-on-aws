@@ -84,14 +84,14 @@ jobs:
 
       - name: Merge to testMain
         run: |
-          git checkout testMain
           COMMIT_ID=''
           if [[ ${{ needs.readme-commit.outputs.changes_detected }} ]]; then
             COMMIT_ID=${{ needs.readme-commit.outputs.commit_hash }}
           else
             COMMIT_ID=$GITHUB_SHA
           fi
-          git push origin testMain
+          echo "$COMMIT_ID"
+          git checkout testMain
           echo
           echo "  Attempting to merge the 'testDevelop' branch ($COMMIT_ID)"
           echo "  into the 'testMain' branch ($(git log -1 --pretty=%H testMain))"
@@ -99,8 +99,9 @@ jobs:
           echo $GITHUB_SHA
           echo "${{ needs.readme-commit.outputs.commit_hash }}"
           echo "${{ needs.readme-commit.outputs.changes_detected }}"
+          echo "$COMMIT_ID"
           echo
-          git merge --ff-only --no-edit $COMMIT_ID
+          git merge $COMMIT_ID --ff-only --no-edit 
           git push origin testMain
           
       - name: Enable branch protection
