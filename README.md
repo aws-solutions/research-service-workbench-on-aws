@@ -1,7 +1,5 @@
 # Worflow Status
-[![Build-and-test](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
-[![Deploy-and-integration-test-example](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-example/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-example/badge.svg)
-[![Deploy-and-integration-test-swb-reference](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-swb-reference/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Deploy-and-integration-test-swb-reference/badge.svg)
+[![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
@@ -14,7 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-89.13%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.63%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.7%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.91%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-89.34%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.8%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-92.16%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.06%25-brightgreen.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -25,23 +23,29 @@ Please read through this document before submitting any issues or pull requests 
 
 In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#monorepo-for-service-workbench-development-instructions)
 
+<!-- GENERATED PROJECT SUMMARY START -->
+
 ## Packages
+
+<!-- the table below was generated using the ./repo-scripts/repo-toolbox script -->
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
 | [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
-| [solutions/swb-reference/](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
-| [solutions/example-ui-app](./solutions/example-ui-app/) | [@amzn/example-ui-app] | [README](./solutions/example-ui-app/README.md)
-| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md)
-| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
-| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
-| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
-| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
-| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
+| [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
+| [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
+| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
+| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
+| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
+| [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
+| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
 | [workbench-core/example/express](./workbench-core/example/express/) | [@amzn/workbench-core-express] | [README](./workbench-core/example/express/README.md)
 | [workbench-core/example/infrastructure](./workbench-core/example/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/example/infrastructure/README.md)
-
+| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/repo-scripts/repo-toolbox](./workbench-core/repo-scripts/repo-toolbox/) | [@amzn/workbench-core-repo-toolbox] | [README](./workbench-core/repo-scripts/repo-toolbox/README.md)
+<!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on
 
