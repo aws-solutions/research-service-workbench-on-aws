@@ -64,7 +64,10 @@ jobs:
     name: Merge develop to TestMain
     runs-on: ubuntu-20.04
     needs: [readme-commit, deploy-example]
-
+    env: 
+      COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
+      CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
+      
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,8 +88,8 @@ jobs:
       - name: Merge to testMain
         run: |
           COMMIT_ID=''
-          if [[ ${{ needs.readme-commit.outputs.changes_detected }} ]]; then
-            COMMIT_ID=${{ needs.readme-commit.outputs.commit_hash }}
+          if [[ $CHANGES_DETECTED ]]; then
+            COMMIT_ID=$COMMIT_HASH
           else
             COMMIT_ID=$GITHUB_SHA
           fi
@@ -97,8 +100,8 @@ jobs:
           echo "  into the 'testMain' branch ($(git log -1 --pretty=%H testMain))"
           echo
           echo $GITHUB_SHA
-          echo "${{ needs.readme-commit.outputs.commit_hash }}"
-          echo "${{ needs.readme-commit.outputs.changes_detected }}"
+          echo "$COMMIT_HASH"
+          echo "CHANGES_DETECTED"
           echo "$COMMIT_ID"
           echo
           git merge $COMMIT_ID --ff-only --no-edit 
