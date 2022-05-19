@@ -8,7 +8,7 @@ import { Box, Button } from '@awsui/components-react';
  * <Table empty={ TableEmptyDisplay("workspace") } />
  * // Displays "No workspaces" title
  * // "No workspaces to display."
- * // <Button> with "Create workspace"
+ * // <Button> with "Create workspace" text
  * ```
  * @returns empty table information and call to action
  */

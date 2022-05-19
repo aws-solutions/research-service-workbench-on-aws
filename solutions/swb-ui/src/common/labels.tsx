@@ -1,15 +1,5 @@
 import { AppLayoutProps, PaginationProps, PropertyFilterProps } from '@awsui/components-react';
 
-export const layoutLabels: AppLayoutProps.Labels = {
-  navigation: 'Navigation drawer',
-  navigationClose: 'Close navigation drawer',
-  navigationToggle: 'Open navigation drawer',
-  notifications: 'Notifications',
-  tools: 'Help panel',
-  toolsClose: 'Close help panel',
-  toolsToggle: 'Open help panel'
-};
-
 // i18nStrings labels for <PropertyFilter>
 export const i18nStrings: PropertyFilterProps.I18nStrings = {
   filteringAriaLabel: 'your choice',
@@ -40,6 +30,16 @@ export const i18nStrings: PropertyFilterProps.I18nStrings = {
   clearFiltersText: 'Clear filters',
   removeTokenButtonAriaLabel: () => 'Remove token',
   enteredTextLabel: (text: string) => `Use: "${text}"`
+};
+
+export const layoutLabels: AppLayoutProps.Labels = {
+  navigation: 'Navigation drawer',
+  navigationClose: 'Close navigation drawer',
+  navigationToggle: 'Open navigation drawer',
+  notifications: 'Notifications',
+  tools: 'Help panel',
+  toolsClose: 'Close help panel',
+  toolsToggle: 'Open help panel'
 };
 
 export const paginationLables: PaginationProps.Labels = {

@@ -38,3 +38,12 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     sortingField: 'workspaceCost'
   }
 ];
+
+export const searchableColumns: string[] = [
+  'workspaceName',
+  'workspaceStatus',
+  'createdAt',
+  'project',
+  'owner',
+  'workspaceCost'
+];

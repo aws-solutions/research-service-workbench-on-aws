@@ -9,6 +9,7 @@ import {
   BreadcrumbGroup,
   BreadcrumbGroupProps,
   Button,
+  CollectionPreferences,
   DateRangePicker,
   DateRangePickerProps,
   Header,
@@ -22,16 +23,20 @@ import {
 import { useCollection } from '@awsui/collection-hooks';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useSettings } from '../context/SettingsContext';
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import React from 'react';
 import { i18nStrings, paginationLables } from '../common/labels';
 import { allItems } from '../environments-table-config/workspacesData';
-import { columnDefinitions } from '../environments-table-config/workspacesColumnDefinitions';
+import {
+  columnDefinitions,
+  searchableColumns
+} from '../environments-table-config/workspacesColumnDefinitions';
 import { getFilterCounterText } from '../common/tableCounterStrings';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import { relativeOptions } from '../common/dateRelativeOptions';
-import { isValidRangeFunction } from '../common/dateRelativeProperties';
+import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
+import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
+import { isWithinInterval } from 'date-fns';
 import Navigation from '../components/Navigation';
 import { layoutLabels } from '../common/labels';
 import styles from '../styles/BaseLayout.module.scss';
@@ -76,32 +81,52 @@ const Environment: NextPage = () => {
     tokens: [],
     operation: 'and'
   });
-  const { items, filteredItemsCount, collectionProps, paginationProps, propertyFilterProps } = useCollection(
-    allItems,
-    {
+
+  // Date filter constants
+  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue>({
+    type: 'relative',
+    amount: 1,
+    unit: 'week'
+  });
+  useEffect(() => {
+    setDateFilter(dateFilter);
+  }, [dateFilter]);
+
+  // Property and date filter collections
+  const { items, filteredItemsCount, collectionProps, filterProps, paginationProps, propertyFilterProps } =
+    useCollection(allItems, {
+      filtering: {
+        empty: TableEmptyDisplay(itemType),
+        noMatch: TableNoMatchDisplay(itemType),
+        filteringFunction: (item, filteringText): any => {
+          if (dateFilter !== null) {
+            const range = convertToAbsoluteRange(dateFilter);
+            if (!isWithinInterval(new Date(item.date), range)) {
+              return false;
+            }
+          }
+
+          const filteringTextLowerCase = filteringText.toLowerCase();
+
+          return searchableColumns
+            .map((key) => item[key])
+            .some(
+              (value) => typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
+            );
+        }
+      },
       propertyFiltering: {
         filteringProperties: filteringProperties,
-        empty: TableEmptyDisplay('workspace'),
-        noMatch: TableNoMatchDisplay('workspace')
+        empty: TableEmptyDisplay(itemType),
+        noMatch: TableNoMatchDisplay(itemType)
       },
       pagination: { pageSize: preferences.pageSize },
       sorting: {},
       selection: {}
-    }
-  );
+    });
   useEffect(() => {
     setWorkspaces(workspaces);
   }, [workspaces]);
-
-  // Date filter constants
-  const [dateValue, setDateValue] = React.useState<DateRangePickerProps.RelativeValue>({
-    type: 'relative',
-    amount: 2,
-    unit: 'week'
-  });
-  useEffect(() => {
-    setDateValue(dateValue);
-  }, [dateValue]);
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
@@ -109,7 +134,7 @@ const Environment: NextPage = () => {
   const stopButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED'];
   const terminateButtonStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
   // Constant buttons should show loading based on statuses in the array
-  const connectButtonLoadingStatuses: string[] = ['PENDING', 'STARTING'];
+  const connectButtonLoadingStatuses: string[] = ['STARTING'];
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];
   const isOneItemSelected = (): boolean | undefined => {
@@ -229,42 +254,16 @@ const Environment: NextPage = () => {
                   expandToViewport={true}
                 />
                 <DateRangePicker
-                  onChange={({ detail }) => setDateValue(detail.value)}
-                  value={dateValue}
+                  onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
+                  value={dateFilter}
                   relativeOptions={relativeOptions}
-                  i18nStrings={{
-                    todayAriaLabel: 'Today',
-                    nextMonthAriaLabel: 'Next month',
-                    previousMonthAriaLabel: 'Previous month',
-                    customRelativeRangeDurationLabel: 'Duration',
-                    customRelativeRangeDurationPlaceholder: 'Enter duration',
-                    customRelativeRangeOptionLabel: 'Custom range',
-                    customRelativeRangeOptionDescription: 'Set a custom range in the past',
-                    customRelativeRangeUnitLabel: 'Unit of time',
-                    formatRelativeRange: (e) => {
-                      const t = 1 === e.amount ? e.unit : `${e.unit}s`;
-                      return `Last ${e.amount} ${t}`;
-                    },
-                    formatUnit: (e, t) => (1 === t ? e : `${e}s`),
-                    dateTimeConstraintText: 'Range must be between 6 and 30 days. Use 24 hour format.',
-                    relativeModeTitle: 'Relative range',
-                    absoluteModeTitle: 'Absolute range',
-                    relativeRangeSelectionHeading: 'Choose a range',
-                    startDateLabel: 'Start date',
-                    endDateLabel: 'End date',
-                    startTimeLabel: 'Start time',
-                    endTimeLabel: 'End time',
-                    clearButtonLabel: 'Clear and dismiss',
-                    cancelButtonLabel: 'Cancel',
-                    applyButtonLabel: 'Apply'
-                  }}
+                  i18nStrings={datei18nStrings}
                   placeholder="Filter by a date and time range"
                   isValidRange={isValidRangeFunction}
                 />
               </>
             }
             pagination={<Pagination {...paginationProps} ariaLabels={paginationLables} />}
-            empty={TableEmptyDisplay(itemType)}
             items={items}
           />
         </Box>

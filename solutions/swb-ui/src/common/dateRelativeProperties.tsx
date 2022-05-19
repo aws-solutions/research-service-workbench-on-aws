@@ -1,4 +1,5 @@
 import { DateRangePickerProps } from '@awsui/components-react';
+import { addDays, addHours, addMinutes, addMonths, addSeconds, addWeeks, addYears } from 'date-fns';
 
 const differenceInDays = (dateOne: Date, dateTwo: Date): number => {
   const milliseconds = Math.abs(
@@ -46,10 +47,10 @@ export const isValidRangeFunction = (range: any): DateRangePickerProps.Validatio
       };
     }
 
-    if (differenceInDays(range.startDate, range.endDate) < 2) {
+    if (differenceInDays(range.startDate, range.endDate) < 1) {
       return {
         valid: false,
-        errorMessage: 'The selected date range is too small. Select a range larger than one day.'
+        errorMessage: 'The selected date range is too small. Select a range that is at least one day.'
       };
     }
   } else if (range.type === 'relative') {
@@ -60,10 +61,10 @@ export const isValidRangeFunction = (range: any): DateRangePickerProps.Validatio
       };
     }
 
-    if (lengthInDays(range.unit, range.amount) < 2) {
+    if (lengthInDays(range.unit, range.amount) < 1) {
       return {
         valid: false,
-        errorMessage: 'The selected date range is too small. Select a range larger than one day.'
+        errorMessage: 'The selected date range is too small. Select a range that is at least one day.'
       };
     }
 
@@ -76,3 +77,36 @@ export const isValidRangeFunction = (range: any): DateRangePickerProps.Validatio
   }
   return { valid: true };
 };
+
+export function convertToAbsoluteRange(range: any): any {
+  if (range.type === 'absolute') {
+    return {
+      start: new Date(range.startDate),
+      end: new Date(range.endDate)
+    };
+  } else {
+    const now = new Date();
+    const start = (() => {
+      switch (range.unit) {
+        case 'second':
+          return addSeconds(now, -range.amount);
+        case 'minute':
+          return addMinutes(now, -range.amount);
+        case 'hour':
+          return addHours(now, -range.amount);
+        case 'day':
+          return addDays(now, -range.amount);
+        case 'week':
+          return addWeeks(now, -range.amount);
+        case 'month':
+          return addMonths(now, -range.amount);
+        case 'year':
+          return addYears(now, -range.amount);
+      }
+    })();
+    return {
+      start: start,
+      end: now
+    };
+  }
+}

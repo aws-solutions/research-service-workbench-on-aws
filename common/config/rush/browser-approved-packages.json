@@ -219,6 +219,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "date-fns",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "esbuild",
       "allowedCategories": [ "production" ]
     },

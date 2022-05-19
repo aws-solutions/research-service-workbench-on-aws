@@ -41,7 +41,7 @@ export const datei18nStrings: DateRangePickerProps.I18nStrings = {
     return `Last ${e.amount} ${t}`;
   },
   formatUnit: (e: string, t: number) => (1 === t ? e : `${e}s`),
-  dateTimeConstraintText: 'Range must be between 6 and 30 days. Use 24 hour format.',
+  dateTimeConstraintText: 'Range must be between 1 and 365 days. Use 24 hour format.',
   relativeModeTitle: 'Relative range',
   absoluteModeTitle: 'Absolute range',
   relativeRangeSelectionHeading: 'Choose a range',
