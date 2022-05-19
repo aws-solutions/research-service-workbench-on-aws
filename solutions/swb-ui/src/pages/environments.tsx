@@ -9,7 +9,6 @@ import {
   BreadcrumbGroup,
   BreadcrumbGroupProps,
   Button,
-  CollectionPreferences,
   DateRangePicker,
   DateRangePickerProps,
   Header,

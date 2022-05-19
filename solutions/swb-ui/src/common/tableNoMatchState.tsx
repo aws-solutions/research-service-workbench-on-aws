@@ -8,7 +8,6 @@ import { Box, Button } from '@awsui/components-react';
  * {propertyFiltering: {noMatch: (TableNoMatchDisplay("workspace"))}
  * // Displays "No matches" title
  * // "No workspaces match filter."
- * // <Button> with "Clear filter" text
  * ```
  * @returns no match information
  */
@@ -19,7 +18,6 @@ export function TableNoMatchDisplay(itemType: string): JSX.Element {
       <Box padding={{ bottom: 's' }} variant="p" color="inherit">
         No {itemType}s match filter.
       </Box>
-      <Button>Clear filter</Button>
     </Box>
   );
 }
