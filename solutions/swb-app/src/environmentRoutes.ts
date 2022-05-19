@@ -18,10 +18,18 @@ export function setUpEnvRoutes(
       if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // nosemgrep
-        await environments[req.body.envType].lifecycle.launch(req.body);
-        // TODO: Handle errors from executing SSM document
         const env = await environmentService.createEnvironment(req.body);
-        res.send(env);
+        try {
+          await environments[req.body.envType].lifecycle.launch(env);
+        } catch (e) {
+          // Update error state
+          const errorMessage = e.message as string;
+          await environmentService.updateEnvironment(env.id!, {
+            error: { type: 'LAUNCH', value: errorMessage },
+            status: 'FAILED'
+          });
+        }
+        res.status(201).send(env);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
       }

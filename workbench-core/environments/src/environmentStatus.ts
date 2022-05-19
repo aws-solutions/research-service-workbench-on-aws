@@ -1,5 +1,5 @@
 // https://www.damirscorner.com/blog/posts/20200619-StringLiteralTypeGuardInTypescript.html
-// This allows us to verify that user input is an EnvironmentStatus
+// This file is structured this way so we can verify whether a user input is of type `EnvironmentStatus`
 export const ENVIRONMENT_STATUS: string[] = [
   'PENDING',
   'COMPLETED',
@@ -15,8 +15,11 @@ export const ENVIRONMENT_STATUS: string[] = [
   'STOPPING_FAILED'
 ];
 
+// Convert ENVIRONMENT_STATUS array to string literals
+// More info here: https://stackoverflow.com/a/59541566
 export type EnvironmentStatus = typeof ENVIRONMENT_STATUS[number];
 
+// This allows us to verify that user input is an EnvironmentStatus
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isEnvironmentStatus(status: any): status is EnvironmentStatus {
   if (typeof status !== 'string') {
