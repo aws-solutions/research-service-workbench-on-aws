@@ -3,7 +3,9 @@ import { AuthenticationService } from './authenticationService';
 
 // TODO send message with res.sendStatus?
 
-export function login(authenticationService: AuthenticationService) {
+export function login(
+  authenticationService: AuthenticationService
+): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
     const code = req.query.code;
     if (code) {
@@ -29,13 +31,15 @@ export function login(authenticationService: AuthenticationService) {
 
 // TODO add logout, get new access token from refresh token functions
 
-export function authenticationMiddleware(authenticationService: AuthenticationService) {
-  return function (req: Request, res: Response, next: NextFunction) {
+export function authenticationMiddleware(
+  authenticationService: AuthenticationService
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async function (req: Request, res: Response, next: NextFunction) {
     const { cookies } = req;
 
     if (cookies.access_token) {
       try {
-        const decodedAccessToken = authenticationService.validateToken(cookies.access_token);
+        const decodedAccessToken = await authenticationService.validateToken(cookies.access_token);
 
         // TODO wrap both of these into a getUserFromToken() call that returns the AuthenticatedUser object
         const id = authenticationService.getUserIdFromToken(decodedAccessToken);

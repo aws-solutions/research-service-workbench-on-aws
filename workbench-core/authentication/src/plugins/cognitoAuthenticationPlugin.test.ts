@@ -69,22 +69,18 @@ describe('CognitoAuthenticationPlugin tests', () => {
       jti: 'jti',
       origin_jti: 'origin_jti'
     };
-    jest.spyOn(CognitoJwtVerifier.prototype, 'verifySync').mockReturnValueOnce(decodedToken);
+    jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(decodedToken);
 
-    const decoded = plugin.validateToken('validToken');
+    const decoded = await plugin.validateToken('validToken');
 
     expect(decoded).toMatchObject(decodedToken);
   });
 
   it('validateToken should throw InvalidJWTError when an invalid token is passed in', async () => {
     const invalidToken = 'invalidToken';
-    const verifierSpy = jest.spyOn(CognitoJwtVerifier.prototype, 'verifySync').mockImplementationOnce(() => {
-      throw new Error();
-    });
+    const verifierSpy = jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockRejectedValueOnce(new Error());
 
-    expect(() => {
-      plugin.validateToken(invalidToken);
-    }).toThrow(new InvalidJWTError('token is invalid'));
+    await expect(plugin.validateToken(invalidToken)).rejects.toThrow(new InvalidJWTError('token is invalid'));
     expect(verifierSpy).toHaveBeenCalledWith(invalidToken);
   });
 
@@ -353,6 +349,14 @@ describe('CognitoAuthenticationPlugin tests', () => {
           Authorization: `Basic ${encodedClientId}`
         }
       }
+    );
+  });
+
+  it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
+    const url = plugin.getAuthorizationCodeUrl();
+
+    expect(url).toBe(
+      `${baseUrl}/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${cognitoPluginOptions.loginUrl}`
     );
   });
 });

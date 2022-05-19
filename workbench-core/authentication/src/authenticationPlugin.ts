@@ -24,7 +24,7 @@ export interface AuthenticationPlugin {
    *
    * @throws {@link InvalidJWTError} if the token is invalid.
    */
-  validateToken(token: string): DecodedJWT;
+  validateToken(token: string): Promise<DecodedJWT>;
 
   /**
    * Tell the Identity Provider to revoke the given token.

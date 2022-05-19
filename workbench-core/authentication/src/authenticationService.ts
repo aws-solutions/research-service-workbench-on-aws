@@ -34,7 +34,7 @@ export class AuthenticationService {
    *
    * @throws {@link InvalidJWTError} if the token is invalid.
    */
-  public validateToken(token: string): DecodedJWT {
+  public async validateToken(token: string): Promise<DecodedJWT> {
     return this._authenticationPlugin.validateToken(token);
   }
 

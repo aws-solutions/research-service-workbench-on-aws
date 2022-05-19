@@ -77,8 +77,6 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         tokenUse: null, // can check both access and ID tokens
         clientId
       });
-
-      this._verifier.hydrate(); // adds the jwks to the cache
     } catch (error) {
       throw new PluginConfigurationError(error.message);
     }
@@ -112,9 +110,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @throws {@link InvalidJWTError} if the token is invalid.
    */
-  public validateToken(token: string): CognitoJwtPayload {
+  public async validateToken(token: string): Promise<CognitoJwtPayload> {
     try {
-      const parts = this._verifier.verifySync(token);
+      const parts = await this._verifier.verify(token);
 
       return parts;
     } catch (error) {
@@ -244,7 +242,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @returns the endpoint URL string
    */
-  getAuthorizationCodeUrl(): string {
+  public getAuthorizationCodeUrl(): string {
     return `${this._oAuth2BaseUrl}/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._loginUrl}`;
   }
 

@@ -11,8 +11,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     }
     return false;
   }
-  public validateToken(token: string): CognitoJwtPayload {
-    return {
+  public validateToken(token: string): Promise<CognitoJwtPayload> {
+    return Promise.resolve({
       token_use: 'access',
       sub: 'sub',
       iss: 'iss',
@@ -21,7 +21,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       auth_time: 456,
       jti: 'jti',
       origin_jti: 'origin_jti'
-    };
+    });
   }
   public async revokeToken(token: string): Promise<void> {}
   public getUserIdFromToken(token: CognitoJwtPayload): string {
@@ -38,5 +38,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       tokenType: 'Bearer',
       expiresIn: 3600
     });
+  }
+  public getAuthorizationCodeUrl(): string {
+    return 'authorizationCodeUrl';
   }
 }
