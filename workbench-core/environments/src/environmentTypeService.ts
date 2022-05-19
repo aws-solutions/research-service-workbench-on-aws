@@ -100,6 +100,15 @@ export default class EnvironmentTypeService {
     envTypeId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
+    try {
+      await this.getEnvironmentType(envTypeId);
+    } catch (e) {
+      if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
+        throw Boom.notFound(`Could not find environment type ${envTypeId} to update`);
+      }
+      throw e;
+    }
+
     const response = await this._aws.helpers.ddb
       .update(this._buildPkSk(envTypeId, envKeyNameToKey.envType), { item: updatedValues })
       .execute();

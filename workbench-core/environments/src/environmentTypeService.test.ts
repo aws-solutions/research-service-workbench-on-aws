@@ -20,7 +20,7 @@ describe('environmentTypeService', () => {
 
   test('update an environment', async () => {
     const envTypeService = new EnvironmentTypeService({ TABLE_NAME });
-    const data = await envTypeService.updateEnvironment(envTypeId, {
+    const data = await envTypeService.updateEnvironment('zzz', {
       status: 'pending'
     });
     console.log('data', data);
