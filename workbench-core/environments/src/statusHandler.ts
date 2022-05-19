@@ -1,7 +1,7 @@
 import _ = require('lodash');
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import EnvironmentStatus from './environmentStatus';
+import { isEnvironmentStatus } from '@amzn/environments';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {
@@ -16,7 +16,9 @@ export default class StatusHandler {
       return;
     }
 
-    envDetails!.status = { S: event.status as EnvironmentStatus };
+    if (!isEnvironmentStatus(event.status)) return;
+
+    envDetails!.status = { S: event.status };
 
     // Update env status using data from event bridge
     await envHelper.storeToDdb(`ENV#${event.envId}`, `ENV#${event.envId}`, envDetails!);
