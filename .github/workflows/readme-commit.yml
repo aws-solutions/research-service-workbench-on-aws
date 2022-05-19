@@ -17,10 +17,20 @@ on:
         required: true
       bot-user-email:
         required: true
+    outputs:
+      commit_hash:
+        description: 'README update commit hash'
+        value: "${{ jobs.readme-commit.outputs.commit_hash }}"
+      changes_detected:
+        description: 'Flag to detect whether README was updated or not'
+        value: "${{ jobs.readme-commit.outputs.changes_detected }}"
 
 jobs:
   readme-commit:  
     runs-on: ubuntu-20.04
+    outputs:
+        commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
+        changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
 
     steps:        
       - uses: actions/checkout@v3
@@ -69,6 +79,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
       - name: Auto commit updated README files to develop
+        id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs: Auto README.md updates"
@@ -88,5 +99,3 @@ jobs:
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
-
-  
