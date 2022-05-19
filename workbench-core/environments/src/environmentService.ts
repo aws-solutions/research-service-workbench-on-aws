@@ -16,7 +16,7 @@ interface Environment {
   name: string;
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
-  status: string;
+  status: EnvironmentStatus;
   datasetIds: string[];
   envTypeConfigId: string;
   updatedAt: string;
@@ -27,7 +27,7 @@ interface Environment {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DS?: any;
+  DS?: any[];
 }
 const defaultEnv: Environment = {
   id: '',
@@ -38,7 +38,7 @@ const defaultEnv: Environment = {
   name: '',
   outputs: [],
   projectId: '',
-  status: '',
+  status: 'PENDING',
   datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
@@ -159,12 +159,18 @@ export default class EnvironmentService {
 
   public async updateEnvironment(
     envId: string,
-    updatedValues: { [key: string]: string }
+    updatedValues: {
+      [key: string]:
+        | string
+        | { type: string; value: string }
+        | { id: string; value: string; description: string }[];
+    }
   ): Promise<Environment> {
     try {
       await this.getEnvironment(envId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
+        console.log('message', e.message);
         throw Boom.notFound(`Could not find environment ${envId} to update`);
       }
       throw e;

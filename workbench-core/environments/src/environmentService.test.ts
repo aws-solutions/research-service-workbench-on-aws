@@ -60,9 +60,13 @@
 //
 //   test('updateEnvironment', async () => {
 //     const environmentService = new EnvironmentService({ TABLE_NAME });
+//     // const data = await environmentService.updateEnvironment('zzz', {
+//     //   instance: 'instance-124',
+//     //   status: 'COMPLETED'
+//     // });
 //     const data = await environmentService.updateEnvironment(envId, {
-//       instance: 'instance-124',
-//       status: 'COMPLETED'
+//       error: { type: 'LAUNCH', value: 'sample launch error message' },
+//       status: 'FAILED'
 //     });
 //     console.log('data', data);
 //   });
