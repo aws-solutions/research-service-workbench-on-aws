@@ -221,7 +221,6 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         idToken: response.data.id_token,
         accessToken: response.data.access_token,
         refreshToken: response.data.refresh_token,
-        tokenType: response.data.token_type,
         expiresIn: response.data.expires_in
       };
     } catch (error) {
