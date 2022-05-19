@@ -22,6 +22,7 @@ jobs:
 
   pre-deployment-check:
     name: Pre deployment check
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-18.04
     timeout-minutes: 10
     steps:
