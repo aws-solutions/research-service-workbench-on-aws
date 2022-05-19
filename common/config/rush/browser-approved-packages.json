@@ -139,6 +139,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@microsoft/rush-lib",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -152,6 +156,14 @@
     },
     {
       "name": "@rushstack/heft-node-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/node-core-library",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/ts-command-line",
       "allowedCategories": [ "production" ]
     },
     {
@@ -220,6 +232,10 @@
     },
     {
       "name": "date-fns",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "diff",
       "allowedCategories": [ "production" ]
     },
     {

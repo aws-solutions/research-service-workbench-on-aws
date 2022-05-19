@@ -159,5 +159,11 @@ export class InfrastructureStack extends Stack {
         reason: 'UserPool CDK construct does not have option to set AdvancedSecurityMode'
       }
     ]);
+    NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/LambdaService/Resource', [
+      {
+        id: 'AwsSolutions-L1',
+        reason: 'We are using Node14 for Lambda functions'
+      }
+    ]);
   }
 }
