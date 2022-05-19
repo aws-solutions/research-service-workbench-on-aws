@@ -401,16 +401,17 @@ importers:
       uuid: ^8.3.2
     dependencies:
       '@amzn/workbench-core-base': link:../base
-      '@aws-sdk/client-cloudformation': 3.82.0
-      '@aws-sdk/client-cognito-identity-provider': 3.82.0
-      '@aws-sdk/client-dynamodb': 3.82.0
-      '@aws-sdk/client-ec2': 3.83.0
-      '@aws-sdk/client-eventbridge': 3.82.0
-      '@aws-sdk/client-iam': 3.82.0
-      '@aws-sdk/client-s3': 3.83.0
-      '@aws-sdk/client-service-catalog': 3.82.0
-      '@aws-sdk/client-ssm': 3.84.0
-      '@aws-sdk/client-sts': 3.82.0
+      '@aws-sdk/client-cloudformation': 3.85.0
+      '@aws-sdk/client-cognito-identity-provider': 3.85.0
+      '@aws-sdk/client-dynamodb': 3.85.0
+      '@aws-sdk/client-ec2': 3.85.0
+      '@aws-sdk/client-eventbridge': 3.85.0
+      '@aws-sdk/client-iam': 3.85.0
+      '@aws-sdk/client-lambda': 3.85.0
+      '@aws-sdk/client-s3': 3.85.0
+      '@aws-sdk/client-service-catalog': 3.85.0
+      '@aws-sdk/client-ssm': 3.85.0
+      '@aws-sdk/client-sts': 3.95.0
       '@aws-sdk/util-dynamodb': 3.92.0
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
@@ -429,7 +430,7 @@ importers:
       '@types/lodash': 4.14.182
       '@types/node': 14.18.16
       '@types/uuid': 8.3.4
-      aws-sdk-client-mock: 0.6.2_1623f36c0ee0e0189219c4d48dbbb18c
+      aws-sdk-client-mock: 0.6.2_a9e86a7e1c6efb9158e19d317f27eca8
       eslint: 8.14.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
