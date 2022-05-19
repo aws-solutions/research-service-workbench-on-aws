@@ -86,6 +86,7 @@ importers:
     specifiers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -104,6 +105,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      '@hapi/boom': 10.0.0
       express: 4.18.1
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
@@ -367,21 +369,27 @@ importers:
       '@aws-sdk/client-ssm': ^3.58.0
       '@aws-sdk/client-sts': ^3.58.0
       '@aws-sdk/types': ^3.55.0
+      '@aws-sdk/util-dynamodb': ^3.87.0
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
+      '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/uuid': ^8.3.4
       aws-sdk-client-mock: ^0.6.2
       eslint: ^8.7.0
       generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      lodash: ^4.17.21
       md5-file: ^5.0.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@amzn/workbench-core-base': link:../base
       '@aws-sdk/client-cloudformation': 3.82.0
@@ -394,8 +402,12 @@ importers:
       '@aws-sdk/client-service-catalog': 3.82.0
       '@aws-sdk/client-ssm': 3.84.0
       '@aws-sdk/client-sts': 3.82.0
+      '@aws-sdk/util-dynamodb': 3.92.0
+      '@hapi/boom': 10.0.0
       generate-password: 1.7.0
+      lodash: 4.17.21
       md5-file: 5.0.0
+      uuid: 8.3.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/types': 3.78.0
@@ -405,7 +417,9 @@ importers:
       '@rushstack/heft-node-rig': 1.9.2_@rushstack+heft@0.45.1
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.5.0
+      '@types/lodash': 4.14.182
       '@types/node': 14.18.16
+      '@types/uuid': 8.3.4
       aws-sdk-client-mock: 0.6.2_1623f36c0ee0e0189219c4d48dbbb18c
       eslint: 8.14.0
       istanbul-badges-readme: 1.8.1
@@ -2166,6 +2180,13 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@aws-sdk/util-dynamodb/3.92.0:
+    resolution: {integrity: sha512-MsrcL5UoANjtgUN5Gp4OE0r4s4QbLZ/5CnQVsngC+WHb1cT+AHP0Mfot+UKClL5BxfIrbtkjFi8YucIofzKp1w==}
+    engines: {node: '>= 12.0.0'}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
+
   /@aws-sdk/util-format-url/3.78.0:
     resolution: {integrity: sha512-wdjt8ZAMyBrH/02QrQtB+S9cwtsBJ6bXRJ3XwL6z7L75nwTflKkzOQUS5Ie7HBf3j3JH0KhlqlEbf2nnM9jsPQ==}
     engines: {node: '>= 12.0.0'}
@@ -3584,6 +3605,16 @@ packages:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
+
+  /@hapi/boom/10.0.0:
+    resolution: {integrity: sha512-1YVs9tLHhypBqqinKQRqh7FUERIolarQApO37OWkzD+z6y6USi871Sv746zBPKcIOBuI6g6y4FrwX87mmJ90Gg==}
+    dependencies:
+      '@hapi/hoek': 10.0.0
+    dev: false
+
+  /@hapi/hoek/10.0.0:
+    resolution: {integrity: sha512-CeNFz1JcLZ5xE8Vc9aau37cgHw9bxXqSDK/D55GF2GAOv0n0XjyyjSodHtKahB7A1tV3FlgCpijp3zkSITmBdA==}
+    dev: false
 
   /@humanwhocodes/config-array/0.9.5:
     resolution: {integrity: sha512-ObyMyWxZiCu/yTisA7uzx81s40xR2fD5Cg/2Kq7G02ajkNubJf6BopgDTmDyc3U7sXpNKM8cYOw7s7Tyr+DnCw==}

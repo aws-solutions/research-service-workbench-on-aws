@@ -4,6 +4,7 @@
  */
 
 import BatchEdit from './batchEdit';
+import TransactEdit from './transactEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
@@ -438,5 +439,20 @@ export default class DynamoDBService {
       }
     }
     return batchEdit;
+  }
+
+  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+    let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params) {
+      if (params.addPutRequest) {
+        // const requests = params.addPutRequest.map((request) => {
+        //   return marshall(request, { removeUndefinedValues: true });
+        // });
+        transactEdit = transactEdit.addPutRequests(
+          params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        );
+      }
+    }
+    return transactEdit;
   }
 }

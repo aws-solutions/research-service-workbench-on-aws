@@ -5,7 +5,7 @@
 
 import { Express } from 'express';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
-import { HostingAccountService } from '@amzn/environments';
+import { HostingAccountService, EnvironmentService } from '@amzn/environments';
 import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
 
@@ -30,6 +30,9 @@ const apiRouteConfig: ApiRouteConfig = {
     SSM_DOC_NAME_SUFFIX: process.env.SSM_DOC_NAME_SUFFIX!,
     MAIN_ACCOUNT_BUS_ARN_NAME: process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
     AMI_IDS_TO_SHARE: process.env.AMI_IDS_TO_SHARE!
+  }),
+  environmentService: new EnvironmentService({
+    TABLE_NAME: process.env.STACK_NAME!
   })
 };
 

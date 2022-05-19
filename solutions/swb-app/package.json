@@ -24,7 +24,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.3",
-    "@amzn/environments": "workspace:*"
+    "@amzn/environments": "workspace:*",
+    "@hapi/boom": "^10.0.0"
   },
   "devDependencies": {
     "@rushstack/heft": "^0.45.0",
