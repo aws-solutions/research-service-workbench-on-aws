@@ -7,9 +7,10 @@ import AccountHandler from './accountHandler';
 import AccountsService from './accountsService';
 import StatusHandler from './statusHandler';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
+import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
 import ServiceCatalogSetup from './serviceCatalogSetup';
 import CognitoSetup from './cognitoSetup';
-import EnvironmentStatus from './environmentStatus';
+import EnvironmentService from './environmentService';
 
 export {
   HostingAccountService,
@@ -22,6 +23,8 @@ export {
   StatusHandler,
   EventBridgeEventToDDB,
   EnvironmentStatus,
+  isEnvironmentStatus,
   ServiceCatalogSetup,
-  CognitoSetup
+  CognitoSetup,
+  EnvironmentService
 };

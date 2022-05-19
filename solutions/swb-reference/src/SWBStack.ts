@@ -451,13 +451,19 @@ export class SWBStack extends Stack {
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByStatus',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'status', type: AttributeType.NUMBER }
+      sortKey: { name: 'status', type: AttributeType.STRING }
     });
     // Add GSI for get resource by owner
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByOwner',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'owner', type: AttributeType.NUMBER }
+      sortKey: { name: 'owner', type: AttributeType.STRING }
+    });
+    // Add GSI for get resource by updatedAt
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByUpdatedAt',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'updatedAt', type: AttributeType.STRING }
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
