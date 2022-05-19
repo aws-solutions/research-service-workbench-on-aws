@@ -32,9 +32,11 @@ export interface CognitoAuthenticationPluginOptions {
   clientSecret: string;
 
   /**
-   * The Cognito app client allowed callback URL
+   * The full login api endpoint url. URL must exist in the Cognito app client allowed callback URLs list.
+   *
+   * @example "https://www.exampleURL.com/login"
    */
-  redirectUri: string;
+  loginUrl: string;
 }
 
 /**
@@ -42,7 +44,7 @@ export interface CognitoAuthenticationPluginOptions {
  * to provide authorization code and jwt token authentication.
  */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
-  private _redirectUri: string;
+  private _loginUrl: string;
   private _clientId: string;
   private _clientSecret: string;
 
@@ -59,12 +61,12 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public constructor({
     cognitoDomain,
-    redirectUri,
+    loginUrl,
     userPoolId,
     clientId,
     clientSecret
   }: CognitoAuthenticationPluginOptions) {
-    this._redirectUri = redirectUri;
+    this._loginUrl = loginUrl;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
 
@@ -75,11 +77,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         tokenUse: null, // can check both access and ID tokens
         clientId
       });
-    } catch (error) {
+
+      this._verifier.hydrate(); // adds the jwks to the cache
+    } catch (error: any) {
       throw new PluginConfigurationError(error.message);
     }
-
-    // this._verifier.hydrate().catch(e => { throw e }); TODO necessary?
   }
 
   /**
@@ -207,7 +209,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
           grant_type: 'authorization_code',
           code: code,
           client_id: this._clientId,
-          redirect_uri: this._redirectUri
+          redirect_uri: this._loginUrl
         }),
         {
           headers: {
@@ -236,6 +238,15 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
       throw error;
     }
+  }
+
+  /**
+   * Returns the URL of the endpoint used to retreive the authorization code.
+   *
+   * @returns the endpoint URL string
+   */
+  getAuthorizationCodeUrl(): string {
+    return `${this._oAuth2BaseUrl}/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._loginUrl}`;
   }
 
   /**

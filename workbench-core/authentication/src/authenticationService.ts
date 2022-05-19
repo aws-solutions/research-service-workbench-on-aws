@@ -86,4 +86,13 @@ export class AuthenticationService {
   public handleAuthorizationCode(code: string): Promise<Tokens> {
     return this._authenticationPlugin.handleAuthorizationCode(code);
   }
+
+  /**
+   * Returns the URL of the endpoint used to retreive the authorization code.
+   *
+   * @returns the endpoint URL string
+   */
+  public getAuthorizationCodeUrl(): string {
+    return this._authenticationPlugin.getAuthorizationCodeUrl();
+  }
 }

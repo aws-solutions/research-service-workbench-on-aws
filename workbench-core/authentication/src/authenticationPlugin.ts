@@ -67,4 +67,11 @@ export interface AuthenticationPlugin {
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
    */
   handleAuthorizationCode(code: string): Promise<Tokens>;
+
+  /**
+   * Returns the URL of the endpoint used to retreive the authorization code.
+   *
+   * @returns the endpoint URL string
+   */
+  getAuthorizationCodeUrl(): string;
 }

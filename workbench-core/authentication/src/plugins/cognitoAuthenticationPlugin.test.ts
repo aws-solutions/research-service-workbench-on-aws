@@ -15,7 +15,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
-  redirectUri: 'fake-redirect-uri'
+  loginUrl: 'fake-login-url'
 };
 
 const baseUrl = `${cognitoPluginOptions.cognitoDomain}/oauth2`;
@@ -239,7 +239,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         grant_type: 'authorization_code',
         code: validCode,
         client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.redirectUri
+        redirect_uri: cognitoPluginOptions.loginUrl
       }),
       {
         headers: {
@@ -272,7 +272,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         grant_type: 'authorization_code',
         code: invalidCode,
         client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.redirectUri
+        redirect_uri: cognitoPluginOptions.loginUrl
       }),
       {
         headers: {
@@ -298,7 +298,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         grant_type: 'authorization_code',
         code: invalidCode,
         client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.redirectUri
+        redirect_uri: cognitoPluginOptions.loginUrl
       }),
       {
         headers: {
@@ -324,7 +324,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         grant_type: 'authorization_code',
         code: invalidCode,
         client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.redirectUri
+        redirect_uri: cognitoPluginOptions.loginUrl
       }),
       {
         headers: {
@@ -346,7 +346,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         grant_type: 'authorization_code',
         code: invalidCode,
         client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.redirectUri
+        redirect_uri: cognitoPluginOptions.loginUrl
       }),
       {
         headers: {

@@ -7,7 +7,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
-  redirectUri: 'fake-redirect-uri'
+  loginUrl: 'fake-login-url'
 };
 
 describe('AuthenticationService tests', () => {
