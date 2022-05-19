@@ -252,7 +252,6 @@ describe('CognitoAuthenticationPlugin tests', () => {
       idToken: 'id token',
       accessToken: 'access token',
       refreshToken: 'refresh token',
-      tokenType: 'Bearer',
       expiresIn: 3600
     });
   });
