@@ -330,9 +330,14 @@ importers:
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/heft-jest': 1.0.2
       '@types/node': ^14
+      aws-jwt-verify: ^3.0.0
+      axios: ^0.27.1
       eslint: ^8.7.0
       istanbul-badges-readme: 1.8.1
       typescript: ^4.5.2
+    dependencies:
+      aws-jwt-verify: 3.0.0
+      axios: 0.27.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.15.0+typescript@4.6.4
@@ -5891,6 +5896,11 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /aws-jwt-verify/3.0.0:
+    resolution: {integrity: sha512-omrsipeveHvc2L7WaoSZIS0hozRoqKsGeaWYxbqKl1ZTAjL7TKCVqYp0Gy0G0juV4Nr6niTYSNqnW4NJHXACbw==}
+    engines: {node: '>=14.0.0'}
+    dev: false
+
   /aws-lambda/1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
     hasBin: true
@@ -5948,7 +5958,6 @@ packages:
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
-    dev: true
 
   /axobject-query/2.2.0:
     resolution: {integrity: sha512-Td525n+iPOOyUQIeBfcASuG6uJsDOITl7Mds5gFyerkWiX7qhUTdYUBlSgNMyVqtSJqwpt1kXGLdUt6SykLMRA==}
@@ -7828,7 +7837,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-    dev: true
 
   /forever-agent/0.6.1:
     resolution: {integrity: sha1-+8cfDEGt6zf5bFd60e1C2P2sypE=}
@@ -7867,7 +7875,6 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
-    dev: true
 
   /formidable/2.0.1:
     resolution: {integrity: sha512-rjTMNbp2BpfQShhFbR3Ruk3qk2y9jKpvMW78nJgx8QKtxjDVrwbZG+wvDOmVbifHyOUOQJXxqEy6r0faRrPzTQ==}
