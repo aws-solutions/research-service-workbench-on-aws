@@ -33,7 +33,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace05',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'STOPPING',
     createdAt: '05/29/2022',
     project: 'MVPProject',
     owner: 'Sample User',
@@ -41,7 +41,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace06',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'TERMINATING',
     createdAt: '05/29/2022',
     project: 'HemoProject',
     owner: 'Test User',
@@ -57,7 +57,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace08',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'STARTING',
     createdAt: '05/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
@@ -113,7 +113,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace15',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'TERMINATING',
     createdAt: '04/29/2022',
     project: 'TestProject',
     owner: 'Test User',
@@ -121,7 +121,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace16',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'STOPPING',
     createdAt: '05/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
@@ -201,7 +201,7 @@ export const allItems: ReadonlyArray<any> = [
   },
   {
     workspaceName: 'workspace26',
-    workspaceStatus: 'STOPPED',
+    workspaceStatus: 'STARTING',
     createdAt: '05/18/2022',
     project: 'BRProject',
     owner: 'Senior User',

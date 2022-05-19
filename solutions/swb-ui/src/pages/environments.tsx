@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NextPage } from 'next';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../common/tableNoMatchState';
@@ -31,7 +32,6 @@ import { filteringOptions } from '../environments-table-config/workspacesFilteri
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
 import { relativeOptions } from '../common/dateRelativeOptions';
 import { isValidRangeFunction } from '../common/dateRelativeProperties';
-import { TerminateWarning } from '../common/alerts';
 import Navigation from '../components/Navigation';
 import { layoutLabels } from '../common/labels';
 import styles from '../styles/BaseLayout.module.scss';
@@ -48,7 +48,7 @@ export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<
 });
 
 const Environment: NextPage = () => {
-  // For messages specific to the table
+  // For functions to return content specific to the table
   const itemType: string = 'workspace';
 
   // App settings constant
@@ -70,13 +70,6 @@ const Environment: NextPage = () => {
   ];
   // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
-
-  // Button constants
-  const [disable, setDisable] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-
-  // Button alert constants
-  const [visible, setVisible] = React.useState(true);
 
   // Property filter constants
   const [workspaces, setWorkspaces] = useState<PropertyFilterProps.Query>({
@@ -101,14 +94,35 @@ const Environment: NextPage = () => {
   }, [workspaces]);
 
   // Date filter constants
-  const [value, setValue] = React.useState<DateRangePickerProps.RelativeValue>({
+  const [dateValue, setDateValue] = React.useState<DateRangePickerProps.RelativeValue>({
     type: 'relative',
     amount: 2,
     unit: 'week'
   });
   useEffect(() => {
-    setValue(value);
-  }, [value]);
+    setDateValue(dateValue);
+  }, [dateValue]);
+
+  // Action button constants
+  // Constant buttons should be enabled based on statuses in the array
+  const connectButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STOPPED'];
+  const stopButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED'];
+  const terminateButtonStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
+  // Constant buttons should show loading based on statuses in the array
+  const connectButtonLoadingStatuses: string[] = ['PENDING', 'STARTING'];
+  const stopButtonLoadingStatuses: string[] = ['STOPPING'];
+  const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];
+  const isOneItemSelected = (): boolean | undefined => {
+    return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
+  };
+  const getWorkspaceStatus = (): string => {
+    const selectedItems = collectionProps.selectedItems;
+    if (selectedItems !== undefined && isOneItemSelected()) {
+      const status = collectionProps.selectedItems?.at(0).workspaceStatus;
+      return status;
+    }
+    return '';
+  };
 
   // Split panel constants
   const { header: panelHeader, body: panelBody } = getPanelContent(collectionProps.selectedItems, itemType);
@@ -177,24 +191,20 @@ const Environment: NextPage = () => {
                     <Box float="right">
                       <SpaceBetween direction="horizontal" size="xs">
                         <Button
-                          loading={loading}
-                          disabled={disable}
-                          onClick={() => {
-                            setLoading(true);
-                            setDisable(false);
-                          }}
+                          disabled={!connectButtonStatuses.includes(getWorkspaceStatus())}
+                          loading={connectButtonLoadingStatuses.includes(getWorkspaceStatus())}
                         >
                           Connect
                         </Button>
-                        <Button disabled={disable} onClick={() => setDisable(true)}>
+                        <Button
+                          disabled={!stopButtonStatuses.includes(getWorkspaceStatus())}
+                          loading={stopButtonLoadingStatuses.includes(getWorkspaceStatus())}
+                        >
                           Stop
                         </Button>
                         <Button
-                          disabled={disable}
-                          onClick={() => {
-                            setDisable(false);
-                            TerminateWarning('workspace', visible, setVisible);
-                          }}
+                          disabled={!terminateButtonStatuses.includes(getWorkspaceStatus())}
+                          loading={terminateButtonLoadingStatuses.includes(getWorkspaceStatus())}
                         >
                           Terminate
                         </Button>
@@ -219,8 +229,8 @@ const Environment: NextPage = () => {
                   expandToViewport={true}
                 />
                 <DateRangePicker
-                  onChange={({ detail }) => setValue(detail.value)}
-                  value={value}
+                  onChange={({ detail }) => setDateValue(detail.value)}
+                  value={dateValue}
                   relativeOptions={relativeOptions}
                   i18nStrings={{
                     todayAriaLabel: 'Today',
