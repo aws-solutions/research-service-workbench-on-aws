@@ -5,7 +5,6 @@
 
 import {
   AttributeValue,
-  BatchWriteItemCommandOutput,
   TransactWriteItemsCommandInput,
   TransactWriteItemsCommandOutput
 } from '@aws-sdk/client-dynamodb';

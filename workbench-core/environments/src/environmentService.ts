@@ -1,11 +1,11 @@
 /* eslint-disable security/detect-object-injection */
 
-import { UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService } from '@amzn/workbench-core-base';
 import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
 import envKeyNameToKey from './environmentKeyNameToKey';
+import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 interface Environment {
   id: string | undefined;
@@ -160,10 +160,21 @@ export default class EnvironmentService {
   public async updateEnvironment(
     envId: string,
     updatedValues: { [key: string]: string }
-  ): Promise<UpdateItemCommandOutput> {
-    return this._aws.helpers.ddb
+  ): Promise<Environment> {
+    try {
+      await this.getEnvironment(envId);
+    } catch (e) {
+      if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
+        throw Boom.notFound(`Could not find environment ${envId} to update`);
+      }
+      throw e;
+    }
+
+    const updateResponse = await this._aws.helpers.ddb
       .update(this._buildPkSk(envId, envKeyNameToKey.environment), { item: updatedValues })
       .execute();
+
+    return updateResponse.Attributes! as unknown as Environment;
   }
 
   private _buildPkSk(id: string, type: string): { [key: string]: string } {
@@ -198,7 +209,9 @@ export default class EnvironmentService {
         return this._buildPkSk(dsId, envKeyNameToKey.dataset);
       })
     ];
-    const batchGetResult = await this._aws.helpers.ddb.get(itemsToGet).execute();
+    const batchGetResult = (await this._aws.helpers.ddb
+      .get(itemsToGet)
+      .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
       id: uuidv4(),
       instance: params.instance,
@@ -216,15 +229,15 @@ export default class EnvironmentService {
       status: params.status
     };
     // GET metadata
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let metadata: any[] = [];
-    if ('Responses' in batchGetResult) {
-      if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
-        throw new Error('Unable to get metadata for all keys defined in environment');
-      }
-      metadata = batchGetResult.Responses![this._tableName].map((item) => {
-        return item;
-      });
+    if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
+      throw new Error('Unable to get metadata for all keys defined in environment');
     }
+    metadata = batchGetResult.Responses![this._tableName].map((item) => {
+      return item;
+    });
+
     // WRITE metadata to DDB
     const items: { [key: string]: unknown }[] = [];
     const buildEnvPkMetadataSk = (
