@@ -211,11 +211,14 @@ export default class EnvironmentService {
     status: EnvironmentStatus;
   }): Promise<Environment> {
     const itemsToGet = [
+      // ETC
       {
         pk: envResourceTypeToKey.envTypeConfig,
         sk: `${envResourceTypeToKey.envType}#${params.envTypeId}${envResourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
       },
+      // PROJ
       this._buildPkSk(params.projectId, envResourceTypeToKey.project),
+      // DS
       ...params.datasetIds.map((dsId) => {
         return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
