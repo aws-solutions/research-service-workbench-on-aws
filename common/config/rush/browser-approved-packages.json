@@ -231,6 +231,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "date-fns",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "diff",
       "allowedCategories": [ "production" ]
     },

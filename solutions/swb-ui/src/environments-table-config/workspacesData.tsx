@@ -1,461 +1,218 @@
-import { Button } from '@awsui/components-react';
-import React from 'react';
-
 export const allItems: ReadonlyArray<any> = [
   {
-    workspace: 'workspace1',
+    workspaceName: 'workspace01',
     workspaceStatus: 'PENDING',
-    updatedAt: '5/3/2022',
+    createdAt: '05/13/2022',
     project: 'TestProject',
     owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace2',
+    workspaceName: 'workspace02',
     workspaceStatus: 'FAILED',
-    updatedAt: '5/3/2022',
-    project: 'SampleProject',
+    createdAt: '05/14/2022',
+    project: 'MitoProject',
     owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace3',
+    workspaceName: 'workspace03',
     workspaceStatus: 'AVAILABLE',
-    updatedAt: '5/2/2022',
+    createdAt: '05/12/2022',
     project: 'MyProject',
     owner: 'Sample User',
-    connections: 3,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 40.05
   },
   {
-    workspace: 'workspace4',
+    workspaceName: 'workspace04',
     workspaceStatus: 'AVAILABLE',
-    updatedAt: '5/2/2022',
-    project: 'SampleProject',
+    createdAt: '05/07/2022',
+    project: 'MitoProject',
     owner: 'Sample User',
-    connections: 8,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 21.0
   },
   {
-    workspace: 'workspace5',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
+    workspaceName: 'workspace05',
+    workspaceStatus: 'STOPPING',
+    createdAt: '05/29/2022',
     project: 'MVPProject',
     owner: 'Sample User',
-    connections: 45,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 7.0
   },
   {
-    workspace: 'workspace6',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
-    project: 'TestProject',
+    workspaceName: 'workspace06',
+    workspaceStatus: 'TERMINATING',
+    createdAt: '05/29/2022',
+    project: 'HemoProject',
     owner: 'Test User',
-    connections: 7,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 18.0
   },
   {
-    workspace: 'workspace7',
+    workspaceName: 'workspace07',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/20/2022',
+    createdAt: '05/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
-    connections: 33,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 8.55
   },
   {
-    workspace: 'workspace8',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/18/2022',
+    workspaceName: 'workspace08',
+    workspaceStatus: 'STARTING',
+    createdAt: '05/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
-    connections: 1,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 10.39
   },
   {
-    workspace: 'workspace9',
+    workspaceName: 'workspace09',
     workspaceStatus: 'TERMINATED',
-    updatedAt: '4/17/2022',
+    createdAt: '05/11/2022',
     project: 'NYCProject',
     owner: 'Admin User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
-      </>
-    )
+    workspaceCost: 123.45
   },
   {
-    workspace: 'workspace10',
+    workspaceName: 'workspace10',
     workspaceStatus: 'PENDING',
-    updatedAt: '5/3/2022',
-    project: 'TestProject',
-    owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    createdAt: '05/03/2022',
+    project: 'BioProject',
+    owner: 'Your User',
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace11',
+    workspaceName: 'workspace11',
     workspaceStatus: 'FAILED',
-    updatedAt: '5/3/2022',
+    createdAt: '05/03/2022',
     project: 'SampleProject',
-    owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    owner: 'Our User',
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace12',
+    workspaceName: 'workspace12',
     workspaceStatus: 'STARTING',
-    updatedAt: '5/2/2022',
+    createdAt: '05/02/2022',
     project: 'MyProject',
     owner: 'Sample User',
-    connections: 3,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 17.53
   },
   {
-    workspace: 'workspace13',
+    workspaceName: 'workspace13',
     workspaceStatus: 'STARTING',
-    updatedAt: '5/2/2022',
+    createdAt: '05/23/2022',
     project: 'SampleProject',
     owner: 'Sample User',
-    connections: 8,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 30.0
   },
   {
-    workspace: 'workspace14',
+    workspaceName: 'workspace14',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
+    createdAt: '04/29/2022',
     project: 'MVPProject',
     owner: 'Sample User',
-    connections: 41,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 29.0
   },
   {
-    workspace: 'workspace15',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
+    workspaceName: 'workspace15',
+    workspaceStatus: 'TERMINATING',
+    createdAt: '04/29/2022',
     project: 'TestProject',
     owner: 'Test User',
-    connections: 7,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 400.05
   },
   {
-    workspace: 'workspace16',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/20/2022',
+    workspaceName: 'workspace16',
+    workspaceStatus: 'STOPPING',
+    createdAt: '05/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
-    connections: 30,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 15.26
   },
   {
-    workspace: 'workspace17',
+    workspaceName: 'workspace17',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/18/2022',
+    createdAt: '05/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
-    connections: 1,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 400.5
   },
   {
-    workspace: 'workspace18',
+    workspaceName: 'workspace18',
     workspaceStatus: 'TERMINATED',
-    updatedAt: '4/17/2022',
+    createdAt: '05/10/2022',
     project: 'NYCProject',
     owner: 'Admin User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
-      </>
-    )
+    workspaceCost: 43.47
   },
   {
-    workspace: 'workspace19',
+    workspaceName: 'workspace19',
     workspaceStatus: 'PENDING',
-    updatedAt: '5/3/2022',
+    createdAt: '05/03/2022',
     project: 'TestProject',
     owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace20',
+    workspaceName: 'workspace20',
     workspaceStatus: 'FAILED',
-    updatedAt: '5/3/2022',
+    createdAt: '05/03/2022',
     project: 'SampleProject',
     owner: 'Test User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 0.0
   },
   {
-    workspace: 'workspace21',
+    workspaceName: 'workspace21',
     workspaceStatus: 'AVAILABLE',
-    updatedAt: '5/2/2022',
+    createdAt: '05/02/2022',
     project: 'MyProject',
     owner: 'Sample User',
-    connections: 3,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 70.8
   },
   {
-    workspace: 'workspace22',
+    workspaceName: 'workspace22',
     workspaceStatus: 'AVAILABLE',
-    updatedAt: '5/2/2022',
+    createdAt: '05/02/2022',
     project: 'SampleProject',
     owner: 'Sample User',
-    connections: 8,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button> <Button href="#">Stop</Button> <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 9.0
   },
   {
-    workspace: 'workspace23',
+    workspaceName: 'workspace23',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
+    createdAt: '04/22/2022',
     project: 'MVPProject',
     owner: 'My User',
-    connections: 42,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 42.24
   },
   {
-    workspace: 'workspace24',
+    workspaceName: 'workspace24',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/29/2022',
+    createdAt: '03/19/2022',
     project: 'TestProject',
     owner: 'Test User',
-    connections: 7,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 7.77
   },
   {
-    workspace: 'workspace25',
+    workspaceName: 'workspace25',
     workspaceStatus: 'STOPPED',
-    updatedAt: '4/20/2022',
+    createdAt: '05/20/2022',
     project: 'CAProject',
     owner: 'Intern User',
-    connections: 34,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 41.0
   },
   {
-    workspace: 'workspace26',
-    workspaceStatus: 'STOPPED',
-    updatedAt: '4/18/2022',
+    workspaceName: 'workspace26',
+    workspaceStatus: 'STARTING',
+    createdAt: '05/18/2022',
     project: 'BRProject',
     owner: 'Senior User',
-    connections: 1,
-    workspaceActions: (
-      <>
-        <Button href="#">Connect</Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#">Terminate</Button>
-      </>
-    )
+    workspaceCost: 82.69
   },
   {
-    workspace: 'workspace27',
+    workspaceName: 'workspace27',
     workspaceStatus: 'TERMINATED',
-    updatedAt: '4/17/2022',
+    createdAt: '05/17/2022',
     project: 'NYCProject',
     owner: 'Admin User',
-    connections: 0,
-    workspaceActions: (
-      <>
-        <Button href="#" disabled>
-          Connect
-        </Button>{' '}
-        <Button href="#" disabled>
-          Stop
-        </Button>{' '}
-        <Button href="#" disabled>
-          Terminate
-        </Button>
-      </>
-    )
+    workspaceCost: 0.0
   }
 ];

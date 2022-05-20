@@ -6,6 +6,7 @@ import Navigation from '../components/Navigation';
 import { BreadcrumbGroupProps } from '@awsui/components-react';
 import styles from '../styles/BaseLayout.module.scss';
 import { useNotifications } from '../context/NotificationContext';
+import { layoutLabels } from '../common/labels';
 
 const breadcrumbs: BreadcrumbGroupProps.Item[] = [
   {
@@ -24,18 +25,11 @@ export interface LayoutProps {
 }
 
 export default function Layout({ navigationHide, children }: LayoutProps): JSX.Element {
+  // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
   const { notifications } = useNotifications();
 
-  const appLayoutLabels: AppLayoutProps.Labels = {
-    navigation: 'Navigation drawer',
-    navigationClose: 'Close navigation drawer',
-    navigationToggle: 'Open navigation drawer',
-    notifications: 'Notifications',
-    tools: 'Help panel',
-    toolsClose: 'Close help panel',
-    toolsToggle: 'Open help panel'
-  };
+  const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
   return (
     <AppLayout
       id="app-layout"
@@ -55,6 +49,7 @@ export default function Layout({ navigationHide, children }: LayoutProps): JSX.E
       content={children}
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       onNavigationChange={({ detail }) => {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
         setNavigationOpen(detail.open);
         navigationOpen = true;
       }}
