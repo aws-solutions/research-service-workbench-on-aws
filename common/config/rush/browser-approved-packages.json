@@ -167,6 +167,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@rushstack/heft-webpack5-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@testing-library/dom",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -228,6 +232,10 @@
     },
     {
       "name": "constructs",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
     {
