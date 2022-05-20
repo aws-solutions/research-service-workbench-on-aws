@@ -2,4 +2,16 @@ export { AuthenticationPlugin } from './authenticationPlugin';
 export { AuthenticationService } from './authenticationService';
 export { User } from './user';
 export { UserManagementPlugin } from './userManagementPlugin';
-export { CognitoAuthenticationPlugin } from './plugins/cognitoAuthenticationPlugin';
+export {
+  CognitoAuthenticationPlugin,
+  CognitoAuthenticationPluginOptions
+} from './plugins/cognitoAuthenticationPlugin';
+export { InvalidJWTError, isInvalidJWTError } from './errors/invalidJwtError';
+export {
+  InvalidAuthorizationCodeError,
+  isInvalidAuthorizationCodeError
+} from './errors/invalidAuthorizationCodeError';
+export { PluginConfigurationError, isPluginConfigurationError } from './errors/pluginConfigurationError';
+export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalidTokenTypeError';
+export { DecodedJWT } from './decodedJWT';
+export { Tokens } from './tokens';

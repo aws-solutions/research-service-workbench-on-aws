@@ -199,6 +199,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "aws-jwt-verify",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "aws-lambda",
       "allowedCategories": [ "production" ]
     },

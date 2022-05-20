@@ -22,6 +22,7 @@ jobs:
 
   pre-deployment-check:
     name: Pre deployment check
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-18.04
     timeout-minutes: 10
     steps:
@@ -54,8 +55,10 @@ jobs:
   merge-develop-to-main:
     name: Merge develop to main
     runs-on: ubuntu-20.04
-    needs: [deploy-swb-reference, deploy-example]
-
+    needs: [readme-commit, deploy-swb-reference, deploy-example]
+    env: 
+      COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
+      CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -76,12 +79,21 @@ jobs:
 
       - name: Merge to main
         run: |
+          echo "Set the COMMIT_ID to merge to main, to current workflow commit id, if no readme commit was made"
+          echo "Else"
+          echo "Set the COMMIT_ID to README commit id"
+          COMMIT_ID=''
+          if $CHANGES_DETECTED; then
+            COMMIT_ID=$COMMIT_HASH
+          else
+            COMMIT_ID=$GITHUB_SHA
+          fi
           git checkout main
           echo
-          echo "  Attempting to merge the 'develop' branch ($(git log -1 --pretty=%H develop))"
+          echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
           echo "  into the 'main' branch ($(git log -1 --pretty=%H main))"
           echo
-          git merge --ff-only --no-edit develop
+          git merge $COMMIT_ID --ff-only --no-edit
           git push origin main
           
       - name: Enable branch protection on main
