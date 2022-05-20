@@ -1,3 +1,8 @@
+/**
+ *
+ * This code is a derivative of the code from https://github.com/microsoft/rushstack/blob/main/repo-scripts/repo-toolbox/src/ReadmeAction.ts
+ *
+ */
 import { CommandLineParser } from '@rushstack/ts-command-line';
 import { ReadmeAction } from './readmeAction';
 

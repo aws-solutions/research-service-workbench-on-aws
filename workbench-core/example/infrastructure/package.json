@@ -17,7 +17,7 @@
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "test": "rushx test:only && rushx make-badges",
     "build:test": "rushx compile && heft test -u --clean --test-path-pattern infrastructure-stack && rushx make-badges",
-    "test:integration": "heft test -u --clean",
+    "test:integration": "heft test -u --clean --no-build",
     "watch": "tsc -w",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",

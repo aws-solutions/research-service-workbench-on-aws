@@ -27,5 +27,9 @@
     "@types/heft-jest": "1.0.2",
     "@types/node": "^14",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+  },
+  "dependencies": {
+    "aws-jwt-verify": "^3.0.0",
+    "axios": "^0.27.1"
   }
 }

@@ -1,3 +1,8 @@
+/**
+ *
+ * This code is a derivative of the code from https://github.com/microsoft/rushstack/blob/main/repo-scripts/repo-toolbox/src/ReadmeAction.ts
+ *
+ */
 import { RushConfiguration, RushConfigurationProject } from '@microsoft/rush-lib';
 import { CommandLineAction, CommandLineFlagParameter } from '@rushstack/ts-command-line';
 import path from 'path';
