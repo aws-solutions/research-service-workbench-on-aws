@@ -9,7 +9,7 @@ import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 interface Environment {
   id: string | undefined;
-  instance: string | undefined;
+  instanceId: string | undefined;
   cidr: string;
   description: string;
   error: { type: string; value: string } | undefined;
@@ -18,6 +18,7 @@ interface Environment {
   projectId: string;
   status: EnvironmentStatus;
   datasetIds: string[];
+  provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
   createdAt: string;
@@ -28,10 +29,12 @@ interface Environment {
   PROJ?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   DS?: any[];
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  INID?: any;
 }
 const defaultEnv: Environment = {
   id: '',
-  instance: '',
+  instanceId: '',
   cidr: '',
   description: '',
   error: undefined,
@@ -43,6 +46,7 @@ const defaultEnv: Environment = {
   envTypeConfigId: '',
   updatedAt: '',
   createdAt: '',
+  provisionedProductId: '',
   owner: ''
 };
 
@@ -193,7 +197,7 @@ export default class EnvironmentService {
   }
 
   public async createEnvironment(params: {
-    instance?: string;
+    instanceId?: string;
     cidr: string;
     description: string;
     error?: { type: string; value: string };
@@ -203,7 +207,7 @@ export default class EnvironmentService {
     datasetIds: string[];
     envTypeId: string;
     envTypeConfigId: string;
-    status: EnvironmentStatus;
+    status?: EnvironmentStatus;
   }): Promise<Environment> {
     const itemsToGet = [
       {
@@ -220,10 +224,11 @@ export default class EnvironmentService {
       .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
       id: uuidv4(),
-      instance: params.instance,
+      instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,
       error: params.error,
+      provisionedProductId: '', // Updated later by StatusHandler
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
@@ -232,7 +237,7 @@ export default class EnvironmentService {
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       owner: 'owner-1', // TODO: Get this from request context
-      status: params.status
+      status: params.status || 'PENDING'
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -322,5 +327,15 @@ export default class EnvironmentService {
 
     //If no error are thrown then transaction was successful. If error did occur then the whole transaction will be rolled back
     return this.getEnvironment(newEnv.id!, true);
+  }
+
+  /*
+   * Store information to DDB
+   * There are multiple access patterns for environment-related resources, so keeping this method rather flexible
+   */
+  public async addMetadata(pkId: string, pkType: string, metaId: string, metaType: string, data: { [key: string]: string }): Promise<void>{
+    const key = {pk: this._buildKey(pkId, pkType), sk: this._buildKey(metaId, metaType)};
+
+    await this._aws.helpers.ddb.update(key, { item: data }).execute();
   }
 }

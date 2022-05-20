@@ -5,7 +5,7 @@ export async function handler(event: any) {
   console.log(`StatusHandler processing event ${JSON.stringify(event)}`);
 
   // We only handle environment status updates on this lambda
-  if (event['detail-type'] !== process.env.ENV_STATUS_UPDATE!) return;
+  if (event['detail-type'] !== process.env.EB_EVENT_TYPE_STATUS_UPDATE!) return;
 
   // Map event to EventBridgeEventToDDB
   const ebToDDB: EventBridgeEventToDDB = {

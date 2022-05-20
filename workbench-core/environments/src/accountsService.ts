@@ -5,9 +5,23 @@
 
 import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
+import Boom from '@hapi/boom';
 import { AwsService } from '@amzn/workbench-core-base';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
+interface Account {
+  id: string | undefined;
+  awsAccountId: string;
+  hostingAccountEventBusArn: string;
+  envMgmtRoleArn: string;
+  error: { type: string; value: string } | undefined;
+  accountHandlerRoleArn: string;
+  vpcId: string;
+  subnetId: string;
+  cidr: string;
+  environmentInstanceFiles: string;
+  encryptionKeyArn: string;
+  externalId: string | undefined;
+}
 export default class AccountsService {
   private _aws: AwsService;
   private _stackName: string;
@@ -16,29 +30,23 @@ export default class AccountsService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
   }
 
-  public async get(
-    accountId: string,
-    fields: Array<string> = []
-  ): Promise<{ [key: string]: AttributeValue }> {
+  /**
+   * Get account from DDB
+   * @param accountId - Env Id of account to retrieve
+   */
+  public async getAccount(accountId: string): Promise<Account> {
     // Get value from aws-accounts in DDB
     const accountEntry = await this._aws.helpers.ddb
-      .get({ pk: { S: `ACC#${accountId}` }, sk: { S: `ACC#${accountId}` } })
+      .get({ pk: `ACC#${accountId}` , sk: `ACC#${accountId}` })
       .execute();
 
-    if (_.isUndefined(_.get(accountEntry, 'Item')))
-      throw new Error(`Account with id ${accountId} does not exist`);
-    const accountDetails = 'Item' in accountEntry ? accountEntry.Item : undefined;
-
-    if (fields.length > 0) {
-      // If specific fields are requested, we return only those
-      return _.reduce(
-        accountDetails,
-        (result, value, key) => (_.includes(fields, key) ? _.set(result, key, value) : result),
-        {}
-      );
+    // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
+    // data should be of type GetItemCommandOutput--check it is and Item exists
+    if ('Item' in accountEntry && accountEntry.Item) {
+      return accountEntry.Item! as unknown as Account;
+    } else {
+      throw Boom.notFound(`Could not find account ${accountId}`);
     }
-
-    return accountDetails!;
   }
 
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
@@ -52,24 +60,11 @@ export default class AccountsService {
   public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateUpdate(accountMetadata);
 
+    console.log(JSON.stringify(accountMetadata));
+
     const accountId = await this.storeToDdb(accountMetadata);
 
     return { accountId, ...accountMetadata };
-  }
-
-  public async getHostEventBusArn(accountId: string): Promise<string> {
-    const accountDetails = await this.get(accountId);
-    return accountDetails.eventBusArn!.S!;
-  }
-
-  public async getEnvMgmtRoleArn(
-    accountId: string
-  ): Promise<{ envMgmtRoleArn: string; externalId?: string | undefined }> {
-    const accountDetails = await this.get(accountId);
-    return {
-      envMgmtRoleArn: accountDetails!.envManagementRoleArn!.S!,
-      externalId: accountDetails!.externalId?.S
-    };
   }
 
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
@@ -82,7 +77,7 @@ export default class AccountsService {
       throw new Error('Missing AWS Account ID in request body');
 
     // Check if AWS account ID already exists in DDB
-    const key = { key: { name: 'pk', value: { S: `AWSACC#${accountMetadata.awsAccountId}` } } };
+    const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
     const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
     // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
     if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0) {
@@ -98,13 +93,8 @@ export default class AccountsService {
 
     // Check if AWS account ID is same as before
     if (!_.isUndefined(accountMetadata.awsAccountId)) {
-      const key = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
-      const ddbEntry = await this._aws.helpers.ddb.get(key).execute();
-      if (
-        'Item' in ddbEntry &&
-        ddbEntry.Item?.awsAccountId &&
-        ddbEntry.Item?.awsAccountId.S !== accountMetadata.awsAccountId
-      ) {
+      const ddbEntry = await this.getAccount(accountMetadata.id);
+      if (ddbEntry.awsAccountId !== accountMetadata.awsAccountId) {
         throw new Error('The AWS Account mapped to this accountId is different than the one provided');
       }
     }
@@ -114,44 +104,42 @@ export default class AccountsService {
    * Store hosting account information in DDB
    */
   public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
-    // If id is provided then we update. If not, we create
-    if (_.isUndefined(accountMetadata.id)) accountMetadata.id = uuidv4();
-
-    // Future: Only update values that were present in accountMetadata request body (with missing keys)
-    const accountKey = { pk: { S: `ACC#${accountMetadata.id}` }, sk: { S: `ACC#${accountMetadata.id}` } };
-    const accountParams: { item: { [key: string]: AttributeValue } } = {
+    const accountKey = { pk: `ACC#${accountMetadata.id}` , sk: `ACC#${accountMetadata.id}` };
+    const accountParams: { item: { [key: string]: string } } = {
       item: {
-        id: { S: accountMetadata.id },
-        accountId: { S: accountMetadata.id },
-        awsAccountId: { S: accountMetadata.awsAccountId },
-        envManagementRoleArn: { S: accountMetadata.envManagementRoleArn },
-        accountHandlerRoleArn: { S: accountMetadata.accountHandlerRoleArn },
-        eventBusArn: { S: accountMetadata.eventBusArn },
-        vpcId: { S: accountMetadata.vpcId },
-        subnetId: { S: accountMetadata.subnetId },
-        cidr: { S: accountMetadata.cidr },
-        encryptionKeyArn: { S: accountMetadata.encryptionKeyArn },
-        environmentInstanceFiles: { S: accountMetadata.environmentInstanceFiles },
-        resourceType: { S: 'account' }
+        id: accountMetadata.id || uuidv4(),
+        accountId: accountMetadata.id,
+        awsAccountId: accountMetadata.awsAccountId,
+        envMgmtRoleArn: accountMetadata. envMgmtRoleArn,
+        accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
+        eventBusArn: accountMetadata.eventBusArn,
+        vpcId: accountMetadata.vpcId,
+        subnetId: accountMetadata.subnetId,
+        cidr: accountMetadata.cidr,
+        encryptionKeyArn: accountMetadata.encryptionKeyArn,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        resourceType: 'account'
       }
     };
 
     // We add the only optional attribute for account
-    if (accountMetadata.externalId) accountParams.item.externalId = { S: accountMetadata.externalId };
+    if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
+
+    console.log(JSON.stringify(accountMetadata));
 
     // Store Account row in DDB
     await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
 
     const awsAccountKey = {
-      pk: { S: `AWSACC#${accountMetadata.awsAccountId}` },
-      sk: { S: `ACC#${accountMetadata.id}` }
+      pk: `AWSACC#${accountMetadata.awsAccountId}`,
+      sk: `ACC#${accountMetadata.id}`
     };
     const awsAccountParams = {
       item: {
-        id: { S: accountMetadata.awsAccountId },
-        accountId: { S: accountMetadata.id },
-        awsAccountId: { S: accountMetadata.awsAccountId },
-        resourceType: { S: 'aws account' }
+        id: accountMetadata.awsAccountId,
+        accountId: accountMetadata.id,
+        awsAccountId: accountMetadata.awsAccountId,
+        resourceType: 'aws account'
       }
     };
 

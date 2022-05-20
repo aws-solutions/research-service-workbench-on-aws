@@ -13,7 +13,7 @@ parameters:
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-  EnvStatusUpdateConstString:
+  EventBridgeStatusUpdateEventType:
     type: String
     description: 'The string value used by main account to filter host events'
 mainSteps:
@@ -52,7 +52,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
-          DetailType: '{{ EnvStatusUpdateConstString }}'
+          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'
     isEnd: true
@@ -63,7 +63,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED" }'
-          DetailType: '{{ EnvStatusUpdateConstString }}'
+          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'TerminateSagemaker'
     isEnd: true

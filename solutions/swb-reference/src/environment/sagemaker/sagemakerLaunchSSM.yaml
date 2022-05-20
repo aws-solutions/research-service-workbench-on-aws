@@ -43,7 +43,7 @@ parameters:
     type: String
     description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
     default: '0'
-  EnvStatusUpdateConstString:
+  EventBridgeStatusUpdateEventType:
     type: String
     description: 'The string value used by main account to filter host events'
   InstanceSize:
@@ -115,7 +115,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
-          DetailType: '{{ EnvStatusUpdateConstString }}'
+          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'
     isEnd: true
@@ -126,7 +126,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
-          DetailType: '{{ EnvStatusUpdateConstString }}'
+          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
           Source: 'LaunchSagemaker'
     isEnd: true

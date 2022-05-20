@@ -24,7 +24,7 @@ export class SWBStack extends Stack {
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
-    ENV_STATUS_UPDATE: string;
+    EB_EVENT_TYPE_STATUS_UPDATE: string;
   };
   public constructor(app: App) {
     const {
@@ -37,7 +37,7 @@ export class SWBStack extends Stack {
       MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
-      ENV_STATUS_UPDATE
+      EB_EVENT_TYPE_STATUS_UPDATE
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -57,7 +57,7 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
-      ENV_STATUS_UPDATE
+      EB_EVENT_TYPE_STATUS_UPDATE
     };
 
     const statusHandler = this._createStatusHandlerLambda();

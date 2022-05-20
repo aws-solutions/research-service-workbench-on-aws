@@ -5,8 +5,6 @@
 
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import AccountsService from './accountsService';
 
 export type Operation = 'Launch' | 'Terminate';
 
@@ -22,53 +20,50 @@ export default class EnvironmentLifecycleHelper {
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
     envType: string;
-    accountId: string;
-    productId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    envMetadata: any;
   }): Promise<void> {
-    const updatedPayload = payload;
+    const updatedPayload = {
+      project: payload.envMetadata.PROJ,
+      operation: payload.operation,
+      envType: payload.envType,
+      ssmParameters: payload.ssmParameters,
+    };
 
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      accountId: payload.accountId,
+      project: payload.envMetadata.PROJ,
       operation: payload.operation,
       envType: payload.envType
     });
 
-    const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
-      ProductId: payload.productId
-    });
-    updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
-    await this.executeSSMDocument(updatedPayload);
-  }
-
-  /**
-   * Get Env entry from DDB
-   */
-  public async getEnvDDBEntry(envId: string): Promise<{ [id: string]: AttributeValue }> {
-    // Get value from env in DDB
-    const envEntry = await this.aws.helpers.ddb
-      .get({ pk: { S: `ENV#${envId}` }, sk: { S: `ENV#${envId}` } })
-      .execute();
-
-    const envDetails = 'Item' in envEntry ? envEntry.Item : undefined;
-    return envDetails!;
+    try{
+      const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
+        ProductId: payload.envMetadata.ETC.productId
+      });
+      updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
+      await this.executeSSMDocument(updatedPayload);
+    } catch(e){
+      console.log(e);
+      throw e;
+    }
   }
 
   /**
    * Executing SSM Document in hosting account with provided envMetadata
    */
   public async executeSSMDocument(payload: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
     envType: string;
-    accountId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    project: any;
   }): Promise<void> {
     // Get SSM doc ARN from main account CFN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      accountId: payload.accountId,
+      project: payload.project,
       operation: payload.operation,
       envType: payload.envType
     });
@@ -89,7 +84,7 @@ export default class EnvironmentLifecycleHelper {
     const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
-      return output.OutputKey && output.OutputKey === ssmDocOutputName;
+      return output.OutputKey && output.OutputKey.toLowerCase() === ssmDocOutputName.toLowerCase();
     });
     if (ssmDocOutput && ssmDocOutput.OutputValue) {
       return ssmDocOutput.OutputValue;
@@ -99,44 +94,23 @@ export default class EnvironmentLifecycleHelper {
   }
 
   public async getAwsSdkForEnvMgmtRole(payload: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    project: any;
     operation: string;
-    accountId: string;
     envType: string;
   }): Promise<AwsService> {
-    console.log(`Assuming EnvMgmt role in ${payload.accountId} account`);
-    const accountsService = new AccountsService();
-    const { envMgmtRoleArn, externalId } = await accountsService.get(payload.accountId, [
-      'envMgmtRoleArn',
-      'externalId'
-    ]);
-    console.log(`Assuming EnvMgmt role ${envMgmtRoleArn!.S!} with externalId ${externalId?.S}`);
+    console.log(`Assuming EnvMgmt role in ${payload.project.awsAccountId} account`);
+    const { envMgmtRoleArn, externalId } = payload.project;
+    console.log(`Assuming EnvMgmt role ${envMgmtRoleArn} with externalId ${externalId}`);
     const params = {
-      roleArn: envMgmtRoleArn!.S!,
+      roleArn: envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
       region: process.env.AWS_REGION!,
-      externalId: externalId?.S
+      externalId
     };
 
     const hostSdk = await this.aws.getAwsServiceForRole(params);
 
     return hostSdk;
-  }
-
-  /*
-   * Store information to DDB
-   * There are multiple access patterns for environment-related resources, so keeping this method rather flexible
-   */
-  public async storeToDdb(
-    pk: string,
-    sk: string,
-    envDetails: { [key: string]: AttributeValue }
-  ): Promise<void> {
-    const envKey = { pk: { S: pk }, sk: { S: sk } };
-
-    console.log(
-      `Storing to DDB : envKey: ${JSON.stringify(envKey)}, \n envDetails: ${JSON.stringify(envDetails)}`
-    );
-
-    await this.aws.helpers.ddb.update(envKey, { item: envDetails }).execute();
   }
 }
