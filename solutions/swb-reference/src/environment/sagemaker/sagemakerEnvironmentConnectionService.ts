@@ -19,7 +19,7 @@ export default class SagemakerEnvironmentConnectionService implements Environmen
     const response = await hostingAccountAwsService.clients.sagemaker.createPresignedNotebookInstanceUrl({
       NotebookInstanceName: instanceName
     });
-    return Promise.resolve({ url: response.AuthorizedUrl });
+    return { url: response.AuthorizedUrl };
   }
 
   /**
