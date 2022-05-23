@@ -33,7 +33,7 @@
     "@awsui/design-tokens": "^3.0.0",
     "@awsui/global-styles": "^1.0.0",
     "@awsui/test-utils-core": "^1.0.0",
-    "@babel/core": "7.17.9",
+    "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
