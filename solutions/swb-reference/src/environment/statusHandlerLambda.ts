@@ -2,6 +2,7 @@ import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
+  // TODO: Allow user-configurability of object attributes to be stored to DDB
   console.log(`StatusHandler processing event ${JSON.stringify(event)}`);
 
   // We only handle environment status updates on this lambda

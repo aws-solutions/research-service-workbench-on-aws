@@ -9,15 +9,14 @@
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
     "<rootDir>/src/accountHandler.ts",
-    "<rootDir>/src/statusHandler.ts",
     "<rootDir>/src/index.ts"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 50,
-      "functions": 50,
-      "lines": 50,
-      "statements": 50
+      "branches": 35,
+      "functions": 40,
+      "lines": 40,
+      "statements": 40
     }
   },
   "coverageReporters": ["json-summary", "json"]

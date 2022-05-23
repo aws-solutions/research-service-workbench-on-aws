@@ -40,12 +40,12 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get environment from DDB
-      const getEnvironment = (envId: string): { envType: string } => {
-        console.log('envId', envId);
-      return { envType: 'sagemaker' };
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
       };
-      const { envType } = getEnvironment(req.params.id);
+      const envType = await getEnvironment(req.params.id);
 
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -62,12 +62,12 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get environment from DDB
-      const getEnvironment = (envId: string): { envType: string } => {
-        console.log('envId', envId);
-      return { envType: 'sagemaker' };
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
       };
-      const { envType } = getEnvironment(req.params.id);
+      const envType = await getEnvironment(req.params.id);
 
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -84,12 +84,12 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get environment from DDB
-      const getEnvironment = (envId: string): { envType: string } => {
-        console.log('envId', envId);
-      return { envType: 'sagemaker' };
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
       };
-      const { envType } = getEnvironment(req.params.id);
+      const envType = await getEnvironment(req.params.id);
 
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object

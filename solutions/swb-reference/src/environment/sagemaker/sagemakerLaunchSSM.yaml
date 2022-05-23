@@ -46,7 +46,7 @@ parameters:
   EventBridgeStatusUpdateEventType:
     type: String
     description: 'The string value used by main account to filter host events'
-  InstanceSize:
+  InstanceType:
     type: String
     description: 'The size of the notebook instance coming from environment type config'
 mainSteps:
@@ -73,7 +73,7 @@ mainSteps:
         - Key: IamPolicyDocument
           Value: '{}'
         - Key: InstanceType
-          Value: '{{ InstanceSize }}'
+          Value: '{{ InstanceType }}'
         - Key: Subnet
           Value: '{{ Subnet }}'
         - Key: EnvironmentInstanceFiles

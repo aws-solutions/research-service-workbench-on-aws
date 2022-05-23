@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import _ = require('lodash');
 import {
   EnvironmentLifecycleService,
   EnvironmentLifecycleHelper,
@@ -18,7 +19,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
   public constructor() {
     this.helper = new EnvironmentLifecycleHelper();
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
-    this.envService = new EnvironmentService({TABLE_NAME: process.env.STACK_NAME!});
+    this.envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
@@ -27,7 +28,11 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       throw new Error('envId cannot be passed in the request body when trying to launch a new environment');
     }
 
-    // TODO: Some of these values will come from env type config params, while rest are account specific (attributes copied in project)
+    const cidr = _.find(envMetadata.ETC.params, { key: 'CIDR' })!.value!;
+    const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
+    const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
+      .value!;
+
     const ssmParameters = {
       InstanceName: [`basicnotebookinstance-${Date.now()}`],
       VPC: [envMetadata.PROJ.vpcId],
@@ -36,19 +41,19 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       ProductId: [envMetadata.ETC.productId],
       Namespace: [`sagemaker-${Date.now()}`],
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
-      CIDR: ['1.1.1.1/32'], // TODO: from env type config params
-      InstanceSize: ['ml.t3.large'], // TODO: from env type config params
+      CIDR: [cidr],
+      InstanceType: [instanceSize],
       EventBusName: [envMetadata.PROJ.hostingAccountEventBusArn],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
-      AutoStopIdleTimeInMinutes: ['0'], // from env type config params
+      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
       EventBridgeStatusUpdateEventType: [process.env.EB_EVENT_TYPE_STATUS_UPDATE!]
     };
 
     await this.helper.launch({
       ssmParameters,
       operation: 'Launch',
-      envType: 'Sagemaker',
+      envType: 'sagemaker',
       envMetadata
     });
 
@@ -73,12 +78,13 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     await this.helper.executeSSMDocument({
       ssmParameters,
       operation: 'Terminate',
-      envType: 'Sagemaker',
-      project: envDetails.PROJ,
+      envType: 'sagemaker',
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId
     });
 
     // Store env row in DDB
-    await this.envService.updateEnvironment(envId, {status: 'TERMINATING'});
+    await this.envService.updateEnvironment(envId, { status: 'TERMINATING' });
 
     return { envId, status: 'TERMINATING' };
   }
@@ -90,15 +96,16 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      project: envDetails.PROJ,
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId,
       operation: 'Start',
-      envType: 'Sagemaker'
+      envType: 'sagemaker'
     });
 
     await hostAwsSdk.clients.sagemaker.startNotebookInstance({ NotebookInstanceName: instanceName });
 
     // Store env row in DDB
-    await this.envService.updateEnvironment(envId, {status: 'STARTING'});
+    await this.envService.updateEnvironment(envId, { status: 'STARTING' });
 
     return { envId, status: 'STARTING' };
   }
@@ -110,9 +117,10 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
-      project: envDetails.PROJ,
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId,
       operation: 'Start',
-      envType: 'Sagemaker'
+      envType: 'sagemaker'
     });
 
     await hostAwsSdk.clients.sagemaker.stopNotebookInstance({ NotebookInstanceName: instanceName });
@@ -120,7 +128,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     envDetails.status = 'STOPPING';
 
     // Store env row in DDB
-    await this.envService.updateEnvironment(envId, {status: 'STOPPING'});
+    await this.envService.updateEnvironment(envId, { status: 'STOPPING' });
 
     return { envId, status: 'STOPPING' };
   }

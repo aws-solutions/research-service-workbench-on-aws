@@ -2,8 +2,6 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-// import { DynamoDBClient, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
-// import { ServiceCatalogClient, ListLaunchPathsCommand } from '@aws-sdk/client-service-catalog';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { Operation } from './environmentLifecycleHelper';
 
@@ -74,7 +72,8 @@ describe('EnvironmentLifecycleHelper', () => {
       },
       operation,
       envType: 'Sagemaker',
-      project: {}
+      envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+      externalId: 'workbench'
     };
 
     helper.getSSMDocArn = jest.fn();

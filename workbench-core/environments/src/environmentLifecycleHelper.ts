@@ -24,25 +24,27 @@ export default class EnvironmentLifecycleHelper {
     envMetadata: any;
   }): Promise<void> {
     const updatedPayload = {
-      project: payload.envMetadata.PROJ,
+      envMgmtRoleArn: payload.envMetadata.PROJ.envMgmtRoleArn,
+      externalId: payload.envMetadata.PROJ.externalId,
       operation: payload.operation,
       envType: payload.envType,
-      ssmParameters: payload.ssmParameters,
+      ssmParameters: payload.ssmParameters
     };
 
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      project: payload.envMetadata.PROJ,
+      envMgmtRoleArn: payload.envMetadata.PROJ.envMgmtRoleArn,
+      externalId: payload.envMetadata.PROJ.externalId,
       operation: payload.operation,
       envType: payload.envType
     });
 
-    try{
+    try {
       const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
         ProductId: payload.envMetadata.ETC.productId
       });
       updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
       await this.executeSSMDocument(updatedPayload);
-    } catch(e){
+    } catch (e) {
       console.log(e);
       throw e;
     }
@@ -55,15 +57,16 @@ export default class EnvironmentLifecycleHelper {
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
     envType: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    project: any;
+    envMgmtRoleArn: string;
+    externalId?: string;
   }): Promise<void> {
     // Get SSM doc ARN from main account CFN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      project: payload.project,
+      envMgmtRoleArn: payload.envMgmtRoleArn,
+      externalId: payload.externalId,
       operation: payload.operation,
       envType: payload.envType
     });
@@ -94,19 +97,17 @@ export default class EnvironmentLifecycleHelper {
   }
 
   public async getAwsSdkForEnvMgmtRole(payload: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    project: any;
+    envMgmtRoleArn: string;
+    externalId?: string;
     operation: string;
     envType: string;
   }): Promise<AwsService> {
-    console.log(`Assuming EnvMgmt role in ${payload.project.awsAccountId} account`);
-    const { envMgmtRoleArn, externalId } = payload.project;
-    console.log(`Assuming EnvMgmt role ${envMgmtRoleArn} with externalId ${externalId}`);
+    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn} with externalId ${payload.externalId}`);
     const params = {
-      roleArn: envMgmtRoleArn,
+      roleArn: payload.envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
       region: process.env.AWS_REGION!,
-      externalId
+      externalId: payload.externalId
     };
 
     const hostSdk = await this.aws.getAwsServiceForRole(params);

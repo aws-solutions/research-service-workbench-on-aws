@@ -7,6 +7,7 @@ import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
 import { AwsService } from '@amzn/workbench-core-base';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 interface Account {
   id: string | undefined;
@@ -20,7 +21,8 @@ interface Account {
   cidr: string;
   environmentInstanceFiles: string;
   encryptionKeyArn: string;
-  externalId: string | undefined;
+  externalId?: string;
+  stackName: string;
 }
 export default class AccountsService {
   private _aws: AwsService;
@@ -35,13 +37,10 @@ export default class AccountsService {
    * @param accountId - Env Id of account to retrieve
    */
   public async getAccount(accountId: string): Promise<Account> {
-    // Get value from aws-accounts in DDB
-    const accountEntry = await this._aws.helpers.ddb
-      .get({ pk: `ACC#${accountId}` , sk: `ACC#${accountId}` })
-      .execute();
+    const accountEntry = (await this._aws.helpers.ddb
+      .get({ pk: `ACC#${accountId}`, sk: `ACC#${accountId}` })
+      .execute()) as GetItemCommandOutput;
 
-    // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
-    // data should be of type GetItemCommandOutput--check it is and Item exists
     if ('Item' in accountEntry && accountEntry.Item) {
       return accountEntry.Item! as unknown as Account;
     } else {
@@ -52,9 +51,9 @@ export default class AccountsService {
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
 
-    const accountId = await this.storeToDdb(accountMetadata);
+    const id = await this.storeToDdb(accountMetadata);
 
-    return { accountId, ...accountMetadata };
+    return { id, ...accountMetadata };
   }
 
   public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
@@ -62,9 +61,9 @@ export default class AccountsService {
 
     console.log(JSON.stringify(accountMetadata));
 
-    const accountId = await this.storeToDdb(accountMetadata);
+    const id = await this.storeToDdb(accountMetadata);
 
-    return { accountId, ...accountMetadata };
+    return { id, ...accountMetadata };
   }
 
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
@@ -104,13 +103,13 @@ export default class AccountsService {
    * Store hosting account information in DDB
    */
   public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
-    const accountKey = { pk: `ACC#${accountMetadata.id}` , sk: `ACC#${accountMetadata.id}` };
+    const accountKey = { pk: `ACC#${accountMetadata.id}`, sk: `ACC#${accountMetadata.id}` };
     const accountParams: { item: { [key: string]: string } } = {
       item: {
         id: accountMetadata.id || uuidv4(),
         accountId: accountMetadata.id,
         awsAccountId: accountMetadata.awsAccountId,
-        envMgmtRoleArn: accountMetadata. envMgmtRoleArn,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
         eventBusArn: accountMetadata.eventBusArn,
         vpcId: accountMetadata.vpcId,
