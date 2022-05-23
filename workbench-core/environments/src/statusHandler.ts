@@ -4,7 +4,7 @@ import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { isEnvironmentStatus } from './environmentStatus';
 import EnvironmentService from './environmentService';
-import envKeyNameToKey from './environmentKeyNameToKey';
+import envResourceTypeToKey from './envResourceTypeToKey';
 import { AwsService } from '@amzn/workbench-core-base';
 
 export default class StatusHandler {
@@ -24,7 +24,7 @@ export default class StatusHandler {
         .query({
           key: {
             name: 'pk',
-            value: `${envKeyNameToKey.instance}#${event.metadata.detail.NotebookInstanceName}`
+            value: `${envResourceTypeToKey.instance}#${event.metadata.detail.NotebookInstanceName}`
           }
         })
         .execute();
@@ -32,7 +32,7 @@ export default class StatusHandler {
         throw Boom.notFound(`Could not find instance ${event.metadata.detail.NotebookInstanceName}`);
       }
       const instance = data.Items![0];
-      envId = instance.sk!.S!.split(`${envKeyNameToKey.environment}#`)[1];
+      envId = instance.sk!.S!.split(`${envResourceTypeToKey.environment}#`)[1];
     }
 
     const envDetails = await envService.getEnvironment(envId, true);
@@ -90,9 +90,9 @@ export default class StatusHandler {
     // Create/update instance ID and ARN in DDB
     await envService.addMetadata(
       envId,
-      envKeyNameToKey.environment,
+      envResourceTypeToKey.environment,
       instanceName,
-      envKeyNameToKey.instance,
+      envResourceTypeToKey.instance,
       envInstDetails
     );
 
@@ -105,9 +105,9 @@ export default class StatusHandler {
     // Create/update corresponding instance resource in DDB
     await envService.addMetadata(
       instanceName,
-      envKeyNameToKey.instance,
+      envResourceTypeToKey.instance,
       envId,
-      envKeyNameToKey.environment,
+      envResourceTypeToKey.environment,
       instDetails
     );
   }
