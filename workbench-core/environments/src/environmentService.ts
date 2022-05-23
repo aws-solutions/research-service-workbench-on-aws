@@ -4,8 +4,8 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { EnvironmentStatus } from './environmentStatus';
 import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
-import envKeyNameToKey from './environmentKeyNameToKey';
-import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import envResourceTypeToKey from './environmentResourceTypeToKey';
+import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 interface Environment {
   id: string | undefined;
@@ -64,7 +64,7 @@ export default class EnvironmentService {
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
     if (includeMetadata) {
       const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: this._buildKey(envId, envKeyNameToKey.environment) } })
+        .query({ key: { name: 'pk', value: this._buildKey(envId, envResourceTypeToKey.environment) } })
         .execute();
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find environment ${envId}`);
@@ -73,24 +73,29 @@ export default class EnvironmentService {
         return item;
       });
       let envWithMetadata: Environment = { ...defaultEnv };
+      envWithMetadata.DS = [];
       for (const item of items) {
         // parent environment item
-        if ((item.sk as unknown) === this._buildKey(envId, envKeyNameToKey.environment)) {
+        const sk = item.sk as unknown as string;
+        if (sk === this._buildKey(envId, envResourceTypeToKey.environment)) {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
-          // metadata of environment item
-          // @ts-ignore
-          envWithMetadata[item.sk.split('#')[0]] = item;
+          const envKey = sk.split('#')[0];
+          if (envKey === 'DS') {
+            envWithMetadata.DS!.push(item);
+          } else {
+            // metadata of environment item
+            // @ts-ignore
+            envWithMetadata[sk.split('#')[0]] = item;
+          }
         }
       }
       return envWithMetadata;
     } else {
-      const data = await this._aws.helpers.ddb
-        .get(this._buildPkSk(envId, envKeyNameToKey.environment))
-        .execute();
-      // TODO: Figure out how to check type of get between 'GetItemCommandOutput' and 'BatchGetItemCommandOutput'
-      // data should be of type GetItemCommandOutput--check it is and Item exists
-      if ('Item' in data && data.Item) {
+      const data = (await this._aws.helpers.ddb
+        .get(this._buildPkSk(envId, envResourceTypeToKey.environment))
+        .execute()) as GetItemCommandOutput;
+      if (data.Item) {
         return data.Item! as unknown as Environment;
       } else {
         throw Boom.notFound(`Could not find environment ${envId}`);
@@ -136,7 +141,7 @@ export default class EnvironmentService {
     } else {
       const queryParams = {
         index: 'getResourceByOwner',
-        key: { name: 'resourceType', value: { S: 'environment' } },
+        key: { name: 'resourceType', value: 'environment' },
         sortKey: 'owner',
         eq: { S: user.ownerId }
       };
@@ -177,7 +182,7 @@ export default class EnvironmentService {
     }
 
     const updateResponse = await this._aws.helpers.ddb
-      .update(this._buildPkSk(envId, envKeyNameToKey.environment), { item: updatedValues })
+      .update(this._buildPkSk(envId, envResourceTypeToKey.environment), { item: updatedValues })
       .execute();
 
     return updateResponse.Attributes! as unknown as Environment;
@@ -206,13 +211,16 @@ export default class EnvironmentService {
     status: EnvironmentStatus;
   }): Promise<Environment> {
     const itemsToGet = [
+      // ETC
       {
-        pk: envKeyNameToKey.envTypeConfig,
-        sk: `${envKeyNameToKey.envType}#${params.envTypeId}${envKeyNameToKey.envTypeConfig}#${params.envTypeConfigId}`
+        pk: envResourceTypeToKey.envTypeConfig,
+        sk: `${envResourceTypeToKey.envType}#${params.envTypeId}${envResourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
       },
-      this._buildPkSk(params.projectId, envKeyNameToKey.project),
+      // PROJ
+      this._buildPkSk(params.projectId, envResourceTypeToKey.project),
+      // DS
       ...params.datasetIds.map((dsId) => {
-        return this._buildPkSk(dsId, envKeyNameToKey.dataset);
+        return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
     ];
     const batchGetResult = (await this._aws.helpers.ddb
@@ -261,7 +269,7 @@ export default class EnvironmentService {
       return item.resourceType === 'envTypeConfig';
     });
     items.push({
-      ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.envTypeConfig, newEnv.envTypeConfigId),
+      ...buildEnvPkMetadataSk(newEnv.id!, envResourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
       productId: envTypeConfig.productId,
       provisioningArtifactId: envTypeConfig.provisioningArtifactId,
@@ -273,7 +281,7 @@ export default class EnvironmentService {
       return item.resourceType === 'project';
     });
     items.push({
-      ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.project, newEnv.projectId),
+      ...buildEnvPkMetadataSk(newEnv.id!, envResourceTypeToKey.project, newEnv.projectId),
       id: newEnv.projectId,
       name: project.name,
       envMgmtRoleArn: project.envMgmtRoleArn,
@@ -293,7 +301,7 @@ export default class EnvironmentService {
     });
     datasets.forEach((dataset) => {
       items.push({
-        ...buildEnvPkMetadataSk(newEnv.id!, envKeyNameToKey.dataset, dataset.id),
+        ...buildEnvPkMetadataSk(newEnv.id!, envResourceTypeToKey.dataset, dataset.id),
         id: dataset.id,
         name: dataset.name,
         resources: dataset.resources
@@ -303,8 +311,8 @@ export default class EnvironmentService {
     // Add environment item
     items.push({
       ...newEnv,
-      pk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
-      sk: this._buildKey(newEnv.id!, envKeyNameToKey.environment),
+      pk: this._buildKey(newEnv.id!, envResourceTypeToKey.environment),
+      sk: this._buildKey(newEnv.id!, envResourceTypeToKey.environment),
       resourceType: 'environment'
     });
 
