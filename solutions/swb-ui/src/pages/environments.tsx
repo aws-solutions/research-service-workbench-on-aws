@@ -97,6 +97,7 @@ const Environment: NextPage = () => {
       filtering: {
         empty: TableEmptyDisplay(itemType),
         noMatch: TableNoMatchDisplay(itemType),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filteringFunction: (item, filteringText): any => {
           if (dateFilter !== null) {
             const range = convertToAbsoluteRange(dateFilter);
@@ -168,7 +169,6 @@ const Environment: NextPage = () => {
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
       }
       contentType="table"
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       onNavigationChange={({ detail }) => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         setNavigationOpen(detail.open);
@@ -253,6 +253,7 @@ const Environment: NextPage = () => {
                   expandToViewport={true}
                 />
                 <DateRangePicker
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
                   value={dateFilter}
                   relativeOptions={relativeOptions}
