@@ -26,6 +26,6 @@ export default class SagemakerEnvironmentConnectionService implements Environmen
    * Instructions for connecting to the workspace that can be shown verbatim in the UI
    */
   public getConnectionInstruction(): Promise<string> {
-    return Promise.resolve('Connection instruction for Sagemaker');
+    return Promise.resolve('Open the provided sagemaker url to access the Jupyter Notebook');
   }
 }
