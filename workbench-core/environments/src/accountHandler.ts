@@ -10,10 +10,7 @@ export default class AccountHandler {
   public async execute(event: any): Promise<void> {
     // eslint-disable-next-line
     const { hostingAccounts, externalId, portfolioId } = await this._getMetadataFromDB();
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService(
-      process.env.AWS_REGION!,
-      process.env.STACK_NAME!
-    );
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
 
     // const cfService = new CloudformationService(this._mainAccountAwsService.clients.cloudformation);
     const cfService = this._mainAccountAwsService.helpers.cloudformation;
@@ -32,7 +29,7 @@ export default class AccountHandler {
         hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
           roleArn: hostingAccount.arns.accountHandler,
           roleSessionName: 'account-handler',
-          externalId: externalId as string,
+          externalId,
           region: process.env.AWS_REGION!
         });
       } catch (e) {
@@ -73,13 +70,13 @@ export default class AccountHandler {
       hostingAccounts: [
         {
           arns: {
-            accountHandler: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-cross-account-role',
-            envManagement: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-env-mgmt'
+            accountHandler: 'arn:aws:iam::<HOSTING_ACCOUNT>:role/swb-swbv2-va-cross-account-role',
+            envManagement: 'arn:aws:iam::<HOSTING_ACCOUNT>:role/swb-swbv2-va-env-mgmt'
           },
-          stackName: `swb-dev-oh-account-1`
+          stackName: `swbv2-host`
         }
       ],
-      portfolioId: 'port-4n4g66unobu34'
+      portfolioId: 'port-45ssvg67eyrek'
     });
   }
 }

@@ -14,7 +14,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-89.05%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.54%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.6%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.83%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-76.3%25-red.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-71%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-80.16%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-77.16%25-red.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -25,7 +25,9 @@ Please read through this document before submitting any issues or pull requests 
 
 In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#monorepo-for-service-workbench-development-instructions)
 
+
 ## Packages
+
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
@@ -41,6 +43,7 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/example/express](./workbench-core/example/express/) | [@amzn/workbench-core-express] | [README](./workbench-core/example/express/README.md)
 | [workbench-core/example/infrastructure](./workbench-core/example/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/example/infrastructure/README.md)
+
 
 
 ## Finding contributions to work on

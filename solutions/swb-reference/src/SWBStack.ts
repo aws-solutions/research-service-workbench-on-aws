@@ -4,7 +4,7 @@ import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { App, CfnOutput, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
 import Workflow from './environment/workflow';
@@ -21,6 +21,10 @@ export class SWBStack extends Stack {
     SSM_DOC_NAME_SUFFIX: string;
     MAIN_ACCOUNT_BUS_ARN_NAME: string;
     AMI_IDS_TO_SHARE: string;
+    LAUNCH_CONSTRAINT_ROLE_NAME: string;
+    S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    STATUS_HANDLER_ARN_NAME: string;
+    EB_EVENT_TYPE_STATUS_UPDATE: string;
   };
   public constructor(app: App) {
     const {
@@ -31,7 +35,9 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
       MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
+      AMI_IDS_TO_SHARE,
+      STATUS_HANDLER_ARN_NAME,
+      EB_EVENT_TYPE_STATUS_UPDATE
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -47,27 +53,105 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
       MAIN_ACCOUNT_BUS_ARN_NAME,
-      AMI_IDS_TO_SHARE
+      AMI_IDS_TO_SHARE,
+      LAUNCH_CONSTRAINT_ROLE_NAME,
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      STATUS_HANDLER_ARN_NAME,
+      EB_EVENT_TYPE_STATUS_UPDATE
     };
 
-    const apiLambdaRole: Role = this._createAPILambdaRole();
-    const apiLambda: Function = this._createAPILambda(apiLambdaRole);
+    const statusHandler = this._createStatusHandlerLambda();
+    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
     this._createRestApi(apiLambda);
 
-    this._createStatusHandlerLambda();
+    const artifactS3Bucket = this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    this._createAccountHandlerLambda(lcRole);
+    this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
     this._createEventBridgeResources();
-    this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-
     this._createDDBTable(apiLambda);
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
+    const commonScManagement = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: [
+            'iam:GetRole',
+            'iam:GetRolePolicy',
+            'iam:*TagRole*',
+            'iam:PassRole',
+            'iam:DeleteRole',
+            'iam:PutRolePolicy',
+            'iam:DeleteRolePolicy',
+            'iam:DetachRolePolicy',
+            'iam:AttachRolePolicy',
+            'iam:CreateRole'
+          ],
+          resources: [
+            'arn:aws:iam::*:role/analysis-*',
+            'arn:aws:iam::*:role/SC-*-ServiceRole-*',
+            'arn:aws:iam::*:role/*-sagemaker-notebook-role'
+          ]
+        }),
+        new PolicyStatement({
+          actions: [
+            'iam:AddRoleToInstanceProfile',
+            'iam:CreateInstanceProfile',
+            'iam:GetInstanceProfile',
+            'iam:DeleteInstanceProfile',
+            'iam:RemoveRoleFromInstanceProfile'
+          ],
+          resources: [
+            'arn:aws:iam::*:instance-profile/analysis-*',
+            'arn:aws:iam::*:instance-profile/SC-*-InstanceProfile-*'
+          ]
+        }),
+        new PolicyStatement({
+          actions: ['iam:GetPolicy', 'iam:CreatePolicy', 'iam:ListPolicyVersions', 'iam:DeletePolicy'],
+          resources: ['arn:aws:iam::*:policy/*-permission-boundary']
+        }),
+        new PolicyStatement({
+          actions: [
+            'cloudformation:CreateStack',
+            'cloudformation:DescribeStacks',
+            'cloudformation:DescribeStackEvents',
+            'cloudformation:DeleteStack'
+          ],
+          resources: ['arn:aws:cloudformation:*:*:stack/SC-*/*']
+        }),
+        new PolicyStatement({
+          actions: ['cloudformation:GetTemplateSummary'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: ['s3:GetObject'],
+          resources: ['arn:aws:s3:::sc-*']
+        }),
+        new PolicyStatement({
+          actions: [
+            'ec2:AuthorizeSecurityGroupIngress',
+            'ec2:RevokeSecurityGroupEgress',
+            'ec2:CreateSecurityGroup',
+            'ec2:DeleteSecurityGroup',
+            'ec2:CreateTags',
+            'ec2:DescribeTags',
+            'ec2:DescribeKeyPairs',
+            'ec2:DescribeSecurityGroups',
+            'ec2:DescribeSubnets',
+            'ec2:DescribeVpcs'
+          ],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: ['kms:CreateGrant'],
+          resources: ['*']
+        })
+      ]
+    });
     const sagemakerPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -127,7 +211,8 @@ export class SWBStack extends Stack {
       roleName: `${this.stackName}-LaunchConstraint`,
       description: 'Launch constraint role for Service Catalog products',
       inlinePolicies: {
-        sagemakerLaunchPermissions: sagemakerPolicy
+        sagemakerLaunchPermissions: sagemakerPolicy,
+        commonScManagement
       }
     });
 
@@ -137,12 +222,13 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3Buckets(s3ArtifactName: string): void {
+  private _createS3Buckets(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-artifacts', {});
 
     new CfnOutput(this, s3ArtifactName, {
       value: s3Bucket.bucketArn
     });
+    return s3Bucket;
   }
 
   private _createEventBridgeResources(): void {
@@ -155,68 +241,100 @@ export class SWBStack extends Stack {
     });
   }
 
-  private _createStatusHandlerLambda(): void {
+  private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: this.lambdaEnvVars
+      environment: this.lambdaEnvVars,
+      timeout: Duration.seconds(60)
     });
 
-    new CfnOutput(this, 'statusHandlerLambdaRoleOutput', {
+    statusHandlerLambda.role?.attachInlinePolicy(
+      new Policy(this, 'statusHandlerLambdaPolicy', {
+        statements: [
+          // TODO: Restrict policy permissions
+          new PolicyStatement({
+            actions: ['dynamodb:*'],
+            resources: ['*'],
+            sid: 'DynamoDBAccess'
+          }),
+          new PolicyStatement({
+            actions: ['sts:AssumeRole'],
+            resources: ['arn:aws:iam::*:role/*env-mgmt'],
+            sid: 'AssumeRole'
+          })
+        ]
+      })
+    );
+
+    new CfnOutput(this, 'StatusHandlerLambdaRoleOutput', {
       value: statusHandlerLambda.role!.roleArn
     });
+
+    new CfnOutput(this, 'StatusHandlerLambdaArnOutput', {
+      value: statusHandlerLambda.functionArn
+    });
+
+    return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(launchConstraintRole: Role): void {
+  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: this.lambdaEnvVars
+      environment: this.lambdaEnvVars,
+      memorySize: 256,
+      timeout: Duration.minutes(4)
     });
 
-    const createPortfolioSharePolicy = new PolicyStatement({
-      actions: ['servicecatalog:CreatePortfolioShare'],
-      resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
-    });
-
-    const assumeRolePolicy = new PolicyStatement({
-      actions: ['sts:AssumeRole'],
-      // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-      resources: [`arn:aws:iam::*:role/${this.stackName}-cross-account-role`]
-    });
-
-    const getLaunchConstraintPolicy = new PolicyStatement({
-      actions: ['iam:GetRole', 'iam:GetRolePolicy', 'iam:ListRolePolicies', 'iam:ListAttachedRolePolicies'],
-      resources: [launchConstraintRole.roleArn]
-    });
-
-    const shareAmiPolicy = new PolicyStatement({
-      actions: ['ec2:ModifyImageAttribute'],
-      resources: ['*']
-    });
-
-    const shareSSMPolicy = new PolicyStatement({
-      actions: ['ssm:ModifyDocumentPermission'],
-      resources: [
-        this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
-      ]
-    });
-
-    const cloudformationPolicy = new PolicyStatement({
-      actions: ['cloudformation:DescribeStacks'],
-      resources: [this.stackId]
-    });
     lambda.role?.attachInlinePolicy(
       new Policy(this, 'accountHandlerPolicy', {
         statements: [
-          createPortfolioSharePolicy,
-          assumeRolePolicy,
-          getLaunchConstraintPolicy,
-          shareAmiPolicy,
-          shareSSMPolicy,
-          cloudformationPolicy
+          new PolicyStatement({
+            sid: 'CreatePortfolioShare',
+            actions: ['servicecatalog:CreatePortfolioShare'],
+            resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+          }),
+          new PolicyStatement({
+            sid: 'AssumeRole',
+            actions: ['sts:AssumeRole'],
+            // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+            resources: ['arn:aws:iam::*:role/*cross-account-role']
+          }),
+          new PolicyStatement({
+            sid: 'GetLaunchConstraint',
+            actions: [
+              'iam:GetRole',
+              'iam:GetRolePolicy',
+              'iam:ListRolePolicies',
+              'iam:ListAttachedRolePolicies'
+            ],
+            resources: [launchConstraintRole.roleArn]
+          }),
+          new PolicyStatement({
+            sid: 'ShareAmi',
+            actions: ['ec2:ModifyImageAttribute'],
+            resources: ['*']
+          }),
+          new PolicyStatement({
+            sid: 'ShareSSM',
+            actions: ['ssm:ModifyDocumentPermission'],
+            resources: [
+              this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+            ]
+          }),
+          new PolicyStatement({
+            sid: 'Cloudformation',
+            actions: ['cloudformation:DescribeStacks'],
+            resources: [this.stackId]
+          }),
+          new PolicyStatement({
+            sid: 'S3Bucket',
+            actions: ['s3:GetObject'],
+            resources: [`${artifactS3Bucket.bucketArn}/*`]
+          })
         ]
       })
     );
@@ -232,51 +350,61 @@ export class SWBStack extends Stack {
     eventRule.addTarget(new targets.LambdaFunction(lambda));
   }
 
-  private _createAPILambdaRole(): Role {
+  private _createAPILambda(statusHandlerLambdaArn: string): Function {
     const { AWS_REGION } = getConstants();
-    const apiLambdaRole = new Role(this, 'ApiLambdaRole', {
-      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
-      roleName: `${this.stackName}-ApiLambdaRole`,
-      description: 'Role assumed by API routes',
-      inlinePolicies: {
-        adminPerms: new PolicyDocument({
-          statements: [
-            // TODO: Restrict policy permissions
-            new PolicyStatement({
-              actions: ['dynamodb:*'],
-              resources: ['*'],
-              sid: 'DynamoDBAccess'
-            }),
-            new PolicyStatement({
-              actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-              resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}`],
-              sid: 'CfnAccess'
-            }),
-            new PolicyStatement({
-              actions: ['servicecatalog:ListLaunchPaths'],
-              resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
-              sid: 'ScAccess'
-            }),
-            new PolicyStatement({
-              actions: ['sts:AssumeRole'],
-              resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
-              sid: 'AssumeRole'
-            })
-          ]
-        })
-      }
-    });
-    return apiLambdaRole;
-  }
 
-  private _createAPILambda(apiLambdaRole: Role): Function {
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      role: apiLambdaRole
+      timeout: Duration.seconds(30)
     });
+    apiLambda.role?.attachInlinePolicy(
+      new Policy(this, 'apiLambdaPolicy', {
+        statements: [
+          // TODO: Restrict policy permissions
+          new PolicyStatement({
+            actions: ['dynamodb:*'],
+            resources: ['*'],
+            sid: 'DynamoDBAccess'
+          }),
+          new PolicyStatement({
+            actions: ['events:PutPermission'],
+            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/${this.stackName}`],
+            sid: 'EventBridgeAccess'
+          }),
+          new PolicyStatement({
+            actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
+            resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
+            sid: 'CfnAccess'
+          }),
+          new PolicyStatement({
+            actions: ['servicecatalog:ListLaunchPaths'],
+            resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+            sid: 'ScAccess'
+          }),
+          new PolicyStatement({
+            actions: ['sts:AssumeRole'],
+            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
+            sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            actions: ['events:DescribeRule', 'events:Put*'],
+            resources: ['*'],
+            sid: 'EventbridgeAccess'
+          }),
+          new PolicyStatement({
+            actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+            resources: ['*']
+          }),
+          new PolicyStatement({
+            actions: ['lambda:AddPermission'],
+            resources: [statusHandlerLambdaArn]
+          })
+        ]
+      })
+    );
 
     new CfnOutput(this, 'apiLambdaRoleOutput', {
       value: apiLambda.role!.roleArn
@@ -323,13 +451,19 @@ export class SWBStack extends Stack {
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByStatus',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'status', type: AttributeType.NUMBER }
+      sortKey: { name: 'status', type: AttributeType.STRING }
     });
     // Add GSI for get resource by owner
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByOwner',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'owner', type: AttributeType.NUMBER }
+      sortKey: { name: 'owner', type: AttributeType.STRING }
+    });
+    // Add GSI for get resource by updatedAt
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByUpdatedAt',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'updatedAt', type: AttributeType.STRING }
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);

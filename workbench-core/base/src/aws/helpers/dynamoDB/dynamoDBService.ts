@@ -4,13 +4,14 @@
  */
 
 import BatchEdit from './batchEdit';
+import TransactEdit from './transactEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
 import Scanner from './scanner';
 import Updater from './updater';
-
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 
 export default class DynamoDBService {
@@ -43,11 +44,11 @@ export default class DynamoDBService {
    */
   public scan(params?: {
     index?: string;
-    start?: { [key: string]: AttributeValue };
+    start?: { [key: string]: unknown };
     filter?: string;
     strong?: boolean;
     names?: { [key: string]: string };
-    values?: { [key: string]: AttributeValue };
+    values?: { [key: string]: unknown };
     projection?: string | string[];
     select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
     limit?: number;
@@ -61,7 +62,7 @@ export default class DynamoDBService {
         scanner = scanner.index(params.index);
       }
       if (params.start) {
-        scanner = scanner.start(params.start);
+        scanner = scanner.start(marshall(params.start));
       }
       if (params.filter) {
         scanner = scanner.filter(params.filter);
@@ -73,7 +74,7 @@ export default class DynamoDBService {
         scanner = scanner.names(params.names);
       }
       if (params.values) {
-        scanner = scanner.values(params.values);
+        scanner = scanner.values(marshall(params.values));
       }
       if (params.projection) {
         scanner = scanner.projection(params.projection);
@@ -114,7 +115,7 @@ export default class DynamoDBService {
    * ```
    */
   public get(
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[],
+    key: { [key: string]: unknown } | { [key: string]: unknown }[],
     params?: {
       strong?: boolean;
       names?: { [key: string]: string };
@@ -160,7 +161,7 @@ export default class DynamoDBService {
    */
   public query(params?: {
     index?: string;
-    key?: { name: string; value: AttributeValue };
+    key?: { name: string; value: unknown };
     sortKey?: string;
     eq?: AttributeValue;
     lt?: AttributeValue;
@@ -169,11 +170,11 @@ export default class DynamoDBService {
     gte?: AttributeValue;
     between?: { value1: AttributeValue; value2: AttributeValue };
     begins?: AttributeValue;
-    start?: { [key: string]: AttributeValue };
+    start?: { [key: string]: unknown };
     filter?: string;
     strong?: boolean;
     names?: { [key: string]: string };
-    values?: { [key: string]: AttributeValue };
+    values?: { [key: string]: unknown };
     projection?: string | string[];
     select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
     limit?: number;
@@ -186,7 +187,7 @@ export default class DynamoDBService {
         query = query.index(params.index);
       }
       if (params.key) {
-        query = query.key(params.key.name, params.key.value);
+        query = query.key(params.key.name, marshall(params.key.value));
       }
       if (params.sortKey) {
         query = query.sortKey(params.sortKey);
@@ -233,7 +234,7 @@ export default class DynamoDBService {
         throw new Error('You cannot query on sortKey without providing a sortKey name');
       }
       if (params.start) {
-        query = query.start(params.start);
+        query = query.start(marshall(params.start));
       }
       if (params.filter) {
         query = query.filter(params.filter);
@@ -245,7 +246,7 @@ export default class DynamoDBService {
         query = query.names(params.names);
       }
       if (params.values) {
-        query = query.values(params.values);
+        query = query.values(marshall(params.values));
       }
       if (params.projection) {
         query = query.projection(params.projection);
@@ -286,23 +287,23 @@ export default class DynamoDBService {
    * ```
    */
   public update(
-    key: { [key: string]: AttributeValue },
+    key: { [key: string]: unknown },
     params?: {
       disableCreatedAt?: boolean;
       disableUpdatedAt?: boolean;
-      item?: { [key: string]: AttributeValue };
+      item?: { [key: string]: unknown };
       set?: string;
       add?: string;
       remove?: string | string[];
       delete?: string;
       names?: { [key: string]: string };
-      values?: { [key: string]: AttributeValue };
+      values?: { [key: string]: unknown };
       return?: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW';
       metrics?: 'NONE' | 'SIZE';
       capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
     }
   ): Updater {
-    let updater = new Updater({ region: this._awsRegion }, this._tableName, key);
+    let updater = new Updater({ region: this._awsRegion }, this._tableName, marshall(key));
     if (params) {
       if (params.disableCreatedAt) {
         updater = updater.disableCreatedAt();
@@ -311,7 +312,7 @@ export default class DynamoDBService {
         updater = updater.disableUpdatedAt();
       }
       if (params.item) {
-        updater = updater.item(params.item);
+        updater = updater.item(marshall(params.item));
       }
       if (params.set) {
         updater = updater.set(params.set);
@@ -329,7 +330,7 @@ export default class DynamoDBService {
         updater = updater.names(params.names);
       }
       if (params.values) {
-        updater = updater.values(params.values);
+        updater = updater.values(marshall(params.values));
       }
       if (params.return) {
         updater = updater.return(params.return);
@@ -364,17 +365,17 @@ export default class DynamoDBService {
    * ```
    */
   public delete(
-    key: { [key: string]: AttributeValue },
+    key: { [key: string]: unknown },
     params?: {
       condition?: string;
       names?: { [key: string]: string };
-      values?: { [key: string]: AttributeValue };
+      values?: { [key: string]: unknown };
       return?: 'NONE' | 'ALL_OLD';
       capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
       metrics?: 'NONE' | 'SIZE';
     }
   ): Deleter {
-    let deleter = new Deleter({ region: this._awsRegion }, this._tableName, key);
+    let deleter = new Deleter({ region: this._awsRegion }, this._tableName, marshall(key));
     if (params) {
       if (params.condition) {
         deleter = deleter.condition(params.condition);
@@ -383,7 +384,7 @@ export default class DynamoDBService {
         deleter = deleter.names(params.names);
       }
       if (params.values) {
-        deleter = deleter.values(params.values);
+        deleter = deleter.values(marshall(params.values));
       }
       if (params.return) {
         deleter = deleter.return(params.return);
@@ -417,26 +418,41 @@ export default class DynamoDBService {
    * ```
    */
   public batchEdit(params?: {
-    addDeleteRequest?: { [key: string]: AttributeValue };
-    addWriteRequest?: { [key: string]: AttributeValue };
-    addDeleteRequests?: { [key: string]: AttributeValue }[];
-    addWriteRequests?: { [key: string]: AttributeValue }[];
+    addDeleteRequest?: { [key: string]: unknown };
+    addWriteRequest?: { [key: string]: unknown };
+    addDeleteRequests?: { [key: string]: unknown }[];
+    addWriteRequests?: { [key: string]: unknown }[];
   }): BatchEdit {
     let batchEdit = new BatchEdit({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.addDeleteRequest) {
-        batchEdit = batchEdit.addDeleteRequest(params.addDeleteRequest);
+        batchEdit = batchEdit.addDeleteRequest(marshall(params.addDeleteRequest));
       }
       if (params.addWriteRequest) {
-        batchEdit = batchEdit.addWriteRequest(params.addWriteRequest);
+        batchEdit = batchEdit.addWriteRequest(marshall(params.addWriteRequest));
       }
       if (params.addDeleteRequests) {
-        batchEdit = batchEdit.addDeleteRequests(params.addDeleteRequests);
+        batchEdit = batchEdit.addDeleteRequests(params.addDeleteRequests.map((request) => marshall(request)));
       }
       if (params.addWriteRequests) {
-        batchEdit = batchEdit.addWriteRequests(params.addWriteRequests);
+        batchEdit = batchEdit.addWriteRequests(params.addWriteRequests.map((request) => marshall(request)));
       }
     }
     return batchEdit;
+  }
+
+  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+    let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params) {
+      if (params.addPutRequest) {
+        // const requests = params.addPutRequest.map((request) => {
+        //   return marshall(request, { removeUndefinedValues: true });
+        // });
+        transactEdit = transactEdit.addPutRequests(
+          params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        );
+      }
+    }
+    return transactEdit;
   }
 }

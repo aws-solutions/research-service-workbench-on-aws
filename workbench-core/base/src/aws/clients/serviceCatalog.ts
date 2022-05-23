@@ -24,6 +24,9 @@ import {
   DescribeProductAsAdminCommand,
   DescribeProductAsAdminCommandOutput,
   DescribeProductAsAdminInput,
+  DescribeRecordCommand,
+  DescribeRecordCommandInput,
+  DescribeRecordCommandOutput,
   ListLaunchPathsCommand,
   ListLaunchPathsCommandInput,
   ListLaunchPathsCommandOutput,
@@ -105,5 +108,9 @@ export default class ServiceCatalog {
 
   public async listLaunchPaths(params: ListLaunchPathsCommandInput): Promise<ListLaunchPathsCommandOutput> {
     return this._client.send(new ListLaunchPathsCommand(params));
+  }
+
+  public async describeRecord(params: DescribeRecordCommandInput): Promise<DescribeRecordCommandOutput> {
+    return this._client.send(new DescribeRecordCommand(params));
   }
 }

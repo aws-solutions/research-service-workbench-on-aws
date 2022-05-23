@@ -53,6 +53,14 @@ class BatchEdit {
     if (!this._params.RequestItems) {
       throw new Error('BatchEdit<==need to initialize the RequestItems property before adding new request');
     }
+    // Add updatedAt and createdAt attributes
+    const currentTime = new Date().toISOString();
+    if (item.updatedAt === undefined) {
+      item.updatedAt = { S: `${currentTime}` };
+    }
+    if (item.createdAt === undefined) {
+      item.createdAt = { S: `${currentTime}` };
+    }
     const writeRequest: PutRequest = { Item: item };
     this._params.RequestItems[this._tableName].push({ PutRequest: writeRequest });
     return this;
