@@ -45,7 +45,7 @@ describe('EnvironmentService', () => {
     studyIds: ['study-123'],
     updatedAt: '2022-05-13T20:03:54.055Z',
     resourceType: 'environment',
-    instance: 'instance-123'
+    instanceId: 'instance-123'
   };
 
   const datasetItem = {
@@ -159,7 +159,9 @@ describe('EnvironmentService', () => {
         DS: [datasetItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...env
+        ...env,
+        provisionedProductId: '',
+        error: undefined
       });
     });
   });
@@ -371,7 +373,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.createEnvironment({
-        instance: 'instance-123',
+        instanceId: 'instance-123',
         cidr: '0.0.0.0/0',
         description: 'test 123',
         name: 'testEnv',
@@ -388,7 +390,9 @@ describe('EnvironmentService', () => {
         DS: [datasetItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...env
+        ...env,
+        provisionedProductId: '',
+        error: undefined
       });
     });
   });
