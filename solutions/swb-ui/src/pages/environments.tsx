@@ -108,11 +108,15 @@ const Environment: NextPage = () => {
 
           const filteringTextLowerCase = filteringText.toLowerCase();
 
-          return searchableColumns
-            .map((key) => item[key])
-            .some(
-              (value) => typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
-            );
+          return (
+            searchableColumns
+              // eslint-disable-next-line security/detect-object-injection
+              .map((key) => item[key])
+              .some(
+                (value) =>
+                  typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
+              )
+          );
         }
       },
       propertyFiltering: {
