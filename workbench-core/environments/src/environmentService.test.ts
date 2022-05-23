@@ -45,7 +45,8 @@ describe('EnvironmentService', () => {
     studyIds: ['study-123'],
     updatedAt: '2022-05-13T20:03:54.055Z',
     resourceType: 'environment',
-    instanceId: 'instance-123'
+    instanceId: 'instance-123',
+    provisionedProductId: ''
   };
 
   const datasetItem = {

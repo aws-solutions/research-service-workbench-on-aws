@@ -40,7 +40,14 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
+      };
+      const envType = await getEnvironment(req.params.id);
+
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // nosemgrep
         const response = await environments[req.body.envType].lifecycle.terminate(req.params.id);
@@ -55,7 +62,14 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
+      };
+      const envType = await getEnvironment(req.params.id);
+
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // nosemgrep
         const response = await environments[req.body.envType].lifecycle.start(req.params.id);
@@ -70,7 +84,14 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
+      };
+      const envType = await getEnvironment(req.params.id);
+
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // nosemgrep
         const response = await environments[req.body.envType].lifecycle.stop(req.params.id);

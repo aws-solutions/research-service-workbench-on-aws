@@ -15,6 +15,8 @@ function getConstants(): {
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
+  STATUS_HANDLER_ARN_NAME: string;
+  EB_EVENT_TYPE_STATUS_UPDATE: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -32,12 +34,14 @@ function getConstants(): {
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
 
   const AMI_IDS: string[] = [];
+  const EB_EVENT_TYPE_STATUS_UPDATE = 'EnvironmentStatusUpdate';
 
   // These are the OutputKey for the SWB Main Account CFN stack
   const MAIN_ACCOUNT_BUS_ARN_NAME = 'EventBusOutput';
   const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
+  const STATUS_HANDLER_ARN_NAME = 'StatusHandlerLambdaArnOutput';
 
   return {
     STAGE: config.stage,
@@ -51,7 +55,9 @@ function getConstants(): {
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
-    USER_POOL_NAME
+    USER_POOL_NAME,
+    STATUS_HANDLER_ARN_NAME,
+    EB_EVENT_TYPE_STATUS_UPDATE
   };
 }
 
