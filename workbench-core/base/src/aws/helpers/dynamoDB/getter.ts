@@ -74,7 +74,7 @@ class Getter {
   }
 
   /**
-   * Sets the Keys balue of the command input for BatchGetItem. This is only for batch get item commands. This method is not required if the Getter is initialized with keys.
+   * Sets the Keys value of the command input for BatchGetItem. This is only for batch get item commands. This method is not required if the Getter is initialized with keys.
    *
    * @param keys - the list of objects of the keys of the items to get
    * @returns Getter with populated params
