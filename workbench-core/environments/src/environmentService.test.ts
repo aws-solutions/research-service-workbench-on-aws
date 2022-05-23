@@ -160,7 +160,9 @@ describe('EnvironmentService', () => {
         DS: [datasetItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...env
+        ...env,
+        provisionedProductId: '',
+        error: undefined
       });
     });
   });
@@ -389,7 +391,9 @@ describe('EnvironmentService', () => {
         DS: [datasetItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
-        ...env
+        ...env,
+        provisionedProductId: '',
+        error: undefined
       });
     });
   });

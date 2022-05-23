@@ -106,19 +106,22 @@ export function setUpEnvRoutes(
   router.get(
     '/environments/:id/connections',
     wrapAsync(async (req: Request, res: Response) => {
-      // Mocked getEnvironment
-      const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
-        console.log('envId', envId);
-        return { envType: 'sagemaker', instanceName: 'abc' };
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const instanceName = environment.instanceId!;
+      const envType = environment.ETC.type;
+
+      const context = {
+        roleArn: environment.PROJ.envMgmtRoleArn,
+        externalId: environment.PROJ.externalId
       };
-      const { envType, instanceName } = getEnvironment(req.params.id);
+
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
-        const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName); // nosemgrep
+        const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context);
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
-        const instructionResponse = await environments[envType].connection.getConnectionInstruction(); // nosemgrep
+        const instructionResponse = await environments[envType].connection.getConnectionInstruction();
         const response = {
           authCredResponse,
           instructionResponse

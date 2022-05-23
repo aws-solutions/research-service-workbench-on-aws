@@ -1,4 +1,7 @@
 import {
+  CreatePresignedNotebookInstanceUrlCommandInput,
+  CreatePresignedNotebookInstanceUrlCommandOutput,
+  CreatePresignedNotebookInstanceUrlCommand,
   SageMakerClient,
   StartNotebookInstanceCommand,
   StartNotebookInstanceCommandInput,
@@ -15,6 +18,12 @@ export default class SageMaker {
   private _client: SageMakerClient;
   public constructor(config: SageMakerClientConfig) {
     this._client = new SageMakerClient(config);
+  }
+
+  public createPresignedNotebookInstanceUrl(
+    params: CreatePresignedNotebookInstanceUrlCommandInput
+  ): Promise<CreatePresignedNotebookInstanceUrlCommandOutput> {
+    return this._client.send(new CreatePresignedNotebookInstanceUrlCommand(params));
   }
 
   public async startNotebookInstance(

@@ -278,6 +278,7 @@ export default class EnvironmentService {
       id: newEnv.envTypeConfigId,
       productId: envTypeConfig.productId,
       provisioningArtifactId: envTypeConfig.provisioningArtifactId,
+      type: envTypeConfig.type,
       params: envTypeConfig.params
     });
 

@@ -24,6 +24,7 @@
     "@aws-sdk/client-eventbridge": "^3.66.0",
     "@aws-sdk/client-service-catalog": "^3.58.0",
     "@aws-sdk/client-s3": "^3.58.0",
+    "@aws-sdk/client-sagemaker": "^3.58.0",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws-sdk/client-dynamodb": "^3.67.0",
     "@aws-cdk/aws-dynamodb": "^1.152.0",
@@ -34,7 +35,7 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.67.0",
     "lodash": "^4.17.21",
     "@aws-sdk/util-dynamodb": "^3.87.0",
-    "@aws-sdk/client-sagemaker": "^3.95.0"
+    "@aws-sdk/client-sagemaker": "^3.58.0"
   },
   "devDependencies": {
     "@rushstack/eslint-config": "^2.5.1",
