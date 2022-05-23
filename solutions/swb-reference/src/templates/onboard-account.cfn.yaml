@@ -32,6 +32,10 @@ Parameters:
   AccountHandlerRoleArn:
     Type: String
     Description: The arn of accountHandler role
+  
+  StatusHandlerRoleArn:
+    Type: String
+    Description: The arn of accountHandler role
 
   MainAccountEventBusArn:
     Type: String
@@ -93,6 +97,7 @@ Resources:
               AWS:
                 - !Join [':', ['arn:aws:iam:', Ref: MainAccountId, 'root']]
                 - !Ref ApiHandlerRoleArn
+                - !Ref StatusHandlerRoleArn
             Action:
               - 'sts:AssumeRole'
             Condition:
@@ -101,6 +106,14 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess
       Policies:
+        - PolicyName: eventbus-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !GetAtt [HostEventBus, Arn]
         - PolicyName: cfn-access
           PolicyDocument:
             Version: '2012-10-17'
@@ -129,7 +142,7 @@ Resources:
                 - ssm:StartAutomationExecution
               Resource:
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
-                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*:*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*'
         - PolicyName: iam-pass-role
           PolicyDocument:
             Statement:
@@ -146,6 +159,14 @@ Resources:
                 - s3:GetObject
               Resource:
                 - 'arn:aws:s3:::cf-templates-*/*'
+        - PolicyName: servicecatalog-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicecatalog:DescribeRecord
+              Resource:
+                - '*'
         - PolicyName: sagemaker-access
           PolicyDocument:
             Statement:
@@ -155,7 +176,24 @@ Resources:
                 - sagemaker:ListNotebookInstances
                 - sagemaker:StartNotebookInstance
                 - sagemaker:StopNotebookInstance
+                - sagemaker:DescribeNotebookInstance
               Resource: '*'
+        # Needed for performing start operation on instances in a given network
+        - PolicyName: network-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:DescribeSubnets
+                - ec2:DescribeVpcs
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DescribeSecurityGroups
+                - ec2:DescribeAvailabilityZones
+                - ec2:DescribeAccountAttributes
+                - ec2:CreateTags
+                - ec2:DeleteTags
+                - ec2:DescribeInternetGateways
+              Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
             Statement:
@@ -194,6 +232,10 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource: !GetAtt [HostEventBus, Arn]
           - Effect: Allow
             Action:
               - s3:*
@@ -488,10 +530,8 @@ Resources:
       EventBusName: !Ref HostEventBus
       State: ENABLED
       EventPattern:
-        source:
-          - aws.sagemaker
-        detail:
-          - SageMaker Notebook Instance State Change
+        account:
+          - !Ref 'AWS::AccountId'
       Targets:
         - Arn: !Ref MainAccountEventBusArn
           Id: 'MainAccountRoutingRule'
@@ -507,7 +547,11 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: !Sub events.amazonaws.com
+              Service: events.amazonaws.com
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
             Action: 'sts:AssumeRole'
       Path: /
       Policies:
@@ -517,7 +561,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'events:PutEvents'
+                  - 'events:Put*'
                 Resource:
                   - !Ref MainAccountEventBusArn
 

@@ -4,12 +4,14 @@ const envResourceTypeToKey: {
   envType: string;
   envTypeConfig: string;
   dataset: string;
+  instance: string;
 } = {
   environment: 'ENV',
   project: 'PROJ',
   envType: 'ET',
   envTypeConfig: 'ETC',
-  dataset: 'DS'
+  dataset: 'DS',
+  instance: 'INID'
 };
 
 export default envResourceTypeToKey;

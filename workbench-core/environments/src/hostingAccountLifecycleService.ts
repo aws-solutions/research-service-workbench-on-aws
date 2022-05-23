@@ -1,30 +1,54 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import _ = require('lodash');
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
+import AccountsService from './accountsService';
 import { Readable } from 'stream';
+import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
-  public constructor(awsRegion: string, stackName: string) {
-    this._aws = new AwsService({ region: awsRegion });
-    this._stackName = stackName;
+  public constructor() {
+    this._stackName = process.env.STACK_NAME!;
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
   }
 
-  public async initializeAccount(
-    accountMetadata: {
-      accountId: string;
-      envManagementRoleArn: string;
-      accountHandlerRoleArn: string;
-    },
-    mainAccountBusArnName: string
-  ): Promise<void> {
+  public async initializeAccount(accountMetadata: {
+    [key: string]: string;
+  }): Promise<{ [key: string]: string }> {
+    const accountsService = new AccountsService();
+
     const cfService = this._aws.helpers.cloudformation;
-    const { [mainAccountBusArnName]: mainAccountBusName } = await cfService.getCfnOutput(this._stackName, [
-      mainAccountBusArnName
+    const {
+      [process.env.MAIN_ACCOUNT_BUS_ARN_NAME!]: mainAccountBusArn,
+      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn
+    } = await cfService.getCfnOutput(this._stackName, [
+      process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
+      process.env.STATUS_HANDLER_ARN_NAME!
     ]);
-    await this.updateEventBridgePermissions(mainAccountBusName, accountMetadata.accountId);
-    await this.storeToDdb(accountMetadata);
+
+    // // Update main account event bus to accept hosting account events
+    await this.updateEventBridgePermissions(
+      mainAccountBusArn,
+      statusHandlerArn,
+      accountMetadata.awsAccountId
+    );
+
+    // Finally store the new/updated account details in DDB
+    let accountDetails;
+    if (_.isUndefined(accountMetadata.id)) {
+      accountDetails = await accountsService.create(accountMetadata);
+    } else {
+      accountDetails = await accountsService.update(accountMetadata);
+    }
+
+    return accountDetails;
   }
 
   /**
@@ -177,14 +201,72 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateEventBridgePermissions(mainAccountBusName: string, accountId: string): Promise<void> {
+  public async updateEventBridgePermissions(
+    mainAccountBusArn: string,
+    statusHandlerArn: string,
+    awsAccountId: string
+  ): Promise<void> {
+    const mainAccountBusName = mainAccountBusArn.split('/')[1];
     const params = {
       Action: 'events:PutEvents',
       EventBusName: mainAccountBusName,
-      Principal: accountId,
-      StatementId: 'Allow-main-account-to-receive-host-account-events'
+      Principal: awsAccountId,
+      StatementId: `Allow-main-account-to-get-${awsAccountId}-events`
     };
+
+    // Put permission for main account to receive hosting account events
     await this._aws.clients.eventBridge.putPermission(params);
+
+    let busRule;
+    const busRuleName = 'RouteHostEvents';
+    const describeRuleParams = { Name: busRuleName, EventBusName: mainAccountBusName };
+
+    try {
+      // Describe rule to see if it exists
+      busRule = await this._aws.clients.eventBridge.describeRule(describeRuleParams);
+    } catch (e) {
+      if (e instanceof ResourceNotFoundException) {
+        console.log(
+          'Onboarding first hosting account for the main event bus. Setting up status handler lambda permissions.'
+        );
+
+        const addPermissionParams = {
+          StatementId: `AWSEvents_${busRuleName}`,
+          Action: 'lambda:InvokeFunction',
+          FunctionName: statusHandlerArn,
+          Principal: 'events.amazonaws.com'
+        };
+
+        // Add permissions on status handler lambda to get events from eventbridge
+        await this._aws.clients.lambda.addPermission(addPermissionParams);
+      } else {
+        throw e;
+      }
+    }
+
+    const putRuleParams = {
+      Name: busRuleName,
+      EventPattern: JSON.stringify({
+        account: busRule?.EventPattern
+          ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
+          : [awsAccountId],
+        // Filter out CloudTrail noise
+        'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+      }),
+      EventBusName: mainAccountBusName
+    };
+
+    // Create/update rule for main account event bus
+    await this._aws.clients.eventBridge.putRule(putRuleParams);
+
+    const putTargetsParams = {
+      EventBusName: mainAccountBusName,
+      Rule: busRuleName,
+      Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
+    };
+
+    // Create/update rule target to route events to status handler lambda
+    await this._aws.clients.eventBridge.putTargets(putTargetsParams);
   }
 
   public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
@@ -240,18 +322,5 @@ export default class HostingAccountLifecycleService {
     return ssmDocOutputs.map((output: Output) => {
       return this._getNameFromArn({ output, outputName: output.OutputKey });
     });
-  }
-
-  /*
-   * Store hosting account information in DDB
-   */
-  public async storeToDdb(accountMetadata: {
-    accountId: string;
-    envManagementRoleArn: string;
-    accountHandlerRoleArn: string;
-  }): Promise<void> {
-    // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
-    // Don't forget to store the external ID used during onboarding
-    return Promise.resolve();
   }
 }
