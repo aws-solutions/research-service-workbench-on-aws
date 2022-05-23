@@ -14,7 +14,7 @@
     "test:only": "heft test --clean --no-build --silent",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "test": "rushx test:only && rushx make-badges",
-    "test:verbose": "rushx test:only && rushx make-badges",
+    "test:verbose": "heft test --clean --no-build && rushx make-badges",
     "build:test": "heft test --clean --silent && rushx make-badges"
   },
   "dependencies": {
