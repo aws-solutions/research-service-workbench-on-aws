@@ -4,7 +4,7 @@ import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { isEnvironmentStatus } from './environmentStatus';
 import EnvironmentService from './environmentService';
-import envResourceTypeToKey from './envResourceTypeToKey';
+import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { AwsService } from '@amzn/workbench-core-base';
 
 export default class StatusHandler {
@@ -79,7 +79,7 @@ export default class StatusHandler {
     // We only update the provisioned product ID once right after the workspace becomes available
     await envService.updateEnvironment(envId, {
       provisionedProductId: event.metadata.detail.ProvisionedProductId,
-      instance: instanceName
+      instanceId: instanceName
     });
 
     const envInstDetails = {
