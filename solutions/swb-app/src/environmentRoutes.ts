@@ -85,19 +85,10 @@ export function setUpEnvRoutes(
   router.get(
     '/environments/:id/connections',
     wrapAsync(async (req: Request, res: Response) => {
-      // Mocked getEnvironment
-      // const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
-      //   console.log('envId', envId);
-      //   return { envType: 'sagemaker', instanceName: 'abc' };
-      // };
-      //   const { envType, instanceName } = getEnvironment(req.params.id);
       const environment = await environmentService.getEnvironment(req.params.id, true);
-      console.log('ZZZ; environment', JSON.stringify(environment));
       const instanceName = environment.instanceId!;
       const envType = environment.ETC.type;
 
-      console.log('ZZZ: instanceName', instanceName);
-      console.log('ZZZ: envType', envType);
       const context = {
         roleArn: environment.PROJ.envMgmtRoleArn,
         externalId: environment.PROJ.externalId

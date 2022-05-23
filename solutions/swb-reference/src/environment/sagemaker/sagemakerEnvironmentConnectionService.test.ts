@@ -37,6 +37,8 @@ describe('SagemakerEnvironmentConnectionService', () => {
 
   test('getConnectionInstruction should return mocked value', async () => {
     const sm = new SagemakerEnvironmentConnectionService();
-    await expect(sm.getConnectionInstruction()).resolves.toEqual('Connection instruction for Sagemaker');
+    await expect(sm.getConnectionInstruction()).resolves.toEqual(
+      'Open the provided sagemaker url to access the Jupyter Notebook'
+    );
   });
 });
