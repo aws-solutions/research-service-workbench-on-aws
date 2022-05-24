@@ -13,6 +13,7 @@
   "scripts": {
     "build": "heft build --clean",
     "test:only": "heft test --clean --no-build",
+    "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
     "test": "rushx test:only",
     "build:test": "heft test --clean",
     "readme": "node ./lib/start.js readme"

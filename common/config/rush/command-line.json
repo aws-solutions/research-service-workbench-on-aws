@@ -174,21 +174,7 @@
       "enableParallelism": true
     },
     {
-      "name": "test:update",
-      "commandKind": "bulk",
-      "summary": "Used to update snapshots",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
       "name": "build:test",
-      "commandKind": "bulk",
-      "summary": "Runs rush build and rush test using a single command",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "build:local",
       "commandKind": "bulk",
       "summary": "Runs rush build and rush test using a single command",
       "safeForSimultaneousRushProcesses": true,
@@ -198,34 +184,6 @@
       "name": "test:only",
       "commandKind": "bulk",
       "summary": "Used to perform tests on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:synth",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk synth commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:bootstrap",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk bootstrap commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:deploy",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk deploy commands",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
@@ -245,20 +203,20 @@
       "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
     },
     {
-      "name": "common-coverage-make-badge",
-      "commandKind": "global",
-      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
-    },
-    {
       "name": "common-coverage",
       "commandKind": "global",
       "summary": "Updates the common code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
       "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
+    },
+    {
+      "name": "common-coverage-make-badge",
+      "commandKind": "global",
+      "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
     },
     {
       "name": "commitlint",

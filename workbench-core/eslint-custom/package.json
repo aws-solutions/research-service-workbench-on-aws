@@ -12,9 +12,9 @@
   "scripts": {
     "build": "heft build --clean",
     "test:only": "heft test --clean --no-build",
-    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
-    "test": "rushx test:only && rushx make-badges",
-    "build:test": "heft test --clean && rushx make-badges"
+    "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
+    "test": "rushx test:only",
+    "build:test": "heft test --clean"
   },
   "author": "Samir Sharan",
   "license": "Apache-2.0",
