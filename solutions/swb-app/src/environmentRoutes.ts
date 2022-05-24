@@ -15,12 +15,14 @@ export function setUpEnvRoutes(
   router.post(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      const envType = req.body.envType;
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
         const env = await environmentService.createEnvironment(req.body);
         try {
-          await environments[req.body.envType].lifecycle.launch(env);
+          // We check that envType is in list of supportedEnvs before calling the environments object
+          //eslint-disable-next-line security/detect-object-injection
+          await environments[envType].lifecycle.launch(env);
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
@@ -40,17 +42,15 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      // Get environment from DDB
-      const getEnvironment = async (envId: string): Promise<string> => {
-        const env = await environmentService.getEnvironment(envId, true);
-        return env.ETC.type;
-      };
-      const envType = await getEnvironment(req.params.id);
+      const env = await environmentService.getEnvironment(req.params.id!, true);
+      console.log('env', JSON.stringify(env));
+      const envType = env.ETC.type;
+      console.log('envType', envType);
 
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.terminate(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.terminate(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);

@@ -7,23 +7,24 @@ import _ = require('lodash');
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
-import AccountsService from './accountsService';
+import AccountService from './accountService';
 import { Readable } from 'stream';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
+  private _ddbTableName: string;
   public constructor() {
     this._stackName = process.env.STACK_NAME!;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
+    this._ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._ddbTableName });
   }
 
   public async initializeAccount(accountMetadata: {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
-    const accountsService = new AccountsService();
-
+    const accountService = new AccountService(this._ddbTableName);
 
     const cfService = this._aws.helpers.cloudformation;
     const {
@@ -44,9 +45,9 @@ export default class HostingAccountLifecycleService {
     // Finally store the new/updated account details in DDB
     let accountDetails;
     if (_.isUndefined(accountMetadata.id)) {
-      accountDetails = await accountsService.create(accountMetadata);
+      accountDetails = await accountService.create({ ...accountMetadata, status: 'PENDING' });
     } else {
-      accountDetails = await accountsService.update(accountMetadata);
+      accountDetails = await accountService.update(accountMetadata);
     }
 
     return accountDetails;
@@ -326,6 +327,5 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-    // TODO: Update this
-
+  // TODO: Update this
 }
