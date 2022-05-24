@@ -45,6 +45,7 @@ export default class AccountHandler {
 
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
       await hostingAccountLifecycleService.updateAccount({
+        ddbAccountId: hostingAccount.id,
         targetAccountId: hostingAccountId,
         targetAccountAwsService: hostingAccountAwsService,
         targetAccountStackName: hostingAccount.stackName,
@@ -57,6 +58,10 @@ export default class AccountHandler {
     }
   }
 
+  /**
+   * Return 12 digit aws account id of the role
+   * @param iamRoleArn - IAM role arn
+   */
   private _getAccountId(iamRoleArn: string): string {
     const match = iamRoleArn.match(/::(\d{12}):role/);
     if (match) {
@@ -98,6 +103,7 @@ export default class AccountHandler {
 
   private async _getAccountMetadata(): Promise<
     {
+      id: string;
       stackName: string;
       accountHandlerRoleArn: string;
       envMgmtRoleArn: string;
@@ -111,6 +117,7 @@ export default class AccountHandler {
 
     return accounts.map((account) => {
       return {
+        id: account.id!,
         stackName: account.stackName,
         accountHandlerRoleArn: account.accountHandlerRoleArn,
         envMgmtRoleArn: account.envMgmtRoleArn,

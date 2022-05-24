@@ -69,7 +69,7 @@ export default class AccountService {
     await this._validateCreate(accountMetadata);
     const id = uuidv4();
 
-    await this.storeToDdb({ id, ...accountMetadata });
+    await this._storeToDdb({ id, ...accountMetadata });
 
     return { id, ...accountMetadata };
   }
@@ -79,7 +79,7 @@ export default class AccountService {
 
     console.log(JSON.stringify(accountMetadata));
 
-    const id = await this.storeToDdb(accountMetadata);
+    const id = await this._storeToDdb(accountMetadata);
 
     return { id, ...accountMetadata };
   }
@@ -120,12 +120,11 @@ export default class AccountService {
   /*
    * Store hosting account information in DDB
    */
-  public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
+  private async _storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
     const accountKey = { pk: `ACC#${accountMetadata.id}`, sk: `ACC#${accountMetadata.id}` };
     const accountParams: { item: { [key: string]: string } } = {
       item: {
-        id: accountMetadata.id || uuidv4(),
-        accountId: accountMetadata.id,
+        id: accountMetadata.id,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
@@ -150,21 +149,23 @@ export default class AccountService {
     // Store Account row in DDB
     await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
 
-    const awsAccountKey = {
-      pk: `${environmentResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
-      sk: `${environmentResourceTypeToKey.account}#${accountMetadata.id}`
-    };
-    const awsAccountParams = {
-      item: {
-        id: accountMetadata.awsAccountId,
-        accountId: accountMetadata.id,
-        awsAccountId: accountMetadata.awsAccountId,
-        resourceType: 'awsAccount'
-      }
-    };
+    if (accountMetadata.awsAccountId) {
+      const awsAccountKey = {
+        pk: `${environmentResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
+        sk: `${environmentResourceTypeToKey.account}#${accountMetadata.id}`
+      };
+      const awsAccountParams = {
+        item: {
+          id: accountMetadata.awsAccountId,
+          accountId: accountMetadata.id,
+          awsAccountId: accountMetadata.awsAccountId,
+          resourceType: 'awsAccount'
+        }
+      };
 
-    // Store AWS Account row in DDB (for easier duplicate checks later on)
-    await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+      // Store AWS Account row in DDB (for easier duplicate checks later on)
+      await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+    }
 
     return accountMetadata.id;
   }
