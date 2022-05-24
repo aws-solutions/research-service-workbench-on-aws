@@ -167,10 +167,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@rushstack/heft-webpack5-plugin",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@testing-library/dom",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -291,10 +287,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "lambda-build",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "lodash",
       "allowedCategories": [ "production" ]
     },
@@ -344,10 +336,6 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "supertest",
       "allowedCategories": [ "production" ]
     },
     {

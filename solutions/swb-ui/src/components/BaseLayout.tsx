@@ -47,7 +47,6 @@ export default function Layout({ navigationHide, children }: LayoutProps): JSX.E
       }
       contentType="table"
       content={children}
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
       onNavigationChange={({ detail }) => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         setNavigationOpen(detail.open);

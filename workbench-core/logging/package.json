@@ -11,12 +11,11 @@
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "build": "heft build --clean",
+    "test:only": "heft test --clean --no-build --silent",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
-    "test": "heft test --clean && rushx make-badges",
-    "testQuiet": "heft test --clean --silent && rushx make-badges",
-    "build:test": "rushx build && rushx testQuiet",
-    "build:testQuiet": "rushx build && rushx testQuiet",
-    "test:only": "heft test --clean"
+    "test": "rushx test:only && rushx make-badges",
+    "test:verbose": "heft test --clean --no-build && rushx make-badges",
+    "build:test": "heft test --clean --silent && rushx make-badges"
   },
   "dependencies": {
     "triple-beam": "^1.3.0",

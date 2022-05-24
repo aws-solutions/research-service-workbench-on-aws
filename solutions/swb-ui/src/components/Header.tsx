@@ -1,5 +1,4 @@
 import { useTranslation } from 'next-i18next';
-import { useState } from 'react';
 import TopNavigation from '@awsui/components-react/top-navigation';
 import styles from '../styles/Header.module.scss';
 import { useSettings } from '../context/SettingsContext';
@@ -10,7 +9,6 @@ export default function Header(): JSX.Element {
   const { settings } = useSettings();
   const { user } = useAuthentication();
 
-  const [searchValue, setSearchValue] = useState('');
   const i18nStrings = {
     searchIconAriaLabel: t('Header.Search'),
     searchDismissIconAriaLabel: t('Header. CloseSearch'),
