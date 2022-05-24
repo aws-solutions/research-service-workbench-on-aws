@@ -301,6 +301,11 @@ export class SWBStack extends Stack {
             resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
           }),
           new PolicyStatement({
+            sid: 'ListPortfolios',
+            actions: ['servicecatalog:ListPortfolios'],
+            resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
+          }),
+          new PolicyStatement({
             sid: 'AssumeRole',
             actions: ['sts:AssumeRole'],
             // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
@@ -337,6 +342,11 @@ export class SWBStack extends Stack {
             sid: 'S3Bucket',
             actions: ['s3:GetObject'],
             resources: [`${artifactS3Bucket.bucketArn}/*`]
+          }),
+          new PolicyStatement({
+            actions: ['dynamodb:*'],
+            resources: ['*'],
+            sid: 'DynamoDBAccess'
           })
         ]
       })

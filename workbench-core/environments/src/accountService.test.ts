@@ -24,5 +24,6 @@ describe('accountService', () => {
       subnetId: 'subnet-0d7f3f2cc3c15868e'
     };
     const response = await accountService.update(updateValues);
+    console.log('response', response);
   });
 });
