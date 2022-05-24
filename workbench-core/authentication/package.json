@@ -1,35 +1,43 @@
 {
   "name": "@amzn/workbench-core-authentication",
   "version": "0.0.1",
-  "license": "APACHE-2.0",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "description": "",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "license": "Apache-2.0",
+  "author": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
-    "build": "heft build --clean",
-    "test:only": "heft test --clean --no-build",
+    "build": "heft build --clean && rushx pkg-json-lint",
+    "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
+    "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "build:test": "heft test --clean && rushx make-badges"
+    "test:only": "heft test --clean --no-build"
+  },
+  "dependencies": {
+    "aws-jwt-verify": "^3.0.0",
+    "axios": "^0.27.1"
   },
   "devDependencies": {
-    "eslint": "^8.7.0",
-    "typescript": "^4.5.2",
-    "istanbul-badges-readme": "1.8.1",
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
     "@types/node": "^14",
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
-  },
-  "dependencies": {
-    "aws-jwt-verify": "^3.0.0",
-    "axios": "^0.27.1"
+    "eslint": "^8.7.0",
+    "istanbul-badges-readme": "1.8.1",
+    "lint-staged": "^12.4.2",
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
+    "sort-package-json": "^1.57.0",
+    "typescript": "^4.5.2"
   }
 }

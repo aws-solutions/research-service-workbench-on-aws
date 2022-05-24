@@ -1,22 +1,26 @@
 {
   "name": "@amzn/example-ui-app",
   "version": "0.0.1",
-  "license": "APACHE-2.0",
+  "description": "",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "license": "Apache-2.0",
+  "author": "",
   "scripts": {
+    "build": "next build && next lint --max-warnings 0 && rushx pkg-json-lint",
+    "build:test": "rushx build && rushx test",
     "dev": "next dev",
     "lint": "next lint --max-warnings 0",
-    "build": "next build && next lint --max-warnings 0",
-    "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
-    "build:test": "rushx build && rushx test",
-    "test:only": "jest --ci --coverage --passWithNoTests 2>&1",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
+    "serve": "node .next/server/webpack-runtime.js",
+    "sort-package-json": "sort-package-json package.json",
     "start": "next start",
-    "serve": "node .next/server/webpack-runtime.js"
+    "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
+    "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "dependencies": {
     "next": "^12.1.5",
@@ -39,10 +43,12 @@
     "@babel/preset-typescript": "^7.16.7",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
     "@testing-library/dom": "^8.13.0",
     "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "12.1.2",
     "@testing-library/user-event": "13.5.0",
+    "@types/jest": "^27.4.1",
     "@types/node": "^14",
     "@types/react": "17.0.38",
     "babel-jest": "27.5.1",
@@ -51,11 +57,13 @@
     "eslint-plugin-testing-library": "5.0.1",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
+    "lint-staged": "^12.4.2",
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
     "sass": "^1.49.8",
     "sharp": "^0.30.4",
+    "sort-package-json": "^1.57.0",
     "ts-jest": "^27.1.3",
-    "typescript": "^4.5.2",
-    "@types/jest": "^27.4.1",
-    "@rushstack/heft-jest-plugin": "^0.2.3"
+    "typescript": "^4.5.2"
   }
 }

@@ -22,9 +22,8 @@ import {
 import { useCollection } from '@awsui/collection-hooks';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useSettings } from '../context/SettingsContext';
-import { SetStateAction, useEffect, useState } from 'react';
-import React from 'react';
-import { i18nStrings, paginationLables } from '../common/labels';
+import React, { SetStateAction, useEffect, useState } from 'react';
+import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
 import { allItems } from '../environments-table-config/workspacesData';
 import {
   columnDefinitions,
@@ -37,7 +36,6 @@ import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions'
 import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
 import { isWithinInterval } from 'date-fns';
 import Navigation from '../components/Navigation';
-import { layoutLabels } from '../common/labels';
 import styles from '../styles/BaseLayout.module.scss';
 import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../common/splitPanel';
 
