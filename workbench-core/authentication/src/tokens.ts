@@ -1,6 +1,14 @@
 export interface Tokens {
-  idToken: string;
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+  idToken: {
+    token: string;
+    expiresIn: number;
+  };
+  accessToken: {
+    token: string;
+    expiresIn: number;
+  };
+  refreshToken?: {
+    token: string;
+    expiresIn: number;
+  };
 }
