@@ -33,22 +33,18 @@ export default class HostingAccountLifecycleService {
       process.env.STATUS_HANDLER_ARN_NAME!
     ]);
 
-    // // Update main account event bus to accept hosting account events
-    await this.updateEventBridgePermissions(
-      mainAccountBusArn,
+    // Update main account custom event bus to accept hosting account events
+    await this.updateBusPermissions(mainAccountBusArn, statusHandlerArn, accountMetadata.awsAccountId);
+
+    // Update main account default event bus to accept hosting account state change events
+    await this.updateBusPermissions(
+      `arn:aws:events:${process.env.AWS_REGION!}:${accountMetadata.awsAccountId}:event-bus/default`,
       statusHandlerArn,
       accountMetadata.awsAccountId
     );
 
     // Finally store the new/updated account details in DDB
-    let accountDetails;
-    if (_.isUndefined(accountMetadata.id)) {
-      accountDetails = await accountsService.create(accountMetadata);
-    } else {
-      accountDetails = await accountsService.update(accountMetadata);
-    }
-
-    return accountDetails;
+    return accountsService.createOrUpdate(accountMetadata);
   }
 
   /**
@@ -201,15 +197,17 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateEventBridgePermissions(
-    mainAccountBusArn: string,
+  public async updateBusPermissions(
+    busArn: string,
     statusHandlerArn: string,
     awsAccountId: string
   ): Promise<void> {
-    const mainAccountBusName = mainAccountBusArn.split('/')[1];
+    const busName = busArn.split('/')[1];
+
+    // TODO: Figure out how to include all accounts IDs in a single permission policy
     const params = {
       Action: 'events:PutEvents',
-      EventBusName: mainAccountBusName,
+      EventBusName: busName,
       Principal: awsAccountId,
       StatementId: `Allow-main-account-to-get-${awsAccountId}-events`
     };
@@ -219,11 +217,63 @@ export default class HostingAccountLifecycleService {
 
     let busRule;
     const busRuleName = 'RouteHostEvents';
-    const describeRuleParams = { Name: busRuleName, EventBusName: mainAccountBusName };
+    const describeRuleParams = { Name: busRuleName, EventBusName: busName };
 
     try {
       // Describe rule to see if it exists
       busRule = await this._aws.clients.eventBridge.describeRule(describeRuleParams);
+
+      const putRuleParams = {
+        Name: busRuleName,
+        EventPattern: JSON.stringify({
+          account: busRule?.EventPattern
+            ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
+            : [awsAccountId],
+          // Filter out CloudTrail noise
+          'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+        }),
+        EventBusName: busName
+      };
+      // Create/update rule for main account event bus
+      await this._aws.clients.eventBridge.putRule(putRuleParams);
+    } catch (e) {
+      if (e instanceof ResourceNotFoundException) {
+        const putRuleParams = {
+          Name: busRuleName,
+          EventPattern: JSON.stringify({
+            account: [awsAccountId],
+            // Filter out CloudTrail noise
+            'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+          }),
+          EventBusName: busName
+        };
+        // Create rule for main account event bus
+        await this._aws.clients.eventBridge.putRule(putRuleParams);
+      } else {
+        throw e;
+      }
+    }
+
+    // Create status handler lambda policy if this is the first hosting account being set up
+    await this._createStatusHandlerPerm(statusHandlerArn, busRuleName);
+
+    const putTargetsParams = {
+      EventBusName: busName,
+      Rule: busRuleName,
+      Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
+    };
+
+    // Create/update rule target to route events to status handler lambda
+    await this._aws.clients.eventBridge.putTargets(putTargetsParams);
+  }
+
+  private async _createStatusHandlerPerm(statusHandlerArn: string, busRuleName: string): Promise<void> {
+    try {
+      // Describe lambda permission to see if it exists
+      const getPolicyParams = {
+        FunctionName: statusHandlerArn
+      };
+      await this._aws.clients.lambda.getPolicy(getPolicyParams);
     } catch (e) {
       if (e instanceof ResourceNotFoundException) {
         console.log(
@@ -243,30 +293,6 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-
-    const putRuleParams = {
-      Name: busRuleName,
-      EventPattern: JSON.stringify({
-        account: busRule?.EventPattern
-          ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
-          : [awsAccountId],
-        // Filter out CloudTrail noise
-        'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
-      }),
-      EventBusName: mainAccountBusName
-    };
-
-    // Create/update rule for main account event bus
-    await this._aws.clients.eventBridge.putRule(putRuleParams);
-
-    const putTargetsParams = {
-      EventBusName: mainAccountBusName,
-      Rule: busRuleName,
-      Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
-    };
-
-    // Create/update rule target to route events to status handler lambda
-    await this._aws.clients.eventBridge.putTargets(putTargetsParams);
   }
 
   public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {

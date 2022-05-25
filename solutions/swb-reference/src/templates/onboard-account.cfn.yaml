@@ -539,6 +539,50 @@ Resources:
             - EventBridgeIAMrole
             - Arn
 
+  StateChangeEventRuleMainRouting:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: Routes environment state changes to the main event bus
+      EventBusName: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+      State: ENABLED
+      EventPattern:
+        account:
+          - !Ref 'AWS::AccountId'
+        detail-type:
+          - anything-but: 'AWS API Call via CloudTrail'
+      Targets:
+        - Arn: !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
+          Id: 'MainAccountRoutingRule'
+          RoleArn: !GetAtt 
+            - StateChangeEventBridgeIAMrole
+            - Arn
+
+  StateChangeEventBridgeIAMrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: PutEventsDestinationBus
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:Put*'
+                Resource:
+                  - !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
+
   EventBridgeIAMrole:
     Type: 'AWS::IAM::Role'
     Properties:

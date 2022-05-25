@@ -19,7 +19,10 @@ export default class StatusHandler {
 
     let envId = event.envId;
     if (_.isUndefined(event.envId)) {
-      const awsService = new AwsService({ region: process.env.AWS_REGION! });
+      const awsService = new AwsService({
+        region: process.env.AWS_REGION!,
+        ddbTableName: process.env.STACK_NAME!
+      });
       const data = await awsService.helpers.ddb
         .query({
           key: {
@@ -31,17 +34,20 @@ export default class StatusHandler {
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find instance ${event.metadata.detail.NotebookInstanceName}`);
       }
+
       const instance = data.Items![0];
-      envId = instance.sk!.S!.split(`${envResourceTypeToKey.environment}#`)[1];
+      const instanceSk = instance.sk as unknown as string;
+      envId = instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
     }
 
-    const envDetails = await envService.getEnvironment(envId, true);
-
     // Check if this event is outdated
+    const envDetails = await envService.getEnvironment(envId, true);
     const lastDDBUpdate = envDetails!.updatedAt;
     const eventBusTime = event.metadata.time;
-    if (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime)) {
-      console.log('Event timestamp is older than the last update for this environment.');
+
+    // We need to check if operation is Launch since SSM doc sends important details
+    if (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) && event.operation !== 'Launch') {
+      console.log('Latest status already applied. Skipping operation...');
       return;
     }
 

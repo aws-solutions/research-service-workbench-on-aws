@@ -4,7 +4,6 @@ export const ENVIRONMENT_STATUS: string[] = [
   'PENDING',
   'COMPLETED',
   'STARTING',
-  'STARTED',
   'STOPPING',
   'STOPPED',
   'TERMINATING',

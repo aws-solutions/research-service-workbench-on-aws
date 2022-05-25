@@ -48,6 +48,14 @@ export default class AccountsService {
     }
   }
 
+  public async createOrUpdate(accountMetadata: {
+    [key: string]: string;
+  }): Promise<{ [key: string]: string }> {
+    if (_.isUndefined(accountMetadata.id)) return this.create(accountMetadata);
+
+    return this.update(accountMetadata);
+  }
+
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
 

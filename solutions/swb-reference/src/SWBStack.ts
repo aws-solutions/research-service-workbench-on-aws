@@ -371,7 +371,10 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/${this.stackName}`],
+            resources: [
+              `arn:aws:events:${AWS_REGION}:${this.account}:event-bus/${this.stackName}`,
+              `arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`
+            ],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
@@ -399,7 +402,7 @@ export class SWBStack extends Stack {
             resources: ['*']
           }),
           new PolicyStatement({
-            actions: ['lambda:AddPermission'],
+            actions: ['lambda:AddPermission', 'lambda:GetPolicy'],
             resources: [statusHandlerLambdaArn]
           })
         ]

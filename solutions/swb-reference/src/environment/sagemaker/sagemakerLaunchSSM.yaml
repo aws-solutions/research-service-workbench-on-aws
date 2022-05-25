@@ -117,7 +117,7 @@ mainSteps:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
           DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+          Source: 'aws.automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
@@ -128,5 +128,5 @@ mainSteps:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
           DetailType: '{{ EventBridgeStatusUpdateEventType }}'
           EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+          Source: 'aws.automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
