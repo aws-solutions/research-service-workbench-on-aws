@@ -8,7 +8,7 @@
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": "Miguel Abreu",
   "scripts": {
     "build": "next build && rushx lint",
     "build:test": "rushx build && rushx test",

@@ -1,14 +1,14 @@
 {
   "name": "@amzn/swb-reference",
   "version": "0.0.1",
-  "description": "",
+  "description": "Example implementation of SWB. This package has a depende =bcy on swb-app and workbench-core packages. No other package should depend on this package.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": "Tim Nguyen",
   "scripts": {
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",

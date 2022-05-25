@@ -1,7 +1,7 @@
 {
   "name": "@amzn/environments",
   "version": "0.0.1",
-  "description": "",
+  "description": "Implementation of environment APIs and resources.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",

@@ -1,1 +1,4 @@
-**/*.js
+*.js
+.next
+node_modules
+next-env.d.ts

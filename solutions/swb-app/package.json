@@ -1,15 +1,14 @@
 {
   "name": "@amzn/swb-app",
   "version": "0.0.1",
-  "description": "",
-  "keywords": [],
+  "description": "This package sets up API routes for SWB",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": "Tim Nguyen",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {

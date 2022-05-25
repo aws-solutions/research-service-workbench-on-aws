@@ -8,7 +8,7 @@
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": "HaiTao Zhang",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {

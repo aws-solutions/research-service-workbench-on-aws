@@ -1,5 +1,6 @@
 import AuditEntry from './auditEntry';
 import Metadata from './metadata';
+
 /**
  * The interface class for all Audit Plugins.
  */

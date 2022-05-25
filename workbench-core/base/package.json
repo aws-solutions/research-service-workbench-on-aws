@@ -8,7 +8,7 @@
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "",
+  "author": "Sanket Dharwadkar",
   "main": "lib/index.js",
   "scripts": {
     "build": "heft build --clean && rushx pkg-json-lint",
