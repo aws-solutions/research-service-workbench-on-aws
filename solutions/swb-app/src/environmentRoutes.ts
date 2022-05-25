@@ -44,9 +44,7 @@ export function setUpEnvRoutes(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
       const env = await environmentService.getEnvironment(req.params.id!, true);
-      console.log('env', JSON.stringify(env));
       const envType = env.ETC.type;
-      console.log('envType', envType);
 
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -68,12 +66,12 @@ export function setUpEnvRoutes(
         const env = await environmentService.getEnvironment(envId, true);
         return env.ETC.type;
       };
-      const envType = await getEnvironment(req.params.id);
+      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
 
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.start(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.start(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -90,12 +88,12 @@ export function setUpEnvRoutes(
         const env = await environmentService.getEnvironment(envId, true);
         return env.ETC.type;
       };
-      const envType = await getEnvironment(req.params.id);
+      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
 
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.stop(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.stop(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -109,14 +107,14 @@ export function setUpEnvRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const environment = await environmentService.getEnvironment(req.params.id, true);
       const instanceName = environment.instanceId!;
-      const envType = environment.ETC.type;
+      const envType = environment.ETC.type.toLocaleLowerCase();
 
       const context = {
         roleArn: environment.PROJ.envMgmtRoleArn,
         externalId: environment.PROJ.externalId
       };
 
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
         const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context);
@@ -159,7 +157,6 @@ export function setUpEnvRoutes(
           status
         };
       }
-      // TODO: Handle environment not found
       // TODO: Add support for pagination with limit and pagination token
       const env = await environmentService.getEnvironments(user, filter);
       res.send(env);

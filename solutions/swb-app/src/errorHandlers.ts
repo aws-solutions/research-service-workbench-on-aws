@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-// import { isBoom } from '@hapi/boom';
 // Followed this tutorial https://scoutapm.com/blog/express-error-handling and https://stackoverflow.com/a/51391081/14310364
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const wrapAsync = (fn: any): any => {

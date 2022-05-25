@@ -131,7 +131,6 @@ export default class AccountService {
         eventBusArn: accountMetadata.eventBusArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
-        // cidr: accountMetadata.cidr,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,
         environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
         stackName: accountMetadata.stackName,
@@ -144,7 +143,6 @@ export default class AccountService {
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
 
     console.log(JSON.stringify(accountMetadata));
-    console.log('accountParams', JSON.stringify(accountParams));
 
     // Store Account row in DDB
     await this._aws.helpers.ddb.update(accountKey, accountParams).execute();

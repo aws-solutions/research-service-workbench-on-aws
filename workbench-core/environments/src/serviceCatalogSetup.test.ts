@@ -60,7 +60,9 @@ describe('ServiceCatalogSetup', () => {
   describe('Mocked private methods', () => {
     test('run: Create new portfolio, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue(undefined);
+      // Mock no portfolio
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({ PortfolioDetails: [] });
       sc['_createSCPortfolio'] = jest.fn().mockResolvedValue('port-abc');
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
@@ -74,7 +76,16 @@ describe('ServiceCatalogSetup', () => {
 
     test('run: Porfolio already exist, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
+      //Mock portfolio already exist
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({
+        PortfolioDetails: [
+          {
+            DisplayName: 'swb-dev-va',
+            Id: 'port-abc'
+          }
+        ]
+      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
@@ -87,7 +98,16 @@ describe('ServiceCatalogSetup', () => {
 
     test('run: Porfolio already exist, product already exist, updating product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
+      //Mock portfolio already exist
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({
+        PortfolioDetails: [
+          {
+            DisplayName: 'swb-dev-va',
+            Id: 'port-abc'
+          }
+        ]
+      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });

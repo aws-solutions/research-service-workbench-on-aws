@@ -91,7 +91,7 @@ export default class HostingAccountLifecycleService {
     } = params;
     const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
     await this._shareSSMDocument(ssmDocuments, targetAccountId);
-    await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
+    await this._shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
     await this._shareAndAcceptScPortfolio(
       targetAccountAwsService,
       targetAccountId as string,
@@ -285,7 +285,7 @@ export default class HostingAccountLifecycleService {
     await this._aws.clients.eventBridge.putTargets(putTargetsParams);
   }
 
-  public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+  private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {

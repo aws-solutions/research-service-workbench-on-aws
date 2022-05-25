@@ -1,7 +1,6 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import AccountService from './accountService';
-import { ListPortfoliosCommandInput, PortfolioDetail } from '@aws-sdk/client-service-catalog';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -11,12 +10,16 @@ export default class AccountHandler {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
   public async execute(event: any): Promise<void> {
     // eslint-disable-next-line
-    // const { hostingAccounts, externalId, portfolioId } = await this._getMetadataFromDB();
     const hostingAccounts = await this._getAccountMetadata();
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
-    const portfolioId = await this._getPortfolioId();
+    const portfolioName = process.env.PORTFOLIO_NAME!;
+    const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog._getPortfolioId(
+      portfolioName
+    );
+    if (portfolioId === undefined) {
+      throw new Error(`Could not find portfolioId for portfolio: ${portfolioName}`);
+    }
 
-    // const cfService = new CloudformationService(this._mainAccountAwsService.clients.cloudformation);
     const cfService = this._mainAccountAwsService.helpers.cloudformation;
     const {
       [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName,
@@ -70,37 +73,6 @@ export default class AccountHandler {
     throw new Error(`Cannot find accountId from arn: ${iamRoleArn}`);
   }
 
-  private async _getPortfolioId(): Promise<string> {
-    let portfolioDetails: PortfolioDetail[] = [];
-    let pageToken: string | undefined = undefined;
-    // Get all portfolios in the account
-    do {
-      const listPortfolioInput: ListPortfoliosCommandInput = {
-        PageToken: pageToken,
-        PageSize: 20
-      };
-      const listPortfolioOutput = await this._mainAccountAwsService.clients.serviceCatalog.listPortfolios(
-        listPortfolioInput
-      );
-      pageToken = listPortfolioOutput.NextPageToken;
-      if (listPortfolioOutput.PortfolioDetails) {
-        portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
-      }
-    } while (pageToken);
-
-    // Find the SWB portfolio
-    const portfolioName = process.env.PORTFOLIO_NAME;
-    const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
-      return portfolio.DisplayName === portfolioName;
-    });
-
-    if (portfolio === undefined) {
-      throw new Error(`Could not find portfolio with name ${portfolioName}`);
-    }
-
-    return portfolio.Id!;
-  }
-
   private async _getAccountMetadata(): Promise<
     {
       id: string;
@@ -124,20 +96,5 @@ export default class AccountHandler {
         externalId: account.externalId || ''
       };
     });
-    // TODO: Update this
-    // TODO: Get this data from DDB
-    // return Promise.resolve({
-    //   externalId: 'workbench',
-    //   hostingAccounts: [
-    //     {
-    //       arns: {
-    //         accountHandler: 'arn:aws:iam::<HOSTING_ACCOUNT>:role/swb-swbv2-va-cross-account-role',
-    //         envManagement: 'arn:aws:iam::<HOSTING_ACCOUNT>:role/swb-swbv2-va-env-mgmt'
-    //       },
-    //       stackName: `swbv2-host`
-    //     }
-    //   ],
-    //   portfolioId: 'port-45ssvg67eyrek'
-    // });
   }
 }

@@ -19,6 +19,7 @@ import DynamoDB from './clients/dynamoDB';
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 import Lambda from './clients/lambda';
 import SageMaker from './clients/sagemaker';
+import ServiceCatalogService from './helpers/serviceCatalogService';
 
 export default class AwsService {
   public clients: {
@@ -39,6 +40,7 @@ export default class AwsService {
     cloudformation: CloudformationService;
     s3: S3Service;
     ddb: DynamoDBService;
+    serviceCatalog: ServiceCatalogService;
   };
 
   public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
@@ -61,7 +63,8 @@ export default class AwsService {
     this.helpers = {
       cloudformation: new CloudformationService(this.clients.cloudformation),
       s3: new S3Service(this.clients.s3),
-      ddb: new DynamoDBService({ region, table: ddbTableName || '' })
+      ddb: new DynamoDBService({ region, table: ddbTableName || '' }),
+      serviceCatalog: new ServiceCatalogService(this.clients.serviceCatalog)
     };
   }
 

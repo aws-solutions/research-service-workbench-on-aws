@@ -4,12 +4,7 @@ import { AwsService } from '@amzn/workbench-core-base';
 import fs from 'fs';
 import md5File from 'md5-file';
 import { join } from 'path';
-import {
-  InvalidParametersException,
-  ListPortfoliosCommandInput,
-  PortfolioDetail,
-  ProductViewDetail
-} from '@aws-sdk/client-service-catalog';
+import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
 
 export default class ServiceCatalogSetup {
   private _aws: AwsService;
@@ -47,7 +42,7 @@ export default class ServiceCatalogSetup {
     const portfolioName = PORTFOLIO_NAME;
 
     // Create SC portfolio if portfolio doesn't exist
-    let portfolioId = await this._getPortfolioId(portfolioName);
+    let portfolioId = await this._aws.helpers.serviceCatalog._getPortfolioId(portfolioName);
     if (portfolioId === undefined) {
       console.log('Creating new portfolio, because portfolio does not exist');
       portfolioId = await this._createSCPortfolio(portfolioName);
@@ -269,26 +264,26 @@ export default class ServiceCatalogSetup {
     return product && product.ProductViewSummary ? product.ProductViewSummary.ProductId : undefined;
   }
 
-  private async _getPortfolioId(portfolioName: string): Promise<string | undefined> {
-    let portfolioDetails: PortfolioDetail[] = [];
-    let pageToken: string | undefined = undefined;
-    do {
-      const listPortfolioInput: ListPortfoliosCommandInput = {
-        PageToken: pageToken,
-        PageSize: 20
-      };
-      const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
-      pageToken = listPortfolioOutput.NextPageToken;
-      if (listPortfolioOutput.PortfolioDetails) {
-        portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
-      }
-    } while (pageToken);
-    const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
-      return portfolio.DisplayName === portfolioName;
-    });
-
-    return portfolio ? portfolio.Id : undefined;
-  }
+  // private async _getPortfolioId(portfolioName: string): Promise<string | undefined> {
+  //   let portfolioDetails: PortfolioDetail[] = [];
+  //   let pageToken: string | undefined = undefined;
+  //   do {
+  //     const listPortfolioInput: ListPortfoliosCommandInput = {
+  //       PageToken: pageToken,
+  //       PageSize: 20
+  //     };
+  //     const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
+  //     pageToken = listPortfolioOutput.NextPageToken;
+  //     if (listPortfolioOutput.PortfolioDetails) {
+  //       portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
+  //     }
+  //   } while (pageToken);
+  //   const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
+  //     return portfolio.DisplayName === portfolioName;
+  //   });
+  //
+  //   return portfolio ? portfolio.Id : undefined;
+  // }
 
   private async _createSCPortfolio(portfolioName: string): Promise<string> {
     const portfolioToCreateParam = {
