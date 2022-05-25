@@ -9,14 +9,14 @@
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "lint": "next lint --max-warnings 0",
+    "build": "next build && next lint --max-warnings 0",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "build:test": "rushx build && rushx test",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1",
     "start": "next start",
-    "serve": "node .next/server/webpack-runtime.js",
-    "lint": "next lint"
+    "serve": "node .next/server/webpack-runtime.js"
   },
   "dependencies": {
     "next": "^12.1.5",
