@@ -1,4 +1,8 @@
-*.js
+.eslintrc.js
+babel.config.js
+jest.config.js
+jest.setup.js
+next.config.js
 .next
 node_modules
 next-env.d.ts
