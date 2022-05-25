@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { isBoom } from '@hapi/boom';
+// import { isBoom } from '@hapi/boom';
 // Followed this tutorial https://scoutapm.com/blog/express-error-handling and https://stackoverflow.com/a/51391081/14310364
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const wrapAsync = (fn: any): any => {
@@ -13,10 +13,11 @@ export const wrapAsync = (fn: any): any => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const boomErrorHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
-  if (isBoom(err)) {
+  if (err.isBoom) {
     res.status(err.output.statusCode).send(err.output.payload);
+  } else {
+    next(err);
   }
-  next(err);
 };
 
 export const unknownErrorHandler = (
@@ -27,6 +28,6 @@ export const unknownErrorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction
 ): void => {
-  console.error('Unhandled Error', err);
+  console.error('Unhandled Error:', err);
   res.status(500).send('Internal server error. Unable to process request');
 };

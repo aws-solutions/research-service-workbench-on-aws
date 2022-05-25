@@ -30,6 +30,7 @@ export function setUpEnvRoutes(
             error: { type: 'LAUNCH', value: errorMessage },
             status: 'FAILED'
           });
+          throw e;
         }
         res.status(201).send(env);
       } else {

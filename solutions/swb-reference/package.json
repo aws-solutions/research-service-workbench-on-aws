@@ -28,7 +28,8 @@
     "js-yaml": "^4.1.0",
     "@amzn/workbench-core-base": "workspace:*",
     "uuid": "^8.3.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "@hapi/boom": "^10.0.0"
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.0.0",
