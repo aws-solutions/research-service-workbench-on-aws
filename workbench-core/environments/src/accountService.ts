@@ -40,7 +40,10 @@ export default class AccountService {
    */
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
-      .get({ pk: `${environmentResourceTypeToKey.account}#${accountId}`, sk: `ACC#${accountId}` })
+      .get({
+        pk: `${environmentResourceTypeToKey.account}#${accountId}`,
+        sk: `${environmentResourceTypeToKey.account}#${accountId}`
+      })
       .execute()) as GetItemCommandOutput;
 
     if (accountEntry.Item) {

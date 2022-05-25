@@ -264,27 +264,6 @@ export default class ServiceCatalogSetup {
     return product && product.ProductViewSummary ? product.ProductViewSummary.ProductId : undefined;
   }
 
-  // private async _getPortfolioId(portfolioName: string): Promise<string | undefined> {
-  //   let portfolioDetails: PortfolioDetail[] = [];
-  //   let pageToken: string | undefined = undefined;
-  //   do {
-  //     const listPortfolioInput: ListPortfoliosCommandInput = {
-  //       PageToken: pageToken,
-  //       PageSize: 20
-  //     };
-  //     const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
-  //     pageToken = listPortfolioOutput.NextPageToken;
-  //     if (listPortfolioOutput.PortfolioDetails) {
-  //       portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
-  //     }
-  //   } while (pageToken);
-  //   const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
-  //     return portfolio.DisplayName === portfolioName;
-  //   });
-  //
-  //   return portfolio ? portfolio.Id : undefined;
-  // }
-
   private async _createSCPortfolio(portfolioName: string): Promise<string> {
     const portfolioToCreateParam = {
       DisplayName: portfolioName,

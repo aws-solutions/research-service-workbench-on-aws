@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
 import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
 import { wrapAsync } from './errorHandlers';
+import Boom from '@hapi/boom';
 
 export function setUpEnvRoutes(
   router: Router,
@@ -18,6 +19,11 @@ export function setUpEnvRoutes(
       const envType = req.body.envType;
       if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
+        if (req.body.id) {
+          throw Boom.badRequest(
+            'id cannot be passed in the request body when trying to launch a new environment'
+          );
+        }
         const env = await environmentService.createEnvironment(req.body);
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object

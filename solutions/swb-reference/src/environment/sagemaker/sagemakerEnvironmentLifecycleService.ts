@@ -11,7 +11,6 @@ import {
 } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 import { v4 as uuidv4 } from 'uuid';
-import Boom from '@hapi/boom';
 
 export default class SagemakerEnvironmentLifecycleService implements EnvironmentLifecycleService {
   public helper: EnvironmentLifecycleHelper;
@@ -24,13 +23,6 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
-    // Check if launch operation is valid for request body
-    if (envMetadata.id) {
-      throw Boom.badRequest(
-        'id cannot be passed in the request body when trying to launch a new environment'
-      );
-    }
-
     const cidr = _.find(envMetadata.ETC.params, { key: 'CIDR' })!.value!;
     const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
