@@ -1,7 +1,6 @@
 {
   "name": "@amzn/swb-reference",
   "version": "0.0.1",
-  "private": true,
   "description": "",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
@@ -18,6 +17,7 @@
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "compile": "scripts/buildLambda.js",
     "jest": "jest",
+    "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "run-postDeployment": "rush build && node lib/postDeployment.js",
@@ -72,6 +72,7 @@
     "constructs": "^10.0.0",
     "esbuild": "^0.14.21",
     "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "lint-staged": "^12.4.2",

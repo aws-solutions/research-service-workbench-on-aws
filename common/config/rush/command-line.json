@@ -208,6 +208,13 @@
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
+    // {
+    //   "name": "lint:fix",
+    //   "commandKind": "bulk",
+    //   "summary": "Fix lint errors",
+    //   "safeForSimultaneousRushProcesses": true,
+    //   "enableParallelism": true
+    // },
     {
       "name": "common-coverage-report",
       "commandKind": "global",

@@ -20,13 +20,13 @@
     "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file cdk-outputs.json",
     "cdk:synth": "cdk synth",
     "compile": "node scripts/buildLambda.js",
+    "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
     "test:integration": "heft test -u --clean --no-build",
-    "test:only": "heft test -u --clean --no-build --test-path-pattern infrastructure-stack",
-    "watch": "tsc -w"
+    "test:only": "heft test -u --clean --no-build --test-path-pattern infrastructure-stack"
   },
   "dependencies": {
     "@amzn/workbench-core-express": "workspace:*",
@@ -57,6 +57,7 @@
     "cdk-nag": "^2.12.25",
     "esbuild": "^0.14.21",
     "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-security": "^1.4.0",
     "express": "^4.17.3",
     "istanbul-badges-readme": "1.8.1",

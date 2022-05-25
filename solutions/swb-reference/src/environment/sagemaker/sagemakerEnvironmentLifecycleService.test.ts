@@ -1,9 +1,10 @@
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { SSMClient, SendCommandCommand } from '@aws-sdk/client-ssm';
-import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { ServiceCatalogClient, ListLaunchPathsCommand } from '@aws-sdk/client-service-catalog';
+import { SSMClient, SendCommandCommand } from '@aws-sdk/client-ssm';
+import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
+
 describe('SagemakerEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   beforeEach(() => {

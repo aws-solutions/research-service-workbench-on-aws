@@ -2,6 +2,10 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution');
 
 module.exports = {
+  // parser: '@typescript-eslint/parser',
   extends: ['@amzn/eslint-config-workbench-core-eslint-custom'],
-  parserOptions: { tsconfigRootDir: __dirname }
+  parserOptions: {
+    tsconfigRootDir: __dirname
+    // project: ['./tsconfig.json']
+  }
 };

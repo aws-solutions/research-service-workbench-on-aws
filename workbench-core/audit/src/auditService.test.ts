@@ -1,7 +1,8 @@
-import AuditService from './auditService';
-import AuditPlugin from './auditPlugin';
-import Metadata from './metadata';
 import AuditEntry from './auditEntry';
+import AuditPlugin from './auditPlugin';
+import AuditService from './auditService';
+import Metadata from './metadata';
+
 const sysTime = new Date('2022-01-01').getTime();
 jest.useFakeTimers().setSystemTime(sysTime);
 describe('Audit Service', () => {

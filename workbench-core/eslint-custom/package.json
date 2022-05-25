@@ -14,6 +14,7 @@
   "scripts": {
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint",
+    "lint:fix": "eslint . --fix",
     "make-badges": "echo 'NO TEST COVERAGE, SO NO BADGE !'",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",

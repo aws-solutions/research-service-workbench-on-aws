@@ -30,6 +30,7 @@ importers:
       babel-jest: 27.5.1
       eslint: ^8.7.0
       eslint-config-next: 12.1.5
+      eslint-plugin-import: ^2.26.0
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -78,6 +79,7 @@ importers:
       babel-jest: 27.5.1_@babel+core@7.17.9
       eslint: 8.15.0
       eslint-config-next: 12.1.5_f546b4809beafe775933990b9cc90cd9
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-testing-library: 5.0.1_eslint@8.15.0+typescript@4.6.4
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -104,6 +106,7 @@ importers:
       '@types/node': ^14
       concurrently: ^7.0.0
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -129,6 +132,7 @@ importers:
       '@types/node': 14.18.18
       concurrently: 7.2.0
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       lint-staged: 12.4.2
@@ -172,6 +176,7 @@ importers:
       constructs: ^10.0.0
       esbuild: ^0.14.21
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -220,6 +225,7 @@ importers:
       constructs: 10.1.12
       esbuild: 0.14.39
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.7.0
       lint-staged: 12.4.2
@@ -261,6 +267,7 @@ importers:
       date-fns: ^2.28.0
       eslint: ^8.7.0
       eslint-config-next: 12.1.5
+      eslint-plugin-import: ^2.26.0
       eslint-plugin-testing-library: 5.0.1
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
@@ -318,6 +325,7 @@ importers:
       concurrently: 7.2.0
       eslint: 8.15.0
       eslint-config-next: 12.1.5_f546b4809beafe775933990b9cc90cd9
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-testing-library: 5.0.1_eslint@8.15.0+typescript@4.6.4
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -341,6 +349,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': ^14
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
@@ -356,6 +365,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.18
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
@@ -375,6 +385,7 @@ importers:
       aws-jwt-verify: ^3.0.0
       axios: ^0.27.1
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
@@ -393,6 +404,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.18
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
@@ -414,6 +426,7 @@ importers:
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       fast-check: ^2.24.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -439,6 +452,7 @@ importers:
       '@types/lodash': 4.14.182
       '@types/node': 14.18.18
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       fast-check: 2.25.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -474,6 +488,7 @@ importers:
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       lint-staged: ^12.4.2
@@ -509,6 +524,7 @@ importers:
       '@types/lodash': 4.14.182
       '@types/node': 14.18.18
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       lint-staged: 12.4.2
@@ -528,6 +544,7 @@ importers:
       '@types/node': ^14
       '@types/triple-beam': ^1.3.2
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       fast-check: ^2.24.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -546,6 +563,7 @@ importers:
       '@types/node': 14.18.18
       '@types/triple-beam': 1.3.2
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       fast-check: 2.25.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -580,6 +598,7 @@ importers:
       '@types/node': ^14
       aws-sdk-client-mock: ^0.6.2
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -616,6 +635,7 @@ importers:
       '@types/node': 14.18.18
       aws-sdk-client-mock: 0.6.2_824b424b08e1614ce867459c52fce65a
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       lint-staged: 12.4.2
@@ -684,6 +704,7 @@ importers:
       axios: ^0.27.1
       constructs: ^10.0.0
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
@@ -714,6 +735,7 @@ importers:
       '@types/request': 2.48.8
       axios: 0.27.2
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-security: 1.5.0
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
@@ -751,6 +773,7 @@ importers:
       constructs: ^10.0.0
       esbuild: ^0.14.21
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
@@ -791,6 +814,7 @@ importers:
       cdk-nag: 2.14.8_1741e7d222fdd0339d4fea6a610dfa16
       esbuild: 0.14.39
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-security: 1.5.0
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
@@ -812,6 +836,7 @@ importers:
       '@types/node': ^14
       '@types/triple-beam': ^1.3.2
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       fast-check: ^2.24.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -837,6 +862,7 @@ importers:
       '@types/node': 14.18.18
       '@types/triple-beam': 1.3.2
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       fast-check: 2.25.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -863,6 +889,7 @@ importers:
       '@types/node': ^14
       diff: ^5.0.0
       eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -887,6 +914,7 @@ importers:
       '@types/jest': 27.5.1
       '@types/node': 14.18.18
       eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-security: 1.5.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -7633,7 +7661,6 @@ packages:
       object.values: 1.1.5
       resolve: 1.22.0
       tsconfig-paths: 3.14.1
-    dev: false
 
   /eslint-plugin-jsx-a11y/6.5.1_eslint@8.15.0:
     resolution: {integrity: sha512-sVCFKX9fllURnXT2JwLN5Qgo24Ug5NF6dxhkmxsMEUZhXRcGg+X3e1JbJ84YePQKBl5E0ZjAH5Q4rkdcGY99+g==}
