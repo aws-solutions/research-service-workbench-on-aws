@@ -7,15 +7,9 @@ parameters:
   TerminateToken:
     type: String
     description: '(Required) The unique token ID assigned to this request.'
-  EventBusName:
-    type: String
-    description: 'The main account event bridge bus name.'
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-  EventBridgeStatusUpdateEventType:
-    type: String
-    description: 'The string value used by main account to filter host events'
 mainSteps:
   - name: TerminateSagemaker
     action: 'aws:executeAwsApi'
@@ -52,9 +46,9 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
-          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'aws.automation' # This is being used for updating env in statusHandler lambda
+          DetailType: 'TerminateSagemaker'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
@@ -63,7 +57,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED" }'
-          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'aws.automation' # This is being used for updating env in statusHandler lambda
+          DetailType: 'TerminateSagemaker'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

@@ -25,23 +25,13 @@ export default class HostingAccountLifecycleService {
     const accountsService = new AccountsService();
 
     const cfService = this._aws.helpers.cloudformation;
-    const {
-      [process.env.MAIN_ACCOUNT_BUS_ARN_NAME!]: mainAccountBusArn,
-      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn
-    } = await cfService.getCfnOutput(this._stackName, [
-      process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
-      process.env.STATUS_HANDLER_ARN_NAME!
-    ]);
-
-    // Update main account custom event bus to accept hosting account events
-    await this.updateBusPermissions(mainAccountBusArn, statusHandlerArn, accountMetadata.awsAccountId);
+    const { [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn } = await cfService.getCfnOutput(
+      this._stackName,
+      [process.env.STATUS_HANDLER_ARN_NAME!]
+    );
 
     // Update main account default event bus to accept hosting account state change events
-    await this.updateBusPermissions(
-      `arn:aws:events:${process.env.AWS_REGION!}:${accountMetadata.awsAccountId}:event-bus/default`,
-      statusHandlerArn,
-      accountMetadata.awsAccountId
-    );
+    await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
 
     // Finally store the new/updated account details in DDB
     return accountsService.createOrUpdate(accountMetadata);
@@ -197,14 +187,10 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateBusPermissions(
-    busArn: string,
-    statusHandlerArn: string,
-    awsAccountId: string
-  ): Promise<void> {
-    const busName = busArn.split('/')[1];
+  public async updateBusPermissions(statusHandlerArn: string, awsAccountId: string): Promise<void> {
+    const busName = 'default';
 
-    // TODO: Figure out how to include all accounts IDs in a single permission policy
+    // TODO: Figure out how to include all accounts IDs in a single statement
     const params = {
       Action: 'events:PutEvents',
       EventBusName: busName,
@@ -229,7 +215,7 @@ export default class HostingAccountLifecycleService {
           account: busRule?.EventPattern
             ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
             : [awsAccountId],
-          // Filter out CloudTrail noise
+          source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
           'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
         }),
         EventBusName: busName
@@ -242,7 +228,7 @@ export default class HostingAccountLifecycleService {
           Name: busRuleName,
           EventPattern: JSON.stringify({
             account: [awsAccountId],
-            // Filter out CloudTrail noise
+            source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
             'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
           }),
           EventBusName: busName

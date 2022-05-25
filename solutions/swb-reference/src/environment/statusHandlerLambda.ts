@@ -25,7 +25,7 @@ export async function handler(event: any) {
     Deleted: 'TERMINATED'
   };
 
-  const source = event.source.split('aws.')[1];
+  const source = event.source === 'automation' ? 'automation' : event.source.split('aws.')[1];
   if (!_.includes(Object.keys(statusLocation), source)) {
     console.log('The source for this event is not recognized by Status Handler. Skipping operation...');
     return;

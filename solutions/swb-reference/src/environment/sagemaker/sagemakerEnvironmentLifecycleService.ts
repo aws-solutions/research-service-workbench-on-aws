@@ -43,11 +43,9 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
       CIDR: [cidr],
       InstanceType: [instanceSize],
-      EventBusName: [envMetadata.PROJ.hostingAccountEventBusArn],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
-      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
-      EventBridgeStatusUpdateEventType: [process.env.EB_EVENT_TYPE_STATUS_UPDATE!]
+      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes]
     };
 
     await this.helper.launch({
@@ -63,15 +61,12 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
   public async terminate(envId: string): Promise<{ [id: string]: string }> {
     // Get value from env in DDB
     const envDetails = await this.envService.getEnvironment(envId, true);
-    const eventBusArn = envDetails.PROJ.hostingAccountEventBusArn;
     const provisionedProductId = envDetails.provisionedProductId!; // This is updated by status handler
 
     const ssmParameters = {
       ProvisionedProductId: [provisionedProductId],
       TerminateToken: [uuidv4()],
-      EventBusName: [eventBusArn],
-      EnvId: [envId],
-      EventBridgeStatusUpdateEventType: [process.env.EB_EVENT_TYPE_STATUS_UPDATE!]
+      EnvId: [envId]
     };
 
     // Execute termination doc

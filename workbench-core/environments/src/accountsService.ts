@@ -12,7 +12,6 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 interface Account {
   id: string | undefined;
   awsAccountId: string;
-  hostingAccountEventBusArn: string;
   envMgmtRoleArn: string;
   error: { type: string; value: string } | undefined;
   accountHandlerRoleArn: string;
@@ -119,7 +118,6 @@ export default class AccountsService {
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
-        eventBusArn: accountMetadata.eventBusArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
         cidr: accountMetadata.cidr,

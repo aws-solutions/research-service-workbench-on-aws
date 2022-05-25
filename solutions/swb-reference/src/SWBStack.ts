@@ -2,7 +2,7 @@
 /* eslint-disable no-new */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -19,12 +19,10 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-    MAIN_ACCOUNT_BUS_ARN_NAME: string;
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
-    EB_EVENT_TYPE_STATUS_UPDATE: string;
   };
   public constructor(app: App) {
     const {
@@ -34,10 +32,8 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
-      MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
-      STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE
+      STATUS_HANDLER_ARN_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -52,12 +48,10 @@ export class SWBStack extends Stack {
       STAGE,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
-      MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
-      STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE
+      STATUS_HANDLER_ARN_NAME
     };
 
     const statusHandler = this._createStatusHandlerLambda();
@@ -71,7 +65,6 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    this._createEventBridgeResources();
     this._createDDBTable(apiLambda);
   }
 
@@ -229,16 +222,6 @@ export class SWBStack extends Stack {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
-  }
-
-  private _createEventBridgeResources(): void {
-    const bus = new EventBus(this, 'bus', {
-      eventBusName: this.stackName
-    });
-
-    new CfnOutput(this, 'EventBusOutput', {
-      value: bus.eventBusArn
-    });
   }
 
   private _createStatusHandlerLambda(): Function {

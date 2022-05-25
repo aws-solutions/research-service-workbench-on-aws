@@ -11,7 +11,6 @@ describe('EnvironmentLifecycleHelper', () => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
-    process.env.MAIN_ACCOUNT_BUS_ARN_NAME = 'Main_Account_Bus_Arn_Output';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
   });
 
@@ -28,10 +27,6 @@ describe('EnvironmentLifecycleHelper', () => {
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
-            {
-              OutputKey: process.env.MAIN_ACCOUNT_BUS_ARN_NAME,
-              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
-            },
             {
               OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
@@ -167,9 +162,6 @@ describe('EnvironmentLifecycleHelper', () => {
   //       sk: {
   //         S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
   //       },
-  //       eventBusArn: {
-  //         S: 'sampleEventBusArn'
-  //       },
   //       envManagementRoleArn: {
   //         S: 'sampleEnvManagementRoleArn'
   //       }
@@ -189,7 +181,6 @@ describe('EnvironmentLifecycleHelper', () => {
   //       Namespace: [`sagemaker-${Date.now()}`],
   //       EncryptionKeyArn: ['encryptionKeyArn'],
   //       CIDR: ['1.1.1.1/32'],
-  //       EventBusName: ['hostingAccountEventBusArn'],
   //       EnvId: ['envId'],
   //       EnvironmentInstanceFiles: ['environmentInstanceFiles'],
   //       AutoStopIdleTimeInMinutes: ['0'],
