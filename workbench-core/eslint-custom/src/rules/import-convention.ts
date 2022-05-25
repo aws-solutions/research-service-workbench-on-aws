@@ -12,6 +12,6 @@ export const importConvention = {
         groups: ['builtin', 'external', 'parent', 'sibling']
       }
     ],
-    'import/newline-after-import': ['warn']
+    'import/newline-after-import': ['error']
   }
 };

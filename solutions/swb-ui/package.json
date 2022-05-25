@@ -13,10 +13,10 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "build": "next build && next lint --max-warnings 0 && rushx pkg-json-lint",
+    "build": "next build && rushx lint",
     "build:test": "rushx build && rushx test",
     "dev": "next dev",
-    "lint": "next lint --max-warnings 0",
+    "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
