@@ -3,7 +3,10 @@ import {
   AddPermissionCommand,
   AddPermissionCommandInput,
   AddPermissionCommandOutput,
-  LambdaClientConfig
+  LambdaClientConfig,
+  GetPolicyCommand,
+  GetPolicyCommandInput,
+  GetPolicyCommandOutput
 } from '@aws-sdk/client-lambda';
 
 export default class Lambda {
@@ -14,5 +17,9 @@ export default class Lambda {
 
   public async addPermission(params: AddPermissionCommandInput): Promise<AddPermissionCommandOutput> {
     return this._client.send(new AddPermissionCommand(params));
+  }
+
+  public async getPolicy(params: GetPolicyCommandInput): Promise<GetPolicyCommandOutput> {
+    return this._client.send(new GetPolicyCommand(params));
   }
 }
