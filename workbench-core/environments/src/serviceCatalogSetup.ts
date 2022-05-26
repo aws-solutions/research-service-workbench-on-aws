@@ -11,7 +11,7 @@ export default class ServiceCatalogSetup {
   private _constants: {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
-    PORTFOLIO_NAME: string;
+    SC_PORTFOLIO_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     STACK_NAME: string;
@@ -20,7 +20,7 @@ export default class ServiceCatalogSetup {
   public constructor(constants: {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
-    PORTFOLIO_NAME: string;
+    SC_PORTFOLIO_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     STACK_NAME: string;
@@ -34,15 +34,15 @@ export default class ServiceCatalogSetup {
   public async run(cfnFilePaths: string[]): Promise<void> {
     const {
       S3_ARTIFACT_BUCKET_SC_PREFIX,
-      PORTFOLIO_NAME,
+      SC_PORTFOLIO_NAME,
       STACK_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME
     } = this._constants;
-    const portfolioName = PORTFOLIO_NAME;
+    const portfolioName = SC_PORTFOLIO_NAME;
 
     // Create SC portfolio if portfolio doesn't exist
-    let portfolioId = await this._aws.helpers.serviceCatalog._getPortfolioId(portfolioName);
+    let portfolioId = await this._aws.helpers.serviceCatalog.getPortfolioId(portfolioName);
     if (portfolioId === undefined) {
       console.log('Creating new portfolio, because portfolio does not exist');
       portfolioId = await this._createSCPortfolio(portfolioName);

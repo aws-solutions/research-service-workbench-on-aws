@@ -12,8 +12,8 @@ export default class AccountHandler {
     // eslint-disable-next-line
     const hostingAccounts = await this._getAccountMetadata();
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
-    const portfolioName = process.env.PORTFOLIO_NAME!;
-    const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog._getPortfolioId(
+    const portfolioName = process.env.SC_PORTFOLIO_NAME!;
+    const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog.getPortfolioId(
       portfolioName
     );
     if (portfolioId === undefined) {

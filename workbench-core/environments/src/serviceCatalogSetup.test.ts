@@ -21,7 +21,7 @@ describe('ServiceCatalogSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     S3_ARTIFACT_BUCKET_SC_PREFIX: 'service-catalog-cfn-templates/',
-    PORTFOLIO_NAME: 'swb-dev-va',
+    SC_PORTFOLIO_NAME: 'swb-dev-va',
     S3_ARTIFACT_BUCKET_ARN_NAME: 'S3BucketArtifactsArnOutput',
     LAUNCH_CONSTRAINT_ROLE_NAME: 'LaunchConstraintIamRoleNameOutput',
     STACK_NAME: 'swb-dev-va'

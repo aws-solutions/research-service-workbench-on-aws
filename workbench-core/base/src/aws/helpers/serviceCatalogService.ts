@@ -11,7 +11,7 @@ export default class ServiceCatalogService {
    * Get portfolioId of a portfolio
    * @param portfolioName - name of the portfolio
    */
-  public async _getPortfolioId(portfolioName: string): Promise<string | undefined> {
+  public async getPortfolioId(portfolioName: string): Promise<string | undefined> {
     let portfolioDetails: PortfolioDetail[] = [];
     let pageToken: string | undefined = undefined;
     // Get all portfolios in the account
