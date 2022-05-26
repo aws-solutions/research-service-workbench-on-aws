@@ -1,5 +1,6 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+import AccountService from './accountService';
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
 
@@ -9,13 +10,16 @@ export default class AccountHandler {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
   public async execute(event: any): Promise<void> {
     // eslint-disable-next-line
-    const { hostingAccounts, externalId, portfolioId } = await this._getMetadataFromDB();
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService(
-      process.env.AWS_REGION!,
-      process.env.STACK_NAME!
+    const hostingAccounts = await this._getAccountMetadata();
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    const portfolioName = process.env.SC_PORTFOLIO_NAME!;
+    const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog.getPortfolioId(
+      portfolioName
     );
+    if (portfolioId === undefined) {
+      throw new Error(`Could not find portfolioId for portfolio: ${portfolioName}`);
+    }
 
-    // const cfService = new CloudformationService(this._mainAccountAwsService.clients.cloudformation);
     const cfService = this._mainAccountAwsService.helpers.cloudformation;
     const {
       [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName,
@@ -26,36 +30,41 @@ export default class AccountHandler {
     ]);
 
     for (const hostingAccount of hostingAccounts) {
-      const hostingAccountId = this._getAccountId(hostingAccount.arns.accountHandler);
+      const hostingAccountId = this._getAccountId(hostingAccount.accountHandlerRoleArn);
       let hostingAccountAwsService: AwsService;
       try {
         hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
-          roleArn: hostingAccount.arns.accountHandler,
+          roleArn: hostingAccount.accountHandlerRoleArn,
           roleSessionName: 'account-handler',
-          externalId: externalId as string,
+          externalId: hostingAccount.externalId,
           region: process.env.AWS_REGION!
         });
       } catch (e) {
         console.log(
-          `Cannot assume role ${hostingAccount.arns.accountHandler} for hosting account. Skipping setup for this account`
+          `Cannot assume role ${hostingAccount.accountHandlerRoleArn} for hosting account. Skipping setup for this account`
         );
         continue;
       }
 
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
       await hostingAccountLifecycleService.updateAccount({
+        ddbAccountId: hostingAccount.id,
         targetAccountId: hostingAccountId,
         targetAccountAwsService: hostingAccountAwsService,
         targetAccountStackName: hostingAccount.stackName,
         portfolioId,
         ssmDocNameSuffix: process.env.SSM_DOC_NAME_SUFFIX!,
-        principalArnForScPortfolio: hostingAccount.arns.envManagement,
+        principalArnForScPortfolio: hostingAccount.envMgmtRoleArn,
         roleToCopyToTargetAccount: launchConstraintRoleName,
         s3ArtifactBucketName
       });
     }
   }
 
+  /**
+   * Return 12 digit aws account id of the role
+   * @param iamRoleArn - IAM role arn
+   */
   private _getAccountId(iamRoleArn: string): string {
     const match = iamRoleArn.match(/::(\d{12}):role/);
     if (match) {
@@ -64,21 +73,28 @@ export default class AccountHandler {
     throw new Error(`Cannot find accountId from arn: ${iamRoleArn}`);
   }
 
-  // eslint-disable-next-line
-  private async _getMetadataFromDB(): Promise<{ [key: string]: any }> {
-    // TODO: Get this data from DDB
-    return Promise.resolve({
-      externalId: 'workbench',
-      hostingAccounts: [
-        {
-          arns: {
-            accountHandler: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-cross-account-role',
-            envManagement: 'arn:aws:iam::0123456789012:role/swb-dev-oh-account-1-env-mgmt'
-          },
-          stackName: `swb-dev-oh-account-1`
-        }
-      ],
-      portfolioId: 'port-4n4g66unobu34'
+  private async _getAccountMetadata(): Promise<
+    {
+      id: string;
+      stackName: string;
+      accountHandlerRoleArn: string;
+      envMgmtRoleArn: string;
+      externalId: string;
+    }[]
+  > {
+    const ddbTableName = process.env.STACK_NAME!;
+    const accountService = new AccountService(ddbTableName);
+
+    const accounts = await accountService.getAccounts();
+
+    return accounts.map((account) => {
+      return {
+        id: account.id!,
+        stackName: account.stackName,
+        accountHandlerRoleArn: account.accountHandlerRoleArn,
+        envMgmtRoleArn: account.envMgmtRoleArn,
+        externalId: account.externalId || ''
+      };
     });
   }
 }

@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
 import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
 import { wrapAsync } from './errorHandlers';
+import Boom from '@hapi/boom';
 
 export function setUpEnvRoutes(
   router: Router,
@@ -15,12 +16,19 @@ export function setUpEnvRoutes(
   router.post(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      const envType = req.body.envType;
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
+        if (req.body.id) {
+          throw Boom.badRequest(
+            'id cannot be passed in the request body when trying to launch a new environment'
+          );
+        }
         const env = await environmentService.createEnvironment(req.body);
         try {
-          await environments[req.body.envType].lifecycle.launch(env);
+          // We check that envType is in list of supportedEnvs before calling the environments object
+          //eslint-disable-next-line security/detect-object-injection
+          await environments[envType].lifecycle.launch(env);
         } catch (e) {
           // Update error state
           const errorMessage = e.message as string;
@@ -28,6 +36,7 @@ export function setUpEnvRoutes(
             error: { type: 'LAUNCH', value: errorMessage },
             status: 'FAILED'
           });
+          throw e;
         }
         res.status(201).send(env);
       } else {
@@ -40,10 +49,13 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      const env = await environmentService.getEnvironment(req.params.id!, true);
+      const envType = env.ETC.type;
+
+      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.terminate(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.terminate(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -55,10 +67,17 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
+      };
+      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
+
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.start(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.start(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -70,10 +89,17 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      if (supportedEnvs.includes(req.body.envType.toLocaleLowerCase())) {
+      // Get environment from DDB
+      const getEnvironment = async (envId: string): Promise<string> => {
+        const env = await environmentService.getEnvironment(envId, true);
+        return env.ETC.type;
+      };
+      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
+
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
-        // nosemgrep
-        const response = await environments[req.body.envType].lifecycle.stop(req.params.id);
+        //eslint-disable-next-line security/detect-object-injection
+        const response = await environments[envType].lifecycle.stop(req.params.id);
         res.send(response);
       } else {
         res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
@@ -85,19 +111,22 @@ export function setUpEnvRoutes(
   router.get(
     '/environments/:id/connections',
     wrapAsync(async (req: Request, res: Response) => {
-      // Mocked getEnvironment
-      const getEnvironment = (envId: string): { envType: string; instanceName: string } => {
-        console.log('envId', envId);
-        return { envType: 'sagemaker', instanceName: 'abc' };
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const instanceName = environment.instanceId!;
+      const envType = environment.ETC.type.toLocaleLowerCase();
+
+      const context = {
+        roleArn: environment.PROJ.envMgmtRoleArn,
+        externalId: environment.PROJ.externalId
       };
-      const { envType, instanceName } = getEnvironment(req.params.id);
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
-        const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName); // nosemgrep
+        const authCredResponse = await environments[envType].connection.getAuthCreds(instanceName, context);
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
-        const instructionResponse = await environments[envType].connection.getConnectionInstruction(); // nosemgrep
+        const instructionResponse = await environments[envType].connection.getConnectionInstruction();
         const response = {
           authCredResponse,
           instructionResponse
@@ -134,7 +163,6 @@ export function setUpEnvRoutes(
           status
         };
       }
-      // TODO: Handle environment not found
       // TODO: Add support for pagination with limit and pagination token
       const env = await environmentService.getEnvironments(user, filter);
       res.send(env);

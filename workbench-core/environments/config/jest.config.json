@@ -5,16 +5,18 @@
     "<rootDir>/src/hostingAccountService.ts",
     "<rootDir>/src/environmentConnectionService.ts",
     "<rootDir>/src/environmentLifecycleService.ts",
+    "<rootDir>/src/environmentLifecycleHelper.ts",
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
+    "<rootDir>/src/accountHandler.ts",
     "<rootDir>/src/index.ts"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 70,
-      "functions": 70,
-      "lines": 70,
-      "statements": 70
+      "branches": 35,
+      "functions": 40,
+      "lines": 40,
+      "statements": 40
     }
   },
   "coverageReporters": ["json-summary", "json"]

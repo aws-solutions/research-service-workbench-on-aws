@@ -45,3 +45,12 @@ directory of this project to build the `lib` folders from scratch.
 **How do I see which line of code my unit tests did not cover?**
 
 Run `rushx jest --coverage`
+
+**Cannot find module in `common/temp`**
+
+Your `node_modules`  might have been corrupted. Try the following command
+```
+rush purge
+rush install
+rush build
+```

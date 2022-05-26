@@ -3,93 +3,128 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { EnvironmentLifecycleService, EnvironmentLifecycleHelper } from '@amzn/environments';
+import _ = require('lodash');
+import {
+  EnvironmentLifecycleService,
+  EnvironmentLifecycleHelper,
+  EnvironmentService
+} from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 import { v4 as uuidv4 } from 'uuid';
 
 export default class SagemakerEnvironmentLifecycleService implements EnvironmentLifecycleService {
   public helper: EnvironmentLifecycleHelper;
   public aws: AwsService;
+  public envService: EnvironmentService;
   public constructor() {
     this.helper = new EnvironmentLifecycleHelper();
-    this.aws = new AwsService({ region: process.env.AWS_REGION! });
+    this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
+    this.envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
-    // Check if launch operation is valid for request body
-    if (envMetadata.envId) {
-      throw new Error('envId cannot be passed in the request body when trying to launch a new environment');
-    }
-    const mainEventBusArn = await this.helper.getMainEventBusArn();
+    const cidr = _.find(envMetadata.ETC.params, { key: 'CIDR' })!.value!;
+    const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
+    const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
+      .value!;
 
-    const productId = 'prod-q4zwyzxpt5c7c';
-    // TODO: All these values will be pulled from DDB for the given hosting account and for the given envTypeConfig
     const ssmParameters = {
-      InstanceName: ['basicnotebookinstance-sampleInstanceName'],
-      VPC: ['vpc-028df59e55564dccd'],
-      Subnet: ['subnet-0dee693d27b04fe37'],
-      ProvisioningArtifactId: ['pa-3lex77o7ju3qw'],
-      ProductId: [productId],
-      Namespace: ['swbv2-test'],
-      EncryptionKeyArn: ['sampleEncryptionKeyArn'],
-      CIDR: ['1.1.1.1/32'],
-      PathId: ['samplePathId'],
-      EventBusName: [mainEventBusArn]
+      InstanceName: [`basicnotebookinstance-${Date.now()}`],
+      VPC: [envMetadata.PROJ.vpcId],
+      Subnet: [envMetadata.PROJ.subnetId],
+      ProvisioningArtifactId: [envMetadata.ETC.provisioningArtifactId],
+      ProductId: [envMetadata.ETC.productId],
+      Namespace: [`sagemaker-${Date.now()}`],
+      EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
+      CIDR: [cidr],
+      InstanceType: [instanceSize],
+      EventBusName: [envMetadata.PROJ.hostingAccountEventBusArn],
+      EnvId: [envMetadata.id],
+      EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
+      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
+      EventBridgeStatusUpdateEventType: [process.env.EB_EVENT_TYPE_STATUS_UPDATE!]
     };
 
-    const responseHost = await this.helper.launch({
+    await this.helper.launch({
       ssmParameters,
       operation: 'Launch',
-      envType: 'Sagemaker',
-      accountId: envMetadata.accountId,
-      productId
+      envType: 'sagemaker',
+      envMetadata
     });
-    return Promise.resolve(responseHost);
+
+    return { ...envMetadata, status: 'PENDING' };
   }
 
   public async terminate(envId: string): Promise<{ [id: string]: string }> {
-    // TODO: Get envMetadata for the given envId from DDB
-    const envMetadata = { envId, accountId: 'placeholderAccountId' };
+    // Get value from env in DDB
+    const envDetails = await this.envService.getEnvironment(envId, true);
+    const eventBusArn = envDetails.PROJ.hostingAccountEventBusArn;
+    const provisionedProductId = envDetails.provisionedProductId!; // This is updated by status handler
 
-    const mainEventBusArn = await this.helper.getMainEventBusArn();
-
-    // TODO: All these values will be pulled from DDB for the given hosting account
     const ssmParameters = {
-      ProvisionedProductId: ['sampleProvisionedProductId'],
+      ProvisionedProductId: [provisionedProductId],
       TerminateToken: [uuidv4()],
-      InstanceName: ['basicnotebookinstance-sampleInstanceName'],
-      EventBusName: [mainEventBusArn]
+      EventBusName: [eventBusArn],
+      EnvId: [envId],
+      EventBridgeStatusUpdateEventType: [process.env.EB_EVENT_TYPE_STATUS_UPDATE!]
     };
 
-    const responseHost = await this.helper.executeSSMDocument({
+    // Execute termination doc
+    await this.helper.executeSSMDocument({
       ssmParameters,
       operation: 'Terminate',
-      envType: 'Sagemaker',
-      accountId: envMetadata.accountId
+      envType: 'sagemaker',
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId
     });
-    return Promise.resolve(responseHost);
+
+    // Store env row in DDB
+    await this.envService.updateEnvironment(envId, { status: 'TERMINATING' });
+
+    return { envId, status: 'TERMINATING' };
   }
 
   public async start(envId: string): Promise<{ [id: string]: string }> {
-    /*
-      TODO
-       1. Get instance details from DDB for the given envId
-       2. Assume hosting account IAM role
-       3. Use SDK API to start instance using `start-notebook-instance` command
-       4. Write to DDB that envStatus is STARTING
-    */
-    return { envId }; // This would contain an object containing envMetadata details with status "STARTING"
+    // Get value from env in DDB
+    const envDetails = await this.envService.getEnvironment(envId, true);
+    const instanceName = envDetails.instanceId;
+
+    // Assume hosting account EnvMgmt role
+    const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId,
+      operation: 'Start',
+      envType: 'sagemaker'
+    });
+
+    await hostAwsSdk.clients.sagemaker.startNotebookInstance({ NotebookInstanceName: instanceName });
+
+    // Store env row in DDB
+    await this.envService.updateEnvironment(envId, { status: 'STARTING' });
+
+    return { envId, status: 'STARTING' };
   }
 
   public async stop(envId: string): Promise<{ [id: string]: string }> {
-    /*
-      TODO
-       1. Get instance details from DDB for the given envId
-       2. Assume hosting account IAM role
-       3. Use SDK API to stop instance using `stop-notebook-instance` command
-       4. Write to DDB that envStatus is STOPPING
-    */
+    // Get value from env in DDB
+    const envDetails = await this.envService.getEnvironment(envId, true);
+    const instanceName = envDetails.instanceId;
 
-    return { envId }; // This would contain an object containing envMetadata details with status "STOPPING"
+    // Assume hosting account EnvMgmt role
+    const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
+      envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
+      externalId: envDetails.PROJ.externalId,
+      operation: 'Start',
+      envType: 'sagemaker'
+    });
+
+    await hostAwsSdk.clients.sagemaker.stopNotebookInstance({ NotebookInstanceName: instanceName });
+
+    envDetails.status = 'STOPPING';
+
+    // Store env row in DDB
+    await this.envService.updateEnvironment(envId, { status: 'STOPPING' });
+
+    return { envId, status: 'STOPPING' };
   }
 }
