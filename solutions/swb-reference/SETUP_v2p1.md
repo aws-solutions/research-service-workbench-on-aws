@@ -240,10 +240,12 @@ Replace `:id` with the `id` value from launching the environment. In the respons
 into the browser to view your Sagemaker instance.
 
 **Stop an Environment**
+
 PUT `{{API_URL}}/environments/:id/stop`
 Replace `:id` with the `id` value from launching the environment.
 
 **Start an Environment**
+
 PUT `{{API_URL}}/environments/:id/start`
 Replace `:id` with the `id` value from launching the environment.
 
