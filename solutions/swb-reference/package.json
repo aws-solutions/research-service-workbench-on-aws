@@ -1,7 +1,7 @@
 {
   "name": "@amzn/swb-reference",
   "version": "0.0.1",
-  "description": "Example implementation of SWB. This package has a depende =bcy on swb-app and workbench-core packages. No other package should depend on this package.",
+  "description": "Example implementation of SWB. This package has a dependency on swb-app and workbench-core packages. No other package should depend on this package.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
