@@ -1,5 +1,8 @@
 jest.mock('../utils', () => ({
-  getTimeInSeconds: jest.fn().mockReturnValue(1)
+  getTimeInSeconds: jest.fn().mockImplementation((length, units) => {
+    if (length && units) return 1;
+    return 0;
+  })
 }));
 
 import axios from 'axios';
@@ -18,6 +21,8 @@ import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 import {
   CognitoIdentityProviderClient,
   DescribeUserPoolClientCommandOutput,
+  NotAuthorizedException,
+  ResourceNotFoundException,
   TimeUnitsType
 } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -559,5 +564,59 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       }
     );
+  });
+
+  it('_getEncodedClientId should return a base64 encoded string representation of clientId:clientSecret', () => {
+    const encodedId = plugin['_getEncodedClientId']();
+
+    expect(encodedId).toBe(encodedClientId);
+  });
+
+  it('_getEncodedClientId should return a TokensExpiration object when user pool has token expiration defined', async () => {
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+
+    const tokens = await plugin['_getTokensExpiration']();
+
+    expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
+  });
+
+  it('_getEncodedClientId should return a TokensExpiration object when user pool doesnt have token expiration defined', async () => {
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.resolve({}));
+
+    const tokens = await plugin['_getTokensExpiration']();
+
+    expect(tokens).toMatchObject({ idToken: 0, accessToken: 0, refreshToken: 0 });
+  });
+
+  it('_getEncodedClientId should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.reject(new NotAuthorizedException({ $metadata: {} })));
+
+    await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      new PluginConfigurationError('service is not authorized to perform this action. Check IAM permissions')
+    );
+  });
+
+  it('_getEncodedClientId should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.reject(new ResourceNotFoundException({ $metadata: {} })));
+
+    await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      new PluginConfigurationError('invalid user pool id or client id')
+    );
+  });
+
+  it('_getEncodedClientId should rethrow an error when the error is unexpected', async () => {
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.reject(new Error()));
+
+    await expect(plugin['_getTokensExpiration']()).rejects.toThrow(Error);
   });
 });

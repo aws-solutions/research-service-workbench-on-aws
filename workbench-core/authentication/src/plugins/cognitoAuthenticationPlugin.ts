@@ -382,7 +382,14 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         refreshToken: getTimeInSeconds(refreshLength, expiresInUnits?.RefreshToken as TimeUnitsType)
       };
     } catch (error) {
-      // TODO figure out what type of errors are thrown
+      if (error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(
+          'service is not authorized to perform this action. Check IAM permissions'
+        );
+      }
+      if (error.name === 'ResourceNotFoundException') {
+        throw new PluginConfigurationError('invalid user pool id or client id');
+      }
       throw error;
     }
   }
