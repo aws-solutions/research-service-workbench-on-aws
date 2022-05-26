@@ -18,7 +18,6 @@ These manual steps will not be required in the final implementation of SWBv2.
 
 ## Installation
 ### Set up Config File
-1. In root directory at `ma-mono` run `rush install`
 1. Navigate to `solutions/swb-reference`.
 1. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
@@ -32,6 +31,8 @@ We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onbo
 In `swb-reference` root directory run the follow code
 ```
 rush install
+rushx build
+rushx compile
 STAGE=<STAGE> rushx cdk bootstrap
 ```
 
