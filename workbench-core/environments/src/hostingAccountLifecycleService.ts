@@ -7,23 +7,25 @@ import _ = require('lodash');
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
-import AccountsService from './accountsService';
+import AccountService from './accountService';
 import { Readable } from 'stream';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import { HostingAccountStatus } from './hostingAccountStatus';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
+  private _accountService: AccountService;
   public constructor() {
     this._stackName = process.env.STACK_NAME!;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
+    const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
+    this._accountService = new AccountService(ddbTableName);
   }
 
   public async initializeAccount(accountMetadata: {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
-    const accountsService = new AccountsService();
-
     const cfService = this._aws.helpers.cloudformation;
     const { [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn } = await cfService.getCfnOutput(
       this._stackName,
@@ -34,12 +36,13 @@ export default class HostingAccountLifecycleService {
     await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
 
     // Finally store the new/updated account details in DDB
-    return accountsService.createOrUpdate(accountMetadata);
+    return this._accountService.createOrUpdate(accountMetadata);
   }
 
   /**
    * Update target account with resources required for launching environments in the account
    * @param params - Listed below
+   * ddbAccountId - id of DDB item with resourceType = 'account'
    * targetAccountId - Account where resources should be set up.
    * targetAccountAwsService - awsService used for setting up the account.
    * targetAccountStackName - StackName of Cloudformation Stack used to set up account's base resources.
@@ -50,6 +53,7 @@ export default class HostingAccountLifecycleService {
    * s3ArtifactBucketName - S3 bucket that contains CFN Template for target account.
    */
   public async updateAccount(params: {
+    ddbAccountId: string;
     targetAccountId: string;
     targetAccountAwsService: AwsService;
     targetAccountStackName: string;
@@ -61,6 +65,7 @@ export default class HostingAccountLifecycleService {
   }): Promise<void> {
     console.log('Updating account');
     const {
+      ddbAccountId,
       targetAccountId,
       targetAccountAwsService,
       targetAccountStackName,
@@ -72,7 +77,7 @@ export default class HostingAccountLifecycleService {
     } = params;
     const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
     await this._shareSSMDocument(ssmDocuments, targetAccountId);
-    await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
+    await this._shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
     await this._shareAndAcceptScPortfolio(
       targetAccountAwsService,
       targetAccountId as string,
@@ -89,6 +94,7 @@ export default class HostingAccountLifecycleService {
     await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
 
     await this._updateHostingAccountStatus(
+      ddbAccountId,
       s3ArtifactBucketName,
       targetAccountAwsService,
       targetAccountStackName
@@ -96,6 +102,7 @@ export default class HostingAccountLifecycleService {
   }
 
   private async _updateHostingAccountStatus(
+    ddbAccountId: string,
     s3ArtifactBucketName: string,
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
@@ -127,37 +134,46 @@ export default class HostingAccountLifecycleService {
     const describeStackResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
-    let vpcId: string | undefined;
-    let subnetId: string | undefined;
     const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
     if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
       const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
-      vpcId = outputs.find((output) => {
+      const vpcId = outputs.find((output) => {
         return output.OutputKey === 'VPC';
       })!.OutputValue;
-      subnetId = outputs.find((output) => {
+      const subnetId = outputs.find((output) => {
         return output.OutputKey === 'VpcSubnet';
       })!.OutputValue;
 
       if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-        await this._writeAccountStatusToDDB({ status: 'UP_TO_DATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'CURRENT', vpcId, subnetId });
       } else {
-        await this._writeAccountStatusToDDB({ status: 'NEEDS_UPDATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'NEEDS_UPDATE', vpcId, subnetId });
       }
     } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
-      await this._writeAccountStatusToDDB({ status: 'ERRORED', vpcId, subnetId });
+      await this._writeAccountStatusToDDB({ ddbAccountId, status: 'ERRORED' });
     }
   }
 
   private async _writeAccountStatusToDDB(param: {
-    status: 'UP_TO_DATE' | 'NEEDS_UPDATE' | 'ERRORED';
-    vpcId: string | undefined;
-    subnetId: string | undefined;
+    ddbAccountId: string;
+    status: HostingAccountStatus;
+    vpcId?: string;
+    subnetId?: string;
   }): Promise<void> {
+    const updateParam: { id: string; status: string; vpcId?: string; subnetId?: string } = {
+      id: param.ddbAccountId,
+      status: param.status
+    };
+    if (param.vpcId) {
+      updateParam.vpcId = param.vpcId;
+    }
+    if (param.subnetId) {
+      updateParam.subnetId = param.subnetId;
+    }
     console.log('_writeAccountStatusToDDB param', param);
-    // TODO: Write above values to DDB. If vpcId or subnetId is undefined, don't write those 2 values to DDB
+    await this._accountService.update(updateParam);
   }
 
   private async _shareAndAcceptScPortfolio(
@@ -281,7 +297,7 @@ export default class HostingAccountLifecycleService {
     }
   }
 
-  public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+  private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {

@@ -5,7 +5,7 @@ import { join } from 'path';
 function getConstants(): {
   STAGE: string;
   STACK_NAME: string;
-  PORTFOLIO_NAME: string;
+  SC_PORTFOLIO_NAME: string;
   AWS_REGION: string;
   SSM_DOC_NAME_SUFFIX: string;
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
@@ -25,7 +25,7 @@ function getConstants(): {
   );
 
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
-  const PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+  const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
   const AWS_REGION = config.awsRegion;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
@@ -42,7 +42,7 @@ function getConstants(): {
   return {
     STAGE: config.stage,
     STACK_NAME,
-    PORTFOLIO_NAME,
+    SC_PORTFOLIO_NAME,
     AWS_REGION,
     SSM_DOC_NAME_SUFFIX,
     S3_ARTIFACT_BUCKET_ARN_NAME,

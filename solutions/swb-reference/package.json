@@ -17,7 +17,7 @@
     "compile": "scripts/buildLambda.js",
     "build": "heft build --clean",
     "run-postDeployment": "rush build && node lib/postDeployment.js",
-    "cdk-deploy": "rush build && rushx compile && cdk deploy --all",
+    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never",
     "jest": "jest"
   },
   "dependencies": {
