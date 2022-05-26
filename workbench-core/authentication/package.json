@@ -1,7 +1,7 @@
 {
   "name": "@amzn/workbench-core-authentication",
   "version": "0.0.1",
-  "description": "",
+  "description": "Package to handle server-side authentication",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
