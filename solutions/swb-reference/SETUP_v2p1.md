@@ -90,7 +90,7 @@ MainAccountEventBusArn: <CFN_OUTPUT.EventBusOutput>
 StatusHandlerRoleArn: <CFN_OUTPUT.StatusHandlerLambdaRoleOutput>
 ```
 
-After the deployment is complete, take note of the following Cloudformation outputs. The outputs are on the `Outputs` tab. We will be using it in the next step
+After the deployment is complete, take note of the following Cloudformation outputs. The outputs are on the `Outputs` tab. We will be using in future steps
 ```
 CrossAccountHandlerRoleArn
 EncryptionKeyArn
@@ -143,7 +143,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of
 the following values
 * productId: `Product ID` of `sagemaker` product
-* provisioningArtifactId: This value can be find by clicking on the `sagemaker` product. There should be one version of the 
+* provisioningArtifactId: This value can be found by clicking on the `sagemaker` product. There should be one version of the 
 `sagemaker` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
 
 ```json
@@ -206,7 +206,7 @@ POST `{{API_URL}}/aws-accounts`
 }
 ```
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
-is listed as `COMPLETED` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
+is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
 # Test the API
 
@@ -239,7 +239,7 @@ Replace `:id` with the `id` value from launching the environment. In the respons
 **Connect to Environment**
 
 GET `{{API_URL}}/environments/:id/connections`
-Replace `:id` with the `id` value from launching the environment. In the response you'll find a `url`. C/p that `url`
+Replace `:id` with the `id` value from launching the environment. In the response you'll find a `url`. Copy and paste that `url`
 into the browser to view your Sagemaker instance.
 
 **Terminate the Environment**
