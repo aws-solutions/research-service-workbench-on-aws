@@ -37,10 +37,6 @@ Parameters:
     Type: String
     Description: The arn of accountHandler role
 
-  MainAccountEventBusArn:
-    Type: String
-    Description: The arn of the event bus in the main account's EventBridge service
-
   # Generous subnet allocation of 8192 addresses
   # Range from 10.0.0.0 to 10.0.31.255
   PublicSubnetCidr:
@@ -113,7 +109,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - events:PutEvents
-                Resource: !GetAtt [HostEventBus, Arn]
+                Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
         - PolicyName: cfn-access
           PolicyDocument:
             Version: '2012-10-17'
@@ -235,7 +231,7 @@ Resources:
           - Effect: Allow
             Action:
               - events:PutEvents
-            Resource: !GetAtt [HostEventBus, Arn]
+            Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
           - Effect: Allow
             Action:
               - s3:*
@@ -518,28 +514,31 @@ Resources:
       AliasName: !Join ['', ['alias/', Ref: Namespace, '-encryption-key']]
       TargetKeyId: !Ref EncryptionKey
 
-  HostEventBus:
-    Type: AWS::Events::EventBus
-    Properties:
-      Name: !Ref Namespace
-
-  EventRuleMainRouting:
+  StateChangeEventRuleMainRouting:
     Type: 'AWS::Events::Rule'
     Properties:
-      Description: Routes to the main event bus
-      EventBusName: !Ref HostEventBus
+      Description: Routes environment state changes to the main event bus
+      EventBusName: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
       State: ENABLED
       EventPattern:
         account:
           - !Ref 'AWS::AccountId'
+        detail-type:
+          - anything-but: 'AWS API Call via CloudTrail'
+        source:
+          - anything-but:
+            - 'aws-config'
+            - 'aws-cloudtrail'
+            - 'aws-ssm'
+            - 'aws-tag'
       Targets:
-        - Arn: !Ref MainAccountEventBusArn
+        - Arn: !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
           Id: 'MainAccountRoutingRule'
           RoleArn: !GetAtt 
-            - EventBridgeIAMrole
+            - StateChangeEventBridgeIAMrole
             - Arn
 
-  EventBridgeIAMrole:
+  StateChangeEventBridgeIAMrole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -551,7 +550,7 @@ Resources:
             Action: 'sts:AssumeRole'
           - Effect: Allow
             Principal:
-              Service: ssm.amazonaws.com
+              Service: sagemaker.amazonaws.com
             Action: 'sts:AssumeRole'
       Path: /
       Policies:
@@ -563,7 +562,7 @@ Resources:
                 Action:
                   - 'events:Put*'
                 Resource:
-                  - !Ref MainAccountEventBusArn
+                  - !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
 
 Outputs:
   EnvMgmtRoleArn:
@@ -589,7 +588,4 @@ Outputs:
   PublicRouteTableId:
     Description: The public route table assigned to the workspace VPC
     Value: !Ref PublicRouteTable
-
-  HostEventBusArn:
-    Description: The arn of the hosting account EventBus
-    Value: !GetAtt [HostEventBus, Arn]
+    

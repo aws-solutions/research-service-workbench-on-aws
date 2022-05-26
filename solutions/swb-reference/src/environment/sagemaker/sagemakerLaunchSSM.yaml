@@ -33,9 +33,6 @@ parameters:
   PathId:
     type: String
     description: 'The Path ID for the Service Catalog product.'
-  EventBusName:
-    type: String
-    description: 'The main account event bridge bus name.'
   EnvironmentInstanceFiles:
     type: String
     description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
@@ -43,9 +40,6 @@ parameters:
     type: String
     description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
     default: '0'
-  EventBridgeStatusUpdateEventType:
-    type: String
-    description: 'The string value used by main account to filter host events'
   InstanceType:
     type: String
     description: 'The size of the notebook instance coming from environment type config'
@@ -115,9 +109,9 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
-          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
@@ -126,7 +120,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
-          DetailType: '{{ EventBridgeStatusUpdateEventType }}'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

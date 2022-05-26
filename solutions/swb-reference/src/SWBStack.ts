@@ -2,7 +2,7 @@
 /* eslint-disable no-new */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -19,12 +19,10 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-    MAIN_ACCOUNT_BUS_ARN_NAME: string;
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
-    EB_EVENT_TYPE_STATUS_UPDATE: string;
     SC_PORTFOLIO_NAME: string;
   };
   public constructor(app: App) {
@@ -35,10 +33,8 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
-      MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE,
       SC_PORTFOLIO_NAME
     } = getConstants();
 
@@ -54,12 +50,10 @@ export class SWBStack extends Stack {
       STAGE,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
-      MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE,
       SC_PORTFOLIO_NAME
     };
 
@@ -74,8 +68,6 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
-
-    this._createEventBridgeResources();
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -234,16 +226,6 @@ export class SWBStack extends Stack {
     return s3Bucket;
   }
 
-  private _createEventBridgeResources(): void {
-    const bus = new EventBus(this, 'bus', {
-      eventBusName: this.stackName
-    });
-
-    new CfnOutput(this, 'EventBusOutput', {
-      value: bus.eventBusArn
-    });
-  }
-
   private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
@@ -251,6 +233,11 @@ export class SWBStack extends Stack {
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60)
+    });
+
+    statusHandlerLambda.addPermission('RouteHostEvents', {
+      action: 'lambda:InvokeFunction',
+      principal: new ServicePrincipal('events.amazonaws.com')
     });
 
     statusHandlerLambda.role?.attachInlinePolicy(
@@ -390,7 +377,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/${this.stackName}`],
+            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
@@ -416,10 +403,6 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
-          }),
-          new PolicyStatement({
-            actions: ['lambda:AddPermission'],
-            resources: [statusHandlerLambdaArn]
           })
         ]
       })

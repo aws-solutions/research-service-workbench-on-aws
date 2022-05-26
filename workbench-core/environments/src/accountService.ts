@@ -14,7 +14,6 @@ import { HostingAccountStatus } from './hostingAccountStatus';
 interface Account {
   id: string | undefined;
   awsAccountId: string;
-  hostingAccountEventBusArn: string;
   envMgmtRoleArn: string;
   error: { type: string; value: string } | undefined;
   accountHandlerRoleArn: string;
@@ -51,6 +50,14 @@ export default class AccountService {
     } else {
       throw Boom.notFound(`Could not find account ${accountId}`);
     }
+  }
+
+  public async createOrUpdate(accountMetadata: {
+    [key: string]: string;
+  }): Promise<{ [key: string]: string }> {
+    if (_.isUndefined(accountMetadata.id)) return this.create(accountMetadata);
+
+    return this.update(accountMetadata);
   }
 
   public async getAccounts(): Promise<Account[]> {
@@ -131,7 +138,6 @@ export default class AccountService {
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
-        eventBusArn: accountMetadata.eventBusArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,

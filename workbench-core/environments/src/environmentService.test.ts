@@ -86,7 +86,6 @@ describe('EnvironmentService', () => {
     productId: 'prod-t5q2vqlgvd76o'
   };
   const projItem = {
-    hostingAccountEventBusArn: 'arn:aws:events:us-east-2:123456789012:event-bus/swb-dev-oh',
     subnetId: 'subnet-07f475d83291a3603',
     accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',

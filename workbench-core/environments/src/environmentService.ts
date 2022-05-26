@@ -296,7 +296,6 @@ export default class EnvironmentService {
       vpcId: project.vpcId,
       subnetId: project.subnetId,
       externalId: project.externalId,
-      hostingAccountEventBusArn: project.hostingAccountEventBusArn,
       environmentInstanceFiles: project.environmentInstanceFiles,
       awsAccountId: project.awsAccountId
     });

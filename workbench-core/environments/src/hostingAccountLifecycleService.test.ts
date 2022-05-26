@@ -31,7 +31,6 @@ describe('HostingAccountLifecycleService', () => {
   // beforeEach(() => {
   //   jest.resetModules(); // Most important - it clears the cache
   //   process.env = { ...ORIGINAL_ENV }; // Make a copy
-  //   process.env.MAIN_ACCOUNT_BUS_ARN_NAME = 'SampleMainAccountBusArn';
   //   process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
   //   process.env.STACK_NAME = 'swb-swbv2-va';
   //   process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
@@ -50,10 +49,6 @@ describe('HostingAccountLifecycleService', () => {
   //         StackStatus: 'CREATE_COMPLETE',
   //         CreationTime: new Date(),
   //         Outputs: [
-  //           {
-  //             OutputKey: process.env.MAIN_ACCOUNT_BUS_ARN_NAME,
-  //             OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
-  //           },
   //           {
   //             OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
   //             OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'

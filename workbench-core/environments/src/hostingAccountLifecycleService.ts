@@ -27,30 +27,16 @@ export default class HostingAccountLifecycleService {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
     const cfService = this._aws.helpers.cloudformation;
-    const {
-      [process.env.MAIN_ACCOUNT_BUS_ARN_NAME!]: mainAccountBusArn,
-      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn
-    } = await cfService.getCfnOutput(this._stackName, [
-      process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
-      process.env.STATUS_HANDLER_ARN_NAME!
-    ]);
-
-    // // Update main account event bus to accept hosting account events
-    await this.updateEventBridgePermissions(
-      mainAccountBusArn,
-      statusHandlerArn,
-      accountMetadata.awsAccountId
+    const { [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn } = await cfService.getCfnOutput(
+      this._stackName,
+      [process.env.STATUS_HANDLER_ARN_NAME!]
     );
 
-    // Finally store the new/updated account details in DDB
-    let accountDetails;
-    if (_.isUndefined(accountMetadata.id)) {
-      accountDetails = await this._accountService.create({ ...accountMetadata, status: 'PENDING' });
-    } else {
-      accountDetails = await this._accountService.update(accountMetadata);
-    }
+    // Update main account default event bus to accept hosting account state change events
+    await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
 
-    return accountDetails;
+    // Finally store the new/updated account details in DDB
+    return this._accountService.createOrUpdate(accountMetadata);
   }
 
   /**
@@ -216,16 +202,18 @@ export default class HostingAccountLifecycleService {
       PrincipalType: 'IAM'
     });
   }
+  /** Update main account default event bus to accept hosting account state change events
+   ** Also update its rule to add the new hosting account ID if it wasn't already present
+   * @param statusHandlerArn - The ARN of StatusHandler lambda which becomes the target of the default bus rule
+   * @param awsAccountId - The hosting account ID that needs to have permission to put events to the main default bus
+   */
+  public async updateBusPermissions(statusHandlerArn: string, awsAccountId: string): Promise<void> {
+    const busName = 'default';
 
-  public async updateEventBridgePermissions(
-    mainAccountBusArn: string,
-    statusHandlerArn: string,
-    awsAccountId: string
-  ): Promise<void> {
-    const mainAccountBusName = mainAccountBusArn.split('/')[1];
+    // TODO: Figure out how to include all accounts IDs in a single statement
     const params = {
       Action: 'events:PutEvents',
-      EventBusName: mainAccountBusName,
+      EventBusName: busName,
       Principal: awsAccountId,
       StatementId: `Allow-main-account-to-get-${awsAccountId}-events`
     };
@@ -235,48 +223,45 @@ export default class HostingAccountLifecycleService {
 
     let busRule;
     const busRuleName = 'RouteHostEvents';
-    const describeRuleParams = { Name: busRuleName, EventBusName: mainAccountBusName };
+    const describeRuleParams = { Name: busRuleName, EventBusName: busName };
 
     try {
       // Describe rule to see if it exists
       busRule = await this._aws.clients.eventBridge.describeRule(describeRuleParams);
+
+      const putRuleParams = {
+        Name: busRuleName,
+        EventPattern: JSON.stringify({
+          account: busRule?.EventPattern
+            ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
+            : [awsAccountId],
+          source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
+          'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+        }),
+        EventBusName: busName
+      };
+      // Create/update rule for main account event bus
+      await this._aws.clients.eventBridge.putRule(putRuleParams);
     } catch (e) {
       if (e instanceof ResourceNotFoundException) {
-        console.log(
-          'Onboarding first hosting account for the main event bus. Setting up status handler lambda permissions.'
-        );
-
-        const addPermissionParams = {
-          StatementId: `AWSEvents_${busRuleName}`,
-          Action: 'lambda:InvokeFunction',
-          FunctionName: statusHandlerArn,
-          Principal: 'events.amazonaws.com'
+        const putRuleParams = {
+          Name: busRuleName,
+          EventPattern: JSON.stringify({
+            account: [awsAccountId],
+            source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
+            'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+          }),
+          EventBusName: busName
         };
-
-        // Add permissions on status handler lambda to get events from eventbridge
-        await this._aws.clients.lambda.addPermission(addPermissionParams);
+        // Create rule for main account event bus
+        await this._aws.clients.eventBridge.putRule(putRuleParams);
       } else {
         throw e;
       }
     }
 
-    const putRuleParams = {
-      Name: busRuleName,
-      EventPattern: JSON.stringify({
-        account: busRule?.EventPattern
-          ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
-          : [awsAccountId],
-        // Filter out CloudTrail noise
-        'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
-      }),
-      EventBusName: mainAccountBusName
-    };
-
-    // Create/update rule for main account event bus
-    await this._aws.clients.eventBridge.putRule(putRuleParams);
-
     const putTargetsParams = {
-      EventBusName: mainAccountBusName,
+      EventBusName: busName,
       Rule: busRuleName,
       Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
     };
