@@ -46,7 +46,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
-          DetailType: 'TerminateSagemaker'
+          DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
@@ -57,7 +57,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED" }'
-          DetailType: 'TerminateSagemaker'
+          DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

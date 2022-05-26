@@ -109,7 +109,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
-          DetailType: 'LaunchSagemaker'
+          DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
@@ -120,7 +120,7 @@ mainSteps:
       Api: PutEvents
       Entries:
         - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
-          DetailType: 'LaunchSagemaker'
+          DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

@@ -377,10 +377,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
-            resources: [
-              `arn:aws:events:${AWS_REGION}:${this.account}:event-bus/${this.stackName}`,
-              `arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`
-            ],
+            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
           new PolicyStatement({
