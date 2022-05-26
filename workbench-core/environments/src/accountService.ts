@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import environmentResourceTypeToKey from './environmentResourceTypeToKey';
+import { HostingAccountStatus } from './hostingAccountStatus';
 
 interface Account {
   id: string | undefined;
@@ -23,13 +25,13 @@ interface Account {
   encryptionKeyArn: string;
   externalId?: string;
   stackName: string;
+  status: HostingAccountStatus;
 }
-export default class AccountsService {
+export default class AccountService {
   private _aws: AwsService;
-  private _stackName: string;
-  public constructor() {
-    this._stackName = process.env.STACK_NAME!;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: this._stackName });
+
+  public constructor(tableName: string) {
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: tableName });
   }
 
   /**
@@ -38,20 +40,39 @@ export default class AccountsService {
    */
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
-      .get({ pk: `ACC#${accountId}`, sk: `ACC#${accountId}` })
+      .get({
+        pk: `${environmentResourceTypeToKey.account}#${accountId}`,
+        sk: `${environmentResourceTypeToKey.account}#${accountId}`
+      })
       .execute()) as GetItemCommandOutput;
 
-    if ('Item' in accountEntry && accountEntry.Item) {
+    if (accountEntry.Item) {
       return accountEntry.Item! as unknown as Account;
     } else {
       throw Boom.notFound(`Could not find account ${accountId}`);
     }
   }
 
+  public async getAccounts(): Promise<Account[]> {
+    const queryParams = {
+      index: 'getResourceByUpdatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    };
+    const response = await this._aws.helpers.ddb.query(queryParams).execute();
+    let accounts: Account[] = [];
+    if (response && response.Items) {
+      accounts = response.Items.map((item) => {
+        return item as unknown as Account;
+      });
+    }
+    return accounts;
+  }
+
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
+    const id = uuidv4();
 
-    const id = await this.storeToDdb(accountMetadata);
+    await this._storeToDdb({ id, ...accountMetadata });
 
     return { id, ...accountMetadata };
   }
@@ -61,7 +82,7 @@ export default class AccountsService {
 
     console.log(JSON.stringify(accountMetadata));
 
-    const id = await this.storeToDdb(accountMetadata);
+    const id = await this._storeToDdb(accountMetadata);
 
     return { id, ...accountMetadata };
   }
@@ -102,21 +123,21 @@ export default class AccountsService {
   /*
    * Store hosting account information in DDB
    */
-  public async storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
+  private async _storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
     const accountKey = { pk: `ACC#${accountMetadata.id}`, sk: `ACC#${accountMetadata.id}` };
     const accountParams: { item: { [key: string]: string } } = {
       item: {
-        id: accountMetadata.id || uuidv4(),
-        accountId: accountMetadata.id,
+        id: accountMetadata.id,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
         eventBusArn: accountMetadata.eventBusArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
-        cidr: accountMetadata.cidr,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,
         environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        stackName: accountMetadata.stackName,
+        status: accountMetadata.status,
         resourceType: 'account'
       }
     };
@@ -129,21 +150,23 @@ export default class AccountsService {
     // Store Account row in DDB
     await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
 
-    const awsAccountKey = {
-      pk: `AWSACC#${accountMetadata.awsAccountId}`,
-      sk: `ACC#${accountMetadata.id}`
-    };
-    const awsAccountParams = {
-      item: {
-        id: accountMetadata.awsAccountId,
-        accountId: accountMetadata.id,
-        awsAccountId: accountMetadata.awsAccountId,
-        resourceType: 'aws account'
-      }
-    };
+    if (accountMetadata.awsAccountId) {
+      const awsAccountKey = {
+        pk: `${environmentResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
+        sk: `${environmentResourceTypeToKey.account}#${accountMetadata.id}`
+      };
+      const awsAccountParams = {
+        item: {
+          id: accountMetadata.awsAccountId,
+          accountId: accountMetadata.id,
+          awsAccountId: accountMetadata.awsAccountId,
+          resourceType: 'awsAccount'
+        }
+      };
 
-    // Store AWS Account row in DDB (for easier duplicate checks later on)
-    await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+      // Store AWS Account row in DDB (for easier duplicate checks later on)
+      await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+    }
 
     return accountMetadata.id;
   }

@@ -25,6 +25,7 @@ export class SWBStack extends Stack {
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     EB_EVENT_TYPE_STATUS_UPDATE: string;
+    SC_PORTFOLIO_NAME: string;
   };
   public constructor(app: App) {
     const {
@@ -37,7 +38,8 @@ export class SWBStack extends Stack {
       MAIN_ACCOUNT_BUS_ARN_NAME,
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE
+      EB_EVENT_TYPE_STATUS_UPDATE,
+      SC_PORTFOLIO_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -57,22 +59,23 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
-      EB_EVENT_TYPE_STATUS_UPDATE
+      EB_EVENT_TYPE_STATUS_UPDATE,
+      SC_PORTFOLIO_NAME
     };
 
     const statusHandler = this._createStatusHandlerLambda();
     const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
+    const table = this._createDDBTable(apiLambda);
     this._createRestApi(apiLambda);
 
     const artifactS3Bucket = this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
+    this._createAccountHandlerLambda(lcRole, artifactS3Bucket, table.tableArn);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
     this._createEventBridgeResources();
-    this._createDDBTable(apiLambda);
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -279,7 +282,11 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): void {
+  private _createAccountHandlerLambda(
+    launchConstraintRole: Role,
+    artifactS3Bucket: Bucket,
+    ddbTableArn: string
+  ): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -296,6 +303,13 @@ export class SWBStack extends Stack {
             sid: 'CreatePortfolioShare',
             actions: ['servicecatalog:CreatePortfolioShare'],
             resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+          }),
+          // Allows accountHandler to get portfolioId based on portfolioName
+          // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
+          new PolicyStatement({
+            sid: 'ListPortfolios',
+            actions: ['servicecatalog:ListPortfolios'],
+            resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
           }),
           new PolicyStatement({
             sid: 'AssumeRole',
@@ -334,6 +348,11 @@ export class SWBStack extends Stack {
             sid: 'S3Bucket',
             actions: ['s3:GetObject'],
             resources: [`${artifactS3Bucket.bucketArn}/*`]
+          }),
+          new PolicyStatement({
+            actions: ['dynamodb:*'],
+            resources: [ddbTableArn, `${ddbTableArn}/index/*`],
+            sid: 'DynamoDBAccess'
           })
         ]
       })
@@ -439,7 +458,7 @@ export class SWBStack extends Stack {
   }
 
   // DynamoDB Table
-  private _createDDBTable(apiLambda: Function): void {
+  private _createDDBTable(apiLambda: Function): Table {
     // Ideally, this needs to involve the solution name
     const tableName: string = `${this.stackName}`;
     const table = new Table(this, tableName, {
@@ -468,5 +487,6 @@ export class SWBStack extends Stack {
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
+    return table;
   }
 }

@@ -8,7 +8,7 @@ async function run(): Promise<void> {
   const {
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
-    PORTFOLIO_NAME,
+    SC_PORTFOLIO_NAME,
     S3_ARTIFACT_BUCKET_ARN_NAME,
     LAUNCH_CONSTRAINT_ROLE_NAME,
     STACK_NAME,
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
-    PORTFOLIO_NAME,
+    SC_PORTFOLIO_NAME,
     S3_ARTIFACT_BUCKET_ARN_NAME,
     LAUNCH_CONSTRAINT_ROLE_NAME,
     STACK_NAME

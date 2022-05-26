@@ -312,7 +312,7 @@ export default class DynamoDBService {
         updater = updater.disableUpdatedAt();
       }
       if (params.item) {
-        updater = updater.item(marshall(params.item));
+        updater = updater.item(marshall(params.item, { removeUndefinedValues: true }));
       }
       if (params.set) {
         updater = updater.set(params.set);
