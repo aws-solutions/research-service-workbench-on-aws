@@ -1,14 +1,17 @@
 {
   "name": "@amzn/workbench-core-repo-toolbox",
   "version": "0.0.1",
-  "description": "Used to update repo's README.md file with package information",
+  "description": "Package to update repo's README.md file with package information",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "Samir Sharan",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
@@ -43,7 +46,6 @@
     "eslint-plugin-security": "^1.4.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
-    "lint-staged": "^12.4.2",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",

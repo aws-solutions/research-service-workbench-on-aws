@@ -34,7 +34,6 @@ importers:
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-i18next: ^11.0.0
@@ -83,7 +82,6 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.15.0+typescript@4.6.4
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sass: 1.52.0
@@ -110,7 +108,6 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       nodemon: ^2.0.15
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -135,7 +132,6 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       nodemon: 2.0.16
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -181,7 +177,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       js-yaml: ^4.1.0
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -228,7 +223,6 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.7.0
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -272,7 +266,6 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-i18next: ^11.0.0
@@ -329,7 +322,6 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.15.0+typescript@4.6.4
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       nodemon: 2.0.16
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -351,7 +343,6 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -367,7 +358,6 @@ importers:
       eslint: 8.15.0
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -387,7 +377,6 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -406,7 +395,6 @@ importers:
       eslint: 8.15.0
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -431,7 +419,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
-      lint-staged: ^12.4.2
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -457,7 +444,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -491,7 +477,6 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -527,7 +512,6 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -549,7 +533,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -568,7 +551,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -602,7 +584,6 @@ importers:
       generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       md5-file: ^5.0.0
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -638,7 +619,6 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -659,7 +639,6 @@ importers:
       eslint-plugin-security: ^1.4.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -678,7 +657,6 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.18
       istanbul-badges-readme: 1.8.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -709,7 +687,6 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       request: ^2.88.2
@@ -740,7 +717,6 @@ importers:
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       request: 2.88.2
@@ -778,7 +754,6 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -819,7 +794,6 @@ importers:
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.7.0
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -841,7 +815,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -867,7 +840,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -893,7 +865,6 @@ importers:
       eslint-plugin-security: ^1.4.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      lint-staged: ^12.4.2
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -918,7 +889,6 @@ importers:
       eslint-plugin-security: 1.5.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
-      lint-staged: 12.4.2
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -5895,14 +5865,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /aggregate-error/3.1.0:
-    resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
-    engines: {node: '>=8'}
-    dependencies:
-      clean-stack: 2.2.0
-      indent-string: 4.0.0
-    dev: true
-
   /ajv-errors/1.0.1_ajv@6.12.6:
     resolution: {integrity: sha512-DCRfO/4nQ+89p/RK43i8Ezd41EqdGIU4ld7nGF8OQ14oc/we5rEntLCUa7+jrn3nn83BosfwZA0wb4pon2o8iQ==}
     peerDependencies:
@@ -5949,11 +5911,6 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  /ansi-regex/6.0.1:
-    resolution: {integrity: sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==}
-    engines: {node: '>=12'}
-    dev: true
-
   /ansi-styles/3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
     engines: {node: '>=4'}
@@ -5969,11 +5926,6 @@ packages:
   /ansi-styles/5.2.0:
     resolution: {integrity: sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==}
     engines: {node: '>=10'}
-
-  /ansi-styles/6.1.0:
-    resolution: {integrity: sha512-VbqNsoz55SYGczauuup0MFUyXNQviSpFTj1RQtFzmQLk18qbVSpTFFGMT293rmDaQuKCT6InmbuEyUne4mTuxQ==}
-    engines: {node: '>=12'}
-    dev: true
 
   /any-promise/1.3.0:
     resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
@@ -6612,11 +6564,6 @@ packages:
   /cjs-module-lexer/1.2.2:
     resolution: {integrity: sha512-cOU9usZw8/dXIXKtwa8pM0OTJQuJkxMN6w30csNRUerHfeQ5R6U3kkU/FtJeIf3M202OHfY2U8ccInBG7/xogA==}
 
-  /clean-stack/2.2.0:
-    resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
-    engines: {node: '>=6'}
-    dev: true
-
   /cli-boxes/2.2.1:
     resolution: {integrity: sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw==}
     engines: {node: '>=6'}
@@ -6627,6 +6574,7 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       restore-cursor: 3.1.0
+    dev: false
 
   /cli-table/0.3.11:
     resolution: {integrity: sha512-IqLQi4lO0nIB4tcdTpN4LCB9FI3uqrJZK7RC515EnhZ6qBaglkIgICb1wjeAqpdoOabm1+SuQtkXIPdYC93jhQ==}
@@ -6634,22 +6582,6 @@ packages:
     dependencies:
       colors: 1.0.3
     dev: false
-
-  /cli-truncate/2.1.0:
-    resolution: {integrity: sha512-n8fOixwDD6b/ObinzTrp1ZKFzbgvKZvuz/TvejnLn1aQfC6r52XEx85FmuC+3HI+JM7coBRXUvNqEU2PHVrHpg==}
-    engines: {node: '>=8'}
-    dependencies:
-      slice-ansi: 3.0.0
-      string-width: 4.2.3
-    dev: true
-
-  /cli-truncate/3.1.0:
-    resolution: {integrity: sha512-wfOBkjXteqSnI59oPcJkcPl/ZmwvMMOj340qUIY1SKZCv0B9Cf4D4fAucRkIKQmsIuYK3x1rrgU7MeGRruiuiA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      slice-ansi: 5.0.0
-      string-width: 5.1.2
-    dev: true
 
   /cli-width/3.0.0:
     resolution: {integrity: sha512-FxqpkPPwu1HjuN93Omfm4h8uIanXofW0RxVEW3k5RKx+mJJYSthzNhp32Kzxxy3YAEZ/Dc/EWN1vZRY0+kOhbw==}
@@ -6729,10 +6661,6 @@ packages:
       color-string: 1.9.1
     dev: true
 
-  /colorette/2.0.16:
-    resolution: {integrity: sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==}
-    dev: true
-
   /colors/1.0.3:
     resolution: {integrity: sha1-BDP0TYCWgP3rYO0mDxsMJi6CpAs=}
     engines: {node: '>=0.1.90'}
@@ -6762,11 +6690,6 @@ packages:
 
   /commander/3.0.2:
     resolution: {integrity: sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==}
-    dev: true
-
-  /commander/8.3.0:
-    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
-    engines: {node: '>= 12'}
     dev: true
 
   /concat-map/0.0.1:
@@ -7028,19 +6951,6 @@ packages:
     dependencies:
       ms: 2.1.2
 
-  /debug/4.3.4_supports-color@9.2.2:
-    resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.2
-      supports-color: 9.2.2
-    dev: true
-
   /debuglog/1.0.1:
     resolution: {integrity: sha1-qiT/uaw9+aI1GDfPstJ5NgzXhJI=}
     dev: false
@@ -7203,10 +7113,6 @@ packages:
 
   /duplexer3/0.1.4:
     resolution: {integrity: sha1-7gHdHKwO08vH/b6jfcCo8c4ALOI=}
-    dev: true
-
-  /eastasianwidth/0.2.0:
-    resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
   /ecc-jsbn/0.1.2:
@@ -8805,11 +8711,6 @@ packages:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
     engines: {node: '>=8'}
 
-  /is-fullwidth-code-point/4.0.0:
-    resolution: {integrity: sha512-O4L094N2/dZ7xqVdrXhh9r1KODPJpFms8B5sGdJLPy664AgvXsreZUyCQQNItZRDlYug4xStLjNp/sz3HvBowQ==}
-    engines: {node: '>=12'}
-    dev: true
-
   /is-generator-fn/2.1.0:
     resolution: {integrity: sha512-cTIB4yPYL/Grw0EaSzASzg6bBy9gqCofvWN8okThAYIxKJZC+udlRAmGbM0XLeniEJSs8uEgHPGuHSe1XsOLSQ==}
     engines: {node: '>=6'}
@@ -9926,55 +9827,8 @@ packages:
       immediate: 3.0.6
     dev: false
 
-  /lilconfig/2.0.4:
-    resolution: {integrity: sha512-bfTIN7lEsiooCocSISTWXkiWJkRqtL9wYtYy+8EK3Y41qh3mpwPU0ycTOgjdY9ErwXCc8QyrQp82bdL0Xkm9yA==}
-    engines: {node: '>=10'}
-    dev: true
-
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
-
-  /lint-staged/12.4.2:
-    resolution: {integrity: sha512-JAJGIzY/OioIUtrRePr8go6qUxij//mL+RGGoFKU3VWQRtIHgWoHizSqH0QVn2OwrbXS9Q6CICQjfj+E5qvrXg==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    hasBin: true
-    dependencies:
-      cli-truncate: 3.1.0
-      colorette: 2.0.16
-      commander: 8.3.0
-      debug: 4.3.4_supports-color@9.2.2
-      execa: 5.1.1
-      lilconfig: 2.0.4
-      listr2: 4.0.5
-      micromatch: 4.0.5
-      normalize-path: 3.0.0
-      object-inspect: 1.12.0
-      pidtree: 0.5.0
-      string-argv: 0.3.1
-      supports-color: 9.2.2
-      yaml: 1.10.2
-    transitivePeerDependencies:
-      - enquirer
-    dev: true
-
-  /listr2/4.0.5:
-    resolution: {integrity: sha512-juGHV1doQdpNT3GSTs9IUN43QJb7KHdF9uqg7Vufs/tG9VTzpFphqF4pm/ICdAABGQxsyNn9CiYA3StkI6jpwA==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      enquirer: '>= 2.3.0 < 3'
-    peerDependenciesMeta:
-      enquirer:
-        optional: true
-    dependencies:
-      cli-truncate: 2.1.0
-      colorette: 2.0.16
-      log-update: 4.0.0
-      p-map: 4.0.0
-      rfdc: 1.3.0
-      rxjs: 7.5.5
-      through: 2.3.8
-      wrap-ansi: 7.0.0
-    dev: true
 
   /load-json-file/6.2.0:
     resolution: {integrity: sha512-gUD/epcRms75Cw8RT1pUdHugZYM5ce64ucs2GEISABwkRsOQr0q2wm/MV2TKThycIe5e0ytRweW2RZxclogCdQ==}
@@ -10029,16 +9883,6 @@ packages:
     dependencies:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
-    dev: true
-
-  /log-update/4.0.0:
-    resolution: {integrity: sha512-9fkkDevMefjg0mmzWFBW8YkFP91OrizzkW3diF7CpG+S2EYdy4+TVfGwz1zeF8x7hCx1ovSPTOE9Ngib74qqUg==}
-    engines: {node: '>=10'}
-    dependencies:
-      ansi-escapes: 4.3.2
-      cli-cursor: 3.1.0
-      slice-ansi: 4.0.0
-      wrap-ansi: 6.2.0
     dev: true
 
   /logform/2.4.0:
@@ -10695,13 +10539,6 @@ packages:
     dependencies:
       p-limit: 2.3.0
 
-  /p-map/4.0.0:
-    resolution: {integrity: sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==}
-    engines: {node: '>=10'}
-    dependencies:
-      aggregate-error: 3.1.0
-    dev: true
-
   /p-reflect/2.1.0:
     resolution: {integrity: sha512-paHV8NUz8zDHu5lhr/ngGWQiW067DK/+IbJ+RfZ4k+s8y4EKyYCz8pGYWjxCg35eHztpJAt+NUgvN4L+GCbPlg==}
     engines: {node: '>=8'}
@@ -10800,12 +10637,6 @@ packages:
   /picomatch/2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
-
-  /pidtree/0.5.0:
-    resolution: {integrity: sha512-9nxspIM7OpZuhBxPg73Zvyq7j1QMPMPsGKTqRc2XOaFQauDvoNz9fM1Wdkjmeo7l9GXOZiRs97sPkuayl39wjA==}
-    engines: {node: '>=0.10'}
-    hasBin: true
-    dev: true
 
   /pirates/4.0.5:
     resolution: {integrity: sha512-8V9+HQPupnaXMA23c5hvl69zXvTwTzyAYasnkb0Tts4XvO4CliqONMOnvlq26rkhLC3nWDFBJf73LU1e1VZLaQ==}
@@ -11386,14 +11217,11 @@ packages:
     dependencies:
       onetime: 5.1.2
       signal-exit: 3.0.7
+    dev: false
 
   /reusify/1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
-
-  /rfdc/1.3.0:
-    resolution: {integrity: sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==}
-    dev: true
 
   /rimraf/3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
@@ -11416,12 +11244,6 @@ packages:
     engines: {npm: '>=2.0.0'}
     dependencies:
       tslib: 1.14.1
-
-  /rxjs/7.5.5:
-    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
-    dependencies:
-      tslib: 2.4.0
-    dev: true
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -11612,15 +11434,6 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
-  /slice-ansi/3.0.0:
-    resolution: {integrity: sha512-pSyv7bSTC7ig9Dcgbw9AuRNUb5k5V6oDudjZoMBSr13qpLBG7tB+zgCkARjq7xIUgdz5P1Qe8u+rSGdouOOIyQ==}
-    engines: {node: '>=8'}
-    dependencies:
-      ansi-styles: 4.3.0
-      astral-regex: 2.0.0
-      is-fullwidth-code-point: 3.0.0
-    dev: true
-
   /slice-ansi/4.0.0:
     resolution: {integrity: sha512-qMCMfhY040cVHT43K9BFygqYbUPFZKHOg7K73mtTWJRb8pyP3fzf4Ixd5SzdEJQ6MRUg/WBnOLxghZtKKurENQ==}
     engines: {node: '>=10'}
@@ -11628,14 +11441,6 @@ packages:
       ansi-styles: 4.3.0
       astral-regex: 2.0.0
       is-fullwidth-code-point: 3.0.0
-    dev: true
-
-  /slice-ansi/5.0.0:
-    resolution: {integrity: sha512-FC+lgizVPfie0kkhqUScwRu1O/lF6NOgJmlCgK+/LYxDCTk8sGelYaHDhFcDN+Sn3Cv+3VSa4Byeo+IMCzpMgQ==}
-    engines: {node: '>=12'}
-    dependencies:
-      ansi-styles: 6.1.0
-      is-fullwidth-code-point: 4.0.0
     dev: true
 
   /sort-keys/4.2.0:
@@ -11782,15 +11587,6 @@ packages:
       is-fullwidth-code-point: 3.0.0
       strip-ansi: 6.0.1
 
-  /string-width/5.1.2:
-    resolution: {integrity: sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA==}
-    engines: {node: '>=12'}
-    dependencies:
-      eastasianwidth: 0.2.0
-      emoji-regex: 9.2.2
-      strip-ansi: 7.0.1
-    dev: true
-
   /string.prototype.matchall/4.0.7:
     resolution: {integrity: sha512-f48okCX7JiwVi1NXCVWcFnZgADDC/n2vePlQ/KUCNqCikLLilQvwjMO8+BHVKvgzH0JB0J9LEPgxOGT02RoETg==}
     dependencies:
@@ -11839,13 +11635,6 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       ansi-regex: 5.0.1
-
-  /strip-ansi/7.0.1:
-    resolution: {integrity: sha512-cXNxvT8dFNRVfhVME3JAe98mkXDYN2O1l7jmcwMnOslDeESg1rF/OZMtK0nRAhiari1unG5cD4jG3rapUAkLbw==}
-    engines: {node: '>=12'}
-    dependencies:
-      ansi-regex: 6.0.1
-    dev: true
 
   /strip-bom/3.0.0:
     resolution: {integrity: sha1-IzTBjpx1n3vdVv3vfprj1YjmjtM=}
@@ -11909,11 +11698,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       has-flag: 4.0.0
-
-  /supports-color/9.2.2:
-    resolution: {integrity: sha512-XC6g/Kgux+rJXmwokjm9ECpD6k/smUoS5LKlUCcsYr4IY3rW0XyAympon2RmxGrlnZURMpg5T18gWDP9CsHXFA==}
-    engines: {node: '>=12'}
-    dev: true
 
   /supports-hyperlinks/2.2.0:
     resolution: {integrity: sha512-6sXEzV5+I5j8Bmq9/vUphGRM/RJNT9SCURJLjwfOg51heRtguGWDzcaBlgAzKhQa0EVNpPEKzQuBwZ8S8WaCeQ==}
@@ -12022,6 +11806,7 @@ packages:
 
   /through/2.3.8:
     resolution: {integrity: sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=}
+    dev: false
 
   /timsort/0.3.0:
     resolution: {integrity: sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=}
@@ -12659,15 +12444,6 @@ packages:
   /wordwrap/1.0.0:
     resolution: {integrity: sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=}
     dev: false
-
-  /wrap-ansi/6.2.0:
-    resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}
-    engines: {node: '>=8'}
-    dependencies:
-      ansi-styles: 4.3.0
-      string-width: 4.2.3
-      strip-ansi: 6.0.1
-    dev: true
 
   /wrap-ansi/7.0.0:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}

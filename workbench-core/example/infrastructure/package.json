@@ -8,7 +8,10 @@
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
   },
   "license": "Apache-2.0",
-  "author": "Samir Sharan",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
   "bin": {
     "infrastructure": "lib/index.js"
   },
@@ -62,7 +65,6 @@
     "express": "^4.17.3",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
-    "lint-staged": "^12.4.2",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",
