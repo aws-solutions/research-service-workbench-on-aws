@@ -202,7 +202,11 @@ export default class HostingAccountLifecycleService {
       PrincipalType: 'IAM'
     });
   }
-
+  /** Update main account default event bus to accept hosting account state change events
+   ** Also update its rule to add the new hosting account ID if it wasn't already present
+   * @param statusHandlerArn - The ARN of StatusHandler lambda which becomes the target of the default bus rule
+   * @param awsAccountId - The hosting account ID that needs to have permission to put events to the main default bus
+   */
   public async updateBusPermissions(statusHandlerArn: string, awsAccountId: string): Promise<void> {
     const busName = 'default';
 
@@ -256,9 +260,6 @@ export default class HostingAccountLifecycleService {
       }
     }
 
-    // Create status handler lambda policy if this is the first hosting account being set up
-    await this._createStatusHandlerPerm(statusHandlerArn, busRuleName);
-
     const putTargetsParams = {
       EventBusName: busName,
       Rule: busRuleName,
@@ -267,34 +268,6 @@ export default class HostingAccountLifecycleService {
 
     // Create/update rule target to route events to status handler lambda
     await this._aws.clients.eventBridge.putTargets(putTargetsParams);
-  }
-
-  private async _createStatusHandlerPerm(statusHandlerArn: string, busRuleName: string): Promise<void> {
-    try {
-      // Describe lambda permission to see if it exists
-      const getPolicyParams = {
-        FunctionName: statusHandlerArn
-      };
-      await this._aws.clients.lambda.getPolicy(getPolicyParams);
-    } catch (e) {
-      if (e instanceof ResourceNotFoundException) {
-        console.log(
-          'Onboarding first hosting account for the main event bus. Setting up status handler lambda permissions.'
-        );
-
-        const addPermissionParams = {
-          StatementId: `AWSEvents_${busRuleName}`,
-          Action: 'lambda:InvokeFunction',
-          FunctionName: statusHandlerArn,
-          Principal: 'events.amazonaws.com'
-        };
-
-        // Add permissions on status handler lambda to get events from eventbridge
-        await this._aws.clients.lambda.addPermission(addPermissionParams);
-      } else {
-        throw e;
-      }
-    }
   }
 
   private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {

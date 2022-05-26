@@ -68,8 +68,6 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
-
-    this._createDDBTable(apiLambda);
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -235,6 +233,11 @@ export class SWBStack extends Stack {
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
       timeout: Duration.seconds(60)
+    });
+
+    statusHandlerLambda.addPermission('RouteHostEvents', {
+      action: 'lambda:InvokeFunction',
+      principal: new ServicePrincipal('events.amazonaws.com')
     });
 
     statusHandlerLambda.role?.attachInlinePolicy(
@@ -403,10 +406,6 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
-          }),
-          new PolicyStatement({
-            actions: ['lambda:AddPermission', 'lambda:GetPolicy'],
-            resources: [statusHandlerLambdaArn]
           })
         ]
       })

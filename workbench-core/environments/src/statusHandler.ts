@@ -12,46 +12,33 @@ export default class StatusHandler {
     const envHelper = new EnvironmentLifecycleHelper();
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
 
-    if (_.isUndefined(event.envId) && _.isUndefined(event.metadata.detail.NotebookInstanceName)) {
-      console.log('Neither Env ID nor Instance ID was provided. Skipping status update for this event');
+    if (_.isUndefined(event.envId) && _.isUndefined(event.instanceId)) {
+      console.log('Neither Env ID nor Instance ID was provided. Skipping status update.');
       return;
     }
 
-    let envId = event.envId;
-    if (_.isUndefined(event.envId)) {
-      const awsService = new AwsService({
-        region: process.env.AWS_REGION!,
-        ddbTableName: process.env.STACK_NAME!
-      });
-      const data = await awsService.helpers.ddb
-        .query({
-          key: {
-            name: 'pk',
-            value: `${envResourceTypeToKey.instance}#${event.metadata.detail.NotebookInstanceName}`
-          }
-        })
-        .execute();
-      if (data.Count === 0) {
-        throw Boom.notFound(`Could not find instance ${event.metadata.detail.NotebookInstanceName}`);
-      }
-
-      const instance = data.Items![0];
-      const instanceSk = instance.sk as unknown as string;
-      envId = instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
+    if (!isEnvironmentStatus(event.status)) {
+      console.log(
+        `Event status ${event.status} is not a recognized Environment Status. Skipping status update.`
+      );
+      return;
     }
 
     // Check if this event is outdated
+    const envId = event.envId ? event.envId : await this._getEnvId(event.instanceId!);
     const envDetails = await envService.getEnvironment(envId, true);
     const lastDDBUpdate = envDetails!.updatedAt;
     const eventBusTime = event.metadata.time;
 
-    // We need to check if operation is Launch since SSM doc sends important details
-    if (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) && event.operation !== 'Launch') {
-      console.log('Latest status already applied. Skipping operation...');
+    // Check if status already applied, or if this is an outdated event
+    // But perform status update regardless if operation is "Launch" since SSM doc sends important details
+    if (
+      (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) || envDetails.status === event.status) &&
+      event.operation !== 'Launch'
+    ) {
+      console.log('Latest status already applied. Skipping status update.');
       return;
     }
-
-    if (!isEnvironmentStatus(event.status)) return;
 
     envDetails.status = event.status;
 
@@ -78,8 +65,10 @@ export default class StatusHandler {
     const { RecordOutputs } = await hostSdk.clients.serviceCatalog.describeRecord({
       Id: event.metadata.detail.RecordId
     });
-    const instanceName = _.find(RecordOutputs, { OutputKey: 'NotebookInstanceName' })!.OutputValue!;
-    const instanceArn = _.find(RecordOutputs, { OutputKey: 'NotebookArn' })!.OutputValue!;
+    const instanceName = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceName })!
+      .OutputValue!;
+    const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceArn })!
+      .OutputValue!;
 
     // We store the provisioned product ID sent in event metadata
     // We only update the provisioned product ID once right after the workspace becomes available
@@ -116,5 +105,31 @@ export default class StatusHandler {
       envResourceTypeToKey.environment,
       instDetails
     );
+  }
+
+  /** Get environment ID from DDB for given instance ID
+   * @param instanceId - Environment instance name stored in DDB
+   * @returns environment ID in DDB from sort key
+   */
+  private async _getEnvId(instanceId: string): Promise<string> {
+    const awsService = new AwsService({
+      region: process.env.AWS_REGION!,
+      ddbTableName: process.env.STACK_NAME!
+    });
+    const data = await awsService.helpers.ddb
+      .query({
+        key: {
+          name: 'pk',
+          value: `${envResourceTypeToKey.instance}#${instanceId}`
+        }
+      })
+      .execute();
+    if (data.Count === 0) {
+      throw Boom.notFound(`Could not find instance ${instanceId}`);
+    }
+
+    const instance = data.Items![0];
+    const instanceSk = instance.sk as unknown as string;
+    return instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
   }
 }

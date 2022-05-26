@@ -17,12 +17,32 @@ export async function handler(event: any) {
     sagemaker: 'NotebookInstanceStatus'
   };
 
+  // Environment types could use different terminologies for their instance names (what we use for "INID#<instanceId>")
+  // This is to standardize each of them
+  const instanceIdLocation: { [id: string]: string } = {
+    sagemaker: 'NotebookInstanceName'
+
+    // Add your new env types here
+  };
+
+  // Various environment types indicate instance names and ARNs differently in ServiceCatalog record outputs
+  // This is to standardize each of them
+  const envTypeRecordOutputKeys: { [id: string]: { [id: string]: string } } = {
+    sagemaker: {
+      instanceNameRecordKey: 'NotebookInstanceName',
+      instanceArnRecordKey: 'NotebookArn'
+    }
+
+    // Add your new env types here
+  };
+
   // Some env types use different terminologies for statuses
-  const alternateStatuses: { [id: string]: string } = {
-    // Sagemaker statuses : ENVIRONMENT_STATUS
-    InService: 'COMPLETED',
-    Deleting: 'TERMINATING',
-    Deleted: 'TERMINATED'
+  const alternateStatuses: { [id: string]: { [id: string]: string } } = {
+    sagemaker: {
+      InService: 'COMPLETED',
+      Deleting: 'TERMINATING',
+      Deleted: 'TERMINATED'
+    }
   };
 
   const source = event.source === 'automation' ? 'automation' : event.source.split('aws.')[1];
@@ -31,12 +51,28 @@ export async function handler(event: any) {
     return;
   }
 
-  let status = _.get(event.detail, statusLocation[source]);
-  if (_.includes(Object.keys(alternateStatuses), status)) status = alternateStatuses[status];
+  const recordOutputKeys = { instanceName: '', instanceArn: '' };
+  let instanceId;
+  let status;
+  status = _.get(event.detail, statusLocation[source]);
+
+  if (source === 'automation') {
+    // For when events arise from launch/terminate operations (SSM docs)
+    const envType = event.detail.EnvType.toLowerCase();
+    recordOutputKeys.instanceName = envTypeRecordOutputKeys[envType].instanceNameRecordKey;
+    recordOutputKeys.instanceArn = envTypeRecordOutputKeys[envType].instanceArnRecordKey;
+  } else {
+    // For when events arise from start/stop operations (not from SSM docs)
+    if (_.includes(Object.keys(alternateStatuses[source]), status))
+      status = alternateStatuses[source][status];
+    instanceId = _.get(event.detail, instanceIdLocation[source]);
+  }
 
   // Map event to EventBridgeEventToDDB
   const ebToDDB: EventBridgeEventToDDB = {
     envId: event.detail.EnvId,
+    instanceId,
+    recordOutputKeys,
     status: status.toUpperCase(),
     operation: event.detail.Operation,
     metadata: event
