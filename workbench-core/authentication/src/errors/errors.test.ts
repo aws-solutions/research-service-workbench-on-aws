@@ -1,9 +1,13 @@
 import {
   InvalidAuthorizationCodeError,
+  InvalidCodeVerifierError,
   InvalidJWTError,
+  InvalidTokenError,
   InvalidTokenTypeError,
   isInvalidAuthorizationCodeError,
+  isInvalidCodeVerifierError,
   isInvalidJWTError,
+  isInvalidTokenError,
   isInvalidTokenTypeError,
   isPluginConfigurationError,
   PluginConfigurationError
@@ -26,7 +30,33 @@ describe('custom error tests', () => {
     it('should not be an instance of the other custom error classes', () => {
       const error = new InvalidAuthorizationCodeError();
 
+      expect(isInvalidCodeVerifierError(error)).toBe(false);
       expect(isInvalidJWTError(error)).toBe(false);
+      expect(isInvalidTokenError(error)).toBe(false);
+      expect(isInvalidTokenTypeError(error)).toBe(false);
+      expect(isPluginConfigurationError(error)).toBe(false);
+    });
+  });
+
+  describe('InvalidCodeVerifierError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new InvalidCodeVerifierError();
+
+      expect(isInvalidCodeVerifierError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new InvalidCodeVerifierError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+
+    it('should not be an instance of the other custom error classes', () => {
+      const error = new InvalidCodeVerifierError();
+
+      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
+      expect(isInvalidJWTError(error)).toBe(false);
+      expect(isInvalidTokenError(error)).toBe(false);
       expect(isInvalidTokenTypeError(error)).toBe(false);
       expect(isPluginConfigurationError(error)).toBe(false);
     });
@@ -49,6 +79,32 @@ describe('custom error tests', () => {
       const error = new InvalidJWTError();
 
       expect(isInvalidAuthorizationCodeError(error)).toBe(false);
+      expect(isInvalidCodeVerifierError(error)).toBe(false);
+      expect(isInvalidTokenError(error)).toBe(false);
+      expect(isInvalidTokenTypeError(error)).toBe(false);
+      expect(isPluginConfigurationError(error)).toBe(false);
+    });
+  });
+
+  describe('InvalidTokenError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new InvalidTokenError();
+
+      expect(isInvalidTokenError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new InvalidTokenError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+
+    it('should not be an instance of the other custom error classes', () => {
+      const error = new InvalidTokenError();
+
+      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
+      expect(isInvalidCodeVerifierError(error)).toBe(false);
+      expect(isInvalidJWTError(error)).toBe(false);
       expect(isInvalidTokenTypeError(error)).toBe(false);
       expect(isPluginConfigurationError(error)).toBe(false);
     });
@@ -70,8 +126,10 @@ describe('custom error tests', () => {
     it('should not be an instance of the other custom error classes', () => {
       const error = new InvalidTokenTypeError();
 
+      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
+      expect(isInvalidCodeVerifierError(error)).toBe(false);
       expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
+      expect(isInvalidTokenError(error)).toBe(false);
       expect(isPluginConfigurationError(error)).toBe(false);
     });
   });
@@ -93,7 +151,9 @@ describe('custom error tests', () => {
       const error = new PluginConfigurationError();
 
       expect(isInvalidAuthorizationCodeError(error)).toBe(false);
+      expect(isInvalidCodeVerifierError(error)).toBe(false);
       expect(isInvalidJWTError(error)).toBe(false);
+      expect(isInvalidTokenError(error)).toBe(false);
       expect(isInvalidTokenTypeError(error)).toBe(false);
     });
   });

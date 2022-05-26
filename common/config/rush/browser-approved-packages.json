@@ -231,6 +231,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "cookie-parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "diff",
       "allowedCategories": [ "production" ]
     },

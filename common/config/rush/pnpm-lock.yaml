@@ -329,13 +329,17 @@ importers:
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
+      '@types/cookie-parser': ^1.4.3
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/node': ^14
+      '@types/supertest': ^2.0.12
       aws-jwt-verify: ^3.0.0
       axios: ^0.27.1
+      cookie-parser: ^1.4.6
       eslint: ^8.7.0
       istanbul-badges-readme: 1.8.1
+      supertest: ^6.2.2
       typescript: ^4.5.2
     dependencies:
       '@aws-sdk/client-cognito-identity-provider': 3.87.0
@@ -347,11 +351,15 @@ importers:
       '@rushstack/heft': 0.45.2
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.2
       '@rushstack/heft-node-rig': 1.9.3_@rushstack+heft@0.45.2
+      '@types/cookie-parser': 1.4.3
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.18
+      '@types/supertest': 2.0.12
+      cookie-parser: 1.4.6
       eslint: 8.15.0
       istanbul-badges-readme: 1.8.1
+      supertest: 6.2.3
       typescript: 4.6.4
 
   ../../workbench-core/authorization:
@@ -5143,6 +5151,12 @@ packages:
       '@types/node': 14.18.18
     dev: true
 
+  /@types/cookie-parser/1.4.3:
+    resolution: {integrity: sha512-CqSKwFwefj4PzZ5n/iwad/bow2hTCh0FlNAeWLtQM3JA/NX/iYagIpWG2cf1bQKQ2c9gU2log5VUCrn7LDOs0w==}
+    dependencies:
+      '@types/express': 4.17.13
+    dev: true
+
   /@types/cookiejar/2.1.2:
     resolution: {integrity: sha512-t73xJJrvdTjXrn4jLS9VSGRbz0nUY3cl2DMGDU48lKl+HR9dbbjW2A9r3g40VA++mQpy6uuHg33gy7du2BKpog==}
     dev: true
@@ -5845,7 +5859,7 @@ packages:
       es-shim-unscopables: 1.0.0
 
   /asap/2.0.6:
-    resolution: {integrity: sha1-5QNHYR1+aQlDIIu9r+vLwvuGbUY=}
+    resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
 
   /asn1/0.2.6:
     resolution: {integrity: sha512-ix/FxPn0MDjeyJ7i/yoHGFt/EX6LyNbxSEhPPXODPL+KB0VPk86UYfL0lMdy+KCnv+fmvIzySwaK5COwqVbWTQ==}
@@ -5872,7 +5886,7 @@ packages:
     dev: false
 
   /asynckit/0.4.0:
-    resolution: {integrity: sha1-x57Zf380y48robyXkLzDZkdLS3k=}
+    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
@@ -6574,8 +6588,21 @@ packages:
     dependencies:
       safe-buffer: 5.1.2
 
+  /cookie-parser/1.4.6:
+    resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.1
+      cookie-signature: 1.0.6
+    dev: true
+
   /cookie-signature/1.0.6:
     resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
+
+  /cookie/0.4.1:
+    resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
+    engines: {node: '>= 0.6'}
+    dev: true
 
   /cookie/0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}

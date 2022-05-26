@@ -32,14 +32,33 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   }
   public async handleAuthorizationCode(code: string): Promise<Tokens> {
     return Promise.resolve({
-      idToken: 'id token',
-      accessToken: 'access token',
-      refreshToken: 'refresh token',
-      tokenType: 'Bearer',
-      expiresIn: 3600
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      },
+      refreshToken: {
+        token: 'refresh token',
+        expiresIn: 1234
+      }
     });
   }
   public getAuthorizationCodeUrl(): string {
     return 'authorizationCodeUrl';
+  }
+  public refreshAccessToken(refreshToken: string): Promise<Tokens> {
+    return Promise.resolve({
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      }
+    });
   }
 }

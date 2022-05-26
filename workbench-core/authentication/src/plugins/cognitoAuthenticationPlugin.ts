@@ -377,9 +377,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       const accessLength = clientInfo.UserPoolClient?.AccessTokenValidity;
 
       return {
-        idToken: getTimeInSeconds(idLength, expiresInUnits?.IdToken),
-        accessToken: getTimeInSeconds(accessLength, expiresInUnits?.AccessToken),
-        refreshToken: getTimeInSeconds(refreshLength, expiresInUnits?.RefreshToken)
+        idToken: getTimeInSeconds(idLength, expiresInUnits?.IdToken as TimeUnitsType),
+        accessToken: getTimeInSeconds(accessLength, expiresInUnits?.AccessToken as TimeUnitsType),
+        refreshToken: getTimeInSeconds(refreshLength, expiresInUnits?.RefreshToken as TimeUnitsType)
       };
     } catch (error) {
       // TODO figure out what type of errors are thrown

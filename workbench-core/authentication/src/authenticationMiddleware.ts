@@ -3,6 +3,7 @@ import { AuthenticatedUser } from './authenticatedUser';
 import { AuthenticationService } from './authenticationService';
 
 // TODO send error message with status code?
+// TODO log errors?
 
 // TODO add to doc
 // requires use of cookieParser and bodyParser middlewares
@@ -33,7 +34,7 @@ export function getTokensFromAuthorizationCode(
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
 
-    if (code) {
+    if (code && codeVerifier) {
       try {
         const { idToken, accessToken, refreshToken } = await authenticationService.handleAuthorizationCode(
           code,
@@ -172,8 +173,8 @@ export function logoutUser(
       }
     }
 
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
+    res.cookie('access_token', 'cleared', { expires: new Date(0) });
+    res.cookie('refresh_token', 'cleared', { expires: new Date(0) });
 
     res.sendStatus(200);
   };

@@ -3,11 +3,12 @@ jest.mock('./plugins/cognitoAuthenticationPlugin');
 import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticationPluginOptions } from '.';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
+  region: 'fake-region',
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
-  loginUrl: 'fake-login-url'
+  websiteUrl: 'fake-website-url'
 };
 
 describe('AuthenticationService tests', () => {
@@ -64,21 +65,43 @@ describe('AuthenticationService tests', () => {
     expect(result).toMatchObject(['role']);
   });
 
-  it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens', async () => {
-    const result = await service.handleAuthorizationCode('access code');
+  it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens and their expiration (in seconds)', async () => {
+    const result = await service.handleAuthorizationCode('access code', 'code verifier');
 
     expect(result).toMatchObject({
-      idToken: 'id token',
-      accessToken: 'access token',
-      refreshToken: 'refresh token',
-      tokenType: 'Bearer',
-      expiresIn: 3600
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      },
+      refreshToken: {
+        token: 'refresh token',
+        expiresIn: 1234
+      }
     });
   });
 
   it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
-    const url = service.getAuthorizationCodeUrl();
+    const url = service.getAuthorizationCodeUrl('state', 'code challenge');
 
     expect(url).toBe('authorizationCodeUrl');
+  });
+
+  it('refreshAccessToken should return a Promise that contains the id and access tokens and their expiration (in seconds)', async () => {
+    const result = await service.refreshAccessToken('refresh token');
+
+    expect(result).toMatchObject({
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      }
+    });
   });
 });

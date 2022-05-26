@@ -1,27 +1,53 @@
+jest.mock('../utils', () => ({
+  getTimeInSeconds: jest.fn().mockReturnValue(1)
+}));
+
 import axios from 'axios';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import {
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions,
   InvalidAuthorizationCodeError,
+  InvalidCodeVerifierError,
   InvalidJWTError,
+  InvalidTokenError,
   InvalidTokenTypeError,
   PluginConfigurationError
 } from '..';
 import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import {
+  CognitoIdentityProviderClient,
+  DescribeUserPoolClientCommandOutput,
+  TimeUnitsType
+} from '@aws-sdk/client-cognito-identity-provider';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
+  region: 'us-west-2',
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
-  loginUrl: 'fake-login-url'
+  websiteUrl: 'fake-website-url'
 };
 
 const baseUrl = `${cognitoPluginOptions.cognitoDomain}/oauth2`;
+
 const encodedClientId = Buffer.from(
   `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
 ).toString('base64');
+
+const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
+  UserPoolClient: {
+    TokenValidityUnits: {
+      IdToken: TimeUnitsType.HOURS,
+      AccessToken: TimeUnitsType.MINUTES,
+      RefreshToken: TimeUnitsType.DAYS
+    },
+    RefreshTokenValidity: 1,
+    IdTokenValidity: 1,
+    AccessTokenValidity: 1
+  }
+};
 
 describe('CognitoAuthenticationPlugin tests', () => {
   const plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
@@ -105,7 +131,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       .mockRejectedValueOnce({ response: { data: { error: 'unsupported_token_type' } } });
 
     await expect(plugin.revokeToken(invalidToken)).rejects.toThrow(
-      new InvalidTokenTypeError('only access tokens may be revoked')
+      new InvalidTokenTypeError('only refresh tokens may be revoked')
     );
     expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/revoke`, new URLSearchParams({ token: invalidToken }), {
       headers: {
@@ -214,28 +240,30 @@ describe('CognitoAuthenticationPlugin tests', () => {
     }).toThrow(new InvalidJWTError('no cognito:roles claim'));
   });
 
-  it('handleAuthorizationCode should exchange the authroization code for tokens when the code is vallid', async () => {
+  it('handleAuthorizationCode should exchange the authorization code for tokens when the code is valid', async () => {
     const validCode = 'validCode';
+    const codeVerifier = 'codeVerifier';
     const fakeTokens = {
       data: {
         id_token: 'id token',
         access_token: 'access token',
-        refresh_token: 'refresh token',
-        token_type: 'Bearer',
-        expires_in: 3600
+        refresh_token: 'refresh token'
       }
     };
     const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
 
-    const tokens = await plugin.handleAuthorizationCode(validCode);
+    const tokens = await plugin.handleAuthorizationCode(validCode, codeVerifier);
 
     expect(axiosSpy).toHaveBeenCalledWith(
       `${baseUrl}/token`,
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: validCode,
-        client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.loginUrl
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: codeVerifier
       }),
       {
         headers: {
@@ -245,20 +273,29 @@ describe('CognitoAuthenticationPlugin tests', () => {
       }
     );
     expect(tokens).toMatchObject({
-      idToken: 'id token',
-      accessToken: 'access token',
-      refreshToken: 'refresh token',
-      expiresIn: 3600
+      idToken: {
+        token: 'id token',
+        expiresIn: 1
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1
+      },
+      refreshToken: {
+        token: 'refresh token',
+        expiresIn: 1
+      }
     });
   });
 
-  it('handleAuthorizationCode should throw InvalidAuthorizationCodeError when an invalid authorization token is passed in', async () => {
+  it('handleAuthorizationCode should throw InvalidAuthorizationCodeError when an invalid authorization code is passed in', async () => {
     const invalidCode = 'invalidCode';
+    const codeVerifier = 'codeVerifier';
     const axiosSpy = jest
       .spyOn(axios, 'post')
       .mockRejectedValueOnce({ response: { data: { error: 'invalid_grant' } } });
 
-    await expect(plugin.handleAuthorizationCode(invalidCode)).rejects.toThrow(
+    await expect(plugin.handleAuthorizationCode(invalidCode, codeVerifier)).rejects.toThrow(
       new InvalidAuthorizationCodeError('authorization code has been used already or is invalid')
     );
     expect(axiosSpy).toHaveBeenCalledWith(
@@ -266,8 +303,8 @@ describe('CognitoAuthenticationPlugin tests', () => {
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: invalidCode,
-        client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.loginUrl
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: codeVerifier
       }),
       {
         headers: {
@@ -280,11 +317,12 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   it('handleAuthorizationCode should throw PluginConfigurationError when the client id or secret is invalid', async () => {
     const invalidCode = 'invalidCode';
+    const codeVerifier = 'codeVerifier';
     const axiosSpy = jest
       .spyOn(axios, 'post')
       .mockRejectedValueOnce({ response: { data: { error: 'invalid_client' } } });
 
-    await expect(plugin.handleAuthorizationCode(invalidCode)).rejects.toThrow(
+    await expect(plugin.handleAuthorizationCode(invalidCode, codeVerifier)).rejects.toThrow(
       new PluginConfigurationError('invalid client id or client secret')
     );
     expect(axiosSpy).toHaveBeenCalledWith(
@@ -292,8 +330,8 @@ describe('CognitoAuthenticationPlugin tests', () => {
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: invalidCode,
-        client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.loginUrl
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: codeVerifier
       }),
       {
         headers: {
@@ -306,11 +344,12 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   it('handleAuthorizationCode should throw PluginConfigurationError when the authorization code grant is disabled for the app client', async () => {
     const invalidCode = 'invalidCode';
+    const codeVerifier = 'codeVerifier';
     const axiosSpy = jest
       .spyOn(axios, 'post')
       .mockRejectedValueOnce({ response: { data: { error: 'unauthorized_client' } } });
 
-    await expect(plugin.handleAuthorizationCode(invalidCode)).rejects.toThrow(
+    await expect(plugin.handleAuthorizationCode(invalidCode, codeVerifier)).rejects.toThrow(
       new PluginConfigurationError('authorization code grant is disabled for this app client')
     );
     expect(axiosSpy).toHaveBeenCalledWith(
@@ -318,8 +357,35 @@ describe('CognitoAuthenticationPlugin tests', () => {
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: invalidCode,
-        client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.loginUrl
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: codeVerifier
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
+    );
+  });
+
+  it('handleAuthorizationCode should throw InvalidCodeVerifierError when the code verifier is invalid', async () => {
+    const validCode = 'validCode';
+    const invalidCodeVerifier = 'invalidCodeVerifier';
+    const axiosSpy = jest
+      .spyOn(axios, 'post')
+      .mockRejectedValueOnce({ response: { data: { error: 'invalid_request' } } });
+
+    await expect(plugin.handleAuthorizationCode(validCode, invalidCodeVerifier)).rejects.toThrow(
+      new InvalidCodeVerifierError('pkce code verifier is invalid')
+    );
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: validCode,
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: invalidCodeVerifier
       }),
       {
         headers: {
@@ -332,16 +398,17 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   it('handleAuthorizationCode should rethrow an error when the error is unexpected', async () => {
     const invalidCode = 'invalidCode';
+    const codeVerifier = 'codeVerifier';
     const axiosSpy = jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error());
 
-    await expect(plugin.handleAuthorizationCode(invalidCode)).rejects.toThrow(Error);
+    await expect(plugin.handleAuthorizationCode(invalidCode, codeVerifier)).rejects.toThrow(Error);
     expect(axiosSpy).toHaveBeenCalledWith(
       `${baseUrl}/token`,
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: invalidCode,
-        client_id: cognitoPluginOptions.clientId,
-        redirect_uri: cognitoPluginOptions.loginUrl
+        redirect_uri: cognitoPluginOptions.websiteUrl,
+        code_verifier: codeVerifier
       }),
       {
         headers: {
@@ -353,10 +420,144 @@ describe('CognitoAuthenticationPlugin tests', () => {
   });
 
   it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
-    const url = plugin.getAuthorizationCodeUrl();
+    const state = 'TEMP_STATE';
+    const codeChallenge = 'TEMP_CODE_CHALLENGE';
+    const url = plugin.getAuthorizationCodeUrl(state, codeChallenge);
 
     expect(url).toBe(
-      `${baseUrl}/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${cognitoPluginOptions.loginUrl}`
+      `${baseUrl}/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${cognitoPluginOptions.websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+    );
+  });
+
+  it('refreshAccessToken should retrieve new id and access tokens from Cognito when the refresh token is valid', async () => {
+    const refreshToken = 'refreshToken';
+    const fakeTokens = {
+      data: {
+        id_token: 'id token',
+        access_token: 'access token'
+      }
+    };
+    const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
+    jest
+      .spyOn(CognitoIdentityProviderClient.prototype, 'send')
+      .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+
+    const tokens = await plugin.refreshAccessToken(refreshToken);
+
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
+    );
+    expect(tokens).toMatchObject({
+      idToken: {
+        token: 'id token',
+        expiresIn: 1
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1
+      }
+    });
+  });
+
+  it('refreshAccessToken should throw InvalidTokenError when an invalid refresh token is passed in', async () => {
+    const invalidRefreshToken = 'invalidRefreshToken';
+    const axiosSpy = jest
+      .spyOn(axios, 'post')
+      .mockRejectedValueOnce({ response: { data: { error: 'invalid_grant' } } });
+
+    await expect(plugin.refreshAccessToken(invalidRefreshToken)).rejects.toThrow(
+      new InvalidTokenError('refresh token is invalid or has been revoked')
+    );
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: invalidRefreshToken
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
+    );
+  });
+
+  it('refreshAccessToken should throw PluginConfigurationError when the client id or secret is invalid', async () => {
+    const invalidRefreshToken = 'invalidRefreshToken';
+    const axiosSpy = jest
+      .spyOn(axios, 'post')
+      .mockRejectedValueOnce({ response: { data: { error: 'invalid_client' } } });
+
+    await expect(plugin.refreshAccessToken(invalidRefreshToken)).rejects.toThrow(
+      new PluginConfigurationError('invalid client id or client secret')
+    );
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: invalidRefreshToken
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
+    );
+  });
+
+  it('refreshAccessToken should throw PluginConfigurationError when refreshing access tokens is disabled for the app client', async () => {
+    const invalidRefreshToken = 'invalidRefreshToken';
+    const axiosSpy = jest
+      .spyOn(axios, 'post')
+      .mockRejectedValueOnce({ response: { data: { error: 'unauthorized_client' } } });
+
+    await expect(plugin.refreshAccessToken(invalidRefreshToken)).rejects.toThrow(
+      new PluginConfigurationError('refreshing access tokens is disabled for this app client')
+    );
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: invalidRefreshToken
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
+    );
+  });
+
+  it('refreshAccessToken should rethrow an error when the error is unexpected', async () => {
+    const invalidRefreshToken = 'invalidRefreshToken';
+    const axiosSpy = jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error());
+
+    await expect(plugin.refreshAccessToken(invalidRefreshToken)).rejects.toThrow(Error);
+    expect(axiosSpy).toHaveBeenCalledWith(
+      `${baseUrl}/token`,
+      new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: invalidRefreshToken
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${encodedClientId}`
+        }
+      }
     );
   });
 });
