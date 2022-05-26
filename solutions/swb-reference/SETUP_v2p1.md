@@ -63,8 +63,8 @@ STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on A
 Take note of the following Cloudformation outputs. We will be using them in future steps.
 ```
 S3BucketArtifactsArnOutput
-accountHandlerLambdaRoleOutput
-apiLambdaRoleOutput
+AccountHandlerLambdaRoleOutput
+ApiLambdaRoleOutput
 EventBusOutput
 ```
 
@@ -89,7 +89,6 @@ ApiHandlerRoleArn: <CFN_OUTPUT.apiLambdaRoleOutput>
 EnableFlowLogs: true
 LaunchConstraintPolicyPrefix: *
 LaunchConstraintRolePrefix: *
-MainAccountEventBusArn: <CFN_OUTPUT.EventBusOutput> 
 StatusHandlerRoleArn: <CFN_OUTPUT.StatusHandlerLambdaRoleOutput>
 ```
 
@@ -131,7 +130,6 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
     "subnetId": "<CFN_OUTPUT.VpcSubnet>",
     "vpcId": "<CFN_OUTPUT.VPC>",
     "externalId": "workbench",
-    "hostingAccountEventBusArn": "<CFN_OUTPUT.HostEventBusArn>",
     "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files", 
     "awsAccountId": "<12 Digit AWS Account ID of hosting account>",
     "createdAt": "2022-01-28T22:42:20.296Z",
@@ -197,15 +195,11 @@ POST `{{API_URL}}/aws-accounts`
 ```json
 {
     "awsAccountId": "<Hosting Account 12 Digit ID>",
-    "eventBusArn": "<CFN_OUTPUT.HostEventBusArn>",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
     "accountHandlerRoleArn": "<CFN_OUTPUT.CrossAccountHandlerRoleArn>",
     "externalId": "workbench",
-    "vpcId": "<CFN_OUTPUT.VPC>",
-    "subnetId": "<CFN_OUTPUT.VpcSubnet>",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
-    "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files",
-    "stackName": "swb-<stage>-<awsRegionShortName>-hosting-account"
+    "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files"
 }
 ```
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
@@ -244,6 +238,15 @@ Replace `:id` with the `id` value from launching the environment. In the respons
 GET `{{API_URL}}/environments/:id/connections`
 Replace `:id` with the `id` value from launching the environment. In the response you'll find a `url`. Copy and paste that `url`
 into the browser to view your Sagemaker instance.
+
+**Stop an Environment**
+PUT `{{API_URL}}/environments/:id/stop`
+Replace `:id` with the `id` value from launching the environment.
+
+**Start an Environment**
+PUT `{{API_URL}}/environments/:id/start`
+Replace `:id` with the `id` value from launching the environment.
+
 
 **Terminate the Environment**
 
