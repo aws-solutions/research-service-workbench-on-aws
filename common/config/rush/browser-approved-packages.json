@@ -251,6 +251,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "eslint-plugin-import",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "eslint-plugin-security",
       "allowedCategories": [ "production" ]
     },
@@ -287,6 +291,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "lint-staged",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production" ]
     },
@@ -315,6 +323,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "npm-package-json-lint",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "npm-package-json-lint-config-default",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -332,6 +348,10 @@
     },
     {
       "name": "sharp",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "sort-package-json",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {

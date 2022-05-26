@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { App, CfnOutput, Stack } from 'aws-cdk-lib';
-import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
-import Workflow from './environment/workflow';
-import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { getConstants } from './constants';
+import { App, CfnOutput, Stack } from 'aws-cdk-lib';
+import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
+import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { getConstants } from './constants';
+import Workflow from './environment/workflow';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda

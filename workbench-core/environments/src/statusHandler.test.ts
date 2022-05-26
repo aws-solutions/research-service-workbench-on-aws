@@ -1,5 +1,6 @@
-import StatusHandler from './statusHandler';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
+import StatusHandler from './statusHandler';
+
 describe('StatusHandler', () => {
   test('execute does not return an error', async () => {
     const statusHandler = new StatusHandler();
