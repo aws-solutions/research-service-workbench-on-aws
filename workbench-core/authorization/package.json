@@ -1,7 +1,7 @@
 {
   "name": "@amzn/workbench-core-authorization",
   "version": "0.0.1",
-  "description": "",
+  "description": "Package containing an authorization service with reference implementation",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
