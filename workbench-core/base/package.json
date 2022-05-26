@@ -1,7 +1,7 @@
 {
   "name": "@amzn/workbench-core-base",
   "version": "0.0.1",
-  "description": "",
+  "description": "Package to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
