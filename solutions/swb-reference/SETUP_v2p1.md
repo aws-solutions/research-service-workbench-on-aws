@@ -11,10 +11,13 @@ These manual steps will not be required in the final implementation of SWBv2.
 * An AWS account for deploying SWBv2 API. This account will be called the `Main Account`.
    * On the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `Main Account` as the `default` profile 
 * An AWS account for hosting environments. This account will be called the `Hosting Account`.
-* Install [Rush](https://rushjs.io/pages/developer/new_developer/). We'll be using this tool to manage the packages in our mono-repo
+* Software
+  * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
+  * Node 14.x or 16.x
 * The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
    * Install Docker ([link](https://docs.docker.com/get-docker/))
+  
 
 ## Installation
 ### Set up Config File
