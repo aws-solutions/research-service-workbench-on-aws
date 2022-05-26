@@ -20,7 +20,7 @@ These manual steps will not be required in the final implementation of SWBv2.
   
 
 ## Installation
-### Set up Config File
+### Setup Config File
 1. Navigate to `solutions/swb-reference`.
 1. Copy `src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
@@ -28,7 +28,7 @@ These manual steps will not be required in the final implementation of SWBv2.
 1. Uncomment `rootUserEmail` and provide the main account user's email address
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
-### Set up CDK
+### Setup CDK
 We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onboard CDK onto your AWS `Main Account`.
 
 In `swb-reference` root directory run the follow code
