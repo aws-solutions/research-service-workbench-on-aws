@@ -358,7 +358,7 @@ export class SWBStack extends Stack {
       })
     );
 
-    new CfnOutput(this, 'accountHandlerLambdaRoleOutput', {
+    new CfnOutput(this, 'AccountHandlerLambdaRoleOutput', {
       value: lambda.role!.roleArn
     });
 
@@ -425,7 +425,7 @@ export class SWBStack extends Stack {
       })
     );
 
-    new CfnOutput(this, 'apiLambdaRoleOutput', {
+    new CfnOutput(this, 'ApiLambdaRoleOutput', {
       value: apiLambda.role!.roleArn
     });
 
