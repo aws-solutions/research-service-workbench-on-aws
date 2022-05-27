@@ -13,8 +13,8 @@ export async function handler(event: any) {
     // This is the source used by SSM automation docs to launch/terminate environments
     automation: 'Status',
 
-    // Add your new env types here
     sagemaker: 'NotebookInstanceStatus'
+    // Add your new env types here
   };
 
   // Environment types could use different terminologies for their instance names (what we use for "INID#<instanceId>")
