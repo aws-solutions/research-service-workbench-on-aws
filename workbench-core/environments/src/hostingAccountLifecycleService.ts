@@ -50,7 +50,7 @@ export default class HostingAccountLifecycleService {
    * ssmDocNameSuffix - Suffix of SSM docs that should be shared with target account.
    * principalArnForScPortfolio - Arn that should be associated with Service Catalog portfolio.
    * roleToCopyToTargetAccount - IAM role that should be copied from main account to target account.
-   * s3ArtifactBucketName - S3 bucket that contains CFN Template for target account.
+   * s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
    */
   public async updateAccount(params: {
     ddbAccountId: string;
@@ -101,6 +101,13 @@ export default class HostingAccountLifecycleService {
     );
   }
 
+  /**
+   * Store hosting account status, vpcId, and subnetId into DDB
+   * @param ddbAccountId - id of DDB item with resourceType = 'account'
+   * @param s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
+   * @param hostingAccountAwsService - AWS Service for hosting account
+   * @param hostingAccountStackName - Hosting account stack name
+   */
   private async _updateHostingAccountStatus(
     ddbAccountId: string,
     s3ArtifactBucketName: string,
