@@ -23,6 +23,12 @@ const apiRouteConfig: ApiRouteConfig = {
       lifecycle: new SagemakerEnvironmentLifecycleService(),
       connection: new SagemakerEnvironmentConnectionService()
     }
+
+    // Add your environment types here as follows:
+    // <newEnvTypeName>: {
+    //   lifecycle: new <newEnvTypeName>EnvironmentLifecycleService(),
+    //   connection: new <newEnvTypeName>EnvironmentConnectionService()
+    // }
   },
   account: new HostingAccountService(),
   environmentService: new EnvironmentService({
