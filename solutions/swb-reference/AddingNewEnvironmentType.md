@@ -1,38 +1,40 @@
 # Adding a new environment type
 Service Workbench (SWB) allows users to upload and provision custom AWS compute environments and manage them via SWB APIs. This document outlines the changes needed in the codebase for adding support for such custom environment types.
 
-## Step 1: Add Service Catalog product
-1. Add a new folder with the environment type name in this folder: `solutions/swb-reference/src/environment/`. Add its Service Catalog template in this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`
-2. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment`
-3. This creates/updates a Service Catalog portfolio with all environment types listed in the folder mentioned above, and imports them into SWB.
+## Step 1: Setup Environment Resource
+1. Add a new folder with the environment type name in this folder: `solutions/swb-reference/src/environment/`. 
+2. Add its Service Catalog template in this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`
+3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment`
+4. This creates/updates a Service Catalog portfolio with all environment types listed in the folder mentioned above, and imports them into SWB.
 
-## Step 2: SSM documents
+## Step 2: Add Environment Workflow Support
+### SSM documents
 1. Add SSM documents for the new environment type's launch and terminate operations. 
-   - For reference, check out `solutions/swb-reference/src/environment/sagemaker/sagemakerLaunchSSM.yaml` and `solutions/swb-reference/src/environment/sagemaker/sagemakerTerminateSSM.yaml`
-2. Add a method in `solutions/swb-reference/src/environment/workflow.ts` (similar to `_createSagemakerSSMDocuments()`) to create SSM documents with the hosting account
+   - For reference, check out [sagemakerLaunchSSM.yaml](./src/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/sagemakerTerminateSSM.yaml)
+2. Add a method in [workflow.ts](../swb-reference/src/environment/workflow.ts) (similar to `_createSagemakerSSMDocuments()`) to create SSM documents with the hosting account
 
-## Step 3: Implement Environment Services
+### Implement Environment Services
 1. Implement lifecycle service: 
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentLifecycleService.ts` for managing the new environment type's lifecycle methods (namely launch, terminate, start, stop)
    2. Launch and terminate actions trigger an SSM document by sending the appropriate environment type-specific parameters
-      - Note: if you need to add new SSM parameters, make sure `workbench-core/environments/src/environmentLifecycleHelper.ts` methods are modified and parameter values propagate to the SSM documents as expected
-   3. For start and stop actions, check if `workbench-core/base/src/aws/awsService.ts` contains the environment type client you're trying to add. If not, you would need to add it similar to the other clients in the class.
+   3. For start and stop actions, check if [AwsService.ts](../../workbench-core/base/src/aws/awsService.ts) contains the environment type client you're trying to add. If not, you would need to add it similar to the other clients in the class.
 2. Implement connection service:
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentConnectionService.ts`
    2. Implement `getAuthCreds()` and `getConnectionInstruction()` methods to provide the required connection information to the user. Implementation will differ based on the environment type being addressed.
-3. Add the new environment type in the `apiRouteConfig.environments` object in `solutions/swb-reference/src/backendAPI.ts` as shown in comments.
-4. Add the required AWS client permission policies to `EnvManagementRole` (and its permission boundary) in `solutions/swb-reference/src/templates/onboard-account.cfn.yaml`
-   - For reference, check out the `sagemaker-access` policy in this role.
+3. API routes and Permissions:
+   1. Add the new environment type in the `apiRouteConfig.environments` object in [backendAPI.ts](../swb-reference/src/backendAPI.ts) as shown in comments.
+   2. Add the required AWS client permission policies to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml)
+      - For reference, check out the `sagemaker-access` policy in this role.
 
-## Step 4: Status Handler Lambda
-1. The Status handler lambda parses out event details sent to it by the hosting account event bus. The locations of various attribute values depending on the environment type will need to be recorded in this file.
+## Step 3: Add Support for Environment Status Update
+1. The Status handler lambda parses out event details sent to it by the hosting account event bus. The locations of various attribute values depending on the environment type will need to be recorded in [statusHandlerLambda.ts](./src/environment/statusHandlerLambda.ts).
    1. When we start/stop an environment instance, the state change event will be generated by the respective environment type client. A status-related attribute's location with respect to the `event.detail` body will need to be recorded in the `statusLocation` variable. 
       - For example, sagemaker sends its status value in `event.detail.NotebookInstanceStatus` attribute, so we record `NotebookInstanceStatus` in `statusLocation` for sagemaker.
    2. Since we only recognize environment status as one of the strings listed in `workbench-core/environments/src/environmentStatus.ts`, we need to map all statuses to those included in the `alternateStatuses` variable (case-insensitive).
       - For example, sagemaker indicates a terminated instance as `Deleted` but SWB recognized this status as `TERMINATED` so we map it. However, we don't need to map sagemaker status `Pending` since `PENDING` (its uppercase converted value) is already recognized by SWB.
    3. We record a unique instance ID for each environment instance provisioned by SWB. This is to match the start/stop events coming to the lambda to their SWB environment IDs. An instance ID-related attribute's location with respect to the `event.detail` body will need to be recorded in the `instanceIdLocation` variable.
    4. We also get the Service Catalog record details (name and ARN) for the given environment instance specifying it in the `envTypeRecordOutputKeys` variable. The value for the `instanceNameRecordKey` will be used as the instance ID for the environment type and should match the `event.detail.<instanceIdLocation>` value for the environment type.
-      - For example, if we perform `serviceCatalog.describeRecord()` after launching a sagemaker provisioned product we get: 
+      - For example, if we perform `serviceCatalog.describeRecord()` after launching a sagemaker provisioned product we get its CloudFormation template [sagemaker.cfn.yaml](./src/environment/sagemaker/sagemaker.cfn.yaml) outputs as follows: 
     ```
     [
         {
@@ -43,12 +45,13 @@ Service Workbench (SWB) allows users to upload and provision custom AWS compute 
             OutputKey: 'NotebookArn', 
             OutputValue: 'arn:aws:sagemaker:us-east-1:<accountID>:notebook-instance/basicnotebookinstance-123456789'
         },
+        ...and so on
     ]
     ```
       - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
   
-## Step 5: Re-onboard hosting account
-1. Depending on whether the `onboard-account.cfn.yaml` template was updated, the hosting account CloudFormation stack will need to be updated.
+## Step 4: Update Hosting Account Resources
+1. Depending on whether the [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml) template was updated, the hosting account CloudFormation stack will need to be updated.
 2. Share new environment type's SSM documents:
    1. Deploy the new changes made to the codebase by running the `STAGE=<STAGE> rushx cdk-deploy` command. This creates the SSM documents in the main account.
    2. Trigger the `/aws-accounts` POST API. This shares the SSM documents with the hosting account.
