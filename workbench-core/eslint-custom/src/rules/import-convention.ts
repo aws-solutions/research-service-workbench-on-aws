@@ -1,4 +1,5 @@
-export const importConvention = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const importConvention: any = {
   rules: {
     'import/no-unresolved': ['off'],
     'import/named': ['off'],
