@@ -16,7 +16,10 @@
     "test": "rushx test:only && rushx make-badges",
     "build:test": "heft test --clean && rushx make-badges"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*"
+  },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/heft": "^0.45.0",
