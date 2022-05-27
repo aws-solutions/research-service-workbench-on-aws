@@ -1,8 +1,10 @@
-import { namingConvention } from './rules/naming-convention';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { importConvention } from './rules/import-convention';
+import { namingConvention } from './rules/naming-convention';
 
-const rules = Object.assign({}, namingConvention.rules, importConvention.rules);
-export const customESLint = {
+const rules: any = Object.assign({}, namingConvention.rules, importConvention.rules);
+
+export const customESLint: any = {
   plugins: ['security', 'import'],
   extends: [
     '@rushstack/eslint-config/profile/node',
