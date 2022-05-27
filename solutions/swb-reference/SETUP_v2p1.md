@@ -14,6 +14,7 @@ These manual steps will not be required in the final implementation of SWBv2.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
   * Node 14.x or 16.x
+  * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN if not needed if you already have a preferred API client. 
 * The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
    * Install Docker ([link](https://docs.docker.com/get-docker/))
@@ -34,7 +35,7 @@ We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onbo
 In `swb-reference` root directory run the follow code
 ```
 rush install
-rushx build
+rush build
 rushx compile
 STAGE=<STAGE> rushx cdk bootstrap
 ```
@@ -66,6 +67,7 @@ S3BucketArtifactsArnOutput
 AccountHandlerLambdaRoleOutput
 ApiLambdaRoleOutput
 StatusHandlerLambdaRoleOutput
+APIGatewayAPIEndpoint
 ```
 
 Run the post deployment step
@@ -188,7 +190,17 @@ If you would like to launch a sagemaker instance with a different instance type 
 in the JSON above.
 
 ### Setup Account Resources
-Use POSTMAN to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
+
+#### POSTMAN Setup
+In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
+Your environment should have one variable. Name it `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. 
+
+Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+
+#### Onboard hosting account
+Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
+
+In POSTMAN this is the `Create Hosting Account` API
 
 POST `{{API_URL}}/aws-accounts`
 ```json
@@ -207,6 +219,8 @@ is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account hand
 # Test the API
 
 **Launch Sagemaker Instance**
+
+In POSTMAN this is the `Launch Environment` API
 
 POST `{{API_URL}}/environments`
 
@@ -227,6 +241,8 @@ status of the environment.
 
 **Check Environment Status**
 
+In POSTMAN this is the `Get Environment` API. Under the `Path Variable` section, update the `id` value.
+
 GET `{{API_URL}}/environments/:id`
 
 Replace `:id` with the `id` value from launching the environment. In the response you'll see the status of the environment.
@@ -234,22 +250,30 @@ Replace `:id` with the `id` value from launching the environment. In the respons
 
 **Connect to Environment**
 
+In POSTMAN this is the `Get Connection` API. Under the `Path Variable` section, update the `id` value.
+
 GET `{{API_URL}}/environments/:id/connections`
 Replace `:id` with the `id` value from launching the environment. In the response you'll find a `url`. Copy and paste that `url`
 into the browser to view your Sagemaker instance.
 
 **Stop an Environment**
 
+In POSTMAN this is the `Stop Environment` API. Under the `Path Variable` section, update the `id` value.
+
 PUT `{{API_URL}}/environments/:id/stop`
 Replace `:id` with the `id` value from launching the environment.
 
 **Start an Environment**
+
+In POSTMAN this is the `Start Environment` API. Under the `Path Variable` section, update the `id` value.
 
 PUT `{{API_URL}}/environments/:id/start`
 Replace `:id` with the `id` value from launching the environment.
 
 
 **Terminate the Environment**
+
+In POSTMAN this is the `Terminate Environment` API. Under the `Path Variable` section, update the `id` value.
 
 DELETE `{{API_URL}}/environments/:id`
 

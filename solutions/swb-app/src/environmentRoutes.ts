@@ -120,7 +120,6 @@ export function setUpEnvRoutes(
         externalId: environment.PROJ.externalId
       };
 
-      // TODO: Only allow get connection if environment is in `COMPLETED` status
       if (environment.status !== 'COMPLETED') {
         throw Boom.conflict(
           `Environment is in ${environment.status} status. Please wait until environment is in 'COMPLETED' status before trying to connect to the environment.`
