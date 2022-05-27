@@ -142,7 +142,7 @@ export default class AccountService {
         subnetId: accountMetadata.subnetId,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,
         environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
-        stackName: accountMetadata.stackName,
+        stackName: `${process.env.STACK_NAME!}-hosting-account`,
         status: accountMetadata.status,
         resourceType: 'account'
       }

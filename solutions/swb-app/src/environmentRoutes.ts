@@ -120,6 +120,11 @@ export function setUpEnvRoutes(
         externalId: environment.PROJ.externalId
       };
 
+      if (environment.status !== 'COMPLETED') {
+        throw Boom.conflict(
+          `Environment is in ${environment.status} status. Please wait until environment is in 'COMPLETED' status before trying to connect to the environment.`
+        );
+      }
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection

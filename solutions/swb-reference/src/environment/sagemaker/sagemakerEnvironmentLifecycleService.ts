@@ -109,7 +109,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     const hostAwsSdk = await this.helper.getAwsSdkForEnvMgmtRole({
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId,
-      operation: 'Start',
+      operation: 'Stop',
       envType: 'sagemaker'
     });
 
