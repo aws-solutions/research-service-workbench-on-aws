@@ -1,24 +1,23 @@
 jest.mock('./iamRoleCloneService');
 
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { EventBridgeClient, PutPermissionCommand } from '@aws-sdk/client-eventbridge';
-import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
-import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { Readable } from 'stream';
+import { AwsService } from '@amzn/workbench-core-base';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
+import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
+import { EventBridgeClient, PutPermissionCommand } from '@aws-sdk/client-eventbridge';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import { AwsService } from '@amzn/workbench-core-base';
-import { Readable } from 'stream';
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
-
+import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import IamRoleCloneService from './iamRoleCloneService';
 
 const constants = {

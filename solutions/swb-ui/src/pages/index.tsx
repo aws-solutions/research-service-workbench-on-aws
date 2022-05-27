@@ -1,10 +1,10 @@
+import Box from '@awsui/components-react/box';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Box from '@awsui/components-react/box';
 import Head from 'next/head';
-import { useSettings } from '../context/SettingsContext';
 import BaseLayout from '../components/BaseLayout';
 import Hero from '../components/Hero';
+import { useSettings } from '../context/SettingsContext';
 
 export interface HomeProps {
   locale: string;

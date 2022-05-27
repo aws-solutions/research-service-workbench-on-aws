@@ -1,12 +1,12 @@
+import { BreadcrumbGroupProps } from '@awsui/components-react';
+import AppLayout, { AppLayoutProps } from '@awsui/components-react/app-layout';
 import BreadcrumbGroup from '@awsui/components-react/breadcrumb-group';
 import Flashbar from '@awsui/components-react/flashbar';
-import AppLayout, { AppLayoutProps } from '@awsui/components-react/app-layout';
 import { useState } from 'react';
-import Navigation from '../components/Navigation';
-import { BreadcrumbGroupProps } from '@awsui/components-react';
-import styles from '../styles/BaseLayout.module.scss';
-import { useNotifications } from '../context/NotificationContext';
 import { layoutLabels } from '../common/labels';
+import Navigation from '../components/Navigation';
+import { useNotifications } from '../context/NotificationContext';
+import styles from '../styles/BaseLayout.module.scss';
 
 const breadcrumbs: BreadcrumbGroupProps.Item[] = [
   {

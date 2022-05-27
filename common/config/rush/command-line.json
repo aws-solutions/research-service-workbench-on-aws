@@ -188,9 +188,30 @@
       "enableParallelism": true
     },
     {
+      "name": "sort-package-json",
+      "commandKind": "bulk",
+      "summary": "Sort package.json file",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "make-badges",
       "commandKind": "bulk",
       "summary": "Used to update README file with code coverage report for the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "pkg-json-lint",
+      "commandKind": "bulk",
+      "summary": "Run lint on package.json files",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "lint:fix",
+      "commandKind": "bulk",
+      "summary": "lint fix",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },

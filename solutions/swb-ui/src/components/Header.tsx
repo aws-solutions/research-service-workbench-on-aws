@@ -1,8 +1,8 @@
-import { useTranslation } from 'next-i18next';
 import TopNavigation from '@awsui/components-react/top-navigation';
-import styles from '../styles/Header.module.scss';
-import { useSettings } from '../context/SettingsContext';
+import { useTranslation } from 'next-i18next';
 import { useAuthentication } from '../context/AuthenticationContext';
+import { useSettings } from '../context/SettingsContext';
+import styles from '../styles/Header.module.scss';
 
 export default function Header(): JSX.Element {
   const { t } = useTranslation();

@@ -3,15 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import _ from 'lodash';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
 import Scanner from './scanner';
 import Updater from './updater';
-
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import _ from 'lodash';
 
 export default class DynamoDBService {
   private _awsRegion: string;

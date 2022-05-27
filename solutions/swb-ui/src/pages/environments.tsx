@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { NextPage } from 'next';
-import { TableEmptyDisplay } from '../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../common/tableNoMatchState';
-import Head from 'next/head';
+import { useCollection } from '@awsui/collection-hooks';
 import {
   AppLayout,
   Box,
@@ -19,27 +16,28 @@ import {
   SplitPanel,
   Table
 } from '@awsui/components-react';
-import { useCollection } from '@awsui/collection-hooks';
+import { isWithinInterval } from 'date-fns';
+import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Head from 'next/head';
+import React, { SetStateAction, useEffect, useState } from 'react';
+import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
+import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
+import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
+import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../common/splitPanel';
+import { getFilterCounterText } from '../common/tableCounterStrings';
+import { TableEmptyDisplay } from '../common/tableEmptyState';
+import { TableNoMatchDisplay } from '../common/tableNoMatchState';
+import Navigation from '../components/Navigation';
 import { useSettings } from '../context/SettingsContext';
-import { SetStateAction, useEffect, useState } from 'react';
-import React from 'react';
-import { i18nStrings, paginationLables } from '../common/labels';
-import { allItems } from '../environments-table-config/workspacesData';
 import {
   columnDefinitions,
   searchableColumns
 } from '../environments-table-config/workspacesColumnDefinitions';
-import { getFilterCounterText } from '../common/tableCounterStrings';
+import { allItems } from '../environments-table-config/workspacesData';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
-import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
-import { isWithinInterval } from 'date-fns';
-import Navigation from '../components/Navigation';
-import { layoutLabels } from '../common/labels';
 import styles from '../styles/BaseLayout.module.scss';
-import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../common/splitPanel';
 
 export interface EnvironmentProps {
   locale: string;

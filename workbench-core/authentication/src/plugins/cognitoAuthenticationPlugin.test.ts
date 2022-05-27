@@ -1,5 +1,6 @@
-import axios from 'axios';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import axios from 'axios';
 import {
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions,
@@ -8,7 +9,6 @@ import {
   InvalidTokenTypeError,
   PluginConfigurationError
 } from '..';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',

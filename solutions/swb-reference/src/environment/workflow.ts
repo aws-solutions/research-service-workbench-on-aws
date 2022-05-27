@@ -1,10 +1,10 @@
 /* eslint-disable no-new */
 // cdk-ssm-document is used instead of 'aws-cdk-lib/aws-ssm` because aws-ssm creates new SSM documents instead of updating existing SSM document
 // https://github.com/aws-cloudformation/cloudformation-coverage-roadmap/issues/339
-import { Document } from 'cdk-ssm-document';
-import { join } from 'path';
 import fs from 'fs';
+import { join } from 'path';
 import { CfnOutput, Stack } from 'aws-cdk-lib';
+import { Document } from 'cdk-ssm-document';
 
 export default class Workflow {
   private _stack: Stack;

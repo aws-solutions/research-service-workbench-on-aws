@@ -1,3 +1,5 @@
+import { User } from '@amzn/workbench-core-authentication';
+import { fc, itProp } from 'jest-fast-check';
 import {
   AuthorizationPlugin,
   Permission,
@@ -6,8 +8,6 @@ import {
   Operation,
   AuthorizationService
 } from '.';
-import { User } from '@amzn/workbench-core-authentication';
-import { fc, itProp } from 'jest-fast-check';
 
 describe('Authorization Service', () => {
   let mockPermissionsPlugin: PermissionsPlugin;
