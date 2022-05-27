@@ -1,18 +1,21 @@
 import Operation from './operation';
 
+// eslint-disable-next-line @rushstack/typedef-var
+export const HTTPMethods = [
+  'GET',
+  'DELETE',
+  'CONNECT',
+  'HEAD',
+  'OPTIONS',
+  'PATCH',
+  'POST',
+  'PUT',
+  'TRACE'
+] as const;
 /**
  * HTTP methods.
  */
-export type HTTPMethod =
-  | 'GET'
-  | 'DELETE'
-  | 'CONNECT'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'PATCH'
-  | 'POST'
-  | 'PUT'
-  | 'TRACE';
+export type HTTPMethod = typeof HTTPMethods[number];
 
 /**
  * Maps {@link HTTPMethod} to a set of {@link Operation}s.

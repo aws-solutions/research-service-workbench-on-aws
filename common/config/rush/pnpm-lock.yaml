@@ -415,6 +415,7 @@ importers:
       '@types/node': ^14
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
+      express: ^4.17.3
       fast-check: ^2.24.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
@@ -440,6 +441,7 @@ importers:
       '@types/node': 14.18.18
       eslint: 8.15.0
       eslint-plugin-import: 2.26.0_eslint@8.15.0
+      express: 4.18.1
       fast-check: 2.25.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
@@ -5975,7 +5977,7 @@ packages:
     dev: true
 
   /array-flatten/1.1.1:
-    resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
+    resolution: {integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=}
 
   /array-includes/3.1.5:
     resolution: {integrity: sha512-iSDYZMMyTPkiFasVqfuAQnWAYcvO/SeBSCGKePoEthjp4LEMTe4uLc7b025o4jAZpHhihh8xPo99TNWUWWkGDQ==}
