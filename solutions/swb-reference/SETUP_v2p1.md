@@ -65,7 +65,7 @@ Take note of the following Cloudformation outputs. We will be using them in futu
 S3BucketArtifactsArnOutput
 AccountHandlerLambdaRoleOutput
 ApiLambdaRoleOutput
-EventBusOutput
+StatusHandlerLambdaRoleOutput
 ```
 
 Run the post deployment step
@@ -84,8 +84,8 @@ MainAccountId: <12 digit Account ID of Main Account>
 ExternalId: workbench
 VpcCidr: 10.0.0.0/16
 PublicSubnetCidr: 10.0.0.0/19
-AccountHandlerRoleArn: <CFN_OUTPUT.accountHandlerLambdaRoleOutput> 
-ApiHandlerRoleArn: <CFN_OUTPUT.apiLambdaRoleOutput> 
+AccountHandlerRoleArn: <CFN_OUTPUT.AccountHandlerLambdaRoleOutput> 
+ApiHandlerRoleArn: <CFN_OUTPUT.ApiLambdaRoleOutput> 
 EnableFlowLogs: true
 LaunchConstraintPolicyPrefix: *
 LaunchConstraintRolePrefix: *
@@ -97,7 +97,6 @@ After the deployment is complete, take note of the following Cloudformation outp
 CrossAccountHandlerRoleArn
 EncryptionKeyArn
 EnvMgmtRoleArn
-HostEventBusArn
 VPC
 VpcSubnet
 ```

@@ -120,6 +120,8 @@ export function setUpEnvRoutes(
         externalId: environment.PROJ.externalId
       };
 
+      // TODO: Only allow get connection if environment is in `COMPLETED` status
+
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         // eslint-disable-next-line security/detect-object-injection
