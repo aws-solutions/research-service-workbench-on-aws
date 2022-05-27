@@ -1,6 +1,6 @@
-import request from 'supertest';
-import express, { Express } from 'express';
 import cookieParser from 'cookie-parser';
+import express, { Express } from 'express';
+import request from 'supertest';
 import {
   AuthenticationService,
   CognitoAuthenticationPlugin,

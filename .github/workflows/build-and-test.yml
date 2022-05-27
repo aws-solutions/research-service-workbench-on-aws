@@ -19,5 +19,5 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
       
-      - name: Rush test and update the README file in each package with the coverage badge
-        run: node common/scripts/install-run-rush.js test --verbose
+      - name: Rush test
+        run: node common/scripts/install-run-rush.js test:only --verbose

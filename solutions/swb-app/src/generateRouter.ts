@@ -1,8 +1,8 @@
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
+import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpEnvRoutes } from './environmentRoutes';
-import { setUpAccountRoutes } from './accountRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();

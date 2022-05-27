@@ -235,6 +235,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "date-fns",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "diff",
       "allowedCategories": [ "production" ]
     },
@@ -248,6 +252,10 @@
     },
     {
       "name": "eslint-config-next",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-import",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
@@ -287,8 +295,8 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "lambda-build",
-      "allowedCategories": [ "production" ]
+      "name": "lint-staged",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "lodash",
@@ -319,6 +327,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "npm-package-json-lint",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "npm-package-json-lint-config-default",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -336,6 +352,10 @@
     },
     {
       "name": "sharp",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "sort-package-json",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {

@@ -1,7 +1,7 @@
+import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import IamRoleCloneService from './iamRoleCloneService';
-import { Readable } from 'stream';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;

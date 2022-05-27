@@ -1,22 +1,21 @@
-import axios, { AxiosError } from 'axios';
-import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 import {
   CognitoIdentityProviderClient,
   DescribeUserPoolClientCommand,
   DescribeUserPoolClientCommandInput,
   TimeUnitsType
 } from '@aws-sdk/client-cognito-identity-provider';
-
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
+import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
-import { InvalidJWTError } from '../errors/invalidJwtError';
 import { InvalidAuthorizationCodeError } from '../errors/invalidAuthorizationCodeError';
-import { Tokens } from '../tokens';
-import { PluginConfigurationError } from '../errors/pluginConfigurationError';
-import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 import { InvalidCodeVerifierError } from '../errors/invalidCodeVerifierError';
+import { InvalidJWTError } from '../errors/invalidJwtError';
 import { InvalidTokenError } from '../errors/invalidTokenError';
+import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
+import { PluginConfigurationError } from '../errors/pluginConfigurationError';
+import { Tokens } from '../tokens';
 import { getTimeInSeconds } from '../utils';
 
 interface TokensExpiration {

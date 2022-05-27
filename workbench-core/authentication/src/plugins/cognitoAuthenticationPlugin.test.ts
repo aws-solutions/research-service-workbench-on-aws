@@ -5,8 +5,16 @@ jest.mock('../utils', () => ({
   })
 }));
 
-import axios from 'axios';
+import {
+  CognitoIdentityProviderClient,
+  DescribeUserPoolClientCommandOutput,
+  NotAuthorizedException,
+  ResourceNotFoundException,
+  TimeUnitsType
+} from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import axios from 'axios';
 import {
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions,
@@ -17,14 +25,6 @@ import {
   InvalidTokenTypeError,
   PluginConfigurationError
 } from '..';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
-import {
-  CognitoIdentityProviderClient,
-  DescribeUserPoolClientCommandOutput,
-  NotAuthorizedException,
-  ResourceNotFoundException,
-  TimeUnitsType
-} from '@aws-sdk/client-cognito-identity-provider';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   region: 'us-west-2',

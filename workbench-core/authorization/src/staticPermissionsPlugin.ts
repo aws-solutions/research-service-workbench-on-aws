@@ -1,10 +1,10 @@
 import { User } from '@amzn/workbench-core-authentication';
-import PermissionsPlugin from './permissionsPlugin';
 import { LoggingService } from '@amzn/workbench-core-logging';
-import Permission, { PermissionsMap } from './permission';
-import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';
 import _ from 'lodash';
 import Operation from './operation';
+import Permission, { PermissionsMap } from './permission';
+import PermissionsPlugin from './permissionsPlugin';
+import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';
 
 /**
  * Static Permissions Plugin.

@@ -1,38 +1,49 @@
-export const columnDefinitions = [
+import { TableProps } from '@awsui/components-react';
+
+export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] = [
   {
-    id: 'workspace',
-    header: 'Workspace',
-    cell: (e: { workspace: string }) => e.workspace
+    id: 'workspaceName',
+    header: 'Workspace name',
+    cell: (e: { workspaceName: string }) => e.workspaceName,
+    sortingField: 'workspaceName'
   },
   {
     id: 'workspaceStatus',
     header: 'Workspace status',
-    cell: (e: { workspaceStatus: string }) => e.workspaceStatus
+    cell: (e: { workspaceStatus: string }) => e.workspaceStatus,
+    sortingField: 'workspaceStatus'
   },
   {
-    id: 'updatedAt',
-    header: 'Updated at',
-    cell: (e: { updatedAt: string }) => e.updatedAt,
-    sortingField: 'updatedAt'
+    id: 'createdAt',
+    header: 'Created at',
+    cell: (e: { createdAt: string }) => e.createdAt,
+    sortingField: 'createdAt'
   },
   {
     id: 'project',
     header: 'Project',
-    cell: (e: { project: string }) => e.project
+    cell: (e: { project: string }) => e.project,
+    sortingField: 'project'
   },
   {
     id: 'owner',
     header: 'Owner',
-    cell: (e: { owner: string }) => e.owner
+    cell: (e: { owner: string }) => e.owner,
+    sortingField: 'owner'
   },
   {
-    id: 'connections',
-    header: 'Connections',
-    cell: (e: { connections: number }) => e.connections
-  },
-  {
-    id: 'workspaceActions',
-    header: 'Workspace actions',
-    cell: (e: { workspaceActions: JSX.Element }) => e.workspaceActions
+    id: 'workspaceCost',
+    header: 'Workspace cost (last 7 days)',
+    cell: (e: { workspaceCost: number }) => `$ ${e.workspaceCost}`,
+    sortingField: 'workspaceCost'
   }
+];
+
+export const searchableColumns: string[] = [
+  'workspaceName',
+  'workspaceStatus',
+  'createdAt',
+  'project',
+  'owner',
+  'workspaceCost'
 ];
