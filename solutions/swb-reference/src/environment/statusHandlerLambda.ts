@@ -42,6 +42,7 @@ export async function handler(event: any) {
       Deleting: 'TERMINATING',
       Deleted: 'TERMINATED'
     }
+    // Add your new env alternate statuses here
   };
 
   const source = event.source === 'automation' ? 'automation' : event.source.split('aws.')[1];
