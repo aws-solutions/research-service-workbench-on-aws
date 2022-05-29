@@ -23,6 +23,7 @@ This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monor
 6. Alternatively you can use:
    - `rush build:test` - single command to perform `rush build && rush test` for each package. See `rush build:test -h` for more options
 7. `rush common-coverage-report` - updates root README file with code coverage summary
+8. `rush lint:fix` - automatically fixes most of the eslint problems.
 
 NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Refer to the [documentation](https://rushjs.io/pages/developer/modifying_package_json/) for more details. Packages can be added/updated in 2 ways:
    - `rush add -p <PACKAGE_NAME>`. See `rush add -h` for more options.
@@ -47,3 +48,19 @@ NOTE: to install new packages or dependencies: **DO NOT USE** `npm install`. Ref
 ## Pull Requests Process
 
 Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-via-pull-requests)
+
+## rush everyday commands
+1. [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files
+    - `rush update --purge` - The `--purge` option is used to delete temporary files created by Rush. This is useful if you are having problems and suspect that cache files may be corrupt.
+2. [`rush install`](https://rushjs.io/pages/commands/rush_install/) - The `rush install` command installs package dependencies for all your projects, based on the pnpm-lock.yaml file that is created/updated using `rush update`
+3. [`rush add`](https://rushjs.io/pages/commands/rush_add/) - Adds a specified package as a dependency of the current project (as determined by the current working directory) and then runs `rush update`.
+    - `rush add -p example-lib@1.2.3 --all` - Adds package to all the projects as dependencies 
+    - `rush add -p example-lib@1.2.3 --all --dev` - Adds package to all the projects as devDependencies
+    - `rush add -p example-lib --all --dev --caret` or `rush add -p example-lib@^1.2.3 --all --dev` - Caret specifier for SemVer dependencies
+    - `rush add -p example-lib --all --dev --caret --make-consistent` - Make all devDependency for a package consistent across all projects
+4. [`rush check`](https://rushjs.io/pages/commands/rush_check/) - Checks each project's package.json files and ensures that all dependencies are of the same version throughout the repository.
+5. Triggering commands using `rush` as mentioned above triggers them for all the projects in the monorepo, but if you want to trigger a command just for a specific package then (for example trigger commands just for [workbench-core/audit](./workbench-core/audit/) package):
+    - Go to projects root folder - `cd ./workbench-core/audit`
+    - Instead of running commands using `rush` use `rushx`:
+        - install a package - `rushx add -p example-lib --dev`
+        - run build - `rushx build`
