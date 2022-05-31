@@ -231,10 +231,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "cookie-parser",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -360,10 +356,6 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "supertest",
       "allowedCategories": [ "production" ]
     },
     {
