@@ -652,7 +652,6 @@ importers:
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
       '@types/node': ^14
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -664,7 +663,6 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@rushstack/eslint-config': 2.6.0_eslint@8.15.0+typescript@4.6.4
-      '@types/jest': 27.5.1
       eslint: 8.15.0
       eslint-plugin-import: 2.26.0_eslint@8.15.0
       eslint-plugin-security: 1.5.0
@@ -691,7 +689,6 @@ importers:
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
       '@types/node': ^14
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -713,7 +710,6 @@ importers:
       '@rushstack/heft-node-rig': 1.9.5_@rushstack+heft@0.45.4
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
-      '@types/jest': 27.5.1
       '@types/node': 14.18.18
       depcheck: 1.4.3
       eslint: 8.15.0
@@ -739,7 +735,6 @@ importers:
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       '@vendia/serverless-express': ^4.5.4
@@ -780,7 +775,6 @@ importers:
       '@rushstack/heft-node-rig': 1.9.5_@rushstack+heft@0.45.4
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
-      '@types/jest': 27.5.1
       '@types/lodash': 4.14.182
       '@types/node': 14.18.18
       '@vendia/serverless-express': 4.8.0
@@ -5422,6 +5416,7 @@ packages:
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
+    dev: true
 
   /@types/js-yaml/4.0.5:
     resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
@@ -6035,6 +6030,7 @@ packages:
   /ansi-styles/5.2.0:
     resolution: {integrity: sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==}
     engines: {node: '>=10'}
+    dev: true
 
   /any-promise/1.3.0:
     resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
@@ -7200,6 +7196,7 @@ packages:
   /diff-sequences/27.5.1:
     resolution: {integrity: sha512-k1gCAXAsNgLwEL+Y8Wvl+M6oEFj5bgazfZULpS5CneoPPXRaCCW7dm+q21Ky2VEE5X+VeRDBVg1Pcvvsr4TtNQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
+    dev: true
 
   /diff/4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
@@ -9260,6 +9257,7 @@ packages:
       diff-sequences: 27.5.1
       jest-get-type: 27.5.1
       pretty-format: 27.5.1
+    dev: true
 
   /jest-docblock/27.5.1:
     resolution: {integrity: sha512-rl7hlABeTsRYxKiUfpHrQrG4e2obOiTQWfMEH3PxPjOtdsfLQO4ReWSZaQ7DETm4xu07rl4q/h4zcKXyU0/OzQ==}
@@ -9334,6 +9332,7 @@ packages:
   /jest-get-type/27.5.1:
     resolution: {integrity: sha512-2KY95ksYSaK7DMBWQn6dQz3kqAf3BB64y2udeG+hv4KfSOb9qwcYQstTJc1KCbsix+wLZWZYN8t7nwX3GOBLRw==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
+    dev: true
 
   /jest-haste-map/27.5.1:
     resolution: {integrity: sha512-7GgkZ4Fw4NFbMSDSpZwXeBiIbx+t/46nJ2QitkOjvwPYyZmqttu2TDSimMHP1EkPOi4xUZAN1doE5Vd25H4Jng==}
@@ -9396,6 +9395,7 @@ packages:
       jest-diff: 27.5.1
       jest-get-type: 27.5.1
       pretty-format: 27.5.1
+    dev: true
 
   /jest-message-util/27.5.1:
     resolution: {integrity: sha512-rMyFe1+jnyAAf+NHwTclDz0eAaLkVDdKVHHBFWsBWHnnh5YeJMNWWsv7AbFYXfK3oTqvL7VTWkhNLu1jX24D+g==}
@@ -10855,6 +10855,7 @@ packages:
       ansi-regex: 5.0.1
       ansi-styles: 5.2.0
       react-is: 17.0.2
+    dev: true
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
@@ -11046,6 +11047,7 @@ packages:
 
   /react-is/17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+    dev: true
 
   /react-keyed-flatten-children/1.3.0_react@17.0.2:
     resolution: {integrity: sha512-qB7A6n+NHU0x88qTZGAJw6dsqwI941jcRPBB640c/CyWqjPQQ+YUmXOuzPziuHb7iqplM3xksWAbGYwkQT0tXA==}

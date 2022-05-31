@@ -6,7 +6,7 @@ ignores: [
     '@types/node'
 ]
 ignore-patterns: [
-    // files matching these patterns will be ignored
+    // directories matching these patterns will be ignored
     '.next',
     '.rush',
     'node_modules',

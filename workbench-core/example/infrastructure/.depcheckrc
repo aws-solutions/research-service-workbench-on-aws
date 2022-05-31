@@ -3,7 +3,6 @@ ignores: [
     '@rushstack/heft-jest-plugin',
     '@rushstack/heft-node-rig',
     '@types/heft-jest',
-    '@types/jest',
     'eslint-plugin-import',
     'eslint-plugin-security',
     'npm-package-json-lint-config-default'

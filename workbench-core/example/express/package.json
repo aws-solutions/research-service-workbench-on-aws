@@ -38,7 +38,6 @@
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/express": "^4.17.13",
     "@types/heft-jest": "1.0.2",
-    "@types/jest": "^27.4.1",
     "@types/node": "^14",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
