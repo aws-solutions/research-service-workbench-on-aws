@@ -55,7 +55,6 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
 2. [`rush install`](https://rushjs.io/pages/commands/rush_install/) - The `rush install` command installs package dependencies for all your projects, based on the pnpm-lock.yaml file that is created/updated using `rush update`
 3. [`rush add`](https://rushjs.io/pages/commands/rush_add/) - Adds a specified package as a dependency of the current project (as determined by the current working directory) and then runs `rush update`. Always use the `--caret` or version with caret sign(example-lib@^1.2.3), not doing so by default installs tilde versions(e.g. ~1.2.3)
     - `rush add -p example-lib --dev --caret` - Adds package to the devDependencies only for the current project (cd /path-to-your-project first)
-    - `rush add -p example-lib@1.2.3 --all --caret` - Adds package with caret version to all the projects as dependencies
     - `rush add -p example-lib --all --dev --caret` or `rush add -p example-lib@^1.2.3 --all --dev` - Caret specifier for SemVer dependencies
     - `rush add -p example-lib --all --dev --caret --make-consistent` - Make all devDependency for a package consistent across all projects
     - `rush add -p example-lib@1.2.3 --all --dev` or `rush add -p example-lib --exact --all --dev` - Adds package to all the projects as devDependencies (installs the exact version, use this if there is a need for exact version or else always install dependencies and devDependencies with `--caret` option)
