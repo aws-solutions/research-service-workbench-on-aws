@@ -10,7 +10,9 @@ export function setUpEnvRoutes(
   environments: { [key: string]: Environment },
   environmentService: EnvironmentService
 ): void {
-  const supportedEnvs = Object.keys(environments);
+  const supportedEnvs = Object.keys(environments).map((env) => {
+    return env.toLocaleLowerCase();
+  });
 
   // Launch
   router.post(
