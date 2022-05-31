@@ -31,7 +31,8 @@ At a high level, we'll need to do the following steps
 1. Add API route
    * Add the new environment type in the `apiRouteConfig.environments` object in [backendAPI.ts](../swb-reference/src/backendAPI.ts). 
 2. API routes and Permissions
-   * Add the required AWS client permission policies to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role.
+   * Add the required AWS client permission for start/stop to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role.
+   * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object.
 
 ## Step 4: Add Support for environment Status Update
 1. The Status handler lambda writes new environment status and details to DDB. These details are sent to it by the hosting account event bus. We'll need to provide a mapping between the Event Bridge events and the environment DDB item. This mapping can be updated in the [statusHandlerLambda.ts](./src/environment/statusHandlerLambda.ts).
