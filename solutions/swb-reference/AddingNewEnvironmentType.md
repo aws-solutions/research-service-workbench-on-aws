@@ -57,8 +57,15 @@ At a high level, we'll need to do the following steps
     ]
     ```
       - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
-  
-## Step 5 (Optional): Update hosting account resources
+
+## Step 5: Deploy updated code 
+
+Run the following command to deploy the updated code to AWS
+```
+STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
+```
+
+## Step 6 (Optional): Update hosting account resources
 * If the [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml) template was updated, the hosting account CloudFormation stack will need to be updated.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
