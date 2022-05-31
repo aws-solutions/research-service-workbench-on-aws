@@ -235,6 +235,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "depcheck",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "diff",
       "allowedCategories": [ "production" ]
     },
