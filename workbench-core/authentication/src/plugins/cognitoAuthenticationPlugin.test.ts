@@ -1,9 +1,4 @@
-jest.mock('../utils', () => ({
-  getTimeInSeconds: jest.fn().mockImplementation((length, units) => {
-    if (length && units) return 1;
-    return 0;
-  })
-}));
+jest.mock('../utils');
 
 import {
   CognitoIdentityProviderClient,
