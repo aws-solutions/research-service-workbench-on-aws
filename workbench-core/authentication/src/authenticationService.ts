@@ -23,7 +23,7 @@ export class AuthenticationService {
    * @returns true if the user is logged in
    */
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
-    return this._authenticationPlugin.isUserLoggedIn(accessToken);
+    return await this._authenticationPlugin.isUserLoggedIn(accessToken);
   }
 
   /**
@@ -35,7 +35,7 @@ export class AuthenticationService {
    * @throws {@link InvalidJWTError} if the token is invalid
    */
   public async validateToken(token: string): Promise<DecodedJWT> {
-    return this._authenticationPlugin.validateToken(token);
+    return await this._authenticationPlugin.validateToken(token);
   }
 
   /**
@@ -47,7 +47,7 @@ export class AuthenticationService {
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    */
   public async revokeToken(token: string): Promise<void> {
-    return this._authenticationPlugin.revokeToken(token);
+    return await this._authenticationPlugin.revokeToken(token);
   }
 
   /**
@@ -86,8 +86,8 @@ export class AuthenticationService {
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
    */
-  public handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
-    return this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
+  public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
+    return await this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
   }
 
   /**
@@ -114,6 +114,6 @@ export class AuthenticationService {
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    */
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
-    return this._authenticationPlugin.refreshAccessToken(refreshToken);
+    return await this._authenticationPlugin.refreshAccessToken(refreshToken);
   }
 }

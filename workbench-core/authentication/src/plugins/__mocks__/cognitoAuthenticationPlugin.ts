@@ -11,7 +11,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     }
     return false;
   }
-  public validateToken(token: string): Promise<CognitoJwtPayload> {
+  public async validateToken(token: string): Promise<CognitoJwtPayload> {
     return Promise.resolve({
       token_use: 'access',
       sub: 'sub',
@@ -49,7 +49,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public getAuthorizationCodeUrl(): string {
     return 'authorizationCodeUrl';
   }
-  public refreshAccessToken(refreshToken: string): Promise<Tokens> {
+  public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
     return Promise.resolve({
       idToken: {
         token: 'id token',
