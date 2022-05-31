@@ -9,7 +9,7 @@ ignores: [
     '@types/node'
 ]
 ignore-patterns: [
-    // dirs matching these patterns will be ignored
+    // files matching these patterns will be ignored
     '.heft',
     '.rush',
     'config',
