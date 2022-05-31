@@ -19,9 +19,9 @@ import { Tokens } from '../tokens';
 import { getTimeInSeconds } from '../utils';
 
 interface TokensExpiration {
-  idToken: number; // in seconds
-  accessToken: number; // in seconds
-  refreshToken: number; // in seconds
+  idToken?: number; // in seconds
+  accessToken?: number; // in seconds
+  refreshToken?: number; // in seconds
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -370,15 +370,33 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     try {
       const clientInfo = await client.send(describeCommand);
 
-      const expiresInUnits = clientInfo.UserPoolClient?.TokenValidityUnits;
-      const refreshLength = clientInfo.UserPoolClient?.RefreshTokenValidity;
-      const idLength = clientInfo.UserPoolClient?.IdTokenValidity;
-      const accessLength = clientInfo.UserPoolClient?.AccessTokenValidity;
+      const {
+        IdToken: idTokenUnits,
+        AccessToken: accessTokenUnits,
+        RefreshToken: refreshTokenUnits
+      } = clientInfo.UserPoolClient?.TokenValidityUnits || {};
+
+      const refreshTokenTime = clientInfo.UserPoolClient?.RefreshTokenValidity;
+      const idTokenTime = clientInfo.UserPoolClient?.IdTokenValidity;
+      const accessTokenTime = clientInfo.UserPoolClient?.AccessTokenValidity;
+
+      const idTokenExpiresIn =
+        idTokenTime && idTokenUnits
+          ? getTimeInSeconds(idTokenTime, idTokenUnits as TimeUnitsType)
+          : undefined;
+      const accessTokenExpiresIn =
+        accessTokenTime && accessTokenUnits
+          ? getTimeInSeconds(accessTokenTime, accessTokenUnits as TimeUnitsType)
+          : undefined;
+      const refreshTokenExpiresIn =
+        refreshTokenTime && refreshTokenUnits
+          ? getTimeInSeconds(refreshTokenTime, refreshTokenUnits as TimeUnitsType)
+          : undefined;
 
       return {
-        idToken: getTimeInSeconds(idLength, expiresInUnits?.IdToken as TimeUnitsType),
-        accessToken: getTimeInSeconds(accessLength, expiresInUnits?.AccessToken as TimeUnitsType),
-        refreshToken: getTimeInSeconds(refreshLength, expiresInUnits?.RefreshToken as TimeUnitsType)
+        idToken: idTokenExpiresIn,
+        accessToken: accessTokenExpiresIn,
+        refreshToken: refreshTokenExpiresIn
       };
     } catch (error) {
       if (error.name === 'NotAuthorizedException') {

@@ -47,7 +47,7 @@ export class AuthenticationService {
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    */
   public async revokeToken(token: string): Promise<void> {
-    return await this._authenticationPlugin.revokeToken(token);
+    await this._authenticationPlugin.revokeToken(token);
   }
 
   /**

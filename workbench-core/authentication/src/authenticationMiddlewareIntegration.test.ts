@@ -1,3 +1,6 @@
+jest.mock('./authenticationService');
+jest.mock('./plugins/cognitoAuthenticationPlugin');
+
 import cookieParser from 'cookie-parser';
 import express, { Express } from 'express';
 import request from 'supertest';
@@ -36,7 +39,7 @@ const tokens = {
   }
 };
 
-describe('authenticationMiddleware tests', () => {
+describe('authenticationMiddleware integration tests', () => {
   let service: AuthenticationService;
   let app: Express;
 
@@ -56,12 +59,16 @@ describe('authenticationMiddleware tests', () => {
     app.get('/refresh', refreshAccessToken(service));
   });
 
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
   describe('getTokensFromAuthorizationCode tests', () => {
     it('should return 200, the id token in the response body, and set the access and refresh tokens as cookies when the code and codeVerifier params are valid', async () => {
-      // TODO figure out how to test without using dates.
-      const accessExpires = new Date(Date.now() + tokens.accessToken.expiresIn * 1000).toUTCString();
-      const refreshExpires = new Date(Date.now() + tokens.refreshToken.expiresIn * 1000).toUTCString();
-      jest.spyOn(service, 'handleAuthorizationCode').mockResolvedValueOnce(tokens);
+      const accessExpires = new Date(tokens.accessToken.expiresIn * 1000).toUTCString();
+      const refreshExpires = new Date(tokens.refreshToken.expiresIn * 1000).toUTCString();
+      jest.spyOn(service, 'handleAuthorizationCode').mockResolvedValue(tokens);
+      jest.spyOn(Date, 'now').mockImplementation(() => 0);
 
       await request(app)
         .post('/token')
@@ -69,25 +76,25 @@ describe('authenticationMiddleware tests', () => {
         .expect('Content-Type', /json/)
         .expect(
           'set-cookie',
-          `access_token=access%20token; Max-Age=1234; Path=/; Expires=${accessExpires}; HttpOnly; Secure; SameSite=Strict,refresh_token=refresh%20token; Max-Age=1234; Path=/; Expires=${refreshExpires}; HttpOnly; Secure; SameSite=Strict`
+          `access_token=access%20token; Path=/; Expires=${accessExpires}; HttpOnly; Secure; SameSite=Strict,refresh_token=refresh%20token; Path=/; Expires=${refreshExpires}; HttpOnly; Secure; SameSite=Strict`
         )
         .expect(200, { idToken: 'id token' });
     });
 
-    it('should return 401 when code param is missing', async () => {
+    it('should return 400 when code param is missing', async () => {
       await request(app)
         .post('/token')
         .send({ codeVerifier: 'code verifier' })
         .expect('Content-Type', /text/)
-        .expect(401);
+        .expect(400);
     });
 
-    it('should return 401 when codeVerifier param is missing', async () => {
-      await request(app).post('/token').send({ code: 'code' }).expect('Content-Type', /text/).expect(401);
+    it('should return 400 when codeVerifier param is missing', async () => {
+      await request(app).post('/token').send({ code: 'code' }).expect('Content-Type', /text/).expect(400);
     });
 
     it('should return 401 when code or codeVerifier param is invalid', async () => {
-      jest.spyOn(service, 'handleAuthorizationCode').mockRejectedValueOnce(new Error());
+      jest.spyOn(service, 'handleAuthorizationCode').mockRejectedValue(new Error());
 
       await request(app)
         .post('/token')
@@ -100,7 +107,7 @@ describe('authenticationMiddleware tests', () => {
   describe('getAuthorizationCodeUrl tests', () => {
     it('should return 200 and the authorization code url when the stateVerifier and codeChallenge params are valid', async () => {
       const authorizationCodeUrl = 'authorizationCodeUrl';
-      jest.spyOn(service, 'getAuthorizationCodeUrl').mockReturnValueOnce(authorizationCodeUrl);
+      jest.spyOn(service, 'getAuthorizationCodeUrl').mockReturnValue(authorizationCodeUrl);
 
       await request(app)
         .get('/login?stateVerifier=stateVerifier&codeChallenge=codeChallenge')
@@ -123,9 +130,9 @@ describe('authenticationMiddleware tests', () => {
         id: 'user id',
         roles: ['role']
       };
-      jest.spyOn(service, 'validateToken').mockResolvedValueOnce({});
-      jest.spyOn(service, 'getUserIdFromToken').mockReturnValueOnce(user.id);
-      jest.spyOn(service, 'getUserRolesFromToken').mockReturnValueOnce(user.roles);
+      jest.spyOn(service, 'validateToken').mockResolvedValue({});
+      jest.spyOn(service, 'getUserIdFromToken').mockReturnValue(user.id);
+      jest.spyOn(service, 'getUserRolesFromToken').mockReturnValue(user.roles);
 
       await request(app)
         .get('/pro')
@@ -139,7 +146,7 @@ describe('authenticationMiddleware tests', () => {
     });
 
     it('should return 401 when access_token cookie is invalid', async () => {
-      jest.spyOn(service, 'validateToken').mockRejectedValueOnce(new Error());
+      jest.spyOn(service, 'validateToken').mockRejectedValue(new Error());
 
       await request(app)
         .get('/pro')
@@ -151,7 +158,7 @@ describe('authenticationMiddleware tests', () => {
 
   describe('logoutUser tests', () => {
     it('should return 200, clear cookies, and revoke refresh token when refresh_token cookie is present and valid', async () => {
-      jest.spyOn(service, 'revokeToken').mockResolvedValueOnce();
+      jest.spyOn(service, 'revokeToken').mockResolvedValue();
 
       await request(app)
         .get('/logout')
@@ -177,7 +184,7 @@ describe('authenticationMiddleware tests', () => {
     });
 
     it('should return 200 and clear cookies when refresh_token cookie is invalid', async () => {
-      jest.spyOn(service, 'revokeToken').mockRejectedValueOnce(new Error());
+      jest.spyOn(service, 'revokeToken').mockRejectedValue(new Error());
 
       await request(app)
         .get('/logout')
@@ -193,9 +200,9 @@ describe('authenticationMiddleware tests', () => {
 
   describe('refreshAccessToken tests', () => {
     it('should return 200, the id token in the response body, and set the access token as a cookie when the refresh_token cookie is present and valid', async () => {
-      // TODO figure out how to test without using dates.
-      const accessExpires = new Date(Date.now() + tokens.accessToken.expiresIn * 1000).toUTCString();
-      jest.spyOn(service, 'refreshAccessToken').mockResolvedValueOnce(tokens);
+      const accessExpires = new Date(tokens.accessToken.expiresIn * 1000).toUTCString();
+      jest.spyOn(service, 'refreshAccessToken').mockResolvedValue(tokens);
+      jest.spyOn(Date, 'now').mockImplementation(() => 0);
 
       await request(app)
         .get('/refresh')
@@ -203,7 +210,7 @@ describe('authenticationMiddleware tests', () => {
         .expect('Content-Type', /json/)
         .expect(
           'set-cookie',
-          `access_token=access%20token; Max-Age=1234; Path=/; Expires=${accessExpires}; HttpOnly; Secure; SameSite=Strict`
+          `access_token=access%20token; Path=/; Expires=${accessExpires}; HttpOnly; Secure; SameSite=Strict`
         )
         .expect(200, { idToken: 'id token' });
     });
@@ -213,7 +220,7 @@ describe('authenticationMiddleware tests', () => {
     });
 
     it('should return 401 when refresh_token cookie is invalid', async () => {
-      jest.spyOn(service, 'refreshAccessToken').mockRejectedValueOnce(new Error());
+      jest.spyOn(service, 'refreshAccessToken').mockRejectedValue(new Error());
 
       await request(app)
         .get('/refresh')

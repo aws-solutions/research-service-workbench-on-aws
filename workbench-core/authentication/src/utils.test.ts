@@ -3,18 +3,6 @@ import { getTimeInSeconds } from '.';
 
 describe('util tests', () => {
   describe('getTimeInSeconds tests', () => {
-    it('should return 0 if length is undefined', () => {
-      const time = getTimeInSeconds(undefined, TimeUnitsType.DAYS);
-
-      expect(time).toBe(0);
-    });
-
-    it('should return 0 if units is undefined', () => {
-      const time = getTimeInSeconds(123, undefined);
-
-      expect(time).toBe(0);
-    });
-
     it('should return length converted to seconds if units is TimeUnitsType.DAYS', () => {
       const time = getTimeInSeconds(1, TimeUnitsType.DAYS);
 

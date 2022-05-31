@@ -582,14 +582,14 @@ describe('CognitoAuthenticationPlugin tests', () => {
     expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
   });
 
-  it('_getEncodedClientId should return a TokensExpiration object when user pool doesnt have token expiration defined', async () => {
+  it('_getEncodedClientId should return an empty TokensExpiration object when user pool doesnt have token expiration defined', async () => {
     jest
       .spyOn(CognitoIdentityProviderClient.prototype, 'send')
       .mockImplementationOnce(() => Promise.resolve({}));
 
     const tokens = await plugin['_getTokensExpiration']();
 
-    expect(tokens).toMatchObject({ idToken: 0, accessToken: 0, refreshToken: 0 });
+    expect(tokens).toMatchObject({});
   });
 
   it('_getEncodedClientId should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {

@@ -85,9 +85,13 @@ describe('AuthenticationService tests', () => {
   });
 
   it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
-    const url = service.getAuthorizationCodeUrl('state', 'code challenge');
+    const state = 'state';
+    const codeChallenge = 'code challenge';
+    const url = service.getAuthorizationCodeUrl(state, codeChallenge);
 
-    expect(url).toBe('authorizationCodeUrl');
+    expect(url).toBe(
+      `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+    );
   });
 
   it('refreshAccessToken should return a Promise that contains the id and access tokens and their expiration (in seconds)', async () => {

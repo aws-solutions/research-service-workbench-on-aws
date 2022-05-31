@@ -34,26 +34,28 @@ export function getTokensFromAuthorizationCode(
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
 
-    if (code && codeVerifier) {
+    if (typeof code === 'string' && typeof codeVerifier === 'string') {
       try {
         const { idToken, accessToken, refreshToken } = await authenticationService.handleAuthorizationCode(
           code,
           codeVerifier
         );
 
+        const now = Date.now();
+
         // set cookies.
         res.cookie('access_token', accessToken.token, {
           httpOnly: true,
           secure: true,
           sameSite: 'strict',
-          maxAge: accessToken.expiresIn * 1000
+          expires: accessToken.expiresIn ? new Date(now + accessToken.expiresIn * 1000) : undefined
         });
         if (refreshToken) {
           res.cookie('refresh_token', refreshToken.token, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: refreshToken.expiresIn * 1000
+            expires: refreshToken.expiresIn ? new Date(now + refreshToken.expiresIn * 1000) : undefined
           });
         }
 
@@ -62,7 +64,7 @@ export function getTokensFromAuthorizationCode(
         res.sendStatus(401);
       }
     } else {
-      res.sendStatus(401);
+      res.sendStatus(400);
     }
   };
 }
@@ -88,9 +90,9 @@ export function getAuthorizationCodeUrl(
   authenticationService: AuthenticationService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const stateVerifier = req.query.stateVerifier as string;
-    const codeChallenge = req.query.codeChallenge as string;
-    if (stateVerifier && codeChallenge) {
+    const stateVerifier = req.query.stateVerifier;
+    const codeChallenge = req.query.codeChallenge;
+    if (typeof stateVerifier === 'string' && typeof codeChallenge === 'string') {
       res
         .status(200)
         .json({ redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge) });
@@ -119,11 +121,11 @@ export function verifyToken(
   authenticationService: AuthenticationService
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
-    const { cookies } = req;
+    const accessToken = req.cookies.access_token;
 
-    if (cookies.access_token) {
+    if (typeof accessToken === 'string') {
       try {
-        const decodedAccessToken = await authenticationService.validateToken(cookies.access_token);
+        const decodedAccessToken = await authenticationService.validateToken(accessToken);
 
         const user: AuthenticatedUser = {
           id: authenticationService.getUserIdFromToken(decodedAccessToken),
@@ -161,11 +163,11 @@ export function logoutUser(
   authenticationService: AuthenticationService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { cookies } = req;
+    const refreshToken = req.cookies.refresh_token;
 
-    if (cookies.refresh_token) {
+    if (typeof refreshToken === 'string') {
       try {
-        await authenticationService.revokeToken(cookies.refresh_token);
+        await authenticationService.revokeToken(refreshToken);
       } catch (error) {
         // token could not be revoked for some reason.
         // Log reason but don't interrupt logout
@@ -198,20 +200,18 @@ export function refreshAccessToken(
   authenticationService: AuthenticationService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { cookies } = req;
+    const refreshToken = req.cookies.refresh_token;
 
-    if (cookies.refresh_token) {
+    if (typeof refreshToken === 'string') {
       try {
-        const { idToken, accessToken } = await authenticationService.refreshAccessToken(
-          cookies.refresh_token
-        );
+        const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
 
         // set access cookie
         res.cookie('access_token', accessToken.token, {
           httpOnly: true,
           secure: true,
           sameSite: 'strict',
-          maxAge: accessToken.expiresIn * 1000
+          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
         });
 
         res.status(200).json({ idToken: idToken.token });
