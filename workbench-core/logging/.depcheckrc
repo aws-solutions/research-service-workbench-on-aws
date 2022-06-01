@@ -8,7 +8,7 @@ ignores: [
     'npm-package-json-lint-config-default',
     '@types/node',
     'fast-check',
-    'jest' // peer dependency for jest-fast-check
+    'jest'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored
