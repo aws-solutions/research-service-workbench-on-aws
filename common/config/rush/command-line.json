@@ -216,6 +216,13 @@
       "enableParallelism": true
     },
     {
+      "name": "depcheck",
+      "commandKind": "bulk",
+      "summary": "Check unused dependecies and devDependencies",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
@@ -269,13 +276,6 @@
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
     },
-    // {
-    //   "name": "heft:build",
-    //   "commandKind": "bulk",
-    //   "summary": "Run heft build, also performs eslint",
-    //   "safeForSimultaneousRushProcesses": true,
-    //   "enableParallelism": true
-    // },
     {
       "name": "prettier",
       "commandKind": "global",
