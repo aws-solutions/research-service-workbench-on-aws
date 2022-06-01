@@ -8,12 +8,15 @@ import { HTTPMethod, HTTPMethods } from './routesMap';
  * @returns - boolean stating if user object is an instance of {@link AuthenticatedUser}.
  */
 function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
-  return user && user instanceof Object && user.hasOwnProperty('roles') && user.hasOwnProperty('id');
+  return user instanceof Object && user.hasOwnProperty('roles') && user.hasOwnProperty('id');
 }
 /**
  * Retrieves the user from the {@link Response}.
  * @param res - {@link Response}
  * @returns - {@link AuthenticatedUser}
+ *
+ * @throws {@link Error}
+ * Throws an error when authenticated user is not found.
  */
 function retrieveUser(res: Response): AuthenticatedUser {
   if (instanceOfAuthenticatedUser(res.locals.user)) {
