@@ -1,6 +1,7 @@
 jest.mock('./authenticationService');
 jest.mock('./plugins/cognitoAuthenticationPlugin');
 
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
 import { tokens } from './__mocks__/authenticationService';
 import {
@@ -39,9 +40,11 @@ const cookieOpts = {
 
 describe('authenticationMiddleware integration tests', () => {
   let service: AuthenticationService;
+  let loggingService: LoggingService;
 
   beforeAll(() => {
     service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
+    loggingService = new LoggingService();
 
     jest.spyOn(Date, 'now').mockImplementation(() => 0);
   });
@@ -49,7 +52,7 @@ describe('authenticationMiddleware integration tests', () => {
   describe('getTokensFromAuthorizationCode tests', () => {
     let getTokensFromAuthorizationCodeMiddleware: (req: Request, res: Response) => Promise<void>;
 
-    beforeAll(() => {
+    beforeEach(() => {
       getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(service);
     });
 
@@ -184,6 +187,22 @@ describe('authenticationMiddleware integration tests', () => {
       await getTokensFromAuthorizationCodeMiddleware(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
+    });
+
+    it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
+      getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(service, loggingService);
+      const req: Request = {
+        body: {
+          code: 'validCode',
+          codeVerifier: 'invalidCodeVerifier'
+        }
+      } as Request;
+      const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
+
+      await getTokensFromAuthorizationCodeMiddleware(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(401);
+      expect(loggingSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -328,6 +347,25 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.sendStatus).toHaveBeenCalledWith(401);
       expect(next).toHaveBeenCalledTimes(0);
     });
+
+    it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
+      verifyTokenMiddleware = verifyToken(service, loggingService);
+      const req: Request = {
+        cookies: {
+          access_token: 'invalidToken'
+        }
+      } as Request;
+
+      const next = jest.fn();
+
+      const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
+
+      await verifyTokenMiddleware(req, res, next);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(401);
+      expect(next).toHaveBeenCalledTimes(0);
+      expect(loggingSpy).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('logoutUser tests', () => {
@@ -389,6 +427,24 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', { expires: new Date(0) });
       expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', { expires: new Date(0) });
       expect(res.sendStatus).toHaveBeenCalledWith(200);
+    });
+
+    it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
+      logoutUserMiddleware = logoutUser(service, loggingService);
+      const req: Request = {
+        cookies: {
+          refresh_token: 'invalidToken'
+        }
+      } as Request;
+
+      const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
+
+      await logoutUserMiddleware(req, res);
+
+      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', { expires: new Date(0) });
+      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', { expires: new Date(0) });
+      expect(res.sendStatus).toHaveBeenCalledWith(200);
+      expect(loggingSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -473,6 +529,22 @@ describe('authenticationMiddleware integration tests', () => {
       await refreshAccessTokenMiddleware(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
+    });
+
+    it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
+      refreshAccessTokenMiddleware = refreshAccessToken(service, loggingService);
+      const req: Request = {
+        cookies: {
+          refresh_token: 'invalidToken'
+        }
+      } as Request;
+
+      const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
+
+      await refreshAccessTokenMiddleware(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(401);
+      expect(loggingSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -25,6 +25,7 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
+    "@amzn/workbench-core-logging": "workspace:*",
     "@aws-sdk/client-cognito-identity-provider": "^3.67.0",
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1"

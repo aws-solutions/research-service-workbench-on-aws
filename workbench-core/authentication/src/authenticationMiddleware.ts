@@ -1,9 +1,9 @@
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';
 import { AuthenticationService } from './authenticationService';
 
 // TODO send error message with status code?
-// TODO log errors?
 
 // TODO add to doc
 // requires use of cookieParser and bodyParser middlewares
@@ -28,7 +28,8 @@ import { AuthenticationService } from './authenticationService';
  * ```
  */
 export function getTokensFromAuthorizationCode(
-  authenticationService: AuthenticationService
+  authenticationService: AuthenticationService,
+  loggingService?: LoggingService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
     const code = req.body.code;
@@ -61,6 +62,9 @@ export function getTokensFromAuthorizationCode(
 
         res.status(200).json({ idToken: idToken.token });
       } catch (error) {
+        if (loggingService) {
+          loggingService.error(error);
+        }
         res.sendStatus(401);
       }
     } else {
@@ -118,7 +122,8 @@ export function getAuthorizationCodeUrl(
  * ```
  */
 export function verifyToken(
-  authenticationService: AuthenticationService
+  authenticationService: AuthenticationService,
+  loggingService?: LoggingService
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies.access_token;
@@ -136,6 +141,9 @@ export function verifyToken(
 
         next();
       } catch (error) {
+        if (loggingService) {
+          loggingService.error(error);
+        }
         res.sendStatus(401);
       }
     } else {
@@ -160,7 +168,8 @@ export function verifyToken(
  * ```
  */
 export function logoutUser(
-  authenticationService: AuthenticationService
+  authenticationService: AuthenticationService,
+  loggingService?: LoggingService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
     const refreshToken = req.cookies.refresh_token;
@@ -170,8 +179,9 @@ export function logoutUser(
         await authenticationService.revokeToken(refreshToken);
       } catch (error) {
         // token could not be revoked for some reason.
-        // Log reason but don't interrupt logout
-        console.log(error); // TODO replace with logging service?
+        if (loggingService) {
+          loggingService.error(error);
+        }
       }
     }
 
@@ -197,7 +207,8 @@ export function logoutUser(
  * ```
  */
 export function refreshAccessToken(
-  authenticationService: AuthenticationService
+  authenticationService: AuthenticationService,
+  loggingService?: LoggingService
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
     const refreshToken = req.cookies.refresh_token;
@@ -217,7 +228,9 @@ export function refreshAccessToken(
         res.status(200).json({ idToken: idToken.token });
       } catch (error) {
         // token could not be refreshed for some reason
-        console.log(error); // TODO replace with logging service?
+        if (loggingService) {
+          loggingService.error(error);
+        }
         res.sendStatus(401);
       }
     } else {

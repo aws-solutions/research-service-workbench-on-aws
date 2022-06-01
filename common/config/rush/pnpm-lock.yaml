@@ -366,6 +366,7 @@ importers:
   ../../workbench-core/authentication:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cognito-identity-provider': ^3.67.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -384,6 +385,7 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
+      '@amzn/workbench-core-logging': link:../logging
       '@aws-sdk/client-cognito-identity-provider': 3.100.0
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
