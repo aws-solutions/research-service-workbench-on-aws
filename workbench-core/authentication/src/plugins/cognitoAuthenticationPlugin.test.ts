@@ -28,7 +28,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
   websiteUrl: 'fake-website-url'
-};
+} as const;
 
 const baseUrl = `${cognitoPluginOptions.cognitoDomain}/oauth2`;
 
@@ -47,7 +47,7 @@ const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
     IdTokenValidity: 1,
     AccessTokenValidity: 1
   }
-};
+} as const;
 
 describe('CognitoAuthenticationPlugin tests', () => {
   const plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);

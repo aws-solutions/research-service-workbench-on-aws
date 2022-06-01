@@ -15,7 +15,7 @@ export const tokens = {
     token: 'refresh token',
     expiresIn: 1234
   }
-};
+} as const;
 
 export class AuthenticationService {
   public constructor(authenticationPlugin: AuthenticationPlugin) {}

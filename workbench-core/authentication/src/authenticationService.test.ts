@@ -9,7 +9,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
   websiteUrl: 'fake-website-url'
-};
+} as const;
 
 describe('AuthenticationService tests', () => {
   const mockPlugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);

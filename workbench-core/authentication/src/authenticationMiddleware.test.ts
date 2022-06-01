@@ -22,31 +22,34 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
   websiteUrl: 'fake-website-url'
-};
-
-const res = {
-  cookie: jest.fn((name, val, opts) => res),
-  status: jest.fn((code) => res),
-  sendStatus: jest.fn((code) => res),
-  json: jest.fn((body) => res),
-  locals: {}
-} as unknown as Response;
+} as const;
 
 const cookieOpts = {
   httpOnly: true,
   secure: true,
   sameSite: 'strict'
-};
+} as const;
 
 describe('authenticationMiddleware integration tests', () => {
   let service: AuthenticationService;
   let loggingService: LoggingService;
+  let res: Response;
 
   beforeAll(() => {
     service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
     loggingService = new LoggingService();
 
     jest.spyOn(Date, 'now').mockImplementation(() => 0);
+  });
+
+  beforeEach(() => {
+    res = {
+      cookie: jest.fn((name, val, opts) => res),
+      status: jest.fn((code) => res),
+      sendStatus: jest.fn((code) => res),
+      json: jest.fn((body) => res),
+      locals: {}
+    } as unknown as Response;
   });
 
   describe('getTokensFromAuthorizationCode tests', () => {
