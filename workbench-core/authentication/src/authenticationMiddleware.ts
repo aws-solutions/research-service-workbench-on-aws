@@ -17,7 +17,7 @@ import { AuthenticationService } from './authenticationService';
  *
  * This function assumes:
  *  - a request body parameter named `code` that holds the authorization code
- *  - a request body parameter named `codeVerifier` that holds a pkce code verififier value
+ *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @returns the middleware function
