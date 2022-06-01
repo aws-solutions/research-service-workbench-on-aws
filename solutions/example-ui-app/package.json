@@ -15,6 +15,7 @@
   "scripts": {
     "build": "next build && rushx lint",
     "build:test": "rushx build && rushx test",
+    "depcheck": "depcheck",
     "dev": "next dev",
     "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
@@ -56,6 +57,7 @@
     "@types/node": "^14",
     "@types/react": "17.0.38",
     "babel-jest": "27.5.1",
+    "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "eslint-config-next": "12.1.5",
     "eslint-plugin-import": "^2.26.0",
