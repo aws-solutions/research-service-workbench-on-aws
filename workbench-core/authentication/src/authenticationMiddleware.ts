@@ -3,8 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';
 import { AuthenticationService } from './authenticationService';
 
-// TODO send error message with status code?
-
 // TODO add to doc
 // requires use of cookieParser and bodyParser middlewares
 // app.use(cookieParser());
