@@ -10,11 +10,10 @@ export interface DataSetsStoragePlugin {
    * @param name - A name identifying the stroage destination. This should be consistent
    * with the naming rules for the underlying storage mechanism for which the
    * interface is implemented.
-   * @param additionalParams - An array of additional parameters needed by the underlying
-   * stroage mechanism to complete the operation.
+   * @param path - the storage specifc path for the destination.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createStorage(name: string, ...additionalParams: any[]): Promise<string>;
+  createStorage(name: string, path: string): Promise<string>;
 
   /**
    * Configures an existing dataset to be connected to an external environment.
@@ -37,6 +36,7 @@ export interface DataSetsStoragePlugin {
    * @param dataSetName - the name of the dataSet accessed by the external endpoint.
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
    * @param externalRoleName - the name of the role which will replace the current role accessing the endpoint.
+
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
   updateExternalEndpoint(
@@ -59,6 +59,7 @@ export interface DataSetsStoragePlugin {
    * @param timeToLiveMilliseconds - the maximum time before the URL expires.
    */
   createPresignedUploadUrl(dataSetName: string, timeToLiveMilliseconds: number): Promise<string>;
+
   /**
    * Create a set of presigned URLs to be used to make a multipart upload to a DataSet.
    *
