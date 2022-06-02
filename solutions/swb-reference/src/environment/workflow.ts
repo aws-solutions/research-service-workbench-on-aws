@@ -4,7 +4,7 @@
 import { Document } from 'cdk-ssm-document';
 import { join } from 'path';
 import fs from 'fs';
-import _ from 'lodash';
+
 import { CfnOutput, Stack } from 'aws-cdk-lib';
 
 export default class Workflow {
@@ -15,14 +15,14 @@ export default class Workflow {
   }
 
   public createSSMDocuments(): void {
-    // Add your new environment type here. The name should exactly match the folder name of the new environment folder
+    // Add your new environment type here. The name should exactly match the folder name of the new environment type in the environment folder
     const envTypes = ['sagemaker'];
 
     envTypes.forEach((envType) => {
       const docTypes = ['Launch', 'Terminate'];
       docTypes.forEach((docType) => {
-        const cfnDoc = new Document(this._stack, `${_.capitalize(envType)}${docType}`, {
-          name: `${this._stack.stackName}-${_.capitalize(envType)}${docType}`,
+        const cfnDoc = new Document(this._stack, `${this._capitalizeFirstLetter(envType)}${docType}`, {
+          name: `${this._stack.stackName}-${this._capitalizeFirstLetter(envType)}${docType}`,
           documentType: 'Automation',
           // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
           // correct file
@@ -34,7 +34,7 @@ export default class Workflow {
             )
             .toString()
         });
-        new CfnOutput(this._stack, `${_.capitalize(envType)}${docType}SSMDocOutput`, {
+        new CfnOutput(this._stack, `${this._capitalizeFirstLetter(envType)}${docType}SSMDocOutput`, {
           value: this._stack.formatArn({
             service: 'ssm',
             resource: 'document',
@@ -43,5 +43,9 @@ export default class Workflow {
         });
       });
     });
+  }
+
+  private _capitalizeFirstLetter(word: string): string {
+    return word.charAt(0).toUpperCase() + word.slice(1);
   }
 }
