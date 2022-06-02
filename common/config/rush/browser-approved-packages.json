@@ -83,6 +83,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-s3-control",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-service-catalog",
       "allowedCategories": [ "production" ]
     },
