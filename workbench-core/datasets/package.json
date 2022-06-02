@@ -27,7 +27,11 @@
   },
   "dependencies": {
     "@amzn/workbench-core-audit": "workspace:*",
-    "@amzn/workbench-core-logging": "workspace:*"
+    "@amzn/workbench-core-logging": "workspace:*",
+    "@amzn/workbench-core-base": "workspace:*",
+    "@aws-sdk/types": "^3.55.0",
+    "@aws-sdk/client-s3": "^3.58.0",
+    "@aws-sdk/client-s3-control": "^3.100.0"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
