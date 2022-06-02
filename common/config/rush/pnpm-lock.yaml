@@ -422,6 +422,7 @@ importers:
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
+      '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^14
@@ -448,6 +449,7 @@ importers:
       '@rushstack/heft': 0.45.4
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.4
       '@rushstack/heft-node-rig': 1.9.5_@rushstack+heft@0.45.4
+      '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 14.18.18
@@ -6086,7 +6088,7 @@ packages:
     dev: true
 
   /array-flatten/1.1.1:
-    resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
+    resolution: {integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=}
 
   /array-includes/3.1.5:
     resolution: {integrity: sha512-iSDYZMMyTPkiFasVqfuAQnWAYcvO/SeBSCGKePoEthjp4LEMTe4uLc7b025o4jAZpHhihh8xPo99TNWUWWkGDQ==}

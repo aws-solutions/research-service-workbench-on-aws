@@ -1,4 +1,4 @@
-import { User } from '@amzn/workbench-core-authentication';
+import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import Operation from './operation';
 import Permission from './permission';
 import { HTTPMethod } from './routesMap';
@@ -8,12 +8,12 @@ import { HTTPMethod } from './routesMap';
  */
 export default interface PermissionsPlugin {
   /**
-   * Returns a set of {@link Permission} given a {@link User}.
-   * @param user - {@link User}
+   * Returns a set of {@link Permission} given a {@link AuthenticatedUser}.
+   * @param user - {@link AuthenticatedUser}
    *
-   * @returns A Promise for a set of the {@link User}'s {@link Permission}.
+   * @returns A Promise for a set of the {@link AuthenticatedUser}'s {@link Permission}.
    */
-  getPermissionsByUser(user: User): Promise<Permission[]>;
+  getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]>;
 
   /**
    * Returns a set of {@link Operation} given a Route and {@link HTTPMethod}.

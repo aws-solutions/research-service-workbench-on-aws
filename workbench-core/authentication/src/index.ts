@@ -15,3 +15,4 @@ export { PluginConfigurationError, isPluginConfigurationError } from './errors/p
 export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalidTokenTypeError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
+export { AuthenticatedUser } from './authenticatedUser';
