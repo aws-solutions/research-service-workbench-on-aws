@@ -10,7 +10,14 @@ export function setUpEnvRoutes(
   environments: { [key: string]: Environment },
   environmentService: EnvironmentService
 ): void {
-  const supportedEnvs = Object.keys(environments);
+  const supportedEnvs = Object.keys(environments).map((env) => {
+    return env.toLocaleLowerCase();
+  });
+
+  async function getEnvironmentType(envId: string): Promise<string> {
+    const env = await environmentService.getEnvironment(envId, true);
+    return env.ETC.type;
+  }
 
   // Launch
   router.post(
@@ -40,7 +47,7 @@ export function setUpEnvRoutes(
         }
         res.status(201).send(env);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
@@ -49,16 +56,15 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      const env = await environmentService.getEnvironment(req.params.id!, true);
-      const envType = env.ETC.type;
+      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
 
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
         const response = await environments[envType].lifecycle.terminate(req.params.id);
         res.send(response);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
@@ -67,12 +73,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      // Get environment from DDB
-      const getEnvironment = async (envId: string): Promise<string> => {
-        const env = await environmentService.getEnvironment(envId, true);
-        return env.ETC.type;
-      };
-      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
+      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -89,12 +90,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      // Get environment from DDB
-      const getEnvironment = async (envId: string): Promise<string> => {
-        const env = await environmentService.getEnvironment(envId, true);
-        return env.ETC.type;
-      };
-      const envType = (await getEnvironment(req.params.id)).toLocaleLowerCase();
+      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -102,7 +98,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.stop(req.params.id);
         res.send(response);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
@@ -138,7 +134,7 @@ export function setUpEnvRoutes(
         };
         res.send(response);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
