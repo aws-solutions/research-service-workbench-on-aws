@@ -21,6 +21,8 @@ export class AuthenticationService {
    *
    * @param accessToken - the user's access token
    * @returns true if the user is logged in
+   *
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
     return await this._authenticationPlugin.isUserLoggedIn(accessToken);
@@ -45,6 +47,7 @@ export class AuthenticationService {
    *
    * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async revokeToken(token: string): Promise<void> {
     await this._authenticationPlugin.revokeToken(token);
@@ -85,6 +88,7 @@ export class AuthenticationService {
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
     return await this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
@@ -112,6 +116,7 @@ export class AuthenticationService {
    *
    * @throws {@link InvalidTokenError} if the refresh token is invalid
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
     return await this._authenticationPlugin.refreshAccessToken(refreshToken);

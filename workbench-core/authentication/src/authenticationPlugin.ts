@@ -13,6 +13,8 @@ export interface AuthenticationPlugin {
    *
    * @param accessToken - the user's access token
    * @returns true if the user is logged in
+   *
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   isUserLoggedIn(accessToken: string): Promise<boolean>;
 
@@ -33,6 +35,7 @@ export interface AuthenticationPlugin {
    *
    * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   revokeToken(token: string): Promise<void>;
 
@@ -67,6 +70,7 @@ export interface AuthenticationPlugin {
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens>;
 
@@ -90,6 +94,7 @@ export interface AuthenticationPlugin {
    *
    * @throws {@link InvalidTokenError} if the refresh token is invalid
    * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   refreshAccessToken(refreshToken: string): Promise<Tokens>;
 }

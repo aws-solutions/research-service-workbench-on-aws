@@ -2,6 +2,7 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';
 import { AuthenticationService } from './authenticationService';
+import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
 // TODO add to doc
 // requires use of cookieParser and bodyParser middlewares
@@ -62,6 +63,9 @@ export function getTokensFromAuthorizationCode(
       } catch (error) {
         if (loggingService) {
           loggingService.error(error);
+        }
+        if (isIdpUnavailableError(error)) {
+          res.sendStatus(503);
         }
         res.sendStatus(401);
       }
@@ -180,6 +184,9 @@ export function logoutUser(
         if (loggingService) {
           loggingService.error(error);
         }
+        if (isIdpUnavailableError(error)) {
+          res.sendStatus(503);
+        }
       }
     }
 
@@ -228,6 +235,9 @@ export function refreshAccessToken(
         // token could not be refreshed for some reason
         if (loggingService) {
           loggingService.error(error);
+        }
+        if (isIdpUnavailableError(error)) {
+          res.sendStatus(503);
         }
         res.sendStatus(401);
       }

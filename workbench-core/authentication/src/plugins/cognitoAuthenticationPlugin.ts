@@ -9,6 +9,7 @@ import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifie
 import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
+import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidAuthorizationCodeError } from '../errors/invalidAuthorizationCodeError';
 import { InvalidCodeVerifierError } from '../errors/invalidCodeVerifierError';
 import { InvalidJWTError } from '../errors/invalidJwtError';
@@ -112,6 +113,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param accessToken - the user's access token
    * @returns true if the user is logged in
+   *
+   * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
     try {
@@ -123,6 +126,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       });
       return true;
     } catch (error) {
+      if (error.response && error.response.status > 499) {
+        throw new IdpUnavailableError('Cognito is unavailable');
+      }
       return false;
     }
   }
@@ -151,7 +157,8 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @param refreshToken - the refresh token to revoke
    *
    * @throws {@link InvalidTokenTypeError} if the token passed in is not a refresh token
-   * @throws {@link PluginConfigurationError} if the {@link CognitoAuthenticationPlugin} has an incorrect configuration.
+   * @throws {@link PluginConfigurationError} if the {@link CognitoAuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
   public async revokeToken(refreshToken: string): Promise<void> {
     const encodedClientId = this._getEncodedClientId();
@@ -179,6 +186,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
       if ((error as AxiosError<{ error: string }>).response?.data.error === 'invalid_client') {
         throw new PluginConfigurationError('invalid client id or client secret');
+      }
+      if ((error as AxiosError<{ error: string }>).response?.status && error.response.status > 499) {
+        throw new IdpUnavailableError('Cognito is unavailable');
       }
       throw error;
     }
@@ -221,6 +231,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
    * @throws {@link PluginConfigurationError} if the {@link CognitoAuthenticationPlugin} has an incorrect configuration
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
+   * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
   public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
     try {
@@ -272,6 +283,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       if ((error as AxiosError<{ error: string }>).response?.data.error === 'invalid_request') {
         throw new InvalidCodeVerifierError('pkce code verifier is invalid');
       }
+      if (error.response && error.response.status > 499) {
+        throw new IdpUnavailableError('Cognito is unavailable');
+      }
       throw error;
     }
   }
@@ -298,6 +312,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @throws {@link InvalidTokenError} if the refresh token is invalid or has been revoked
    * @throws {@link PluginConfigurationError} if the {@link CognitoAuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
     try {
@@ -339,6 +354,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
       if ((error as AxiosError<{ error: string }>).response?.data.error === 'unauthorized_client') {
         throw new PluginConfigurationError('refreshing access tokens is disabled for this app client');
+      }
+      if (error.response && error.response.status > 499) {
+        throw new IdpUnavailableError('Cognito is unavailable');
       }
       throw error;
     }

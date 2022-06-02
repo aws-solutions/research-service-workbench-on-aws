@@ -10,6 +10,7 @@ import {
   CognitoAuthenticationPluginOptions,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
+  IdpUnavailableError,
   logoutUser,
   refreshAccessToken,
   verifyToken
@@ -190,6 +191,20 @@ describe('authenticationMiddleware integration tests', () => {
       await getTokensFromAuthorizationCodeMiddleware(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
+    });
+
+    it('should return 503 when authN service IDP is unavailable', async () => {
+      const req: Request = {
+        body: {
+          code: 'validCode',
+          codeVerifier: 'validCodeVerifier'
+        }
+      } as Request;
+      jest.spyOn(service, 'handleAuthorizationCode').mockRejectedValueOnce(new IdpUnavailableError());
+
+      await getTokensFromAuthorizationCodeMiddleware(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
@@ -432,6 +447,19 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.sendStatus).toHaveBeenCalledWith(200);
     });
 
+    it('should return 503 when authN service IDP is unavailable', async () => {
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        }
+      } as Request;
+      jest.spyOn(service, 'revokeToken').mockRejectedValueOnce(new IdpUnavailableError());
+
+      await logoutUserMiddleware(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(503);
+    });
+
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
       logoutUserMiddleware = logoutUser(service, loggingService);
       const req: Request = {
@@ -532,6 +560,19 @@ describe('authenticationMiddleware integration tests', () => {
       await refreshAccessTokenMiddleware(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
+    });
+
+    it('should return 503 when authN service IDP is unavailable', async () => {
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        }
+      } as Request;
+      jest.spyOn(service, 'refreshAccessToken').mockRejectedValueOnce(new IdpUnavailableError());
+
+      await refreshAccessTokenMiddleware(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {

@@ -15,6 +15,7 @@ export { PluginConfigurationError, isPluginConfigurationError } from './errors/p
 export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalidTokenTypeError';
 export { InvalidCodeVerifierError, isInvalidCodeVerifierError } from './errors/invalidCodeVerifierError';
 export { InvalidTokenError, isInvalidTokenError } from './errors/invalidTokenError';
+export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavailableError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
 export { AuthenticatedUser } from './authenticatedUser';
