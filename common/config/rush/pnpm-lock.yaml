@@ -451,10 +451,10 @@ importers:
       lodash: 4.17.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@rushstack/eslint-config': 2.6.0_eslint@8.15.0+typescript@4.6.4
-      '@rushstack/heft': 0.45.4
-      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.4
-      '@rushstack/heft-node-rig': 1.9.5_@rushstack+heft@0.45.4
+      '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
+      '@rushstack/heft': 0.45.5
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
+      '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
@@ -772,8 +772,8 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/workbench-core-example-express': link:../express
-      aws-cdk-lib: 2.24.1_constructs@10.1.12
-      constructs: 10.1.12
+      aws-cdk-lib: 2.25.0_constructs@10.1.18
+      constructs: 10.1.18
       lodash: 4.17.21
       source-map-support: 0.5.21
     devDependencies:
@@ -802,6 +802,47 @@ importers:
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      npm-package-json-lint: 6.3.0
+      npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
+      sort-package-json: 1.57.0
+      typescript: 4.7.2
+
+  ../../workbench-core/infrastructure:
+    specifiers:
+      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@rushstack/eslint-config': ^2.5.1
+      '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
+      '@rushstack/heft-node-rig': ^1.7.1
+      '@types/heft-jest': 1.0.2
+      '@types/node': ^14
+      aws-cdk-lib: ^2.0.0
+      constructs: ^10.0.0
+      depcheck: ^1.4.3
+      eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
+      eslint-plugin-security: ^1.4.0
+      istanbul-badges-readme: 1.8.1
+      npm-package-json-lint: ^6.3.0
+      npm-package-json-lint-config-default: ^5.0.0
+      sort-package-json: ^1.57.0
+      typescript: ^4.5.2
+    dependencies:
+      aws-cdk-lib: 2.25.0_constructs@10.1.18
+      constructs: 10.1.18
+    devDependencies:
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
+      '@rushstack/heft': 0.45.5
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
+      '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
+      '@types/heft-jest': 1.0.2
+      '@types/node': 14.18.18
+      depcheck: 1.4.3
+      eslint: 8.16.0
+      eslint-plugin-import: 2.26.0_eslint@8.16.0
+      eslint-plugin-security: 1.5.0
+      istanbul-badges-readme: 1.8.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -6099,7 +6140,7 @@ packages:
     dev: true
 
   /array-flatten/1.1.1:
-    resolution: {integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=}
+    resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
 
   /array-includes/3.1.5:
     resolution: {integrity: sha512-iSDYZMMyTPkiFasVqfuAQnWAYcvO/SeBSCGKePoEthjp4LEMTe4uLc7b025o4jAZpHhihh8xPo99TNWUWWkGDQ==}
@@ -6623,7 +6664,7 @@ packages:
     dev: false
 
   /charenc/0.0.2:
-    resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
+    resolution: {integrity: sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc=}
     dev: true
 
   /chokidar/3.4.3:
@@ -7130,7 +7171,7 @@ packages:
       object-keys: 1.1.1
 
   /delayed-stream/1.0.0:
-    resolution: {integrity: sha1-3zrhmayt+31ECqrgsp4icrJOxhk=}
+    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
   /delegates/1.0.0:
@@ -7297,7 +7338,7 @@ packages:
     dev: false
 
   /encodeurl/1.0.2:
-    resolution: {integrity: sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=}
+    resolution: {integrity: sha512-TPJXq8JqFaVYm2CWmPvnP2Iyo4ZSM7/QKcSmuMLDObfpH5fi7RUGmd/rTDf+rut/saiDiQEeVTNgAmJEdAOx0w==}
     engines: {node: '>= 0.8'}
 
   /end-of-stream/1.4.4:
@@ -7582,7 +7623,7 @@ packages:
     dev: true
 
   /escape-html/1.0.3:
-    resolution: {integrity: sha1-Aljq5NPQwJdN4cFpGI7wBR0dGYg=}
+    resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
 
   /escape-string-regexp/1.0.5:
     resolution: {integrity: sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==}
@@ -7994,7 +8035,7 @@ packages:
     engines: {node: '>=0.10.0'}
 
   /etag/1.8.1:
-    resolution: {integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=}
+    resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
   /events/1.1.1:
@@ -10002,7 +10043,7 @@ packages:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
   /lodash.truncate/4.4.2:
-    resolution: {integrity: sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=}
+    resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
     dev: true
 
   /lodash/4.17.21:
@@ -10134,7 +10175,7 @@ packages:
     engines: {node: '>= 8'}
 
   /methods/1.1.2:
-    resolution: {integrity: sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=}
+    resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
     engines: {node: '>= 0.6'}
 
   /micromatch/4.0.5:
