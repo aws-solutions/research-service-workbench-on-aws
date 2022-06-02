@@ -7,31 +7,33 @@ At a high level, we'll need to do the following steps
 * Set up API routes and provide IAM permissions for managing the environment
 * Set up environment status updates
 
+[Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/feat/environments...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
+
 ## Step 1: Define environment AWS resources 
-1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase. 
-2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`
+1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerNotebook`.
+2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemaker.cfn.yaml](https://github.com/awslabs/monorepo-for-service-workbench/blob/feat/environments/solutions/swb-reference/src/environment/sagemaker/sagemaker.cfn.yaml). Take note of the `paramaters` section in the CF template. These are custom parameters that users can provide to customize the environment. For example, `VPC` and `Subnet` are custom values that can be provided.
 3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
 
 ## Step 2: Set up environment management workflow 
 ### SSM documents
 1. Add SSM documents for the new environment type's launch and terminate operations. 
-   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml)
-2. Add a method in [workflow.ts](../swb-reference/src/environment/workflow.ts) (similar to `_createSagemakerSSMDocuments()`) to upload SSM documents to the main account. SWB will then share these SSM documents with all `hosting accounts`. 
+   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). Take note of the `parameters` section in the SSM document. These parameters will be passed to Service Catalog portfolio, which will be used when launching your custom environment. 
+2. In [workflow.ts](../swb-reference/src/environment/workflow.ts) add the name of your new environment to the `envTypes` array. The name should exactly match the name you used for the new environment type folder. 
 
 ### Implement Environment Services
 1. Implement lifecycle service: 
-   1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentLifecycleService.ts` for managing the new environment type's lifecycle methods (namely launch, terminate, start, stop)
-   2. Launch and terminate actions executes an SSM document by sending the environment specific parameters to SSM. Each environment can have its own custom parameters.
-   3. For start and stop actions, check if [AwsService.ts](../../workbench-core/base/src/aws/awsService.ts) contains the environment type client you're trying to add. If not, you would need to add it similar to the other clients in the class.
+   1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentLifecycleService.ts` for managing the new environment type's lifecycle methods (launch, terminate, start, stop). For reference, check out [sagemakerEnvironmentLifecycleService.ts](./src/environment/sagemaker/sagemakerEnvironmentLifecycleService.ts). 
+   2. In the launch method of that class, you'll see that we are providing custom `ssmParameters` to `this.helper.launch`. The keys of the `ssmParameters` object should match the `parameters` in the `<newEnvTypeName>LaunchSSM.yaml` file. 
+   3. The start and stop method of the class can call the `start` and `stop` AWS API directly to start/stop the environment.
 2. Implement connection service:
-   1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentConnectionService.ts`
+   1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentConnectionService.ts`. For reference, check out [sagemakerEnvironmentConnectionService.ts](./src/environment/sagemaker/sagemakerEnvironmentConnectionService.ts)
    2. Implement `getAuthCreds()` to allow users to connect to the new environment. Implement `getConnectionInstruction()` to provide users with instructions for connecting to the environment. Implementation will differ based on the environment type being added.
 
 ## Step 3: Set up API routes and provide IAM permissions for managing the environment
 1. Add API route
    * Add the new environment type in the `apiRouteConfig.environments` object in [backendAPI.ts](../swb-reference/src/backendAPI.ts). 
 2. API routes and Permissions
-   * Add the required AWS client permission for start/stop to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role.
+   * Add the required AWS client permission for starting/stopping/connecting to the environment to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role.
    * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object.
 
 ## Step 4: Add Support for environment Status Update
@@ -71,6 +73,7 @@ STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on A
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Appendix
+
 
 Launch/Terminate event structure
 ```
