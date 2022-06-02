@@ -15,9 +15,13 @@ jest.mock('./authorizationService', () => {
       };
     });
 });
+jest.mock('./authorizationPlugin');
+jest.mock('./permissionsPlugin');
 import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { Request, Response, NextFunction } from 'express';
 import { fc, itProp } from 'jest-fast-check';
+import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
+import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
 import {
   AuthorizationPlugin,
   HTTPMethod,
@@ -33,15 +37,9 @@ describe('authorization middleware', () => {
   let authorizationService: AuthorizationService;
   let mockPermissionsPlugin: PermissionsPlugin;
   let mockAuthorizationPlugin: AuthorizationPlugin;
-  let mockGuestPermissions: Permission[];
-  let mockAdminPermissions: Permission[];
-  let mockGetOperations: Operation[];
-  let mockPutOperations: Operation[];
   let mockAdmin: AuthenticatedUser;
   let mockGuest: AuthenticatedUser;
-  let errorMessage: string;
   beforeEach(() => {
-    errorMessage = 'Permission is not granted';
     mockAdmin = {
       id: 'sampleUID',
       roles: ['admin']
@@ -50,71 +48,8 @@ describe('authorization middleware', () => {
       id: 'sampleUID',
       roles: ['guest']
     };
-    mockGuestPermissions = [
-      {
-        effect: 'ALLOW',
-        action: 'READ',
-        subject: 'Sample'
-      }
-    ];
-    mockAdminPermissions = [
-      {
-        effect: 'ALLOW',
-        action: 'UPDATE',
-        subject: 'Sample'
-      },
-      {
-        effect: 'ALLOW',
-        action: 'READ',
-        subject: 'Sample'
-      }
-    ];
-
-    mockPutOperations = [
-      {
-        action: 'UPDATE',
-        subject: 'Sample'
-      },
-      {
-        action: 'READ',
-        subject: 'Sample'
-      }
-    ];
-    mockGetOperations = [
-      {
-        action: 'READ',
-        subject: 'Sample'
-      }
-    ];
-    mockPermissionsPlugin = {
-      getPermissionsByUser: jest.fn(async (user: AuthenticatedUser): Promise<Permission[]> => {
-        if (user.roles.includes('admin')) {
-          return mockAdminPermissions;
-        } else {
-          return mockGuestPermissions;
-        }
-      }),
-      getOperationsByRoute: jest.fn(async (route: string, method: HTTPMethod): Promise<Operation[]> => {
-        if (route === '/sample') {
-          if (method === 'GET') return mockGetOperations;
-          else if (method === 'PUT') return mockPutOperations;
-        }
-        throw new Error('Route not secured');
-      })
-    };
-    mockAuthorizationPlugin = {
-      isAuthorized: jest.fn(async (userPermissions: Permission[], operations: Operation[]): Promise<void> => {
-        if (operations === mockPutOperations && userPermissions === mockAdminPermissions) {
-          return;
-        } else if (
-          operations === mockGetOperations &&
-          (userPermissions === mockAdminPermissions || userPermissions === mockGuestPermissions)
-        ) {
-          return;
-        }
-        throw new Error(errorMessage);
-      })
-    };
+    mockPermissionsPlugin = new MockPermissionsPlugin();
+    mockAuthorizationPlugin = new MockAuthorizationPlugin();
     authorizationService = new AuthorizationService(mockAuthorizationPlugin, mockPermissionsPlugin);
     authorizationMiddleware = withAuth(authorizationService);
   });
