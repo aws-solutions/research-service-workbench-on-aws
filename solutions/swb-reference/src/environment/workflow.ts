@@ -4,6 +4,7 @@
 import { Document } from 'cdk-ssm-document';
 import { join } from 'path';
 import fs from 'fs';
+import _ from 'lodash';
 import { CfnOutput, Stack } from 'aws-cdk-lib';
 
 export default class Workflow {
@@ -14,31 +15,30 @@ export default class Workflow {
   }
 
   public createSSMDocuments(): void {
-    this._createSagemakerSSMDocuments();
-  }
-
-  private _createSagemakerSSMDocuments(): void {
-    const docTypes = ['Launch', 'Terminate'];
-    docTypes.forEach((docType) => {
-      const cfnDoc = new Document(this._stack, `Sagemaker${docType}`, {
-        name: `${this._stack.stackName}-Sagemaker${docType}`,
-        documentType: 'Automation',
-        // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-        // correct file
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        content: fs // nosemgrep
-          .readFileSync(
-            join(__dirname, `../../src/environment/sagemaker/sagemaker${docType}SSM.yaml`),
-            'utf8'
-          )
-          .toString()
-      });
-      new CfnOutput(this._stack, `Sagemaker${docType}SSMDocOutput`, {
-        value: this._stack.formatArn({
-          service: 'ssm',
-          resource: 'document',
-          resourceName: cfnDoc.name
-        })
+    const envTypes = ['sagemaker'];
+    envTypes.forEach((envType) => {
+      const docTypes = ['Launch', 'Terminate'];
+      docTypes.forEach((docType) => {
+        const cfnDoc = new Document(this._stack, `${_.capitalize(envType)}${docType}`, {
+          name: `${this._stack.stackName}-${_.capitalize(envType)}${docType}`,
+          documentType: 'Automation',
+          // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+          // correct file
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          content: fs // nosemgrep
+            .readFileSync(
+              join(__dirname, `../../src/environment/${envType}/${envType}${docType}SSM.yaml`),
+              'utf8'
+            )
+            .toString()
+        });
+        new CfnOutput(this._stack, `${_.capitalize(envType)}${docType}SSMDocOutput`, {
+          value: this._stack.formatArn({
+            service: 'ssm',
+            resource: 'document',
+            resourceName: cfnDoc.name
+          })
+        });
       });
     });
   }
