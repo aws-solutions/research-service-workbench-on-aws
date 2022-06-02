@@ -19,8 +19,6 @@ export class DataSetService {
   public constructor(audit: AuditService, log: LoggingService) {
     this._audit = audit;
     this._log = log;
-
-    return this;
   }
 
   /**
