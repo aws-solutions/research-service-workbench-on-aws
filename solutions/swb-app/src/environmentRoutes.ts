@@ -47,7 +47,7 @@ export function setUpEnvRoutes(
         }
         res.status(201).send(env);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
