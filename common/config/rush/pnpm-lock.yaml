@@ -794,6 +794,43 @@ importers:
       sort-package-json: 1.57.0
       typescript: 4.6.4
 
+  ../../workbench-core/infrastructure:
+    specifiers:
+      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@rushstack/eslint-config': ^2.5.1
+      '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
+      '@rushstack/heft-node-rig': ^1.7.1
+      '@types/heft-jest': 1.0.2
+      '@types/node': ^14
+      aws-cdk-lib: ^2.0.0
+      constructs: ^10.0.0
+      eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
+      istanbul-badges-readme: 1.8.1
+      npm-package-json-lint: ^6.3.0
+      npm-package-json-lint-config-default: ^5.0.0
+      sort-package-json: ^1.57.0
+      typescript: ^4.5.2
+    dependencies:
+      aws-cdk-lib: 2.24.1_constructs@10.1.12
+      constructs: 10.1.12
+    devDependencies:
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@rushstack/eslint-config': 2.6.0_eslint@8.15.0+typescript@4.6.4
+      '@rushstack/heft': 0.45.4
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.4
+      '@rushstack/heft-node-rig': 1.9.5_@rushstack+heft@0.45.4
+      '@types/heft-jest': 1.0.2
+      '@types/node': 14.18.18
+      eslint: 8.15.0
+      eslint-plugin-import: 2.26.0_eslint@8.15.0
+      istanbul-badges-readme: 1.8.1
+      npm-package-json-lint: 6.3.0
+      npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
+      sort-package-json: 1.57.0
+      typescript: 4.6.4
+
   ../../workbench-core/logging:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
@@ -7053,7 +7090,7 @@ packages:
     dev: false
 
   /decamelize-keys/1.1.0:
-    resolution: {integrity: sha1-0XGoeTMlKAfrPLYdwcFEXQeN8tk=}
+    resolution: {integrity: sha512-ocLWuYzRPoS9bfiSdDd3cxvrzovVMZnRDVEzAs+hWIVXGDbHxWMECij2OBuyB/An0FFW/nLuq6Kv1i/YC5Qfzg==}
     engines: {node: '>=0.10.0'}
     dependencies:
       decamelize: 1.2.0
@@ -7061,7 +7098,7 @@ packages:
     dev: true
 
   /decamelize/1.2.0:
-    resolution: {integrity: sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=}
+    resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -8861,7 +8898,7 @@ packages:
     dev: true
 
   /is-plain-obj/1.1.0:
-    resolution: {integrity: sha1-caUMhCnfync8kqOQpKA7OfzVHT4=}
+    resolution: {integrity: sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -10064,7 +10101,7 @@ packages:
     dev: true
 
   /map-obj/1.0.1:
-    resolution: {integrity: sha1-2TPOuSBdgr3PSIb2dCvcK03qFG0=}
+    resolution: {integrity: sha512-7N/q3lyZ+LVCp7PzuxrJr4KMbBE2hW7BT7YNia330OFxIf4d3r5zVpicP2650l7CPN6RM9zOJRl3NGpqSiw3Eg==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -10592,7 +10629,7 @@ packages:
       ee-first: 1.1.1
 
   /once/1.4.0:
-    resolution: {integrity: sha1-WDsap3WWHUsROsF9nFC6753Xa9E=}
+    resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
     dependencies:
       wrappy: 1.0.2
 
@@ -10746,7 +10783,7 @@ packages:
     dev: true
 
   /path-is-absolute/1.0.1:
-    resolution: {integrity: sha1-F0uSaHNVNP+8es5r9TpanhtcX18=}
+    resolution: {integrity: sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==}
     engines: {node: '>=0.10.0'}
 
   /path-key/3.1.1:
