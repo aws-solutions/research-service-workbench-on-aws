@@ -1,4 +1,4 @@
-import { User } from '@amzn/workbench-core-authentication';
+import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
 import {
@@ -15,7 +15,7 @@ import {
 describe('StaticPermissionsPlugin', () => {
   let staticPermissionsPlugin: StaticPermissionsPlugin;
   let mockPermissionsMap: PermissionsMap;
-  let mockUser: User;
+  let mockUser: AuthenticatedUser;
   let role1Permissions: Permission[];
   let role2Permissions: Permission[];
   let logger: LoggingService;
@@ -144,10 +144,7 @@ describe('StaticPermissionsPlugin', () => {
   describe('getPermissionsByUser', () => {
     test('single role user', async () => {
       mockUser = {
-        uid: '1234567890',
-        firstName: 'sampleFirst',
-        lastName: 'sampleLast',
-        email: 'sampleEmail',
+        id: '1234567890',
         roles: ['role1']
       };
 
@@ -157,10 +154,7 @@ describe('StaticPermissionsPlugin', () => {
 
     test('multiple role user', async () => {
       mockUser = {
-        uid: '1234567890',
-        firstName: 'sampleFirst',
-        lastName: 'sampleLast',
-        email: 'sampleEmail',
+        id: '1234567890',
         roles: ['role1', 'role2']
       };
 
@@ -170,10 +164,7 @@ describe('StaticPermissionsPlugin', () => {
 
     test('modify permissions should not be allowed', async () => {
       mockUser = {
-        uid: '1234567890',
-        firstName: 'sampleFirst',
-        lastName: 'sampleLast',
-        email: 'sampleEmail',
+        id: '1234567890',
         roles: ['role1']
       };
 
@@ -189,10 +180,7 @@ describe('StaticPermissionsPlugin', () => {
 
     test('invalid role user', async () => {
       mockUser = {
-        uid: '1234567890',
-        firstName: 'sampleFirst',
-        lastName: 'sampleLast',
-        email: 'sampleEmail',
+        id: '1234567890',
         roles: ['role3']
       };
 
@@ -202,7 +190,7 @@ describe('StaticPermissionsPlugin', () => {
 
     itProp('random inputs as user', [fc.anything()], async (user) => {
       try {
-        await staticPermissionsPlugin.getPermissionsByUser(user as User);
+        await staticPermissionsPlugin.getPermissionsByUser(user as AuthenticatedUser);
         expect.hasAssertions();
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
