@@ -13,6 +13,17 @@ export {
 } from './errors/invalidAuthorizationCodeError';
 export { PluginConfigurationError, isPluginConfigurationError } from './errors/pluginConfigurationError';
 export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalidTokenTypeError';
+export { InvalidCodeVerifierError, isInvalidCodeVerifierError } from './errors/invalidCodeVerifierError';
+export { InvalidTokenError, isInvalidTokenError } from './errors/invalidTokenError';
+export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavailableError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
 export { AuthenticatedUser } from './authenticatedUser';
+export { getTimeInSeconds } from './utils';
+export {
+  getAuthorizationCodeUrl,
+  getTokensFromAuthorizationCode,
+  logoutUser,
+  refreshAccessToken,
+  verifyToken
+} from './authenticationMiddleware';
