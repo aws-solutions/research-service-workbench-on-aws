@@ -1,4 +1,4 @@
-import { router } from '@amzn/workbench-core-express';
+import { router } from '@amzn/workbench-core-example-express';
 import serverlessExpress from '@vendia/serverless-express';
 import express, { Express } from 'express';
 
