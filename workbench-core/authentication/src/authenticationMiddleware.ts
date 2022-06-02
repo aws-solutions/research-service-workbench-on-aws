@@ -176,7 +176,7 @@ export function logoutUser(
       try {
         await authenticationService.revokeToken(refreshToken);
       } catch (error) {
-        // token could not be revoked for some reason.
+        // token was not a refresh token or there was an authentication service configuration issue.
         if (loggingService) {
           loggingService.error(error);
         }
