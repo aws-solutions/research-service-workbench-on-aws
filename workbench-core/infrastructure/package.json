@@ -12,9 +12,6 @@
     "name": "Amazon Web Services",
     "url": "http://aws.amazon.com"
   },
-  "bin": {
-    "infrastructure": "lib/index.js"
-  },
   "scripts": {
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",

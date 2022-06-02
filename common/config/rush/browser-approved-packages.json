@@ -16,7 +16,7 @@
     },
     {
       "name": "@amzn/workbench-core-audit",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-authentication",
@@ -28,11 +28,7 @@
     },
     {
       "name": "@amzn/workbench-core-example-express",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@amzn/workbench-core-express",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-logging",
@@ -40,19 +36,19 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-dynamodb",
@@ -220,7 +216,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -299,10 +295,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "lint-staged",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -347,10 +339,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "request",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "sass",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -364,7 +352,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "triple-beam",
