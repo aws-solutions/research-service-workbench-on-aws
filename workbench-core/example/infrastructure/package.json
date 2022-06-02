@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-infrastructure",
+  "name": "@amzn/workbench-core-example-infrastructure",
   "version": "0.0.1",
   "description": "Example infrastructure to deploy express app",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -33,7 +33,7 @@
     "test:only": "heft test -u --clean --no-build --test-path-pattern infrastructure-stack"
   },
   "dependencies": {
-    "@amzn/workbench-core-express": "workspace:*",
+    "@amzn/workbench-core-example-express": "workspace:*",
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0",
     "lodash": "^4.17.21",

@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-express",
+  "name": "@amzn/workbench-core-example-express",
   "version": "0.0.1",
   "description": "Example Express App",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",

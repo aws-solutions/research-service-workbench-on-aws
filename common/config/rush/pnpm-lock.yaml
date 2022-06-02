@@ -724,7 +724,7 @@ importers:
   ../../workbench-core/example/infrastructure:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-express': workspace:*
+      '@amzn/workbench-core-example-express': workspace:*
       '@aws-cdk/assert': ^2.0.0
       '@aws-cdk/aws-apigatewayv2-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': ^2.22.0-alpha.0
@@ -758,7 +758,7 @@ importers:
       source-map-support: ^0.5.16
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-express': link:../express
+      '@amzn/workbench-core-example-express': link:../express
       aws-cdk-lib: 2.24.1_constructs@10.1.12
       constructs: 10.1.12
       lodash: 4.17.21
