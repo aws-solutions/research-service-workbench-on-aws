@@ -14,7 +14,6 @@ export interface DataSetsStoragePlugin {
    *
    * @returns a URL to access the new storage location.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createStorage(name: string, path: string): Promise<string>;
 
   /**
