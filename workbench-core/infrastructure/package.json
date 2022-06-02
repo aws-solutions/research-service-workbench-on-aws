@@ -1,7 +1,7 @@
 {
   "name": "@amzn/workbench-core-infrastructure",
   "version": "0.0.1",
-  "description": "Example infrastructure to deploy express app",
+  "description": "Package containing CDK constructs used in workbench core",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
