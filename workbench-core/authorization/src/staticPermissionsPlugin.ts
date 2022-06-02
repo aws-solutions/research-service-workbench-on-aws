@@ -1,10 +1,10 @@
-import { User } from '@amzn/workbench-core-authentication';
-import PermissionsPlugin from './permissionsPlugin';
+import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
-import Permission, { PermissionsMap } from './permission';
-import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';
 import _ from 'lodash';
 import Operation from './operation';
+import Permission, { PermissionsMap } from './permission';
+import PermissionsPlugin from './permissionsPlugin';
+import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';
 
 /**
  * Static Permissions Plugin.
@@ -33,7 +33,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
     this._logger = logger;
   }
 
-  public async getPermissionsByUser(user: User): Promise<Permission[]> {
+  public async getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]> {
     let permissions: Permission[] = [];
     user.roles.forEach((role: string) => {
       if (_.has(this._permissionsMap, role))

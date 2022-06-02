@@ -9,69 +9,92 @@ import { Tokens } from './tokens';
  */
 export interface AuthenticationPlugin {
   /**
-   * Check to see if the user represented in the current request context is logged in.
+   * Checks to see if the user represented in the access token is logged in.
    *
-   * @param accessToken - the user's access token from the request context.
-   * @returns true if the user represented in the request context is logged in.
+   * @param accessToken - the user's access token
+   * @returns true if the user is logged in
+   *
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   isUserLoggedIn(accessToken: string): Promise<boolean>;
 
   /**
    * Validates the jwt token and returns the values on the token.
    *
-   * @param token - an Id or Access token to be validated.
-   * @returns the decoded jwt.
+   * @param token - the jwt token to be validated
+   * @returns the decoded jwt
    *
-   * @throws {@link InvalidJWTError} if the token is invalid.
+   * @throws {@link InvalidJWTError} if the token is invalid
    */
   validateToken(token: string): Promise<DecodedJWT>;
 
   /**
-   * Tell the Identity Provider to revoke the given token.
+   * Revokes the given token.
    *
-   * @param token - the token to revoke.
+   * @param token - the token to revoke
    *
-   * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked.
-   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
+   * @throws {@link InvalidTokenTypeError} if the token type provided cannot be revoked
+   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   revokeToken(token: string): Promise<void>;
 
   /**
-   * Get the Id of the user for whom the token was issued.
+   * Gets the Id of the user for whom the token was issued.
    *
-   * @param decodedToken - a decoded Id or access token from which to extract the user Id.
-   * @returns the user Id found within the token.
+   * @param decodedToken - a decoded Id or access token from which to extract the user Id
+   * @returns the user Id found within the token
    *
-   * @throws {@link InvalidJWTError} if the token doesnt contain the user's Id.
+   * @throws {@link InvalidJWTError} if the token doesnt contain the user's Id
    */
   getUserIdFromToken(decodedToken: DecodedJWT): string;
 
   /**
-   * Get any roles associated with a user for whom a token was issued.
+   * Gets any roles associated with a user for whom a token was issued.
    *
    * @param decodedToken - a decoded Id or access token from which to find the user's role(s)
-   * @returns list of roles included in the jwt token.
+   * @returns list of roles included in the jwt token
    *
-   * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles.
+   * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
   getUserRolesFromToken(decodedToken: DecodedJWT): string[];
 
   /**
-   * Take the authorization code parameter and request JWT tokens from the IdP.
+   * Takes the authorization code parameter and requests JWT tokens from the IdP.
    * The authorization code grant is explained [here](https://aws.amazon.com/blogs/mobile/understanding-amazon-cognito-user-pool-oauth-2-0-grants/)
    *
-   * @param code - an authorization code given as a query parameter in a user request
-   * @returns a {@link Tokens} object containing the id, access, and refresh tokens as well as the token type and expiration.
+   * @param code - an authorization code
+   * @param codeVerifier - the PKCE code verifier
+   * @returns a {@link Tokens} object containing the id, access, and refresh tokens and their expiration (in seconds)
    *
-   * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid.
-   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration.
+   * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
+   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
-  handleAuthorizationCode(code: string): Promise<Tokens>;
+  handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens>;
 
   /**
-   * Returns the URL of the endpoint used to retreive the authorization code.
+   * Takes temporary state and codeChallenge values and returns the URL of the endpoint used to retreive the authorization code.
    *
+   * The state and codeChallenge parameters should be temporary strings, such as TEMP_STATE and TEMP_CODE_CHALLENGE.
+   * These values will be replaced on the frontend with the real values to keep them secret.
+   *
+   * @param state - a temporary value to represent the state parameter
+   * @param codeChallenge - a temporary value to represent the code challenge parameter
    * @returns the endpoint URL string
    */
-  getAuthorizationCodeUrl(): string;
+  getAuthorizationCodeUrl(state: string, codeChallenge: string): string;
+
+  /**
+   * Uses the refresh token to generate new jwt tokens.
+   *
+   * @param refreshToken - the refresh token
+   * @returns a {@link Tokens} object containing the refreshed tokens and their expiration (in seconds)
+   *
+   * @throws {@link InvalidTokenError} if the refresh token is invalid
+   * @throws {@link PluginConfigurationError} if the {@link AuthenticationPlugin} has an incorrect configuration
+   * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
+   */
+  refreshAccessToken(refreshToken: string): Promise<Tokens>;
 }

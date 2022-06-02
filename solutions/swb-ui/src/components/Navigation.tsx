@@ -1,7 +1,7 @@
-import { useTranslation } from 'next-i18next';
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
-import { User, researcherUser } from '../models/User';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
+import { User, researcherUser } from '../models/User';
 
 export interface NavigationProps {
   activeHref?: string;

@@ -1,8 +1,7 @@
 jest.mock('md5-file');
 
-import md5File from 'md5-file';
-import ServiceCatalogSetup from './serviceCatalogSetup';
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
 import {
   CreateConstraintCommand,
   CreatePortfolioCommand,
@@ -14,8 +13,9 @@ import {
   DescribeProductAsAdminCommand,
   CreateProvisioningArtifactCommand
 } from '@aws-sdk/client-service-catalog';
-import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import md5File from 'md5-file';
+import ServiceCatalogSetup from './serviceCatalogSetup';
 
 describe('ServiceCatalogSetup', () => {
   const constants = {

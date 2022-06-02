@@ -12,7 +12,8 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-89.34%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-80.8%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-92.16%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.06%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-91.39%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.76%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-93.73%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-91.95%25-brightgreen.svg?style=flat) |
+
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -41,8 +42,6 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
 | [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md)
 | [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
-| [workbench-core/example/express](./workbench-core/example/express/) | [@amzn/workbench-core-express] | [README](./workbench-core/example/express/README.md)
-| [workbench-core/example/infrastructure](./workbench-core/example/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/example/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 | [workbench-core/repo-scripts/repo-toolbox](./workbench-core/repo-scripts/repo-toolbox/) | [@amzn/workbench-core-repo-toolbox] | [README](./workbench-core/repo-scripts/repo-toolbox/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->

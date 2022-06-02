@@ -8,6 +8,8 @@ on:
   pull_request_target:
     types:
       - closed
+    branches:
+      - 'develop'
   
 jobs:
   readme-commit:
@@ -41,21 +43,21 @@ jobs:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
   
-  deploy-example:
-    needs: [pre-deployment-check]
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
-    secrets:
-      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
-      role-to-assume: ${{ secrets.ASSUME_ROLE }}
-      aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-      cognito-username: "${{ secrets.COGNITO_USERNAME }}"
-      cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
-      cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
+  # deploy-example:
+  #   needs: [pre-deployment-check]
+  #   uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
+  #   secrets:
+  #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+  #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
+  #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+  #     cognito-username: "${{ secrets.COGNITO_USERNAME }}"
+  #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
+  #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
 
   merge-develop-to-main:
     name: Merge develop to main
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference, deploy-example]
+    needs: [readme-commit, deploy-swb-reference]
     env: 
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"

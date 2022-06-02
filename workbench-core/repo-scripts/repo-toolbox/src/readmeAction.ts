@@ -1,6 +1,10 @@
-import { RushConfiguration, RushConfigurationProject } from '@microsoft/rush-lib';
-import { CommandLineAction, CommandLineFlagParameter } from '@rushstack/ts-command-line';
+/**
+ *
+ * This code is a derivative of the code from https://github.com/microsoft/rushstack/blob/main/repo-scripts/repo-toolbox/src/ReadmeAction.ts
+ *
+ */
 import path from 'path';
+import { RushConfiguration, RushConfigurationProject } from '@microsoft/rush-lib';
 import {
   AlreadyReportedError,
   Colors,
@@ -12,6 +16,7 @@ import {
   Terminal,
   Text
 } from '@rushstack/node-core-library';
+import { CommandLineAction, CommandLineFlagParameter } from '@rushstack/ts-command-line';
 import * as Diff from 'diff';
 
 const GENERATED_PROJECT_SUMMARY_START_COMMENT_TEXT: string = '<!-- GENERATED PROJECT SUMMARY START -->';

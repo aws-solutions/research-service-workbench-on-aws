@@ -1,4 +1,5 @@
 import SagemakerEnvironmentConnectionService from './sagemakerEnvironmentConnectionService';
+
 describe('SagemakerEnvironmentConnectionService', () => {
   test('getAuthCreds should return mocked value', async () => {
     const sm = new SagemakerEnvironmentConnectionService();

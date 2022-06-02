@@ -1,8 +1,9 @@
-export const filteringOptions = [
-  { propertyKey: 'connections', value: '' },
+import { PropertyFilterProps } from '@awsui/components-react/property-filter';
+
+export const filteringOptions: readonly PropertyFilterProps.FilteringOption[] = [
   { propertyKey: 'owner', value: '' },
   { propertyKey: 'project', value: '' },
-  { propertyKey: 'workspace', value: '' },
+  { propertyKey: 'workspaceName', value: '' },
   { propertyKey: 'workspaceStatus', value: 'AVAILABLE' },
   { propertyKey: 'workspaceStatus', value: 'FAILED' },
   { propertyKey: 'workspaceStatus', value: 'PENDING' },
@@ -10,6 +11,5 @@ export const filteringOptions = [
   { propertyKey: 'workspaceStatus', value: 'STOPPED' },
   { propertyKey: 'workspaceStatus', value: 'STOPPING' },
   { propertyKey: 'workspaceStatus', value: 'TERMINATED' },
-  { propertyKey: 'workspaceStatus', value: 'TERMINATING' },
-  { propertyKey: 'workspaceType', value: '' }
+  { propertyKey: 'workspaceStatus', value: 'TERMINATING' }
 ];

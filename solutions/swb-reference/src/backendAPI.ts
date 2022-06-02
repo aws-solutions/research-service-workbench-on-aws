@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Express } from 'express';
-import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { HostingAccountService } from '@amzn/environments';
-import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
+import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
+import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
+import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [

@@ -3,12 +3,13 @@ jest.mock('./plugins/cognitoAuthenticationPlugin');
 import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticationPluginOptions } from '.';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
+  region: 'fake-region',
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
   clientSecret: 'fake-client-secret',
-  loginUrl: 'fake-login-url'
-};
+  websiteUrl: 'fake-website-url'
+} as const;
 
 describe('AuthenticationService tests', () => {
   const mockPlugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
@@ -64,21 +65,47 @@ describe('AuthenticationService tests', () => {
     expect(result).toMatchObject(['role']);
   });
 
-  it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens', async () => {
-    const result = await service.handleAuthorizationCode('access code');
+  it('handleAuthorizationCode should return a Promise that contains the id, access, and refresh tokens and their expiration (in seconds)', async () => {
+    const result = await service.handleAuthorizationCode('access code', 'code verifier');
 
     expect(result).toMatchObject({
-      idToken: 'id token',
-      accessToken: 'access token',
-      refreshToken: 'refresh token',
-      tokenType: 'Bearer',
-      expiresIn: 3600
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      },
+      refreshToken: {
+        token: 'refresh token',
+        expiresIn: 1234
+      }
     });
   });
 
   it('getAuthorizationCodeUrl should return the full URL of the authentication servers authorization code endpoint', () => {
-    const url = service.getAuthorizationCodeUrl();
+    const state = 'state';
+    const codeChallenge = 'code challenge';
+    const url = service.getAuthorizationCodeUrl(state, codeChallenge);
 
-    expect(url).toBe('authorizationCodeUrl');
+    expect(url).toBe(
+      `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+    );
+  });
+
+  it('refreshAccessToken should return a Promise that contains the id and access tokens and their expiration (in seconds)', async () => {
+    const result = await service.refreshAccessToken('refresh token');
+
+    expect(result).toMatchObject({
+      idToken: {
+        token: 'id token',
+        expiresIn: 1234
+      },
+      accessToken: {
+        token: 'access token',
+        expiresIn: 1234
+      }
+    });
   });
 });
