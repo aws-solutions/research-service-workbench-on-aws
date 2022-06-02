@@ -1,4 +1,4 @@
-import { User } from '@amzn/workbench-core-authentication';
+import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import AuthorizationPlugin from './authorizationPlugin';
 import Operation from './operation';
 import Permission from './permission';
@@ -22,14 +22,18 @@ export default class AuthorizationService {
   }
 
   /**
-   * Checks whether a {@link User} is authorized to utilize a {@link HTTPMethod} on a route.
-   * @param user - {@link User}.
+   * Checks whether a {@link AuthenticatedUser} is authorized to utilize a {@link HTTPMethod} on a route.
+   * @param user - {@link AuthenticatedUser}.
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
    *
    * @throws Foribdden {@link Error} when {@link User} is not authorized
    */
-  public async isAuthorizedOnRoute(user: User, route: string, method: HTTPMethod): Promise<void> {
+  public async isAuthorizedOnRoute(
+    user: AuthenticatedUser,
+    route: string,
+    method: HTTPMethod
+  ): Promise<void> {
     try {
       const permissions: Permission[] = await this._permissionsPlugin.getPermissionsByUser(user);
       const operations: Operation[] = await this._permissionsPlugin.getOperationsByRoute(route, method);
