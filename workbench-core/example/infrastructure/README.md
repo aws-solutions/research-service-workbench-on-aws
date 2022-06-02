@@ -1,4 +1,4 @@
-# `infrastructure`
+# `example-infrastructure`
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |

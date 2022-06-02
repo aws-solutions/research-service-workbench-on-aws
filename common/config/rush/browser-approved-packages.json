@@ -16,7 +16,7 @@
     },
     {
       "name": "@amzn/workbench-core-audit",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-authentication",
@@ -27,28 +27,32 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-example-express",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@amzn/workbench-core-express",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-logging",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-authorizers-alpha",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-dynamodb",
@@ -156,7 +160,7 @@
     },
     {
       "name": "@rushstack/heft-node-rig",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/node-core-library",
@@ -184,15 +188,15 @@
     },
     {
       "name": "@vendia/serverless-express",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-cdk",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-cdk-lib",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "aws-jwt-verify",
@@ -208,7 +212,7 @@
     },
     {
       "name": "axios",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "babel-jest",
@@ -216,7 +220,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -228,7 +232,7 @@
     },
     {
       "name": "constructs",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "date-fns",
@@ -244,7 +248,7 @@
     },
     {
       "name": "esbuild",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint",
@@ -260,7 +264,7 @@
     },
     {
       "name": "eslint-plugin-security",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint-plugin-testing-library",
@@ -268,7 +272,7 @@
     },
     {
       "name": "express",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "fast-check",
@@ -300,7 +304,7 @@
     },
     {
       "name": "lodash",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "md5-file",
@@ -360,7 +364,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "triple-beam",
