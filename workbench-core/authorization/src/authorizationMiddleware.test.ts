@@ -19,7 +19,6 @@ jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
 import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { Request, Response, NextFunction } from 'express';
-import { fc, itProp } from 'jest-fast-check';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
 import {
@@ -143,8 +142,8 @@ describe('authorization middleware', () => {
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
-    expect(response.status).toBeCalledWith(403);
-    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
+    expect(response.status).toBeCalledWith(400);
+    expect(response.json).toBeCalledWith({ error: 'Invalid request' });
   });
   test('Request has no authenticatedUser for PUT on /sample', async () => {
     const next = jest.fn();
@@ -207,56 +206,6 @@ describe('authorization middleware', () => {
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
-    expect(response.status).toBeCalledWith(403);
-    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
-  });
-
-  itProp('Invalid request, deny request', [fc.anything()], async (request) => {
-    const response: Response = {
-      locals: {
-        user: mockGuest
-      },
-      status: jest.fn().mockImplementation((statusCode: number) => {
-        return response;
-      }),
-      json: jest.fn()
-    } as unknown as Response;
-    const next = jest.fn();
-    await authorizationMiddleware(request as Request, response, next);
-    expect(next).toBeCalledTimes(0);
-    expect(response.status).toBeCalledWith(403);
-    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
-  });
-
-  itProp('Invalid response should throw error', [fc.anything()], async (response) => {
-    const next = jest.fn();
-    const request: Request = {
-      method: 'GET',
-      originalUrl: '/sample'
-    } as Request;
-    try {
-      await authorizationMiddleware(request, response as Response, next);
-      expect.hasAssertions();
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-    }
-  });
-
-  itProp('Invalid next, deny request', [fc.anything()], async (next) => {
-    const response: Response = {
-      locals: {
-        user: mockGuest
-      },
-      status: jest.fn().mockImplementation((statusCode: number) => {
-        return response;
-      }),
-      json: jest.fn()
-    } as unknown as Response;
-    const request: Request = {
-      method: 'GET',
-      originalUrl: '/sample'
-    } as Request;
-    await authorizationMiddleware(request, response, next as NextFunction);
     expect(response.status).toBeCalledWith(403);
     expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
   });

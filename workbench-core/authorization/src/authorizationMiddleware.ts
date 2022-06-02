@@ -34,7 +34,7 @@ function checkMethod(method: string): method is HTTPMethod {
 }
 
 /**
- * Creates an authorization middleware function for Express using the {@link AuthorizationService}.
+ * Creates an authorization middleware function for {@link https://expressjs.com/ | express} using the {@link AuthorizationService}.
  * @param authorizationService - {@link AuthorizationService}
  * @returns - The authorization middleware function.
  */
@@ -52,7 +52,7 @@ export default function withAuth(
       if (checkMethod(method)) {
         await authorizationService.isAuthorizedOnRoute(user, route, method);
         next();
-      } else throw new Error('Method not found');
+      } else res.status(400).json({ error: 'Invalid request' });
     } catch (err) {
       res.status(403).json({ error: 'User is not authorized' });
     }
