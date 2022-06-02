@@ -28,7 +28,7 @@
     },
     {
       "name": "@amzn/workbench-core-example-express",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-express",
