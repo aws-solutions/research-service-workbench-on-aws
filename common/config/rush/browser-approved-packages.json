@@ -16,7 +16,7 @@
     },
     {
       "name": "@amzn/workbench-core-audit",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-authentication",
