@@ -278,7 +278,7 @@ export default class HostingAccountLifecycleService {
   }
 
   private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
-    console.log(`Sharing AMIs: [${amisToShare}] with account ${this._accountService}`);
+    console.log(`Sharing AMIs: [${amisToShare}] with account ${targetAccountId}`);
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {
