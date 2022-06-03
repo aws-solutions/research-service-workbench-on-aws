@@ -13,6 +13,8 @@ export class DataSetService {
    *
    * @param audit - an instance of a {@link AuditService} configured for use by the DataSetService
    * @param log - an instance of a {@link LoggingService} configured for use by the DataSetService
+   *
+   * @returns - the intialized {@link DataSetService}.
    */
   public constructor(audit: AuditService, log: LoggingService) {
     this._audit = audit;
@@ -51,9 +53,10 @@ export class DataSetService {
    * Get the mount configuration string for a DataSet.
    * @param dataSetName - the name of the DataSet.
    * @param environmentRoleArn - an arn with which the DataSet will be accessed from the external environment.
+   *
    * @returns the string needed to mount the Dataset in an external environment.
    */
-  public async getDataSetMountString(dataSetName: string, environmentRoleArn: string): Promise<void> {
+  public async getDataSetMountString(dataSetName: string, environmentRoleArn: string): Promise<string> {
     throw new Error(notImplementedText);
   }
 }

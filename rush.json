@@ -96,16 +96,16 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-express",
+      "packageName": "@amzn/workbench-core-example-express",
       "projectFolder": "workbench-core/example/express",
-      "reviewCategory": "production",
-      "shouldPublish": true
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-infrastructure",
+      "packageName": "@amzn/workbench-core-example-infrastructure",
       "projectFolder": "workbench-core/example/infrastructure",
-      "reviewCategory": "production",
-      "shouldPublish": true
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/swb-ui",
@@ -116,6 +116,12 @@
     {
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-infrastructure",
+      "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

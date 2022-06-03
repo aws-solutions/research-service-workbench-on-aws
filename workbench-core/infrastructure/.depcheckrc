@@ -5,16 +5,15 @@ ignores: [
     '@types/heft-jest',
     'eslint-plugin-import',
     'eslint-plugin-security',
-    'npm-package-json-lint-config-default',
-    '@types/node',
-    'fast-check',
-    'jest'
+    'npm-package-json-lint-config-default'
 ]
 ignore-patterns: [
     // files matching these patterns will be ignored
     '.heft',
     '.rush',
+    'build',
     'config',
+    'cdk.out',
     'lib',
     'node_modules',
     'temp',

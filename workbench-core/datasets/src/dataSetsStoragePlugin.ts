@@ -11,8 +11,9 @@ export interface DataSetsStoragePlugin {
    * with the naming rules for the underlying storage mechanism for which the
    * interface is implemented.
    * @param path - the storage specifc path for the destination.
+   *
+   * @returns a URL to access the new storage location.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createStorage(name: string, path: string): Promise<string>;
 
   /**
@@ -22,6 +23,7 @@ export interface DataSetsStoragePlugin {
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param externalRoleName - the role name which the external environment will assume to
    * access the DataSet
+   *
    * @returns a string which can be used to mount the DataSet to an external environment.
    */
   addExternalEndpoint(
@@ -49,6 +51,8 @@ export interface DataSetsStoragePlugin {
    *
    * @param dataSetName - the name of the DataSet which will be mounted to the environment.
    * @param externalEndpointName - the unique name used to identify the endpont.
+   *
+   * @returns a string which can be used to mount the Dataset to an external environment.
    */
   getExternalEndpoint(dataSetName: string, externalEndpointName: string): Promise<string>;
 
@@ -57,6 +61,8 @@ export interface DataSetsStoragePlugin {
    *
    * @param dataSetName - the name of the Dataset to which to make an upload.
    * @param timeToLiveMilliseconds - the maximum time before the URL expires.
+   *
+   * @returns a URL which can be used to upload a file directly to the DataSet destination.
    */
   createPresignedUploadUrl(dataSetName: string, timeToLiveMilliseconds: number): Promise<string>;
 
@@ -66,6 +72,7 @@ export interface DataSetsStoragePlugin {
    * @param storageLocation - the DataSet to which files will be uploaded.
    * @param numberOfParts - the number of parts in which the file will be divided.
    * @param timeToLiveMilliseconds - the length of time in milliseconds for which the URLs will be valid.
+   *
    * @returns an Array of presigned Urls. The first iniates the upload. The last completes it. All in between represent the parts
    * of the upload.
    */
