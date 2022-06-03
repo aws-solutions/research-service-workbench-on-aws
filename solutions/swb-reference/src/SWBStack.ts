@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
@@ -364,7 +364,8 @@ export class SWBStack extends Stack {
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      timeout: Duration.seconds(30)
+      timeout: Duration.seconds(30),
+      memorySize: 832
     });
     apiLambda.role?.attachInlinePolicy(
       new Policy(this, 'apiLambdaPolicy', {
@@ -435,8 +436,14 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
+    const alias = new Alias(this, 'LiveAlias', {
+      aliasName: 'live',
+      version: apiLambda.currentVersion,
+      provisionedConcurrentExecutions: 1
+    });
+
     API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(apiLambda)
+      defaultIntegration: new LambdaIntegration(alias)
     });
   }
 
