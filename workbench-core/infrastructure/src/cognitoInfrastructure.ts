@@ -1,46 +1,47 @@
 import {
   AccountRecovery,
+  OAuthScope,
   UserPool,
   UserPoolClient,
   UserPoolClientIdentityProvider,
+  UserPoolClientOptions,
   UserPoolClientProps,
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { RemovalPolicy } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 
-export class WorkbenchUserPool {
-  public constructor(scope: Construct, id: string, props?: UserPoolProps & UserPoolClientProps) {
-    const userPool = new UserPool(scope, 'ExampleUserPool', {
-      userPoolName: `example-user-pool`,
-      removalPolicy: RemovalPolicy.DESTROY,
-      selfSignUpEnabled: true,
-      signInAliases: {
-        username: true,
-        email: true
-      },
-      autoVerify: {
-        email: true
-      },
-      passwordPolicy: {
-        minLength: 8,
-        requireLowercase: true,
-        requireDigits: true,
-        requireUppercase: true,
-        requireSymbols: true
-      },
-      accountRecovery: AccountRecovery.EMAIL_ONLY
-    });
+import merge from 'lodash/merge';
 
-    const userPoolClient = new UserPoolClient(scope, 'ExampleUserPoolClient', {
-      userPool,
-      authFlows: {
-        adminUserPassword: true,
-        userPassword: true,
-        custom: true,
-        userSrp: true
-      },
-      supportedIdentityProviders: [UserPoolClientIdentityProvider.COGNITO]
-    });
+const userPoolDefaults: UserPoolProps = {};
+
+export class WorkbenchUserPool extends UserPool {
+  public constructor(scope: Construct, id: string, props?: UserPoolProps) {
+    const completeProps = merge(props, userPoolDefaults);
+
+    super(scope, id, completeProps);
+  }
+}
+
+const userPoolClientDefaults: UserPoolClientOptions = {
+  generateSecret: true,
+  authFlows: {
+    // TODO
+  },
+  oAuth: {
+    flows: {
+      authorizationCodeGrant: true
+    }, // TODO callback and logout URLSs?
+    scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PHONE]
+  },
+  preventUserExistenceErrors: true,
+  enableTokenRevocation: true
+};
+
+export class WorkbenchUserPoolClient extends UserPoolClient {
+  public constructor(scope: Construct, id: string, props: UserPoolClientProps) {
+    const completeProps = merge(props, userPoolClientDefaults);
+
+    super(scope, id, completeProps);
   }
 }
