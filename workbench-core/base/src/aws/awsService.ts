@@ -11,6 +11,7 @@ import EC2 from './clients/ec2';
 import EventBridge from './clients/eventbridge';
 import IAM from './clients/iam';
 import S3 from './clients/s3';
+import S3Control from './clients/s3Control';
 import ServiceCatalog from './clients/serviceCatalog';
 import SSM from './clients/ssm';
 import STS from './clients/sts';
@@ -30,6 +31,7 @@ export default class AwsService {
     sts: STS;
     iam: IAM;
     ddb: DynamoDB;
+    s3Control: S3Control;
   };
   public helpers: {
     cloudformation: CloudformationService;
@@ -49,7 +51,8 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region })
+      ddb: new DynamoDB({ region }),
+      s3Control: new S3Control(options)
     };
 
     this.helpers = {
