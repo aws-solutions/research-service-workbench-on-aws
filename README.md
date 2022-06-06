@@ -14,7 +14,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-85.17%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-75.05%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.04%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-86.08%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-86.33%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-77.14%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.78%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-87.06%25-yellow.svg?style=flat) |
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.

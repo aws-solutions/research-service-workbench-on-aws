@@ -95,10 +95,6 @@ export default class AccountService {
   }
 
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
-    // Verify id is not provided
-    if (!_.isUndefined(accountMetadata.id))
-      throw new Error('Cannot specify id in request body when creating new account');
-
     // Verify awsAccountId is specified
     if (_.isUndefined(accountMetadata.awsAccountId))
       throw new Error('Missing AWS Account ID in request body');
@@ -115,9 +111,6 @@ export default class AccountService {
   }
 
   public async _validateUpdate(accountMetadata: { [key: string]: string }): Promise<void> {
-    // Verify id is provided
-    if (_.isUndefined(accountMetadata.id)) throw new Error('Please specify id in request body');
-
     // Check if AWS account ID is same as before
     if (!_.isUndefined(accountMetadata.awsAccountId)) {
       const ddbEntry = await this.getAccount(accountMetadata.id);
