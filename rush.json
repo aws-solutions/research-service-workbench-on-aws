@@ -6,7 +6,7 @@
     "strictPeerDependencies": true,
     "useWorkspaces": true
   },
-  "nodeSupportedVersionRange": ">=12.13.0 <13.0.0 || >=14.15.0 <15.0.0 || >=16.13.0 <17.0.0",
+  "nodeSupportedVersionRange": ">=14.15.0 <15.0.0 || >=16.13.0 <17.0.0",
   "ensureConsistentVersions": true,
   "projectFolderMaxDepth": 3,
   "approvedPackagesPolicy": {
@@ -18,7 +18,7 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "git@ssh.gitlab.aws.dev:ma-foundation/ma-mono.git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
     "defaultBranch": "main"
   },
   "eventHooks": {
@@ -90,14 +90,38 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-express",
+      "packageName": "@amzn/workbench-core-datasets",
+      "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-example-express",
       "projectFolder": "workbench-core/example/express",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-example-infrastructure",
+      "projectFolder": "workbench-core/example/infrastructure",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/swb-ui",
+      "projectFolder": "solutions/swb-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-repo-toolbox",
+      "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
-      "projectFolder": "workbench-core/example/infrastructure",
+      "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

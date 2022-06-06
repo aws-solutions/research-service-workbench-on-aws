@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { InfrastructureStack } from './infrastructure-stack';
 import { App, Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
+import { InfrastructureStack } from './infrastructure-stack';
 
 const app: App = new cdk.App();
 // eslint-disable-next-line no-new

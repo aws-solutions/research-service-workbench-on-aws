@@ -1,6 +1,4 @@
-import IamRoleCloneService from './iamRoleCloneService';
 import { AwsService } from '@amzn/workbench-core-base';
-import { mockClient } from 'aws-sdk-client-mock';
 import {
   AttachRolePolicyCommand,
   CreatePolicyCommand,
@@ -15,6 +13,8 @@ import {
   ListRolePoliciesCommand,
   PutRolePolicyCommand
 } from '@aws-sdk/client-iam';
+import { mockClient } from 'aws-sdk-client-mock';
+import IamRoleCloneService from './iamRoleCloneService';
 
 describe('iamRoleCloneService', () => {
   beforeEach(() => {

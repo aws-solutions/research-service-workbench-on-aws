@@ -1,10 +1,10 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { AwsService } from '@amzn/workbench-core-base';
 
 import fs from 'fs';
-import md5File from 'md5-file';
 import { join } from 'path';
+import { AwsService } from '@amzn/workbench-core-base';
 import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
+import md5File from 'md5-file';
 
 export default class ServiceCatalogSetup {
   private _aws: AwsService;

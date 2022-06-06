@@ -1,6 +1,7 @@
 import { expandNamingConventionSelectors } from './macros';
 
-export const namingConvention = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const namingConvention: any = {
   rules: {
     '@typescript-eslint/naming-convention': [
       'warn',

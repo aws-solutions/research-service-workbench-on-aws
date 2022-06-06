@@ -1,11 +1,11 @@
-import _ = require('lodash');
-import Boom from '@hapi/boom';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
-import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import { isEnvironmentStatus } from './environmentStatus';
-import EnvironmentService from './environmentService';
-import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { AwsService } from '@amzn/workbench-core-base';
+import Boom from '@hapi/boom';
+import _ = require('lodash');
+import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
+import envResourceTypeToKey from './environmentResourceTypeToKey';
+import EnvironmentService from './environmentService';
+import { isEnvironmentStatus } from './environmentStatus';
+import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {

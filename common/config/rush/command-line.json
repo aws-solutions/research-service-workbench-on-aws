@@ -174,21 +174,7 @@
       "enableParallelism": true
     },
     {
-      "name": "test:update",
-      "commandKind": "bulk",
-      "summary": "Used to update snapshots",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
       "name": "build:test",
-      "commandKind": "bulk",
-      "summary": "Runs rush build and rush test using a single command",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "build:local",
       "commandKind": "bulk",
       "summary": "Runs rush build and rush test using a single command",
       "safeForSimultaneousRushProcesses": true,
@@ -202,30 +188,9 @@
       "enableParallelism": true
     },
     {
-      "name": "cdk",
+      "name": "sort-package-json",
       "commandKind": "bulk",
-      "summary": "Used to run cdk commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:synth",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk synth commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:bootstrap",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk bootstrap commands",
-      "safeForSimultaneousRushProcesses": true,
-      "enableParallelism": true
-    },
-    {
-      "name": "cdk:deploy",
-      "commandKind": "bulk",
-      "summary": "Used to run cdk deploy commands",
+      "summary": "Sort package.json file",
       "safeForSimultaneousRushProcesses": true,
       "enableParallelism": true
     },
@@ -237,20 +202,49 @@
       "enableParallelism": true
     },
     {
+      "name": "pkg-json-lint",
+      "commandKind": "bulk",
+      "summary": "Run lint on package.json files",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "lint:fix",
+      "commandKind": "bulk",
+      "summary": "lint fix",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "depcheck",
+      "commandKind": "bulk",
+      "summary": "Check unused dependecies and devDependencies",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
+      "commandKind": "global",
+      "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
+    },
+    {
+      "name": "common-coverage",
+      "commandKind": "global",
+      "summary": "Updates the common code coverage report in root README file",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
+    },
+    {
+      "name": "common-coverage-make-badge",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage && git add README.md"
-    },
-    {
-      "name": "common-coverage-ci",
-      "commandKind": "global",
-      "summary": "[To be used in the Pipeline] The --ci argument will throw an error if the badges generated do not match what is already in the README file",
-      "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
     },
     {
       "name": "commitlint",
@@ -282,13 +276,6 @@
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
     },
-    // {
-    //   "name": "heft:build",
-    //   "commandKind": "bulk",
-    //   "summary": "Run heft build, also performs eslint",
-    //   "safeForSimultaneousRushProcesses": true,
-    //   "enableParallelism": true
-    // },
     {
       "name": "prettier",
       "commandKind": "global",
@@ -323,6 +310,12 @@
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Throws an error if the badges generated do not match what is already in the README.md",
+      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**
