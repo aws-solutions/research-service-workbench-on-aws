@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ = require('lodash');
+import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
-import IamRoleCloneService from './iamRoleCloneService';
-import AccountService from './accountService';
-import { Readable } from 'stream';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import _ = require('lodash');
+import AccountService from './accountService';
 import { HostingAccountStatus } from './hostingAccountStatus';
+import IamRoleCloneService from './iamRoleCloneService';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;

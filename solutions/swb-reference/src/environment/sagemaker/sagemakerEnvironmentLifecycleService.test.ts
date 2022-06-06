@@ -3,9 +3,9 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
 import { EnvironmentLifecycleHelper, EnvironmentService } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
+import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
 
 describe('SagemakerEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;

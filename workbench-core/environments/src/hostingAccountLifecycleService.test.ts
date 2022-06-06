@@ -1,6 +1,14 @@
 jest.mock('./iamRoleCloneService');
 
-import { mockClient, AwsStub } from 'aws-sdk-client-mock';
+import { Readable } from 'stream';
+import { AwsService } from '@amzn/workbench-core-base';
+import {
+  CloudFormationClient,
+  DescribeStacksCommand,
+  GetTemplateCommand
+} from '@aws-sdk/client-cloudformation';
+import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import {
   EventBridgeClient,
   PutPermissionCommand,
@@ -8,24 +16,15 @@ import {
   PutRuleCommand,
   PutTargetsCommand
 } from '@aws-sdk/client-eventbridge';
-import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
-import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
-import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
-import {
-  CloudFormationClient,
-  DescribeStacksCommand,
-  GetTemplateCommand
-} from '@aws-sdk/client-cloudformation';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import { AwsService } from '@amzn/workbench-core-base';
-import { Readable } from 'stream';
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
-
+import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { mockClient, AwsStub } from 'aws-sdk-client-mock';
+import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import IamRoleCloneService from './iamRoleCloneService';
 
 describe('HostingAccountLifecycleService', () => {

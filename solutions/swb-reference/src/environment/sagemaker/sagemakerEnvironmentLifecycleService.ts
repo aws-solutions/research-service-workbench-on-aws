@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ = require('lodash');
 import {
   EnvironmentLifecycleService,
   EnvironmentLifecycleHelper,
   EnvironmentService
 } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
+import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 
 export default class SagemakerEnvironmentLifecycleService implements EnvironmentLifecycleService {

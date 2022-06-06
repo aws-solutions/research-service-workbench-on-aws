@@ -1,10 +1,10 @@
-import StatusHandler from './statusHandler';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
-import { mockClient } from 'aws-sdk-client-mock';
-import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService } from '@amzn/workbench-core-base';
-import EnvironmentService from './environmentService';
+import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
+import { mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
+import EnvironmentService from './environmentService';
+import EventBridgeEventToDDB from './eventBridgeEventToDDB';
+import StatusHandler from './statusHandler';
 
 describe('StatusHandler', () => {
   const ORIGINAL_ENV = process.env;

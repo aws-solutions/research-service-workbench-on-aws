@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
-import _ = require('lodash');
 import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
+import _ = require('lodash');
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
