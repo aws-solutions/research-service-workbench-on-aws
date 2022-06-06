@@ -3,16 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import _ from 'lodash';
 import BatchEdit from './batchEdit';
-import TransactEdit from './transactEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
 import Scanner from './scanner';
+import TransactEdit from './transactEdit';
 import Updater from './updater';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
-import _ from 'lodash';
 
 export default class DynamoDBService {
   private _awsRegion: string;

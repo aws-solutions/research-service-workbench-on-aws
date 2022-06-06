@@ -1,9 +1,9 @@
 // Environment launch
+import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
+import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { Environment } from './apiRouteConfig';
-import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
 import { wrapAsync } from './errorHandlers';
-import Boom from '@hapi/boom';
 
 export function setUpEnvRoutes(
   router: Router,

@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ = require('lodash');
-import { v4 as uuidv4 } from 'uuid';
-import Boom from '@hapi/boom';
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import Boom from '@hapi/boom';
+import _ = require('lodash');
+import { v4 as uuidv4 } from 'uuid';
 import environmentResourceTypeToKey from './environmentResourceTypeToKey';
 import { HostingAccountStatus } from './hostingAccountStatus';
 

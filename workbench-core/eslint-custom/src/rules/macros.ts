@@ -60,7 +60,8 @@
 //   },
 //   . . .
 // ]
-const expandNamingConventionSelectors = (inputBlocks: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const expandNamingConventionSelectors = (inputBlocks: any): any[] => {
   const firstPassBlocks = [];
 
   // Expand "selectors" --> "selector"

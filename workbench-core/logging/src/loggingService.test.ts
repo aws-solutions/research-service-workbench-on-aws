@@ -1,8 +1,8 @@
 jest.mock('./plugins/winstonPlugin');
 
 import { fc, itProp } from 'jest-fast-check';
-import { LoggingPlugin, LoggingService, LogLevel, WinstonPlugin } from '.';
 import { LogMessageObject } from './logMessage';
+import { LoggingPlugin, LoggingService, LogLevel, WinstonPlugin } from '.';
 
 const testErrorStack = `Error
   at REPL1:1:13

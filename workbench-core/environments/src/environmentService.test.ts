@@ -1,7 +1,5 @@
 const envId = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 jest.mock('uuid', () => ({ v4: () => envId }));
-import EnvironmentService from './environmentService';
-import { mockClient } from 'aws-sdk-client-mock';
 import {
   BatchGetItemCommand,
   DynamoDBClient,
@@ -13,6 +11,8 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
+import EnvironmentService from './environmentService';
 
 describe('EnvironmentService', () => {
   beforeAll(() => {
