@@ -1,4 +1,13 @@
 import { User } from './user';
+import { AddUserToRoleInput } from './userManagementInputs/addUserToRoleInput';
+import { CreateRoleInput } from './userManagementInputs/createRoleInput';
+import { CreateUserInput } from './userManagementInputs/createUserInput';
+import { DeleteRoleInput } from './userManagementInputs/deleteRoleInput';
+import { DeleteUserInput } from './userManagementInputs/deleteUserInput';
+import { GetUserInput } from './userManagementInputs/getUserInput';
+import { ListUsersForRoleInput } from './userManagementInputs/listUsersForRoleInput';
+import { RemoveUserFromRoleInput } from './userManagementInputs/removeUserFromRoleInput';
+import { UpdateUserInput } from './userManagementInputs/updateUserInput';
 
 /**
  * Implement the `UserManagementPlugin` interface to connect the UserRoleService
@@ -7,9 +16,9 @@ import { User } from './user';
 export interface UserManagementPlugin {
   /**
    * Get details for a particular user from the user/role data store.
-   * @param uid - the identifier of a given user.
+   * @param getUserInput - {@link GetUserInput}.
    */
-  getUser(uid: string): Promise<User>;
+  getUser(getUserInput: GetUserInput): Promise<User>;
 
   /**
    * Get all user IDs from the user/role data store.
@@ -18,28 +27,27 @@ export interface UserManagementPlugin {
 
   /**
    * Create a new user with the given details.
-   * @param user - the details of the user to create.
+   * @param createUserInput - {@link CreateUserInput}.
    */
-  createUser(user: User): Promise<void>;
+  createUser(createUserInput: CreateUserInput): Promise<void>;
 
   /**
    * Update a user with new details.
-   * @param uid - the ID of the user to update.
-   * @param user - the new details for the user.
+   * @param updateUserInput - {@link UpdateUserInput}.
    */
-  updateUser(uid: string, user: User): Promise<void>;
+  updateUser(updateUserInput: UpdateUserInput): Promise<void>;
 
   /**
    * Delete a user from the backing store.
-   * @param uid - the ID of the user to delete.
+   * @param deleteUserInput - {@link DeleteUserInput}.
    */
-  deleteUser(uid: string): Promise<void>;
+  deleteUser(deleteUserInput: DeleteUserInput): Promise<void>;
 
   /**
    * List the user IDs assoicated with a given role.
-   * @param role - the role for which the users should be listed.
+   * @param listUsersForRoleInput - {@link ListUsersForRoleInput}.
    */
-  listUsersForRole(role: string): Promise<string[]>;
+  listUsersForRole(listUsersForRoleInput: ListUsersForRoleInput): Promise<string[]>;
 
   /**
    * List the currenlty available roles.
@@ -48,29 +56,27 @@ export interface UserManagementPlugin {
 
   /**
    * Add the given user to the given role.
-   * @param uid - the ID of the user to add to the role.
-   * @param role - the name which identifies the role.
+   * @param addUserToRoleInput -  {@link AddUserToRoleInput}
    */
-  addUserToRole(uid: string, role: string): Promise<void>;
+  addUserToRole(addUserToRoleInput: AddUserToRoleInput): Promise<void>;
 
   /**
    * Create a new role with no associated users.
-   * @param role - the name of the role to create.
+   * @param createRoleInput - {@link CreateRoleInput}.
    */
-  createRole(role: string): Promise<void>;
+  createRole(createRoleInput: CreateRoleInput): Promise<void>;
 
   /**
    * Remove the given user from the given role.
-   * @param uid - the ID of the user to remove from the given role.
-   * @param role - the role from which the user is to be removed.
+   * @param removeUserFromRoleInput - {@link RemoveUserFromRoleInput}.
    */
-  removeUserFromRole(uid: string, role: string): Promise<void>;
+  removeUserFromRole(removeUserFromRoleInput: RemoveUserFromRoleInput): Promise<void>;
 
   /**
    * Delete the given role. It is recommended implementers check to
    * ensure an empty role before deletion to help guard against accidental
    * deletin.
-   * @param role - the role to remove.
+   * @param deleteRoleInput - {@link DeleteRoleInput}.
    */
-  deleteRole(role: string): Promise<void>;
+  deleteRole(deleteRoleInput: DeleteRoleInput): Promise<void>;
 }
