@@ -3,13 +3,37 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { EnvironmentLifecycleHelper, EnvironmentService } from '@amzn/environments';
+import { EnvironmentLifecycleHelper, EnvironmentService, EnvironmentStatus } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
 
 describe('SagemakerEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
-  let environment: any = {};
+  let environment: {
+    id: string | undefined;
+    instanceId: string | undefined;
+    cidr: string;
+    description: string;
+    error: { type: string; value: string } | undefined;
+    name: string;
+    outputs: { id: string; value: string; description: string }[];
+    projectId: string;
+    status: EnvironmentStatus;
+    datasetIds: string[];
+    provisionedProductId: string;
+    envTypeConfigId: string;
+    updatedAt: string;
+    createdAt: string;
+    owner: string;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ETC?: any;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    PROJ?: any;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DS?: any[];
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    INID?: any;
+  };
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
@@ -18,11 +42,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     mockUuid.v4.mockImplementationOnce(() => 'sampleEnvId');
     environment = {
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
-      accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
-      awsAccountId: '123456789012',
       createdAt: '2022-05-05T19:39:03.023Z',
-      envTypeId: 'prod-hxwmltpkg2edy-pa-fh6spfcycydtq',
-      resourceType: 'environment',
       status: 'PENDING',
       updatedAt: '2022-05-05T19:43:57.143Z',
       cidr: '1.1.1.1/32',
@@ -118,7 +138,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     const sm = new SagemakerEnvironmentLifecycleService();
     sm.helper = envHelper;
     sm.envService = envService;
-    const response = await sm.terminate(environment.id);
+    const response = await sm.terminate(environment.id!);
     expect(response).toEqual({ envId: environment.id, status: 'TERMINATING' });
   });
 

@@ -3,12 +3,37 @@ import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-ser
 import { mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentService from './environmentService';
+import { EnvironmentStatus } from './environmentStatus';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import StatusHandler from './statusHandler';
 
 describe('StatusHandler', () => {
   const ORIGINAL_ENV = process.env;
-  let environment: any = {};
+  let environment: {
+    id: string | undefined;
+    instanceId: string | undefined;
+    cidr: string;
+    description: string;
+    error: { type: string; value: string } | undefined;
+    name: string;
+    outputs: { id: string; value: string; description: string }[];
+    projectId: string;
+    status: EnvironmentStatus;
+    datasetIds: string[];
+    provisionedProductId: string;
+    envTypeConfigId: string;
+    updatedAt: string;
+    createdAt: string;
+    owner: string;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ETC?: any;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    PROJ?: any;
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    DS?: any[];
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    INID?: any;
+  };
   let ebToDDB: EventBridgeEventToDDB;
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -41,11 +66,7 @@ describe('StatusHandler', () => {
     };
     environment = {
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
-      accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
-      awsAccountId: '123456789012',
       createdAt: '2022-05-05T19:39:03.023Z',
-      envTypeId: 'prod-hxwmltpkg2edy-pa-fh6spfcycydtq',
-      resourceType: 'environment',
       status: 'PENDING',
       updatedAt: '2022-05-05T16:43:57.143Z',
       cidr: '1.1.1.1/32',
