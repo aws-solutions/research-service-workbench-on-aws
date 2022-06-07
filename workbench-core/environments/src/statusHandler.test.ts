@@ -122,7 +122,7 @@ describe('StatusHandler', () => {
     expect(envService.updateEnvironment).not.toBeCalled();
   });
 
-  test('execute does not return an error on Launch operation', async () => {
+  test('execute does not return an error on Launch operation even when event older than last update', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
@@ -139,7 +139,7 @@ describe('StatusHandler', () => {
         'detail-type': 'EnvironmentStatusUpdate',
         source: 'LaunchSagemaker',
         account: '123456789012',
-        time: '2022-05-05T17:25:37Z',
+        time: '2022-05-05T14:25:37Z',
         region: 'us-east-1',
         resources: [],
         detail: {
