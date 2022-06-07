@@ -185,7 +185,13 @@ export default class HostingAccountLifecycleService {
     subnetId?: string;
     encryptionKeyArn?: string;
   }): Promise<void> {
-    const updateParam: { id: string; status: string; vpcId?: string; subnetId?: string } = {
+    const updateParam: {
+      id: string;
+      status: string;
+      vpcId?: string;
+      subnetId?: string;
+      encryptionKeyArn?: string;
+    } = {
       id: param.ddbAccountId,
       status: param.status
     };
@@ -194,6 +200,9 @@ export default class HostingAccountLifecycleService {
     }
     if (param.subnetId) {
       updateParam.subnetId = param.subnetId;
+    }
+    if (param.encryptionKeyArn) {
+      updateParam.encryptionKeyArn = param.encryptionKeyArn;
     }
     console.log('_writeAccountStatusToDDB param', param);
     await this._accountService.update(updateParam);
