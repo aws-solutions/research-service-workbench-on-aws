@@ -300,16 +300,17 @@ describe('StatusHandler', () => {
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.updatedAt = '2022-05-05T19:43:57.143Z';
     const ebToDDB: EventBridgeEventToDDB = {
-      envId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       status: 'COMPLETED',
       operation: 'Launch',
+      instanceId: 'notebookInstance-abc',
+      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
       metadata: {
         version: '0',
         id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
         'detail-type': 'EnvironmentStatusUpdate',
         source: 'LaunchSagemaker',
         account: '123456789012',
-        time: '2022-05-05T17:25:37Z',
+        time: '2022-05-05T15:25:37Z',
         region: 'us-east-1',
         resources: [],
         detail: {
@@ -318,7 +319,7 @@ describe('StatusHandler', () => {
           RecordId: 'rec-6xswbmafv4bny',
           EnvType: 'Sagemaker',
           Operation: 'Launch',
-          Status: 'InService'
+          Status: 'COMPLETED'
         }
       }
     };
