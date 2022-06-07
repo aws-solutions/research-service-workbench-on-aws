@@ -1,10 +1,16 @@
 import {
+  GetBucketPolicyCommand,
+  GetBucketPolicyCommandInput,
+  GetBucketPolicyCommandOutput,
   GetObjectCommand,
   GetObjectCommandInput,
   GetObjectCommandOutput,
   ListObjectsCommand,
   ListObjectsCommandInput,
   ListObjectsCommandOutput,
+  PutBucketPolicyCommand,
+  PutBucketPolicyCommandInput,
+  PutBucketPolicyCommandOutput,
   PutObjectCommand,
   PutObjectCommandInput,
   PutObjectCommandOutput,
@@ -23,6 +29,10 @@ export default class S3 {
     this._client = new S3Client(config);
   }
 
+  public async getBucketPolicy(params: GetBucketPolicyCommandInput): Promise<GetBucketPolicyCommandOutput> {
+    return this._client.send(new GetBucketPolicyCommand(params));
+  }
+
   public getObject(params: GetObjectCommandInput): Promise<GetObjectCommandOutput> {
     return this._client.send(new GetObjectCommand(params));
   }
@@ -38,5 +48,9 @@ export default class S3 {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public listBuckets(params: ListBucketsCommandInput): Promise<any> {
     return this._client.send(new ListBucketsCommand(params));
+  }
+
+  public async putBucketPolicy(params: PutBucketPolicyCommandInput): Promise<PutBucketPolicyCommandOutput> {
+    return this._client.send(new PutBucketPolicyCommand(params));
   }
 }

@@ -38,40 +38,40 @@ export default class S3Control {
   public async createAccessPoint(
     params: CreateAccessPointCommandInput
   ): Promise<CreateAccessPointCommandOutput> {
-    return await this._client.send(new CreateAccessPointCommand(params));
+    return this._client.send(new CreateAccessPointCommand(params));
   }
 
   public async deleteAccessPoint(
     params: DeleteAccessPointCommandInput
   ): Promise<DeleteAccessPointCommandOutput> {
-    return await this._client.send(new DeleteAccessPointCommand(params));
+    return this._client.send(new DeleteAccessPointCommand(params));
   }
 
   public async deleteAccessPointPolicy(
     params: DeleteAccessPointPolicyCommandInput
   ): Promise<DeleteAccessPointPolicyCommandOutput> {
-    return await this._client.send(new DeleteAccessPointPolicyCommand(params));
+    return this._client.send(new DeleteAccessPointPolicyCommand(params));
   }
 
   public async getAccessPoint(params: GetAccessPointCommandInput): Promise<GetAccessPointCommandOutput> {
-    return await this._client.send(new GetAccessPointCommand(params));
+    return this._client.send(new GetAccessPointCommand(params));
   }
 
   public async getAccessPointPolicy(
     params: GetAccessPointPolicyCommandInput
   ): Promise<GetAccessPointPolicyCommandOutput> {
-    return await this._client.send(new GetAccessPointPolicyCommand(params));
+    return this._client.send(new GetAccessPointPolicyCommand(params));
   }
 
   public async listAccessPoints(
     params: ListAccessPointsCommandInput
   ): Promise<ListAccessPointsCommandOutput> {
-    return await this._client.send(new ListAccessPointsCommand(params));
+    return this._client.send(new ListAccessPointsCommand(params));
   }
 
   public async putAccessPointPolicy(
     params: PutAccessPointPolicyCommandInput
   ): Promise<PutAccessPointPolicyCommandOutput> {
-    return await this._client.send(new PutAccessPointPolicyCommand(params));
+    return this._client.send(new PutAccessPointPolicyCommand(params));
   }
 }
