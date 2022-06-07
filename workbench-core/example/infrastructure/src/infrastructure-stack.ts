@@ -1,4 +1,8 @@
 /* eslint-disable no-new */
+import { join } from 'path';
+import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { HttpUserPoolAuthorizer } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
+import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import {
   Stack,
   StackProps,
@@ -9,20 +13,12 @@ import {
   Duration,
   Fn
 } from 'aws-cdk-lib';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
-import { Construct } from 'constructs';
-import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
-import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
-import { HttpUserPoolAuthorizer } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
-import { join } from 'path';
 import {
   AccountRecovery,
   UserPool,
   UserPoolClient,
   UserPoolClientIdentityProvider
 } from 'aws-cdk-lib/aws-cognito';
-import { NagSuppressions } from 'cdk-nag';
 import {
   AccountRootPrincipal,
   Effect,
@@ -30,6 +26,10 @@ import {
   PolicyStatement,
   ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
+import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
 
 export class InfrastructureStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
@@ -157,6 +157,12 @@ export class InfrastructureStack extends Stack {
       {
         id: 'AwsSolutions-COG3',
         reason: 'UserPool CDK construct does not have option to set AdvancedSecurityMode'
+      }
+    ]);
+    NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/LambdaService/Resource', [
+      {
+        id: 'AwsSolutions-L1',
+        reason: 'We are using Node14 for Lambda functions'
       }
     ]);
   }

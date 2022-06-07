@@ -1,6 +1,6 @@
-import yaml from 'js-yaml';
 import fs from 'fs';
 import { join } from 'path';
+import yaml from 'js-yaml';
 
 function getConstants(): {
   STAGE: string;
