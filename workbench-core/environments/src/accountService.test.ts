@@ -42,6 +42,7 @@ describe('AccountService', () => {
     mockDDB.on(QueryCommand).resolves({ Count: 0 });
 
     accountMetadata.awsAccountId = '123456789012';
+    accountMetadata.externalId = 'workbench';
 
     // OPERATE
     const response = await accountService.createOrUpdate(accountMetadata);
@@ -69,6 +70,33 @@ describe('AccountService', () => {
     accountMetadata.id = 'sampleAccId';
     accountMetadata.accountId = 'sampleAccId';
     accountMetadata.awsAccountId = '123456789012';
+    accountMetadata.externalId = 'workbench';
+
+    // OPERATE
+    const response = await accountService.createOrUpdate(accountMetadata);
+
+    // CHECK
+    expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
+  });
+
+  test('createOrUpdate follows update account path as expected without awsAccountId or externalId', async () => {
+    // BUILD
+    const accountService = new AccountService(process.env.STACK_NAME!);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        awsAccountId: { S: '123456789012' },
+        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
+        portfolioId: { S: 'port-1234' },
+        id: { S: 'sampleAccId' },
+        accountId: { S: 'sampleAccId' }
+      }
+    });
+
+    accountMetadata.id = 'sampleAccId';
+    accountMetadata.accountId = 'sampleAccId';
 
     // OPERATE
     const response = await accountService.createOrUpdate(accountMetadata);
