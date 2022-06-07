@@ -70,7 +70,7 @@ export async function handler(event: any) {
 
   // Map event to EventBridgeEventToDDB
   const ebToDDB: EventBridgeEventToDDB = {
-    envId: event.detail.EnvId,
+    envId: event.detail.EnvId || event.detail.Tags?.Env,
     instanceId,
     recordOutputKeys,
     status: status.toUpperCase(),

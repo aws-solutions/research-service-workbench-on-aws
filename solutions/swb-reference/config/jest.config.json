@@ -11,15 +11,14 @@
     "<rootDir>/src/environment/statusHandlerLambda.ts",
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
-    "<rootDir>/src/postDeployment.ts",
-    "<rootDir>/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.ts"
+    "<rootDir>/src/postDeployment.ts"
   ],
   "coverageThreshold": {
     "global": {
       "branches": 70,
       "functions": 70,
-      "lines": 45,
-      "statements": 45
+      "lines": 70,
+      "statements": 70
     }
   },
   "coverageReporters": ["json-summary", "json"]
