@@ -16,6 +16,11 @@ export { InvalidTokenTypeError, isInvalidTokenTypeError } from './errors/invalid
 export { InvalidCodeVerifierError, isInvalidCodeVerifierError } from './errors/invalidCodeVerifierError';
 export { InvalidTokenError, isInvalidTokenError } from './errors/invalidTokenError';
 export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavailableError';
+export { InvalidParameterError, isInvalidParameterError } from './errors/invalidParameterError';
+export { RoleAlreadyExistsError, isRoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
+export { RoleNotFoundError, isRoleNotFoundError } from './errors/roleNotFoundError';
+export { UserAlreadyExistsError, isUserAlreadyExistsError } from './errors/userAlreadyExistsError';
+export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
 export { AuthenticatedUser } from './authenticatedUser';
@@ -27,3 +32,7 @@ export {
   refreshAccessToken,
   verifyToken
 } from './authenticationMiddleware';
+export {
+  CognitoUserManagementPlugin,
+  CognitoUserManagementPluginOptions
+} from './plugins/cognitoUserManagementPlugin';
