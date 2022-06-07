@@ -296,6 +296,7 @@ describe('StatusHandler', () => {
   test('execute does not skip update if event is older than last update time during a Launch event', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
+    const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.updatedAt = '2022-05-05T19:43:57.143Z';
     const ebToDDB: EventBridgeEventToDDB = {
@@ -321,10 +322,21 @@ describe('StatusHandler', () => {
         }
       }
     };
+    const mockSC = mockClient(ServiceCatalogClient);
+    mockSC.on(DescribeRecordCommand).resolves({
+      RecordOutputs: [
+        { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+      ]
+    });
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
     envService.addMetadata = jest.fn();
     statusHandler['_getEnvService'] = jest.fn(() => envService);
+    environmentLifecycleHelper.getAwsSdkForEnvMgmtRole = jest.fn(
+      async () => new AwsService({ region: 'us-east-1' })
+    );
+    statusHandler['_getEnvHelper'] = jest.fn(() => environmentLifecycleHelper);
 
     // OPERATE
     await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
