@@ -139,7 +139,7 @@ describe('StatusHandler', () => {
         'detail-type': 'EnvironmentStatusUpdate',
         source: 'LaunchSagemaker',
         account: '123456789012',
-        time: '2022-05-05T14:25:37Z',
+        time: '2022-05-05T17:25:37Z',
         region: 'us-east-1',
         resources: [],
         detail: {
@@ -291,5 +291,119 @@ describe('StatusHandler', () => {
     // CHECK
     expect(envService.getEnvironment).toBeCalledTimes(1);
     expect(envService.updateEnvironment).toBeCalledTimes(0);
+  });
+
+  test('execute does not skip update on Launch operation if env status same as event status', async () => {
+    // BUILD
+    const statusHandler = new StatusHandler();
+    const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
+    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    environment.status = 'COMPLETED';
+
+    const ebToDDB: EventBridgeEventToDDB = {
+      status: 'COMPLETED',
+      operation: 'Launch',
+      instanceId: 'notebookInstance-abc',
+      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      metadata: {
+        version: '0',
+        id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
+        'detail-type': 'EnvironmentStatusUpdate',
+        source: 'LaunchSagemaker',
+        account: '123456789012',
+        time: '2022-05-05T17:25:37Z',
+        region: 'us-east-1',
+        resources: [],
+        detail: {
+          EnvId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
+          ProvisionedProductId: 'pp-z5bkj4vcwasi2',
+          RecordId: 'rec-6xswbmafv4bny',
+          EnvType: 'Sagemaker',
+          Operation: 'Launch',
+          Status: 'COMPLETED'
+        }
+      }
+    };
+    const mockSC = mockClient(ServiceCatalogClient);
+    mockSC.on(DescribeRecordCommand).resolves({
+      RecordOutputs: [
+        { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+      ]
+    });
+    envService.getEnvironment = jest.fn(async () => environment);
+    envService.updateEnvironment = jest.fn();
+    envService.addMetadata = jest.fn();
+    environmentLifecycleHelper.getAwsSdkForEnvMgmtRole = jest.fn(
+      async () => new AwsService({ region: 'us-east-1' })
+    );
+    statusHandler['_getEnvService'] = jest.fn(() => envService);
+    statusHandler['_getEnvHelper'] = jest.fn(() => environmentLifecycleHelper);
+    statusHandler['_getEnvId'] = jest.fn().mockResolvedValue('6e185c8c-caeb-4305-8f08-d408b316dca7');
+
+    // OPERATE
+    await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
+
+    // CHECK
+    expect(envService.getEnvironment).toBeCalledTimes(1);
+    expect(envService.updateEnvironment).toBeCalledTimes(2);
+    expect(envService.addMetadata).toBeCalledTimes(2);
+  });
+
+  test('execute does not skip update on Launch operation if event earlier than last ddb update', async () => {
+    // BUILD
+    const statusHandler = new StatusHandler();
+    const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
+    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    environment.updatedAt = '2022-05-05T19:43:57.143Z';
+
+    const ebToDDB: EventBridgeEventToDDB = {
+      status: 'COMPLETED',
+      operation: 'Launch',
+      instanceId: 'notebookInstance-abc',
+      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      metadata: {
+        version: '0',
+        id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
+        'detail-type': 'EnvironmentStatusUpdate',
+        source: 'LaunchSagemaker',
+        account: '123456789012',
+        time: '2022-05-05T17:25:37Z',
+        region: 'us-east-1',
+        resources: [],
+        detail: {
+          EnvId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
+          ProvisionedProductId: 'pp-z5bkj4vcwasi2',
+          RecordId: 'rec-6xswbmafv4bny',
+          EnvType: 'Sagemaker',
+          Operation: 'Launch',
+          Status: 'COMPLETED'
+        }
+      }
+    };
+    const mockSC = mockClient(ServiceCatalogClient);
+    mockSC.on(DescribeRecordCommand).resolves({
+      RecordOutputs: [
+        { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+      ]
+    });
+    envService.getEnvironment = jest.fn(async () => environment);
+    envService.updateEnvironment = jest.fn();
+    envService.addMetadata = jest.fn();
+    environmentLifecycleHelper.getAwsSdkForEnvMgmtRole = jest.fn(
+      async () => new AwsService({ region: 'us-east-1' })
+    );
+    statusHandler['_getEnvService'] = jest.fn(() => envService);
+    statusHandler['_getEnvHelper'] = jest.fn(() => environmentLifecycleHelper);
+    statusHandler['_getEnvId'] = jest.fn().mockResolvedValue('6e185c8c-caeb-4305-8f08-d408b316dca7');
+
+    // OPERATE
+    await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
+
+    // CHECK
+    expect(envService.getEnvironment).toBeCalledTimes(1);
+    expect(envService.updateEnvironment).toBeCalledTimes(2);
+    expect(envService.addMetadata).toBeCalledTimes(2);
   });
 });
