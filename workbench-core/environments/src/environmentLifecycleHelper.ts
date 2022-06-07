@@ -71,7 +71,7 @@ export default class EnvironmentLifecycleHelper {
       envType: payload.envType
     });
 
-    // Execute SSM document in hosting account
+    // OPERATE SSM document in hosting account
     if (hostAwsSdk) {
       await hostAwsSdk.clients.ssm.startAutomationExecution({
         DocumentName: ssmDocArn,

@@ -66,7 +66,7 @@ describe('EnvironmentLifecycleHelper', () => {
       return new AwsService({ region: 'us-east-1' });
     });
 
-    // EXECUTE & CHECK
+    // OPERATE & CHECK
     await expect(helper.getAwsSdkForEnvMgmtRole(payload)).resolves.not.toThrowError();
   });
 
@@ -79,7 +79,7 @@ describe('EnvironmentLifecycleHelper', () => {
 
     const validOutputName = 'SagemakerLaunchSSMDoc';
 
-    // EXECUTE & CHECK
+    // OPERATE & CHECK
     await expect(helper.getSSMDocArn(validOutputName)).resolves.toEqual(
       'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
     );
@@ -94,7 +94,7 @@ describe('EnvironmentLifecycleHelper', () => {
 
     const invalidOutputName = 'SomeInvalidDocName';
 
-    // EXECUTE & CHECK
+    // OPERATE & CHECK
     await expect(helper.getSSMDocArn(invalidOutputName)).rejects.toThrow(
       `Cannot find output name: ${invalidOutputName}`
     );
@@ -133,7 +133,7 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.getSSMDocArn = jest.fn();
     helper.getAwsSdkForEnvMgmtRole = jest.fn();
 
-    // EXECUTE & CHECK
+    // OPERATE & CHECK
     await expect(helper.executeSSMDocument(payload)).resolves.not.toThrowError();
   });
 

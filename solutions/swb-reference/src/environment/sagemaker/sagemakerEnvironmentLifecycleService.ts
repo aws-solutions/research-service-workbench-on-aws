@@ -64,7 +64,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       EnvId: [envId]
     };
 
-    // Execute termination doc
+    // OPERATE termination doc
     await this.helper.executeSSMDocument({
       ssmParameters,
       operation: 'Terminate',
