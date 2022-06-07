@@ -174,17 +174,6 @@ Resources:
                 - sagemaker:StopNotebookInstance
                 - sagemaker:DescribeNotebookInstance
               Resource: '*'
-        - PolicyName: sagemakerNotebook-access
-          PolicyDocument:
-            Statement:
-              Effect: Allow
-              Action:
-                - sagemaker:CreatePresignedNotebookInstanceUrl
-                - sagemaker:ListNotebookInstances
-                - sagemaker:StartNotebookInstance
-                - sagemaker:StopNotebookInstance
-                - sagemaker:DescribeNotebookInstance
-              Resource: '*'
         # Needed for performing start operation on instances in a given network
         - PolicyName: network-access
           PolicyDocument:

@@ -8,8 +8,6 @@ import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
 import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
-import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
-import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -24,13 +22,13 @@ const apiRouteConfig: ApiRouteConfig = {
     sagemaker: {
       lifecycle: new SagemakerEnvironmentLifecycleService(),
       connection: new SagemakerEnvironmentConnectionService()
-    },
+    }
 
     // Add your environment types here as follows:
-    sagemakerNotebook: {
-       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
-       connection: new SagemakerNotebookEnvironmentConnectionService()
-     }
+    // <newEnvTypeName>: {
+    //   lifecycle: new <newEnvTypeName>EnvironmentLifecycleService(),
+    //   connection: new <newEnvTypeName>EnvironmentConnectionService()
+    // }
   },
   account: new HostingAccountService(),
   environmentService: new EnvironmentService({
