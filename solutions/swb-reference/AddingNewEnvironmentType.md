@@ -165,20 +165,20 @@ The Status handler lambda writes new environment status and environment details 
              // Add your new env types here
           }
           ```
-      1. Since we only recognize environment status as one of the strings listed in `workbench-core/environments/src/environmentStatus.ts`, we need to map all statuses to those included in the `alternateStatuses` variable (case-insensitive).
-         - For example, sagemaker indicates a terminated instance as `Deleted` but SWB recognized this status as `TERMINATED` so we map it. However, we don't need to map sagemaker status `Pending` since `PENDING` (its uppercase converted value) is already recognized by SWB.
-         - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
-         - Code snippet
-             ```ts
-             const alternateStatuses: { [id: string]: { [id: string]: string } } = {
-                 sagemaker: {
-                   InService: 'COMPLETED',
-                   Deleting: 'TERMINATING',
-                   Deleted: 'TERMINATED'
-                 }
-                 // Add your new env alternate statuses here
-           };
-       ```
+   4. Since we only recognize environment status as one of the strings listed in `workbench-core/environments/src/environmentStatus.ts`, we need to map all statuses to those included in the `alternateStatuses` variable (case-insensitive).
+        - For example, sagemaker indicates a terminated instance as `Deleted` but SWB recognized this status as `TERMINATED` so we map it. However, we don't need to map sagemaker status `Pending` since `PENDING` (its uppercase converted value) is already recognized by SWB.
+        - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
+        - Code snippet
+            ```ts
+            const alternateStatuses: { [id: string]: { [id: string]: string } } = {
+                sagemaker: {
+                  InService: 'COMPLETED',
+                  Deleting: 'TERMINATING',
+                  Deleted: 'TERMINATED'
+                }
+                // Add your new env alternate statuses here
+          };
+          ```
 ## Step 5: Deploy updated code 
 
 Run the following command in `solutions/swb-reference` directory to deploy the updated code to AWS
