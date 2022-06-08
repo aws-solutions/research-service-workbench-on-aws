@@ -18,4 +18,4 @@
 #
 #   //registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}
 #
-//amazon-${CODEARTIFACT_DOMAIN_OWNER}.d.codeartifact.us-east-1.amazonaws.com/npm/issharan-test/:_authToken=${CODEARTIFACT_AUTH_TOKEN}
+//issharan-${CODEARTIFACT_DOMAIN_OWNER}.d.codeartifact.us-east-1.amazonaws.com/npm/issharan-test/:_authToken=${CODEARTIFACT_AUTH_TOKEN}

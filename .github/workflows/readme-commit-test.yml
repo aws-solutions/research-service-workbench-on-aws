@@ -119,7 +119,7 @@ jobs:
       
       - name: git checkout to new version if README was updated
         run: |
-          if ${{ steps.auto-commit-action.outputs.changes_detected }}; then
+          if ${{ steps.auto-commit-action.outputs.changes_detected }} ; then
             git checkout ${{ steps.auto-commit-action.outputs.commit_hash }}
           fi
           
@@ -134,18 +134,18 @@ jobs:
         id: last_sha
         run: |
           commit_hash=`git log -1 --format='%h'`
-          echo "::set-output name:commit_hash=$commit_hash'
+          echo "::set-output name=commit_hash::$commit_hash"
 
       - name: Rush Version
         id: rush-version
         run: |
           node common/scripts/install-run-rush.js version --bump --target-branch testDevelop --ignore-git-hooks
           commit_hash=`git log -1 --format='%h'`
+          echo $commit_hash
+          echo "::set-output name=changes_detected::false"
           if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
-            echo "::set-output name:changes_detected=true"
-            echo "::set-output name:commit_hash=$commit_hash"
-          else
-            echo "::set-output name:changes_detected=false"
+            echo "::set-output name=changes_detected::true"
+            echo "::set-output name=commit_hash::$commit_hash"
           fi
 
       - name: git checkout to new version if Rush version performed updates
