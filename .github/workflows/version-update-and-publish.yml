@@ -1,0 +1,117 @@
+name: Version-update-and-publish
+on:
+  workflow_call:
+    secrets: 
+      codeartifact-domain-name:
+        required: true
+      codeartifact-domain-owner:
+        required: true
+      codeartifact-region:
+        required: true
+      codeartifact-package-format:
+        required: true
+      codeartifact-repo-name:
+        required: true
+      merge-token:
+        required: true
+      aws-dev-region:
+        required: true
+      assume-role:
+        required: true
+    outputs:
+      commit_hash:
+        description: 'rush verson-update-and-publish commit hash'
+        value: "${{ jobs.verson-update-and-publish.outputs.commit_hash }}"
+      changes_detected:
+        description: 'Flag to detect whether rush verson-update-and-publish performed any update or not'
+        value: "${{ jobs.verson-update-and-publish.outputs.changes_detected }}"
+
+jobs:
+  verson-update-and-publish:
+    name: verson-update-and-publish
+    runs-on: ubuntu-18.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+    env: 
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
+    outputs:
+        commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
+        changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.merge-token }}
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14.x'
+
+      - name: Cache Rush
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/install-run
+            ~/.rush
+          key: ${{ runner.os }}-rush-${{ hashFiles('rush.json') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-
+            ${{ runner.os }}-
+
+      - name: Cache pnpm
+        uses: actions/cache@v3
+        with:
+          path: |
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependecies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.assume-role }}
+          role-session-name: OIDCSessionName
+
+      - name: Temporarily disable branch protection on testDevelop
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: testDevelop
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
+
+      - name: Rush version
+        id: rush-version
+        run: node common/scripts/install-run-rush.js version --bump --target-branch testDevelop
+
+      - name: CodeArtifact Auth
+        run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token "::add-mask::$CODEARTIFACT_AUTH_TOKEN" --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+
+      - name: Enable branch protection on testDevelop
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: testDevelop
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
