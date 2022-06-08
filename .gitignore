@@ -95,3 +95,5 @@ solutions/swb-reference/.aws-sam/
 
 # example package
 workbench-core/example/infrastructure/build
+
+.github/workflows/readme-commit-test-old.yml
