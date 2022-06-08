@@ -21,6 +21,20 @@ jobs:
       merge-token: ${{ secrets.MERGE_TOKEN }}
       bot-user: ${{ secrets.BOT_USER }}
       bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+  
+  version-update-and-publish:
+    if: github.event.pull_request.merged == true
+    needs: [readme-commit-test]
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/version-update-and-publish.yml@testDevelop
+    secrets:
+      codeartifact-domain-name: ${{ secrets.CODEARTIFACT_DOMAIN_NAME }}
+      codeartifact-domain-owner: ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}
+      codeartifact-region: ${{ secrets.CODEARTIFACT_REGION }}
+      codeartifact-package-format: ${{ secrets.CODEARTIFACT_PACKAGE_FORMAT }}
+      codeartifact-repo-name: ${{ secrets.CODEARTIFACT_REPO_NAME }}
+      merge-token: ${{ secrets.MERGE_TOKEN }}
+      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+      assume-role: ${{ secrets.ASSUME_ROLE }}
 
   pre-deployment-check:
     name: Pre deployment check
@@ -57,10 +71,12 @@ jobs:
   merge-develop-to-main:
     name: Merge develop to testMain
     runs-on: ubuntu-20.04
-    needs: [readme-commit-test]
+    needs: [readme-commit-test, version-update-and-publish]
     env: 
-      COMMIT_HASH: "${{ needs.readme-commit-test.outputs.commit_hash }}"
-      CHANGES_DETECTED: "${{ needs.readme-commit-test.outputs.changes_detected }}"
+      README_COMMIT_HASH: "${{ needs.readme-commit-test.outputs.commit_hash }}"
+      README_CHANGES_DETECTED: "${{ needs.readme-commit-test.outputs.changes_detected }}"
+      VERSION_COMMIT_HASH: "${{ needs.version-update-and-publish.outputs.commit_hash }}"
+      VERSION_CHANGES_DETECTED: "${{ needs.version-update-and-publish.outputs.changes_detected }}"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,8 +101,10 @@ jobs:
           echo "Else"
           echo "Set the COMMIT_ID to README commit id"
           COMMIT_ID=''
-          if $CHANGES_DETECTED; then
-            COMMIT_ID=$COMMIT_HASH
+          if $VERSION_CHANGES_DETECTED; then
+            COMMIT_ID=$VERSION_COMMIT_HASH
+          elif $README_CHANGES_DETECTED; then
+            COMMIT_ID=$README_COMMIT_HASH
           else
             COMMIT_ID=$GITHUB_SHA
           fi
