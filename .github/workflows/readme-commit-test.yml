@@ -6,7 +6,17 @@
 name: Readme-commit-test
 on:
   workflow_call:
-    secrets: 
+    secrets:
+      codeartifact-domain-name:
+        required: true
+      codeartifact-domain-owner:
+        required: true
+      codeartifact-region:
+        required: true
+      codeartifact-package-format:
+        required: true
+      codeartifact-repo-name:
+        required: true
       gpg-private-key:
         required: true
       passphrase:
@@ -17,20 +27,38 @@ on:
         required: true
       bot-user-email:
         required: true
+      aws-dev-region:
+        required: true
+      assume-role:
+        required: true
     outputs:
-      commit_hash:
+      readme_commit_hash:
         description: 'README update commit hash'
-        value: "${{ jobs.readme-commit-test.outputs.commit_hash }}"
-      changes_detected:
+        value: "${{ jobs.readme-commit-test.outputs.readme_commit_hash }}"
+      readme_changes_detected:
         description: 'Flag to detect whether README was updated or not'
-        value: "${{ jobs.readme-commit-test.outputs.changes_detected }}"
+        value: "${{ jobs.readme-commit-test.outputs.readme_changes_detected }}"
+      version_commit_hash:
+        description: 'README update commit hash'
+        value: "${{ jobs.readme-commit-test.outputs.version_commit_hash }}"
+      version_changes_detected:
+        description: 'Flag to detect whether README was updated or not'
+        value: "${{ jobs.readme-commit-test.outputs.version_changes_detected }}"
 
 jobs:
   readme-commit-test:  
     runs-on: ubuntu-20.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
     outputs:
-        commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
-        changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
+        readme_commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
+        readme_changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
+        version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
+        version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
+    env: 
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
 
     steps:        
       - uses: actions/checkout@v3
@@ -88,6 +116,25 @@ jobs:
           commit_user_email: ${{ secrets.bot-user-email }}
           file_pattern: "README.md **/README.md"
           branch: testDevelop
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.assume-role }}
+          role-session-name: OIDCSessionName
+
+      - name: Rush version
+        id: rush-version
+        run: node common/scripts/install-run-rush.js version --bump --target-branch testDevelop
+
+      - name: CodeArtifact Auth
+        run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token "::add-mask::$CODEARTIFACT_AUTH_TOKEN" --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
           
       - name: Enable branch protection on testDevelop
         uses: octokit/request-action@v2.x
