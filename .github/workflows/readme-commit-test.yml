@@ -68,7 +68,7 @@ jobs:
 
         # There's no way for github actions to push to a protected branch. This is a workaround
         # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on develop
+      - name: Temporarily disable branch protection on testDevelop
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
@@ -78,7 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
-      - name: Auto commit updated README files to develop
+      - name: Auto commit updated README files to testDevelop
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -89,7 +89,7 @@ jobs:
           file_pattern: "README.md **/README.md"
           branch: testDevelop
           
-      - name: Enable branch protection on develop
+      - name: Enable branch protection on testDevelop
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
