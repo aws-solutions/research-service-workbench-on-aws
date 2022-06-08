@@ -59,7 +59,8 @@ describe('HostingAccountLifecycleService', () => {
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
-            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' }
+            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
+            { OutputKey: 'EncryptionKeyArn', OutputValue: 'FakeEncryptionKeyArn' }
           ]
         }
       ]
@@ -191,7 +192,8 @@ describe('HostingAccountLifecycleService', () => {
       status: 'CURRENT',
       ddbAccountId: 'abc-xyz',
       vpcId: 'fakeVPC',
-      subnetId: 'FakeSubnet'
+      subnetId: 'FakeSubnet',
+      encryptionKeyArn: 'FakeEncryptionKeyArn'
     });
   });
 });
