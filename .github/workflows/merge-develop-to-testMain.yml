@@ -14,7 +14,7 @@ on:
 jobs:
   readme-commit-test:
     if: github.event.pull_request.merged == true
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit-test.yml@feature/rush-publish
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit-test.yml@testDevelop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       passphrase: ${{ secrets.PASSPHRASE }}
@@ -75,7 +75,7 @@ jobs:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: monorepo-for-service-workbench
-          branch: main
+          branch: testMain
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 

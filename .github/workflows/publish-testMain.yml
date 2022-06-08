@@ -21,6 +21,13 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_DEV_REGION }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: OIDCSessionName
+
       - name: CodeArtifact Auth
         run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN_NAME }} --domain-owner ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
 
