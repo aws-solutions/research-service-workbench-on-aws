@@ -11,58 +11,174 @@ At a high level, we'll need to do the following steps
 
 ## Step 1: Define environment AWS resources 
 1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerNotebook`.
-2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemaker.cfn.yaml](https://github.com/awslabs/monorepo-for-service-workbench/blob/feat/environments/solutions/swb-reference/src/environment/sagemaker/sagemaker.cfn.yaml). Take note of the `paramaters` section in the CF template. These are custom parameters that users can provide to customize the environment. For example, `VPC` and `Subnet` are custom values that can be provided.
+2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemaker.cfn.yaml](https://github.com/awslabs/monorepo-for-service-workbench/blob/feat/environments/solutions/swb-reference/src/environment/sagemaker/sagemaker.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
+```yaml
+Parameters:
+  InstanceType:
+    Type: String
+    Description: Sagemaker instance type to launch
+    Default: ml.t3.xlarge
+```
 3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
 
 ## Step 2: Set up environment management workflow 
 ### SSM documents
-1. Add SSM documents for the new environment type's launch and terminate operations. 
-   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). Take note of the `parameters` section in the SSM document. These parameters will be passed to Service Catalog portfolio, which will be used when launching your custom environment. 
-2. In [workflow.ts](../swb-reference/src/environment/workflow.ts) add the name of your new environment to the `envTypes` array. The name should exactly match the name you used for the new environment type folder. 
+1. Add SSM documents for the new environment type's launch and terminate operations.
+   - You'll have two new SSM files: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>LaunchSSM.yaml` and `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>TerminateSSM.yaml` 
+   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in Step 1. An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
+```yaml
+description: SSM document to provision a Sagemaker instance
+assumeRole: ''
+schemaVersion: '0.3'
+parameters:
+  ...
+  InstanceType:
+    type: String
+    description: 'The size of the notebook instance coming from environment type config'
+mainSteps:
+  - name: LaunchSagemaker
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: ProvisionProduct
+      ProductId: '{{ ProductId }}'
+      ProvisionedProductName: '{{ InstanceName }}'
+      PathId: '{{ PathId }}'
+      ProvisioningArtifactId: '{{ ProvisioningArtifactId }}'
+      ProvisioningParameters:
+        ...
+        - Key: InstanceType
+          Value: '{{ InstanceType }}'
+      Tags:
+```
+3. In [workflow.ts](../swb-reference/src/environment/workflow.ts) add the name of your new environment to the `envTypes` array. The name should exactly match the name you used for the new environment type folder. 
 
 ### Implement Environment Services
 1. Implement lifecycle service: 
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentLifecycleService.ts` for managing the new environment type's lifecycle methods (launch, terminate, start, stop). For reference, check out [sagemakerEnvironmentLifecycleService.ts](./src/environment/sagemaker/sagemakerEnvironmentLifecycleService.ts). 
-   2. In the launch method of that class, you'll see that we are providing custom `ssmParameters` to `this.helper.launch`. The keys of the `ssmParameters` object should match the `parameters` in the `<newEnvTypeName>LaunchSSM.yaml` file. 
+   2. In the launch method of that class, you'll see that we are providing custom `ssmParameters` to `this.helper.launch`. The keys of the `ssmParameters` object should match the `parameters` in the `<newEnvTypeName>LaunchSSM.yaml` file. A code excerpt is shown below where we're focusing on passing the `InstanceType` param to SSM docs. Notice how the key `InstanceType` matches the `parameters` section of the SSM document. 
+```ts
+public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
+ const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
+   .value!;
+
+ const ssmParameters = {
+     ...
+   InstanceType: [instanceSize]
+ };
+
+ await this.helper.launch({
+   ssmParameters,
+   operation: 'Launch',
+   envType: 'sagemaker',
+   envMetadata
+ });
+
+ return { ...envMetadata, status: 'PENDING' };
+}
+```
    3. The start and stop method of the class can call the `start` and `stop` AWS API directly to start/stop the environment.
 2. Implement connection service:
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentConnectionService.ts`. For reference, check out [sagemakerEnvironmentConnectionService.ts](./src/environment/sagemaker/sagemakerEnvironmentConnectionService.ts)
-   2. Implement `getAuthCreds()` to allow users to connect to the new environment. Implement `getConnectionInstruction()` to provide users with instructions for connecting to the environment. Implementation will differ based on the environment type being added.
+   2. Implement `getAuthCreds()` to allow users to connect to the new environment. Implement `getConnectionInstruction()` to provide users with instructions for connecting to the environment. Implementation will differ based on the environment type being added. An example implementation of `getAuthCreds` for Sagemaker environment is show below.
+```ts
+public async getAuthCreds(instanceName: string, context?: any): Promise<any> {
+ const region = process.env.AWS_REGION!;
+ const awsService = new AwsService({ region });
+ // Assuming IAM Role in hosting account. This step will be required for all environment types
+ const hostingAccountAwsService = await awsService.getAwsServiceForRole({
+   roleArn: context.roleArn,
+   roleSessionName: `SagemakerConnect-${Date.now()}`,
+   externalId: context.externalId,
+   region
+ });
+
+ // To access a Sagemaker environment, we provide the user with a presigned notebook URL that they can use
+ // Other environment types will require the `{{API_URL}}/environments/:id/connections` API to provide other access credentials  
+ const response = await hostingAccountAwsService.clients.sagemaker.createPresignedNotebookInstanceUrl({
+   NotebookInstanceName: instanceName
+ });
+ return { url: response.AuthorizedUrl };
+}
+```
 
 ## Step 3: Set up API routes and provide IAM permissions for managing the environment
 1. Add API route
    * Add the new environment type in the `apiRouteConfig.environments` object in [backendAPI.ts](../swb-reference/src/backendAPI.ts). 
 2. API routes and Permissions
-   * Add the required AWS client permission for starting/stopping/connecting to the environment to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role.
-   * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object.
+   * Add the required AWS client permission for starting/stopping/connecting to the environment to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role. When users call the start/stop/connect to environment SWB APIs, we will assume the `EnvManagementRole` in the hosting account and execute the appropriate AWS API. 
+   * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object. The `LaunchConstraintIAMRole` is used by Service Catalog portfolio to launch a Service Catalog product. A Service Catalog product is equivalent to an environment type. 
 
 ## Step 4: Add Support for environment Status Update
-1. The Status handler lambda writes new environment status and details to DDB. These details are sent to it by the hosting account event bus. We'll need to provide a mapping between the Event Bridge events and the environment DDB item. This mapping can be updated in the [statusHandlerLambda.ts](./src/environment/statusHandlerLambda.ts). This mapping only needs to be updated for new compute resources, that doesn't already have the mapping specified. If two environment types use the same compute environment, the mapping does not need to be updated. For example EC2 Linux and EC2 Windows will use the same mapping. The events are generated by the AWS services themselves [(link)](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html), and SWB have configured the `default` Event Bus to route those events to the `Main account`.
+The Status handler lambda writes new environment status and environment details to DDB. These details are sent to it by the hosting account event bus. We'll need to provide a mapping between the Event Bridge events and the environment DDB item. This mapping can be updated in the [statusHandlerLambda.ts](./src/environment/statusHandlerLambda.ts). This mapping only needs to be updated for new compute resources that doesn't already have the mapping specified. **If two environment types use the same compute environment, the mapping does not need to be updated.** For example EC2 Linux and EC2 Windows will use the same mapping, and no new mapping is needed. The events are generated by the AWS services themselves [(link)](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html), and SWB have configured the `default` Event Bus to route those events to the `Main account`. For the next few steps, please refer to the [Appendix](#Appendix) section for examples of what Sagemaker Event Bridge events look like.
    1. When we start/stop an environment instance, the state change event will be generated by the respective AWS compute resources. A status-related attribute's location with respect to the `event.detail` body will need to be recorded in the `statusLocation` variable. 
       - For example, sagemaker sends its status value in `event.detail.NotebookInstanceStatus` attribute, so we record `NotebookInstanceStatus` in `statusLocation` for sagemaker.
+      - Code snippet 
+        ```ts
+        const statusLocation: { [id: string]: string } = {
+        // This is the source used by SSM automation docs to launch/terminate environments
+        automation: 'Status',
+
+        sagemaker: 'NotebookInstanceStatus'
+        // Add your new env types here
+        };
+        ``` 
    2. We record a unique instance ID for each environment instance provisioned by SWB. This is to match the start/stop events coming to the lambda to their SWB environment IDs. An instance ID-related attribute's location with respect to the `event.detail` body will need to be recorded in the `instanceIdLocation` variable.
+        - Code snippet
+            ```ts
+            // Environment types could use different terminologies for their instance names (what we use for "INID#<instanceId>")
+            // This is to standardize each of them
+            const instanceIdLocation: { [id: string]: string } = {
+            sagemaker: 'NotebookInstanceName'
+
+                // Add your new env types here
+            };
+            ```
    3. We also get the Service Catalog record details (name and ARN) for the given environment instance specifying it in the `envTypeRecordOutputKeys` variable. The value for the `instanceNameRecordKey` will be used as the instance ID for the environment type and should match the `event.detail.<instanceIdLocation>` value for the environment type.
       - For example, if we perform `serviceCatalog.describeRecord()` after launching a sagemaker provisioned product we get its CloudFormation template [sagemaker.cfn.yaml](./src/environment/sagemaker/sagemaker.cfn.yaml) outputs as follows: 
-    ```
-    [
-        {
-            OutputKey: 'NotebookInstanceName', 
-            OutputValue: 'BasicNotebookInstance-blah'
-        },
-        {
-            OutputKey: 'NotebookArn', 
-            OutputValue: 'arn:aws:sagemaker:us-east-1:<accountID>:notebook-instance/basicnotebookinstance-123456789'
-        },
-        ...and so on
-    ]
-    ```
-   4. Since we only recognize environment status as one of the strings listed in `workbench-core/environments/src/environmentStatus.ts`, we need to map all statuses to those included in the `alternateStatuses` variable (case-insensitive).
-      - For example, sagemaker indicates a terminated instance as `Deleted` but SWB recognized this status as `TERMINATED` so we map it. However, we don't need to map sagemaker status `Pending` since `PENDING` (its uppercase converted value) is already recognized by SWB.
-      - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
+        ```js
+        [
+            {
+                OutputKey: 'NotebookInstanceName', 
+                OutputValue: 'BasicNotebookInstance-blah'
+            },
+            {
+                OutputKey: 'NotebookArn', 
+                OutputValue: 'arn:aws:sagemaker:us-east-1:<accountID>:notebook-instance/basicnotebookinstance-123456789'
+            },
+            ...and so on
+        ]
+        ```
+      - Code snippet 
+          ```ts
+          // Various environment types indicate instance names and ARNs differently in ServiceCatalog record outputs
+          // This is to standardize each of them
+          const envTypeRecordOutputKeys: { [id: string]: { [id: string]: string } } = {
+              sagemaker: {
+                 instanceNameRecordKey: 'NotebookInstanceName',
+                 instanceArnRecordKey: 'NotebookArn'
+              }
 
+             // Add your new env types here
+          }
+          ```
+      1. Since we only recognize environment status as one of the strings listed in `workbench-core/environments/src/environmentStatus.ts`, we need to map all statuses to those included in the `alternateStatuses` variable (case-insensitive).
+         - For example, sagemaker indicates a terminated instance as `Deleted` but SWB recognized this status as `TERMINATED` so we map it. However, we don't need to map sagemaker status `Pending` since `PENDING` (its uppercase converted value) is already recognized by SWB.
+         - `BasicNotebookInstance-blah` will be used as the instance ID in SWB, and will need to match the `event.detail.NotebookInstanceName` value when start/stop events trigger the lambda.
+         - Code snippet
+             ```ts
+             const alternateStatuses: { [id: string]: { [id: string]: string } } = {
+                 sagemaker: {
+                   InService: 'COMPLETED',
+                   Deleting: 'TERMINATING',
+                   Deleted: 'TERMINATED'
+                 }
+                 // Add your new env alternate statuses here
+           };
+       ```
 ## Step 5: Deploy updated code 
 
-Run the following command to deploy the updated code to AWS
+Run the following command in `solutions/swb-reference` directory to deploy the updated code to AWS
 ```
 STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
 ```
