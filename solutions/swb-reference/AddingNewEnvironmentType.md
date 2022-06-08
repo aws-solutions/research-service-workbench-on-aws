@@ -13,13 +13,13 @@ At a high level, we'll need to do the following steps
 In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
 1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerNotebook`.
 2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemaker.cfn.yaml](https://github.com/awslabs/monorepo-for-service-workbench/blob/feat/environments/solutions/swb-reference/src/environment/sagemaker/sagemaker.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
-```yaml
-Parameters:
-  InstanceType:
-    Type: String
-    Description: Sagemaker instance type to launch
-    Default: ml.t3.xlarge
-```
+    ```yaml
+    Parameters:
+      InstanceType:
+        Type: String
+        Description: Sagemaker instance type to launch
+        Default: ml.t3.xlarge
+    ```
 3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
 
 ## Step 2: Set up environment management workflow 
@@ -28,81 +28,81 @@ In this step we set up the workflow for managing environment launch and terminat
 1. Add SSM documents for the new environment type's launch and terminate operations.
    - You'll have two new SSM files: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>LaunchSSM.yaml` and `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>TerminateSSM.yaml` 
    - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in [Step 1](#step-1-define-environment-aws-resources). An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
-```yaml
-description: SSM document to provision a Sagemaker instance
-assumeRole: ''
-schemaVersion: '0.3'
-parameters:
-  ...
-  InstanceType:
-    type: String
-    description: 'The size of the notebook instance coming from environment type config'
-mainSteps:
-  - name: LaunchSagemaker
-    action: 'aws:executeAwsApi'
-    inputs:
-      Service: servicecatalog
-      Api: ProvisionProduct
-      ProductId: '{{ ProductId }}'
-      ProvisionedProductName: '{{ InstanceName }}'
-      PathId: '{{ PathId }}'
-      ProvisioningArtifactId: '{{ ProvisioningArtifactId }}'
-      ProvisioningParameters:
-        ...
-        - Key: InstanceType
-          Value: '{{ InstanceType }}'
-      Tags:
-```
+        ```yaml
+        description: SSM document to provision a Sagemaker instance
+        assumeRole: ''
+        schemaVersion: '0.3'
+        parameters:
+          ...
+          InstanceType:
+            type: String
+            description: 'The size of the notebook instance coming from environment type config'
+        mainSteps:
+          - name: LaunchSagemaker
+            action: 'aws:executeAwsApi'
+            inputs:
+              Service: servicecatalog
+              Api: ProvisionProduct
+              ProductId: '{{ ProductId }}'
+              ProvisionedProductName: '{{ InstanceName }}'
+              PathId: '{{ PathId }}'
+              ProvisioningArtifactId: '{{ ProvisioningArtifactId }}'
+              ProvisioningParameters:
+                ...
+                - Key: InstanceType
+                  Value: '{{ InstanceType }}'
+              Tags:
+        ```
 3. In [workflow.ts](../swb-reference/src/environment/workflow.ts) add the name of your new environment to the `envTypes` array. The name should exactly match the name you used for the new environment type folder. 
 
 ### Implement Environment Services
 1. Implement lifecycle service: 
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentLifecycleService.ts` for managing the new environment type's lifecycle methods (launch, terminate, start, stop). For reference, check out [sagemakerEnvironmentLifecycleService.ts](./src/environment/sagemaker/sagemakerEnvironmentLifecycleService.ts). 
    2. In the launch method of that class, you'll see that we are providing custom `ssmParameters` to `this.helper.launch`. The keys of the `ssmParameters` object should match the `parameters` in the `<newEnvTypeName>LaunchSSM.yaml` file. A code excerpt is shown below where we're focusing on passing the `InstanceType` param to SSM docs. Notice how the key `InstanceType` matches the `parameters` section of the SSM document. 
-```ts
-public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
- const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
-   .value!;
+        ```ts
+        public async launch(envMetadata: any): Promise<{ [id: string]: string }> {
+         const instanceSize = _.find(envMetadata.ETC.params, { key: 'InstanceType' })!.value!;
+           .value!;
 
- const ssmParameters = {
-     ...
-   InstanceType: [instanceSize]
- };
+         const ssmParameters = {
+             ...
+           InstanceType: [instanceSize]
+         };
 
- await this.helper.launch({
-   ssmParameters,
-   operation: 'Launch',
-   envType: 'sagemaker',
-   envMetadata
- });
+         await this.helper.launch({
+           ssmParameters,
+           operation: 'Launch',
+           envType: 'sagemaker',
+           envMetadata
+         });
 
- return { ...envMetadata, status: 'PENDING' };
-}
-```
+         return { ...envMetadata, status: 'PENDING' };
+        }
+        ```
    3. The start and stop method of the class can call the `start` and `stop` AWS API directly to start/stop the environment.
 2. Implement connection service:
    1. Create a new file `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>EnvironmentConnectionService.ts`. For reference, check out [sagemakerEnvironmentConnectionService.ts](./src/environment/sagemaker/sagemakerEnvironmentConnectionService.ts)
    2. Implement `getAuthCreds()` to allow users to connect to the new environment. Implement `getConnectionInstruction()` to provide users with instructions for connecting to the environment. Implementation will differ based on the environment type being added. An example implementation of `getAuthCreds` for Sagemaker environment is show below.
-```ts
-public async getAuthCreds(instanceName: string, context?: any): Promise<any> {
- const region = process.env.AWS_REGION!;
- const awsService = new AwsService({ region });
- // Assuming IAM Role in hosting account. This step will be required for all environment types
- const hostingAccountAwsService = await awsService.getAwsServiceForRole({
-   roleArn: context.roleArn,
-   roleSessionName: `SagemakerConnect-${Date.now()}`,
-   externalId: context.externalId,
-   region
- });
+        ```ts
+        public async getAuthCreds(instanceName: string, context?: any): Promise<any> {
+         const region = process.env.AWS_REGION!;
+         const awsService = new AwsService({ region });
+         // Assuming IAM Role in hosting account. This step will be required for all environment types
+         const hostingAccountAwsService = await awsService.getAwsServiceForRole({
+           roleArn: context.roleArn,
+           roleSessionName: `SagemakerConnect-${Date.now()}`,
+           externalId: context.externalId,
+           region
+         });
 
- // To access a Sagemaker environment, we provide the user with a presigned notebook URL that they can use
- // Other environment types will require the `{{API_URL}}/environments/:id/connections` API to provide other access credentials  
- const response = await hostingAccountAwsService.clients.sagemaker.createPresignedNotebookInstanceUrl({
-   NotebookInstanceName: instanceName
- });
- return { url: response.AuthorizedUrl };
-}
-```
+         // To access a Sagemaker environment, we provide the user with a presigned notebook URL that they can use
+         // Other environment types will require the `{{API_URL}}/environments/:id/connections` API to provide other access credentials  
+         const response = await hostingAccountAwsService.clients.sagemaker.createPresignedNotebookInstanceUrl({
+           NotebookInstanceName: instanceName
+         });
+         return { url: response.AuthorizedUrl };
+        }
+        ```
 
 ## Step 3: Set up API routes and provide IAM permissions for managing the environment
 In this step we add support for the new environment type to our API routes. We also add the permission for managing the new environment to two IAM roles: `EnvManagementRole` and `LaunchConstraint`
@@ -193,56 +193,56 @@ STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on A
 Do the following steps if you would like to launch your new environment type
 
 1. Create a new `envTypeConfig` for your environment, by adding the following JSON to DDB. Example below
-```json
-{
-   "pk": "ETC",
-   "sk": "ET#envType-2ETC#envTypeConfig-2",
-   "allowRoleIds": [],
-   "createdAt": "2022-02-03T20:07:50.573Z",
-   "createdBy": "abc",
-   "desc": "Description for config 1",
-   "id": "envTypeConfig-2",
-   "name": "Config 1",
-   "owner": "abc",
-   "params": [
-      {
-         "key": "IamPolicyDocument",
-         "value": "${iamPolicyDocument}"
-      },
-      {
-         "key": "InstanceType",
-         "value": "ml.t3.medium"
-      },
-      {
-         "key": "AutoStopIdleTimeInMinutes",
-         "value": "0"
-      },
-      {
-         "key": "CIDR",
-         "value": "0.0.0.0/0"
-      }
-   ],
-   "productId": "prod-a6vului72ggkk",                 // Grab new product id from Service Catalog Portfolio 
-   "provisioningArtifactId": "pa-n23bxsl22zkju",      // Grab new provisionArtifact id from Service Catalog Portfolio 
-   "resourceType": "envTypeConfig",
-   "type": "sagemakerNotebook",
-   "updatedAt": "2022-02-03T20:07:50.573Z",
-   "updatedBy": "abc"
-}
-```
+    ```json
+    {
+       "pk": "ETC",
+       "sk": "ET#envType-2ETC#envTypeConfig-2",
+       "allowRoleIds": [],
+       "createdAt": "2022-02-03T20:07:50.573Z",
+       "createdBy": "abc",
+       "desc": "Description for config 1",
+       "id": "envTypeConfig-2",
+       "name": "Config 1",
+       "owner": "abc",
+       "params": [
+          {
+             "key": "IamPolicyDocument",
+             "value": "${iamPolicyDocument}"
+          },
+          {
+             "key": "InstanceType",
+             "value": "ml.t3.medium"
+          },
+          {
+             "key": "AutoStopIdleTimeInMinutes",
+             "value": "0"
+          },
+          {
+             "key": "CIDR",
+             "value": "0.0.0.0/0"
+          }
+       ],
+       "productId": "prod-a6vului72ggkk",                 // Grab new product id from Service Catalog Portfolio 
+       "provisioningArtifactId": "pa-n23bxsl22zkju",      // Grab new provisionArtifact id from Service Catalog Portfolio 
+       "resourceType": "envTypeConfig",
+       "type": "sagemakerNotebook",
+       "updatedAt": "2022-02-03T20:07:50.573Z",
+       "updatedBy": "abc"
+    }
+    ```
 2. Launch environment. Make the following API request
 POST `{{API_URL}}/environments`
-```json
-{
-    "description": "test-sagemakerNotebook AWS",
-    "name": "test",
-    "envTypeId": "envType-2",
-    "envTypeConfigId": "envTypeConfig-2",
-    "projectId": "proj-123",
-    "datasetIds": [],
-    "envType": "sagemakerNotebook"
-}
-```
+    ```json
+    {
+        "description": "test-sagemakerNotebook AWS",
+        "name": "test",
+        "envTypeId": "envType-2",
+        "envTypeConfigId": "envTypeConfig-2",
+        "projectId": "proj-123",
+        "datasetIds": [],
+        "envType": "sagemakerNotebook"
+    }
+    ```
 The `envTypeId` and `envTypeConfigId` value are references to the `envTypeConfig` that you created in step 1.
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
