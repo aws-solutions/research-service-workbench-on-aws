@@ -27,7 +27,7 @@ In this step we set up the workflow for managing environment launch and terminat
 ### SSM documents
 1. Add SSM documents for the new environment type's launch and terminate operations.
    - You'll have two new SSM files: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>LaunchSSM.yaml` and `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>TerminateSSM.yaml` 
-   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in [Step 1](##step-1). An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
+   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in [Step 1](#step-1-define-environment-aws-resources). An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
 ```yaml
 description: SSM document to provision a Sagemaker instance
 assumeRole: ''
