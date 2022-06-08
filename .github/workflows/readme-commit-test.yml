@@ -126,7 +126,7 @@ jobs:
 
       - name: Rush version
         id: rush-version
-        run: node common/scripts/install-run-rush.js version --bump --target-branch testDevelop
+        run: node common/scripts/install-run-rush.js version --bump --target-branch testDevelop --ignore-git-hooks
 
       - name: CodeArtifact Auth
         run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
