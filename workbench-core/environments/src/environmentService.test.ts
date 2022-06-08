@@ -87,7 +87,7 @@ describe('EnvironmentService', () => {
   };
   const projItem = {
     subnetId: 'subnet-07f475d83291a3603',
-    accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
+    hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     createdAt: '2022-05-18T20:33:42.608Z',

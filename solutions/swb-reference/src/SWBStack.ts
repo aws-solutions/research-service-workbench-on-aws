@@ -301,8 +301,8 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             sid: 'AssumeRole',
             actions: ['sts:AssumeRole'],
-            // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-            resources: ['arn:aws:iam::*:role/*cross-account-role']
+            // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+            resources: ['arn:aws:iam::*:role/*hosting-account-role']
           }),
           new PolicyStatement({
             sid: 'GetLaunchConstraint',
@@ -393,7 +393,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
-            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
+            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
           }),
           new PolicyStatement({

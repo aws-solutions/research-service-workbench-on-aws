@@ -31,18 +31,18 @@ export default class AccountHandler {
     ]);
 
     for (const hostingAccount of hostingAccounts) {
-      const hostingAccountId = this._getAccountId(hostingAccount.accountHandlerRoleArn);
+      const hostingAccountId = this._getAccountId(hostingAccount.hostingAccountHandlerRoleArn);
       let hostingAccountAwsService: AwsService;
       try {
         hostingAccountAwsService = await this._mainAccountAwsService.getAwsServiceForRole({
-          roleArn: hostingAccount.accountHandlerRoleArn,
+          roleArn: hostingAccount.hostingAccountHandlerRoleArn,
           roleSessionName: 'account-handler',
           externalId: hostingAccount.externalId,
           region: process.env.AWS_REGION!
         });
       } catch (e) {
         console.log(
-          `Cannot assume role ${hostingAccount.accountHandlerRoleArn} for hosting account. Skipping setup for this account`
+          `Cannot assume role ${hostingAccount.hostingAccountHandlerRoleArn} for hosting account. Skipping setup for this account`
         );
         continue;
       }
@@ -78,7 +78,7 @@ export default class AccountHandler {
     {
       id: string;
       stackName: string;
-      accountHandlerRoleArn: string;
+      hostingAccountHandlerRoleArn: string;
       envMgmtRoleArn: string;
       externalId: string;
     }[]
@@ -92,7 +92,7 @@ export default class AccountHandler {
       return {
         id: account.id!,
         stackName: account.stackName,
-        accountHandlerRoleArn: account.accountHandlerRoleArn,
+        hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         envMgmtRoleArn: account.envMgmtRoleArn,
         externalId: account.externalId || ''
       };

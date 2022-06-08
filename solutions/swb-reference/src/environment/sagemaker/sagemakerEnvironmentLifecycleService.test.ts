@@ -60,7 +60,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
         subnetId: 'subnet-07f475d83291a3603',
         accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
         resourceType: 'project',
-        accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-hosting-account-role',
         awsAccountId: '123456789012',
         environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
         createdAt: '2022-05-18T20:33:42.608Z',
