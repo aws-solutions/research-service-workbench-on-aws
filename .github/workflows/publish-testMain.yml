@@ -1,0 +1,30 @@
+name: publish-to-codeArtifact
+on:
+  push:
+    branches:
+      - "testMain"
+
+env:
+  CODEARTIFACT_PACKAGE_REGISTRY: "amazon-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/${{ secrets.CODEARIFACT_PACKAGE_FORMAT }}/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with: 
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: CodeArtifact Auth
+        run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN_NAME }} --domain-owner ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD

@@ -19,7 +19,7 @@
   },
   "repository": {
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
-    "defaultBranch": "main"
+    "defaultBranch": "testDevelop"
   },
   "eventHooks": {
     "preRushInstall": [],
@@ -45,43 +45,43 @@
       "packageName": "@amzn/environments",
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-logging",
       "projectFolder": "workbench-core/logging",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-base",
       "projectFolder": "workbench-core/base",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-authorization",
       "projectFolder": "workbench-core/authorization",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-authentication",
       "projectFolder": "workbench-core/authentication",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-audit",
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/example-ui-app",
@@ -93,7 +93,7 @@
       "packageName": "@amzn/workbench-core-datasets",
       "projectFolder": "workbench-core/datasets",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-example-express",
@@ -117,13 +117,13 @@
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     }
   ]
 }
