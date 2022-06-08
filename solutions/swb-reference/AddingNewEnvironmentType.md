@@ -10,6 +10,7 @@ At a high level, we'll need to do the following steps
 [Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/feat/environments...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
 
 ## Step 1: Define environment AWS resources 
+In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
 1. Add a new folder for your custom environment at this location: `solutions/swb-reference/src/environment/`. The new folder name should be in camelCase, for example `sagemakerNotebook`.
 2. Add the Service Catalog template for the new environment to this folder, eg: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>.cfn.yaml`. For reference check out [sagemaker.cfn.yaml](https://github.com/awslabs/monorepo-for-service-workbench/blob/feat/environments/solutions/swb-reference/src/environment/sagemaker/sagemaker.cfn.yaml). The `parameters` section of the CF template allow users to customize the environment with their own setting. For example, `InstanceType` is a parameter that can be provided when launching the environment to determine the instance size of the environment.
 ```yaml
@@ -22,10 +23,11 @@ Parameters:
 3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
 
 ## Step 2: Set up environment management workflow 
+In this step we set up the workflow for managing environment launch and terminate. These workflows are defined by SSM documents. We will also implement **environment services** to handle start/stop/connecting to the new environment. These three actions do not require SSM documents, and will make AWS API calls in the hosting account to start/stop/connect to the environment. 
 ### SSM documents
 1. Add SSM documents for the new environment type's launch and terminate operations.
    - You'll have two new SSM files: `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>LaunchSSM.yaml` and `solutions/swb-reference/src/environment/<newEnvTypeName>/<newEnvTypeName>TerminateSSM.yaml` 
-   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in Step 1. An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
+   - For reference, check out [sagemakerLaunchSSM.yaml](./src/environment/sagemaker/sagemakerLaunchSSM.yaml) and [sagemakerTerminateSSM.yaml](./src/environment/sagemaker/sagemakerTerminateSSM.yaml). The `parameters` section in the SSM document allows you to customize the parameters passed to Service Catalog portfolio. Service Catalog portfolio uses those parameters when provisioning your SC product as defined by the SC template defined in [Step 1](##Step 1). An example SSM doc for launching a sagemaker environment is show below. The `InstanceType` parameter is being passed to SC. 
 ```yaml
 description: SSM document to provision a Sagemaker instance
 assumeRole: ''
@@ -103,11 +105,12 @@ public async getAuthCreds(instanceName: string, context?: any): Promise<any> {
 ```
 
 ## Step 3: Set up API routes and provide IAM permissions for managing the environment
+In this step we add support for the new environment type to our API routes. We also add the permission for managing the new environment to two IAM roles: `EnvManagementRole` and `LaunchConstraint`
 1. Add API route
    * Add the new environment type in the `apiRouteConfig.environments` object in [backendAPI.ts](../swb-reference/src/backendAPI.ts). 
 2. API routes and Permissions
    * Add the required AWS client permission for starting/stopping/connecting to the environment to `EnvManagementRole` (and its permission boundary `EnvMgmtPermissionsBoundary`) in [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml). For reference, check out the `sagemaker-access` policy in this role. When users call the start/stop/connect to environment SWB APIs, we will assume the `EnvManagementRole` in the hosting account and execute the appropriate AWS API. 
-   * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object. The `LaunchConstraintIAMRole` is used by Service Catalog portfolio to launch a Service Catalog product. A Service Catalog product is equivalent to an environment type. 
+   * Add the required AWS client permission for launch/terminate to the method `_createLaunchConstraintIAMRole` in [SWBStack.ts](./src/SWBStack.ts). For reference, check the `sagemakerPolicy` object. The `LaunchConstraint` role is used by Service Catalog portfolio to launch a Service Catalog product. A Service Catalog product is equivalent to an environment type. 
 
 ## Step 4: Add Support for environment Status Update
 The Status handler lambda writes new environment status and environment details to DDB. These details are sent to it by the hosting account event bus. We'll need to provide a mapping between the Event Bridge events and the environment DDB item. This mapping can be updated in the [statusHandlerLambda.ts](./src/environment/statusHandlerLambda.ts). This mapping only needs to be updated for new compute resources that doesn't already have the mapping specified. **If two environment types use the same compute environment, the mapping does not need to be updated.** For example EC2 Linux and EC2 Windows will use the same mapping, and no new mapping is needed. The events are generated by the AWS services themselves [(link)](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-service-event.html), and SWB have configured the `default` Event Bus to route those events to the `Main account`. For the next few steps, please refer to the [Appendix](#Appendix) section for examples of what Sagemaker Event Bridge events look like.
