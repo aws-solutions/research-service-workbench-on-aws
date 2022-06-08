@@ -126,7 +126,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
     "resourceType": "project",
     "name": "Example project",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
-    "accountHandlerRoleArn": "<CFN_OUTPUT.HandlerAccountHandlerRoleArn>",
+    "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
     "subnetId": "<CFN_OUTPUT.VpcSubnet>",
     "vpcId": "<CFN_OUTPUT.VPC>",
