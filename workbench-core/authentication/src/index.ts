@@ -32,7 +32,4 @@ export {
   refreshAccessToken,
   verifyToken
 } from './authenticationMiddleware';
-export {
-  CognitoUserManagementPlugin,
-  CognitoUserManagementPluginOptions
-} from './plugins/cognitoUserManagementPlugin';
+export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';

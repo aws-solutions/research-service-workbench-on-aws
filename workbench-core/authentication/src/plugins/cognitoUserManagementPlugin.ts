@@ -24,16 +24,19 @@ import { UserNotFoundError } from '../errors/userNotFoundError';
 import { User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 
-export interface CognitoUserManagementPluginOptions {
-  userPoolId: string;
-}
-
+/**
+ * A CognitoUserManagementPlugin instance that interfaces with Cognito to provide user management services.
+ */
 export class CognitoUserManagementPlugin implements UserManagementPlugin {
   private _userPoolId: string;
 
   private _cognitoClient: CognitoIdentityProviderClient;
 
-  public constructor({ userPoolId }: CognitoUserManagementPluginOptions) {
+  /**
+   *
+   * @param userPoolId - the user pool id to update with the plugin
+   */
+  public constructor(userPoolId: string) {
     this._userPoolId = userPoolId;
 
     const region = userPoolId.split('_')[0];
@@ -41,6 +44,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     this._cognitoClient = new CognitoIdentityProviderClient({ region });
   }
 
+  /**
+   * Gets the details for a certain user.
+   *
+   * @param uid - the user id to get details for
+   * @returns a {@link User} object containing the user's details
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to get user info
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
   public async getUser(uid: string): Promise<User> {
     try {
       const { UserAttributes: userAttributes } = await this._cognitoClient.send(
@@ -81,6 +95,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Creates a new user with the given details. Roles need to be added with `addUserToRole()`.
+   *
+   * @param user - the user to create
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to add a user to a user pool
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
+   * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
+   */
   public async createUser(user: Omit<User, 'roles'>): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -131,6 +156,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Updates a user with new details. Roles and uid will not be updated.
+   *
+   * @param uid - the id of the user to update
+   * @param user - the information to update
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to update user info
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
+   */
   public async updateUser(uid: string, user: Omit<User, 'uid' | 'roles'>): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -173,6 +210,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Deletes a user from the user pool.
+   *
+   * @param uid - the id of the user to delete
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to delete a user from a user pool
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
   public async deleteUser(uid: string): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -198,6 +245,15 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Lists the user ids within the user pool.
+   *
+   * @returns and array containing the user ids within the user pool
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the users in a user pool
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   */
   public async listUsers(): Promise<string[]> {
     try {
       const { Users: users } = await this._cognitoClient.send(
@@ -221,6 +277,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Lists the user ids associated with a given group.
+   *
+   * @param role - the group to list the users associated with it
+   * @returns an array containing the user ids that are associated with the group
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the users within a group
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   */
   public async listUsersForRole(role: string): Promise<string[]> {
     try {
       const { Users: users } = await this._cognitoClient.send(
@@ -236,7 +303,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         throw new IdpUnavailableError('Cognito encountered an internal error');
       }
       if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the groups a user is in');
+        throw new PluginConfigurationError('Plugin is not authorized to list the users within a group');
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
@@ -248,6 +315,15 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Lists the currently available groups in the user pool.
+   *
+   * @returns an array containing the names of the groups in the user pool
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the groups in a user pool
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   */
   public async listRoles(): Promise<string[]> {
     try {
       const { Groups: groups } = await this._cognitoClient.send(
@@ -271,6 +347,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Adds the given user to the given group in the user pool.
+   *
+   * @param uid - the username of the user
+   * @param role - the group to add the user to
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to add a user to a user pool group
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   */
   public async addUserToRole(uid: string, role: string): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -300,6 +388,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Removes the given user from the given group in the user pool.
+   *
+   * @param uid - the username of the user
+   * @param role - the group to remove the user from
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to remove a user from a user pool group
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   */
   public async removeUserFromRole(uid: string, role: string): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -331,6 +431,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Creates a new group in the user pool.
+   *
+   * @param role - the group to create
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to create a user pool group
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link RoleAlreadyExistsError} if the group provided already exists in the user pool
+   */
   public async createRole(role: string): Promise<void> {
     try {
       await this._cognitoClient.send(
@@ -356,6 +466,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Deletes the given group in the user pool.
+   *
+   * @param role - the group to delete
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dont have permission to delete a user pool group
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   */
   public async deleteRole(role: string): Promise<void> {
     try {
       await this._cognitoClient.send(
