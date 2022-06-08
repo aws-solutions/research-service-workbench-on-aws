@@ -23,7 +23,6 @@ import {
 import { mockClient } from 'aws-sdk-client-mock';
 import {
   CognitoUserManagementPlugin,
-  CognitoUserManagementPluginOptions,
   IdpUnavailableError,
   InvalidParameterError,
   PluginConfigurationError,
@@ -34,10 +33,6 @@ import {
   UserNotFoundError
 } from '..';
 import { UserManagementPlugin } from '../userManagementPlugin';
-
-const cognitoPluginOptions: CognitoUserManagementPluginOptions = {
-  userPoolId: 'us-west-2_fakeId'
-} as const;
 
 const userInfo: Omit<User, 'roles'> = {
   uid: '123',
@@ -54,7 +49,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
   beforeEach(() => {
     cognitoMock.reset();
-    plugin = new CognitoUserManagementPlugin(cognitoPluginOptions);
+    plugin = new CognitoUserManagementPlugin('us-west-2_fakeId');
     roles = ['Role1', 'Role2'];
   });
 
@@ -502,7 +497,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       cognitoMock.on(ListUsersInGroupCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
 
       await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to list the groups a user is in')
+        new PluginConfigurationError('Plugin is not authorized to list the users within a group')
       );
     });
 
