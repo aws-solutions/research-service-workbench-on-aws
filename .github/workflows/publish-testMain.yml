@@ -24,7 +24,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ secrets.AWS_DEV_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.ASSUME_ROLE }}
           role-session-name: OIDCSessionName
 
@@ -34,4 +34,5 @@ jobs:
       - name: Rush Publish
         run: |
           PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --publish"
+          npm config list
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
