@@ -5,7 +5,7 @@ on:
       - "testMain"
 
 env:
-  CODEARTIFACT_PACKAGE_REGISTRY: "amazon-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/${{ secrets.CODEARIFACT_PACKAGE_FORMAT }}/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
+  CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.CODEARTIFACT_DOMAIN_NAME }}-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/${{ secrets.CODEARIFACT_PACKAGE_FORMAT }}/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
 
 jobs:
   publish:
