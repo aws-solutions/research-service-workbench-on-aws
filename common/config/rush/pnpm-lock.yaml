@@ -545,6 +545,8 @@ importers:
   ../../workbench-core/datasets:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
@@ -562,6 +564,9 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
+    dependencies:
+      '@amzn/workbench-core-audit': link:../audit
+      '@amzn/workbench-core-logging': link:../logging
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/heft': 0.45.5
