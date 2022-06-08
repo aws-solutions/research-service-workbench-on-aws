@@ -134,7 +134,7 @@ jobs:
         id: last_sha
         run: |
           commit_hash=`git log -1 --format='%h'`
-          echo "::set-output name:commit_hash=$commit_hash'
+          echo "::set-output name:commit_hash=$commit_hash"
 
       - name: Rush Version
         id: rush-version
