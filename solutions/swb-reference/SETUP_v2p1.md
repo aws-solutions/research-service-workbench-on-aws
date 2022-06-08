@@ -96,7 +96,7 @@ StatusHandlerRoleArn: <CFN_OUTPUT.StatusHandlerLambdaRoleOutput>
 
 After the deployment is complete, take note of the following Cloudformation outputs. The outputs are on the `Outputs` tab. We will be using in future steps
 ```
-CrossAccountHandlerRoleArn
+HostingAccountHandlerRoleArn
 EncryptionKeyArn
 EnvMgmtRoleArn
 VPC
@@ -126,7 +126,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
     "resourceType": "project",
     "name": "Example project",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
-    "accountHandlerRoleArn": "<CFN_OUTPUT.CrossAccountHandlerRoleArn>",
+    "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
     "subnetId": "<CFN_OUTPUT.VpcSubnet>",
     "vpcId": "<CFN_OUTPUT.VPC>",
@@ -207,7 +207,7 @@ POST `{{API_URL}}/aws-accounts`
 {
     "awsAccountId": "<Hosting Account 12 Digit ID>",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
-    "accountHandlerRoleArn": "<CFN_OUTPUT.CrossAccountHandlerRoleArn>",
+    "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
     "externalId": "workbench",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
     "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files"

@@ -291,7 +291,7 @@ export default class EnvironmentService {
       id: newEnv.projectId,
       name: project.name,
       envMgmtRoleArn: project.envMgmtRoleArn,
-      accountHandlerRoleArn: project.accountHandlerRoleArn,
+      hostingAccountHandlerRoleArn: project.hostingAccountHandlerRoleArn,
       encryptionKeyArn: project.encryptionKeyArn,
       vpcId: project.vpcId,
       subnetId: project.subnetId,

@@ -90,7 +90,7 @@ describe('HostingAccountLifecycleService', () => {
         accountId: 'abc-xyz',
         awsAccountId: '123456789012',
         envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
-        accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-cross-account-role'
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
       })
     ).resolves.not.toThrowError();
   });

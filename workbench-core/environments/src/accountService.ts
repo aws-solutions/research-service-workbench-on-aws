@@ -16,7 +16,7 @@ interface Account {
   awsAccountId: string;
   envMgmtRoleArn: string;
   error: { type: string; value: string } | undefined;
-  accountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArn: string;
   vpcId: string;
   subnetId: string;
   cidr: string;
@@ -130,7 +130,7 @@ export default class AccountService {
         id: accountMetadata.id,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-        accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,
