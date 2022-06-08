@@ -141,8 +141,9 @@ jobs:
         run: |
           node common/scripts/install-run-rush.js version --bump --target-branch testDevelop --ignore-git-hooks
           commit_hash=`git log -1 --format='%h'`
+          echo $commit_hash
           echo "::set-output name=changes_detected::false"
-          if [ ${{ steps.last_sha.outputs.commit_hash }} && ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
+          if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
             echo "::set-output name=changes_detected::true"
             echo "::set-output name=commit_hash::$commit_hash"
           fi
