@@ -14,8 +14,8 @@
     "ignoredNpmScopes": ["@types"]
   },
   "gitPolicy": {
-    "versionBumpCommitMessage": "Bump versions [skip ci]",
-    "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
+    "versionBumpCommitMessage": "chore: Bump versions [skip ci]",
+    "changeLogUpdateCommitMessage": "chore: Update changelogs [skip ci]"
   },
   "repository": {
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
