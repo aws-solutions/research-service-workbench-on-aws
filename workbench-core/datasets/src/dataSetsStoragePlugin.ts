@@ -20,13 +20,20 @@ export interface DataSetsStoragePlugin {
    * Configures an existing dataset to be connected to an external environment.
    *
    * @param name - the name of the storage destination to be accessed
+   * @param path - a string which locates to root of the dataset within the storage medium
+   * such as a prefix in an S3 bucket.
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param externalRoleName - the role name which the external environment will assume to
    * access the DataSet
    *
    * @returns a string which can be used to mount the DataSet to an external environment.
    */
-  addExternalEndpoint(name: string, externalEndpointName: string, externalRoleName: string): Promise<string>;
+  addExternalEndpoint(
+    name: string,
+    path: string,
+    externalEndpointName: string,
+    externalRoleName: string
+  ): Promise<string>;
 
   /**
    * Add a role used to access an external endpoint.
@@ -39,6 +46,7 @@ export interface DataSetsStoragePlugin {
    */
   addRoleToExternalEndpoint(
     name: string,
+    path: string,
     externalEndpointName: string,
     externalRoleName: string
   ): Promise<string>;
