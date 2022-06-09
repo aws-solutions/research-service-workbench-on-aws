@@ -223,6 +223,9 @@ jobs:
         with:
           token: ${{ secrets.merge-token }}
           ref: ${{ steps.set-ref.outputs.ref }}
+      
+      - name: Base Action
+        uses: ./.github/actions/baseAction
 
       - name: Set git config
         run: |
