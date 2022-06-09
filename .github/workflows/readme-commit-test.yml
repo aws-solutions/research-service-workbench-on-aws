@@ -118,10 +118,10 @@ jobs:
           branch: testDevelop
       
       - name: git checkout to new version if README was updated
-        run: |
-          if ${{ steps.auto-commit-action.outputs.changes_detected }} ; then
-            git checkout ${{ steps.auto-commit-action.outputs.commit_hash }}
-          fi
+        if: ${{ steps.auto-commit-action.outputs.changes_detected }} == 'true'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.auto-commit-action.outputs.commit_hash }}
           
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -149,10 +149,10 @@ jobs:
           fi
 
       - name: git checkout to new version if Rush version performed updates
-        run: |
-          if ${{ steps.rush-version.outputs.changes_detected }}; then
-            git checkout ${{ steps.rush-version.outputs.commit_hash }}
-          fi
+        if: ${{ steps.rush-version.outputs.changes_detected }} == 'true'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.rush-version.outputs.commit_hash }}
 
       - name: CodeArtifact Auth
         run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
