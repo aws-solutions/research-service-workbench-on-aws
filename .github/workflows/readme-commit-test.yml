@@ -39,11 +39,11 @@ on:
         description: 'Flag to detect whether README was updated or not'
         value: "${{ jobs.readme-commit-test.outputs.readme_changes_detected }}"
       version_commit_hash:
-        description: 'README update commit hash'
-        value: "${{ jobs.readme-commit-test.outputs.version_commit_hash }}"
+        description: 'Rush version update commit hash'
+        value: "${{ jobs.rush-version.outputs.version_commit_hash }}"
       version_changes_detected:
-        description: 'Flag to detect whether README was updated or not'
-        value: "${{ jobs.readme-commit-test.outputs.version_changes_detected }}"
+        description: 'Flag to detect whether rush version performed an update'
+        value: "${{ jobs.rush-version.outputs.version_changes_detected }}"
 
 jobs:
   readme-commit-test:  
@@ -55,8 +55,6 @@ jobs:
     outputs:
         readme_commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
         readme_changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
-        version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
-        version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
     env: 
       CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
 
@@ -116,26 +114,62 @@ jobs:
           commit_user_email: ${{ secrets.bot-user-email }}
           file_pattern: "README.md **/README.md"
           branch: testDevelop
-      
-      - name: git checkout to new version if README was updated
-        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+
+      - name: Enable branch protection on testDevelop
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: testDevelop
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
+
+  rush-version:  
+    runs-on: ubuntu-20.04
+    needs: [readme-commit-test]
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+        version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
+        version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
+
+    steps:
+      - name: Set ref
+        id: set-ref
+        run: |
+          ref=''
+          if ${{ needs.readme-commit-test.outputs.readme_changes_detected }}; then
+            ref=${{ needs.readme-commit-test.outputs.readme_commit_hash }}
+          fi
+          echo "::set-output name=ref::$ref"
+
+      - name: git checkout
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.merge-token }}
-          ref: ${{ steps.auto-commit-action.outputs.commit_hash }}
-          
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ secrets.aws-dev-region }}
-          role-to-assume: ${{ secrets.assume-role }}
-          role-session-name: OIDCSessionName
+          ref: ${{ steps.set-ref.outputs.ref }}
       
       - name: Get Current SHA
         id: last_sha
         run: |
           commit_hash=`git log -1 --format='%h'`
           echo "::set-output name=commit_hash::$commit_hash"
+
+        # There's no way for github actions to push to a protected branch. This is a workaround
+        # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+      - name: Temporarily disable branch protection on testDevelop
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: testDevelop
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
 
       - name: Rush Version
         id: rush-version
@@ -148,22 +182,7 @@ jobs:
             echo "::set-output name=changes_detected::true"
             echo "::set-output name=commit_hash::$commit_hash"
           fi
-
-      - name: git checkout to new version if Rush version performed updates
-        if: steps.rush-version.outputs.changes_detected == 'true'
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.merge-token }}
-          ref: ${{ steps.rush-version.outputs.commit_hash }}
-
-      - name: CodeArtifact Auth
-        run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
-
-      - name: Rush Publish
-        run: |
-          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
-          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
-          
+      
       - name: Enable branch protection on testDevelop
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
@@ -174,3 +193,42 @@ jobs:
           branch: testDevelop
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
+
+  rush-publish:  
+    runs-on: ubuntu-20.04
+    needs: [rush-version]
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Set ref
+        id: set-ref
+        run: |
+          ref=''
+          if ${{ needs.rush-version.outputs.version_changes_detected }}; then
+            ref=${{ needs.rush-version.outputs.version_commit_hash }}
+          fi
+          echo "::set-output name=ref::$ref"
+      
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.merge-token }}
+          ref: ${{ steps.set-ref.outputs.ref }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.assume-role }}
+          role-session-name: OIDCSessionName
+
+      - name: CodeArtifact Auth
+        run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
