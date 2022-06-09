@@ -12,7 +12,7 @@ on:
       - 'testDevelop'
   
 jobs:
-  readme-commit-test:
+  readme-version-update-and-publish:
     if: github.event.pull_request.merged == true
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit-test.yml@testDevelop
     secrets:
@@ -78,12 +78,12 @@ jobs:
   merge-develop-to-main:
     name: Merge develop to testMain
     runs-on: ubuntu-20.04
-    needs: [readme-commit-test]
+    needs: [readme-version-update-and-publish]
     env: 
-      README_COMMIT_HASH: "${{ needs.readme-commit-test.outputs.readme_commit_hash }}"
-      README_CHANGES_DETECTED: "${{ needs.readme-commit-test.outputs.readme_changes_detected }}"
-      VERSION_COMMIT_HASH: "${{ needs.readme-commit-test.outputs.version_commit_hash }}"
-      VERSION_CHANGES_DETECTED: "${{ needs.readme-commit-test.outputs.version_changes_detected }}"
+      README_COMMIT_HASH: "${{ needs.readme-version-update-and-publish.outputs.readme_commit_hash }}"
+      README_CHANGES_DETECTED: "${{ needs.readme-version-update-and-publish.outputs.readme_changes_detected }}"
+      VERSION_COMMIT_HASH: "${{ needs.readme-version-update-and-publish.outputs.version_commit_hash }}"
+      VERSION_CHANGES_DETECTED: "${{ needs.readme-version-update-and-publish.outputs.version_changes_detected }}"
     steps:
       - uses: actions/checkout@v3
         with:
