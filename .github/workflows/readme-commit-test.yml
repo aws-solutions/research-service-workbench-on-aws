@@ -121,6 +121,7 @@ jobs:
         if: ${{ steps.auto-commit-action.outputs.changes_detected }} == 'true'
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.merge-token }}
           ref: ${{ steps.auto-commit-action.outputs.commit_hash }}
           
       - name: Configure AWS Credentials
@@ -152,6 +153,7 @@ jobs:
         if: ${{ steps.rush-version.outputs.changes_detected }} == 'true'
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.merge-token }}
           ref: ${{ steps.rush-version.outputs.commit_hash }}
 
       - name: CodeArtifact Auth
