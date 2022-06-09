@@ -170,7 +170,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
       - name: Set git config
-        run:
+        run: |
           git config user.email ${{ secrets.bot-user-email }}
           git config user.name ${{ secrets.bot-user }}
           git config commit.gpgsign true
@@ -225,7 +225,7 @@ jobs:
           ref: ${{ steps.set-ref.outputs.ref }}
 
       - name: Set git config
-        run:
+        run: |
           git config user.email ${{ secrets.bot-user-email }}
           git config user.name ${{ secrets.bot-user }}
           git config commit.gpgsign true
