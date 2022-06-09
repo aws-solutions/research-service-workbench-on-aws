@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/swb-reference",
+      "comment": "readme update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@amzn/swb-reference"
+}
