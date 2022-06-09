@@ -32,6 +32,7 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
+| [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
 | [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
 | [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
