@@ -169,6 +169,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
+      - name: Set git config
+        run:
+          git config user.email ${{ secrets.bot-user-email }}
+          git config user.name ${{ secrets.bot-user }}
+          git config commit.gpgsign true
+
       - name: Rush Version
         id: rush-version
         run: |
@@ -217,6 +223,12 @@ jobs:
         with:
           token: ${{ secrets.merge-token }}
           ref: ${{ steps.set-ref.outputs.ref }}
+
+      - name: Set git config
+        run:
+          git config user.email ${{ secrets.bot-user-email }}
+          git config user.name ${{ secrets.bot-user }}
+          git config commit.gpgsign true
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
