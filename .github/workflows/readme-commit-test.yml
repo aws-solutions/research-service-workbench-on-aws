@@ -55,8 +55,6 @@ jobs:
     outputs:
         readme_commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
         readme_changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
-    env: 
-      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
 
     steps:        
       - uses: actions/checkout@v3
@@ -201,6 +199,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    env: 
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
 
     steps:
       - name: Set ref
