@@ -238,6 +238,11 @@ jobs:
       - name: CodeArtifact Auth
         run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
 
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.bot-user-email }}
+          git config user.name ${{ secrets.bot-user }}
+          
       - name: Rush Publish
         run: |
           PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
