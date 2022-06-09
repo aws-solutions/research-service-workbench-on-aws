@@ -118,7 +118,7 @@ jobs:
           branch: testDevelop
       
       - name: git checkout to new version if README was updated
-        if: ${{ steps.auto-commit-action.outputs.changes_detected }} == 'true'
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.merge-token }}
@@ -150,7 +150,7 @@ jobs:
           fi
 
       - name: git checkout to new version if Rush version performed updates
-        if: ${{ steps.rush-version.outputs.changes_detected }} == 'true'
+        if: steps.rush-version.outputs.changes_detected == 'true'
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.merge-token }}
