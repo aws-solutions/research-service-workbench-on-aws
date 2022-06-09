@@ -150,6 +150,7 @@ jobs:
         with:
           token: ${{ secrets.merge-token }}
           ref: ${{ steps.set-ref.outputs.ref }}
+          fetch-depth: 0
       
       - name: Get Current SHA
         id: last_sha
@@ -222,6 +223,7 @@ jobs:
         with:
           token: ${{ secrets.merge-token }}
           ref: ${{ steps.set-ref.outputs.ref }}
+          fetch-depth: 0
       
       - name: Base Action
         uses: ./.github/actions/baseAction
