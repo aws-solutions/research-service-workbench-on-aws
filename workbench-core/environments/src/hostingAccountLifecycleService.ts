@@ -152,11 +152,26 @@ export default class HostingAccountLifecycleService {
       const subnetId = outputs.find((output) => {
         return output.OutputKey === 'VpcSubnet';
       })!.OutputValue;
+      const encryptionKeyArn = outputs.find((output) => {
+        return output.OutputKey === 'EncryptionKeyArn';
+      })!.OutputValue;
 
       if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'CURRENT', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'CURRENT',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       } else {
-        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'NEEDS_UPDATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'NEEDS_UPDATE',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       }
     } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
       await this._writeAccountStatusToDDB({ ddbAccountId, status: 'ERRORED' });
@@ -168,8 +183,15 @@ export default class HostingAccountLifecycleService {
     status: HostingAccountStatus;
     vpcId?: string;
     subnetId?: string;
+    encryptionKeyArn?: string;
   }): Promise<void> {
-    const updateParam: { id: string; status: string; vpcId?: string; subnetId?: string } = {
+    const updateParam: {
+      id: string;
+      status: string;
+      vpcId?: string;
+      subnetId?: string;
+      encryptionKeyArn?: string;
+    } = {
       id: param.ddbAccountId,
       status: param.status
     };
@@ -178,6 +200,9 @@ export default class HostingAccountLifecycleService {
     }
     if (param.subnetId) {
       updateParam.subnetId = param.subnetId;
+    }
+    if (param.encryptionKeyArn) {
+      updateParam.encryptionKeyArn = param.encryptionKeyArn;
     }
     console.log('_writeAccountStatusToDDB param', param);
     await this._accountService.update(updateParam);

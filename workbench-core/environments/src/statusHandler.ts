@@ -9,9 +9,6 @@ import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {
-    const envHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
-
     if (_.isUndefined(event.envId) && _.isUndefined(event.instanceId)) {
       console.log('Neither Env ID nor Instance ID was provided. Skipping status update.');
       return;
@@ -23,6 +20,8 @@ export default class StatusHandler {
       );
       return;
     }
+
+    const envService = this._getEnvService();
 
     // Check if this event is outdated
     const envId = event.envId ? event.envId : await this._getEnvId(event.instanceId!);
@@ -54,6 +53,7 @@ export default class StatusHandler {
     }
 
     // Get hosting account SDK instance
+    const envHelper = this._getEnvHelper();
     const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId,
@@ -65,9 +65,9 @@ export default class StatusHandler {
     const { RecordOutputs } = await hostSdk.clients.serviceCatalog.describeRecord({
       Id: event.metadata.detail.RecordId
     });
-    const instanceName = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceName })!
+    const instanceName = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceName })!
       .OutputValue!;
-    const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceArn })!
+    const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceArn })!
       .OutputValue!;
 
     // We store the provisioned product ID sent in event metadata
@@ -131,5 +131,19 @@ export default class StatusHandler {
     const instance = data.Items![0];
     const instanceSk = instance.sk as unknown as string;
     return instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
+  }
+
+  /** Get environment service instance
+   * @returns EnvironmentService instance
+   */
+  private _getEnvService(): EnvironmentService {
+    return new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+  }
+
+  /** Get environment helper instance
+   * @returns EnvironmentLifecycleHelper instance
+   */
+  private _getEnvHelper(): EnvironmentLifecycleHelper {
+    return new EnvironmentLifecycleHelper();
   }
 }
