@@ -70,7 +70,7 @@ export interface DataSetsStoragePlugin {
    *
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
-  getExternalEndpoint(name: string, externalEndpointName: string): Promise<string>;
+  // getExternalEndpoint(name: string, externalEndpointName: string): Promise<string>;
 
   /**
    * Create a presigned URL to be used to upload a file to a Dataset.
