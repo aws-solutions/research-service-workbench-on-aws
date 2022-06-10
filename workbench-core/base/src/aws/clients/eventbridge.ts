@@ -4,11 +4,23 @@
  */
 
 import {
+  DescribeEventBusCommand,
+  DescribeEventBusCommandInput,
+  DescribeEventBusCommandOutput,
+  DescribeRuleCommand,
+  DescribeRuleCommandInput,
+  DescribeRuleCommandOutput,
   EventBridgeClient,
   EventBridgeClientConfig,
   PutPermissionCommand,
   PutPermissionCommandInput,
-  PutPermissionCommandOutput
+  PutPermissionCommandOutput,
+  PutRuleCommand,
+  PutRuleCommandInput,
+  PutRuleCommandOutput,
+  PutTargetsCommand,
+  PutTargetsCommandInput,
+  PutTargetsCommandOutput
 } from '@aws-sdk/client-eventbridge';
 
 // Documentation for client and methods
@@ -22,5 +34,23 @@ export default class EventBridge {
 
   public async putPermission(params: PutPermissionCommandInput): Promise<PutPermissionCommandOutput> {
     return this._client.send(new PutPermissionCommand(params));
+  }
+
+  public async describeEventBus(
+    params: DescribeEventBusCommandInput
+  ): Promise<DescribeEventBusCommandOutput> {
+    return this._client.send(new DescribeEventBusCommand(params));
+  }
+
+  public async putRule(params: PutRuleCommandInput): Promise<PutRuleCommandOutput> {
+    return this._client.send(new PutRuleCommand(params));
+  }
+
+  public async putTargets(params: PutTargetsCommandInput): Promise<PutTargetsCommandOutput> {
+    return this._client.send(new PutTargetsCommand(params));
+  }
+
+  public async describeRule(params: DescribeRuleCommandInput): Promise<DescribeRuleCommandOutput> {
+    return this._client.send(new DescribeRuleCommand(params));
   }
 }

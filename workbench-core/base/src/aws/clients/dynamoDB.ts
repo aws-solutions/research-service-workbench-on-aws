@@ -25,7 +25,10 @@ import {
   DeleteItemCommandOutput,
   BatchWriteItemCommand,
   BatchWriteItemCommandInput,
-  BatchWriteItemCommandOutput
+  BatchWriteItemCommandOutput,
+  TransactWriteItemsCommandInput,
+  TransactWriteItemsCommandOutput,
+  TransactWriteItemsCommand
 } from '@aws-sdk/client-dynamodb';
 
 export default class DynamoDB {
@@ -41,7 +44,7 @@ export default class DynamoDB {
   }
 
   public async get(params: GetItemCommandInput): Promise<GetItemCommandOutput> {
-    return await this._client.send(new GetItemCommand(params));
+    return this._client.send(new GetItemCommand(params));
   }
 
   public async batchGet(params: BatchGetItemCommandInput): Promise<BatchGetItemCommandOutput> {
@@ -58,5 +61,11 @@ export default class DynamoDB {
 
   public async batchWriteOrDelete(params: BatchWriteItemCommandInput): Promise<BatchWriteItemCommandOutput> {
     return await this._client.send(new BatchWriteItemCommand(params));
+  }
+
+  public async transactWrite(
+    params: TransactWriteItemsCommandInput
+  ): Promise<TransactWriteItemsCommandOutput> {
+    return await this._client.send(new TransactWriteItemsCommand(params));
   }
 }

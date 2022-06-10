@@ -79,7 +79,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-lambda",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-sagemaker",
       "allowedCategories": [ "production" ]
     },
     {
@@ -96,6 +104,10 @@
     },
     {
       "name": "@aws-sdk/types",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/util-dynamodb",
       "allowedCategories": [ "production" ]
     },
     {
@@ -136,6 +148,10 @@
     },
     {
       "name": "@casl/ability",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@hapi/boom",
       "allowedCategories": [ "production" ]
     },
     {
