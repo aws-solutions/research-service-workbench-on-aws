@@ -95,17 +95,17 @@ export class ReadmeAction extends CommandLineAction {
     builder.append('\n\n');
     builder.append('## Packages\n\n');
     builder.append('<!-- the table below was generated using the ./repo-scripts/repo-toolbox script -->\n\n');
-    builder.append('| Folder | Package | README |\n');
-    builder.append('| ------ | ------- | ------ |\n');
+    builder.append('| Folder | Package | README | PUBLISH \n');
+    builder.append('| ------ | ------- | ------ | ------- |\n');
     for (const project of orderedProjects) {
-      if (ReadmeAction._isPublished(project)) {
-        const folder: string = project.projectRelativeFolder;
+      const folder: string = project.projectRelativeFolder;
 
-        const packageName: string = project.packageName;
+      const packageName: string = project.packageName;
 
-        const readme: string = `./${folder}/README.md`;
-        builder.append(`| [${folder}](./${folder}/) | [${packageName}] | [README](${readme})\n`);
-      }
+      const publish: boolean = ReadmeAction._isPublished(project);
+
+      const readme: string = `./${folder}/README.md`;
+      builder.append(`| [${folder}](./${folder}/) | [${packageName}] | [README](${readme}) | ${publish}\n`);
     }
     builder.append(readmePostfix);
 

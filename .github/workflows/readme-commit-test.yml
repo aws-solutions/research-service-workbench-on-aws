@@ -170,10 +170,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.gpg-private-key }}
+          passphrase: ${{ secrets.passphrase }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Set git config
         run: |
           git config user.email ${{ secrets.bot-user-email }}
           git config user.name ${{ secrets.bot-user }}
+          git config commit.gpgsign true
 
       - name: Rush Version
         id: rush-version
@@ -238,12 +247,23 @@ jobs:
       - name: CodeArtifact Auth
         run: echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.gpg-private-key }}
+          passphrase: ${{ secrets.passphrase }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Set git config
         run: |
           git config user.email ${{ secrets.bot-user-email }}
           git config user.name ${{ secrets.bot-user }}
+          git config commit.gpgsign true
           
       - name: Rush Publish
         run: |
           PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
