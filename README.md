@@ -1,6 +1,5 @@
-# Worflow Status
+# Workflow Status
 [![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
-
 [![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
@@ -47,7 +46,6 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 | [workbench-core/repo-scripts/repo-toolbox](./workbench-core/repo-scripts/repo-toolbox/) | [@amzn/workbench-core-repo-toolbox] | [README](./workbench-core/repo-scripts/repo-toolbox/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
-
 
 ## Finding contributions to work on
 
