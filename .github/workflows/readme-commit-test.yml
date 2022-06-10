@@ -155,7 +155,7 @@ jobs:
       - name: Get Current SHA
         id: last_sha
         run: |
-          commit_hash=`git log -1 --format='%h'`
+          commit_hash=`git log -1 --format='%H'`
           echo "::set-output name=commit_hash::$commit_hash"
 
         # There's no way for github actions to push to a protected branch. This is a workaround
@@ -179,7 +179,7 @@ jobs:
         id: rush-version
         run: |
           node common/scripts/install-run-rush.js version --bump --target-branch testDevelop --ignore-git-hooks
-          commit_hash=`git log -1 --format='%h'`
+          commit_hash=`git log -1 --format='%H'`
           echo $commit_hash
           echo "::set-output name=changes_detected::false"
           if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
