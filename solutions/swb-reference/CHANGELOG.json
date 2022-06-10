@@ -2,6 +2,18 @@
   "name": "@amzn/swb-reference",
   "entries": [
     {
+      "version": "0.0.7",
+      "tag": "@amzn/swb-reference_v0.0.7",
+      "date": "Fri, 10 Jun 2022 03:29:06 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test publish again"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.6",
       "tag": "@amzn/swb-reference_v0.0.6",
       "date": "Thu, 09 Jun 2022 22:19:21 GMT",
