@@ -51,7 +51,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @returns a {@link User} object containing the user's details
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to get user info
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to get user info
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
@@ -101,7 +101,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param user - the user to create
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to add a user to a user pool
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to add a user to a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
@@ -163,7 +163,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param user - the information to update
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to update user info
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to update user info
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
@@ -216,7 +216,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param uid - the id of the user to delete
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to delete a user from a user pool
+   * @throws {@link PluginConfigurationError} if the plugin dones't have permission to delete a user from a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
@@ -248,10 +248,10 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Lists the user ids within the user pool.
    *
-   * @returns and array containing the user ids within the user pool
+   * @returns an array containing the user ids within the user pool
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the users in a user pool
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    */
   public async listUsers(): Promise<string[]> {
@@ -284,9 +284,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @returns an array containing the user ids that are associated with the group
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the users within a group
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users within a group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
-   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
   public async listUsersForRole(role: string): Promise<string[]> {
     try {
@@ -321,7 +321,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @returns an array containing the names of the groups in the user pool
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to list the groups in a user pool
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the groups in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    */
   public async listRoles(): Promise<string[]> {
@@ -354,10 +354,10 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param role - the group to add the user to
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to add a user to a user pool group
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to add a user to a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
-   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
-   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
   public async addUserToRole(uid: string, role: string): Promise<void> {
     try {
@@ -395,10 +395,10 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param role - the group to remove the user from
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to remove a user from a user pool group
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to remove a user from a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
-   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
-   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
   public async removeUserFromRole(uid: string, role: string): Promise<void> {
     try {
@@ -437,7 +437,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param role - the group to create
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to create a user pool group
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to create a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link RoleAlreadyExistsError} if the group provided already exists in the user pool
    */
@@ -472,9 +472,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @param role - the group to delete
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
-   * @throws {@link PluginConfigurationError} if the plugin dont have permission to delete a user pool group
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to delete a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
-   * @throws {@link RoleNotFoundError} if the group provided doesnt exist in the user pool
+   * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
   public async deleteRole(role: string): Promise<void> {
     try {
