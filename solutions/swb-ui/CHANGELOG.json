@@ -1,0 +1,17 @@
+{
+  "name": "@amzn/swb-ui",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@amzn/swb-ui_v0.0.2",
+      "date": "Fri, 10 Jun 2022 06:23:50 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "test release trigger"
+          }
+        ]
+      }
+    }
+  ]
+}
