@@ -27,7 +27,7 @@ export default class AuthorizationService {
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
    *
-   * @throws Foribdden {@link Error} when {@link User} is not authorized
+   * @throws Forbidden {@link Error} when {@link User} is not authorized
    */
   public async isAuthorizedOnRoute(
     user: AuthenticatedUser,
