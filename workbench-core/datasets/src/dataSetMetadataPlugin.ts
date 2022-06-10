@@ -36,4 +36,16 @@ export interface DataSetMetadataPlugin {
    * @returns the metadata assoicated with the object.
    */
   getDataSetObjectMetadata(dataSetName: string, objectName: string): Promise<Record<string, string>>;
+
+  /**
+   * Add a DataSet to the solution.
+   * @param dataSet - the DataSet to add.
+   */
+  addDataSet(dataSet: DataSet): Promise<void>;
+
+  /**
+   * Udpate a DataSet
+   * @param dataSet - the updated DataSet data.
+   */
+  updateDataSet(dataSet: DataSet): Promise<void>;
 }
