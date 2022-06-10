@@ -30,10 +30,24 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 <!-- the table below was generated using the ./repo-scripts/repo-toolbox script -->
 
-| Folder | Package | README |
-| ------ | ------- | ------ |
-| [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
-| [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
+| Folder | Package | README | PUBLISH 
+| ------ | ------- | ------ | ------- |
+| [solutions/example-ui-app](./solutions/example-ui-app/) | [@amzn/example-ui-app] | [README](./solutions/example-ui-app/README.md) | false
+| [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md) | true
+| [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md) | true
+| [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md) | true
+| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md) | false
+| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md) | false
+| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md) | false
+| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md) | false
+| [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md) | false
+| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md) | false
+| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md) | false
+| [workbench-core/example/express](./workbench-core/example/express/) | [@amzn/workbench-core-example-express] | [README](./workbench-core/example/express/README.md) | false
+| [workbench-core/example/infrastructure](./workbench-core/example/infrastructure/) | [@amzn/workbench-core-example-infrastructure] | [README](./workbench-core/example/infrastructure/README.md) | false
+| [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md) | false
+| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md) | false
+| [workbench-core/repo-scripts/repo-toolbox](./workbench-core/repo-scripts/repo-toolbox/) | [@amzn/workbench-core-repo-toolbox] | [README](./workbench-core/repo-scripts/repo-toolbox/README.md) | false
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on
