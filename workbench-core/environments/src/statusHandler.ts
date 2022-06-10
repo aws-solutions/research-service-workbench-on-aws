@@ -30,8 +30,7 @@ export default class StatusHandler {
     const eventBusTime = event.metadata.time;
 
     // Check if status already applied, or if this is an outdated event
-    // But perform status update regardless if
-    // 1. operation is "Launch" since SSM doc sends important details
+    // But perform status update regardless if operation is "Launch" since SSM doc sends important details
     if (
       (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) || envDetails.status === event.status) &&
       event.operation !== 'Launch'
