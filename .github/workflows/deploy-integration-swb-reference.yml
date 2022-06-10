@@ -44,5 +44,5 @@ jobs:
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
-          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy --all --require-approval never
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
