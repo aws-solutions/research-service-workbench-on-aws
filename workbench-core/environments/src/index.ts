@@ -6,7 +6,9 @@ import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
 import EnvironmentService from './environmentService';
 import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
+
+import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+import HostingAccountService from './hostingAccountService';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
 import ServiceCatalogSetup from './serviceCatalogSetup';

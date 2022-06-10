@@ -141,6 +141,7 @@ export default class HostingAccountLifecycleService {
     const describeStackResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
+
     const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });

@@ -2,6 +2,7 @@ jest.mock('./iamRoleCloneService');
 
 import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
+
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -17,6 +18,7 @@ import {
   PutTargetsCommand
 } from '@aws-sdk/client-eventbridge';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,

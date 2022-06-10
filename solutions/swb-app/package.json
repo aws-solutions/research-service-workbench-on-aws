@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@amzn/environments": "workspace:*",
-    "@hapi/boom": "^10.0.0",
     "express": "^4.17.3"
   },
   "devDependencies": {
