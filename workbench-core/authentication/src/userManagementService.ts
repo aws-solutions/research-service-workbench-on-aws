@@ -71,7 +71,7 @@ export default class UserManagementService {
   }
 
   /**
-   * List the user IDs assoicated with a given role.
+   * List the user IDs associated with a given role.
    * @param role - the role for which the users should be listed.
    * @returns an array containing the user ids that are associated with the role
    *
