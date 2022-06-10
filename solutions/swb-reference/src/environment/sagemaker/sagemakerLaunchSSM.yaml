@@ -109,7 +109,7 @@ mainSteps:
       - Name: ProductStatus
         Type: String
         Selector: '$.ProvisionedProductDetail.Status'
-      - Name: StatusMessage
+      - Name: ErrorMessage
         Type: String
         Selector: '$.ProvisionedProductDetail.StatusMessage'
     nextStep: ChooseByStatus
@@ -141,7 +141,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED", "StatusMessage": "{{ GetProvisionedProductDetail.StatusMessage }}" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED", "ErrorMessage": "{{ GetProvisionedProductDetail.ErrorMessage }}" }'
           DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

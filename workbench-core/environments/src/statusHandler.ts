@@ -40,11 +40,20 @@ export default class StatusHandler {
       return;
     }
 
+    const updateRequest: { status: string; error?: { type: string; value: string } } = {
+      status: event.status
+    };
+    if (event.errorMsg) {
+      updateRequest.error = {
+        // We use event.operation for Launch/Terminate SSM doc events
+        // (for future) and event.status for automatic status update events (STARTING/STOPPING etc.)
+        type: event.operation?.toUpperCase() || event.status,
+        value: event.errorMsg!
+      };
+    }
+
     // Update env status using data from event bridge
-    await envService.updateEnvironment(envId, {
-      status: event.status,
-      statusMsg: event.statusMsg || envDetails.statusMsg
-    });
+    await envService.updateEnvironment(envId, updateRequest);
 
     // The next few DDB updates are only needed during environment provisioning
     if (event.operation !== 'Launch') {

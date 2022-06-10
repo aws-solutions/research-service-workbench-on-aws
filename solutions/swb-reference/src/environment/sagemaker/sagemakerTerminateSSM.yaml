@@ -46,7 +46,7 @@ mainSteps:
       - Name: ProductStatus
         Type: String
         Selector: '$.RecordDetail.Status'
-      - Name: StatusMessage
+      - Name: ErrorMessage
         Type: StringList
         Selector: '$.RecordDetail.RecordErrors'
     nextStep: ChooseByStatus
@@ -78,7 +78,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "StatusMessage": {{ GetRecordDetail.StatusMessage }} }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "ErrorMessage": {{ GetRecordDetail.ErrorMessage }} }'
           DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

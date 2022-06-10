@@ -19,7 +19,6 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     outputs: { id: string; value: string; description: string }[];
     projectId: string;
     status: EnvironmentStatus;
-    statusMsg: string;
     datasetIds: string[];
     provisionedProductId: string;
     envTypeConfigId: string;
@@ -45,7 +44,6 @@ describe('SagemakerEnvironmentLifecycleService', () => {
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       createdAt: '2022-05-05T19:39:03.023Z',
       status: 'PENDING',
-      statusMsg: '',
       updatedAt: '2022-05-05T19:43:57.143Z',
       cidr: '1.1.1.1/32',
       description: 'blah',
