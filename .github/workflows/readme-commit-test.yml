@@ -265,5 +265,6 @@ jobs:
         run: |
           PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+          echo '${{ toJSON(github) }}'
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
