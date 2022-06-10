@@ -1,6 +1,6 @@
 {
   "name": "@amzn/swb-ui",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NextJS frontend UI for Service Workbench v2",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
