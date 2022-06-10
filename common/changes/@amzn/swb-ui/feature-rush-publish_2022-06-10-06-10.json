@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/swb-ui",
+      "comment": "test release trigger",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@amzn/swb-ui"
+}
