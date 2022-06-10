@@ -74,8 +74,8 @@ jobs:
   #     cognito-username: "${{ secrets.COGNITO_USERNAME }}"
   #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
   #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
-  merge-develop-to-main:
-    name: Merge develop to testMain
+  merge-testDevelop-to-testMain:
+    name: Merge testDevelop to testMain
     runs-on: ubuntu-20.04
     needs: [readme-version-update-and-publish]
     env: 
