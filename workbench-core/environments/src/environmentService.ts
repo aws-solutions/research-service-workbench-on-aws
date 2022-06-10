@@ -17,6 +17,7 @@ interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
+  statusMsg: string;
   datasetIds: string[];
   provisionedProductId: string;
   envTypeConfigId: string;
@@ -42,6 +43,7 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
+  statusMsg: '',
   datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
@@ -245,7 +247,8 @@ export default class EnvironmentService {
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       owner: 'owner-1', // TODO: Get this from request context
-      status: params.status || 'PENDING'
+      status: params.status || 'PENDING',
+      statusMsg: ''
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

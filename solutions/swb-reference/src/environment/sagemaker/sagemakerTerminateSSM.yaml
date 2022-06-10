@@ -32,13 +32,35 @@ mainSteps:
       Id: '{{ TerminateSagemaker.RecordId }}'
       DesiredValues:
         - SUCCEEDED
+        - FAILED
       PropertySelector: '$.RecordDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetRecordDetail
+  - name: GetRecordDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeRecord
+      Id: '{{ TerminateSagemaker.RecordId }}'
     outputs:
-      - Name: ProvisionedProductDetail
-        Type: StringMap
-        Selector: '$.ProvisionedProductDetail'
-    onFailure: step:PushFailureStatusToEventBridge
-    nextStep: PushMetadataToEventBridge
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.RecordDetail.Status'
+      - Name: StatusMessage
+        Type: StringList
+        Selector: '$.RecordDetail.RecordErrors'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: SUCCEEDED
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: FAILED
+      Default: PushFailureStatusToEventBridge
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -56,7 +78,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "StatusMessage": {{ GetRecordDetail.StatusMessage }} }'
           DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

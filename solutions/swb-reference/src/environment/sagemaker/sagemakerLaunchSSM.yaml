@@ -95,13 +95,35 @@ mainSteps:
       Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
       DesiredValues:
         - AVAILABLE
+        - ERROR
       PropertySelector: '$.ProvisionedProductDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetProvisionedProductDetail
+  - name: GetProvisionedProductDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeProvisionedProduct
+      Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
     outputs:
-      - Name: ProvisionedProductDetail
-        Type: StringMap
-        Selector: '$.ProvisionedProductDetail'
-    onFailure: step:PushFailureStatusToEventBridge
-    nextStep: PushMetadataToEventBridge
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.ProvisionedProductDetail.Status'
+      - Name: StatusMessage
+        Type: String
+        Selector: '$.ProvisionedProductDetail.StatusMessage'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: AVAILABLE
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: ERROR
+      Default: PushFailureStatusToEventBridge
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
@@ -119,7 +141,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED", "StatusMessage": "{{ GetProvisionedProductDetail.StatusMessage }}" }'
           DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

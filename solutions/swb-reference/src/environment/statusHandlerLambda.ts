@@ -74,6 +74,10 @@ export async function handler(event: any) {
     instanceId,
     recordOutputKeys,
     status: status.toUpperCase(),
+    // TODO: This propagates statusMsg only for launch/terminate failure events. Add logic for propagating start/stop failure event messages
+    statusMsg: _.isObject(event.detail.StatusMessage)
+      ? JSON.stringify(event.detail.StatusMessage)
+      : event.detail.StatusMessage,
     operation: event.detail.Operation,
     metadata: event
   };

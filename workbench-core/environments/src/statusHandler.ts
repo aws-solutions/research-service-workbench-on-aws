@@ -30,7 +30,8 @@ export default class StatusHandler {
     const eventBusTime = event.metadata.time;
 
     // Check if status already applied, or if this is an outdated event
-    // But perform status update regardless if operation is "Launch" since SSM doc sends important details
+    // But perform status update regardless if
+    // 1. operation is "Launch" since SSM doc sends important details
     if (
       (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) || envDetails.status === event.status) &&
       event.operation !== 'Launch'
@@ -39,10 +40,11 @@ export default class StatusHandler {
       return;
     }
 
-    envDetails.status = event.status;
-
     // Update env status using data from event bridge
-    await envService.updateEnvironment(envId, { status: event.status });
+    await envService.updateEnvironment(envId, {
+      status: event.status,
+      statusMsg: event.statusMsg || envDetails.statusMsg
+    });
 
     // The next few DDB updates are only needed during environment provisioning
     if (event.operation !== 'Launch') {
