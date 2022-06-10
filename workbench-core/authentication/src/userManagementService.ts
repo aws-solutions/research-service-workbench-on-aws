@@ -136,7 +136,7 @@ export default class UserManagementService {
   /**
    * Delete the given role. It is recommended implementers check to
    * ensure an empty role before deletion to help guard against accidental
-   * deletin.
+   * deletion.
    * @param role - the role to remove.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
