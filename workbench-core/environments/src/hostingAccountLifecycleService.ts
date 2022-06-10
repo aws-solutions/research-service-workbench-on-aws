@@ -304,6 +304,7 @@ export default class HostingAccountLifecycleService {
   }
 
   private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+    console.log(`Sharing AMIs: [${amisToShare}] with account ${targetAccountId}`);
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {
@@ -320,6 +321,7 @@ export default class HostingAccountLifecycleService {
    * Make an API call to SSM in the main account to share SSM documents for launch/terminate with the hosting account.
    */
   private async _shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
+    console.log(`Sharing SSM documents: [${ssmDocuments}]`);
     for (const ssmDoc of ssmDocuments) {
       const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
       await this._aws.clients.ssm.modifyDocumentPermission(params);
