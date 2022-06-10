@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 
 import { AwsService } from '@amzn/workbench-core-base';
-import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { BatchGetItemCommandOutput, GetItemCommandOutput, AttributeValue } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
@@ -32,6 +32,30 @@ interface Environment {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
 }
+
+interface QueryParams {
+  index?: string;
+  key?: { name: string; value: unknown };
+  sortKey?: string;
+  eq?: AttributeValue;
+  lt?: AttributeValue;
+  lte?: AttributeValue;
+  gt?: AttributeValue;
+  gte?: AttributeValue;
+  between?: { value1: AttributeValue; value2: AttributeValue };
+  begins?: AttributeValue;
+  start?: { [key: string]: unknown };
+  filter?: string;
+  strong?: boolean;
+  names?: { [key: string]: string };
+  values?: { [key: string]: unknown };
+  projection?: string | string[];
+  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
+  limit?: number;
+  forward?: boolean;
+  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+}
+
 const defaultEnv: Environment = {
   id: '',
   instanceId: '',
@@ -119,38 +143,45 @@ export default class EnvironmentService {
     user: { role: string; ownerId: string },
     filter?: { status?: EnvironmentStatus },
     limit?: number,
-    paginationToken?: number
-  ): Promise<Environment[]> {
+    paginationToken?: string
+  ): Promise<{ envs: Environment[]; token: string | undefined }> {
     let environments: Environment[] = [];
-    let data;
+
+    const queryParams: QueryParams = {
+      key: { name: 'resourceType', value: 'environment' }
+    };
 
     if (user.role === 'admin') {
       if (filter && filter.status) {
         // if admin and status is selected in the filter, use GSI getResourceByStatus
-        const queryParams = {
-          index: 'getResourceByStatus',
-          key: { name: 'resourceType', value: 'environment' },
-          sortKey: 'status',
-          eq: { S: filter.status }
-        };
-        data = await this._aws.helpers.ddb.query(queryParams).execute();
+        queryParams.index = 'getResourceByStatus';
+        queryParams.sortKey = 'status';
+        queryParams.eq = { S: filter.status };
       } else {
         // if admin, use GSI getResourceByUpdatedAt
-        const queryParams = {
-          index: 'getResourceByUpdatedAt',
-          key: { name: 'resourceType', value: 'environment' }
-        };
-        data = await this._aws.helpers.ddb.query(queryParams).execute();
+        queryParams.index = 'getResourceByUpdatedAt';
       }
     } else {
-      const queryParams = {
-        index: 'getResourceByOwner',
-        key: { name: 'resourceType', value: 'environment' },
-        sortKey: 'owner',
-        eq: { S: user.ownerId }
-      };
-      data = await this._aws.helpers.ddb.query(queryParams).execute();
+      queryParams.index = 'getResourceByOwner';
+      queryParams.sortKey = 'owner';
+      queryParams.eq = { S: user.ownerId };
     }
+
+    // If limit is defined and non zero, add param
+    if (limit && limit > 0) {
+      queryParams.limit = limit;
+    }
+    // If paginationToken is defined, add param
+    // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
+    if (paginationToken) {
+      try {
+        queryParams.start = JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8'));
+      } catch (error) {
+        throw new Error('Invalid paginationToken');
+      }
+    }
+
+    const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
     // check that Items is defined
     if (data && data.Items) {
@@ -163,7 +194,10 @@ export default class EnvironmentService {
         return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
       });
     }
-    return environments;
+    const token = data.LastEvaluatedKey
+      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
+      : undefined;
+    return { envs: environments, token };
   }
 
   public async updateEnvironment(

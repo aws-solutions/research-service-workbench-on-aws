@@ -157,16 +157,23 @@ export function setUpEnvRoutes(
         role: 'admin',
         ownerId: ''
       };
-      const { status } = req.query;
+      const { status, token, pageSize } = req.query;
       let filter = undefined;
       if (isEnvironmentStatus(status)) {
         filter = {
           status
         };
       }
-      // TODO: Add support for pagination with limit and pagination token
-      const env = await environmentService.getEnvironments(user, filter);
-      res.send(env);
+      let pagToken = undefined;
+      if (typeof token === 'string') {
+        pagToken = token;
+      }
+      let limit: number = 0;
+      if (pageSize) {
+        limit = +pageSize;
+      }
+      const response = await environmentService.getEnvironments(user, filter, limit, pagToken);
+      res.send(response);
     })
   );
 }
