@@ -20,7 +20,7 @@
     },
     {
       "name": "@amzn/workbench-core-authentication",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-base",
@@ -121,6 +121,14 @@
     {
       "name": "@babel/core",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-flow",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@babel/plugin-transform-react-jsx",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@babel/preset-env",
@@ -231,6 +239,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cookie-parser",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -331,12 +343,20 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "pkce-challenge",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "react-scripts",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "sass",
@@ -372,7 +392,11 @@
     },
     {
       "name": "uuid",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "web-vitals",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "winston",

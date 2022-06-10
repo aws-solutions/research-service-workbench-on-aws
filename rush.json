@@ -108,6 +108,18 @@
       "shouldPublish": false
     },
     {
+      "packageName": "@amzn/workbench-core-example-auth-frontend",
+      "projectFolder": "workbench-core/example/auth-frontend",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-example-auth-backend",
+      "projectFolder": "workbench-core/example/auth-backend",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
       "packageName": "@amzn/swb-ui",
       "projectFolder": "solutions/swb-ui",
       "reviewCategory": "production",
