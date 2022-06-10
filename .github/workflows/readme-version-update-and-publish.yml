@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Readme-commit-test
+name: Readme-Version-update-and-publish
 on:
   workflow_call:
     secrets:

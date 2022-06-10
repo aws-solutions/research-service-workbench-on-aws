@@ -43,6 +43,10 @@ runs:
       shell: bash
       run: node common/scripts/install-run-rush.js check
 
+    # - name: Rush change verify
+    #   shell: bash
+    #   run: node common/scripts/install-run-rush.js change --verify
+
     - name: Rush build
       shell: bash
       run: node common/scripts/install-run-rush.js build --verbose
