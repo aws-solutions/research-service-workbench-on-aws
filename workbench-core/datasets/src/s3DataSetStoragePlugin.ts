@@ -1,5 +1,5 @@
 import { AwsService } from '@amzn/workbench-core-base';
-import { AnyPrincipal, ArnPrincipal, Effect, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import {
   GetBucketPolicyCommandInput,
   GetBucketPolicyCommandOutput,
@@ -14,7 +14,7 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { Credentials } from '@aws-sdk/types';
-import _ from 'lodash';
+import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
 /**
@@ -71,7 +71,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   ): Promise<string> {
     const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName);
     await this._configureBucketPolicy(name, accessPointArn);
-
     await this._configureAccessPointPolicy(
       name,
       path,
@@ -79,7 +78,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       accessPointArn,
       externalRoleName
     );
-
     return `s3://${accessPointArn}/${path}/`;
   }
 
@@ -135,17 +133,23 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     };
     const s3BucketArn: string = `arn:aws:s3:::${name}`;
     const accountId: string = this._awsAccountIdFromArn(accessPointArn);
-    const delegationStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
-      principals: [new AnyPrincipal()],
-      actions: ['*'], // this will be limted in the access point policy.
-      resources: [s3BucketArn, `${s3BucketArn}/*`],
-      conditions: {
-        StringEquals: {
-          's3:DataAccessPointAccount': accountId
+
+    const delegationStatement = PolicyStatement.fromJson(
+      JSON.parse(`
+     {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"*"
+      },
+      "Action": "*",
+      "Resource": ["${s3BucketArn}", "${s3BucketArn}/*"],
+      "Condition": {
+        "StringEquals": {
+          "s3:DataAccessPointAccount": "${accountId}"
+          }
         }
-      }
-    });
+      }`)
+    );
 
     const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
       getBucketPolicyConfig
@@ -157,14 +161,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       bucketPolicy = new PolicyDocument();
     }
 
-    if (
-      this._policyContainsStatement(bucketPolicy, this._isBucketDelegationStatement, {
-        accountId: accountId,
-        s3BucketArn: s3BucketArn
-      })
-    ) {
-      return;
-    }
+    if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
 
     bucketPolicy.addStatements(delegationStatement);
 
@@ -183,19 +180,31 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     accessPointArn: string,
     externalRoleArn: string
   ): Promise<void> {
-    const listBucketPolicyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
-      principals: [new ArnPrincipal(externalRoleArn)],
-      actions: ['s3:ListBucket'],
-      resources: [accessPointArn]
-    });
+    const listBucketPolicyStatement = PolicyStatement.fromJson(
+      JSON.parse(`
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"${externalRoleArn}"
+      },
+      "Action": "s3:ListBucket",
+      "Resource": "${accessPointArn}"
+    }
+    `)
+    );
 
-    const getPutBucketPolicyStatement = new PolicyStatement({
-      effect: Effect.ALLOW,
-      principals: [new ArnPrincipal(externalRoleArn)],
-      actions: ['s3:GetObject', 's3:PutObject'],
-      resources: [`${accessPointArn}/object/${dataSetPrefix}/*`]
-    });
+    const getPutBucketPolicyStatement = PolicyStatement.fromJson(
+      JSON.parse(`
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"${externalRoleArn}"
+      },
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "${accessPointArn}/object/${dataSetPrefix}/*"
+    }
+    `)
+    );
 
     const accountId: string = this._awsAccountIdFromArn(accessPointArn);
     const getPolicyParams: GetAccessPointPolicyCommandInput = {
@@ -214,23 +223,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
     let isDirty: boolean = false;
 
-    if (
-      !this._policyContainsStatement(apPolicy, this._isListBucketAccessPolicyStatement, {
-        accessPointArn: accessPointArn,
-        externalRoleArn: externalRoleArn
-      })
-    ) {
+    if (!IamHelper.policyDocumentContainsStatement(apPolicy, listBucketPolicyStatement)) {
       isDirty = true;
       apPolicy.addStatements(listBucketPolicyStatement);
     }
 
-    if (
-      this._policyContainsStatement(apPolicy, this._isGetPutAccessPolicyStatement, {
-        accessPointArn: accessPointArn,
-        externalRoleArn: externalRoleArn,
-        path: dataSetPrefix
-      })
-    ) {
+    if (IamHelper.policyDocumentContainsStatement(apPolicy, getPutBucketPolicyStatement)) {
       if (!isDirty) return;
     } else {
       apPolicy.addStatements(getPutBucketPolicyStatement);
@@ -256,84 +254,5 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     }
 
     return arnParts[4];
-  }
-
-  private _policyContainsStatement(
-    policy: PolicyDocument,
-    comparer: (statement: PolicyStatement, args: Record<string, string>) => boolean,
-    comparerArgs: Record<string, string>
-  ): boolean {
-    const policyObj = policy.toJSON();
-    if (!policyObj || !policyObj.Statement) return false;
-    if (_.find(policyObj.Statement, (s) => s && comparer(PolicyStatement.fromJson(s), comparerArgs))) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private _isListBucketAccessPolicyStatement(
-    statement: PolicyStatement,
-    args: Record<string, string>
-  ): boolean {
-    const accessPointArn: string = args.accessPointArn;
-    const externalRoleArn: string = args.externalRoleArn;
-    if (!statement.hasPrincipal) return false;
-    if (
-      !statement.principals.find(
-        (p) => JSON.stringify(p.policyFragment.principalJson) === `{"AWS":"${externalRoleArn}"}`
-      )
-    )
-      return false;
-    if (statement.effect !== Effect.ALLOW) return false;
-    if (statement.actions.length !== 1) return false;
-    if (!statement.actions.includes('s3:ListBucket')) return false;
-    if (statement.resources.length !== 1) return false;
-    if (!statement.resources.includes(accessPointArn)) return false;
-    return true;
-  }
-
-  private _isGetPutAccessPolicyStatement(statement: PolicyStatement, args: Record<string, string>): boolean {
-    const accessPointArn: string = args.accessPointArn;
-    const externalRoleArn: string = args.externalRoleArn;
-    const path: string = args.path;
-    if (!statement.hasPrincipal) return false;
-    if (
-      !statement.principals.find(
-        (p) => JSON.stringify(p.policyFragment.principalJson) === `{"AWS":"${externalRoleArn}"}`
-      )
-    )
-      return false;
-    if (statement.effect !== Effect.ALLOW) return false;
-    if (statement.actions.length !== 2) return false;
-    if (!statement.actions.includes('s3:GetObject')) return false;
-    if (!statement.actions.includes('s3:PutObject')) return false;
-    if (statement.resources.length !== 1) return false;
-    const resourceString = `${accessPointArn}/object/${path}/*`;
-    if (!statement.resources.includes(resourceString)) return false;
-
-    return true;
-  }
-
-  private _isBucketDelegationStatement(statement: PolicyStatement, args: Record<string, string>): boolean {
-    const accountId: string = args.accountId;
-    const s3BucketArn: string = args.s3BucketArn;
-
-    // principal should be the "AWS: *"
-    if (!statement.hasPrincipal) return false;
-    if (!statement.principals.find((p) => JSON.stringify(p.policyFragment.principalJson) === `{"AWS":"*"}`))
-      return false;
-    if (statement.effect !== Effect.ALLOW) return false;
-    if (statement.actions.length !== 1) return false;
-    if (!statement.actions.includes('*')) return false;
-    if (statement.resources.length !== 2) return false;
-    if (!statement.resources.includes(s3BucketArn)) return false;
-    if (!statement.resources.includes(`${s3BucketArn}/*`)) return false;
-    const conditions = statement.conditions;
-    const stringEqualsCondition = _.get(conditions, 'StringEquals');
-    if (!stringEqualsCondition) return false;
-    const accessAccountCondition = stringEqualsCondition['s3:DataAccessPointAccount'];
-    if (!accessAccountCondition) return false;
-    return accessAccountCondition === accountId;
   }
 }
