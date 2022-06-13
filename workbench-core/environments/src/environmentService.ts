@@ -131,7 +131,6 @@ export default class EnvironmentService {
     }
   }
 
-  // TODO: Implement limit and paginationToken will be used for next task
   /**
    * Get all environments with option to filter by status
    * @param user - User information
