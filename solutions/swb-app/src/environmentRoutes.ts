@@ -168,7 +168,7 @@ export function setUpEnvRoutes(
       let limit: number = 0;
       if (typeof paginationToken === 'string' && pageSize) {
         pagToken = paginationToken;
-        limit = +pageSize;
+        limit = Number(pageSize);
       } else {
         res.status(400).send('Invalid pagination token or page size. Please try again with valid inputs.');
       }

@@ -112,13 +112,13 @@ export default class EnvironmentService {
    * Get all environments with option to filter by status
    * @param user - User information
    * @param filter - Provide which attribute to filter by
-   * @param limit - Number of results per page
+   * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    */
   public async getEnvironments(
     user: { role: string; ownerId: string },
     filter?: { status?: EnvironmentStatus },
-    limit?: number,
+    pageSize: number = 50,
     paginationToken?: string
   ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
     let environments: Environment[] = [];
@@ -144,8 +144,8 @@ export default class EnvironmentService {
     }
 
     // If limit is defined and non zero, add param
-    if (limit && limit > 0) {
-      queryParams.limit = limit;
+    if (pageSize && pageSize > 0) {
+      queryParams.limit = pageSize;
     }
     // If paginationToken is defined, add param
     // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
