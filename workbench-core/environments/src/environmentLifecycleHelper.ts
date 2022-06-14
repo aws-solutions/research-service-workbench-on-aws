@@ -7,62 +7,68 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 
 export type Operation = 'Launch' | 'Terminate';
+
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
   public ssmDocSuffix: string;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_NAME_SUFFIX!;
-    this.aws = new AwsService({ region: process.env.AWS_REGION! });
+    this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
   }
 
   public async launch(payload: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
     envType: string;
-    accountId: string;
-    productId: string;
-  }): Promise<{ [id: string]: string }> {
-    const updatedPayload = payload;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    envMetadata: any;
+  }): Promise<void> {
+    const updatedPayload = {
+      envMgmtRoleArn: payload.envMetadata.PROJ.envMgmtRoleArn,
+      externalId: payload.envMetadata.PROJ.externalId,
+      operation: payload.operation,
+      envType: payload.envType,
+      ssmParameters: payload.ssmParameters
+    };
 
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      accountId: payload.accountId,
+      envMgmtRoleArn: payload.envMetadata.PROJ.envMgmtRoleArn,
+      externalId: payload.envMetadata.PROJ.externalId,
       operation: payload.operation,
       envType: payload.envType
-      // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
-      // Note: empty string is not the same as undefined
-      // externalId: <accountIdDDBMetadata>.externalId
     });
 
-    const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
-      ProductId: payload.productId
-    });
-    updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
-    return this.executeSSMDocument(updatedPayload);
+    try {
+      const listLaunchPathResponse = await hostAwsSdk.clients.serviceCatalog.listLaunchPaths({
+        ProductId: payload.envMetadata.ETC.productId
+      });
+      updatedPayload.ssmParameters.PathId = [listLaunchPathResponse.LaunchPathSummaries![0]!.Id!];
+      await this.executeSSMDocument(updatedPayload);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
+
   /**
    * Executing SSM Document in hosting account with provided envMetadata
-   *
-   * TODO: Return and store DDB entry for environment
    */
   public async executeSSMDocument(payload: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
     envType: string;
-    accountId: string;
-  }): Promise<{ [id: string]: string }> {
+    envMgmtRoleArn: string;
+    externalId?: string;
+  }): Promise<void> {
     // Get SSM doc ARN from main account CFN stack (shared documents need to send ARN)
     const ssmDocArn = await this.getSSMDocArn(`${payload.envType}${payload.operation}${this.ssmDocSuffix}`);
 
     // Assume hosting account EnvMgmt role
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
-      accountId: payload.accountId,
+      envMgmtRoleArn: payload.envMgmtRoleArn,
+      externalId: payload.externalId,
       operation: payload.operation,
       envType: payload.envType
-      // TODO: Get the same external ID as used during this hosting account's onboarding from DDB and use it here
-      // Note: empty string is not the same as undefined
-      // externalId: <accountIdDDBMetadata>.externalId
     });
 
     // Execute SSM document in hosting account
@@ -72,8 +78,6 @@ export default class EnvironmentLifecycleHelper {
         Parameters: payload.ssmParameters
       });
     }
-
-    return { envId: 'sampleEnvId' };
   }
 
   public async getSSMDocArn(ssmDocOutputName: string): Promise<string> {
@@ -83,7 +87,7 @@ export default class EnvironmentLifecycleHelper {
     const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
 
     const ssmDocOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
-      return output.OutputKey && output.OutputKey === ssmDocOutputName;
+      return output.OutputKey && output.OutputKey.toLowerCase() === ssmDocOutputName.toLowerCase();
     });
     if (ssmDocOutput && ssmDocOutput.OutputValue) {
       return ssmDocOutput.OutputValue;
@@ -92,50 +96,22 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
-  public async getEnvMgmtRoleArn(accountId: string): Promise<string> {
-    // TODO: Get metadata from DDB for the given hosting account ID, and return its EnvMgmtRoleArn
-    return Promise.resolve(`arn:aws:iam::${accountId}:role/EnvMgmtRole`);
-  }
-
   public async getAwsSdkForEnvMgmtRole(payload: {
-    operation: string;
-    accountId: string;
-    envType: string;
+    envMgmtRoleArn: string;
     externalId?: string;
+    operation: string;
+    envType: string;
   }): Promise<AwsService> {
-    const envMgmtRoleArn = await this.getEnvMgmtRoleArn(payload.accountId);
-    const hostAwsSdk = await this.aws.getAwsServiceForRole({
-      roleArn: envMgmtRoleArn,
+    console.log(`Assuming EnvMgmt role ${payload.envMgmtRoleArn} with externalId ${payload.externalId}`);
+    const params = {
+      roleArn: payload.envMgmtRoleArn,
       roleSessionName: `${payload.operation}-${payload.envType}-${Date.now()}`,
       region: process.env.AWS_REGION!,
       externalId: payload.externalId
-    });
-
-    return hostAwsSdk;
-  }
-
-  /*
-   * Store new/updated environment metadata information in DDB
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async storeToDdb(envMetadata: any): Promise<void> {
-    // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
-    return Promise.resolve();
-  }
-
-  /*
-   * Get main account's EventBridge bus arn
-   */
-  public async getMainEventBusArn(): Promise<string> {
-    const describeStackParam = {
-      StackName: process.env.STACK_NAME!
     };
 
-    const stackDetails = await this.aws.clients.cloudformation.describeStacks(describeStackParam);
+    const hostSdk = await this.aws.getAwsServiceForRole(params);
 
-    const eventBusArnOutput = stackDetails.Stacks![0].Outputs!.find((output: Output) => {
-      return output.OutputKey && output.OutputKey === process.env.MAIN_ACCOUNT_BUS_ARN_NAME!;
-    });
-    return eventBusArnOutput?.OutputValue!;
+    return hostSdk;
   }
 }

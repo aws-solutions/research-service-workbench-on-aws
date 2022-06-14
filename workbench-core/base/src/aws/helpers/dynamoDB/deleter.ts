@@ -4,6 +4,7 @@
  */
 
 import { AttributeValue, DeleteItemCommandInput, DeleteItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
 import DynamoDB from '../../clients/dynamoDB';
 
@@ -189,6 +190,7 @@ class Deleter {
   /**
    * Sends the internal parameters as input to the DynamoDB table to execute the delete request. Call this after populating the command input params with the above methods.
    * Attributes will appear in the response only if ReturnValues=ALL_OLD was set before the command.
+   * Attributes are returned unmarshalled.
    *
    * @returns The output from the delete item command
    *
@@ -203,7 +205,12 @@ class Deleter {
    * ```
    */
   public async execute(): Promise<DeleteItemCommandOutput> {
-    return await this._ddb.delete(this._params);
+    const result = await this._ddb.delete(this._params);
+    if (result.Attributes) {
+      result.Attributes = unmarshall(result.Attributes);
+    }
+
+    return result;
   }
 }
 

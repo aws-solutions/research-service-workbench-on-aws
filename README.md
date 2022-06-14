@@ -1,4 +1,4 @@
-# Worflow Status
+# Workflow Status
 [![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
@@ -12,7 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-92.9%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-88.92%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-95.07%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-93.29%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-90.64%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.87%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-92.48%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-91%25-brightgreen.svg?style=flat) |
 
 # Contributing Guidelines
 

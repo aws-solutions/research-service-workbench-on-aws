@@ -6,6 +6,9 @@
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
+  // Example iso date string 2022-05-16T21:29:23.461Z
+  const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
   describe('batchEdit', () => {
     test('should succeed with no optional params', async () => {
@@ -24,7 +27,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: addDeleteRequest', async () => {
       // BUILD
-      const developerParams = { addDeleteRequest: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } } };
+      const developerParams = { addDeleteRequest: { pk: 'samplePK', sk: 'sampleSK' } };
       const expectedParams = {
         RequestItems: {
           'some-table': [
@@ -48,7 +51,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: addWriteRequest', async () => {
       // BUILD
-      const developerParams = { addWriteRequest: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } } };
+      const developerParams = { addWriteRequest: { pk: 'samplePK', sk: 'sampleSK' } };
       const expectedParams = {
         RequestItems: {
           'some-table': [
@@ -56,7 +59,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK' },
-                  sk: { S: 'sampleSK' }
+                  sk: { S: 'sampleSK' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             }
@@ -68,14 +73,14 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toEqual(expectedParams);
+      expect(generatedParams).toMatchObject(expectedParams);
     });
     test('should populate params with optional param: addDeleteRequests', async () => {
       // BUILD
       const developerParams = {
         addDeleteRequests: [
-          { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
-          { pk: { S: 'samplePK2' }, sk: { S: 'sampleSK2' } }
+          { pk: 'samplePK', sk: 'sampleSK' },
+          { pk: 'samplePK2', sk: 'sampleSK2' }
         ]
       };
       const expectedParams = {
@@ -111,8 +116,8 @@ describe('DynamoDBService', () => {
       // BUILD
       const developerParams = {
         addWriteRequests: [
-          { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
-          { pk: { S: 'samplePK2' }, sk: { S: 'sampleSK2' } }
+          { pk: 'samplePK', sk: 'sampleSK' },
+          { pk: 'samplePK2', sk: 'sampleSK2' }
         ]
       };
       const expectedParams = {
@@ -122,7 +127,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK' },
-                  sk: { S: 'sampleSK' }
+                  sk: { S: 'sampleSK' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             },
@@ -130,7 +137,9 @@ describe('DynamoDBService', () => {
               PutRequest: {
                 Item: {
                   pk: { S: 'samplePK2' },
-                  sk: { S: 'sampleSK2' }
+                  sk: { S: 'sampleSK2' },
+                  createdAt: { S: expect.stringMatching(isoStringRegex) },
+                  updatedAt: { S: expect.stringMatching(isoStringRegex) }
                 }
               }
             }
@@ -142,13 +151,13 @@ describe('DynamoDBService', () => {
       const generatedParams = dbService.batchEdit(developerParams).getParams();
 
       // CHECK
-      expect(generatedParams).toEqual(expectedParams);
+      expect(generatedParams).toMatchObject(expectedParams);
     });
   });
   describe('deleter', () => {
     test('should suceed with no optional params', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table'
@@ -162,7 +171,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: condition', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { condition: 'attribute_exists(toDelete)' };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -178,7 +187,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: names', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { names: { '#P': 'Percentile' } };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -194,8 +203,8 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: values', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
-      const developerParams = { values: { ':P': { S: 'Percentile' } } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
+      const developerParams = { values: { ':P': 'Percentile' } };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
@@ -210,7 +219,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -226,7 +235,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = ALL_OLD', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'ALL_OLD' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -242,7 +251,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = indexes', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -258,7 +267,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = total', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -274,7 +283,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = none', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -290,7 +299,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: metrics = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { metrics: 'NONE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -306,7 +315,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: metrics = SIZE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { metrics: 'SIZE' as const };
       const expectedParams = {
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -325,8 +334,11 @@ describe('DynamoDBService', () => {
     // Get Item
     test('single get should populate params with no optional params', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
-      const expectedParams = { Key: { pk: { S: 'testId' }, sk: { S: 'testId' } }, TableName: 'some-table' };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
+      const expectedParams = {
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
+        TableName: 'some-table'
+      };
 
       // OPERATE
       const generatedItemParams = dbService.get(key).getItemParams();
@@ -338,10 +350,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: strong = true', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { strong: true };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ConsistentRead: true
       };
@@ -356,9 +368,12 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: strong = false', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { strong: false };
-      const expectedParams = { Key: { pk: { S: 'testId' }, sk: { S: 'testId' } }, TableName: 'some-table' };
+      const expectedParams = {
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
+        TableName: 'some-table'
+      };
 
       // OPERATE
       const generatedItemParams = dbService.get(key, developerParams).getItemParams();
@@ -370,10 +385,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: names', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { names: { '#P': 'Percentile' } };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ExpressionAttributeNames: { '#P': 'Percentile' }
       };
@@ -388,10 +403,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: projection', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { projection: 'status' };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ProjectionExpression: 'status'
       };
@@ -406,10 +421,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: projection list', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { projection: ['status', 'createdBy'] };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ExpressionAttributeNames: { '#createdBy': 'createdBy', '#status': 'status' },
         ProjectionExpression: '#status, #createdBy'
@@ -425,10 +440,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ReturnConsumedCapacity: 'INDEXES'
       };
@@ -443,10 +458,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ReturnConsumedCapacity: 'TOTAL'
       };
@@ -461,10 +476,10 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with optional param: capacity = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ReturnConsumedCapacity: 'NONE'
       };
@@ -479,7 +494,7 @@ describe('DynamoDBService', () => {
     });
     test('single get should populate params with all optional params', async () => {
       // BUILD
-      const key = { pk: { S: 'testId' }, sk: { S: 'testId' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = {
         strong: true,
         names: { '#P': 'Percentile' },
@@ -487,7 +502,7 @@ describe('DynamoDBService', () => {
         capacity: 'NONE' as const
       };
       const expectedParams = {
-        Key: { pk: { S: 'testId' }, sk: { S: 'testId' } },
+        Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
         TableName: 'some-table',
         ConsistentRead: true,
         ExpressionAttributeNames: { '#createdBy': 'createdBy', '#status': 'status', '#P': 'Percentile' },
@@ -507,8 +522,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with no optional params', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const expectedParams = {
         RequestItems: {
@@ -532,8 +547,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: strong = true', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { strong: true };
       const expectedParams = {
@@ -559,8 +574,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: strong = false', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { strong: false };
       const expectedParams = {
@@ -585,8 +600,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: names', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { names: { '#P': 'Percentile' } };
       const expectedParams = {
@@ -612,8 +627,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: projection', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { projection: 'status' };
       const expectedParams = {
@@ -639,8 +654,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: projection list', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { projection: ['status', 'createdBy'] };
       const expectedParams = {
@@ -667,8 +682,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
@@ -694,8 +709,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
@@ -721,8 +736,8 @@ describe('DynamoDBService', () => {
     test('batch get should populate params with optional param: capacity = NONE', async () => {
       // BUILD
       const key = [
-        { pk: { S: 'testId' }, sk: { S: 'testId' } },
-        { pk: { S: 'testId2' }, sk: { S: 'testId2' } }
+        { pk: 'testId', sk: 'testId' },
+        { pk: 'testId2', sk: 'testId2' }
       ];
       const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
@@ -775,7 +790,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: key', async () => {
       // BUILD
-      const developerParams = { key: { name: 'keyName', value: { S: 'keyValue' } } };
+      const developerParams = { key: { name: 'keyName', value: 'keyValue' } };
       const expectedParams = {
         TableName: 'some-table',
         ExpressionAttributeNames: { '#keyName': 'keyName' },
@@ -910,7 +925,7 @@ describe('DynamoDBService', () => {
     test('should populate params with optional param: key and sort key and eq', async () => {
       // BUILD
       const developerParams = {
-        key: { name: 'partitionKeyName', value: { S: 'partitionKeyValue' } },
+        key: { name: 'partitionKeyName', value: 'partitionKeyValue' },
         sortKey: 'sortKey',
         eq: { S: 'sortKeyEqValue' }
       };
@@ -954,7 +969,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: start', async () => {
       // BUILD
-      const developerParams = { start: { lastEvaluatedPk: { S: 'pk' }, lastEvaluatedSk: { S: 'sk' } } };
+      const developerParams = { start: { lastEvaluatedPk: 'pk', lastEvaluatedSk: 'sk' } };
       const expectedParams = {
         TableName: 'some-table',
         ExclusiveStartKey: { lastEvaluatedPk: { S: 'pk' }, lastEvaluatedSk: { S: 'sk' } }
@@ -1023,7 +1038,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: values', async () => {
       // BUILD
-      const developerParams = { values: { ':P': { S: 'Percentile' } } };
+      const developerParams = { values: { ':P': 'Percentile' } };
       const expectedParams = {
         TableName: 'some-table',
         ExpressionAttributeValues: { ':P': { S: 'Percentile' } }
@@ -1243,7 +1258,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: start', async () => {
       // BUILD
-      const developerParams = { start: { lastEvaluatedPk: { S: 'pk' }, lastEvaluatedSk: { S: 'sk' } } };
+      const developerParams = { start: { lastEvaluatedPk: 'pk', lastEvaluatedSk: 'sk' } };
       const expectedParams = {
         TableName: 'some-table',
         ExclusiveStartKey: { lastEvaluatedPk: { S: 'pk' }, lastEvaluatedSk: { S: 'sk' } }
@@ -1312,7 +1327,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: values', async () => {
       // BUILD
-      const developerParams = { values: { ':P': { S: 'Percentile' } } };
+      const developerParams = { values: { ':P': 'Percentile' } };
       const expectedParams = {
         TableName: 'some-table',
         ExpressionAttributeValues: { ':P': { S: 'Percentile' } }
@@ -1484,7 +1499,7 @@ describe('DynamoDBService', () => {
   describe('updater', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const expectedParams = {
         TableName: 'some-table',
         Key: { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } },
@@ -1499,12 +1514,12 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: item', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       // must include disableCreatedAt and disableUpdateAt as true so the tests pass
       const developerParams = {
         disableCreatedAt: true,
         disableUpdatedAt: true,
-        item: { newAttribute: { S: 'newValue' } }
+        item: { newAttribute: 'newValue' }
       };
       const expectedParams = {
         TableName: 'some-table',
@@ -1525,14 +1540,14 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: set and names and values', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       // must include disableCreatedAt and disableUpdateAt as true so the tests pass
       const developerParams = {
         disableCreatedAt: true,
         disableUpdatedAt: true,
         set: '#newAttribute = :newValue',
         names: { '#newAttribute': 'newAttribute' },
-        values: { ':newValue': { S: 'newValue' } }
+        values: { ':newValue': 'newValue' }
       };
       const expectedParams = {
         TableName: 'some-table',
@@ -1553,14 +1568,14 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: add and names and values', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       // must include disableCreatedAt and disableUpdateAt as true so the tests pass
       const developerParams = {
         disableCreatedAt: true,
         disableUpdatedAt: true,
         add: '#myNum :newValue',
         names: { '#myNum': 'myNum' },
-        values: { ':newValue': { S: 'newValue' } }
+        values: { ':newValue': 'newValue' }
       };
       const expectedParams = {
         TableName: 'some-table',
@@ -1581,7 +1596,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: remove and names', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       // must include disableCreatedAt and disableUpdateAt as true so the tests pass
       const developerParams = {
         disableCreatedAt: true,
@@ -1605,14 +1620,14 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: delete and names', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       // must include disableCreatedAt and disableUpdateAt as true so the tests pass
       const developerParams = {
         disableCreatedAt: true,
         disableUpdatedAt: true,
         delete: '#itemToDeleteFrom :itemToDelete',
         names: { '#itemToDeleteFrom': 'itemToDeleteFrom' },
-        values: { ':itemToDelete': { S: 'itemToDelete' } }
+        values: { ':itemToDelete': 'itemToDelete' }
       };
       const expectedParams = {
         TableName: 'some-table',
@@ -1633,7 +1648,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1649,7 +1664,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = ALL_OLD', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'ALL_OLD' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1665,7 +1680,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = UPDATED_OLD', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'UPDATED_OLD' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1681,7 +1696,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = ALL_NEW', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'ALL_NEW' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1697,7 +1712,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: return = UPDATED_NEW', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { return: 'UPDATED_NEW' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1713,7 +1728,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: metrics = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { metrics: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1730,7 +1745,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: metrics = SIZE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { metrics: 'SIZE' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1747,7 +1762,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = INDEXES', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'INDEXES' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1764,7 +1779,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = TOTAL', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'TOTAL' as const };
       const expectedParams = {
         TableName: 'some-table',
@@ -1781,7 +1796,7 @@ describe('DynamoDBService', () => {
     });
     test('should populate params with optional param: capacity = NONE', async () => {
       // BUILD
-      const key = { pk: { S: 'samplePK' }, sk: { S: 'sampleSK' } };
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
       const developerParams = { capacity: 'NONE' as const };
       const expectedParams = {
         TableName: 'some-table',

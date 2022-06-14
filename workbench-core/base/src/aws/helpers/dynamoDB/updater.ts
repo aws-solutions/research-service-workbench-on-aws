@@ -5,6 +5,7 @@
  */
 
 import { AttributeValue, UpdateItemCommandInput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
 import DynamoDB from '../../clients/dynamoDB';
 
@@ -506,6 +507,7 @@ class Updater {
   /**
    * Sends the internal parameters as input to the DynamoDB table to execute the update item request. Call this after populating the command input params with the above methods.
    * Attributes will appear in the response only if ReturnValues does not equal NONE was set before the command.
+   * Attributes are returned unmarshalled.
    *
    * @returns The output from the update item command
    *
@@ -520,7 +522,11 @@ class Updater {
    * ```
    */
   public async execute(): Promise<UpdateItemCommandOutput> {
-    return await this._ddb.update(this._internals.toParams());
+    const result = await this._ddb.update(this._internals.toParams());
+    if (result.Attributes) {
+      result.Attributes = unmarshall(result.Attributes);
+    }
+    return result;
   }
 }
 

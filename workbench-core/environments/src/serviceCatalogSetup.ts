@@ -1,14 +1,11 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 
 import fs from 'fs';
+
 import { join } from 'path';
 import { AwsService } from '@amzn/workbench-core-base';
-import {
-  InvalidParametersException,
-  ListPortfoliosCommandInput,
-  PortfolioDetail,
-  ProductViewDetail
-} from '@aws-sdk/client-service-catalog';
+import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
+
 import md5File from 'md5-file';
 
 export default class ServiceCatalogSetup {
@@ -16,7 +13,7 @@ export default class ServiceCatalogSetup {
   private _constants: {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
-    PORTFOLIO_NAME: string;
+    SC_PORTFOLIO_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     STACK_NAME: string;
@@ -25,7 +22,7 @@ export default class ServiceCatalogSetup {
   public constructor(constants: {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
-    PORTFOLIO_NAME: string;
+    SC_PORTFOLIO_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     STACK_NAME: string;
@@ -39,15 +36,15 @@ export default class ServiceCatalogSetup {
   public async run(cfnFilePaths: string[]): Promise<void> {
     const {
       S3_ARTIFACT_BUCKET_SC_PREFIX,
-      PORTFOLIO_NAME,
+      SC_PORTFOLIO_NAME,
       STACK_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME
     } = this._constants;
-    const portfolioName = PORTFOLIO_NAME;
+    const portfolioName = SC_PORTFOLIO_NAME;
 
     // Create SC portfolio if portfolio doesn't exist
-    let portfolioId = await this._getPortfolioId(portfolioName);
+    let portfolioId = await this._aws.helpers.serviceCatalog.getPortfolioId(portfolioName);
     if (portfolioId === undefined) {
       console.log('Creating new portfolio, because portfolio does not exist');
       portfolioId = await this._createSCPortfolio(portfolioName);
@@ -267,27 +264,6 @@ export default class ServiceCatalogSetup {
       });
     }
     return product && product.ProductViewSummary ? product.ProductViewSummary.ProductId : undefined;
-  }
-
-  private async _getPortfolioId(portfolioName: string): Promise<string | undefined> {
-    let portfolioDetails: PortfolioDetail[] = [];
-    let pageToken: string | undefined = undefined;
-    do {
-      const listPortfolioInput: ListPortfoliosCommandInput = {
-        PageToken: pageToken,
-        PageSize: 20
-      };
-      const listPortfolioOutput = await this._aws.clients.serviceCatalog.listPortfolios(listPortfolioInput);
-      pageToken = listPortfolioOutput.NextPageToken;
-      if (listPortfolioOutput.PortfolioDetails) {
-        portfolioDetails = portfolioDetails.concat(listPortfolioOutput.PortfolioDetails);
-      }
-    } while (pageToken);
-    const portfolio = portfolioDetails.find((portfolio: PortfolioDetail) => {
-      return portfolio.DisplayName === portfolioName;
-    });
-
-    return portfolio ? portfolio.Id : undefined;
   }
 
   private async _createSCPortfolio(portfolioName: string): Promise<string> {
