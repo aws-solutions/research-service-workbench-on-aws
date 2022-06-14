@@ -11,6 +11,7 @@ import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { IAM } from '@aws-sdk/client-iam';
 import { Lambda } from '@aws-sdk/client-lambda';
 import { S3 } from '@aws-sdk/client-s3';
+import { S3Control } from '@aws-sdk/client-s3-control';
 import { SageMaker } from '@aws-sdk/client-sagemaker';
 import { ServiceCatalog } from '@aws-sdk/client-service-catalog';
 import { SSM } from '@aws-sdk/client-ssm';
@@ -34,6 +35,7 @@ export default class AwsService {
     sts: STS;
     iam: IAM;
     ddb: DynamoDB;
+    s3Control: S3Control;
     lambda: Lambda;
     sagemaker: SageMaker;
   };
@@ -56,6 +58,7 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
+      s3Control: new S3Control(options),
       ddb: new DynamoDB(options),
       lambda: new Lambda(options),
       sagemaker: new SageMaker(options)
