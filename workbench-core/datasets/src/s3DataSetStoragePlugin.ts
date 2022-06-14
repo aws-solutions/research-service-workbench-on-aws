@@ -55,7 +55,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   /**
-   * Add an extenral endpoing (accespoint) to the S3 Bucket and grant access
+   * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
    * to the dataset prefix for a given external role.
    * @param name - the name of the S3 bucket where the storage resides.
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
