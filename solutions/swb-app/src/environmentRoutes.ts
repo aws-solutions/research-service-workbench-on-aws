@@ -10,9 +10,7 @@ export function setUpEnvRoutes(
   environments: { [key: string]: Environment },
   environmentService: EnvironmentService
 ): void {
-  const supportedEnvs = Object.keys(environments).map((env) => {
-    return env.toLocaleLowerCase();
-  });
+  const supportedEnvs = Object.keys(environments);
 
   async function getEnvironmentType(envId: string): Promise<string> {
     const env = await environmentService.getEnvironment(envId, true);
@@ -24,7 +22,7 @@ export function setUpEnvRoutes(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
       const envType = req.body.envType;
-      if (supportedEnvs.includes(envType.toLocaleLowerCase())) {
+      if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         if (req.body.id) {
           throw Boom.badRequest(
@@ -56,7 +54,7 @@ export function setUpEnvRoutes(
   router.delete(
     '/environments/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
+      const envType = await getEnvironmentType(req.params.id);
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -73,7 +71,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
+      const envType = await getEnvironmentType(req.params.id);
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -81,7 +79,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.start(req.params.id);
         res.send(response);
       } else {
-        res.send(`No service provided for environment ${req.body.envType.toLocaleLowerCase()}`);
+        res.send(`No service provided for environment ${req.body.envType}`);
       }
     })
   );
@@ -90,7 +88,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = (await getEnvironmentType(req.params.id)).toLocaleLowerCase();
+      const envType = await getEnvironmentType(req.params.id);
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -109,7 +107,7 @@ export function setUpEnvRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const environment = await environmentService.getEnvironment(req.params.id, true);
       const instanceName = environment.instanceId!;
-      const envType = environment.ETC.type.toLocaleLowerCase();
+      const envType = environment.ETC.type;
 
       const context = {
         roleArn: environment.PROJ.envMgmtRoleArn,
