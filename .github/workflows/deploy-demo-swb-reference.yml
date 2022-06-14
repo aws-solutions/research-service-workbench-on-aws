@@ -27,7 +27,6 @@ jobs:
         uses: ./.github/actions/baseAction
 
       - name: Configure AWS Credentials
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-east-2
@@ -35,7 +34,6 @@ jobs:
           role-session-name: OIDCSessionName
 
       - name: Deploy SWB-reference Demo
-        # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
