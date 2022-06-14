@@ -7,11 +7,11 @@ import {
   GetItemCommandInput,
   BatchGetItemCommandInput,
   GetItemCommandOutput,
-  BatchGetItemCommandOutput
+  BatchGetItemCommandOutput,
+  DynamoDB
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
 
 class Getter {
   private _ddb: DynamoDB;
@@ -346,12 +346,12 @@ class Getter {
     }
     let result;
     if (this._paramsItem) {
-      result = await this._ddb.get(this._paramsItem);
+      result = await this._ddb.getItem(this._paramsItem);
       if (result.Item) {
         result.Item = unmarshall(result.Item);
       }
     } else if (this._paramsBatch) {
-      result = await this._ddb.batchGet(this._paramsBatch);
+      result = await this._ddb.batchGetItem(this._paramsBatch);
       if (result.Responses) {
         // Each object in Responses consists of a table name, along with a map of attribute data consisting of the
         // data type and attribute value. This implementation expects only one table since this._tableName only supports
