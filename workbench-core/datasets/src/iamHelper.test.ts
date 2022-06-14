@@ -25,7 +25,7 @@ describe('IamHelper', () => {
         }
       `)
       );
-      expect(IamHelper.compareStatementPrinicpal(source, target)).toBe(false);
+      expect(IamHelper.compareStatementPrincipal(source, target)).toBe(false);
     });
 
     it('returns false when source has no principal but target does.', () => {
@@ -50,7 +50,7 @@ describe('IamHelper', () => {
         }
       `)
       );
-      expect(IamHelper.compareStatementPrinicpal(source, target)).toBe(false);
+      expect(IamHelper.compareStatementPrincipal(source, target)).toBe(false);
     });
 
     it('returns false when the source and target principals do not match.', () => {
@@ -78,7 +78,7 @@ describe('IamHelper', () => {
         }
       `)
       );
-      expect(IamHelper.compareStatementPrinicpal(source, target)).toBe(false);
+      expect(IamHelper.compareStatementPrincipal(source, target)).toBe(false);
     });
 
     it('returns true when the source and target principals match.', () => {
@@ -106,7 +106,7 @@ describe('IamHelper', () => {
         }
       `)
       );
-      expect(IamHelper.compareStatementPrinicpal(source, target)).toBe(true);
+      expect(IamHelper.compareStatementPrincipal(source, target)).toBe(true);
     });
   });
 
