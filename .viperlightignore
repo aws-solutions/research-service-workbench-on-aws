@@ -17,6 +17,8 @@ cdk.out
 #Fake access key id used
 solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.js
 solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.ts
+solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentConnectionService.test.js
+solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentConnectionService.test.ts
 workbench-core/environments/lib/environmentLifecycleHelper.test.js
 workbench-core/environments/src/environmentLifecycleHelper.test.ts 
 

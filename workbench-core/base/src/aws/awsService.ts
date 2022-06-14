@@ -10,14 +10,19 @@ import DynamoDB from './clients/dynamoDB';
 import EC2 from './clients/ec2';
 import EventBridge from './clients/eventbridge';
 import IAM from './clients/iam';
+import Lambda from './clients/lambda';
 import S3 from './clients/s3';
 import S3Control from './clients/s3Control';
+import SageMaker from './clients/sagemaker';
 import ServiceCatalog from './clients/serviceCatalog';
 import SSM from './clients/ssm';
 import STS from './clients/sts';
+
 import CloudformationService from './helpers/cloudformationService';
+
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
 import S3Service from './helpers/s3Service';
+import ServiceCatalogService from './helpers/serviceCatalogService';
 
 export default class AwsService {
   public clients: {
@@ -32,11 +37,14 @@ export default class AwsService {
     iam: IAM;
     ddb: DynamoDB;
     s3Control: S3Control;
+    lambda: Lambda;
+    sagemaker: SageMaker;
   };
   public helpers: {
     cloudformation: CloudformationService;
     s3: S3Service;
     ddb: DynamoDBService;
+    serviceCatalog: ServiceCatalogService;
   };
 
   public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
@@ -51,14 +59,17 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region }),
-      s3Control: new S3Control(options)
+      s3Control: new S3Control(options),
+      ddb: new DynamoDB(options),
+      lambda: new Lambda(options),
+      sagemaker: new SageMaker(options)
     };
 
     this.helpers = {
       cloudformation: new CloudformationService(this.clients.cloudformation),
       s3: new S3Service(this.clients.s3),
-      ddb: new DynamoDBService({ region, table: ddbTableName || '' })
+      ddb: new DynamoDBService({ region, table: ddbTableName || '' }),
+      serviceCatalog: new ServiceCatalogService(this.clients.serviceCatalog)
     };
   }
 
