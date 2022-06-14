@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AwsService } from '@amzn/workbench-core-base';
-import { BatchGetItemCommandOutput, GetItemCommandOutput, AttributeValue } from '@aws-sdk/client-dynamodb';
+import { AwsService, QueryParams } from '@amzn/workbench-core-base';
+import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
@@ -31,29 +31,6 @@ interface Environment {
   DS?: any[];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
-}
-
-interface QueryParams {
-  index?: string;
-  key?: { name: string; value: unknown };
-  sortKey?: string;
-  eq?: AttributeValue;
-  lt?: AttributeValue;
-  lte?: AttributeValue;
-  gt?: AttributeValue;
-  gte?: AttributeValue;
-  between?: { value1: AttributeValue; value2: AttributeValue };
-  begins?: AttributeValue;
-  start?: { [key: string]: unknown };
-  filter?: string;
-  strong?: boolean;
-  names?: { [key: string]: string };
-  values?: { [key: string]: unknown };
-  projection?: string | string[];
-  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
-  limit?: number;
-  forward?: boolean;
-  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
 }
 
 const defaultEnv: Environment = {
@@ -143,7 +120,7 @@ export default class EnvironmentService {
     filter?: { status?: EnvironmentStatus },
     limit?: number,
     paginationToken?: string
-  ): Promise<{ envs: Environment[]; token: string | undefined }> {
+  ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
     let environments: Environment[] = [];
 
     const queryParams: QueryParams = {
@@ -196,7 +173,7 @@ export default class EnvironmentService {
     const token = data.LastEvaluatedKey
       ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
       : undefined;
-    return { envs: environments, token };
+    return { envs: environments, paginationToken: token };
   }
 
   public async updateEnvironment(

@@ -14,6 +14,31 @@ import Scanner from './scanner';
 import TransactEdit from './transactEdit';
 import Updater from './updater';
 
+interface QueryParams {
+  index?: string;
+  key?: { name: string; value: unknown };
+  sortKey?: string;
+  eq?: AttributeValue;
+  lt?: AttributeValue;
+  lte?: AttributeValue;
+  gt?: AttributeValue;
+  gte?: AttributeValue;
+  between?: { value1: AttributeValue; value2: AttributeValue };
+  begins?: AttributeValue;
+  start?: { [key: string]: unknown };
+  filter?: string;
+  strong?: boolean;
+  names?: { [key: string]: string };
+  values?: { [key: string]: unknown };
+  projection?: string | string[];
+  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
+  limit?: number;
+  forward?: boolean;
+  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+}
+
+export { QueryParams };
+
 export default class DynamoDBService {
   private _awsRegion: string;
   private _tableName: string;
@@ -159,28 +184,7 @@ export default class DynamoDBService {
    * const queryValueEq5 = await query.sortKey('value').eq({N: '5'}).execute();
    * ```
    */
-  public query(params?: {
-    index?: string;
-    key?: { name: string; value: unknown };
-    sortKey?: string;
-    eq?: AttributeValue;
-    lt?: AttributeValue;
-    lte?: AttributeValue;
-    gt?: AttributeValue;
-    gte?: AttributeValue;
-    between?: { value1: AttributeValue; value2: AttributeValue };
-    begins?: AttributeValue;
-    start?: { [key: string]: unknown };
-    filter?: string;
-    strong?: boolean;
-    names?: { [key: string]: string };
-    values?: { [key: string]: unknown };
-    projection?: string | string[];
-    select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
-    limit?: number;
-    forward?: boolean;
-    capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-  }): Query {
+  public query(params?: QueryParams): Query {
     let query = new Query({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.index) {

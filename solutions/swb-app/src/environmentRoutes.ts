@@ -157,7 +157,7 @@ export function setUpEnvRoutes(
         role: 'admin',
         ownerId: ''
       };
-      const { status, token, pageSize } = req.query;
+      const { status, paginationToken, pageSize } = req.query;
       let filter = undefined;
       if (isEnvironmentStatus(status)) {
         filter = {
@@ -165,12 +165,12 @@ export function setUpEnvRoutes(
         };
       }
       let pagToken = undefined;
-      if (typeof token === 'string') {
-        pagToken = token;
-      }
       let limit: number = 0;
-      if (pageSize) {
+      if (typeof paginationToken === 'string' && pageSize) {
+        pagToken = paginationToken;
         limit = +pageSize;
+      } else {
+        res.send('Invalid pagination token or page size. Please try again with valid inputs.');
       }
       const response = await environmentService.getEnvironments(user, filter, limit, pagToken);
       res.send(response);
