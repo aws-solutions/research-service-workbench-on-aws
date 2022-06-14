@@ -5,7 +5,9 @@ import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+
 import * as targets from 'aws-cdk-lib/aws-events-targets';
+
 import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -19,6 +21,7 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
+
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;

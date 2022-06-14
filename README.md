@@ -1,4 +1,4 @@
-# Worflow Status
+# Workflow Status
 [![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
 [![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
@@ -12,7 +12,8 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-86.33%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-77.14%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.78%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-87.06%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-92.51%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-88.53%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-94.67%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-92.95%25-brightgreen.svg?style=flat) |
+
 # Contributing Guidelines
 
 Thank you for your interest in contributing to our project. Whether it's a bug report, new feature, correction, or additional documentation, we greatly value feedback and contributions from our community.
@@ -45,7 +46,6 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 | [workbench-core/repo-scripts/repo-toolbox](./workbench-core/repo-scripts/repo-toolbox/) | [@amzn/workbench-core-repo-toolbox] | [README](./workbench-core/repo-scripts/repo-toolbox/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
-
 
 ## Finding contributions to work on
 

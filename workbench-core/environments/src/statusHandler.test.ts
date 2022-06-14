@@ -254,6 +254,30 @@ describe('StatusHandler', () => {
     });
   });
 
+  test('execute updates with failure status', async () => {
+    // BUILD
+    const statusHandler = new StatusHandler();
+    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    environment.status = 'COMPLETED';
+    ebToDDB.errorMsg = 'Instance ran into error and cannot be terminated';
+    ebToDDB.status = 'TERMINATING_FAILED';
+    envService.getEnvironment = jest.fn(async () => environment);
+    envService.updateEnvironment = jest.fn();
+    envService.addMetadata = jest.fn();
+    statusHandler['_getEnvService'] = jest.fn(() => envService);
+
+    // OPERATE
+    await expect(statusHandler.execute(ebToDDB)).resolves.not.toThrowError();
+
+    // CHECK
+    expect(envService.getEnvironment).toBeCalledTimes(1);
+    expect(envService.updateEnvironment).toBeCalledTimes(1);
+    expect(envService.updateEnvironment).toBeCalledWith('6e185c8c-caeb-4305-8f08-d408b316dca7', {
+      status: ebToDDB.status,
+      error: { value: ebToDDB.errorMsg, type: 'TERMINATE' }
+    });
+  });
+
   test('execute skips update if env status same as event status during a non-Launch event', async () => {
     // BUILD
     const statusHandler = new StatusHandler();

@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "aws-cdk-lib": "^2.0.0",
-    "constructs": "^10.0.0"
+    "constructs": "^10.0.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -34,6 +35,7 @@
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
     "@types/heft-jest": "1.0.2",
+    "@types/lodash": "^4.14.181",
     "@types/node": "^14",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",

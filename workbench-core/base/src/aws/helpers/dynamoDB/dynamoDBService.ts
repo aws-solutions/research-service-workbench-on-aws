@@ -447,15 +447,10 @@ export default class DynamoDBService {
 
   public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
-    if (params) {
-      if (params.addPutRequest) {
-        // const requests = params.addPutRequest.map((request) => {
-        //   return marshall(request, { removeUndefinedValues: true });
-        // });
-        transactEdit = transactEdit.addPutRequests(
-          params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
-        );
-      }
+    if (params?.addPutRequest) {
+      transactEdit = transactEdit.addPutRequests(
+        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
     }
     return transactEdit;
   }
