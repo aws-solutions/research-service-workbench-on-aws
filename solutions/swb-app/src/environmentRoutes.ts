@@ -79,7 +79,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.start(req.params.id);
         res.send(response);
       } else {
-        res.send(`No service provided for environment ${req.body.envType}`);
+        res.send(`No service provided for environment ${envType}`);
       }
     })
   );
