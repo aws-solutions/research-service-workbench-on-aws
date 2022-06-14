@@ -45,7 +45,7 @@ jobs:
 
   deploy-swb-demo:
     needs: [ deploy-swb-reference]
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-demo-swb-reference.yml@develop
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
 

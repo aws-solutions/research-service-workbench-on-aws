@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Deploy-demo-swb-reference
+name: Deploy-swb-reference-demo
 on:
   workflow_call:
     secrets:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   # deploy only when files specific to swb package changed
-  deploy-and-integration-test-swb-reference:
+  deploy-swb-ref-demo:
     runs-on: ubuntu-20.04
     environment: dev
     permissions:
