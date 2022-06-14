@@ -22,4 +22,10 @@ export class MockPermissionsPlugin implements PermissionsPlugin {
     }
     throw new Error('Route not secured');
   }
+  public async isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean> {
+    if (route === '/login' && method === 'GET') {
+      return true;
+    }
+    return false;
+  }
 }
