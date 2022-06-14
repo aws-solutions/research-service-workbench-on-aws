@@ -9,7 +9,13 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   public async listDataSets(): Promise<DataSet[]> {
-    throw new Error('Method not implemented.');
+    this._aws.helpers.ddb.query({
+      key: {
+        name: 'pk',
+        value: 'DataSet#'
+      }
+    });
+    return [];
   }
   public async getDataSetMetadata(name: string): Promise<Record<string, string | string[]>> {
     throw new Error('Method not implemented.');
