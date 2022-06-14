@@ -288,7 +288,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, endPointNameNoColon, externalRoleName)
-      ).rejects.toThrow(new Error("Expected an arn with at least six ':' sepearted values."));
+      ).rejects.toThrow(new Error("Expected an arn with at least six ':' separated values."));
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(0);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(0);
     });

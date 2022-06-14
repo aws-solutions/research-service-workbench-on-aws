@@ -367,7 +367,7 @@ export class SWBStack extends Stack {
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      timeout: Duration.seconds(30),
+      timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
       memorySize: 832
     });
     apiLambda.role?.attachInlinePolicy(

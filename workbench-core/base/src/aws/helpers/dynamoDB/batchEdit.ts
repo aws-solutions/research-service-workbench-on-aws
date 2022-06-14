@@ -8,9 +8,9 @@ import {
   BatchWriteItemCommandInput,
   BatchWriteItemCommandOutput,
   DeleteRequest,
-  PutRequest
+  PutRequest,
+  DynamoDB
 } from '@aws-sdk/client-dynamodb';
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with batch writes or deletes.
@@ -136,7 +136,7 @@ class BatchEdit {
    * ```
    */
   public async execute(): Promise<BatchWriteItemCommandOutput> {
-    return await this._ddb.batchWriteOrDelete(this._params);
+    return await this._ddb.batchWriteItem(this._params);
   }
 }
 

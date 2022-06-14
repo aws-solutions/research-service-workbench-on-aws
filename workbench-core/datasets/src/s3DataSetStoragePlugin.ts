@@ -55,7 +55,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   /**
-   * Add an extenral endpoing (accespoint) to the S3 Bucket and grant access
+   * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
    * to the dataset prefix for a given external role.
    * @param name - the name of the S3 bucket where the storage resides.
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
@@ -246,7 +246,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _awsAccountIdFromArn(arn: string): string {
     const arnParts = arn.split(':');
     if (arnParts.length < 6) {
-      throw new Error("Expected an arn with at least six ':' sepearted values.");
+      throw new Error("Expected an arn with at least six ':' separated values.");
     }
 
     if (!arnParts[4] || arnParts[4] === '') {
