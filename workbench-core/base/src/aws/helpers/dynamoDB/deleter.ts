@@ -3,10 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AttributeValue, DeleteItemCommandInput, DeleteItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import {
+  AttributeValue,
+  DeleteItemCommandInput,
+  DeleteItemCommandOutput,
+  DynamoDB
+} from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with deleting a single item from a DDB table.
@@ -205,7 +209,7 @@ class Deleter {
    * ```
    */
   public async execute(): Promise<DeleteItemCommandOutput> {
-    const result = await this._ddb.delete(this._params);
+    const result = await this._ddb.deleteItem(this._params);
     if (result.Attributes) {
       result.Attributes = unmarshall(result.Attributes);
     }
