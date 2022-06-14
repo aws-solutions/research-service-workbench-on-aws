@@ -42,7 +42,13 @@ jobs:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-  
+
+  deploy-swb-demo:
+    needs: [ deploy-swb-reference]
+    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-demo-swb-reference.yml@develop
+    secrets:
+      role-to-assume: ${{ secrets.ASSUME_ROLE }}
+
   # deploy-example:
   #   needs: [pre-deployment-check]
   #   uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
