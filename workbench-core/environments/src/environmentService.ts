@@ -153,7 +153,7 @@ export default class EnvironmentService {
       try {
         queryParams.start = JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8'));
       } catch (error) {
-        throw new Error('Invalid paginationToken');
+        throw Boom.badRequest('Invalid paginationToken');
       }
     }
 

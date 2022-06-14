@@ -170,7 +170,7 @@ export function setUpEnvRoutes(
         pagToken = paginationToken;
         limit = +pageSize;
       } else {
-        res.send('Invalid pagination token or page size. Please try again with valid inputs.');
+        res.status(400).send('Invalid pagination token or page size. Please try again with valid inputs.');
       }
       const response = await environmentService.getEnvironments(user, filter, limit, pagToken);
       res.send(response);
