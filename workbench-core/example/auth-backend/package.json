@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@amzn/workbench-core-authentication": "workspace:*",
+    "@amzn/workbench-core-authorization": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
     "express": "^4.17.3"
   },
   "devDependencies": {

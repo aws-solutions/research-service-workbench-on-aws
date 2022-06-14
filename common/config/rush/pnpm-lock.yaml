@@ -701,6 +701,8 @@ importers:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-authentication': workspace:*
+      '@amzn/workbench-core-authorization': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -721,6 +723,8 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/workbench-core-authentication': link:../../authentication
+      '@amzn/workbench-core-authorization': link:../../authorization
+      '@amzn/workbench-core-logging': link:../../logging
       express: 4.18.1
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
