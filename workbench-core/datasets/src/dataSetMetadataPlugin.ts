@@ -16,7 +16,7 @@ export interface DataSetMetadataPlugin {
    *
    * @returns the metadata associated with the overall DataSet.
    */
-  getDataSetMetadata(name: string): Promise<Record<string, string | string[]>>;
+  getDataSetMetadata(name: string): Promise<DataSet>;
 
   /**
    * Get a list of objects in the DataSet as stored in the backend.
