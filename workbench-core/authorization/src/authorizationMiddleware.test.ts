@@ -147,8 +147,8 @@ describe('authorization middleware', () => {
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
-    expect(response.status).toBeCalledWith(400);
-    expect(response.json).toBeCalledWith({ error: 'Invalid request' });
+    expect(response.status).toBeCalledWith(403);
+    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
   });
   test('Request has no authenticatedUser for PUT on /sample', async () => {
     const next = jest.fn();

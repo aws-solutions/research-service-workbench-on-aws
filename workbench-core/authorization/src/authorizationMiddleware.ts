@@ -56,7 +56,7 @@ export default function withAuth(
           await authorizationService.isAuthorizedOnRoute(user, route, method);
           next();
         }
-      } else res.status(400).json({ error: 'Invalid request' });
+      } else throw new Error('Method is not valid');
     } catch (err) {
       res.status(403).json({ error: 'User is not authorized' });
     }
