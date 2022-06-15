@@ -4,11 +4,6 @@ import { AuthenticatedUser } from './authenticatedUser';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
-// TODO add to doc
-// requires use of cookieParser and bodyParser middlewares
-// app.use(cookieParser());
-// app.use(express.json());
-
 /**
  * An Express middleware function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
@@ -201,7 +196,7 @@ export function logoutUser(
  * An Express middleware function used to refresh an expired access code.
  *
  * This function assumes:
- *  - the access token is stored in a cookie named `access_token`.
+ *  - the access token is stored in a cookie named `access_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @returns the middleware function
