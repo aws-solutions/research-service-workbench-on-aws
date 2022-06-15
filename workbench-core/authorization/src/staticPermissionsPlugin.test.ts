@@ -197,4 +197,13 @@ describe('StaticPermissionsPlugin', () => {
       }
     });
   });
+
+  describe('isRouteIgnored', () => {
+    test(' /user with PUT request should be ignored', async () => {
+      expect(await staticPermissionsPlugin.isRouteIgnored('/user', 'PUT')).toBe(true);
+    });
+    test('/user with GET request should not be ignored', async () => {
+      expect(await staticPermissionsPlugin.isRouteIgnored('/user', 'GET')).toBe(false);
+    });
+  });
 });

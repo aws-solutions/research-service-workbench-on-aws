@@ -43,4 +43,14 @@ export default class AuthorizationService {
       throw new Error(`User is forbidden: ${err.message}`);
     }
   }
+
+  /**
+   * Checks if a route is being ignored for Authorization.
+   * @param route - The path the user is requesting access to.
+   * @param method - {@link HTTPMethod}.
+   * @returns boolean stating if the route is ignored.
+   */
+  public async isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean> {
+    return this._permissionsPlugin.isRouteIgnored(route, method);
+  }
 }
