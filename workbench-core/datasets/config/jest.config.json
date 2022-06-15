@@ -9,5 +9,5 @@
       "statements": 90
     }
   },
-  "coverageReporters": ["json-summary", "json", "lcov"]
+  "coverageReporters": ["json-summary", "json", "lcov", "text"]
 }

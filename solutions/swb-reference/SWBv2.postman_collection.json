@@ -1,214 +1,185 @@
 {
-	"info": {
-		"_postman_id": "56b7ea82-f4d0-4860-b94c-8a55fb4c4fb8",
-		"name": "SWBv2",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "4320586"
-	},
-	"item": [
-		{
-			"name": "environments",
-			"item": [
-				{
-					"name": "Terminate Environment",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments/:id",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Launch Environment",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemaker\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{API_URL}}/environments",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Start Environment",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments/:id/start",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments",
-								":id",
-								"start"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null 
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Stop Environment",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments/:id/stop",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments",
-								":id",
-								"stop"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Environment",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments/:id",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Environments",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments"
-							],
-							"query": [
-								{
-									"key": "status",
-									"value": "COMPLETED",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Connection",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{API_URL}}/environments/:id/connections",
-							"host": [
-								"{{API_URL}}"
-							],
-							"path": [
-								"environments",
-								":id",
-								"connections"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": null
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Create Hosting Account",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"accountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{API_URL}}/aws-accounts",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"aws-accounts"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "56b7ea82-f4d0-4860-b94c-8a55fb4c4fb8",
+    "name": "SWBv2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "4320586"
+  },
+  "item": [
+    {
+      "name": "environments",
+      "item": [
+        {
+          "name": "Terminate Environment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Launch Environment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemaker\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["environments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Environment",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments/:id/start",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "start"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stop Environment",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments/:id/stop",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "stop"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Environment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Environments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments",
+              "host": ["{{API_URL}}"],
+              "path": ["environments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": null,
+                  "diasbled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": 50,
+                  "diasbled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Connection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environments/:id/connections",
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "connections"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Create Hosting Account",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/aws-accounts",
+          "host": ["{{API_URL}}"],
+          "path": ["aws-accounts"]
+        }
+      },
+      "response": []
+    }
+  ]
 }
