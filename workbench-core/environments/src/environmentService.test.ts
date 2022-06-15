@@ -164,6 +164,56 @@ describe('EnvironmentService', () => {
         error: undefined
       });
     });
+
+    test('env not found w/ includeMetadata', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [],
+        $metadata: {},
+        Count: 0
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          KeyConditionExpression: '#pk = :pk',
+          ExpressionAttributeNames: {
+            '#pk': 'pk'
+          },
+          ExpressionAttributeValues: {
+            ':pk': {
+              S: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+            }
+          }
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE n CHECK
+      await expect(envService.getEnvironment('44fd3490-2cdb-43fb-8459-4f08b3e6cd00', true)).rejects.toThrow(
+        'Could not find environment 44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+      );
+    });
+
+    test('env not found w/o includeMetadata', async () => {
+      // BUILD
+      const getItemResponse: GetItemCommandOutput = {
+        Item: undefined,
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: 'exampleDDBTable',
+          Key: marshall({
+            pk: `ENV#${envId}`,
+            sk: `ENV#${envId}`
+          })
+        })
+        .resolves(getItemResponse);
+
+      // OPERATE n CHECK
+      await expect(envService.getEnvironment('44fd3490-2cdb-43fb-8459-4f08b3e6cd00')).rejects.toThrow(
+        'Could not find environment 44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+      );
+    });
   });
 
   describe('getEnvironments', () => {
@@ -204,7 +254,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse).toEqual(items);
+      expect(actualResponse.envs).toEqual(items);
     });
 
     test('admin with no filter', async () => {
@@ -237,7 +287,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse).toEqual(items);
+      expect(actualResponse.envs).toEqual(items);
     });
 
     test('non admin', async () => {
@@ -274,7 +324,89 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'researcher', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse).toEqual(items);
+      expect(actualResponse.envs).toEqual(items);
+    });
+
+    test('admin with pagination token', async () => {
+      // BUILD
+      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const paginationToken =
+        'eyJzayI6IkVOViNhM2VmZjdjZC1kNTM5LTRlZWMtODdiYy05MTcwMGJiZjZkZDIiLCJyZXNvdXJjZVR5cGUiOiJlbnZpcm9ubWVudCIsInBrIjoiRU5WI2EzZWZmN2NkLWQ1MzktNGVlYy04N2JjLTkxNzAwYmJmNmRkMiIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMDFUMTg6NTI6MTguMTkyWiJ9';
+      const limit = 1;
+
+      // Limit: limit,
+      // ExclusiveStartKey: JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8')),
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByUpdatedAt',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'environment'
+            }
+          }
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await envService.getEnvironments(
+        { role: 'admin', ownerId: 'owner-123' },
+        {},
+        limit,
+        paginationToken
+      );
+
+      // CHECK
+      expect(actualResponse.envs).toEqual(items);
+    });
+
+    test('admin with invalid pagination token', async () => {
+      // BUILD
+      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const paginationToken =
+        'eaJzayI6IkVOViNhM2VmZjdjZC1kNTM5LTRlZWMtODdiYy05MTcwMGJiZjZkZDIiLCJyZXNvdXJjZVR5cGUiOiJlbnZpcm9ubWVudCIsInBrIjoiRU5WI2EzZWZmN2NkLWQ1MzktNGVlYy04N2JjLTkxNzAwYmJmNmRkMiIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMDFUMTg6NTI6MTguMTkyWiJ9';
+      const limit = 1;
+
+      // Limit: limit,
+      // ExclusiveStartKey: JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8')),
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByUpdatedAt',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'environment'
+            }
+          }
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE n CHECK
+      await expect(
+        envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' }, {}, limit, paginationToken)
+      ).rejects.toThrow('Invalid paginationToken');
     });
   });
 
