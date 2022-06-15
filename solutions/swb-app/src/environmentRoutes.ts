@@ -157,16 +157,26 @@ export function setUpEnvRoutes(
         role: 'admin',
         ownerId: ''
       };
-      const { status } = req.query;
+      const { status, paginationToken, pageSize } = req.query;
       let filter = undefined;
       if (isEnvironmentStatus(status)) {
         filter = {
           status
         };
       }
-      // TODO: Add support for pagination with limit and pagination token
-      const env = await environmentService.getEnvironments(user, filter);
-      res.send(env);
+      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
+        res
+          .status(400)
+          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      } else {
+        const response = await environmentService.getEnvironments(
+          user,
+          filter,
+          pageSize ? Number(pageSize) : undefined,
+          paginationToken
+        );
+        res.send(response);
+      }
     })
   );
 }

@@ -46,13 +46,17 @@ export default function withAuth(
    */
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const user: AuthenticatedUser = retrieveUser(res);
       const route: string = req.originalUrl;
       const method: string = req.method;
       if (checkMethod(method)) {
-        await authorizationService.isAuthorizedOnRoute(user, route, method);
-        next();
-      } else res.status(400).json({ error: 'Invalid request' });
+        if (await authorizationService.isRouteIgnored(route, method)) {
+          next();
+        } else {
+          const user: AuthenticatedUser = retrieveUser(res);
+          await authorizationService.isAuthorizedOnRoute(user, route, method);
+          next();
+        }
+      } else throw new Error('Method is not valid');
     } catch (err) {
       res.status(403).json({ error: 'User is not authorized' });
     }

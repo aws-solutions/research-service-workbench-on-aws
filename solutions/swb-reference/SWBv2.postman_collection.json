@@ -121,6 +121,16 @@
                   "key": "status",
                   "value": "COMPLETED",
                   "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": null,
+                  "diasbled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": 50,
+                  "diasbled": true
                 }
               ]
             }
@@ -155,7 +165,8 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"accountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+          "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+
           "options": {
             "raw": {
               "language": "json"
