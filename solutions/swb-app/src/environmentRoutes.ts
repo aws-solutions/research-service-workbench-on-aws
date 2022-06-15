@@ -166,10 +166,13 @@ export function setUpEnvRoutes(
       }
       let pagToken = undefined;
       let limit: number = 0;
-      if (typeof paginationToken === 'string' && pageSize) {
+      if (typeof paginationToken === 'string') {
         pagToken = paginationToken;
-        limit = Number(pageSize);
-      } else {
+      }
+      if (pageSize) {
+        limit = +pageSize;
+      }
+      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         res.status(400).send('Invalid pagination token or page size. Please try again with valid inputs.');
       }
       const response = await environmentService.getEnvironments(user, filter, limit, pagToken);
