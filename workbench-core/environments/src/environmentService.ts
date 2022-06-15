@@ -124,7 +124,8 @@ export default class EnvironmentService {
     let environments: Environment[] = [];
 
     const queryParams: QueryParams = {
-      key: { name: 'resourceType', value: 'environment' }
+      key: { name: 'resourceType', value: 'environment' },
+      limit: pageSize
     };
 
     if (user.role === 'admin') {
@@ -141,11 +142,6 @@ export default class EnvironmentService {
       queryParams.index = 'getResourceByOwner';
       queryParams.sortKey = 'owner';
       queryParams.eq = { S: user.ownerId };
-    }
-
-    // If limit is defined and non zero, add param
-    if (pageSize && pageSize > 0) {
-      queryParams.limit = pageSize;
     }
     // If paginationToken is defined, add param
     // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code

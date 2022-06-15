@@ -126,6 +126,11 @@
                   "key": "paginationToken",
                   "value": null,
                   "diasbled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": 50,
+                  "diasbled": true
                 }
               ]
             }
