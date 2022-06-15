@@ -20,7 +20,16 @@ export const routesMap: RoutesMap = {
 };
 
 export const routesIgnored: RoutesIgnored = {
-  '/unprotected': {
+  '/login': {
+    GET: true
+  },
+  '/token': {
+    POST: true
+  },
+  '/logout': {
+    GET: true
+  },
+  '/refresh': {
     GET: true
   }
 };

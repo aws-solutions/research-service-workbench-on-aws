@@ -19,7 +19,7 @@ import {
 } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
 
@@ -34,6 +34,21 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   clientSecret: 'TODO',
   websiteUrl: 'http://localhost:3000'
 };
+
+// Wrapper verify token
+function wrapVerifyToken(
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
+  ignoreRoutes: string[]
+): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const baseUrl = req.baseUrl;
+    if (ignoreRoutes.includes(baseUrl)) {
+      next();
+    } else {
+      await fn(req, res, next);
+    }
+  };
+}
 
 // Create Logger Service
 const logger: LoggingService = new LoggingService();
@@ -61,14 +76,24 @@ const authorizationService: AuthorizationService = new AuthorizationService(
 app.use(cookieParser());
 app.use(express.json());
 
+app.use(wrapVerifyToken(verifyToken(authenticationService), ['/login', '/token', '/logout', 'refresh']));
+app.use(withAuth(authorizationService));
+
 app.get('/login', getAuthorizationCodeUrl(authenticationService));
 app.post('/token', getTokensFromAuthorizationCode(authenticationService));
 app.get('/logout', logoutUser(authenticationService));
 app.get('/refresh', refreshAccessToken(authenticationService));
-app.get('/pro', verifyToken(authenticationService), (req, res) => {
+
+app.get('/pro', (req, res) => {
   res.status(200).json({ user: res.locals.user });
 });
 
-app.use(withAuth(authorizationService));
+app.get('/guest', (req, res) => {
+  res.status(200).json({ message: 'Guest successfully accessed' });
+});
+
+app.get('/admin', (req, res) => {
+  res.status(200).json({ message: 'Admin successfully accessed' });
+});
 
 app.listen(3001);
