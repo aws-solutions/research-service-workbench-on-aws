@@ -83,4 +83,13 @@ describe('Authorization Service', () => {
       }
     });
   });
+
+  describe('isRouteIgnored', () => {
+    test('GET /login should be ignored', async () => {
+      expect(await authorizationService.isRouteIgnored('/login', 'GET')).toBe(true);
+    });
+    test('PUT /login should not be ignored', async () => {
+      expect(await authorizationService.isRouteIgnored('/login', 'PUT')).toBe(false);
+    });
+  });
 });
