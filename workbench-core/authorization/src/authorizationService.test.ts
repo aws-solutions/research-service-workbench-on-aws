@@ -1,10 +1,15 @@
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { fc, itProp } from 'jest-fast-check';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
-import { AuthorizationPlugin, PermissionsPlugin, HTTPMethod, AuthorizationService } from '.';
+import {
+  AuthenticatedUser,
+  AuthorizationPlugin,
+  PermissionsPlugin,
+  HTTPMethod,
+  AuthorizationService
+} from '.';
 
 describe('Authorization Service', () => {
   let mockPermissionsPlugin: PermissionsPlugin;

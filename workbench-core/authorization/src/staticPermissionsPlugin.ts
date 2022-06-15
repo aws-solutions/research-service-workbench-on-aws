@@ -1,6 +1,6 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import _ from 'lodash';
+import { AuthenticatedUser } from './authenticatedUser';
 import Operation from './operation';
 import Permission, { PermissionsMap } from './permission';
 import PermissionsPlugin from './permissionsPlugin';

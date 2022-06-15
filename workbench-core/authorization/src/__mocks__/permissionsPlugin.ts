@@ -1,5 +1,4 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
-import { HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
+import { AuthenticatedUser, HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
 import {
   mockAdminPermissions,
   mockGetOperations,

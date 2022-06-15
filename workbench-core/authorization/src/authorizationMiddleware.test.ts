@@ -17,11 +17,11 @@ jest.mock('./authorizationService', () => {
 });
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { Request, Response, NextFunction } from 'express';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
 import {
+  AuthenticatedUser,
   AuthorizationPlugin,
   HTTPMethod,
   Operation,

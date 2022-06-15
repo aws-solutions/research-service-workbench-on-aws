@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
+import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationPlugin from './authorizationPlugin';
 import Operation from './operation';
 import Permission from './permission';
