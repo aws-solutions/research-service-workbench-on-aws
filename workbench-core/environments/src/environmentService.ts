@@ -118,14 +118,14 @@ export default class EnvironmentService {
   public async getEnvironments(
     user: { role: string; ownerId: string },
     filter?: { status?: EnvironmentStatus },
-    pageSize: number = 50,
+    pageSize?: number,
     paginationToken?: string
   ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
     let environments: Environment[] = [];
 
     const queryParams: QueryParams = {
       key: { name: 'resourceType', value: 'environment' },
-      limit: pageSize
+      limit: pageSize && pageSize >= 0 ? pageSize : 50
     };
 
     if (user.role === 'admin') {

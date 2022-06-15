@@ -164,19 +164,19 @@ export function setUpEnvRoutes(
           status
         };
       }
-      let pagToken = undefined;
-      let limit: number = 0;
-      if (typeof paginationToken === 'string') {
-        pagToken = paginationToken;
-      }
-      if (pageSize) {
-        limit = +pageSize;
-      }
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res.status(400).send('Invalid pagination token or page size. Please try again with valid inputs.');
+        res
+          .status(400)
+          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      } else {
+        const response = await environmentService.getEnvironments(
+          user,
+          filter,
+          pageSize ? Number(pageSize) : undefined,
+          paginationToken
+        );
+        res.send(response);
       }
-      const response = await environmentService.getEnvironments(user, filter, limit, pagToken);
-      res.send(response);
     })
   );
 }
