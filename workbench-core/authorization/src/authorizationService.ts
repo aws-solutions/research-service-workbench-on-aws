@@ -27,7 +27,7 @@ export default class AuthorizationService {
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
    *
-   * @throws Foribdden {@link Error} when {@link User} is not authorized
+   * @throws Forbidden {@link Error} when {@link User} is not authorized
    */
   public async isAuthorizedOnRoute(
     user: AuthenticatedUser,
@@ -42,5 +42,15 @@ export default class AuthorizationService {
     } catch (err) {
       throw new Error(`User is forbidden: ${err.message}`);
     }
+  }
+
+  /**
+   * Checks if a route is being ignored for Authorization.
+   * @param route - The path the user is requesting access to.
+   * @param method - {@link HTTPMethod}.
+   * @returns boolean stating if the route is ignored.
+   */
+  public async isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean> {
+    return this._permissionsPlugin.isRouteIgnored(route, method);
   }
 }

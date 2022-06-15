@@ -1,22 +1,15 @@
 description: SSM document to terminate a Sagemaker instance
 schemaVersion: '0.3'
 parameters:
-  InstanceName:
-    type: String
-    description: 'The name of the Sagemaker instance being terminated.'
-    default: ''
   ProvisionedProductId:
     type: String
     description: 'The ID of the Sagemaker provisioned product being terminated.'
-    default: ''
   TerminateToken:
     type: String
     description: '(Required) The unique token ID assigned to this request.'
-    default: ''
-  EventBusName:
+  EnvId:
     type: String
-    description: 'The main account event bridge bus name.'
-    default: ''
+    description: 'The ID of the environment resource stored in DDB'
 mainSteps:
   - name: TerminateSagemaker
     action: 'aws:executeAwsApi'
@@ -35,27 +28,49 @@ mainSteps:
     timeoutSeconds: 600
     inputs:
       Service: servicecatalog
-      Api: DescribeProvisionedProduct
-      Id: '{{ ProvisionedProductId }}'
+      Api: DescribeRecord
+      Id: '{{ TerminateSagemaker.RecordId }}'
       DesiredValues:
         - SUCCEEDED
-      PropertySelector: '$.ProvisionedProductDetail.Status'
+        - FAILED
+      PropertySelector: '$.RecordDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetRecordDetail
+  - name: GetRecordDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeRecord
+      Id: '{{ TerminateSagemaker.RecordId }}'
     outputs:
-      - Name: ProvisionedProductDetail
-        Type: StringMap
-        Selector: '$.ProvisionedProductDetail'
-    onFailure: step:PushFailureStatusToEventBridge
-    nextStep: PushMetadataToEventBridge
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.RecordDetail.Status'
+      - Name: ErrorMessage
+        Type: StringList
+        Selector: '$.RecordDetail.RecordErrors'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: SUCCEEDED
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: FAILED
+      Default: PushFailureStatusToEventBridge
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
-          DetailType: 'Success'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'TerminateSagemaker'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
+          DetailType: 'Terminate'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
@@ -63,8 +78,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ ProvisionedProductId }}\", \"RecordId\": \"{{ TerminateSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Terminate\" }'
-          DetailType: 'Failure'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'TerminateSagemaker'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "ErrorMessage": {{ GetRecordDetail.ErrorMessage }} }'
+          DetailType: 'Terminate'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

@@ -1,9 +1,11 @@
 import AccountHandler from './accountHandler';
+import AccountService from './accountService';
 import CognitoSetup from './cognitoSetup';
 import EnvironmentConnectionService from './environmentConnectionService';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
-import { EnvironmentStatus } from './environmentStatus';
+import EnvironmentService from './environmentService';
+import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
@@ -16,10 +18,13 @@ export {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
   AccountHandler,
+  AccountService,
   EnvironmentLifecycleHelper,
   StatusHandler,
   EventBridgeEventToDDB,
   EnvironmentStatus,
+  isEnvironmentStatus,
   ServiceCatalogSetup,
-  CognitoSetup
+  CognitoSetup,
+  EnvironmentService
 };

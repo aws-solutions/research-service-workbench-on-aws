@@ -8,9 +8,9 @@ import {
   BatchWriteItemCommandInput,
   BatchWriteItemCommandOutput,
   DeleteRequest,
-  PutRequest
+  PutRequest,
+  DynamoDB
 } from '@aws-sdk/client-dynamodb';
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with batch writes or deletes.
@@ -52,6 +52,14 @@ class BatchEdit {
   public addWriteRequest(item: { [key: string]: AttributeValue }): BatchEdit {
     if (!this._params.RequestItems) {
       throw new Error('BatchEdit<==need to initialize the RequestItems property before adding new request');
+    }
+    // Add updatedAt and createdAt attributes
+    const currentTime = new Date().toISOString();
+    if (item.updatedAt === undefined) {
+      item.updatedAt = { S: `${currentTime}` };
+    }
+    if (item.createdAt === undefined) {
+      item.createdAt = { S: `${currentTime}` };
     }
     const writeRequest: PutRequest = { Item: item };
     this._params.RequestItems[this._tableName].push({ PutRequest: writeRequest });
@@ -128,7 +136,7 @@ class BatchEdit {
    * ```
    */
   public async execute(): Promise<BatchWriteItemCommandOutput> {
-    return await this._ddb.batchWriteOrDelete(this._params);
+    return await this._ddb.batchWriteItem(this._params);
   }
 }
 

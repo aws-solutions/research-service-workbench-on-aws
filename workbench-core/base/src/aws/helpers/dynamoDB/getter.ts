@@ -4,14 +4,14 @@
  */
 
 import {
-  AttributeValue,
   GetItemCommandInput,
   BatchGetItemCommandInput,
   GetItemCommandOutput,
-  BatchGetItemCommandOutput
+  BatchGetItemCommandOutput,
+  DynamoDB
 } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
 
 class Getter {
   private _ddb: DynamoDB;
@@ -24,16 +24,16 @@ class Getter {
       region: string;
     },
     table: string,
-    key: { [key: string]: AttributeValue } | { [key: string]: AttributeValue }[]
+    key: { [key: string]: unknown } | { [key: string]: unknown }[]
   ) {
     this._ddb = new DynamoDB({ ...config });
     this._tableName = table;
     if (Array.isArray(key)) {
       this._paramsBatch = { RequestItems: {} };
       this._paramsBatch.RequestItems = {};
-      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(key) };
+      this._paramsBatch.RequestItems[this._tableName] = { Keys: Object.assign(key.map((k) => marshall(k))) };
     } else {
-      this._paramsItem = { TableName: table, Key: key };
+      this._paramsItem = { TableName: table, Key: marshall(key) };
     }
   }
 
@@ -62,24 +62,24 @@ class Getter {
    * @param key - object of the key of the item to get
    * @returns Getter with populated params
    */
-  public key(key: { [key: string]: AttributeValue }): Getter {
+  public key(key: { [key: string]: unknown }): Getter {
     if (!this._paramsItem) {
       throw new Error('Cannot use .key() on a batch get request.');
     }
     if (!this._paramsItem.Key) {
       this._paramsItem.Key = {};
     }
-    this._paramsItem.Key = key;
+    this._paramsItem.Key = marshall(key);
     return this;
   }
 
   /**
-   * Sets the Keys balue of the command input for BatchGetItem. This is only for batch get item commands. This method is not required if the Getter is initialized with keys.
+   * Sets the Keys value of the command input for BatchGetItem. This is only for batch get item commands. This method is not required if the Getter is initialized with keys.
    *
    * @param keys - the list of objects of the keys of the items to get
    * @returns Getter with populated params
    */
-  public keys(keys: { [key: string]: AttributeValue }[]): Getter {
+  public keys(keys: { [key: string]: unknown }[]): Getter {
     if (!this._paramsBatch || !this._paramsBatch.RequestItems) {
       throw new Error('Cannot use .keys() on a single get request.');
     }
@@ -316,6 +316,7 @@ class Getter {
    * Call this after populating the command input params with the above methods.
    * Each object in Responses consists of a table name, along with a map of attribute data consisting of the data type and attribute value
    * If UnproccessedKeys is non empty, some request failed.
+   * Item/Responses are returned unmarshalled.
    *
    * @returns The output from the get item command or the batch get item command
    *
@@ -343,11 +344,26 @@ class Getter {
     if (this._paramsItem && this._paramsBatch) {
       throw new Error('Getter <== only key() or keys() may be called, not both');
     }
-
+    let result;
     if (this._paramsItem) {
-      return await this._ddb.get(this._paramsItem);
+      result = await this._ddb.getItem(this._paramsItem);
+      if (result.Item) {
+        result.Item = unmarshall(result.Item);
+      }
     } else if (this._paramsBatch) {
-      return await this._ddb.batchGet(this._paramsBatch);
+      result = await this._ddb.batchGetItem(this._paramsBatch);
+      if (result.Responses) {
+        // Each object in Responses consists of a table name, along with a map of attribute data consisting of the
+        // data type and attribute value. This implementation expects only one table since this._tableName only supports
+        // one name.
+        // ex. {'sample_table_name': {'L': [obj1, etc] } }
+        // Note: unmarshall does not work on the attributes of each object in the list
+        result.Responses[this._tableName] = result.Responses[this._tableName].map((item) => unmarshall(item));
+      }
+    }
+
+    if (result) {
+      return result;
     }
 
     throw new Error('Getter <== neither parameters were initialized');
