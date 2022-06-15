@@ -575,6 +575,7 @@ importers:
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-s3-control': ^3.100.0
       '@aws-sdk/types': ^3.55.0
+      '@hapi/boom': ^10.0.0
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
@@ -604,6 +605,7 @@ importers:
       '@aws-sdk/client-s3': 3.100.0
       '@aws-sdk/client-s3-control': 3.100.0
       '@aws-sdk/types': 3.78.0
+      '@hapi/boom': 10.0.0
       lodash: 4.17.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
