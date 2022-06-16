@@ -1,6 +1,6 @@
 import { EnvironmentTypeService, isEnvironmentTypeStatus, ENVIRONMENT_TYPE_STATUS } from '@amzn/environments';
 import Boom from '@hapi/boom';
-import { NextFunction, Request, Response, Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpEnvTypeRoutes(router: Router, environmentTypeService: EnvironmentTypeService): void {
@@ -14,7 +14,15 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
           `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
         );
       }
-      const envType = await environmentTypeService.createNewEnvironmentType(req.body);
+      // TODO: Get user information from req context once Auth has been integrated
+      const user = {
+        role: 'admin',
+        ownerId: 'owner-123'
+      };
+      const envType = await environmentTypeService.createNewEnvironmentType({
+        ...req.body,
+        owner: user.ownerId
+      });
       res.status(201).send(envType);
     })
   );
@@ -23,7 +31,13 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await environmentTypeService.getEnvironmentType(req.params.id);
+      // TODO: Get user information from req context once Auth has been integrated
+      const user = {
+        role: 'admin',
+        ownerId: 'owner-123'
+      };
+      console.log('paramsId', req.params.id);
+      const envType = await environmentTypeService.getEnvironmentType(user.ownerId, req.params.id);
       res.send(envType);
     })
   );
@@ -36,12 +50,32 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         role: 'admin',
         ownerId: 'owner-123'
       };
-      const envType = await environmentTypeService.getEnvironmentType(req.params.id);
+      const envType = await environmentTypeService.getEnvironmentTypes(user);
       res.send(envType);
     })
   );
 
   // Update envTypes
-
-  //Delete envTypes
+  router.put(
+    '/environmentTypes/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      // TODO: Get user information from req context once Auth has been integrated
+      const user = {
+        role: 'admin',
+        ownerId: 'owner-123'
+      };
+      const { status } = req.body;
+      if (!isEnvironmentTypeStatus(status)) {
+        throw Boom.badRequest(
+          `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
+        );
+      }
+      const envType = await environmentTypeService.updateEnvironmentType(
+        user.ownerId,
+        req.params.id,
+        req.body
+      );
+      res.status(200).send(envType);
+    })
+  );
 }

@@ -1,4 +1,4 @@
-import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
+import { AwsService, buildDynamoDBPkSk, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 import Boom from '@hapi/boom';
@@ -43,37 +43,38 @@ export default class EnvironmentTypeService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
-  public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
+  public async getEnvironmentType(owner: string, envTypeId: string): Promise<EnvironmentType> {
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType))
       .execute();
-
     const item = (response as GetItemCommandOutput).Item;
     if (item === undefined) {
       throw Boom.notFound(`Could not find environment type ${envTypeId}`);
     } else {
+      console.log('item', JSON.stringify(item));
       const envType = item as unknown as EnvironmentType;
+      console.log('envType Owner', envType.owner);
+      console.log('req owner', owner);
+      if (envType.owner !== owner) {
+        throw Boom.unauthorized();
+      }
       return Promise.resolve(envType);
     }
   }
 
   public async getEnvironmentTypes(user: { role: string; ownerId: string }): Promise<EnvironmentType[]> {
-    let items;
-    const queryParams: any = {
+    const queryParams: QueryParams = {
       key: { name: 'resourceType', value: 'envType' }
     };
     if (user.role === 'admin') {
       queryParams.index = 'getResourceByUpdatedAt';
     } else {
-      const queryParams = {
-        index: 'getResourceByOwner',
-        key: { name: 'resourceType', value: 'envType' },
-        sortKey: 'owner',
-        eq: { S: user.ownerId }
-      };
+      queryParams.index = 'getResourceByOwner';
+      queryParams.sortKey = 'owner';
+      queryParams.eq = { S: user.ownerId };
     }
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    items = envTypesResponse.Items;
+    const items = envTypesResponse.Items;
     if (items === undefined) {
       return Promise.resolve([]);
     } else {
@@ -82,12 +83,12 @@ export default class EnvironmentTypeService {
   }
 
   public async updateEnvironmentType(
-    envTypeId: string,
     owner: string,
+    envTypeId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
     try {
-      await this.getEnvironmentType(envTypeId);
+      await this.getEnvironmentType(owner, envTypeId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.notFound(`Could not find environment type ${envTypeId} to update`);

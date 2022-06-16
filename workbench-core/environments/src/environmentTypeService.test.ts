@@ -1,3 +1,4 @@
+/* eslint-disable */
 import EnvironmentTypeService from './environmentTypeService';
 
 describe('environmentTypeService', () => {
