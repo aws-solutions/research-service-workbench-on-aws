@@ -1,4 +1,4 @@
-import CloudFormation from '../clients/cloudformation';
+import { CloudFormation } from '@aws-sdk/client-cloudformation';
 
 export default class CloudformationService {
   private _cloudformation: CloudFormation;

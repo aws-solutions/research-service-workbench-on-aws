@@ -3,25 +3,29 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import CloudFormation from './clients/cloudformation';
-import Cognito from './clients/cognito';
-import EC2 from './clients/ec2';
-import EventBridge from './clients/eventbridge';
-import SSM from './clients/ssm';
-import ServiceCatalog from './clients/serviceCatalog';
-import S3 from './clients/s3';
-import STS from './clients/sts';
+import { CloudFormation } from '@aws-sdk/client-cloudformation';
+import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { EC2 } from '@aws-sdk/client-ec2';
+import { EventBridge } from '@aws-sdk/client-eventbridge';
+import { IAM } from '@aws-sdk/client-iam';
+import { Lambda } from '@aws-sdk/client-lambda';
+import { S3 } from '@aws-sdk/client-s3';
+import { S3Control } from '@aws-sdk/client-s3-control';
+import { SageMaker } from '@aws-sdk/client-sagemaker';
+import { ServiceCatalog } from '@aws-sdk/client-service-catalog';
+import { SSM } from '@aws-sdk/client-ssm';
+import { STS } from '@aws-sdk/client-sts';
 import { Credentials } from '@aws-sdk/types';
-import IAM from './clients/iam';
 import CloudformationService from './helpers/cloudformationService';
-import S3Service from './helpers/s3Service';
-import DynamoDB from './clients/dynamoDB';
 import DynamoDBService from './helpers/dynamoDB/dynamoDBService';
+import S3Service from './helpers/s3Service';
+import ServiceCatalogService from './helpers/serviceCatalogService';
 
 export default class AwsService {
   public clients: {
     cloudformation: CloudFormation;
-    cognito: Cognito;
+    cognito: CognitoIdentityProvider;
     ssm: SSM;
     ec2: EC2;
     eventBridge: EventBridge;
@@ -30,18 +34,22 @@ export default class AwsService {
     sts: STS;
     iam: IAM;
     ddb: DynamoDB;
+    s3Control: S3Control;
+    lambda: Lambda;
+    sagemaker: SageMaker;
   };
   public helpers: {
     cloudformation: CloudformationService;
     s3: S3Service;
     ddb: DynamoDBService;
+    serviceCatalog: ServiceCatalogService;
   };
 
   public constructor(options: { region: string; ddbTableName?: string; credentials?: Credentials }) {
     const { region, ddbTableName } = options;
     this.clients = {
       cloudformation: new CloudFormation(options),
-      cognito: new Cognito(options),
+      cognito: new CognitoIdentityProvider(options),
       ssm: new SSM(options),
       ec2: new EC2(options),
       eventBridge: new EventBridge(options),
@@ -49,13 +57,17 @@ export default class AwsService {
       s3: new S3(options),
       sts: new STS(options),
       iam: new IAM(options),
-      ddb: new DynamoDB({ region })
+      s3Control: new S3Control(options),
+      ddb: new DynamoDB(options),
+      lambda: new Lambda(options),
+      sagemaker: new SageMaker(options)
     };
 
     this.helpers = {
       cloudformation: new CloudformationService(this.clients.cloudformation),
       s3: new S3Service(this.clients.s3),
-      ddb: new DynamoDBService({ region, table: ddbTableName || '' })
+      ddb: new DynamoDBService({ region, table: ddbTableName || '' }),
+      serviceCatalog: new ServiceCatalogService(this.clients.serviceCatalog)
     };
   }
 

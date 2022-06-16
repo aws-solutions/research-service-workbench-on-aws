@@ -1,90 +1,32 @@
-import { User } from '@amzn/workbench-core-authentication';
-import { Action } from './action';
-
-/**
- * States whether a {@link Permission} should be ALLOW or DENY.
- */
-export type Effect = 'ALLOW' | 'DENY';
-
-/**
- * Represents what a Permission contains.
- */
-export interface Permission {
-  /**
-   * The {@link Effect} of a Permission.
-   */
-  effect: Effect;
-  /**
-   * {@link Action}.
-   */
-  action: Action;
-  /**
-   * The subject that the {@link Action} acts on.
-   */
-  subject: string;
-  /**
-   * Used to restrict a {@link User}'s action to a specific field.
-   *
-   * @example
-   * Allows User update access to only 'method';
-   * ```
-   *  class Article {
-   *    method() {
-   *    }
-   *    methodTwo() {
-   *    }
-   *  }
-   *
-   * const permission:Permission = {
-   *  action: Action.UPDATE,
-   *  subject: 'Article',
-   *  fields: ['method']
-   * };
-   * ```
-   */
-  fields?: string[];
-  /**
-   * Reason for why this is forbidden.
-   */
-  reason?: string;
-}
-
-/**
- * The operation a {@link User} wants to perform.
- */
-export interface Operation {
-  /**
-   * The {@link Action} a {@link User} wants to perform.
-   */
-  action: Action;
-
-  /**
-   * The subject that the {@link Action} acts on.
-   */
-  subject: string;
-
-  /**
-   * The field a {@link User} wants access to.
-   */
-  field?: string;
-}
-
-/**
- * A map that represents the mapping of a role to a set of {@link Permission}.
- */
-export interface PermissionsMap {
-  [role: string]: Permission[];
-}
+import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
+import Operation from './operation';
+import Permission from './permission';
+import { HTTPMethod } from './routesMap';
 
 /**
  * Represents the PermissionsPlugin.
  */
 export default interface PermissionsPlugin {
   /**
-   * Returns a set of {@link Permission} given a {@link User}.
-   * @param user - {@link User}
+   * Returns a set of {@link Permission} given a {@link AuthenticatedUser}.
+   * @param user - {@link AuthenticatedUser}
    *
-   * @returns A Promise for a set of the {@link User}'s {@link Permission}.
+   * @returns A Promise for a set of the {@link AuthenticatedUser}'s {@link Permission}.
    */
-  getPermissionsByUser(user: User): Promise<Permission[]>;
+  getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]>;
+
+  /**
+   * Returns a set of {@link Operation} given a Route and {@link HTTPMethod}.
+   * @param route - The path the user is requesting access to.
+   * @param method - {@link HTTPMethod}.
+   */
+  getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]>;
+
+  /**
+   * Checks if a route is being ignored for Authorization.
+   * @param route - The path the user is requesting access to.
+   * @param method - {@link HTTPMethod}.
+   * @returns boolean stating if the route is ignored.
+   */
+  isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean>;
 }

@@ -1,15 +1,13 @@
-import '@awsui/global-styles/index.css';
 import '../styles/globals.scss';
-import type { AppProps } from 'next/app';
+import '@awsui/global-styles/index.css';
 import { appWithTranslation } from 'next-i18next';
-import Header from '../components/Header';
+import type { AppProps } from 'next/app';
+import nextI18NextConfig from '../../next-i18next.config';
 import BaseLayout from '../components/BaseLayout';
-import { SettingsProvider } from '../context/SettingsContext';
-import { NotificationsProvider } from '../context/NotificationContext';
+import Header from '../components/Header';
 import { AuthenticationProvider } from '../context/AuthenticationContext';
-
-// eslint-disable-next-line @rushstack/typedef-var
-const nextI18NextConfig = require('../../next-i18next.config');
+import { NotificationsProvider } from '../context/NotificationContext';
+import { SettingsProvider } from '../context/SettingsContext';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {

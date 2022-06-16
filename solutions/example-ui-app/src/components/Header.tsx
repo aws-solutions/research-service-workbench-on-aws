@@ -1,10 +1,10 @@
+import Input from '@awsui/components-react/input';
+import TopNavigation from '@awsui/components-react/top-navigation';
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
-import TopNavigation from '@awsui/components-react/top-navigation';
-import Input from '@awsui/components-react/input';
-import styles from '../styles/Header.module.scss';
-import { useSettings } from '../context/SettingsContext';
 import { useAuthentication } from '../context/AuthenticationContext';
+import { useSettings } from '../context/SettingsContext';
+import styles from '../styles/Header.module.scss';
 
 export default function Header(): JSX.Element {
   const { t } = useTranslation();

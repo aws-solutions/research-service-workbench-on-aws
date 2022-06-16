@@ -1,8 +1,7 @@
 jest.mock('md5-file');
 
-import md5File from 'md5-file';
-import ServiceCatalogSetup from './serviceCatalogSetup';
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
 import {
   CreateConstraintCommand,
   CreatePortfolioCommand,
@@ -14,14 +13,15 @@ import {
   DescribeProductAsAdminCommand,
   CreateProvisioningArtifactCommand
 } from '@aws-sdk/client-service-catalog';
-import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import md5File from 'md5-file';
+import ServiceCatalogSetup from './serviceCatalogSetup';
 
 describe('ServiceCatalogSetup', () => {
   const constants = {
     AWS_REGION: 'us-east-1',
     S3_ARTIFACT_BUCKET_SC_PREFIX: 'service-catalog-cfn-templates/',
-    PORTFOLIO_NAME: 'swb-dev-va',
+    SC_PORTFOLIO_NAME: 'swb-dev-va',
     S3_ARTIFACT_BUCKET_ARN_NAME: 'S3BucketArtifactsArnOutput',
     LAUNCH_CONSTRAINT_ROLE_NAME: 'LaunchConstraintIamRoleNameOutput',
     STACK_NAME: 'swb-dev-va'
@@ -60,7 +60,9 @@ describe('ServiceCatalogSetup', () => {
   describe('Mocked private methods', () => {
     test('run: Create new portfolio, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue(undefined);
+      // Mock no portfolio
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({ PortfolioDetails: [] });
       sc['_createSCPortfolio'] = jest.fn().mockResolvedValue('port-abc');
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
@@ -74,7 +76,16 @@ describe('ServiceCatalogSetup', () => {
 
     test('run: Porfolio already exist, add new product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
+      //Mock portfolio already exist
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({
+        PortfolioDetails: [
+          {
+            DisplayName: 'swb-dev-va',
+            Id: 'port-abc'
+          }
+        ]
+      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
@@ -87,7 +98,16 @@ describe('ServiceCatalogSetup', () => {
 
     test('run: Porfolio already exist, product already exist, updating product, add launch constraint', async () => {
       const sc = new ServiceCatalogSetup(constants);
-      sc['_getPortfolioId'] = jest.fn().mockResolvedValue('port-abc');
+      //Mock portfolio already exist
+      const scMock = mockClient(ServiceCatalogClient);
+      scMock.on(ListPortfoliosCommand).resolves({
+        PortfolioDetails: [
+          {
+            DisplayName: 'swb-dev-va',
+            Id: 'port-abc'
+          }
+        ]
+      });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
         .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });

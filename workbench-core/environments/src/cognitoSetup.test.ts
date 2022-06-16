@@ -1,7 +1,5 @@
 jest.mock('md5-file');
 
-import CognitoSetup from './cognitoSetup';
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
   AdminCreateUserCommand,
   CognitoIdentityProviderClient,
@@ -9,6 +7,8 @@ import {
   ListUserPoolsCommand,
   UsernameExistsException
 } from '@aws-sdk/client-cognito-identity-provider';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import CognitoSetup from './cognitoSetup';
 
 describe('CognitoSetup', () => {
   const constants = {

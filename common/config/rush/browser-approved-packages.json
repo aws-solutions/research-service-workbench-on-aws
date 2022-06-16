@@ -55,6 +55,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-iam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production" ]
     },
@@ -79,11 +83,19 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/client-managedblockchain",
-      "allowedCategories": [ "prototypes" ]
+      "name": "@aws-sdk/client-lambda",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-s3-control",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-sagemaker",
       "allowedCategories": [ "production" ]
     },
     {
@@ -100,6 +112,10 @@
     },
     {
       "name": "@aws-sdk/types",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/util-dynamodb",
       "allowedCategories": [ "production" ]
     },
     {
@@ -140,6 +156,10 @@
     },
     {
       "name": "@casl/ability",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@hapi/boom",
       "allowedCategories": [ "production" ]
     },
     {
@@ -275,14 +295,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "fabric-ca-client",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "fabric-common",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "fast-check",
       "allowedCategories": [ "production" ]
     },
@@ -313,10 +325,6 @@
     {
       "name": "md5-file",
       "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "nconf",
-      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next",
@@ -380,7 +388,7 @@
     },
     {
       "name": "ts-node",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "typescript",
