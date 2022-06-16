@@ -1,8 +1,8 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import envKeyNameToKey from './environmentKeyNameToKey';
-import { v4 as uuidv4 } from 'uuid';
 import Boom from '@hapi/boom';
+import { v4 as uuidv4 } from 'uuid';
+import envKeyNameToKey from './environmentKeyNameToKey';
 
 interface EnvironmentType {
   pk: string;
@@ -12,7 +12,7 @@ interface EnvironmentType {
   provisioningArtifactId: string;
   createdAt: string;
   createdBy: string;
-  desc: string;
+  description: string;
   name: string;
   owner: string;
   type: string;
