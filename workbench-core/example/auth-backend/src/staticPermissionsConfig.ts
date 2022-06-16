@@ -22,6 +22,6 @@ const adminPermissions: Permission[] = [
 ];
 
 export const permissionsMap: PermissionsMap = {
-  guest: guestPermissions,
-  admin: adminPermissions
+  Guest: guestPermissions,
+  Admin: adminPermissions
 };

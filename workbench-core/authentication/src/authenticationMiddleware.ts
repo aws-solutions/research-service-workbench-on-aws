@@ -190,8 +190,8 @@ export function logoutUser(
       }
     }
 
-    res.cookie('access_token', 'cleared', { expires: new Date(0) });
-    res.cookie('refresh_token', 'cleared', { expires: new Date(0) });
+    res.cookie('access_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
+    res.cookie('refresh_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
 
     res.sendStatus(200);
   };

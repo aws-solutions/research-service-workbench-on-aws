@@ -27,11 +27,11 @@ import * as StaticRoutesConfig from './staticRouteConfig';
 const app = express();
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'TODO',
-  cognitoDomain: 'TODO',
-  userPoolId: 'TODO',
-  clientId: 'TODO',
-  clientSecret: 'TODO',
+  region: '<AWS Region>',
+  cognitoDomain: '<Cognito Hosted UI Domain>',
+  userPoolId: '<Cognito User Pool ID>',
+  clientId: '<Cognito User Pool Client ID>',
+  clientSecret: '<Cognito User Pool Client Secret>',
   websiteUrl: 'http://localhost:3000'
 };
 
@@ -41,8 +41,8 @@ function wrapVerifyToken(
   ignoreRoutes: string[]
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const baseUrl = req.baseUrl;
-    if (ignoreRoutes.includes(baseUrl)) {
+    const path = req.path;
+    if (ignoreRoutes.includes(path)) {
       next();
     } else {
       await fn(req, res, next);
@@ -76,7 +76,7 @@ const authorizationService: AuthorizationService = new AuthorizationService(
 app.use(cookieParser());
 app.use(express.json());
 
-app.use(wrapVerifyToken(verifyToken(authenticationService), ['/login', '/token', '/logout', 'refresh']));
+app.use(wrapVerifyToken(verifyToken(authenticationService), ['/login', '/token', '/logout', '/refresh']));
 app.use(withAuth(authorizationService));
 
 app.get('/login', getAuthorizationCodeUrl(authenticationService));

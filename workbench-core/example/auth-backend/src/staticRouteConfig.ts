@@ -9,6 +9,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/pro': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Guest'
+      }
+    ]
+  },
   '/admin': {
     GET: [
       {
