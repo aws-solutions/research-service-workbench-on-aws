@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AttributeValue, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, QueryCommandInput, QueryCommandOutput, DynamoDB } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
+
 
 /**
  * This class helps with building queries to a DDB table

@@ -1,5 +1,4 @@
-import { ListPortfoliosCommandInput, PortfolioDetail } from '@aws-sdk/client-service-catalog';
-import ServiceCatalog from '../clients/serviceCatalog';
+import { ServiceCatalog, ListPortfoliosCommandInput, PortfolioDetail } from '@aws-sdk/client-service-catalog';
 
 export default class ServiceCatalogService {
   private _serviceCatalog: ServiceCatalog;

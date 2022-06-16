@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ScanCommandInput, AttributeValue, ScanCommandOutput } from '@aws-sdk/client-dynamodb';
+import { ScanCommandInput, AttributeValue, ScanCommandOutput, DynamoDB } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
+
 
 /**
  * This class helps with scans of an entire table in DDB

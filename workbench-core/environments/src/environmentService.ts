@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,6 +32,7 @@ interface Environment {
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
 }
+
 const defaultEnv: Environment = {
   id: '',
   instanceId: '',
@@ -107,50 +108,53 @@ export default class EnvironmentService {
     }
   }
 
-  // TODO: Implement limit and paginationToken will be used for next task
+
   /**
    * Get all environments with option to filter by status
    * @param user - User information
    * @param filter - Provide which attribute to filter by
-   * @param limit - Number of results per page
+   * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    */
   public async getEnvironments(
     user: { role: string; ownerId: string },
     filter?: { status?: EnvironmentStatus },
-    limit?: number,
-    paginationToken?: number
-  ): Promise<Environment[]> {
+    pageSize?: number,
+    paginationToken?: string
+  ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
     let environments: Environment[] = [];
-    let data;
+
+    const queryParams: QueryParams = {
+      key: { name: 'resourceType', value: 'environment' },
+      limit: pageSize && pageSize >= 0 ? pageSize : 50
+    };
 
     if (user.role === 'admin') {
       if (filter && filter.status) {
         // if admin and status is selected in the filter, use GSI getResourceByStatus
-        const queryParams = {
-          index: 'getResourceByStatus',
-          key: { name: 'resourceType', value: 'environment' },
-          sortKey: 'status',
-          eq: { S: filter.status }
-        };
-        data = await this._aws.helpers.ddb.query(queryParams).execute();
+        queryParams.index = 'getResourceByStatus';
+        queryParams.sortKey = 'status';
+        queryParams.eq = { S: filter.status };
       } else {
         // if admin, use GSI getResourceByUpdatedAt
-        const queryParams = {
-          index: 'getResourceByUpdatedAt',
-          key: { name: 'resourceType', value: 'environment' }
-        };
-        data = await this._aws.helpers.ddb.query(queryParams).execute();
+        queryParams.index = 'getResourceByUpdatedAt';
       }
     } else {
-      const queryParams = {
-        index: 'getResourceByOwner',
-        key: { name: 'resourceType', value: 'environment' },
-        sortKey: 'owner',
-        eq: { S: user.ownerId }
-      };
-      data = await this._aws.helpers.ddb.query(queryParams).execute();
+      queryParams.index = 'getResourceByOwner';
+      queryParams.sortKey = 'owner';
+      queryParams.eq = { S: user.ownerId };
     }
+    // If paginationToken is defined, add param
+    // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
+    if (paginationToken) {
+      try {
+        queryParams.start = JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8'));
+      } catch (error) {
+        throw Boom.badRequest('Invalid paginationToken');
+      }
+    }
+
+    const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
     // check that Items is defined
     if (data && data.Items) {
@@ -163,7 +167,10 @@ export default class EnvironmentService {
         return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
       });
     }
-    return environments;
+    const token = data.LastEvaluatedKey
+      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
+      : undefined;
+    return { envs: environments, paginationToken: token };
   }
 
   public async updateEnvironment(
@@ -230,7 +237,7 @@ export default class EnvironmentService {
     const batchGetResult = (await this._aws.helpers.ddb
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
-    const currentDate = new Date().toISOString();
+
     const newEnv: Environment = {
       id: uuidv4(),
       instanceId: params.instanceId,
@@ -243,8 +250,8 @@ export default class EnvironmentService {
       projectId: params.projectId,
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
-      updatedAt: currentDate,
-      createdAt: currentDate,
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       owner: 'owner-1', // TODO: Get this from request context
       status: params.status || 'PENDING'
     };
