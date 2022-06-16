@@ -311,12 +311,22 @@ Object {
       "DependsOn": Array [
         "LambdaServiceServiceRole71319041",
       ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-L1",
+              "reason": "We are using Node14 for Lambda functions",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "0cbba7608888c3948fdec181048880eebc1eca58d3e2f70826988b9abfb1076a.zip",
+          "S3Key": "b165ba96447b544e2d847aaeaefa98873af9cc78be87bde5b5e561010c3a9e8a.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "buildLambda.handler",

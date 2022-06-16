@@ -54,7 +54,7 @@ jobs:
         with:
           input_path: solutions/swb-reference/src/templates
           extra_args: --fail-on-warnings -o json
-      
+
       - name: Grep cfn-nag for violations
         uses: sergeysova/jq-action@v2
         id: cfn-nag

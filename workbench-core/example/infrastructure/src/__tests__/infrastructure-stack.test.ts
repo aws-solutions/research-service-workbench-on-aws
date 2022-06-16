@@ -1,7 +1,7 @@
-import { App } from 'aws-cdk-lib';
 import { expect as expectCDK, haveResourceLike } from '@aws-cdk/assert';
-import { InfrastructureStack } from '../infrastructure-stack';
+import { App } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { InfrastructureStack } from '../infrastructure-stack';
 
 describe('CDKStack', () => {
   test('Infrastructure Test', () => {

@@ -5,31 +5,24 @@ parameters:
   ProductId:
     type: String
     description: 'The ProductId to be used from Service Catalog'
-    default: ''
   EncryptionKeyArn:
     type: String
     description: 'The encryption key ARN to be used'
-    default: ''
   CIDR:
     type: String
     description: 'The initial CIDR block to be granted access'
-    default: ''
   ProvisioningArtifactId:
     type: String
     description: 'The ProvisioningArtifactId to be used from Service Catalog'
-    default: ''
   VPC:
     type: String
     description: 'The VPC to be used where the environment will reside'
-    default: ''
   Subnet:
     type: String
     description: 'The Subnet to be used where the environment will reside'
-    default: ''
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    default: ''
   Namespace:
     type: String
     description: 'The namespace to be used for creating the CfN stack resources'
@@ -37,15 +30,19 @@ parameters:
   InstanceName:
     type: String
     description: '(Required) The name of the Sagemaker instance being provisioned.'
-    default: ''
   PathId:
     type: String
     description: 'The Path ID for the Service Catalog product.'
-    default: ''
-  EventBusName:
+  EnvironmentInstanceFiles:
     type: String
-    description: 'The main account event bridge bus name.'
-    default: ''
+    description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
+  AutoStopIdleTimeInMinutes:
+    type: String
+    description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
+    default: '0'
+  InstanceType:
+    type: String
+    description: 'The size of the notebook instance coming from environment type config'
 mainSteps:
   - name: LaunchSagemaker
     action: 'aws:executeAwsApi'
@@ -70,19 +67,23 @@ mainSteps:
         - Key: IamPolicyDocument
           Value: '{}'
         - Key: InstanceType
-          Value: ml.t3.medium
+          Value: '{{ InstanceType }}'
         - Key: Subnet
           Value: '{{ Subnet }}'
+        - Key: EnvironmentInstanceFiles
+          Value: '{{ EnvironmentInstanceFiles }}'
+        - Key: AutoStopIdleTimeInMinutes
+          Value: '{{ AutoStopIdleTimeInMinutes }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'
-      outputs:
-        - Name: ProvisionedProductId
-          Type: String
-          Selector: '$.RecordDetail.ProvisionedProductId'
-        - Name: RecordId
-          Type: String
-          Selector: '$.RecordDetail.RecordId'
+    outputs:
+      - Name: ProvisionedProductId
+        Type: String
+        Selector: '$.RecordDetail.ProvisionedProductId'
+      - Name: RecordId
+        Type: String
+        Selector: '$.RecordDetail.RecordId'
     description: Launch Sagemaker
     nextStep: WaitForProvisioning
   - name: WaitForProvisioning
@@ -94,23 +95,45 @@ mainSteps:
       Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
       DesiredValues:
         - AVAILABLE
+        - ERROR
       PropertySelector: '$.ProvisionedProductDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetProvisionedProductDetail
+  - name: GetProvisionedProductDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeProvisionedProduct
+      Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
     outputs:
-      - Name: ProvisionedProductDetail
-        Type: StringMap
-        Selector: '$.ProvisionedProductDetail'
-    onFailure: step:PushFailureStatusToEventBridge
-    nextStep: PushMetadataToEventBridge
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.ProvisionedProductDetail.Status'
+      - Name: ErrorMessage
+        Type: String
+        Selector: '$.ProvisionedProductDetail.StatusMessage'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: AVAILABLE
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: ERROR
+      Default: PushFailureStatusToEventBridge
   - name: PushMetadataToEventBridge
     action: 'aws:executeAwsApi'
     inputs:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ LaunchSagemaker.ProvisionedProductId }}\", \"RecordId\": \"{{ LaunchSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Launch\" }'
-          DetailType: 'Success'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true
   - name: PushFailureStatusToEventBridge
     action: 'aws:executeAwsApi'
@@ -118,8 +141,8 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ \"ProvisionedProductId\": \"{{ LaunchSagemaker.ProvisionedProductId }}\", \"RecordId\": \"{{ LaunchSagemaker.RecordId }}\", \"EnvType\": \"Sagemaker\", \"Operation\": \"Launch\" }'
-          DetailType: 'Failure'
-          EventBusName: '{{ EventBusName }}'
-          Source: 'LaunchSagemaker'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED", "ErrorMessage": "{{ GetProvisionedProductDetail.ErrorMessage }}" }'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
     isEnd: true

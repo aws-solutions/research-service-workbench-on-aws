@@ -1,7 +1,7 @@
-import AuditPlugin from '../auditPlugin';
-import Writer from './writer';
 import AuditEntry from '../auditEntry';
+import AuditPlugin from '../auditPlugin';
 import Metadata from '../metadata';
+import Writer from './writer';
 
 /**
  *  This is the base audit plugin that utilizes {@link Writer} to output

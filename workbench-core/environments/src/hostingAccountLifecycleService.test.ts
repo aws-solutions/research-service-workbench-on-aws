@@ -1,34 +1,46 @@
 jest.mock('./iamRoleCloneService');
 
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { EventBridgeClient, PutPermissionCommand } from '@aws-sdk/client-eventbridge';
-import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
-import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { Readable } from 'stream';
+import { AwsService } from '@amzn/workbench-core-base';
+
 import {
   CloudFormationClient,
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
+import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
+import {
+  EventBridgeClient,
+  PutPermissionCommand,
+  DescribeRuleCommand,
+  PutRuleCommand,
+  PutTargetsCommand
+} from '@aws-sdk/client-eventbridge';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import { AwsService } from '@amzn/workbench-core-base';
-import { Readable } from 'stream';
+
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
-
+import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { mockClient, AwsStub } from 'aws-sdk-client-mock';
+import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import IamRoleCloneService from './iamRoleCloneService';
 
-const constants = {
-  MAIN_ACCOUNT_BUS_ARN_NAME: 'SampleMainAccountBusArn',
-  SAGEMAKER_LAUNCH_SSM_DOC: 'SagemakerLaunchSSMDocOutput'
-};
-
 describe('HostingAccountLifecycleService', () => {
+  const ORIGINAL_ENV = process.env;
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetModules(); // Most important - it clears the cache
+    process.env = { ...ORIGINAL_ENV }; // Make a copy
+    process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
+    process.env.STACK_NAME = 'swb-swbv2-va';
+    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+  });
+
+  afterAll(() => {
+    process.env = ORIGINAL_ENV; // Restore old environment
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,73 +53,91 @@ describe('HostingAccountLifecycleService', () => {
           CreationTime: new Date(),
           Outputs: [
             {
-              OutputKey: constants.MAIN_ACCOUNT_BUS_ARN_NAME,
-              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
+              OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
             },
             {
-              OutputKey: constants.SAGEMAKER_LAUNCH_SSM_DOC,
-              OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
-            }
+              OutputKey: process.env.STATUS_HANDLER_ARN_NAME,
+              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+            },
+            { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
+            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
+            { OutputKey: 'EncryptionKeyArn', OutputValue: 'FakeEncryptionKeyArn' }
           ]
         }
       ]
     });
   }
-  test('execute does not return an error', async () => {
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-swbv2-va');
 
-    const ebMock = mockClient(EventBridgeClient);
-    const ec2Mock = mockClient(EC2Client);
-    const ssmMock = mockClient(SSMClient);
+  test('initializeAccount does not return an error', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     const cfnMock = mockClient(CloudFormationClient);
-
-    // Mock Modify Doc Permission
-    ssmMock.on(ModifyDocumentPermissionCommand).resolves({});
-
-    // Mock Modify AMI permission attribute
-    ec2Mock.on(ModifyImageAttributeCommand).resolves({});
-
-    // Mock EventBridge put permission
-    ebMock.on(PutPermissionCommand).resolves({});
-
-    // Mock Cloudformation describeStacks
     mockCloudformationOutputs(cfnMock);
 
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        awsAccountId: { S: '123456789012' },
+        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
+        portfolioId: { S: 'port-1234' },
+        accountId: { S: 'abc-xyz' }
+      }
+    });
+
     await expect(
-      hostingAccountLifecycleService.initializeAccount(
-        {
-          accountId: '123456789012',
-          envManagementRoleArn: 'sampleEnvManagementRoleArn',
-          accountHandlerRoleArn: 'sampleAccountHandlerRoleArn'
-        },
-        'SampleMainAccountBusArn'
-      )
+      hostingAccountLifecycleService.initializeAccount({
+        id: 'abc-xyz',
+        accountId: 'abc-xyz',
+        awsAccountId: '123456789012',
+        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('updateBusPermissions triggered for adding account to bus rule', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    // Mock EventBridge calls
+    const ebMock = mockClient(EventBridgeClient);
+    ebMock.on(PutPermissionCommand).resolves({});
+    ebMock.on(PutTargetsCommand).resolves({});
+    ebMock.on(PutRuleCommand).resolves({});
+    ebMock.on(DescribeRuleCommand).resolves({});
+
+    await expect(
+      hostingAccountLifecycleService.updateBusPermissions('sampleStatusHandlerArn', '123456789012')
+    ).resolves.not.toThrowError();
+  });
+
+  test('updateBusPermissions triggered for updating account in bus rule', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+
+    // Mock EventBridge calls
+    const ebMock = mockClient(EventBridgeClient);
+    ebMock.on(PutPermissionCommand).resolves({});
+    ebMock.on(PutRuleCommand).resolves({});
+    ebMock.on(PutTargetsCommand).resolves({});
+    ebMock.on(DescribeRuleCommand).resolves({
+      EventPattern: JSON.stringify({
+        account: ['123456789012']
+      })
+    });
+
+    await expect(
+      hostingAccountLifecycleService.updateBusPermissions('sampleStatusHandlerArn', '123456789012')
     ).resolves.not.toThrowError();
   });
 
   test('updateAccount', async () => {
     process.env.AMI_IDS_TO_SHARE = JSON.stringify(['ami-1234']);
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService('us-east-1', 'swb-dev-va');
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const cfnMock = mockClient(CloudFormationClient);
 
     // Mock for getting SSM Documents, VPC, and VpcSubnet
-    cfnMock.on(DescribeStacksCommand).resolves({
-      Stacks: [
-        {
-          StackName: 'ExampleStack',
-          CreationTime: new Date(),
-          StackStatus: 'CREATE_COMPLETE',
-          Outputs: [
-            {
-              OutputKey: 'SagemakerLaunchSSMDocOutput',
-              OutputValue: 'arn:aws:ssm:us-east-2:0123456789012:document/swb-dev-oh-SagemakerLaunch'
-            },
-            { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
-            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' }
-          ]
-        }
-      ]
-    });
+    mockCloudformationOutputs(cfnMock);
 
     // Mock sharing SSM Documents
     const ssmMock = mockClient(SSMClient);
@@ -154,15 +184,18 @@ describe('HostingAccountLifecycleService', () => {
         ssmDocNameSuffix: 'SSMDocOutput',
         principalArnForScPortfolio: 'arn:aws:iam::0123456789012:role/swb-dev-va-hosting-account-env-mgmt',
         roleToCopyToTargetAccount: 'swb-dev-va-LaunchConstraint',
-        s3ArtifactBucketName: 'artifactBucket'
+        s3ArtifactBucketName: 'artifactBucket',
+        ddbAccountId: 'abc-xyz'
       })
     ).resolves.not.toThrowError();
 
     expect(IamRoleCloneService).toBeCalled();
     expect(writeAccountStatusSpy).toHaveBeenCalledWith({
-      status: 'UP_TO_DATE',
+      status: 'CURRENT',
+      ddbAccountId: 'abc-xyz',
       vpcId: 'fakeVPC',
-      subnetId: 'FakeSubnet'
+      subnetId: 'FakeSubnet',
+      encryptionKeyArn: 'FakeEncryptionKeyArn'
     });
   });
 });

@@ -3,15 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import _ from 'lodash';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
 import Query from './query';
 import Scanner from './scanner';
+import TransactEdit from './transactEdit';
 import Updater from './updater';
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
-import _ from 'lodash';
 
 export default class DynamoDBService {
   private _awsRegion: string;
@@ -311,7 +312,7 @@ export default class DynamoDBService {
         updater = updater.disableUpdatedAt();
       }
       if (params.item) {
-        updater = updater.item(marshall(params.item));
+        updater = updater.item(marshall(params.item, { removeUndefinedValues: true }));
       }
       if (params.set) {
         updater = updater.set(params.set);
@@ -438,5 +439,15 @@ export default class DynamoDBService {
       }
     }
     return batchEdit;
+  }
+
+  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+    let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params?.addPutRequest) {
+      transactEdit = transactEdit.addPutRequests(
+        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
+    }
+    return transactEdit;
   }
 }
