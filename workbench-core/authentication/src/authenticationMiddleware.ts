@@ -1,6 +1,8 @@
+import { AuthenticatedUser, RoutesIgnored } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
-import { AuthenticatedUser } from './authenticatedUser';
+import get from 'lodash/get';
+import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
@@ -28,9 +30,10 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  */
 export function getTokensFromAuthorizationCode(
   authenticationService: AuthenticationService,
-  loggingService?: LoggingService
+  options?: { loggingService?: LoggingService }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
+    const { loggingService } = options || {};
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
 
@@ -125,31 +128,36 @@ export function getAuthorizationCodeUrl(
  */
 export function verifyToken(
   authenticationService: AuthenticationService,
-  loggingService?: LoggingService
+  options?: { ignoredRoutes?: RoutesIgnored; loggingService?: LoggingService }
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
-    const accessToken = req.cookies.access_token;
+    const { ignoredRoutes, loggingService } = options || {};
+    if (has(ignoredRoutes, req.originalUrl) && get(get(ignoredRoutes, req.originalUrl), req.method)) {
+      next();
+    } else {
+      const accessToken = req.cookies.access_token;
 
-    if (typeof accessToken === 'string') {
-      try {
-        const decodedAccessToken = await authenticationService.validateToken(accessToken);
+      if (typeof accessToken === 'string') {
+        try {
+          const decodedAccessToken = await authenticationService.validateToken(accessToken);
 
-        const user: AuthenticatedUser = {
-          id: authenticationService.getUserIdFromToken(decodedAccessToken),
-          roles: authenticationService.getUserRolesFromToken(decodedAccessToken)
-        };
+          const user: AuthenticatedUser = {
+            id: authenticationService.getUserIdFromToken(decodedAccessToken),
+            roles: authenticationService.getUserRolesFromToken(decodedAccessToken)
+          };
 
-        res.locals.user = user;
+          res.locals.user = user;
 
-        next();
-      } catch (error) {
-        if (loggingService) {
-          loggingService.error(error);
+          next();
+        } catch (error) {
+          if (loggingService) {
+            loggingService.error(error);
+          }
+          res.sendStatus(401);
         }
+      } else {
         res.sendStatus(401);
       }
-    } else {
-      res.sendStatus(401);
     }
   };
 }
@@ -171,9 +179,10 @@ export function verifyToken(
  */
 export function logoutUser(
   authenticationService: AuthenticationService,
-  loggingService?: LoggingService
+  options?: { loggingService?: LoggingService }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
+    const { loggingService } = options || {};
     const refreshToken = req.cookies.refresh_token;
 
     if (typeof refreshToken === 'string') {
@@ -213,9 +222,10 @@ export function logoutUser(
  */
 export function refreshAccessToken(
   authenticationService: AuthenticationService,
-  loggingService?: LoggingService
+  options?: { loggingService?: LoggingService }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
+    const { loggingService } = options || {};
     const refreshToken = req.cookies.refresh_token;
 
     if (typeof refreshToken === 'string') {

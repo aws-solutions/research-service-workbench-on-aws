@@ -24,7 +24,7 @@
     },
     {
       "name": "@amzn/workbench-core-authorization",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@amzn/workbench-core-base",
