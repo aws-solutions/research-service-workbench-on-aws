@@ -384,6 +384,7 @@ importers:
   ../../workbench-core/authentication:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-authorization': workspace:*
       '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cognito-identity-provider': ^3.67.0
       '@aws-sdk/client-s3': ^3.58.0
@@ -394,6 +395,7 @@ importers:
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/lodash': ^4.14.181
       '@types/node': ^14
       aws-jwt-verify: ^3.0.0
       aws-sdk-client-mock: ^0.6.2
@@ -402,15 +404,18 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
+      lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
+      '@amzn/workbench-core-authorization': link:../authorization
       '@amzn/workbench-core-logging': link:../logging
       '@aws-sdk/client-cognito-identity-provider': 3.102.0
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
+      lodash: 4.17.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/client-s3': 3.100.0
@@ -421,6 +426,7 @@ importers:
       '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/lodash': 4.14.182
       '@types/node': 14.18.20
       aws-sdk-client-mock: 0.6.2_b3baf346a3b9422a0ecddb3e973bec80
       depcheck: 1.4.3
@@ -435,7 +441,6 @@ importers:
   ../../workbench-core/authorization:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-logging': workspace:*
       '@casl/ability': ^5.4.3
       '@rushstack/eslint-config': ^2.5.1
@@ -459,7 +464,6 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-authentication': link:../authentication
       '@amzn/workbench-core-logging': link:../logging
       '@casl/ability': 5.4.4
       lodash: 4.17.21
@@ -1376,6 +1380,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.159.0:
     resolution: {integrity: sha512-/j0wrbcyugAtq0JC7peYUhyEMREU+esFU9PEoeYZFOlUbFkkOeaLNiZj4mc21XgOKbScw+RfQRpD3YX6+QAw3w==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
+    dependencies:
+      jsonschema: 1.4.1
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - jsonschema
@@ -1420,7 +1427,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.159.0
       '@aws-cdk/cx-api': 1.159.0
       '@aws-cdk/region-info': 1.159.0
+      '@balena/dockerignore': 1.0.2
       constructs: 3.4.25
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -1457,6 +1468,7 @@ packages:
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.159.0
+      semver: 7.3.7
     dev: false
     bundledDependencies:
       - semver
@@ -1802,8 +1814,6 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@aws-sdk/client-s3-control/3.100.0:
-    resolution: {integrity: sha512-PVnu4FmQHwZj0Q1hgRAiyu63lBqoXqeB5N0tseH9U5Q+qCRtZfpJhN/f5YbyR5AsenAMSS38mNQfisS9V+QuhQ==}
   /@aws-sdk/client-lambda/3.105.0:
     resolution: {integrity: sha512-wLAo88id2REcYk4ogvmKid/WCXsEQcDZckvYWKIaX7yII9Uluox9fblxSl+cnaylb14cCxH+ZoVEkfRZQlzhqw==}
     engines: {node: '>=12.0.0'}
@@ -1843,6 +1853,54 @@ packages:
       '@aws-sdk/util-utf8-node': 3.55.0
       '@aws-sdk/util-waiter': 3.78.0
       tslib: 2.4.0
+    dev: false
+
+  /@aws-sdk/client-s3-control/3.100.0:
+    resolution: {integrity: sha512-PVnu4FmQHwZj0Q1hgRAiyu63lBqoXqeB5N0tseH9U5Q+qCRtZfpJhN/f5YbyR5AsenAMSS38mNQfisS9V+QuhQ==}
+    engines: {node: '>=12.0.0'}
+    dependencies:
+      '@aws-crypto/sha256-browser': 2.0.0
+      '@aws-crypto/sha256-js': 2.0.0
+      '@aws-sdk/client-sts': 3.100.0
+      '@aws-sdk/config-resolver': 3.80.0
+      '@aws-sdk/credential-provider-node': 3.100.0
+      '@aws-sdk/fetch-http-handler': 3.78.0
+      '@aws-sdk/hash-blob-browser': 3.78.0
+      '@aws-sdk/hash-node': 3.78.0
+      '@aws-sdk/hash-stream-node': 3.78.0
+      '@aws-sdk/invalid-dependency': 3.78.0
+      '@aws-sdk/md5-js': 3.78.0
+      '@aws-sdk/middleware-apply-body-checksum': 3.78.0
+      '@aws-sdk/middleware-content-length': 3.78.0
+      '@aws-sdk/middleware-host-header': 3.78.0
+      '@aws-sdk/middleware-logger': 3.78.0
+      '@aws-sdk/middleware-retry': 3.80.0
+      '@aws-sdk/middleware-sdk-s3-control': 3.80.0
+      '@aws-sdk/middleware-serde': 3.78.0
+      '@aws-sdk/middleware-signing': 3.78.0
+      '@aws-sdk/middleware-stack': 3.78.0
+      '@aws-sdk/middleware-user-agent': 3.78.0
+      '@aws-sdk/node-config-provider': 3.80.0
+      '@aws-sdk/node-http-handler': 3.94.0
+      '@aws-sdk/protocol-http': 3.78.0
+      '@aws-sdk/smithy-client': 3.99.0
+      '@aws-sdk/types': 3.78.0
+      '@aws-sdk/url-parser': 3.78.0
+      '@aws-sdk/util-base64-browser': 3.58.0
+      '@aws-sdk/util-base64-node': 3.55.0
+      '@aws-sdk/util-body-length-browser': 3.55.0
+      '@aws-sdk/util-body-length-node': 3.55.0
+      '@aws-sdk/util-defaults-mode-browser': 3.99.0
+      '@aws-sdk/util-defaults-mode-node': 3.99.0
+      '@aws-sdk/util-user-agent-browser': 3.78.0
+      '@aws-sdk/util-user-agent-node': 3.80.0
+      '@aws-sdk/util-utf8-browser': 3.55.0
+      '@aws-sdk/util-utf8-node': 3.55.0
+      '@aws-sdk/xml-builder': 3.55.0
+      entities: 2.2.0
+      fast-xml-parser: 3.19.0
+      tslib: 2.4.0
+      uuid: 8.3.2
     dev: false
 
   /@aws-sdk/client-s3/3.100.0:

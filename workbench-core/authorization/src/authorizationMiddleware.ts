@@ -1,5 +1,5 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { NextFunction, Request, Response } from 'express';
+import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationService from './authorizationService';
 import { HTTPMethod, HTTPMethods } from './routesMap';
 /**
