@@ -230,6 +230,7 @@ export default class EnvironmentService {
     const batchGetResult = (await this._aws.helpers.ddb
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
+    const currentDate = new Date().toISOString();
     const newEnv: Environment = {
       id: uuidv4(),
       instanceId: params.instanceId,
@@ -242,8 +243,8 @@ export default class EnvironmentService {
       projectId: params.projectId,
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
-      updatedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      updatedAt: currentDate,
+      createdAt: currentDate,
       owner: 'owner-1', // TODO: Get this from request context
       status: params.status || 'PENDING'
     };

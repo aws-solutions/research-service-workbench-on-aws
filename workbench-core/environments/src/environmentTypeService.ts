@@ -1,5 +1,6 @@
-import { AwsService } from '@amzn/workbench-core-base';
-import { GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envKeyNameToKey from './environmentKeyNameToKey';
@@ -11,8 +12,6 @@ interface EnvironmentType {
   id: string;
   productId: string;
   provisioningArtifactId: string;
-  createdAt: string;
-  createdBy: string;
   description: string;
   name: string;
   owner: string;
@@ -29,27 +28,11 @@ interface EnvironmentType {
   }[];
   resourceType: string;
   status: EnvironmentTypeStatus;
+  createdAt: string;
+  createdBy: string;
   updatedAt: string;
   updatedBy: string;
 }
-const defaultEnvType = {
-  pk: '',
-  sk: '',
-  id: '',
-  productId: '',
-  provisioningArtifactId: '',
-  createdAt: '',
-  createdBy: '',
-  desc: '',
-  name: '',
-  owner: '',
-  type: '',
-  params: [],
-  resourceType: 'envType',
-  status: '',
-  updatedAt: '',
-  updatedBy: ''
-};
 export default class EnvironmentTypeService {
   private _aws: AwsService;
   private _tableName: string;
@@ -62,7 +45,7 @@ export default class EnvironmentTypeService {
 
   public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
     const response = await this._aws.helpers.ddb
-      .get(this._buildPkSk(envTypeId, envKeyNameToKey.envType))
+      .get(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType))
       .execute();
 
     const item = (response as GetItemCommandOutput).Item;
@@ -88,17 +71,9 @@ export default class EnvironmentTypeService {
     }
   }
 
-  private _buildPkSk(id: string, type: string): { pk: string; sk: string } {
-    const key = this._buildKey(id, type);
-    return { pk: key, sk: key };
-  }
-
-  private _buildKey(id: string, type: string): string {
-    return `${type}#${id}`;
-  }
-
   public async updateEnvironment(
     envTypeId: string,
+    owner: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
     try {
@@ -110,18 +85,28 @@ export default class EnvironmentTypeService {
       throw e;
     }
 
+    const currentDate = new Date().toISOString();
+    const updatedEnvType = {
+      ...updatedValues,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+      updatedBy: owner
+    };
+
     const response = await this._aws.helpers.ddb
-      .update(this._buildPkSk(envTypeId, envKeyNameToKey.envType), { item: updatedValues })
+      .update(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType), { item: updatedEnvType })
       .execute();
-    return response.Attributes! as unknown as EnvironmentType;
+    if (response.Attributes) {
+      return response.Attributes as unknown as EnvironmentType;
+    }
+    console.error('Unable to update environment type', updatedEnvType);
+    throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
   }
 
   public async createNewEnvironment(params: {
     productId: string;
     provisioningArtifactId: string;
-    createdAt: string;
-    createdBy: string;
-    desc: string;
+    description: string;
     name: string;
     owner: string;
     type: string;
@@ -135,19 +120,28 @@ export default class EnvironmentTypeService {
         AllowedValues: string[];
       };
     }[];
-    resourceType: string;
-    status: string;
-    updatedAt: string;
-    updatedBy: string;
-  }) {
+    status: EnvironmentTypeStatus;
+  }): Promise<EnvironmentType> {
     const id = uuidv4();
-    const newEnvType = {
+    const currentDate = new Date().toISOString();
+    const newEnvType: EnvironmentType = {
       id,
-      ...this._buildPkSk(id, envKeyNameToKey.envType),
+      ...buildDynamoDBPkSk(id, envKeyNameToKey.envType),
+      createdAt: currentDate,
+      updatedAt: currentDate,
+      createdBy: params.owner,
+      updatedBy: params.owner,
+      resourceType: 'envType',
       ...params
     };
-    return this._aws.helpers.ddb
-      .update(this._buildPkSk(id, envKeyNameToKey.envType), { item: newEnvType })
+    const item = newEnvType as unknown as { [key: string]: unknown };
+    const response = await this._aws.helpers.ddb
+      .update(buildDynamoDBPkSk(id, envKeyNameToKey.envType), { item })
       .execute();
+    if (response.Attributes) {
+      return response.Attributes as unknown as EnvironmentType;
+    }
+    console.error('Unable to create environment type', newEnvType);
+    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
   }
 }

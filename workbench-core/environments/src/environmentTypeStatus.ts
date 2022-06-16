@@ -2,7 +2,7 @@
 // This file is structured this way so we can verify whether a user input is of type `EnvironmentStatus`
 export const ENVIRONMENT_TYPE_STATUS: string[] = ['APPROVED', 'NOT_APPROVED'];
 
-// Convert ENVIRONMENT_STATUS array to string literals
+// Convert ENVIRONMENT_TYPE_STATUS array to string literals
 // More info here: https://stackoverflow.com/a/59541566
 export type EnvironmentTypeStatus = typeof ENVIRONMENT_TYPE_STATUS[number];
 
