@@ -132,7 +132,7 @@ export function verifyToken(
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const { ignoredRoutes, loggingService } = options || {};
-    if (has(ignoredRoutes, req.originalUrl) && get(get(ignoredRoutes, req.originalUrl), req.method)) {
+    if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
       const accessToken = req.cookies.access_token;

@@ -19,7 +19,7 @@ import {
 } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import cookieParser from 'cookie-parser';
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
 
@@ -34,21 +34,6 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   clientSecret: '<Cognito User Pool Client Secret>',
   websiteUrl: 'http://localhost:3000'
 };
-
-// Wrapper verify token
-function wrapVerifyToken(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<void>,
-  ignoreRoutes: string[]
-): (req: Request, res: Response, next: NextFunction) => Promise<void> {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const path = req.path;
-    if (ignoreRoutes.includes(path)) {
-      next();
-    } else {
-      await fn(req, res, next);
-    }
-  };
-}
 
 // Create Logger Service
 const logger: LoggingService = new LoggingService();
@@ -76,13 +61,13 @@ const authorizationService: AuthorizationService = new AuthorizationService(
 app.use(cookieParser());
 app.use(express.json());
 
-app.use(wrapVerifyToken(verifyToken(authenticationService), ['/login', '/token', '/logout', '/refresh']));
+app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
 app.use(withAuth(authorizationService));
 
 app.get('/login', getAuthorizationCodeUrl(authenticationService));
-app.post('/token', getTokensFromAuthorizationCode(authenticationService));
-app.get('/logout', logoutUser(authenticationService));
-app.get('/refresh', refreshAccessToken(authenticationService));
+app.post('/token', getTokensFromAuthorizationCode(authenticationService, { loggingService: logger }));
+app.get('/logout', logoutUser(authenticationService, { loggingService: logger }));
+app.get('/refresh', refreshAccessToken(authenticationService, { loggingService: logger }));
 
 app.get('/pro', (req, res) => {
   res.status(200).json({ user: res.locals.user });
