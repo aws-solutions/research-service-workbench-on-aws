@@ -3,6 +3,7 @@ import { GetItemCommandOutput, UpdateItemCommandOutput } from '@aws-sdk/client-d
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envKeyNameToKey from './environmentKeyNameToKey';
+import { EnvironmentTypeStatus } from './environmentTypeStatus';
 
 interface EnvironmentType {
   pk: string;
@@ -27,7 +28,7 @@ interface EnvironmentType {
     };
   }[];
   resourceType: string;
-  status: string;
+  status: EnvironmentTypeStatus;
   updatedAt: string;
   updatedBy: string;
 }
