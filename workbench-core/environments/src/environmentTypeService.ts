@@ -57,13 +57,23 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async getEnvironmentTypes(): Promise<EnvironmentType[]> {
-    const queryParams = {
-      index: 'getResourceByUpdatedAt',
+  public async getEnvironmentTypes(user: { role: string; ownerId: string }): Promise<EnvironmentType[]> {
+    let items;
+    const queryParams: any = {
       key: { name: 'resourceType', value: 'envType' }
     };
+    if (user.role === 'admin') {
+      queryParams.index = 'getResourceByUpdatedAt';
+    } else {
+      const queryParams = {
+        index: 'getResourceByOwner',
+        key: { name: 'resourceType', value: 'envType' },
+        sortKey: 'owner',
+        eq: { S: user.ownerId }
+      };
+    }
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    const items = envTypesResponse.Items;
+    items = envTypesResponse.Items;
     if (items === undefined) {
       return Promise.resolve([]);
     } else {
@@ -71,7 +81,7 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async updateEnvironment(
+  public async updateEnvironmentType(
     envTypeId: string,
     owner: string,
     updatedValues: { [key: string]: string }
@@ -103,7 +113,7 @@ export default class EnvironmentTypeService {
     throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
   }
 
-  public async createNewEnvironment(params: {
+  public async createNewEnvironmentType(params: {
     productId: string;
     provisioningArtifactId: string;
     description: string;

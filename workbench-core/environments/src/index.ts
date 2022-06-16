@@ -6,6 +6,12 @@ import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
 import EnvironmentService from './environmentService';
 import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
+import EnvironmentTypeService from './environmentTypeService';
+import {
+  EnvironmentTypeStatus,
+  isEnvironmentTypeStatus,
+  ENVIRONMENT_TYPE_STATUS
+} from './environmentTypeStatus';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
@@ -26,5 +32,9 @@ export {
   isEnvironmentStatus,
   ServiceCatalogSetup,
   CognitoSetup,
-  EnvironmentService
+  EnvironmentService,
+  EnvironmentTypeService,
+  EnvironmentTypeStatus,
+  isEnvironmentTypeStatus,
+  ENVIRONMENT_TYPE_STATUS
 };

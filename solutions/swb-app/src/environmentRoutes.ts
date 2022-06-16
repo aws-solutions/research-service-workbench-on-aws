@@ -1,4 +1,3 @@
-// Environment launch
 import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
 import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
