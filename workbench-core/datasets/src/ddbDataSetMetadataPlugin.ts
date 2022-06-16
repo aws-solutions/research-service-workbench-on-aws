@@ -2,6 +2,7 @@ import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import { DataSet, DataSetMetadataPlugin } from '.';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
@@ -48,15 +49,19 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   public async addDataSet(dataSet: DataSet): Promise<void> {
-    throw new Error('Method not implemented.');
+    this._validateCreateDataSet(dataSet);
+    dataSet.id = uuidv4();
+    if (_.isUndefined(dataSet.createdAt)) dataSet.createdAt = new Date().toISOString();
+    await this._updateDataSet(dataSet);
   }
+
   public async updateDataSet(dataSet: DataSet): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
   private _validateCreateDataSet(dataSet: DataSet): void {
     if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
-    if (!_.isUndefined(dataSet.name))
+    if (_.isUndefined(dataSet.name))
       throw new Error("Cannot create the DataSet. A 'name' was not supplied but it is required.");
     try {
       const existing = this.getDataSetMetadata(dataSet.name);
@@ -66,5 +71,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     } catch (err) {
       if (!Boom.isBoom(err, 404)) throw err;
     }
+  }
+
+  private async _updateDataSet(dataSet: DataSet): Promise<void> {
+    const dataSetParams = {};
   }
 }
