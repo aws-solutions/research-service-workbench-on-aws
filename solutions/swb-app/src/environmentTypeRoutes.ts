@@ -48,7 +48,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
       // TODO: Get user information from req context once Auth has been integrated
       const user = {
         role: 'admin',
-        ownerId: 'owner-123'
+        owner: 'owner-123'
       };
       const envType = await environmentTypeService.getEnvironmentTypes(user);
       res.send(envType);

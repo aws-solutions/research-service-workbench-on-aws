@@ -185,12 +185,6 @@ export default class DynamoDBService {
    * ```
    */
   public query(params?: QueryParams): Query {
-
-
-
-
-
-
     let query = new Query({ region: this._awsRegion }, this._tableName);
     if (params) {
       if (params.index) {

@@ -6,6 +6,7 @@ import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
 import EnvironmentService from './environmentService';
 import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
+import EnvironmentTypeConfigService from './environmentTypeConfigService';
 import EnvironmentTypeService from './environmentTypeService';
 import {
   EnvironmentTypeStatus,
@@ -36,5 +37,6 @@ export {
   EnvironmentTypeService,
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
-  ENVIRONMENT_TYPE_STATUS
+  ENVIRONMENT_TYPE_STATUS,
+  EnvironmentTypeConfigService
 };

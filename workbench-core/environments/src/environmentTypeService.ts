@@ -52,10 +52,7 @@ export default class EnvironmentTypeService {
     if (item === undefined) {
       throw Boom.notFound(`Could not find environment type ${envTypeId}`);
     } else {
-      console.log('item', JSON.stringify(item));
       const envType = item as unknown as EnvironmentType;
-      console.log('envType Owner', envType.owner);
-      console.log('req owner', owner);
       if (envType.owner !== owner) {
         throw Boom.unauthorized();
       }
@@ -63,7 +60,7 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async getEnvironmentTypes(user: { role: string; ownerId: string }): Promise<EnvironmentType[]> {
+  public async getEnvironmentTypes(user: { role: string; owner: string }): Promise<EnvironmentType[]> {
     const queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType }
     };
@@ -72,7 +69,7 @@ export default class EnvironmentTypeService {
     } else {
       queryParams.index = 'getResourceByOwner';
       queryParams.sortKey = 'owner';
-      queryParams.eq = { S: user.ownerId };
+      queryParams.eq = { S: user.owner };
     }
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
     const items = envTypesResponse.Items;
