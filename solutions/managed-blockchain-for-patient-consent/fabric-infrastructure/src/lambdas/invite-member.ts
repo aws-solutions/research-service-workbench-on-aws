@@ -8,17 +8,19 @@ import {
   CreateProposalCommand,
   VoteOnProposalCommand
 } from '@aws-sdk/client-managedblockchain';
-const {
-  MEMBER_ID: memberId,
-  NETWORK_ID: networkId,
-  MEMBERS_TO_INVITE: membersToInvite
-} = process.env as {
-  MEMBER_ID: string;
-  NETWORK_ID: string;
-  MEMBERS_TO_INVITE: string;
-};
+
+const client = new ManagedBlockchainClient({});
 
 export const inviteMemberHandler = async (event: CdkCustomResourceEvent): Promise<void> => {
+  const {
+    MEMBER_ID: memberId,
+    NETWORK_ID: networkId,
+    MEMBERS_TO_INVITE: membersToInvite
+  } = process.env as {
+    MEMBER_ID: string;
+    NETWORK_ID: string;
+    MEMBERS_TO_INVITE: string;
+  };
   if (event.RequestType === 'Create') {
     for (const accountId of membersToInvite.split(',')) {
       try {
@@ -32,13 +34,9 @@ export const inviteMemberHandler = async (event: CdkCustomResourceEvent): Promis
           },
           MemberId: memberId,
           NetworkId: networkId,
-          Description: 'Invite new member ',
-          Tags: {
-            'new-member': accountId
-          }
+          Description: 'Invite new member '
         };
 
-        const client = new ManagedBlockchainClient({});
         const proposalCommand = new CreateProposalCommand(proposalParams);
         const proposalResponse = await client.send(proposalCommand);
 
@@ -52,6 +50,7 @@ export const inviteMemberHandler = async (event: CdkCustomResourceEvent): Promis
         const command = new VoteOnProposalCommand(voteParams);
         const response = await client.send(command);
         console.log(response);
+        console.log(`Successfully invited account ${accountId}`);
       } catch (error) {
         console.error(`Failed to invite account ${accountId}, encountered error ${error}`);
       }

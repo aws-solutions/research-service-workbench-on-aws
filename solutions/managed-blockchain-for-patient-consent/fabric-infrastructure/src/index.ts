@@ -17,4 +17,4 @@ new InfrastructureStack(app, 'HyperledgerTestStack', {
   }
 });
 
-// Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

@@ -37,8 +37,8 @@ export class HyperledgerFabricInvite extends constructs.Construct {
     super(scope, id);
 
     // Collect metadata on the stack
-    // const partition = cdk.Stack.of(this).partition;
-    // const region = cdk.Stack.of(this).region;
+    const partition = cdk.Stack.of(this).partition;
+    const region = cdk.Stack.of(this).region;
 
     const memberId = scope.memberId;
     const networkId = scope.networkId;
@@ -49,12 +49,27 @@ export class HyperledgerFabricInvite extends constructs.Construct {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com')
     });
 
-    // Policies for the custom resource lambda to enroll and register users
-    customResourceRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+    // Policies for the custom resource lambda to invite new members to join
+    customResourceRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['logs:CreateLogStream', 'logs:CreateLogGroup', 'logs:PutLogEvents'],
+        resources: [`arn:${partition}:logs:${region}:*:*`]
+      })
     );
-    customResourceRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonManagedBlockchainFullAccess')
+    customResourceRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'managedblockchain:CreateProposal',
+          'managedblockchain:VoteOnProposal',
+          'managedblockchain:TagResource'
+        ],
+        resources: [
+          `arn:${partition}:managedblockchain:${region}::networks/*`,
+          `arn:${partition}:managedblockchain:${region}::proposals/*`
+        ]
+      })
     );
 
     const inviteFunction = new nodejsLambda.NodejsFunction(this, 'InviteFunction', {

@@ -10,6 +10,7 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as cdknag from 'cdk-nag';
 
 import * as hyperledger from '../components';
+import { NagSuppressions } from 'cdk-nag';
 
 const DEFAULT_ENV = { env: { region: 'us-east-1' } };
 
@@ -387,33 +388,62 @@ describe('HyperledgerFabricNetwork', () => {
 
   test('No unexpected CDK nag errors occur in stack', () => {
     const app = new cdk.App();
-    const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
-    new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
+    const stack = new cdk.Stack(app, 'HyperledgerTestStack', DEFAULT_ENV);
+    new hyperledger.HyperledgerFabricNetwork(stack, 'V2TestNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember'
     });
+
     cdknag.NagSuppressions.addStackSuppressions(stack, [
       {
         id: 'AwsSolutions-IAM4',
-        reason: 'The CDK custom resource framework uses a managed policy for its Lambda'
+        reason:
+          'The CDK custom resource framework uses a managed policy for its Lambda, and the name for the Lambda is randomly generated'
       },
       {
         id: 'AwsSolutions-IAM5',
-        reason: 'The CDK custom resource framework creates default wildcard policies that are never used'
-      },
-      {
-        id: 'AwsSolutions-SMG4',
-        reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
-      },
-      {
-        id: 'AwsSolutions-EC23',
-        reason: 'wip to address'
+        reason:
+          'The CDK custom resource framework uses wildcard permission for its Lambda, and the name for the Lambda is randomly generated'
       },
       {
         id: 'AwsSolutions-L1',
-        reason: 'NODE16 is the latest available version, this is a false positive'
+        reason:
+          'The CDK custom resource framework uses NodeJS 12 and NodeJS 14 for onEvent trigger, and the name for these resources are randomly generated'
       }
     ]);
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      stack,
+      '/HyperledgerTestStack/V2TestNetwork/AdminPassword/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      stack,
+      '/HyperledgerTestStack/V2TestNetwork/AdminPrivateKey/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      stack,
+      '/HyperledgerTestStack/V2TestNetwork/AdminSignedCert/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
     cdk.Aspects.of(stack).add(new cdknag.AwsSolutionsChecks({ verbose: true }));
     const annotations = assertions.Annotations.fromStack(stack);
     const errors = annotations.findError('*', assertions.Match.stringLikeRegexp('AwsSolutions-.*'));

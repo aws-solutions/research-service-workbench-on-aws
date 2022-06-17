@@ -88,21 +88,57 @@ export class InfrastructureStack extends Stack {
     });
 
     /**
-     * cdk-nag suppressions
+     * cdk-nag suppression
      */
     NagSuppressions.addStackSuppressions(this, [
       {
-        id: 'AwsSolutions-SMG4',
-        reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
-      },
-      {
         id: 'AwsSolutions-IAM4',
-        reason: 'The CDK custom resource framework uses a managed policy for its Lambda'
+        reason:
+          'The CDK custom resource framework uses a managed policy for its Lambda, and the name for the Lambda is randomly generated'
       },
       {
         id: 'AwsSolutions-IAM5',
-        reason: 'The manageblockchain bucket is a public bucket for cert chain sharing'
+        reason:
+          'The CDK custom resource framework uses wildcard permission for its Lambda, and the name for the Lambda is randomly generated'
+      },
+      {
+        id: 'AwsSolutions-L1',
+        reason:
+          'The CDK custom resource framework uses NodeJS 12 and NodeJS 14 for onEvent trigger, and the name for these resources are randomly generated'
       }
     ]);
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/HyperledgerTestStack/V2TestNetwork/AdminPassword/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/HyperledgerTestStack/V2TestNetwork/AdminPrivateKey/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/HyperledgerTestStack/V2TestNetwork/AdminSignedCert/Resource',
+      [
+        {
+          id: 'AwsSolutions-SMG4',
+          reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
   }
 }

@@ -92,7 +92,7 @@
     },
     {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
@@ -116,7 +116,7 @@
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -232,7 +232,7 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "axios",

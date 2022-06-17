@@ -100,6 +100,8 @@ importers:
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
       '@aws-sdk/client-managedblockchain': ^3.53.0
+      '@aws-sdk/client-s3': ^3.58.0
+      '@aws-sdk/types': ^3.55.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -113,6 +115,7 @@ importers:
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.0.0
+      aws-sdk-client-mock: ^0.6.2
       axios: ^0.27.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
@@ -144,6 +147,8 @@ importers:
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_47b13785010171dab9c30d40a45387b9
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_15bb583c0b2f1331ba42a53a8128ee01
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_15bb583c0b2f1331ba42a53a8128ee01
+      '@aws-sdk/client-s3': 3.100.0
+      '@aws-sdk/types': 3.110.0
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_04f3c65f6de4a5e5529a6fededa44e1d
@@ -156,6 +161,7 @@ importers:
       '@types/node': 14.18.20
       '@vendia/serverless-express': 4.8.0
       aws-cdk: 2.26.0
+      aws-sdk-client-mock: 0.6.2_173bab65b389e5226b8c64b8f1a6443d
       axios: 0.27.2
       cdk-nag: 2.14.22_47b13785010171dab9c30d40a45387b9
       esbuild: 0.14.42
@@ -7242,6 +7248,19 @@ packages:
       commander: 3.0.2
       js-yaml: 3.14.1
       watchpack: 2.4.0
+    dev: true
+
+  /aws-sdk-client-mock/0.6.2_173bab65b389e5226b8c64b8f1a6443d:
+    resolution: {integrity: sha512-0kH1cyfqGogp69vJitzVducx9q691vGOwg7wEG+DUegGlepjaeskp6YG4SJI0y5Vwh3vi+fP27YQTcWllv4GlQ==}
+    peerDependencies:
+      '@aws-sdk/client-s3': ^3.0.0
+      '@aws-sdk/types': ^3.0.0
+    dependencies:
+      '@aws-sdk/client-s3': 3.100.0
+      '@aws-sdk/types': 3.110.0
+      '@types/sinon': 10.0.10
+      sinon: 11.1.2
+      tslib: 2.4.0
     dev: true
 
   /aws-sdk-client-mock/0.6.2_b3baf346a3b9422a0ecddb3e973bec80:
