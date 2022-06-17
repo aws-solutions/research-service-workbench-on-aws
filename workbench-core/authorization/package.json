@@ -26,7 +26,6 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@amzn/workbench-core-authentication": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
     "@casl/ability": "^5.4.3",
     "lodash": "^4.17.21"
