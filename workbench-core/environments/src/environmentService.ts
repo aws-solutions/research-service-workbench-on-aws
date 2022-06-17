@@ -147,16 +147,16 @@ export class EnvironmentService {
   ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
     // Check that filter and sort are not both defined
     if (filter && sort) {
-      throw Boom.badRequest('Cannot apply a filter and sort by different attributes');
+      throw Boom.badRequest('Cannot apply a filter and sort at the same time');
     }
 
     // Check that at most one filter is defined because we not support more than one filter
-    if (filter && Object.values(filter).filter((x) => x !== undefined).length > 1) {
+    if (filter && Object.keys(filter).length > 1) {
       throw Boom.badRequest('Cannot apply more than one filter.');
     }
 
     // Check that at most one sort attribute is defined because we not support sorting by more than one attribute
-    if (sort && Object.values(sort).filter((x) => x !== undefined).length > 1) {
+    if (sort && Object.keys(sort).length > 1) {
       throw Boom.badRequest('Cannot sort by more than one attribute.');
     }
 
