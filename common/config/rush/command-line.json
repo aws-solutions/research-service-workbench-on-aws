@@ -332,12 +332,6 @@
       "associatedCommands": ["common-coverage"]
     }
     // {
-    //   "parameterKind": "flag",
-    //   "longName": "--cd",
-    //   "description": "This flag handles code defender workarounds",
-    //   "associatedCommands": ["cinstall"]
-    // }
-    // {
     //   /**
     //    * (Required) Determines the type of custom parameter.
     //    * A "flag" is a custom command-line parameter whose presence acts as an on/off switch.
