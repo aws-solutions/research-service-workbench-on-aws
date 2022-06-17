@@ -10,9 +10,9 @@ describe('environmentTypeConfigService', () => {
     expect(true).toEqual(true);
   });
   const envTypeId = '6c732e11-87fb-40e7-ae3b-2551658d78f0';
-  test('create', async () => {
-    const envTypeConfigService = new EnvironmentTypeConfigService({ TABLE_NAME });
+  const envTypeConfigService = new EnvironmentTypeConfigService({ TABLE_NAME });
 
+  test('create', async () => {
     const params = {
       envTypeId,
       productId: 'prod-77ncg2cb3bx4g',
@@ -26,6 +26,14 @@ describe('environmentTypeConfigService', () => {
     };
 
     const response = await envTypeConfigService.createNewEnvironmentTypeConfig(params);
+    console.log('response', response);
+  });
+
+  test('getAll', async () => {
+    const response = await envTypeConfigService.getEnvironmentTypeConfigs({
+      role: 'admin',
+      ownerId: 'owner-123'
+    });
     console.log('response', response);
   });
 });

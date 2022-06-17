@@ -36,6 +36,7 @@ interface EnvironmentType {
 export default class EnvironmentTypeService {
   private _aws: AwsService;
   private _tableName: string;
+  private _resourceType: string = 'envType';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
@@ -64,7 +65,7 @@ export default class EnvironmentTypeService {
 
   public async getEnvironmentTypes(user: { role: string; ownerId: string }): Promise<EnvironmentType[]> {
     const queryParams: QueryParams = {
-      key: { name: 'resourceType', value: 'envType' }
+      key: { name: 'resourceType', value: this._resourceType }
     };
     if (user.role === 'admin') {
       queryParams.index = 'getResourceByUpdatedAt';
@@ -142,7 +143,7 @@ export default class EnvironmentTypeService {
       updatedAt: currentDate,
       createdBy: params.owner,
       updatedBy: params.owner,
-      resourceType: 'envType',
+      resourceType: this._resourceType,
       ...params
     };
     const item = newEnvType as unknown as { [key: string]: unknown };

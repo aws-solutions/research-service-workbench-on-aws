@@ -1,4 +1,4 @@
-import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
+import { AwsService, buildDynamoDBPkSk, QueryParams } from '@amzn/workbench-core-base';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envKeyNameToKey from './environmentKeyNameToKey';
@@ -26,6 +26,7 @@ interface EnvironmentTypeConfig {
 export default class EnvironmentTypeConfigService {
   private _aws: AwsService;
   private _tableName: string;
+  private _resourceType: string = 'envTypeConfig';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
@@ -33,7 +34,28 @@ export default class EnvironmentTypeConfigService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
-  public async getEnvironmentTypeConfigs(envTypeId: string) {}
+  public async getEnvironmentTypeConfigs(user: {
+    role: string;
+    ownerId: string;
+  }): Promise<EnvironmentTypeConfig[]> {
+    const queryParams: QueryParams = {
+      key: { name: 'resourceType', value: this._resourceType }
+    };
+    if (user.role === 'admin') {
+      queryParams.index = 'getResourceByUpdatedAt';
+    } else {
+      queryParams.index = 'getResourceByOwner';
+      queryParams.sortKey = 'owner';
+      queryParams.eq = { S: user.ownerId };
+    }
+    const envTypeConfigsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+    const items = envTypeConfigsResponse.Items;
+    if (items === undefined) {
+      return Promise.resolve([]);
+    } else {
+      return Promise.resolve(items as unknown as EnvironmentTypeConfig[]);
+    }
+  }
 
   public async createNewEnvironmentTypeConfig(params: {
     envTypeId: string;
@@ -45,7 +67,7 @@ export default class EnvironmentTypeConfigService {
     name: string;
     owner: string;
     params: { key: string; value: string }[];
-  }) {
+  }): Promise<EnvironmentTypeConfig> {
     const envTypeConfigId = uuidv4();
     const currentDate = new Date().toISOString();
 
@@ -57,7 +79,7 @@ export default class EnvironmentTypeConfigService {
       updatedAt: currentDate,
       createdBy: params.owner,
       updatedBy: params.owner,
-      resourceType: 'envTypeConfig',
+      resourceType: this._resourceType,
       ...updatedParams
     };
 
