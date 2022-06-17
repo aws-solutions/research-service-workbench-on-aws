@@ -284,6 +284,20 @@
       "autoinstallerName": "rush-prettier",
       // This will invoke common/autoinstallers/rush-prettier/node_modules/.bin/pretty-quick
       "shellCommand": "pretty-quick --staged"
+    },
+    {
+      "name": "cinstall",
+      "commandKind": "global",
+      "summary": "Run rush install with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy && node common/scripts/install-hooks"
+    },
+    {
+      "name": "cupdate",
+      "commandKind": "global",
+      "summary": "Run rush update with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy && node common/scripts/install-hooks"
     }
   ],
 
@@ -317,6 +331,12 @@
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["common-coverage"]
     }
+    // {
+    //   "parameterKind": "flag",
+    //   "longName": "--cd",
+    //   "description": "This flag handles code defender workarounds",
+    //   "associatedCommands": ["cinstall"]
+    // }
     // {
     //   /**
     //    * (Required) Determines the type of custom parameter.
