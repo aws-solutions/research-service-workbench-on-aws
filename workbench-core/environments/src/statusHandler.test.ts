@@ -57,7 +57,9 @@ describe('StatusHandler', () => {
       provisionedProductId: '123',
       owner: 'blah',
       type: 'testEnvType',
-      dependency: '123'
+      dependency: '123',
+      updatedBy: 'blah',
+      createdBy: 'blah'
     };
   });
 

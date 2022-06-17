@@ -48,7 +48,9 @@ describe('EnvironmentService', () => {
     resourceType: 'environment',
     instanceId: 'instance-123',
     provisionedProductId: '',
-    dependency: 'proj-123'
+    dependency: 'proj-123',
+    createdBy: 'user-1',
+    updatedBy: 'user-1'
   };
 
   const datasetItem = {

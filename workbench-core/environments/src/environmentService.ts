@@ -21,7 +21,9 @@ export interface Environment {
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
+  updatedBy: string;
   createdAt: string;
+  createdBy: string;
   owner: string;
   type: string;
   dependency: string;
@@ -48,7 +50,9 @@ const defaultEnv: Environment = {
   datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
+  updatedBy: '',
   createdAt: '',
+  createdBy: '',
   provisionedProductId: '',
   owner: '',
   type: '',
@@ -351,7 +355,9 @@ export class EnvironmentService {
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
+      updatedBy: 'user-1', // TODO: Get this from request context
       createdAt: new Date().toISOString(),
+      createdBy: 'user-1', // TODO: Get this from request context
       owner: 'owner-1', // TODO: Get this from request context
       status: params.status || 'PENDING',
       type: params.envTypeId,

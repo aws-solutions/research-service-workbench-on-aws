@@ -34,6 +34,8 @@ describe('SagemakerEnvironmentLifecycleService', () => {
       owner: 'blah',
       type: 'envTypeTest',
       dependency: 'proj-123',
+      updatedBy: 'blah',
+      createdBy: 'blah',
       PROJ: {
         subnetId: 'subnet-07f475d83291a3603',
         accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
