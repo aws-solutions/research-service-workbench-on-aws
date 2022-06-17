@@ -1,7 +1,8 @@
 // Environment launch
-import { EnvironmentService, isEnvironmentStatus } from '@amzn/environments';
+import { EnvironmentService, isEnvironmentStatus, isSortAttribute } from '@amzn/environments';
 import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
+import _ = require('lodash');
 import { Environment } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
 
@@ -157,23 +158,69 @@ export function setUpEnvRoutes(
         role: 'admin',
         ownerId: ''
       };
-      const { status, paginationToken, pageSize } = req.query;
-      let filter = undefined;
-      if (isEnvironmentStatus(status)) {
-        filter = {
-          status
-        };
+      const {
+        status,
+        name,
+        createdAt,
+        owner,
+        type,
+        project,
+        paginationToken,
+        pageSize,
+        ascending,
+        descending
+      } = req.query;
+      // Apply filter if applicable
+      let filter: { [key: string]: string } | undefined = {};
+      if (status && isEnvironmentStatus(status)) {
+        filter = { ...filter, status };
       }
+      if (name && typeof name === 'string') {
+        filter = { ...filter, name };
+      }
+      if (createdAt && typeof createdAt === 'string') {
+        filter = { ...filter, createdAt };
+      }
+      if (owner && typeof owner === 'string') {
+        filter = { ...filter, owner };
+      }
+      if (type && typeof type === 'string') {
+        filter = { ...filter, type };
+      }
+      if (project && typeof project === 'string') {
+        filter = { ...filter, project };
+      }
+      if (_.isEmpty(filter)) {
+        filter = undefined;
+      }
+      // Apply sort if applicable
+      let sort: { [key: string]: boolean } | undefined = {};
+      if (ascending && isSortAttribute(ascending)) {
+        sort[`${ascending}`] = true;
+      } else if (descending && isSortAttribute(descending)) {
+        sort[`${descending}`] = false;
+      }
+      if (_.isEmpty(sort)) {
+        sort = undefined;
+      }
+      // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         res
           .status(400)
           .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      } else if (status && !isEnvironmentStatus(status)) {
+        res.status(400).send('Invalid environment status. Please try again with valid inputs.');
+      } else if ((ascending && !isSortAttribute(ascending)) || (descending && !isSortAttribute(descending))) {
+        res.status(400).send('Invalid sort attribute. Please try again with valid inputs.');
+      } else if (ascending && descending) {
+        res.status(400).send('Cannot sort on two attributes. Please try again with valid inputs.');
       } else {
         const response = await environmentService.getEnvironments(
           user,
           filter,
           pageSize ? Number(pageSize) : undefined,
-          paginationToken
+          paginationToken,
+          sort
         );
         res.send(response);
       }

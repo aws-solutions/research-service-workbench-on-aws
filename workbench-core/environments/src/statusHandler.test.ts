@@ -2,38 +2,13 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import EnvironmentService from './environmentService';
-import { EnvironmentStatus } from './environmentStatus';
+import { EnvironmentService, Environment } from './environmentService';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import StatusHandler from './statusHandler';
 
 describe('StatusHandler', () => {
   const ORIGINAL_ENV = process.env;
-  let environment: {
-    id: string | undefined;
-    instanceId: string | undefined;
-    cidr: string;
-    description: string;
-    error: { type: string; value: string } | undefined;
-    name: string;
-    outputs: { id: string; value: string; description: string }[];
-    projectId: string;
-    status: EnvironmentStatus;
-    datasetIds: string[];
-    provisionedProductId: string;
-    envTypeConfigId: string;
-    updatedAt: string;
-    createdAt: string;
-    owner: string;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ETC?: any;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    PROJ?: any;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DS?: any[];
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    INID?: any;
-  };
+  let environment: Environment;
   let ebToDDB: EventBridgeEventToDDB;
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -80,7 +55,9 @@ describe('StatusHandler', () => {
       datasetIds: [],
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
-      owner: 'blah'
+      owner: 'blah',
+      type: 'testEnvType',
+      dependency: '123'
     };
   });
 

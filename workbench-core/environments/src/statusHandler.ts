@@ -3,7 +3,7 @@ import Boom from '@hapi/boom';
 import _ = require('lodash');
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
-import EnvironmentService from './environmentService';
+import { EnvironmentService } from './environmentService';
 import { isEnvironmentStatus } from './environmentStatus';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 

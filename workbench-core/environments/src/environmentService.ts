@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { EnvironmentStatus } from './environmentStatus';
 
-interface Environment {
+export interface Environment {
   id: string | undefined;
   instanceId: string | undefined;
   cidr: string;
@@ -23,6 +23,8 @@ interface Environment {
   updatedAt: string;
   createdAt: string;
   owner: string;
+  type: string;
+  dependency: string;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,10 +50,12 @@ const defaultEnv: Environment = {
   updatedAt: '',
   createdAt: '',
   provisionedProductId: '',
-  owner: ''
+  owner: '',
+  type: '',
+  dependency: ''
 };
 
-export default class EnvironmentService {
+export class EnvironmentService {
   private _aws: AwsService;
   private _tableName: string;
 
@@ -114,13 +118,44 @@ export default class EnvironmentService {
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
+   * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
   public async getEnvironments(
     user: { role: string; ownerId: string },
-    filter?: { status?: EnvironmentStatus },
+    filter?: {
+      status?: EnvironmentStatus;
+      name?: string;
+      createdAt?: string;
+      project?: string;
+      owner?: string;
+      type?: string;
+    },
     pageSize?: number,
-    paginationToken?: string
+    paginationToken?: string,
+    sort?: {
+      status?: boolean;
+      name?: boolean;
+      createdAt?: boolean;
+      project?: boolean;
+      owner?: boolean;
+      type?: boolean;
+    }
   ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
+    // Check that filter and sort are not both defined
+    if (filter && sort) {
+      throw Boom.badRequest('Cannot apply a filter and sort by different attributes');
+    }
+
+    // Check that at most one filter is defined because we not support more than one filter
+    if (filter && Object.values(filter).filter((x) => x !== undefined).length > 1) {
+      throw Boom.badRequest('Cannot apply more than one filter.');
+    }
+
+    // Check that at most one sort attribute is defined because we not support sorting by more than one attribute
+    if (sort && Object.values(sort).filter((x) => x !== undefined).length > 1) {
+      throw Boom.badRequest('Cannot sort by more than one attribute.');
+    }
+
     let environments: Environment[] = [];
 
     const queryParams: QueryParams = {
@@ -129,16 +164,77 @@ export default class EnvironmentService {
     };
 
     if (user.role === 'admin') {
-      if (filter && filter.status) {
-        // if admin and status is selected in the filter, use GSI getResourceByStatus
-        queryParams.index = 'getResourceByStatus';
-        queryParams.sortKey = 'status';
-        queryParams.eq = { S: filter.status };
+      if (filter) {
+        if (filter.status) {
+          // if admin and status is selected in the filter, use GSI getResourceByStatus
+          queryParams.index = 'getResourceByStatus';
+          queryParams.sortKey = 'status';
+          queryParams.eq = { S: filter.status };
+        } else if (filter.name) {
+          // if admin and name is selected in the filter, use GSI getResourceByName
+          queryParams.index = 'getResourceByName';
+          queryParams.sortKey = 'name';
+          queryParams.eq = { S: filter.name };
+        } else if (filter.createdAt) {
+          // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
+          queryParams.index = 'getResourceByCreatedAt';
+          queryParams.sortKey = 'createdAt';
+          queryParams.eq = { S: filter.createdAt };
+        } else if (filter.project) {
+          // if admin and project is selected in the filter, use GSI getResourceByProject
+          queryParams.index = 'getResourceByDependency';
+          queryParams.sortKey = 'dependency';
+          queryParams.eq = { S: filter.project };
+        } else if (filter.owner) {
+          // if admin and owner is selected in the filter, use GSI getResourceByOwner
+          queryParams.index = 'getResourceByOwner';
+          queryParams.sortKey = 'owner';
+          queryParams.eq = { S: filter.owner };
+        } else if (filter.type) {
+          // if admin and type is selected in the filter, use GSI getResourceByType
+          queryParams.index = 'getResourceByType';
+          queryParams.sortKey = 'type';
+          queryParams.eq = { S: filter.type };
+        }
+      } else if (sort) {
+        if (sort.status !== undefined) {
+          // if admin and status is selected in the sort param, use GSI getResourceByStatus
+          queryParams.index = 'getResourceByStatus';
+          queryParams.sortKey = 'status';
+          queryParams.forward = sort.status;
+        } else if (sort.name !== undefined) {
+          // throw Boom.badRequest('in sort name');
+          // if admin and name is selected in the sort param, use GSI getResourceByName
+          queryParams.index = 'getResourceByName';
+          queryParams.sortKey = 'name';
+          queryParams.forward = sort.name;
+        } else if (sort.createdAt !== undefined) {
+          // if admin and createdAt is selected in the sort param, use GSI getResourceByCreatedAt
+          queryParams.index = 'getResourceByCreatedAt';
+          queryParams.sortKey = 'createdAt';
+          queryParams.forward = sort.createdAt;
+        } else if (sort.project !== undefined) {
+          // if admin and project is selected in the sort param, use GSI getResourceByProject
+          queryParams.index = 'getResourceByDependency';
+          queryParams.sortKey = 'dependency';
+          queryParams.forward = sort.project;
+        } else if (sort.owner !== undefined) {
+          // if admin and owner is selected in the sort param, use GSI getResourceByOwner
+          queryParams.index = 'getResourceByOwner';
+          queryParams.sortKey = 'owner';
+          queryParams.forward = sort.owner;
+        } else if (sort.type !== undefined) {
+          // if admin and type is selected in the sort param, use GSI getResourceByType
+          queryParams.index = 'getResourceByType';
+          queryParams.sortKey = 'type';
+          queryParams.forward = sort.type;
+        }
       } else {
-        // if admin, use GSI getResourceByUpdatedAt
-        queryParams.index = 'getResourceByUpdatedAt';
+        // if admin, use GSI getResourceByCreatedAt by default
+        queryParams.index = 'getResourceByCreatedAt';
       }
     } else {
+      // if nonadmin, use GSI getResourceByOwner
       queryParams.index = 'getResourceByOwner';
       queryParams.sortKey = 'owner';
       queryParams.eq = { S: user.ownerId };
@@ -153,23 +249,29 @@ export default class EnvironmentService {
       }
     }
 
-    const data = await this._aws.helpers.ddb.query(queryParams).execute();
+    try {
+      const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
-    // check that Items is defined
-    if (data && data.Items) {
-      environments = data.Items.map((item) => {
-        return item as unknown as Environment;
-      });
+      // check that Items is defined
+      if (data && data.Items) {
+        environments = data.Items.map((item) => {
+          return item as unknown as Environment;
+        });
 
-      // Always sort by UpdatedAt values for environments. Newest environment appear first
-      environments = environments.sort((envA, envB) => {
-        return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
-      });
+        // Always sort by UpdatedAt values for environments if not sorting by other attribute. Newest environment appear first
+        if (!sort) {
+          environments = environments.sort((envA, envB) => {
+            return new Date(envB.createdAt).getTime() - new Date(envA.createdAt).getTime();
+          });
+        }
+      }
+      const token = data.LastEvaluatedKey
+        ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
+        : undefined;
+      return { envs: environments, paginationToken: token };
+    } catch (error) {
+      throw Boom.badRequest(error);
     }
-    const token = data.LastEvaluatedKey
-      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
-      : undefined;
-    return { envs: environments, paginationToken: token };
   }
 
   public async updateEnvironment(
@@ -251,7 +353,9 @@ export default class EnvironmentService {
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       owner: 'owner-1', // TODO: Get this from request context
-      status: params.status || 'PENDING'
+      status: params.status || 'PENDING',
+      type: params.envTypeId,
+      dependency: params.projectId
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -3,37 +3,13 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { EnvironmentLifecycleHelper, EnvironmentService, EnvironmentStatus } from '@amzn/environments';
+import { EnvironmentLifecycleHelper, EnvironmentService, Environment } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
 
 describe('SagemakerEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
-  let environment: {
-    id: string | undefined;
-    instanceId: string | undefined;
-    cidr: string;
-    description: string;
-    error: { type: string; value: string } | undefined;
-    name: string;
-    outputs: { id: string; value: string; description: string }[];
-    projectId: string;
-    status: EnvironmentStatus;
-    datasetIds: string[];
-    provisionedProductId: string;
-    envTypeConfigId: string;
-    updatedAt: string;
-    createdAt: string;
-    owner: string;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ETC?: any;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    PROJ?: any;
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DS?: any[];
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    INID?: any;
-  };
+  let environment: Environment;
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
@@ -56,6 +32,8 @@ describe('SagemakerEnvironmentLifecycleService', () => {
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah',
+      type: 'envTypeTest',
+      dependency: 'proj-123',
       PROJ: {
         subnetId: 'subnet-07f475d83291a3603',
         accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
