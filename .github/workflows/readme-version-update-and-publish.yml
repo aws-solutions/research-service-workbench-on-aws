@@ -243,9 +243,11 @@ jobs:
           role-session-name: OIDCSessionName
 
       - name: CodeArtifact Auth
+        id: codeartifact
         run: |
-          echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
-          echo "::add-mask::$CODEARTIFACT_AUTH_TOKEN"
+          TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=auth_token::$TOKEN"
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
@@ -263,7 +265,7 @@ jobs:
           
       - name: Rush Publish
         run: |
-          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
