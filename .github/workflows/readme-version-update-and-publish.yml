@@ -13,8 +13,6 @@ on:
         required: true
       codeartifact-region:
         required: true
-      codeartifact-package-format:
-        required: true
       codeartifact-repo-name:
         required: true
       gpg-private-key:
@@ -215,7 +213,7 @@ jobs:
       id-token: write
       contents: read
     env: 
-      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/${{ secrets.codeartifact-package-format }}/${{ secrets.codeartifact-repo-name }}/"
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.codeartifact-domain-name }}-${{ secrets.codeartifact-domain-owner }}.d.codeartifact.${{ secrets.codeartifact-region }}.amazonaws.com/npm/${{ secrets.codeartifact-repo-name }}/"
 
     steps:
       - name: Set ref
@@ -245,7 +243,9 @@ jobs:
           role-session-name: OIDCSessionName
 
       - name: CodeArtifact Auth
-        run: echo "::add-mask::CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+        run: |
+          echo "CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.codeartifact-domain-name }} --domain-owner ${{ secrets.codeartifact-domain-owner }} --query authorizationToken --duration-seconds 900 --output text`" >> $GITHUB_ENV
+          echo "::add-mask::$CODEARTIFACT_AUTH_TOKEN"
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
@@ -265,6 +265,5 @@ jobs:
         run: |
           PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token $CODEARTIFACT_AUTH_TOKEN --add-commit-details --ignore-git-hooks --include-all --target-branch testDevelop --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
-          echo '${{ toJSON(github) }}'
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}

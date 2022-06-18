@@ -19,7 +19,6 @@ jobs:
       codeartifact-domain-name: ${{ secrets.CODEARTIFACT_DOMAIN_NAME }}
       codeartifact-domain-owner: ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}
       codeartifact-region: ${{ secrets.CODEARTIFACT_REGION }}
-      codeartifact-package-format: ${{ secrets.CODEARTIFACT_PACKAGE_FORMAT }}
       codeartifact-repo-name: ${{ secrets.CODEARTIFACT_REPO_NAME }}
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       assume-role: ${{ secrets.ASSUME_ROLE }}
