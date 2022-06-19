@@ -15,6 +15,7 @@ jobs:
         with: 
           ref: ${{ github.head_ref }}
           token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
 
       - name: Base Action
         uses: ./.github/actions/baseAction
