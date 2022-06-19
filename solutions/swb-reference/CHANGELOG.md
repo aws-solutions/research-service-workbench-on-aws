@@ -1,6 +1,13 @@
 # Change Log - @amzn/swb-reference
 
-This log was last generated on Fri, 10 Jun 2022 18:55:35 GMT and should not be manually modified.
+This log was last generated on Sun, 19 Jun 2022 01:53:35 GMT and should not be manually modified.
+
+## 0.0.13
+Sun, 19 Jun 2022 01:53:35 GMT
+
+### Patches
+
+- test change again
 
 ## 0.0.12
 Fri, 10 Jun 2022 18:55:35 GMT
