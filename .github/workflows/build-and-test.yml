@@ -42,14 +42,14 @@ jobs:
             ${{ runner.os }}-pnpm-
             ${{ runner.os }}-
 
+      - name: Rush change verify
+        run: node common/scripts/install-run-rush.js change --verify
+
       - name: Install dependecies
         run: node common/scripts/install-run-rush.js install
         
       - name: Rush check
         run: node common/scripts/install-run-rush.js check
-
-      - name: Rush change verify
-        run: node common/scripts/install-run-rush.js change -v
 
       - name: Rush build
         run: node common/scripts/install-run-rush.js build --verbose
