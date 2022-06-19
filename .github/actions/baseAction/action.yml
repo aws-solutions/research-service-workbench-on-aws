@@ -45,7 +45,7 @@ runs:
 
     - name: Rush change verify
       shell: bash
-      run: node common/scripts/install-run-rush.js change --verify
+      run: node common/scripts/install-run-rush.js change -v
 
     - name: Rush build
       shell: bash
