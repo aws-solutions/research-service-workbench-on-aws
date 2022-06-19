@@ -18,7 +18,7 @@
     "changeLogUpdateCommitMessage": "chore: Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench",
     "defaultBranch": "testDevelop"
   },
   "eventHooks": {
