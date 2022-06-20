@@ -19,9 +19,8 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         role: 'admin',
         ownerId: 'owner-123'
       };
-      const envType = await environmentTypeService.createNewEnvironmentType({
-        ...req.body,
-        owner: user.ownerId
+      const envType = await environmentTypeService.createNewEnvironmentType(user.ownerId, {
+        ...req.body
       });
       res.status(201).send(envType);
     })
@@ -31,13 +30,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: 'owner-123'
-      };
-      console.log('paramsId', req.params.id);
-      const envType = await environmentTypeService.getEnvironmentType(user.ownerId, req.params.id);
+      const envType = await environmentTypeService.getEnvironmentType(req.params.id);
       res.send(envType);
     })
   );
@@ -45,12 +38,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        owner: 'owner-123'
-      };
-      const envType = await environmentTypeService.getEnvironmentTypes(user);
+      const envType = await environmentTypeService.getEnvironmentTypes();
       res.send(envType);
     })
   );

@@ -33,6 +33,7 @@ interface EnvironmentType {
   updatedAt: string;
   updatedBy: string;
 }
+
 export default class EnvironmentTypeService {
   private _aws: AwsService;
   private _tableName: string;
@@ -44,7 +45,7 @@ export default class EnvironmentTypeService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
-  public async getEnvironmentType(owner: string, envTypeId: string): Promise<EnvironmentType> {
+  public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType))
       .execute();
@@ -53,24 +54,16 @@ export default class EnvironmentTypeService {
       throw Boom.notFound(`Could not find environment type ${envTypeId}`);
     } else {
       const envType = item as unknown as EnvironmentType;
-      if (envType.owner !== owner) {
-        throw Boom.unauthorized();
-      }
       return Promise.resolve(envType);
     }
   }
 
-  public async getEnvironmentTypes(user: { role: string; owner: string }): Promise<EnvironmentType[]> {
+  public async getEnvironmentTypes(): Promise<EnvironmentType[]> {
     const queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType }
     };
-    if (user.role === 'admin') {
-      queryParams.index = 'getResourceByUpdatedAt';
-    } else {
-      queryParams.index = 'getResourceByOwner';
-      queryParams.sortKey = 'owner';
-      queryParams.eq = { S: user.owner };
-    }
+    queryParams.index = 'getResourceByUpdatedAt';
+    // TODO: Add pagination
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
     const items = envTypesResponse.Items;
     if (items === undefined) {
@@ -81,12 +74,12 @@ export default class EnvironmentTypeService {
   }
 
   public async updateEnvironmentType(
-    owner: string,
+    ownerId: string,
     envTypeId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
     try {
-      await this.getEnvironmentType(owner, envTypeId);
+      await this.getEnvironmentType(envTypeId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.notFound(`Could not find environment type ${envTypeId} to update`);
@@ -99,7 +92,7 @@ export default class EnvironmentTypeService {
       ...updatedValues,
       createdAt: currentDate,
       updatedAt: currentDate,
-      updatedBy: owner
+      updatedBy: ownerId
     };
 
     const response = await this._aws.helpers.ddb
@@ -112,34 +105,37 @@ export default class EnvironmentTypeService {
     throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
   }
 
-  public async createNewEnvironmentType(params: {
-    productId: string;
-    provisioningArtifactId: string;
-    description: string;
-    name: string;
-    owner: string;
-    type: string;
+  public async createNewEnvironmentType(
+    ownerId: string,
     params: {
-      DefaultValue?: string;
-      Description: string;
-      IsNoEcho: boolean;
-      ParameterKey: string;
-      ParameterType: string;
-      ParameterConstraints: {
-        AllowedValues: string[];
-      };
-    }[];
-    status: EnvironmentTypeStatus;
-  }): Promise<EnvironmentType> {
+      productId: string;
+      provisioningArtifactId: string;
+      description: string;
+      name: string;
+      type: string;
+      params: {
+        DefaultValue?: string;
+        Description: string;
+        IsNoEcho: boolean;
+        ParameterKey: string;
+        ParameterType: string;
+        ParameterConstraints: {
+          AllowedValues: string[];
+        };
+      }[];
+      status: EnvironmentTypeStatus;
+    }
+  ): Promise<EnvironmentType> {
     const id = uuidv4();
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
       ...buildDynamoDBPkSk(id, envKeyNameToKey.envType),
+      owner: ownerId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      createdBy: params.owner,
-      updatedBy: params.owner,
+      createdBy: ownerId,
+      updatedBy: ownerId,
       resourceType: this._resourceType,
       ...params
     };

@@ -13,10 +13,10 @@ export function setUpEnvTypeConfigRoutes(
       // TODO: Get user information from req context once Auth has been integrated
       const user = {
         role: 'admin',
-        owner: 'owner-123'
+        ownerId: 'owner-123'
       };
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
-        user.owner,
+        user.ownerId,
         req.params.envTypeId,
         req.body
       );
@@ -28,13 +28,7 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        owner: 'owner-123'
-      };
       const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(
-        user,
         req.params.envTypeId,
         req.params.envTypeConfigId
       );
@@ -45,13 +39,7 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        owner: 'owner-123'
-      };
       const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfigs(
-        user,
         req.params.envTypeId
       );
       res.send(envTypeConfig);
@@ -65,10 +53,10 @@ export function setUpEnvTypeConfigRoutes(
       // TODO: Get user information from req context once Auth has been integrated
       const user = {
         role: 'admin',
-        owner: 'owner-123'
+        ownerId: 'owner-123'
       };
       const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
-        user,
+        user.ownerId,
         req.params.envTypeId,
         req.params.envTypeConfigId,
         req.body

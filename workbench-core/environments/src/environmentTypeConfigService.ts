@@ -38,7 +38,6 @@ export default class EnvironmentTypeConfigService {
   }
 
   public async getEnvironmentTypeConfig(
-    user: { owner: string; role: string },
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<EnvironmentTypeConfig> {
@@ -50,31 +49,23 @@ export default class EnvironmentTypeConfigService {
       throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
     } else {
       const envTypeConfig = item as unknown as EnvironmentTypeConfig;
-      if (envTypeConfig.owner !== user.owner && user.role !== 'admin') {
-        throw Boom.unauthorized();
-      }
       return Promise.resolve(envTypeConfig);
     }
   }
 
-  public async getEnvironmentTypeConfigs(
-    user: { owner: string; role: string },
-    envTypeId: string
-  ): Promise<EnvironmentTypeConfig[]> {
+  public async getEnvironmentTypeConfigs(envTypeId: string): Promise<EnvironmentTypeConfig[]> {
     const queryParams: QueryParams = {
       key: { name: 'pk', value: environmentResourceTypeToKey.envTypeConfig },
       sortKey: 'sk',
       begins: { S: `${environmentResourceTypeToKey.envType}#${envTypeId}` }
     };
+    // TODO: Add pagination
     const envTypeConfigsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    const items = envTypeConfigsResponse.Items as unknown[] as EnvironmentTypeConfig[];
-    return items.filter((item) => {
-      return item.owner === user.owner || user.role === 'admin';
-    });
+    return envTypeConfigsResponse.Items as unknown[] as EnvironmentTypeConfig[];
   }
 
   public async createNewEnvironmentTypeConfig(
-    owner: string,
+    ownerId: string,
     envTypeId: string,
     params: {
       productId: string;
@@ -87,7 +78,7 @@ export default class EnvironmentTypeConfigService {
     }
   ): Promise<EnvironmentTypeConfig> {
     try {
-      await this._envTypeService.getEnvironmentType(owner, envTypeId);
+      await this._envTypeService.getEnvironmentType(envTypeId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.badRequest(
@@ -103,11 +94,11 @@ export default class EnvironmentTypeConfigService {
       ...this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId),
       createdAt: currentDate,
       updatedAt: currentDate,
-      createdBy: owner,
-      updatedBy: owner,
+      createdBy: ownerId,
+      updatedBy: ownerId,
       resourceType: this._resourceType,
       ...params,
-      owner
+      owner: ownerId
     };
 
     const item = newEnvTypeConfig as unknown as { [key: string]: unknown };
@@ -122,13 +113,13 @@ export default class EnvironmentTypeConfigService {
   }
 
   public async updateEnvironmentTypeConfig(
-    user: { owner: string; role: string },
+    ownerId: string,
     envTypeId: string,
     envTypeConfigId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentTypeConfig> {
     try {
-      await this.getEnvironmentTypeConfig(user, envTypeId, envTypeConfigId);
+      await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.notFound(
@@ -143,7 +134,7 @@ export default class EnvironmentTypeConfigService {
       ...updatedValues,
       createdAt: currentDate,
       updatedAt: currentDate,
-      updatedBy: user.owner
+      updatedBy: ownerId
     };
 
     const response = await this._aws.helpers.ddb
