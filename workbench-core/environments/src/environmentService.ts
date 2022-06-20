@@ -265,18 +265,20 @@ export class EnvironmentService {
   }
 
   private _setFilter(gsi: string, sortKey: string, eq: string): QueryParams {
-    const queryParams: QueryParams = {};
-    queryParams.index = gsi;
-    queryParams.sortKey = sortKey;
-    queryParams.eq = { S: eq };
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      eq: { S: eq }
+    };
     return queryParams;
   }
 
   private _setSort(gsi: string, sortKey: string, forward: boolean): QueryParams {
-    const queryParams: QueryParams = {};
-    queryParams.index = gsi;
-    queryParams.sortKey = sortKey;
-    queryParams.forward = forward;
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      forward: forward
+    };
     return queryParams;
   }
 
