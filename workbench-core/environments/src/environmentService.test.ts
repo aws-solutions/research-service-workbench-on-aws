@@ -18,10 +18,11 @@ describe('EnvironmentService', () => {
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
   });
+  const ddbMock = mockClient(DynamoDBClient);
   beforeEach(() => {
     jest.clearAllMocks();
+    ddbMock.reset();
   });
-  const ddbMock = mockClient(DynamoDBClient);
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
   const TABLE_NAME = 'exampleDDBTable';
   const envService = new EnvironmentService({ TABLE_NAME });
