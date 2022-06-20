@@ -162,7 +162,7 @@ export class EnvironmentService {
 
     let environments: Environment[] = [];
 
-    const queryParams: QueryParams = {
+    let queryParams: QueryParams = {
       key: { name: 'resourceType', value: 'environment' },
       limit: pageSize && pageSize >= 0 ? pageSize : 50
     };
@@ -171,67 +171,54 @@ export class EnvironmentService {
       if (filter) {
         if (filter.status) {
           // if admin and status is selected in the filter, use GSI getResourceByStatus
-          queryParams.index = 'getResourceByStatus';
-          queryParams.sortKey = 'status';
-          queryParams.eq = { S: filter.status };
+          const addFilter = this._setFilter('getResourceByStatus', 'status', filter.status);
+          queryParams = { ...queryParams, ...addFilter };
         } else if (filter.name) {
           // if admin and name is selected in the filter, use GSI getResourceByName
-          queryParams.index = 'getResourceByName';
-          queryParams.sortKey = 'name';
-          queryParams.eq = { S: filter.name };
+          const addFilter = this._setFilter('getResourceByName', 'name', filter.name);
+          queryParams = { ...queryParams, ...addFilter };
         } else if (filter.createdAt) {
           // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
-          queryParams.index = 'getResourceByCreatedAt';
-          queryParams.sortKey = 'createdAt';
-          queryParams.eq = { S: filter.createdAt };
+          const addFilter = this._setFilter('getResourceByCreatedAt', 'createdAt', filter.createdAt);
+          queryParams = { ...queryParams, ...addFilter };
         } else if (filter.project) {
           // if admin and project is selected in the filter, use GSI getResourceByProject
-          queryParams.index = 'getResourceByDependency';
-          queryParams.sortKey = 'dependency';
-          queryParams.eq = { S: filter.project };
+          const addFilter = this._setFilter('getResourceByDependency', 'dependency', filter.project);
+          queryParams = { ...queryParams, ...addFilter };
         } else if (filter.owner) {
           // if admin and owner is selected in the filter, use GSI getResourceByOwner
-          queryParams.index = 'getResourceByOwner';
-          queryParams.sortKey = 'owner';
-          queryParams.eq = { S: filter.owner };
+          const addFilter = this._setFilter('getResourceByOwner', 'owner', filter.owner);
+          queryParams = { ...queryParams, ...addFilter };
         } else if (filter.type) {
           // if admin and type is selected in the filter, use GSI getResourceByType
-          queryParams.index = 'getResourceByType';
-          queryParams.sortKey = 'type';
-          queryParams.eq = { S: filter.type };
+          const addFilter = this._setFilter('getResourceByType', 'type', filter.type);
+          queryParams = { ...queryParams, ...addFilter };
         }
       } else if (sort) {
         if (sort.status !== undefined) {
           // if admin and status is selected in the sort param, use GSI getResourceByStatus
-          queryParams.index = 'getResourceByStatus';
-          queryParams.sortKey = 'status';
-          queryParams.forward = sort.status;
+          const addSort = this._setSort('getResourceByStatus', 'status', sort.status);
+          queryParams = { ...queryParams, ...addSort };
         } else if (sort.name !== undefined) {
-          // throw Boom.badRequest('in sort name');
           // if admin and name is selected in the sort param, use GSI getResourceByName
-          queryParams.index = 'getResourceByName';
-          queryParams.sortKey = 'name';
-          queryParams.forward = sort.name;
+          const addSort = this._setSort('getResourceByName', 'name', sort.name);
+          queryParams = { ...queryParams, ...addSort };
         } else if (sort.createdAt !== undefined) {
           // if admin and createdAt is selected in the sort param, use GSI getResourceByCreatedAt
-          queryParams.index = 'getResourceByCreatedAt';
-          queryParams.sortKey = 'createdAt';
-          queryParams.forward = sort.createdAt;
+          const addSort = this._setSort('getResourceByCreatedAt', 'createdAt', sort.createdAt);
+          queryParams = { ...queryParams, ...addSort };
         } else if (sort.project !== undefined) {
           // if admin and project is selected in the sort param, use GSI getResourceByProject
-          queryParams.index = 'getResourceByDependency';
-          queryParams.sortKey = 'dependency';
-          queryParams.forward = sort.project;
+          const addSort = this._setSort('getResourceByDependency', 'dependency', sort.project);
+          queryParams = { ...queryParams, ...addSort };
         } else if (sort.owner !== undefined) {
           // if admin and owner is selected in the sort param, use GSI getResourceByOwner
-          queryParams.index = 'getResourceByOwner';
-          queryParams.sortKey = 'owner';
-          queryParams.forward = sort.owner;
+          const addSort = this._setSort('getResourceByOwner', 'owner', sort.owner);
+          queryParams = { ...queryParams, ...addSort };
         } else if (sort.type !== undefined) {
           // if admin and type is selected in the sort param, use GSI getResourceByType
-          queryParams.index = 'getResourceByType';
-          queryParams.sortKey = 'type';
-          queryParams.forward = sort.type;
+          const addSort = this._setSort('getResourceByType', 'type', sort.type);
+          queryParams = { ...queryParams, ...addSort };
         }
       } else {
         // if admin, use GSI getResourceByCreatedAt by default
@@ -239,9 +226,8 @@ export class EnvironmentService {
       }
     } else {
       // if nonadmin, use GSI getResourceByOwner
-      queryParams.index = 'getResourceByOwner';
-      queryParams.sortKey = 'owner';
-      queryParams.eq = { S: user.ownerId };
+      const addFilter = this._setFilter('getResourceByOwner', 'owner', user?.ownerId);
+      queryParams = { ...queryParams, ...addFilter };
     }
     // If paginationToken is defined, add param
     // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
@@ -276,6 +262,22 @@ export class EnvironmentService {
     } catch (error) {
       throw Boom.badRequest(error);
     }
+  }
+
+  private _setFilter(gsi: string, sortKey: string, eq: string): QueryParams {
+    const queryParams: QueryParams = {};
+    queryParams.index = gsi;
+    queryParams.sortKey = sortKey;
+    queryParams.eq = { S: eq };
+    return queryParams;
+  }
+
+  private _setSort(gsi: string, sortKey: string, forward: boolean): QueryParams {
+    const queryParams: QueryParams = {};
+    queryParams.index = gsi;
+    queryParams.sortKey = sortKey;
+    queryParams.forward = forward;
+    return queryParams;
   }
 
   public async updateEnvironment(
