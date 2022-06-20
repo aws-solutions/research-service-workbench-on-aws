@@ -4,7 +4,7 @@ import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpEnvTypeRoutes(router: Router, environmentTypeService: EnvironmentTypeService): void {
-  // CREATE envType
+  // Create envType
   router.post(
     '/environmentTypes',
     wrapAsync(async (req: Request, res: Response) => {
@@ -34,6 +34,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
       res.send(envType);
     })
   );
+
   // Get envTypes
   router.get(
     '/environmentTypes',

@@ -2,8 +2,10 @@ import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_API_PAGE_SIZE } from './constants';
 import environmentResourceTypeToKey from './environmentResourceTypeToKey';
 import EnvironmentTypeService from './environmentTypeService';
+import { addPaginationToken, getPaginationToken } from './paginationHelper';
 
 interface EnvironmentTypeConfig {
   pk: string;
@@ -26,13 +28,11 @@ interface EnvironmentTypeConfig {
 
 export default class EnvironmentTypeConfigService {
   private _aws: AwsService;
-  private _tableName: string;
   private _envTypeService: EnvironmentTypeService;
   private _resourceType: string = 'envTypeConfig';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
     this._envTypeService = new EnvironmentTypeService({ TABLE_NAME });
   }
@@ -53,15 +53,24 @@ export default class EnvironmentTypeConfigService {
     }
   }
 
-  public async getEnvironmentTypeConfigs(envTypeId: string): Promise<EnvironmentTypeConfig[]> {
-    const queryParams: QueryParams = {
+  public async getEnvironmentTypeConfigs(
+    envTypeId: string,
+    pageSize?: number,
+    paginationToken?: string
+  ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }> {
+    let queryParams: QueryParams = {
       key: { name: 'pk', value: environmentResourceTypeToKey.envTypeConfig },
       sortKey: 'sk',
-      begins: { S: `${environmentResourceTypeToKey.envType}#${envTypeId}` }
+      begins: { S: `${environmentResourceTypeToKey.envType}#${envTypeId}` },
+      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
-    // TODO: Add pagination
+    queryParams = addPaginationToken(paginationToken, queryParams);
     const envTypeConfigsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    return envTypeConfigsResponse.Items as unknown[] as EnvironmentTypeConfig[];
+    const token = getPaginationToken(envTypeConfigsResponse);
+    return {
+      data: envTypeConfigsResponse.Items as unknown as EnvironmentTypeConfig[],
+      paginationToken: token
+    };
   }
 
   public async createNewEnvironmentTypeConfig(
@@ -77,6 +86,7 @@ export default class EnvironmentTypeConfigService {
       params: { key: string; value: string }[];
     }
   ): Promise<EnvironmentTypeConfig> {
+    // To create envTypeConfig, we must ensure the parent envType exist
     try {
       await this._envTypeService.getEnvironmentType(envTypeId);
     } catch (e) {

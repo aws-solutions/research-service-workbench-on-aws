@@ -254,7 +254,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with no filter', async () => {
@@ -287,7 +287,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('non admin', async () => {
@@ -324,7 +324,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'researcher', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with pagination token', async () => {
@@ -368,7 +368,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with invalid pagination token', async () => {

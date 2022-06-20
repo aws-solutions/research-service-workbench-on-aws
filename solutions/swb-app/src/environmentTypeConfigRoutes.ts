@@ -35,14 +35,24 @@ export function setUpEnvTypeConfigRoutes(
       res.send(envTypeConfig);
     })
   );
+
   // Get envTypeConfigs
   router.get(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfigs(
-        req.params.envTypeId
-      );
-      res.send(envTypeConfig);
+      const { paginationToken, pageSize } = req.query;
+      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
+        res
+          .status(400)
+          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      } else {
+        const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfigs(
+          req.params.envTypeId,
+          pageSize ? Number(pageSize) : undefined,
+          paginationToken
+        );
+        res.send(envTypeConfig);
+      }
     })
   );
 

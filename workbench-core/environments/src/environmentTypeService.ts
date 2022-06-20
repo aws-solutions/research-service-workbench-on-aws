@@ -5,6 +5,7 @@ import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import envKeyNameToKey from './environmentKeyNameToKey';
 import { EnvironmentTypeStatus } from './environmentTypeStatus';
+import { addPaginationToken, getPaginationToken } from './paginationHelper';
 
 interface EnvironmentType {
   pk: string;
@@ -36,12 +37,10 @@ interface EnvironmentType {
 
 export default class EnvironmentTypeService {
   private _aws: AwsService;
-  private _tableName: string;
   private _resourceType: string = 'envType';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
@@ -58,19 +57,23 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async getEnvironmentTypes(): Promise<EnvironmentType[]> {
-    const queryParams: QueryParams = {
+  public async getEnvironmentTypes(
+    pageSize?: number,
+    paginationToken?: string
+  ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {
+    let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType }
     };
     queryParams.index = 'getResourceByUpdatedAt';
-    // TODO: Add pagination
+
+    queryParams = addPaginationToken(paginationToken, queryParams);
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    const items = envTypesResponse.Items;
-    if (items === undefined) {
-      return Promise.resolve([]);
-    } else {
-      return Promise.resolve(items as unknown as EnvironmentType[]);
-    }
+    const token = getPaginationToken(envTypesResponse);
+
+    return {
+      data: envTypesResponse.Items as unknown as EnvironmentType[],
+      paginationToken: token
+    };
   }
 
   public async updateEnvironmentType(

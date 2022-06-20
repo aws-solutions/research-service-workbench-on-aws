@@ -6,7 +6,7 @@ export const ENVIRONMENT_TYPE_STATUS: string[] = ['APPROVED', 'NOT_APPROVED'];
 // More info here: https://stackoverflow.com/a/59541566
 export type EnvironmentTypeStatus = typeof ENVIRONMENT_TYPE_STATUS[number];
 
-// This allows us to verify that user input is an EnvironmentStatus
+// This allows us to verify that user input is an EnvironmentTypeStatus
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isEnvironmentTypeStatus(status: any): status is EnvironmentTypeStatus {
   if (typeof status !== 'string') {

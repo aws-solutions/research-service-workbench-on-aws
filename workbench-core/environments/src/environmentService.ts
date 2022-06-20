@@ -4,8 +4,10 @@ import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_API_PAGE_SIZE } from './constants';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { EnvironmentStatus } from './environmentStatus';
+import { addPaginationToken, getPaginationToken } from './paginationHelper';
 
 interface Environment {
   id: string | undefined;
@@ -120,12 +122,12 @@ export default class EnvironmentService {
     filter?: { status?: EnvironmentStatus },
     pageSize?: number,
     paginationToken?: string
-  ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
+  ): Promise<{ data: Environment[]; paginationToken: string | undefined }> {
     let environments: Environment[] = [];
 
-    const queryParams: QueryParams = {
+    let queryParams: QueryParams = {
       key: { name: 'resourceType', value: 'environment' },
-      limit: pageSize && pageSize >= 0 ? pageSize : 50
+      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 
     if (user.role === 'admin') {
@@ -143,15 +145,8 @@ export default class EnvironmentService {
       queryParams.sortKey = 'owner';
       queryParams.eq = { S: user.ownerId };
     }
-    // If paginationToken is defined, add param
-    // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
-    if (paginationToken) {
-      try {
-        queryParams.start = JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8'));
-      } catch (error) {
-        throw Boom.badRequest('Invalid paginationToken');
-      }
-    }
+
+    queryParams = addPaginationToken(paginationToken, queryParams);
 
     const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
@@ -166,10 +161,8 @@ export default class EnvironmentService {
         return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
       });
     }
-    const token = data.LastEvaluatedKey
-      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
-      : undefined;
-    return { envs: environments, paginationToken: token };
+    const token = getPaginationToken(data);
+    return { data: environments, paginationToken: token };
   }
 
   public async updateEnvironment(
