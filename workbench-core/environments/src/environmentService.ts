@@ -262,7 +262,7 @@ export class EnvironmentService {
           return item as unknown as Environment;
         });
 
-        // Always sort by UpdatedAt values for environments if not sorting by other attribute. Newest environment appear first
+        // Always sort by CreatedAt values for environments if not sorting by other attribute. Newest environment appear first
         if (!sort) {
           environments = environments.sort((envA, envB) => {
             return new Date(envB.createdAt).getTime() - new Date(envA.createdAt).getTime();
