@@ -10,6 +10,7 @@ export interface ApiRouteConfig {
   environments: { [key: string]: Environment };
   account: HostingAccountService;
   environmentService: EnvironmentService;
+  allowedOrigins: string[];
 }
 
 export interface ApiRoute {

@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
@@ -9,6 +10,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   const router: Router = express.Router();
 
+  app.use(cors({ origin: apiRouteConfig.allowedOrigins }));
   // parse application/json
   app.use(express.json());
 
@@ -23,8 +25,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
       res.send(response);
     });
   });
-
-  // TODO: Enable CORS so UI can make requests to backend
 
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);

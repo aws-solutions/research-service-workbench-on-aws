@@ -30,6 +30,8 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@hapi/boom": "^10.0.0",
+    "@types/cors": "^2.8.12",
+    "cors": "^2.8.5",
     "express": "^4.17.3"
   },
   "devDependencies": {
