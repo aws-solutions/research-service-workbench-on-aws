@@ -236,7 +236,6 @@ export default class EnvironmentService {
     const batchGetResult = (await this._aws.helpers.ddb
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
-
     const newEnv: Environment = {
       id: uuidv4(),
       instanceId: params.instanceId,

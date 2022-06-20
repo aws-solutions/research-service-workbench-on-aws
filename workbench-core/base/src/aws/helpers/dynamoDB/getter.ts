@@ -4,7 +4,6 @@
  */
 
 import {
-
   GetItemCommandInput,
   BatchGetItemCommandInput,
   GetItemCommandOutput,
@@ -13,7 +12,6 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-
 
 class Getter {
   private _ddb: DynamoDB;
