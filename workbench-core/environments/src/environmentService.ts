@@ -108,7 +108,6 @@ export default class EnvironmentService {
     }
   }
 
-
   /**
    * Get all environments with option to filter by status
    * @param user - User information

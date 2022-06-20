@@ -12,7 +12,6 @@ import {
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
 
-
 /**
  * This class helps with deleting a single item from a DDB table.
  */

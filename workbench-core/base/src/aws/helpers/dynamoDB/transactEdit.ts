@@ -10,7 +10,6 @@ import {
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
 
-
 /**
  * This class helps with batch writes or deletes.
  */

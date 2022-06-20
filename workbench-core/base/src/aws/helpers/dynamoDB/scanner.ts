@@ -7,7 +7,6 @@ import { ScanCommandInput, AttributeValue, ScanCommandOutput, DynamoDB } from '@
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
 
-
 /**
  * This class helps with scans of an entire table in DDB
  */

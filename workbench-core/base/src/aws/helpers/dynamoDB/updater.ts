@@ -13,7 +13,6 @@ import {
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
 
-
 /**
  * This class helps with writes or updates to single items in DDB
  */
