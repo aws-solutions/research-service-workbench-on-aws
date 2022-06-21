@@ -3,13 +3,15 @@ import { httpApiGet, httpApiPut, httpApiDelete } from './apiHelper';
 import { EnvironmentItem } from '../models/Environment';
 
 const useEnvironments = () => {
-  const { data, error, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
-  (data || []).forEach((item: EnvironmentItem) => {
+  const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
+
+  let environments = (data && data.envs) || [];
+  environments.forEach((item: EnvironmentItem) => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;
     item.project = item.projectId;
   });
-  return { environments: data || [], mutate };
+  return { environments, mutate };
 };
 
 const start = async (id: string): Promise<void> => {
