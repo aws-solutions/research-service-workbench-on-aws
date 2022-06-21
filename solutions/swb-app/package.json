@@ -30,7 +30,6 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@hapi/boom": "^10.0.0",
-    "@types/cors": "^2.8.12",
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "lodash": "^4.17.21"
@@ -41,6 +40,7 @@
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/heft-jest": "1.0.2",
     "@types/jest": "^27.4.1",

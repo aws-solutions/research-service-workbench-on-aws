@@ -135,9 +135,9 @@ const Environment: NextPage = () => {
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
-  const connectButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STOPPED'];
-  const stopButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
-  const terminateButtonStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
+  const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STOPPED'];
+  const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
+  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
   // Constant buttons should show loading based on statuses in the array
   const connectButtonLoadingStatuses: string[] = ['STARTING'];
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
@@ -149,7 +149,7 @@ const Environment: NextPage = () => {
   const isOneItemSelected = (): boolean | undefined => {
     return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
   };
-  const getWorkspaceStatus = (): string => {
+  const getEnvironmentStatus = (): string => {
     const selectedItems = collectionProps.selectedItems;
     if (selectedItems !== undefined && isOneItemSelected()) {
       const status = collectionProps.selectedItems?.at(0).workspaceStatus;
@@ -165,7 +165,7 @@ const Environment: NextPage = () => {
     return '';
   };
 
-  const excecuteAction = async (action: string): Promise<void> => {
+  const executeAction = async (action: string): Promise<void> => {
     let actionLabel = 'Retrieve Worspaces Data';
     if (isOneItemSelected()) {
       const id = collectionProps.selectedItems?.at(0).id;
@@ -174,19 +174,16 @@ const Environment: NextPage = () => {
         switch (action) {
           case 'TERMINATE':
             setTerminatingIds((prev) => new Set(prev.add(id)));
-            console.log(terminatingIds);
             actionLabel = 'Terminate Workspace';
             await terminate(id);
             break;
           case 'STOP':
             setStoppingIds((prev) => new Set(prev.add(id)));
-            console.log(stoppingIds);
             actionLabel = 'Stop Workspace';
             await stop(id);
             break;
           case 'START':
             setConnectingIds((prev) => new Set(prev.add(id)));
-            console.log(connectingIds);
             actionLabel = 'Connect to Workspace';
             await start(id);
             break;
@@ -277,40 +274,40 @@ const Environment: NextPage = () => {
                       <SpaceBetween direction="horizontal" size="xs">
                         <Button
                           disabled={
-                            !connectButtonStatuses.includes(getWorkspaceStatus()) ||
+                            !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                             connectingIds.has(getSelectedId())
                           }
                           loading={
-                            connectButtonLoadingStatuses.includes(getWorkspaceStatus()) ||
+                            connectButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
                             connectingIds.has(getSelectedId())
                           }
-                          onClick={() => excecuteAction('START')}
+                          onClick={() => executeAction('START')}
                         >
                           Connect
                         </Button>
                         <Button
                           disabled={
-                            !stopButtonStatuses.includes(getWorkspaceStatus()) ||
+                            !stopButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                             stoppingIds.has(getSelectedId())
                           }
                           loading={
-                            stopButtonLoadingStatuses.includes(getWorkspaceStatus()) ||
+                            stopButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
                             stoppingIds.has(getSelectedId())
                           }
-                          onClick={() => excecuteAction('STOP')}
+                          onClick={() => executeAction('STOP')}
                         >
                           Stop
                         </Button>
                         <Button
                           disabled={
-                            !terminateButtonStatuses.includes(getWorkspaceStatus()) ||
+                            !terminateButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                             terminatingIds.has(getSelectedId())
                           }
                           loading={
-                            terminateButtonLoadingStatuses.includes(getWorkspaceStatus()) ||
+                            terminateButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
                             terminatingIds.has(getSelectedId())
                           }
-                          onClick={() => excecuteAction('TERMINATE')}
+                          onClick={() => executeAction('TERMINATE')}
                         >
                           Terminate
                         </Button>

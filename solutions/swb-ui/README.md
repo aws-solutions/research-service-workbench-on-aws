@@ -10,6 +10,14 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+In swb-ui/next.config,js, add the API lambda url for setting 'API_BASE_URL', this url can be found in [Installation](../swb-reference/SETUP_v2p1.md) during the '### Deploy the code' step  on the APIGatewayAPIEndpoint output from cloud formation.
+API url can also be found by login to aws with Main Account
+-Select Services menu 
+-Select API Gateway option
+-In APis grid select the API created
+-Select Dashboard option on the left panel
+-Url will be shown at the top of the page with the format "Invoke this API at: <url>"
+
 In the project directory, ensure all dependencies are installed. Run:
 ```
 rush update

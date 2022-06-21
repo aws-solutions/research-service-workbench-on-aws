@@ -74,6 +74,11 @@ Run the post deployment step
 ```
 STAGE=<STAGE> rushx run-postDeployment      # Setup Service Catalog portfolio and products
 ```
+Once the cdk creates the API Gateway, we need to specify the url of the API to the client application
+In `swb-ui` directory go to next.config.js and add APIGatewayAPIEndpoint value to API_BASE_URL
+```js
+API_BASE_URL: '<CFN_OUTPUT.APIGatewayAPIEndpoint>'
+```
 
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
