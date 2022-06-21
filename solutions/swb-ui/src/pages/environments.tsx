@@ -166,7 +166,7 @@ const Environment: NextPage = () => {
   };
 
   const executeAction = async (action: string): Promise<void> => {
-    let actionLabel = 'Retrieve Worspaces Data';
+    let actionLabel = 'Retrieve Workspaces Data';
     if (isOneItemSelected()) {
       const id = collectionProps.selectedItems?.at(0).id;
       try {
