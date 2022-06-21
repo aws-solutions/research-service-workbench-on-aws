@@ -64,7 +64,7 @@ export default class EnvironmentTypeService {
   ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {
     let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByUpdatedAt',
+      index: 'getResourceByCreatedAt',
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 

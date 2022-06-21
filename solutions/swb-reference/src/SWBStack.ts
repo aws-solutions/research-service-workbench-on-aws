@@ -439,19 +439,14 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
-    // const alias = new Alias(this, 'LiveAlias', {
-    //   aliasName: 'live',
-    //   version: apiLambda.currentVersion,
-    //   provisionedConcurrentExecutions: 1
-    // });
-    new Alias(this, 'LiveAlias', {
+    const alias = new Alias(this, 'LiveAlias', {
       aliasName: 'live',
       version: apiLambda.currentVersion,
       provisionedConcurrentExecutions: 1
     });
 
     API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(apiLambda)
+      defaultIntegration: new LambdaIntegration(alias)
     });
   }
 
