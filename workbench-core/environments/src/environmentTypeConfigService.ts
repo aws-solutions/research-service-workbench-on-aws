@@ -77,8 +77,6 @@ export default class EnvironmentTypeConfigService {
     ownerId: string,
     envTypeId: string,
     params: {
-      productId: string;
-      provisioningArtifactId: string;
       allowRoleIds: string[];
       type: string;
       description: string;
@@ -87,8 +85,12 @@ export default class EnvironmentTypeConfigService {
     }
   ): Promise<EnvironmentTypeConfig> {
     // To create envTypeConfig, we must ensure the parent envType exist
+    let productId = '';
+    let provisioningArtifactId = '';
     try {
-      await this._envTypeService.getEnvironmentType(envTypeId);
+      const envType = await this._envTypeService.getEnvironmentType(envTypeId);
+      productId = envType.productId;
+      provisioningArtifactId = envType.provisioningArtifactId;
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.badRequest(
@@ -102,6 +104,8 @@ export default class EnvironmentTypeConfigService {
     const newEnvTypeConfig: EnvironmentTypeConfig = {
       id: envTypeConfigId,
       ...this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId),
+      productId,
+      provisioningArtifactId,
       createdAt: currentDate,
       updatedAt: currentDate,
       createdBy: ownerId,
@@ -128,6 +132,13 @@ export default class EnvironmentTypeConfigService {
     envTypeConfigId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentTypeConfig> {
+    const attributesAllowedToUpdate = ['description', 'name'];
+    const attributesNotAllowed = Object.keys(updatedValues).filter((key) => {
+      return !attributesAllowedToUpdate.includes(key);
+    });
+    if (attributesNotAllowed.length > 0) {
+      throw Boom.badRequest(`We do not support updating these attributes ${attributesNotAllowed}`);
+    }
     try {
       await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     } catch (e) {

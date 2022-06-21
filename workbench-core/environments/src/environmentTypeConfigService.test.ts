@@ -33,7 +33,7 @@ describe('environmentTypeConfigService', () => {
     name: 'config 1',
     allowRoleIds: [],
     resourceType: 'envTypeConfig',
-    provisioningArtifactId: 'pa-dewjn123',
+    // provisioningArtifactId: 'pa-dewjn123',
     params: [],
     updatedAt: '2022-06-17T21:25:24.333Z',
     sk: `${environmentResourceTypeToKey.envType}#${envTypeId}${environmentResourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
@@ -41,7 +41,7 @@ describe('environmentTypeConfigService', () => {
     description: 'Example config 1',
     id: envTypeConfigId,
     pk: 'ETC',
-    productId: 'prod-dasjk123',
+    // productId: 'prod-dasjk123',
     type: 'sagemaker'
   };
 
@@ -197,6 +197,16 @@ describe('environmentTypeConfigService', () => {
       ).rejects.toThrow(
         `Could not find envType ${invalidEnvTypeId} with envTypeConfig ${invalidEnvTypeConfigId} to update`
       );
+    });
+
+    test('update attributes that are not allowed', async () => {
+      // BUILD & OPERATE & CHECK
+      await expect(
+        envTypeConfigService.updateEnvironmentTypeConfig('owner-123', envTypeId, envTypeConfigId, {
+          productId: 'abc',
+          provisioningArtifactId: 'xyz'
+        })
+      ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
     });
   });
 

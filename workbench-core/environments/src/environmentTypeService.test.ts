@@ -155,6 +155,16 @@ describe('environmentTypeService', () => {
         envTypeService.updateEnvironmentType('owner-123', invalidId, { name: 'FakeName' })
       ).rejects.toThrow(`Could not find environment type ${invalidId} to update`);
     });
+
+    test('update attributes that are not allowed', async () => {
+      // BUILD & OPERATE & CHECK
+      await expect(
+        envTypeService.updateEnvironmentType('owner-123', envTypeId, {
+          productId: 'abc',
+          provisioningArtifactId: 'xyz'
+        })
+      ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
+    });
   });
 
   describe('createNewEnvironmentType', () => {

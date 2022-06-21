@@ -83,6 +83,13 @@ export default class EnvironmentTypeService {
     envTypeId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
+    const attributesAllowedToUpdate = ['description', 'name', 'status'];
+    const attributesNotAllowed = Object.keys(updatedValues).filter((key) => {
+      return !attributesAllowedToUpdate.includes(key);
+    });
+    if (attributesNotAllowed.length > 0) {
+      throw Boom.badRequest(`We do not support updating these attributes ${attributesNotAllowed}`);
+    }
     try {
       await this.getEnvironmentType(envTypeId);
     } catch (e) {
