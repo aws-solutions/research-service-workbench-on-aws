@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authorization",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },
@@ -55,6 +59,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-iam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production" ]
     },
@@ -84,6 +92,10 @@
     },
     {
       "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-s3-control",
       "allowedCategories": [ "production" ]
     },
     {

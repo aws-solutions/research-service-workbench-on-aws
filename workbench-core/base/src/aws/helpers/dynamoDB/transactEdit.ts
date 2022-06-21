@@ -6,9 +6,9 @@
 import {
   AttributeValue,
   TransactWriteItemsCommandInput,
-  TransactWriteItemsCommandOutput
+  TransactWriteItemsCommandOutput,
+  DynamoDB
 } from '@aws-sdk/client-dynamodb';
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with batch writes or deletes.
@@ -74,7 +74,7 @@ class TransactEdit {
    * @returns The output from the transact write item command
    */
   public async execute(): Promise<TransactWriteItemsCommandOutput> {
-    return await this._ddb.transactWrite(this._params);
+    return await this._ddb.transactWriteItems(this._params);
   }
 }
 
