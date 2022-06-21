@@ -38,7 +38,7 @@ export {
   CognitoSetup,
   EnvironmentService,
   EnvironmentTypeService,
-  Environment
+  Environment,
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,

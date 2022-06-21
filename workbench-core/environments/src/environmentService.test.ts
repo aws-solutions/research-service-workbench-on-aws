@@ -339,7 +339,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with filter by project', async () => {
@@ -379,7 +379,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with filter by owner', async () => {
@@ -459,7 +459,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('should fail with too many filters', async () => {
@@ -549,7 +549,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with sort by name descending', async () => {
@@ -589,7 +589,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with sort by createdAt', async () => {
@@ -629,7 +629,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with sort by project', async () => {
@@ -669,7 +669,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with sort by owner', async () => {
@@ -709,7 +709,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with sort by type', async () => {
@@ -749,7 +749,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('should fail with too many sort attributes', async () => {
@@ -792,7 +792,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('non admin', async () => {
@@ -829,7 +829,7 @@ describe('EnvironmentService', () => {
       const actualResponse = await envService.getEnvironments({ role: 'researcher', ownerId: 'owner-123' });
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with pagination token', async () => {
@@ -883,7 +883,7 @@ describe('EnvironmentService', () => {
       );
 
       // CHECK
-      expect(actualResponse.envs).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
 
     test('admin with invalid pagination token', async () => {
