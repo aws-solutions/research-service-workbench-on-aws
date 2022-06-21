@@ -96,6 +96,9 @@ importers:
     specifiers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-authentication': workspace:*
+      '@amzn/workbench-core-authorization': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -120,6 +123,9 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
+      '@amzn/workbench-core-authorization': link:../../workbench-core/authorization
+      '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@hapi/boom': 10.0.0
       express: 4.18.1
     devDependencies:
@@ -150,6 +156,7 @@ importers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
+      '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-dynamodb': ^3.67.0
@@ -197,6 +204,7 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
+      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
       '@amzn/workbench-core-base': link:../../workbench-core/base
       '@aws-sdk/client-cloudformation': 3.100.0
       '@aws-sdk/client-dynamodb': 3.100.0

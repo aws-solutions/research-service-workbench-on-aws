@@ -29,6 +29,9 @@
   },
   "dependencies": {
     "@amzn/environments": "workspace:*",
+    "@amzn/workbench-core-authentication": "workspace:*",
+    "@amzn/workbench-core-authorization": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "express": "^4.17.3"
   },

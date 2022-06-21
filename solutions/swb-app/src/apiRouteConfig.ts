@@ -4,11 +4,13 @@ import {
   EnvironmentLifecycleService,
   EnvironmentService
 } from '@amzn/environments';
+import { AuthenticationService } from '@amzn/workbench-core-authentication';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
   account: HostingAccountService;
+  auth: AuthenticationService;
   environmentService: EnvironmentService;
 }
 
