@@ -33,7 +33,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       })
       .execute()) as GetItemCommandOutput;
 
-    if (!response || response.Item) throw Boom.notFound(`Could not find DataSet ${name}.`);
+    if (!response || !response.Item) throw Boom.notFound(`Could not find DataSet '${name}'.`);
     return response.Item as unknown as DataSet;
   }
 
@@ -51,7 +51,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addDataSet(dataSet: DataSet): Promise<DataSet> {
     const dataSetParam: DataSet = dataSet;
     await this._validateCreateDataSet(dataSet);
-    dataSetParam.Id = uuidv4();
+    dataSetParam.id = uuidv4();
     if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
     await this._storeToDdb(dataSetParam);
 
@@ -79,8 +79,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _storeToDdb(dataSet: DataSet): Promise<string> {
     const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSet.Id}`,
-      sk: `${this._dataSetKeyType}#${dataSet.Id}`
+      pk: `${this._dataSetKeyType}#${dataSet.name}`,
+      sk: `${this._dataSetKeyType}#${dataSet.name}`
     };
     const dataSetParams: { item: { [key: string]: string | string[] } } = {
       item: {
