@@ -125,7 +125,6 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@hapi/boom': 10.0.0
-      '@types/cors': 2.8.12
       cors: 2.8.5
       express: 4.18.1
       lodash: 4.17.21
@@ -135,6 +134,7 @@ importers:
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
       '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
+      '@types/cors': 2.8.12
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.5.2
@@ -861,7 +861,7 @@ importers:
       '@vendia/serverless-express': 4.8.0
       aws-cdk: 2.26.0
       axios: 0.27.2
-      cdk-nag: 2.14.22_47b13785010171dab9c30d40a45387b9
+      cdk-nag: 2.14.26_47b13785010171dab9c30d40a45387b9
       depcheck: 1.4.3
       esbuild: 0.14.42
       eslint: 8.16.0
@@ -1417,11 +1417,11 @@ packages:
     resolution: {integrity: sha512-HpkeUdQdZFVFDkIeNxVYuUUKijeuNNloRHldqE66aRbWzBjDIqhlHfbey3lEHpH/sOfPmkNC+akjIvel4Auw6A==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.159.0
-      '@aws-cdk/cx-api': 1.159.0
-      '@aws-cdk/region-info': 1.159.0
+      '@aws-cdk/cloud-assembly-schema': 1.158.0
+      '@aws-cdk/cx-api': 1.158.0
+      '@aws-cdk/region-info': 1.158.0
       '@balena/dockerignore': 1.0.2
-      constructs: 3.4.29
+      constructs: 3.4.25
       fs-extra: 9.1.0
       ignore: 5.2.0
       minimatch: 3.1.2
@@ -1469,7 +1469,7 @@ packages:
     resolution: {integrity: sha512-VafYfYpKGrrYndk1bwtNxrIlbkS13wiqAnuHzfa1pdblWS5TX+Z/wEGqQzVbXmh8RFPdpxxvQr0mZJBFrqTdjQ==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
     dependencies:
-      '@aws-cdk/cloud-assembly-schema': 1.159.0
+      '@aws-cdk/cloud-assembly-schema': 1.158.0
       semver: 7.3.7
     dev: false
     bundledDependencies:
@@ -5737,7 +5737,7 @@ packages:
 
   /@types/cors/2.8.12:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
-    dev: false
+    dev: true
 
   /@types/diff/5.0.1:
     resolution: {integrity: sha512-XIpxU6Qdvp1ZE6Kr3yrkv1qgUab0fyf4mHYvW8N3Bx3PCsbN6or1q9/q72cv5jIFWolaGH08U9XyYoLLIykyKQ==}
@@ -6559,7 +6559,7 @@ packages:
     dependencies:
       '@balena/dockerignore': 1.0.2
       case: 1.6.3
-      constructs: 10.1.30
+      constructs: 10.1.25
       fs-extra: 9.1.0
       ignore: 5.2.0
       jsonschema: 1.4.1
@@ -6945,7 +6945,7 @@ packages:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
     engines: {node: '>= 0.8.0'}
 
-  /cdk-nag/2.14.26_cb4d961d3ab0a175db0d2240fe599ce1:
+  /cdk-nag/2.14.26_47b13785010171dab9c30d40a45387b9:
     resolution: {integrity: sha512-emOwacq+6kHgVcCqQWRGdznBYt+GlfYU0Bqh4q9XvvxCSXxRL0K5UKrTFDqXpcquvncryegh4Pa2UoFBVdOWgA==}
     peerDependencies:
       aws-cdk-lib: ^2.11.0
