@@ -1,27 +1,12 @@
 /* eslint-disable no-new */
 import { join } from 'path';
+import { Stack, StackProps, CfnOutput, RemovalPolicy, aws_kms, Duration, Fn } from 'aws-cdk-lib';
 import {
-  Stack,
-  StackProps,
-  CfnOutput,
-  RemovalPolicy,
-  aws_apigateway,
-  aws_kms,
-  Duration,
-  Fn
-} from 'aws-cdk-lib';
-import {
-  ApiKeySourceType,
   AuthorizationType,
-  CognitoUserPoolsAuthorizer,
-  RestApi,
-  EndpointType,
   LambdaIntegration,
-  MethodLoggingLevel,
   AccessLogFormat,
   LogGroupLogDestination,
   LambdaRestApi,
-  RequestAuthorizer,
   RequestValidator,
   AccessLogField
 } from 'aws-cdk-lib/aws-apigateway';

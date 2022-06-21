@@ -13,13 +13,13 @@ describe('CDKStack', () => {
       })
     );
     expectCDK(infraStack).to(
-      haveResourceLike('AWS::ApiGatewayV2::Integration', {
-        IntegrationType: 'AWS_PROXY'
+      haveResourceLike('AWS::ApiGateway::Resource', {
+        PathPart: 'consent'
       })
     );
     expectCDK(infraStack).to(
-      haveResourceLike('AWS::ApiGatewayV2::Api', {
-        Name: 'HttpApiService'
+      haveResourceLike('AWS::ApiGateway::RestApi', {
+        Name: 'RestApi'
       })
     );
     const infraStackTemplate = Template.fromStack(infraStack);
