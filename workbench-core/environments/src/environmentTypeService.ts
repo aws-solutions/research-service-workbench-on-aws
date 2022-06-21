@@ -3,6 +3,7 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_API_PAGE_SIZE } from './constants';
 import envKeyNameToKey from './environmentKeyNameToKey';
 import { EnvironmentTypeStatus } from './environmentTypeStatus';
 import { addPaginationToken, getPaginationToken } from './paginationHelper';
@@ -62,9 +63,10 @@ export default class EnvironmentTypeService {
     paginationToken?: string
   ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {
     let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: this._resourceType }
+      key: { name: 'resourceType', value: this._resourceType },
+      index: 'getResourceByUpdatedAt',
+      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
-    queryParams.index = 'getResourceByUpdatedAt';
 
     queryParams = addPaginationToken(paginationToken, queryParams);
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();

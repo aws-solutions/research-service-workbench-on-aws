@@ -1,6 +1,13 @@
 /* eslint-disable */
 import EnvironmentTypeService from './environmentTypeService';
-import { DynamoDBClient, GetItemCommand, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  GetItemCommandOutput,
+  QueryCommand,
+  QueryCommandOutput,
+  UpdateItemCommand
+} from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import environmentResourceTypeToKey from './environmentResourceTypeToKey';
@@ -76,19 +83,113 @@ describe('environmentTypeService', () => {
     });
   });
   describe('getEnvironmentTypes', () => {
-    test('validPaginationToken', async () => {});
-    test('invalidPaginationToken', async () => {});
+    test('validPaginationToken', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [marshall(envType), marshall(envType)],
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: TABLE_NAME,
+          KeyConditionExpression: '#resourceType = :resourceType'
+        })
+        .resolves(queryItemResponse);
+      const validPaginationToken =
+        'eyJzayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInJlc291cmNlVHlwZSI6ImVudlR5cGUiLCJwayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMTZUMjI6NDE6MDUuOTYyWiJ9';
+
+      // OPERATE
+      const actualResponse = await envTypeService.getEnvironmentTypes(10, validPaginationToken);
+
+      // CHECK
+      expect(actualResponse).toEqual({ data: [envType, envType] });
+    });
+    test('invalidPaginationToken', async () => {
+      // BUILD & OPERATE & CHECK
+      await expect(envTypeService.getEnvironmentTypes(10, 'invalidPaginationToken')).rejects.toThrow(
+        'Invalid paginationToken'
+      );
+    });
   });
 
   describe('updateEnvironmentType', () => {
-    test('valid id', async () => {});
+    test('valid id', async () => {
+      // BUILD
+      const getItemResponse: GetItemCommandOutput = {
+        Item: marshall(envType),
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: TABLE_NAME,
+          Key: marshall({
+            pk: `${environmentResourceTypeToKey.envType}#${envTypeId}`,
+            sk: `${environmentResourceTypeToKey.envType}#${envTypeId}`
+          })
+        })
+        .resolves(getItemResponse);
+      ddbMock
+        .on(UpdateItemCommand)
+        //@ts-ignore
+        .resolves({ Attributes: marshall({ ...envType, name: 'FakeName' }) });
 
-    test('invalid id', async () => {});
+      // OPERATE
+      const actualResponse = await envTypeService.updateEnvironmentType('owner-123', envTypeId, {
+        name: 'FakeName'
+      });
+
+      // CHECK
+      expect(actualResponse).toEqual({ ...envType, name: 'FakeName' });
+    });
+
+    test('invalid id', async () => {
+      // BUILD
+      const getItemResponse: GetItemCommandOutput = {
+        Item: undefined,
+        $metadata: {}
+      };
+      ddbMock.on(GetItemCommand).resolves(getItemResponse);
+      const invalidId = 'invalidId-1';
+      // OPERATE & CHECK
+      await expect(
+        envTypeService.updateEnvironmentType('owner-123', invalidId, { name: 'FakeName' })
+      ).rejects.toThrow(`Could not find environment type ${invalidId} to update`);
+    });
   });
 
   describe('createNewEnvironmentType', () => {
-    test('successfully create envType', async () => {});
+    const updateParams = {
+      status: 'APPROVED',
+      name: 'Jupyter Notebook',
+      provisioningArtifactId: 'pa-dqwijdnwq12',
+      params: [],
+      description: 'An Amazon SageMaker Jupyter Notebook',
+      productId: 'prod-dwqdqdqdwq',
+      type: 'sagemaker'
+    };
+    test('successfully create envType', async () => {
+      // BUILD
+      ddbMock.on(UpdateItemCommand).resolves({
+        Attributes: marshall(envType)
+      });
 
-    test('failed to create envType', async () => {});
+      // OPERATE
+      const actualResponse = await envTypeService.createNewEnvironmentType('owner-123', updateParams);
+
+      // CHECK
+      expect(actualResponse).toEqual(envType);
+    });
+
+    test('failed to create envType', async () => {
+      // BUILD
+      ddbMock.on(UpdateItemCommand).resolves({
+        Attributes: undefined
+      });
+
+      // OPERATE & CHECK
+      await expect(envTypeService.createNewEnvironmentType('owner-123', updateParams)).rejects.toThrow(
+        `Unable to create environment type with params: ${JSON.stringify(updateParams)}`
+      );
+    });
   });
 });

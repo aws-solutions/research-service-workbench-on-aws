@@ -39,8 +39,18 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await environmentTypeService.getEnvironmentTypes();
-      res.send(envType);
+      const { paginationToken, pageSize } = req.query;
+      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
+        res
+          .status(400)
+          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      } else {
+        const envType = await environmentTypeService.getEnvironmentTypes(
+          pageSize ? Number(pageSize) : undefined,
+          paginationToken
+        );
+        res.send(envType);
+      }
     })
   );
 
