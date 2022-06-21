@@ -20,7 +20,7 @@ jobs:
       codeartifact-domain-owner: ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}
       codeartifact-region: ${{ secrets.CODEARTIFACT_REGION }}
       codeartifact-repo-name: ${{ secrets.CODEARTIFACT_REPO_NAME }}
-      aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
+      aws-dev-region: ${{ secrets.AWS_TEST_REGION }}
       assume-role: ${{ secrets.ASSUME_ROLE }}
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       passphrase: ${{ secrets.PASSPHRASE }}
