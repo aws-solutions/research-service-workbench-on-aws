@@ -24,4 +24,14 @@ export interface DataSet {
    * the endpoints through which the dataset is accessible.
    */
   externalEndpoints?: string[];
+
+  /**
+   * AWS Account ID of DataSet
+   */
+  awsAccountId?: string;
+
+  /**
+   * Storage Type of the DataSet
+   */
+  storageType?: string;
 }

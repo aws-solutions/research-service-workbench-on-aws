@@ -41,11 +41,11 @@ export interface DataSetMetadataPlugin {
    * Add a DataSet to the solution.
    * @param dataSet - the DataSet to add.
    */
-  addDataSet(dataSet: DataSet): Promise<void>;
+  addDataSet(dataSet: DataSet): Promise<DataSet>;
 
   /**
    * Udpate a DataSet
    * @param dataSet - the updated DataSet data.
    */
-  updateDataSet(dataSet: DataSet): Promise<void>;
+  updateDataSet(dataSet: DataSet): Promise<DataSet>;
 }

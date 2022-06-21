@@ -48,15 +48,18 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     throw new Error('Method not implemented.');
   }
 
-  public async addDataSet(dataSet: DataSet): Promise<void> {
+  public async addDataSet(dataSet: DataSet): Promise<DataSet> {
     this._validateCreateDataSet(dataSet);
     dataSet.id = uuidv4();
     if (_.isUndefined(dataSet.createdAt)) dataSet.createdAt = new Date().toISOString();
-    await this._updateDataSet(dataSet);
+    await this._storeToDdb(dataSet);
+
+    return dataSet;
   }
 
-  public async updateDataSet(dataSet: DataSet): Promise<void> {
-    throw new Error('Method not implemented.');
+  public async updateDataSet(dataSet: DataSet): Promise<DataSet> {
+    const id = await this._storeToDdb(dataSet);
+    return dataSet;
   }
 
   private _validateCreateDataSet(dataSet: DataSet): void {
@@ -73,7 +76,27 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
   }
 
-  private async _updateDataSet(dataSet: DataSet): Promise<void> {
-    const dataSetParams = {};
+  private async _storeToDdb(dataSet: DataSet): Promise<string> {
+    const dataSetKey = {
+      pk: `${this._dataSetKeyType}#${dataSet.Id}`,
+      sk: `${this._dataSetKeyType}#${dataSet.Id}`
+    };
+    const dataSetParams: { item: { [key: string]: string | string[] } } = {
+      item: {
+        id: dataSet.Id as string,
+        name: dataSet.name,
+        createdAt: dataSet.createdAt as string,
+        path: dataSet.path,
+        awsAccountId: dataSet.awsAccountId as string,
+        storageType: dataSet.storageType as string
+      }
+    };
+
+    if (dataSet.externalEndpoints)
+      dataSetParams.item.externalEndpoints = dataSet.externalEndpoints as string[];
+
+    await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
+
+    return dataSet.Id as string;
   }
 }
