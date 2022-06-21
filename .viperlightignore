@@ -17,17 +17,21 @@ cdk.out
 #Fake access key id used
 solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.js
 solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.ts
+solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentConnectionService.test.js
+solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentConnectionService.test.ts
 workbench-core/environments/lib/environmentLifecycleHelper.test.js
 workbench-core/environments/src/environmentLifecycleHelper.test.ts 
 
 #Fake email used
 solutions/example-ui-app/src/models/User.ts
 solutions/swb-reference/src/config/testEnv.yaml
-solutions/example-ui-app/.next/server/pages/_app.js 
+solutions/swb-reference/src/config/demo.yaml
+solutions/example-ui-app/.next/server/pages/_app.js
 solutions/example-ui-app/.next/server/pages/_document.js
 solutions/example-ui-app/.next/server/pages/en/404.html
 solutions/example-ui-app/.next/server/pages/en/500.html
 solutions/example-ui-app/.next/server/pages/es/404.html
 solutions/example-ui-app/.next/server/pages/es/500.html
 solutions/example-ui-app/.next/static/chunks/pages
-solutions/swb-ui/.next/server/pages/_document.js 
+solutions/swb-ui/.next/server/pages/_document.js
+workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts

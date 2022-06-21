@@ -1,35 +1,48 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
+import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import _ = require('lodash');
+import AccountService from './accountService';
+import { HostingAccountStatus } from './hostingAccountStatus';
 import IamRoleCloneService from './iamRoleCloneService';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
-  public constructor(awsRegion: string, stackName: string) {
-    this._aws = new AwsService({ region: awsRegion });
-    this._stackName = stackName;
+  private _accountService: AccountService;
+  public constructor() {
+    this._stackName = process.env.STACK_NAME!;
+    const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
+    this._accountService = new AccountService(ddbTableName);
   }
 
-  public async initializeAccount(
-    accountMetadata: {
-      accountId: string;
-      envManagementRoleArn: string;
-      accountHandlerRoleArn: string;
-    },
-    mainAccountBusArnName: string
-  ): Promise<void> {
+  public async initializeAccount(accountMetadata: {
+    [key: string]: string;
+  }): Promise<{ [key: string]: string }> {
     const cfService = this._aws.helpers.cloudformation;
-    const { [mainAccountBusArnName]: mainAccountBusName } = await cfService.getCfnOutput(this._stackName, [
-      mainAccountBusArnName
-    ]);
-    await this.updateEventBridgePermissions(mainAccountBusName, accountMetadata.accountId);
-    await this.storeToDdb(accountMetadata);
+    const { [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn } = await cfService.getCfnOutput(
+      this._stackName,
+      [process.env.STATUS_HANDLER_ARN_NAME!]
+    );
+
+    // Update main account default event bus to accept hosting account state change events
+    await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
+
+    // Finally store the new/updated account details in DDB
+    return this._accountService.createOrUpdate(accountMetadata);
   }
 
   /**
    * Update target account with resources required for launching environments in the account
    * @param params - Listed below
+   * ddbAccountId - id of DDB item with resourceType = 'account'
    * targetAccountId - Account where resources should be set up.
    * targetAccountAwsService - awsService used for setting up the account.
    * targetAccountStackName - StackName of Cloudformation Stack used to set up account's base resources.
@@ -37,9 +50,10 @@ export default class HostingAccountLifecycleService {
    * ssmDocNameSuffix - Suffix of SSM docs that should be shared with target account.
    * principalArnForScPortfolio - Arn that should be associated with Service Catalog portfolio.
    * roleToCopyToTargetAccount - IAM role that should be copied from main account to target account.
-   * s3ArtifactBucketName - S3 bucket that contains CFN Template for target account.
+   * s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
    */
   public async updateAccount(params: {
+    ddbAccountId: string;
     targetAccountId: string;
     targetAccountAwsService: AwsService;
     targetAccountStackName: string;
@@ -51,6 +65,7 @@ export default class HostingAccountLifecycleService {
   }): Promise<void> {
     console.log('Updating account');
     const {
+      ddbAccountId,
       targetAccountId,
       targetAccountAwsService,
       targetAccountStackName,
@@ -62,7 +77,7 @@ export default class HostingAccountLifecycleService {
     } = params;
     const ssmDocuments = await this._getSSMDocuments(this._stackName, ssmDocNameSuffix);
     await this._shareSSMDocument(ssmDocuments, targetAccountId);
-    await this.shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
+    await this._shareAMIs(targetAccountId, JSON.parse(process.env.AMI_IDS_TO_SHARE!));
     await this._shareAndAcceptScPortfolio(
       targetAccountAwsService,
       targetAccountId as string,
@@ -79,13 +94,22 @@ export default class HostingAccountLifecycleService {
     await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
 
     await this._updateHostingAccountStatus(
+      ddbAccountId,
       s3ArtifactBucketName,
       targetAccountAwsService,
       targetAccountStackName
     );
   }
 
+  /**
+   * Store hosting account status, vpcId, and subnetId into DDB
+   * @param ddbAccountId - id of DDB item with resourceType = 'account'
+   * @param s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
+   * @param hostingAccountAwsService - AWS Service for hosting account
+   * @param hostingAccountStackName - Hosting account stack name
+   */
   private async _updateHostingAccountStatus(
+    ddbAccountId: string,
     s3ArtifactBucketName: string,
     hostingAccountAwsService: AwsService,
     hostingAccountStackName: string
@@ -117,37 +141,72 @@ export default class HostingAccountLifecycleService {
     const describeStackResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
-    let vpcId: string | undefined;
-    let subnetId: string | undefined;
+
     const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
     if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
       const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
-      vpcId = outputs.find((output) => {
+      const vpcId = outputs.find((output) => {
         return output.OutputKey === 'VPC';
       })!.OutputValue;
-      subnetId = outputs.find((output) => {
+      const subnetId = outputs.find((output) => {
         return output.OutputKey === 'VpcSubnet';
+      })!.OutputValue;
+      const encryptionKeyArn = outputs.find((output) => {
+        return output.OutputKey === 'EncryptionKeyArn';
       })!.OutputValue;
 
       if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-        await this._writeAccountStatusToDDB({ status: 'UP_TO_DATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'CURRENT',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       } else {
-        await this._writeAccountStatusToDDB({ status: 'NEEDS_UPDATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'NEEDS_UPDATE',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       }
     } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
-      await this._writeAccountStatusToDDB({ status: 'ERRORED', vpcId, subnetId });
+      await this._writeAccountStatusToDDB({ ddbAccountId, status: 'ERRORED' });
     }
   }
 
   private async _writeAccountStatusToDDB(param: {
-    status: 'UP_TO_DATE' | 'NEEDS_UPDATE' | 'ERRORED';
-    vpcId: string | undefined;
-    subnetId: string | undefined;
+    ddbAccountId: string;
+    status: HostingAccountStatus;
+    vpcId?: string;
+    subnetId?: string;
+    encryptionKeyArn?: string;
   }): Promise<void> {
+    const updateParam: {
+      id: string;
+      status: string;
+      vpcId?: string;
+      subnetId?: string;
+      encryptionKeyArn?: string;
+    } = {
+      id: param.ddbAccountId,
+      status: param.status
+    };
+    if (param.vpcId) {
+      updateParam.vpcId = param.vpcId;
+    }
+    if (param.subnetId) {
+      updateParam.subnetId = param.subnetId;
+    }
+    if (param.encryptionKeyArn) {
+      updateParam.encryptionKeyArn = param.encryptionKeyArn;
+    }
     console.log('_writeAccountStatusToDDB param', param);
-    // TODO: Write above values to DDB. If vpcId or subnetId is undefined, don't write those 2 values to DDB
+    await this._accountService.update(updateParam);
   }
 
   private async _shareAndAcceptScPortfolio(
@@ -176,18 +235,76 @@ export default class HostingAccountLifecycleService {
       PrincipalType: 'IAM'
     });
   }
+  /** Update main account default event bus to accept hosting account state change events
+   ** Also update its rule to add the new hosting account ID if it wasn't already present
+   * @param statusHandlerArn - The ARN of StatusHandler lambda which becomes the target of the default bus rule
+   * @param awsAccountId - The hosting account ID that needs to have permission to put events to the main default bus
+   */
+  public async updateBusPermissions(statusHandlerArn: string, awsAccountId: string): Promise<void> {
+    const busName = 'default';
 
-  public async updateEventBridgePermissions(mainAccountBusName: string, accountId: string): Promise<void> {
+    // TODO: Figure out how to include all accounts IDs in a single statement
     const params = {
       Action: 'events:PutEvents',
-      EventBusName: mainAccountBusName,
-      Principal: accountId,
-      StatementId: 'Allow-main-account-to-receive-host-account-events'
+      EventBusName: busName,
+      Principal: awsAccountId,
+      StatementId: `Allow-main-account-to-get-${awsAccountId}-events`
     };
+
+    // Put permission for main account to receive hosting account events
     await this._aws.clients.eventBridge.putPermission(params);
+
+    let busRule;
+    const busRuleName = 'RouteHostEvents';
+    const describeRuleParams = { Name: busRuleName, EventBusName: busName };
+
+    try {
+      // Describe rule to see if it exists
+      busRule = await this._aws.clients.eventBridge.describeRule(describeRuleParams);
+
+      const putRuleParams = {
+        Name: busRuleName,
+        EventPattern: JSON.stringify({
+          account: busRule?.EventPattern
+            ? _.uniq(_.concat(JSON.parse(busRule.EventPattern).account, awsAccountId))
+            : [awsAccountId],
+          source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
+          'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+        }),
+        EventBusName: busName
+      };
+      // Create/update rule for main account event bus
+      await this._aws.clients.eventBridge.putRule(putRuleParams);
+    } catch (e) {
+      if (e instanceof ResourceNotFoundException) {
+        const putRuleParams = {
+          Name: busRuleName,
+          EventPattern: JSON.stringify({
+            account: [awsAccountId],
+            source: [{ 'anything-but': ['aws.config', 'aws.cloudtrail', 'aws.ssm', 'aws.tag'] }],
+            'detail-type': [{ 'anything-but': 'AWS API Call via CloudTrail' }]
+          }),
+          EventBusName: busName
+        };
+        // Create rule for main account event bus
+        await this._aws.clients.eventBridge.putRule(putRuleParams);
+      } else {
+        throw e;
+      }
+    }
+
+    const putTargetsParams = {
+      EventBusName: busName,
+      Rule: busRuleName,
+      Targets: [{ Arn: statusHandlerArn, Id: 'RouteToStatusHandler' }]
+    };
+
+    // Create/update rule target to route events to status handler lambda
+    await this._aws.clients.eventBridge.putTargets(putTargetsParams);
   }
 
-  public async shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+  private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+    console.log(`Sharing AMIs: [${amisToShare}] with account ${targetAccountId}`);
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {
@@ -204,6 +321,7 @@ export default class HostingAccountLifecycleService {
    * Make an API call to SSM in the main account to share SSM documents for launch/terminate with the hosting account.
    */
   private async _shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
+    console.log(`Sharing SSM documents: [${ssmDocuments}]`);
     for (const ssmDoc of ssmDocuments) {
       const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
       await this._aws.clients.ssm.modifyDocumentPermission(params);
@@ -240,18 +358,5 @@ export default class HostingAccountLifecycleService {
     return ssmDocOutputs.map((output: Output) => {
       return this._getNameFromArn({ output, outputName: output.OutputKey });
     });
-  }
-
-  /*
-   * Store hosting account information in DDB
-   */
-  public async storeToDdb(accountMetadata: {
-    accountId: string;
-    envManagementRoleArn: string;
-    accountHandlerRoleArn: string;
-  }): Promise<void> {
-    // TODO: Add DDB calls here once access patterns are established in @amzn/workbench-core-base
-    // Don't forget to store the external ID used during onboarding
-    return Promise.resolve();
   }
 }

@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ScanCommandInput, AttributeValue, ScanCommandOutput } from '@aws-sdk/client-dynamodb';
+import { ScanCommandInput, AttributeValue, ScanCommandOutput, DynamoDB } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with scans of an entire table in DDB
@@ -302,6 +302,7 @@ class Scanner {
    * If LastEvaluatedKey is empty, then the "last page" of results has been processed and there is no more data to be retrieved.
    * If LastEvaluatedKey is not empty, it does not necessarily mean that there is more data in the result set.
    * The only way to know when you have reached the end of the result set is when LastEvaluatedKey is empty.
+   * Items and LastEvaluatedKey are returned unmarshalled.
    *
    * @returns The output from the scan command
    *
@@ -326,7 +327,16 @@ class Scanner {
     ) {
       throw new Error('Must declare both Segment and TotalSegment if using either.');
     }
-    return await this._ddb.scan(this._params);
+    const result = await this._ddb.scan(this._params);
+    if (result.Items) {
+      result.Items = result.Items.map((item) => unmarshall(item));
+    }
+
+    if (result.LastEvaluatedKey) {
+      result.LastEvaluatedKey = unmarshall(result.LastEvaluatedKey);
+    }
+
+    return result;
   }
 }
 

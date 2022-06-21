@@ -3,16 +3,26 @@ import {
   InvalidAuthorizationCodeError,
   InvalidCodeVerifierError,
   InvalidJWTError,
+  InvalidParameterError,
   InvalidTokenError,
   InvalidTokenTypeError,
   isIdpUnavailableError,
   isInvalidAuthorizationCodeError,
   isInvalidCodeVerifierError,
   isInvalidJWTError,
+  isInvalidParameterError,
   isInvalidTokenError,
   isInvalidTokenTypeError,
   isPluginConfigurationError,
-  PluginConfigurationError
+  isRoleAlreadyExistsError,
+  isRoleNotFoundError,
+  isUserAlreadyExistsError,
+  isUserNotFoundError,
+  PluginConfigurationError,
+  RoleAlreadyExistsError,
+  RoleNotFoundError,
+  UserAlreadyExistsError,
+  UserNotFoundError
 } from '../';
 
 describe('custom error tests', () => {
@@ -28,17 +38,6 @@ describe('custom error tests', () => {
 
       expect(error instanceof Error).toBe(true);
     });
-
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new IdpUnavailableError();
-
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
-    });
   });
 
   describe('InvalidAuthorizationCodeError tests', () => {
@@ -52,17 +51,6 @@ describe('custom error tests', () => {
       const error = new InvalidAuthorizationCodeError();
 
       expect(error instanceof Error).toBe(true);
-    });
-
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new InvalidAuthorizationCodeError();
-
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
     });
   });
 
@@ -78,17 +66,6 @@ describe('custom error tests', () => {
 
       expect(error instanceof Error).toBe(true);
     });
-
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new InvalidCodeVerifierError();
-
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
-    });
   });
 
   describe('InvalidJWTError tests', () => {
@@ -103,16 +80,19 @@ describe('custom error tests', () => {
 
       expect(error instanceof Error).toBe(true);
     });
+  });
 
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new InvalidJWTError();
+  describe('InvalidParameterError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new InvalidParameterError();
 
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
+      expect(isInvalidParameterError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new InvalidParameterError();
+
+      expect(error instanceof Error).toBe(true);
     });
   });
 
@@ -128,17 +108,6 @@ describe('custom error tests', () => {
 
       expect(error instanceof Error).toBe(true);
     });
-
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new InvalidTokenError();
-
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
-    });
   });
 
   describe('InvalidTokenTypeError tests', () => {
@@ -152,17 +121,6 @@ describe('custom error tests', () => {
       const error = new InvalidTokenTypeError();
 
       expect(error instanceof Error).toBe(true);
-    });
-
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new InvalidTokenTypeError();
-
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isPluginConfigurationError(error)).toBe(false);
     });
   });
 
@@ -178,16 +136,61 @@ describe('custom error tests', () => {
 
       expect(error instanceof Error).toBe(true);
     });
+  });
 
-    it('should not be an instance of the other custom error classes', () => {
-      const error = new PluginConfigurationError();
+  describe('RoleAlreadyExistsError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new RoleAlreadyExistsError();
 
-      expect(isIdpUnavailableError(error)).toBe(false);
-      expect(isInvalidAuthorizationCodeError(error)).toBe(false);
-      expect(isInvalidCodeVerifierError(error)).toBe(false);
-      expect(isInvalidJWTError(error)).toBe(false);
-      expect(isInvalidTokenError(error)).toBe(false);
-      expect(isInvalidTokenTypeError(error)).toBe(false);
+      expect(isRoleAlreadyExistsError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new RoleAlreadyExistsError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+  });
+
+  describe('RoleNotFoundError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new RoleNotFoundError();
+
+      expect(isRoleNotFoundError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new RoleNotFoundError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+  });
+
+  describe('UserAlreadyExistsError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new UserAlreadyExistsError();
+
+      expect(isUserAlreadyExistsError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new UserAlreadyExistsError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+  });
+
+  describe('UserNotFoundError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new UserNotFoundError();
+
+      expect(isUserNotFoundError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new UserNotFoundError();
+
+      expect(error instanceof Error).toBe(true);
     });
   });
 });

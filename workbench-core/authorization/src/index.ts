@@ -8,3 +8,4 @@ export { Action } from './action';
 export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth } from './authorizationMiddleware';
+export { AuthenticatedUser } from './authenticatedUser';

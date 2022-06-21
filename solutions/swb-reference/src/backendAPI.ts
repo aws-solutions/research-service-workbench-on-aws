@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HostingAccountService } from '@amzn/environments';
+import { HostingAccountService, EnvironmentService } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
@@ -23,13 +23,16 @@ const apiRouteConfig: ApiRouteConfig = {
       lifecycle: new SagemakerEnvironmentLifecycleService(),
       connection: new SagemakerEnvironmentConnectionService()
     }
+
+    // Add your environment types here as follows:
+    // <newEnvTypeName>: {
+    //   lifecycle: new <newEnvTypeName>EnvironmentLifecycleService(),
+    //   connection: new <newEnvTypeName>EnvironmentConnectionService()
+    // }
   },
-  account: new HostingAccountService({
-    AWS_REGION: process.env.AWS_REGION!,
-    STACK_NAME: process.env.STACK_NAME!,
-    SSM_DOC_NAME_SUFFIX: process.env.SSM_DOC_NAME_SUFFIX!,
-    MAIN_ACCOUNT_BUS_ARN_NAME: process.env.MAIN_ACCOUNT_BUS_ARN_NAME!,
-    AMI_IDS_TO_SHARE: process.env.AMI_IDS_TO_SHARE!
+  account: new HostingAccountService(),
+  environmentService: new EnvironmentService({
+    TABLE_NAME: process.env.STACK_NAME!
   })
 };
 

@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
+import { AuthenticatedUser } from './authenticatedUser';
 import Operation from './operation';
 import Permission from './permission';
 import { HTTPMethod } from './routesMap';
@@ -21,4 +21,12 @@ export default interface PermissionsPlugin {
    * @param method - {@link HTTPMethod}.
    */
   getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]>;
+
+  /**
+   * Checks if a route is being ignored for Authorization.
+   * @param route - The path the user is requesting access to.
+   * @param method - {@link HTTPMethod}.
+   * @returns boolean stating if the route is ignored.
+   */
+  isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean>;
 }

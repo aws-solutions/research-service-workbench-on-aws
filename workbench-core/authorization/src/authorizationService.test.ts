@@ -1,10 +1,15 @@
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { fc, itProp } from 'jest-fast-check';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
-import { AuthorizationPlugin, PermissionsPlugin, HTTPMethod, AuthorizationService } from '.';
+import {
+  AuthenticatedUser,
+  AuthorizationPlugin,
+  PermissionsPlugin,
+  HTTPMethod,
+  AuthorizationService
+} from '.';
 
 describe('Authorization Service', () => {
   let mockPermissionsPlugin: PermissionsPlugin;
@@ -81,6 +86,15 @@ describe('Authorization Service', () => {
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
       }
+    });
+  });
+
+  describe('isRouteIgnored', () => {
+    test('GET /login should be ignored', async () => {
+      expect(await authorizationService.isRouteIgnored('/login', 'GET')).toBe(true);
+    });
+    test('PUT /login should not be ignored', async () => {
+      expect(await authorizationService.isRouteIgnored('/login', 'PUT')).toBe(false);
     });
   });
 });
