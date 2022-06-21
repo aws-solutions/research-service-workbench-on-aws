@@ -3,7 +3,7 @@
 import { join } from 'path';
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -468,12 +468,18 @@ export class SWBStack extends Stack {
 
   // DynamoDB Table
   private _createDDBTable(apiLambda: Function): Table {
-    // Ideally, this needs to involve the solution name
     const tableName: string = `${this.stackName}`;
     const table = new Table(this, tableName, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
-      tableName: tableName
+      tableName: tableName,
+      billingMode: BillingMode.PAY_PER_REQUEST
+    });
+    // Add GSI for get resource by name
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByName',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'name', type: AttributeType.STRING }
     });
     // Add GSI for get resource by status
     table.addGlobalSecondaryIndex({
@@ -481,17 +487,30 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'status', type: AttributeType.STRING }
     });
+    // Add GSI for get resource by createdAt
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByCreatedAt',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: AttributeType.STRING }
+    });
+    // Add GSI for get resource by dependency
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByDependency',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'dependency', type: AttributeType.STRING }
+    });
     // Add GSI for get resource by owner
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByOwner',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'owner', type: AttributeType.STRING }
     });
-    // Add GSI for get resource by updatedAt
+    // TODO Add GSI for get resource by cost
+    // Add GSI for get resource by type
     table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByUpdatedAt',
+      indexName: 'getResourceByType',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'updatedAt', type: AttributeType.STRING }
+      sortKey: { name: 'type', type: AttributeType.STRING }
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);

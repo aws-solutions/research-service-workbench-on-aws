@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { EnvironmentStatus } from './environmentStatus';
 
-interface Environment {
+export interface Environment {
   id: string | undefined;
   instanceId: string | undefined;
   cidr: string;
@@ -21,8 +21,12 @@ interface Environment {
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
+  updatedBy: string;
   createdAt: string;
+  createdBy: string;
   owner: string;
+  type: string;
+  dependency: string;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,12 +50,16 @@ const defaultEnv: Environment = {
   datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
+  updatedBy: '',
   createdAt: '',
+  createdBy: '',
   provisionedProductId: '',
-  owner: ''
+  owner: '',
+  type: '',
+  dependency: ''
 };
 
-export default class EnvironmentService {
+export class EnvironmentService {
   private _aws: AwsService;
   private _tableName: string;
 
@@ -114,34 +122,112 @@ export default class EnvironmentService {
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
+   * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
   public async getEnvironments(
     user: { role: string; ownerId: string },
-    filter?: { status?: EnvironmentStatus },
+    filter?: {
+      status?: EnvironmentStatus;
+      name?: string;
+      createdAt?: string;
+      project?: string;
+      owner?: string;
+      type?: string;
+    },
     pageSize?: number,
-    paginationToken?: string
+    paginationToken?: string,
+    sort?: {
+      status?: boolean;
+      name?: boolean;
+      createdAt?: boolean;
+      project?: boolean;
+      owner?: boolean;
+      type?: boolean;
+    }
   ): Promise<{ envs: Environment[]; paginationToken: string | undefined }> {
+    // Check that filter and sort are not both defined
+    if (filter && sort) {
+      throw Boom.badRequest('Cannot apply a filter and sort at the same time');
+    }
+
+    // Check that at most one filter is defined because we not support more than one filter
+    if (filter && Object.keys(filter).length > 1) {
+      throw Boom.badRequest('Cannot apply more than one filter.');
+    }
+
+    // Check that at most one sort attribute is defined because we not support sorting by more than one attribute
+    if (sort && Object.keys(sort).length > 1) {
+      throw Boom.badRequest('Cannot sort by more than one attribute.');
+    }
+
     let environments: Environment[] = [];
 
-    const queryParams: QueryParams = {
+    let queryParams: QueryParams = {
       key: { name: 'resourceType', value: 'environment' },
       limit: pageSize && pageSize >= 0 ? pageSize : 50
     };
 
     if (user.role === 'admin') {
-      if (filter && filter.status) {
-        // if admin and status is selected in the filter, use GSI getResourceByStatus
-        queryParams.index = 'getResourceByStatus';
-        queryParams.sortKey = 'status';
-        queryParams.eq = { S: filter.status };
+      if (filter) {
+        if (filter.status) {
+          // if admin and status is selected in the filter, use GSI getResourceByStatus
+          const addFilter = this._setFilter('getResourceByStatus', 'status', filter.status);
+          queryParams = { ...queryParams, ...addFilter };
+        } else if (filter.name) {
+          // if admin and name is selected in the filter, use GSI getResourceByName
+          const addFilter = this._setFilter('getResourceByName', 'name', filter.name);
+          queryParams = { ...queryParams, ...addFilter };
+        } else if (filter.createdAt) {
+          // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
+          const addFilter = this._setFilter('getResourceByCreatedAt', 'createdAt', filter.createdAt);
+          queryParams = { ...queryParams, ...addFilter };
+        } else if (filter.project) {
+          // if admin and project is selected in the filter, use GSI getResourceByProject
+          const addFilter = this._setFilter('getResourceByDependency', 'dependency', filter.project);
+          queryParams = { ...queryParams, ...addFilter };
+        } else if (filter.owner) {
+          // if admin and owner is selected in the filter, use GSI getResourceByOwner
+          const addFilter = this._setFilter('getResourceByOwner', 'owner', filter.owner);
+          queryParams = { ...queryParams, ...addFilter };
+        } else if (filter.type) {
+          // if admin and type is selected in the filter, use GSI getResourceByType
+          const addFilter = this._setFilter('getResourceByType', 'type', filter.type);
+          queryParams = { ...queryParams, ...addFilter };
+        }
+      } else if (sort) {
+        if (sort.status !== undefined) {
+          // if admin and status is selected in the sort param, use GSI getResourceByStatus
+          const addSort = this._setSort('getResourceByStatus', 'status', sort.status);
+          queryParams = { ...queryParams, ...addSort };
+        } else if (sort.name !== undefined) {
+          // if admin and name is selected in the sort param, use GSI getResourceByName
+          const addSort = this._setSort('getResourceByName', 'name', sort.name);
+          queryParams = { ...queryParams, ...addSort };
+        } else if (sort.createdAt !== undefined) {
+          // if admin and createdAt is selected in the sort param, use GSI getResourceByCreatedAt
+          const addSort = this._setSort('getResourceByCreatedAt', 'createdAt', sort.createdAt);
+          queryParams = { ...queryParams, ...addSort };
+        } else if (sort.project !== undefined) {
+          // if admin and project is selected in the sort param, use GSI getResourceByProject
+          const addSort = this._setSort('getResourceByDependency', 'dependency', sort.project);
+          queryParams = { ...queryParams, ...addSort };
+        } else if (sort.owner !== undefined) {
+          // if admin and owner is selected in the sort param, use GSI getResourceByOwner
+          const addSort = this._setSort('getResourceByOwner', 'owner', sort.owner);
+          queryParams = { ...queryParams, ...addSort };
+        } else if (sort.type !== undefined) {
+          // if admin and type is selected in the sort param, use GSI getResourceByType
+          const addSort = this._setSort('getResourceByType', 'type', sort.type);
+          queryParams = { ...queryParams, ...addSort };
+        }
       } else {
-        // if admin, use GSI getResourceByUpdatedAt
-        queryParams.index = 'getResourceByUpdatedAt';
+        // if admin, use GSI getResourceByCreatedAt by default
+        queryParams.index = 'getResourceByCreatedAt';
       }
     } else {
-      queryParams.index = 'getResourceByOwner';
-      queryParams.sortKey = 'owner';
-      queryParams.eq = { S: user.ownerId };
+      // if nonadmin, use GSI getResourceByOwner
+      const addFilter = this._setFilter('getResourceByOwner', 'owner', user?.ownerId);
+      queryParams = { ...queryParams, ...addFilter };
     }
     // If paginationToken is defined, add param
     // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
@@ -153,23 +239,47 @@ export default class EnvironmentService {
       }
     }
 
-    const data = await this._aws.helpers.ddb.query(queryParams).execute();
+    try {
+      const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
-    // check that Items is defined
-    if (data && data.Items) {
-      environments = data.Items.map((item) => {
-        return item as unknown as Environment;
-      });
+      // check that Items is defined
+      if (data && data.Items) {
+        environments = data.Items.map((item) => {
+          return item as unknown as Environment;
+        });
 
-      // Always sort by UpdatedAt values for environments. Newest environment appear first
-      environments = environments.sort((envA, envB) => {
-        return new Date(envB.updatedAt).getTime() - new Date(envA.updatedAt).getTime();
-      });
+        // Always sort by CreatedAt values for environments if not sorting by other attribute. Newest environment appear first
+        if (!sort) {
+          environments = environments.sort((envA, envB) => {
+            return new Date(envB.createdAt).getTime() - new Date(envA.createdAt).getTime();
+          });
+        }
+      }
+      const token = data.LastEvaluatedKey
+        ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
+        : undefined;
+      return { envs: environments, paginationToken: token };
+    } catch (error) {
+      throw Boom.badRequest(error);
     }
-    const token = data.LastEvaluatedKey
-      ? Buffer.from(JSON.stringify(data.LastEvaluatedKey)).toString('base64')
-      : undefined;
-    return { envs: environments, paginationToken: token };
+  }
+
+  private _setFilter(gsi: string, sortKey: string, eq: string): QueryParams {
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      eq: { S: eq }
+    };
+    return queryParams;
+  }
+
+  private _setSort(gsi: string, sortKey: string, forward: boolean): QueryParams {
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      forward: forward
+    };
+    return queryParams;
   }
 
   public async updateEnvironment(
@@ -249,9 +359,13 @@ export default class EnvironmentService {
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
+      updatedBy: 'user-1', // TODO: Get this from request context
       createdAt: new Date().toISOString(),
+      createdBy: 'user-1', // TODO: Get this from request context
       owner: 'owner-1', // TODO: Get this from request context
-      status: params.status || 'PENDING'
+      status: params.status || 'PENDING',
+      type: params.envTypeId,
+      dependency: params.projectId
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
