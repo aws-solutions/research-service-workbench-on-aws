@@ -150,4 +150,4 @@ const app = express();
 // This example shows an authorization middleware with no mount path. Authorization will execute every time a request is received
 app.use(WithAuth(authorizationService));
 ```
-The middleware function can be mounted on any path, however it is recommended to be mounted with no path, as it should execute every time a request is received. Click [here](https://expressjs.com/en/guide/using-middleware.html) for more information about ExpressJS middleware.
+**REQUIRED**:The middleware function needs to be mounted with no path, as it should execute every time a request is received. Click [here](https://expressjs.com/en/guide/using-middleware.html) for more information about ExpressJS middleware.

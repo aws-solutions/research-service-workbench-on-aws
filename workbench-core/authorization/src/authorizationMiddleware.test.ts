@@ -67,7 +67,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'GET',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -82,7 +82,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -101,7 +101,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -122,7 +122,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/randomRoute'
+      path: '/randomRoute'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -143,7 +143,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'IncorrectMethod',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -161,7 +161,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -184,7 +184,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -207,7 +207,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -219,7 +219,7 @@ describe('authorization middleware', () => {
     const next = jest.fn();
     const request: Request = {
       method: 'GET',
-      originalUrl: '/login'
+      path: '/login'
     } as Request;
     const response: Response = {} as Response;
     await authorizationMiddleware(request, response, next);
