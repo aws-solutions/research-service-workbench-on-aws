@@ -1,10 +1,14 @@
 import { User } from './user';
-
+import { UserManagementPlugin } from './userManagementPlugin';
 /**
- * Implement the `UserManagementPlugin` interface to connect the UserRoleService
- * to an Identity Provider or other datastore for users and roles.
+ *
  */
-export interface UserManagementPlugin {
+export default class UserManagementService {
+  private _userManagementPlugin: UserManagementPlugin;
+
+  public constructor(userManagementPlugin: UserManagementPlugin) {
+    this._userManagementPlugin = userManagementPlugin;
+  }
   /**
    * Get details for a particular user from the user/role data store.
    *
@@ -15,8 +19,9 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  getUser(uid: string): Promise<User>;
-
+  public async getUser(uid: string): Promise<User> {
+    return await this._userManagementPlugin.getUser(uid);
+  }
   /**
    * Create a new user with the given details.
    * @param user - the details of the user to create.
@@ -26,8 +31,9 @@ export interface UserManagementPlugin {
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  createUser(user: User): Promise<void>;
-
+  public async createUser(user: User): Promise<void> {
+    await this._userManagementPlugin.createUser(user);
+  }
   /**
    * Update a user with new details.
    * @param uid - the ID of the user to update.
@@ -38,7 +44,9 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  updateUser(uid: string, user: User): Promise<void>;
+  public async updateUser(uid: string, user: User): Promise<void> {
+    await this._userManagementPlugin.updateUser(uid, user);
+  }
 
   /**
    * Delete a user from the backing store.
@@ -48,8 +56,9 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  deleteUser(uid: string): Promise<void>;
-
+  public async deleteUser(uid: string): Promise<void> {
+    await this._userManagementPlugin.deleteUser(uid);
+  }
   /**
    * Get all user IDs from the user/role data store.
    * @returns an array containing all the user ids
@@ -57,10 +66,12 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
-  listUsers(): Promise<string[]>;
+  public async listUsers(): Promise<string[]> {
+    return await this._userManagementPlugin.listUsers();
+  }
 
   /**
-   * List the user IDs assoicated with a given role.
+   * List the user IDs associated with a given role.
    * @param role - the role for which the users should be listed.
    * @returns an array containing the user ids that are associated with the role
    *
@@ -68,17 +79,21 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  listUsersForRole(role: string): Promise<string[]>;
+  public async listUsersForRole(role: string): Promise<string[]> {
+    return await this._userManagementPlugin.listUsersForRole(role);
+  }
 
   /**
-   * List the currenlty available roles.
+   * List the currently available roles.
    *
    * @returns an array containing all available roles
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
-  listRoles(): Promise<string[]>;
+  public async listRoles(): Promise<string[]> {
+    return await this._userManagementPlugin.listRoles();
+  }
 
   /**
    * Add the given user to the given role.
@@ -90,8 +105,9 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  addUserToRole(uid: string, role: string): Promise<void>;
-
+  public async addUserToRole(uid: string, role: string): Promise<void> {
+    await this._userManagementPlugin.addUserToRole(uid, role);
+  }
   /**
    * Remove the given user from the given role.
    * @param uid - the ID of the user to remove from the given role.
@@ -102,7 +118,9 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  removeUserFromRole(uid: string, role: string): Promise<void>;
+  public async removeUserFromRole(uid: string, role: string): Promise<void> {
+    await this._userManagementPlugin.removeUserFromRole(uid, role);
+  }
 
   /**
    * Create a new role with no associated users.
@@ -112,17 +130,20 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleAlreadyExistsError} - role already exists error
    */
-  createRole(role: string): Promise<void>;
-
+  public async createRole(role: string): Promise<void> {
+    await this._userManagementPlugin.createRole(role);
+  }
   /**
    * Delete the given role. It is recommended implementers check to
    * ensure an empty role before deletion to help guard against accidental
-   * deletin.
+   * deletion.
    * @param role - the role to remove.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  deleteRole(role: string): Promise<void>;
+  public async deleteRole(role: string): Promise<void> {
+    await this._userManagementPlugin.deleteRole(role);
+  }
 }

@@ -141,6 +141,7 @@ describe('EnvironmentLifecycleHelper', () => {
     const helper = new EnvironmentLifecycleHelper();
     const stsMock = mockClient(STSClient);
     const ssmMock = mockClient(SSMClient);
+
     const cfnMock = mockClient(CloudFormationClient);
     const mockSC = mockClient(ServiceCatalogClient);
     mockSC.on(ListLaunchPathsCommand).resolves({

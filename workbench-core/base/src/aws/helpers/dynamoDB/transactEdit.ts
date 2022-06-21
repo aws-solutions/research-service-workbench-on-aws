@@ -22,7 +22,6 @@ class TransactEdit {
     this._ddb = new DynamoDB({ ...config });
     this._tableName = table;
     this._params = { TransactItems: [] };
-    this._params.TransactItems = [];
   }
 
   /**
