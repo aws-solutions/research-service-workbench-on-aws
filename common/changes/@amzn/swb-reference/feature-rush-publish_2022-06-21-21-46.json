@@ -3,7 +3,7 @@
     {
       "packageName": "@amzn/swb-reference",
       "comment": "test change",
-      "type": "none"
+      "type": "patch"
     }
   ],
   "packageName": "@amzn/swb-reference"
