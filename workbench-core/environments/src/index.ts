@@ -4,7 +4,7 @@ import CognitoSetup from './cognitoSetup';
 import EnvironmentConnectionService from './environmentConnectionService';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
-import EnvironmentService from './environmentService';
+import { EnvironmentService, Environment } from './environmentService';
 import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
 import EnvironmentTypeConfigService from './environmentTypeConfigService';
 import EnvironmentTypeService from './environmentTypeService';
@@ -17,6 +17,7 @@ import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
 import ServiceCatalogSetup from './serviceCatalogSetup';
+import { SortAttribute, isSortAttribute } from './sortAttributes';
 import StatusHandler from './statusHandler';
 
 export {
@@ -31,10 +32,13 @@ export {
   EventBridgeEventToDDB,
   EnvironmentStatus,
   isEnvironmentStatus,
+  SortAttribute,
+  isSortAttribute,
   ServiceCatalogSetup,
   CognitoSetup,
   EnvironmentService,
   EnvironmentTypeService,
+  Environment
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
