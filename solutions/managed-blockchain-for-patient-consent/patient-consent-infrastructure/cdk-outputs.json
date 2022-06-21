@@ -1,0 +1,6 @@
+{
+  "InfrastructureStack": {
+    "RestApiEndpoint0551178A": "https://086y0cgmz7.execute-api.us-east-1.amazonaws.com/prod/",
+    "HttpEndpoint": "https://086y0cgmz7.execute-api.us-east-1.amazonaws.com/prod/"
+  }
+}
