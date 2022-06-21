@@ -36,7 +36,7 @@ describe('authenticationMiddleware integration tests', () => {
   let loggingService: LoggingService;
   let res: Response;
 
-  beforeAll(() => {
+  beforeEach(() => {
     service = new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions));
     loggingService = new LoggingService();
 
@@ -208,7 +208,7 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(service, loggingService);
+      getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(service, { loggingService });
       const req: Request = {
         body: {
           code: 'validCode',
@@ -227,7 +227,7 @@ describe('authenticationMiddleware integration tests', () => {
   describe('getAuthorizationCodeUrl tests', () => {
     let getAuthorizationCodeUrlMiddleware: (req: Request, res: Response) => Promise<void>;
 
-    beforeAll(() => {
+    beforeEach(() => {
       getAuthorizationCodeUrlMiddleware = getAuthorizationCodeUrl(service);
     });
 
@@ -304,12 +304,61 @@ describe('authenticationMiddleware integration tests', () => {
   describe('verifyToken tests', () => {
     let verifyTokenMiddleware: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
-    beforeAll(() => {
+    beforeEach(() => {
       verifyTokenMiddleware = verifyToken(service);
     });
 
     it('should continue to the next middleware when the access_token cookie is set and is valid', async () => {
       const req: Request = {
+        cookies: {
+          access_token: 'validToken'
+        }
+      } as Request;
+
+      const next = jest.fn();
+
+      await verifyTokenMiddleware(req, res, next);
+
+      expect(res.locals.user).toMatchObject({ id: 'id', roles: ['role'] });
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    it('should continue to the next middleware when the route is included in the ignoredRoutes object', async () => {
+      verifyTokenMiddleware = verifyToken(service, {
+        ignoredRoutes: {
+          '/ignored': {
+            GET: true
+          }
+        }
+      });
+      const req: Request = {
+        originalUrl: '/ignored',
+        method: 'GET',
+        cookies: {
+          access_token: 'validToken'
+        }
+      } as Request;
+
+      const next = jest.fn();
+
+      await verifyTokenMiddleware(req, res, next);
+
+      expect(res.locals.user).toBeUndefined();
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    it('should continue to the next middleware when the route is not in the ignoredRoutes object and the access_token cookie is set and is valid', async () => {
+      verifyTokenMiddleware = verifyToken(service, {
+        ignoredRoutes: {
+          '/ignored': {
+            GET: true,
+            POST: false
+          }
+        }
+      });
+      const req: Request = {
+        originalUrl: '/ignored',
+        method: 'POST',
         cookies: {
           access_token: 'validToken'
         }
@@ -367,7 +416,7 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      verifyTokenMiddleware = verifyToken(service, loggingService);
+      verifyTokenMiddleware = verifyToken(service, { loggingService });
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
@@ -389,7 +438,7 @@ describe('authenticationMiddleware integration tests', () => {
   describe('logoutUser tests', () => {
     let logoutUserMiddleware: (req: Request, res: Response) => Promise<void>;
 
-    beforeAll(() => {
+    beforeEach(() => {
       logoutUserMiddleware = logoutUser(service);
     });
 
@@ -461,7 +510,7 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      logoutUserMiddleware = logoutUser(service, loggingService);
+      logoutUserMiddleware = logoutUser(service, { loggingService });
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
@@ -482,7 +531,7 @@ describe('authenticationMiddleware integration tests', () => {
   describe('refreshAccessToken tests', () => {
     let refreshAccessTokenMiddleware: (req: Request, res: Response) => Promise<void>;
 
-    beforeAll(() => {
+    beforeEach(() => {
       refreshAccessTokenMiddleware = refreshAccessToken(service);
     });
 
@@ -576,7 +625,7 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      refreshAccessTokenMiddleware = refreshAccessToken(service, loggingService);
+      refreshAccessTokenMiddleware = refreshAccessToken(service, { loggingService });
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'

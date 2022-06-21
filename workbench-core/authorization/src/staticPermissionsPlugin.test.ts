@@ -1,7 +1,7 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
 import {
+  AuthenticatedUser,
   PermissionsMap,
   Permission,
   Operation,
