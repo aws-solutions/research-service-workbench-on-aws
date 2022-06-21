@@ -49,25 +49,26 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   public async addDataSet(dataSet: DataSet): Promise<DataSet> {
-    this._validateCreateDataSet(dataSet);
-    dataSet.id = uuidv4();
-    if (_.isUndefined(dataSet.createdAt)) dataSet.createdAt = new Date().toISOString();
-    await this._storeToDdb(dataSet);
+    const dataSetParam: DataSet = dataSet;
+    await this._validateCreateDataSet(dataSet);
+    dataSetParam.Id = uuidv4();
+    if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
+    await this._storeToDdb(dataSetParam);
 
-    return dataSet;
+    return dataSetParam;
   }
 
   public async updateDataSet(dataSet: DataSet): Promise<DataSet> {
-    const id = await this._storeToDdb(dataSet);
+    await this._storeToDdb(dataSet);
     return dataSet;
   }
 
-  private _validateCreateDataSet(dataSet: DataSet): void {
+  private async _validateCreateDataSet(dataSet: DataSet): Promise<void> {
     if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
     if (_.isUndefined(dataSet.name))
       throw new Error("Cannot create the DataSet. A 'name' was not supplied but it is required.");
     try {
-      const existing = this.getDataSetMetadata(dataSet.name);
+      await this.getDataSetMetadata(dataSet.name);
       throw new Error(
         `Cannot create the DataSet. A DataSet must have a unique \'name\', and  \'${dataSet.name}\' already exists. `
       );

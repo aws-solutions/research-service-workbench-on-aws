@@ -4,7 +4,7 @@ import { DdbDataSetMetadataPlugin } from '.';
 describe('DdbDataSetMetadataPlugin', () => {
   let plugin: DdbDataSetMetadataPlugin;
   beforeEach(() => {
-    plugin = new DdbDataSetMetadataPlugin({ region: 'us-east-1', tableName: 'DataSetsTable' });
+    plugin = new DdbDataSetMetadataPlugin({ region: 'us-east-1', tableName: 'DataSetsTable' }, 'DS');
   });
 
   describe('listDataSets', () => {
