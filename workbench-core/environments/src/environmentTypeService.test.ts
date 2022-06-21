@@ -86,7 +86,7 @@ describe('environmentTypeService', () => {
     test('validPaginationToken', async () => {
       // BUILD
       const queryItemResponse: QueryCommandOutput = {
-        Items: [marshall(envType), marshall(envType)],
+        Items: [marshall(envType)],
         $metadata: {}
       };
       ddbMock
@@ -99,14 +99,14 @@ describe('environmentTypeService', () => {
         'eyJzayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInJlc291cmNlVHlwZSI6ImVudlR5cGUiLCJwayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMTZUMjI6NDE6MDUuOTYyWiJ9';
 
       // OPERATE
-      const actualResponse = await envTypeService.getEnvironmentTypes(10, validPaginationToken);
+      const actualResponse = await envTypeService.getEnvironmentTypes(1, validPaginationToken);
 
       // CHECK
-      expect(actualResponse).toEqual({ data: [envType, envType] });
+      expect(actualResponse).toEqual({ data: [envType] });
     });
     test('invalidPaginationToken', async () => {
       // BUILD & OPERATE & CHECK
-      await expect(envTypeService.getEnvironmentTypes(10, 'invalidPaginationToken')).rejects.toThrow(
+      await expect(envTypeService.getEnvironmentTypes(1, 'invalidPaginationToken')).rejects.toThrow(
         'Invalid paginationToken'
       );
     });
@@ -158,7 +158,7 @@ describe('environmentTypeService', () => {
   });
 
   describe('createNewEnvironmentType', () => {
-    const updateParams = {
+    const createParams = {
       status: 'APPROVED',
       name: 'Jupyter Notebook',
       provisioningArtifactId: 'pa-dqwijdnwq12',
@@ -174,7 +174,7 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE
-      const actualResponse = await envTypeService.createNewEnvironmentType('owner-123', updateParams);
+      const actualResponse = await envTypeService.createNewEnvironmentType('owner-123', createParams);
 
       // CHECK
       expect(actualResponse).toEqual(envType);
@@ -187,8 +187,8 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE & CHECK
-      await expect(envTypeService.createNewEnvironmentType('owner-123', updateParams)).rejects.toThrow(
-        `Unable to create environment type with params: ${JSON.stringify(updateParams)}`
+      await expect(envTypeService.createNewEnvironmentType('owner-123', createParams)).rejects.toThrow(
+        `Unable to create environment type with params: ${JSON.stringify(createParams)}`
       );
     });
   });
