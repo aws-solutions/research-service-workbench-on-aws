@@ -31,7 +31,7 @@ API URL can also be found by login to aws with Main Account:
 
 Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL="<API_URL>"`
 
-For local instances, in swb-ui directory create a file with name .env.local containing the API url variable with the format:
+For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
 ```
 NEXT_PUBLIC_API_BASE_URL="<API_URL>"
 ```
