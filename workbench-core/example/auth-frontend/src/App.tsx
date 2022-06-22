@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { v4 as uuid } from 'uuid';
 
-function getFragmentParam(location: Location, key: string) {
+function getFragmentParam(location: Location, key: string): string {
   const fragmentParams = location.search;
   const keyValues: Record<string, string> = {};
   const params = fragmentParams.substring(1).split('&');
@@ -14,21 +14,23 @@ function getFragmentParam(location: Location, key: string) {
       const currentKey = keyValueArr[0].replace('?', '');
       const value = keyValueArr[1];
       if (value) {
+        // eslint-disable-next-line security/detect-object-injection
         keyValues[currentKey] = value;
       }
     });
   }
+  // eslint-disable-next-line security/detect-object-injection
   return keyValues[key];
 }
 
-function App() {
+function App(): JSX.Element {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [info, setInfo] = useState<any>(undefined);
+  const [info, setInfo] = useState<Record<string, string> | undefined>(undefined);
   const [guestLogin, setGuestLogin] = useState(false);
   const [adminLogin, setAdminLogin] = useState(false);
 
   useEffect(() => {
-    async function getTokens() {
+    async function getTokens(): Promise<void> {
       const code = getFragmentParam(window.location, 'code');
       const state = getFragmentParam(window.location, 'state');
 
@@ -88,7 +90,7 @@ function App() {
     getTokens().catch((e) => console.log(e));
   }, []);
 
-  async function login() {
+  async function login(): Promise<void> {
     try {
       const response = await axios.get(
         'login?stateVerifier=TEMP_STATE_VERIFIER&codeChallenge=TEMP_CODE_CHALLENGE'
@@ -109,13 +111,11 @@ function App() {
     }
   }
 
-  async function logout() {
+  async function logout(): Promise<void> {
     try {
-      await axios.get('logout');
-      // TODO replace with call to auth middleware
-      window.location.assign(
-        '<Cognito Hosted UI Domain>/logout?client_id=<Cognito User Pool Client ID>&logout_uri=http://localhost:3000'
-      );
+      const response = await axios.get('logout');
+      const logoutUrl = response.data.logoutUrl;
+      window.location.assign(logoutUrl);
 
       setLoggedIn(false);
       setInfo(undefined);

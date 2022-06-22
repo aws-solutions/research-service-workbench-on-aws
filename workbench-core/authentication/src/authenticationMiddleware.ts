@@ -202,7 +202,7 @@ export function logoutUser(
     res.cookie('access_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
     res.cookie('refresh_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
 
-    res.sendStatus(200);
+    res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl() });
   };
 }
 
