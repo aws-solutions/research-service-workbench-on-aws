@@ -4,6 +4,7 @@ import {
   CognitoAuthenticationPluginOptions,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
+  isUserLoggedIn,
   logoutUser,
   refreshAccessToken,
   verifyToken
@@ -68,6 +69,7 @@ app.get('/login', getAuthorizationCodeUrl(authenticationService));
 app.post('/token', getTokensFromAuthorizationCode(authenticationService, { loggingService: logger }));
 app.get('/logout', logoutUser(authenticationService, { loggingService: logger }));
 app.get('/refresh', refreshAccessToken(authenticationService, { loggingService: logger }));
+app.get('/loggedIn', isUserLoggedIn(authenticationService, { loggingService: logger }));
 
 app.get('/pro', (req, res) => {
   res.status(200).json({ user: res.locals.user });

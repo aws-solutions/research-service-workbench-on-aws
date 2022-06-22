@@ -39,5 +39,8 @@ export const routesIgnored: RoutesIgnored = {
   },
   '/refresh': {
     GET: true
+  },
+  '/loggedIn': {
+    GET: true
   }
 };

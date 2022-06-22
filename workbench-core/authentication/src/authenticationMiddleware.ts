@@ -6,11 +6,6 @@ import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
-// TODO add to doc
-// requires use of cookieParser and bodyParser middlewares
-// app.use(cookieParser());
-// app.use(express.json());
-
 /**
  * An Express middleware function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
@@ -21,6 +16,7 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing an optional logging service parameter
  * @returns the middleware function
  *
  * @example
@@ -69,8 +65,9 @@ export function getTokensFromAuthorizationCode(
         }
         if (isIdpUnavailableError(error)) {
           res.sendStatus(503);
+        } else {
+          res.sendStatus(401);
         }
-        res.sendStatus(401);
       }
     } else {
       res.sendStatus(400);
@@ -119,6 +116,7 @@ export function getAuthorizationCodeUrl(
  *  - the access token is stored in a cookie named `access_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing optional routes to ignore and logging service parameters
  * @returns the middleware function
  *
  * @example
@@ -170,6 +168,7 @@ export function verifyToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing an optional logging service parameter
  * @returns the middleware function
  *
  * @example
@@ -210,9 +209,10 @@ export function logoutUser(
  * An Express middleware function used to refresh an expired access code.
  *
  * This function assumes:
- *  - the access token is stored in a cookie named `access_token`.
+ *  - the refresh token is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing an optional logging service parameter
  * @returns the middleware function
  *
  * @example
@@ -248,12 +248,71 @@ export function refreshAccessToken(
         }
         if (isIdpUnavailableError(error)) {
           res.sendStatus(503);
+        } else {
+          res.sendStatus(401);
         }
-        res.sendStatus(401);
       }
     } else {
       // refresh token expired, must login again
       res.sendStatus(401);
+    }
+  };
+}
+
+/**
+ * An Express middleware function used to check if there is a logged in user.
+ *
+ * This function assumes:
+ *  - the access token is stored in a cookie named `access_token`
+ *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
+ *
+ * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing an optional logging service parameter
+ * @returns the middleware function
+ *
+ * @example
+ * ```
+ * app.get('loggedIn', isUserLoggedIn(authenticationService));
+ * ```
+ */
+export function isUserLoggedIn(
+  authenticationService: AuthenticationService,
+  options?: { loggingService?: LoggingService }
+): (req: Request, res: Response) => Promise<void> {
+  return async function (req: Request, res: Response) {
+    const { loggingService } = options || {};
+    const accessToken = req.cookies.access_token;
+    const refreshToken = req.cookies.refresh_token;
+
+    try {
+      if (typeof accessToken === 'string') {
+        const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
+
+        res.status(200).json({ loggedIn });
+      } else if (typeof refreshToken === 'string') {
+        const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
+
+        // set access cookie
+        res.cookie('access_token', accessToken.token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
+        });
+
+        res.status(200).json({ idToken: idToken.token, loggedIn: true });
+      } else {
+        res.status(200).json({ loggedIn: false });
+      }
+    } catch (error) {
+      if (loggingService) {
+        loggingService.error(error);
+      }
+      if (isIdpUnavailableError(error)) {
+        res.sendStatus(503);
+      } else {
+        res.status(200).json({ loggedIn: false });
+      }
     }
   };
 }

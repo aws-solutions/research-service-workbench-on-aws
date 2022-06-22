@@ -29,6 +29,7 @@ export {
   getTokensFromAuthorizationCode,
   logoutUser,
   refreshAccessToken,
-  verifyToken
+  verifyToken,
+  isUserLoggedIn
 } from './authenticationMiddleware';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';

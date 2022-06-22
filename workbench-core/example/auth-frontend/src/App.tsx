@@ -30,6 +30,40 @@ function App(): JSX.Element {
   const [adminLogin, setAdminLogin] = useState(false);
 
   useEffect(() => {
+    async function isUserLoggedIn(): Promise<void> {
+      try {
+        const isLoggedIn = await axios.get('loggedIn');
+        setLoggedIn(isLoggedIn.data.loggedIn);
+      } catch (e) {
+        console.log(e);
+      }
+
+      try {
+        const userInfo = await axios.get('pro');
+        setInfo(userInfo.data.user);
+      } catch (e) {
+        console.log(e);
+      }
+
+      try {
+        await axios.get('guest');
+        setGuestLogin(true);
+      } catch (e) {
+        console.log(e);
+      }
+
+      try {
+        await axios.get('admin');
+        setAdminLogin(true);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    isUserLoggedIn().catch((e) => console.log(e));
+  }, []);
+
+  useEffect(() => {
     async function getTokens(): Promise<void> {
       const code = getFragmentParam(window.location, 'code');
       const state = getFragmentParam(window.location, 'state');
