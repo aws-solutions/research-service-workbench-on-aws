@@ -66,5 +66,12 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
         - run test - `rushx test`
         - run lint:fix - `rushx lint:fix`
 
-## Getting Support for rush
+## Commands applicable for developers with existing GitHooks
+### `rush cinstall/cupdate` usage instructions:
+1. `git checkout develop`
+2. `git checkout -b < your new branch >`
+3. `rush install --bypass-policy` (This will install the `cinstall` and `cupdate` commands)
+4. Start using `rush cinstall` or `rush cupdate` instead of `rush install` or `rush update`.
+
+## Getting support for rush
 [Getting Support](https://rushjs.io/pages/help/support/)
