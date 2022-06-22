@@ -27,8 +27,18 @@
     "run-postDeployment": "rush build && node lib/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "test:only": "jest src --coverage",
+    "test:only": "heft test --clean --no-build",
     "integration-tests": "jest integration-tests"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
   },
   "dependencies": {
     "@amzn/environments": "workspace:*",
