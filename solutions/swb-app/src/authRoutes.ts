@@ -10,10 +10,7 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import { Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 
-// Create Logger Service
-const logger: LoggingService = new LoggingService();
-
-export function setUpAuthRoutes(router: Router, auth: AuthenticationService): void {
+export function setUpAuthRoutes(router: Router, auth: AuthenticationService, logger: LoggingService): void {
   // Exchange auth code for token
   router.post('/token', wrapAsync(getTokensFromAuthorizationCode(auth, { loggingService: logger })));
 
