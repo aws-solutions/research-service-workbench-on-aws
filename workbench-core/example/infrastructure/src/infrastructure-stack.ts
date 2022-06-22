@@ -34,7 +34,6 @@ import { Construct } from 'constructs';
 export class InfrastructureStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
-
     const lambdaService = new Function(this, 'LambdaService', {
       runtime: Runtime.NODEJS_14_X,
       handler: 'buildLambda.handler',
