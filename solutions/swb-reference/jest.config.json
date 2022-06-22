@@ -1,7 +1,25 @@
 {
-  "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
-  "collectCoverage": true,
+  "moduleFileExtensions": [
+    "ts",
+    "js"
+  ],
+  "testRegex": ".test.ts",
+  "transform": {
+    "\\.(ts)$": "ts-jest"
+  },
+  "coverageReporters": ["json-summary", "json"],
+  "coverageDirectory": "<rootDir>/temp/coverage",
+  "collectCoverageFrom": [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/test/**",
+    "!src/**/__tests__/**",
+    "!src/**/__fixtures__/**",
+    "!src/**/__mocks__/**"
+  ],
   "coveragePathIgnorePatterns": [
+    "/node_modules/",
     "<rootDir>/src/SWBStack.ts",
     "<rootDir>/src/backendAPI.ts",
     "<rootDir>/src/accountHandlerWrapper.ts",
@@ -20,6 +38,5 @@
       "lines": 70,
       "statements": 70
     }
-  },
-  "coverageReporters": ["json-summary", "json"]
+  }
 }

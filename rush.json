@@ -10,7 +10,7 @@
   "ensureConsistentVersions": true,
   "projectFolderMaxDepth": 3,
   "approvedPackagesPolicy": {
-    "reviewCategories": ["production", "tools", "prototypes", "tests"],
+    "reviewCategories": ["production", "tools", "prototypes"],
     "ignoredNpmScopes": ["@types"]
   },
   "gitPolicy": {
@@ -124,12 +124,6 @@
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
-    },
-    {
-      "packageName": "@amzn/swb-integration-test",
-      "projectFolder": "solutions/swb-integration-test",
-      "reviewCategory": "tests",
-      "shouldPublish": false
     }
   ]
 }

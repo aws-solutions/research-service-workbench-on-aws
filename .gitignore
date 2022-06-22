@@ -91,6 +91,10 @@ solutions/swb-reference/src/config/*.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 solutions/swb-reference/.aws-sam/
+solutions/swb-reference/integration-tests/**/*.test.d.ts
+solutions/swb-reference/integration-tests/**/*.test.d.ts.map
+solutions/swb-reference/integration-tests/**/*.test.js
+solutions/swb-reference/integration-tests/**/*.test.js.map
 
 
 # example package
