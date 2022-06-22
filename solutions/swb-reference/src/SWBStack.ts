@@ -21,7 +21,6 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
@@ -455,15 +454,22 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
-    const alias = new Alias(this, 'LiveAlias', {
-      aliasName: 'live',
-      version: apiLambda.currentVersion,
-      provisionedConcurrentExecutions: 1
-    });
-
-    API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(alias)
-    });
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      // SAM local start-api doesn't work with ALIAS so this is the workaround to allow us to run the code locally
+      // https://github.com/aws/aws-sam-cli/issues/2227
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(apiLambda)
+      });
+    } else {
+      const alias = new Alias(this, 'LiveAlias', {
+        aliasName: 'live',
+        version: apiLambda.currentVersion,
+        provisionedConcurrentExecutions: 1
+      });
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(alias)
+      });
+    }
   }
 
   // DynamoDB Table
