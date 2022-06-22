@@ -230,7 +230,7 @@ export class SWBStack extends Stack {
 
   private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
+      code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -277,7 +277,7 @@ export class SWBStack extends Stack {
     ddbTableArn: string
   ): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
+      code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -362,7 +362,7 @@ export class SWBStack extends Stack {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
-      code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
+      code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
