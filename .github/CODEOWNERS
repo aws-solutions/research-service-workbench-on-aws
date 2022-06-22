@@ -2,19 +2,31 @@
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
 common/config/rush/pnpm-lock.yaml
+common/changes/
 solutions/example-ui-app                              @mabreuortega
 solutions/swb-ui                                      @kpark277
+common/changes/@amzn/swb-ui                           @kpark277
 solutions/swb-reference                               @nguyen102 @SanketD92 @maghirardelli
+common/changes/@amzn/swb-reference                    @nguyen102 @SanketD92 @maghirardelli
 solutions/swb-app                                     @nguyen102 @SanketD92 @maghirardelli
+common/changes/@amzn/swb-app                          @nguyen102 @SanketD92 @maghirardelli
 solutions/managed-blockchain-for-patient-consent      @Bingjiling
 workbench-core/audit                                  @htztomic
+common/changes/@amzn/workbench-core-audit             @htztomic
 workbench-core/authentication                         @bhudnell
+common/changes/@amzn/workbench-core-authentication    @bhudnell
 workbench-core/authorization                          @htztomic
+common/changes/@amzn/workbench-core-authorization     @htztomic
 workbench-core/base                                   @nguyen102 @SanketD92 @maghirardelli
+common/changes/@amzn/workbench-core-base              @nguyen102 @SanketD92 @maghirardelli
 workbench-core/datasets                               @DaveMadsen
+common/changes/@amzn/workbench-core-datasets          @DaveMadsen
 workbench-core/environments                           @nguyen102 @SanketD92 @maghirardelli
+common/changes/@amzn/workbench-core-environments      @nguyen102 @SanketD92 @maghirardelli
 workbench-core/eslint-custom                          @insignias
 workbench-core/infrastructure                         @bhudnell
+common/changes/@amzn/workbench-core-infrastructure    @bhudnell
 workbench-core/example                                @insignias
 workbench-core/logging                                @bhudnell
 workbench-core/repo-scripts/repo-toolbox              @insignias
+
