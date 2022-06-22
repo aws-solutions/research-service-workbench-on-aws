@@ -3,15 +3,24 @@ import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamo
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { DataSet, DataSetMetadataPlugin } from '.';
+import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
   private _dataSetKeyType: string;
+  private _endPointKeyType: string;
 
-  public constructor(options: { region: string; tableName: string }, dataSetKeyTypeId: string) {
+  public constructor(
+    options: {
+      region: string;
+      tableName: string;
+    },
+    dataSetKeyTypeId: string,
+    endPointKeyTypeId: string
+  ) {
     this._aws = new AwsService(options);
     this._dataSetKeyType = dataSetKeyTypeId;
+    this._endPointKeyType = endPointKeyTypeId;
   }
 
   public async listDataSets(): Promise<DataSet[]> {
@@ -53,15 +62,24 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._validateCreateDataSet(dataSet);
     dataSetParam.id = uuidv4();
     if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
-    await this._storeToDdb(dataSetParam);
+    await this._storeDataSetToDdb(dataSetParam);
 
     return dataSetParam;
   }
 
   public async updateDataSet(dataSet: DataSet): Promise<DataSet> {
-    await this._storeToDdb(dataSet);
+    await this._storeDataSetToDdb(dataSet);
     return dataSet;
   }
+
+  public async addExternalEndpoint(endPoint: ExternalEndpoint) {
+    const endPointParam: ExternalEndpoint = endPoint;
+    await this._validateCreateExternalEndpoint(endPoint);
+    endPoint.Id = uuidv4();
+    if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
+  }
+
+  private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {}
 
   private async _validateCreateDataSet(dataSet: DataSet): Promise<void> {
     if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
@@ -77,7 +95,29 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
   }
 
-  private async _storeToDdb(dataSet: DataSet): Promise<string> {
+  private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
+    const endPointKey = {
+      pk: `${this._dataSetKeyType}#${endPoint.dataSetName}`,
+      sk: `${this._endPointKeyType}#${endPoint.name}`
+    };
+    const endPointParams: { item: { [key: string]: string | string[] } } = {
+      item: {
+        id: endPoint.id as string,
+        name: endPoint.name,
+        createdAt: endPoint.createdAt as string,
+        dataSetName: endPoint.dataSetName,
+        path: endPoint.path,
+        endPointUrl: endPoint.endPointUrl,
+        allowedRoles: endPoint.allowedRoles as string[]
+      }
+    };
+
+    await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
+
+    return endPoint.id as string;
+  }
+
+  private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
     const dataSetKey = {
       pk: `${this._dataSetKeyType}#${dataSet.name}`,
       sk: `${this._dataSetKeyType}#${dataSet.name}`
@@ -87,6 +127,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         id: dataSet.Id as string,
         name: dataSet.name,
         createdAt: dataSet.createdAt as string,
+        storageName: dataSet.storageName,
         path: dataSet.path,
         awsAccountId: dataSet.awsAccountId as string,
         storageType: dataSet.storageType as string

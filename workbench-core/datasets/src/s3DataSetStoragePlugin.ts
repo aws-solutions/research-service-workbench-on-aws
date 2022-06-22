@@ -33,6 +33,10 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     this._kmsKeyArn = s3Options.kmsKeyArn;
   }
 
+  public getStorageType(): string {
+    return 'S3';
+  }
+
   /**
    * Create a new DataSet storage location. For S3, this is a prefix within a bucket.
    * @param name - the name of the S3 bucket where the storage should reside.
@@ -51,6 +55,11 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
     await this._aws.clients.s3.putObject(params);
 
+    return `s3://${name}/${objectKey}`;
+  }
+
+  public async importStorage(name: string, path: string): Promise<string> {
+    const objectKey: string = path.endsWith('/') ? path : `${path}/`;
     return `s3://${name}/${objectKey}`;
   }
 
