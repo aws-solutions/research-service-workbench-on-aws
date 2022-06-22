@@ -11,7 +11,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Getting Started
 
 In order to run the application We need to setup the base API Url environment variable first.
--Copy API url from [Installation](../swb-reference/SETUP_v2p1.md) '### Deploy the code' step on the <APIGatewayAPIEndpoint> output from cloud formation. API url has the next format "https://{api}.{region}.amazonaws.com/dev/".
+-Copy API url from [Installation](../swb-reference/SETUP_v2p1.md##deploy-the-code)' step.
+Look for the cloud formation output `APIGatewayAPIEndpoint`. The API url has the format "https://{api}.{region}.amazonaws.com/dev/".
 API url can also be found by login to aws with Main Account:
     -Select Services menu 
     -Select API Gateway option
@@ -20,8 +21,10 @@ API url can also be found by login to aws with Main Account:
     -Url will be shown at the top of the page with the format "Invoke this API at: <API_URL>"
 
 -Assign value to environment variable NEXT_PUBLIC_API_BASE_URL=<API_URL>
--For local instances, in swb-ui directory create a file with name .env.local containing the API url variable with the next format:
-  NEXT_PUBLIC_API_BASE_URL=<API_URL>
+-For local instances, in swb-ui directory create a file with name .env.local containing the API url variable with the format:
+```
+NEXT_PUBLIC_API_BASE_URL="<API_URL>"
+```
 
 
 
