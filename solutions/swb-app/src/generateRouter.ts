@@ -20,6 +20,7 @@ import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
+import { setUpUserRoutes } from './userRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
@@ -81,6 +82,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, apiRouteConfig.auth);
+  setUpUserRoutes(router, apiRouteConfig.auth);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

@@ -12,6 +12,8 @@ export interface ApiRouteConfig {
   account: HostingAccountService;
   auth: AuthenticationService;
   environmentService: EnvironmentService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
 }
 
 export interface ApiRoute {
