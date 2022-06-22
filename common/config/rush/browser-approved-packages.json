@@ -8,7 +8,7 @@
     },
     {
       "name": "@amzn/eslint-config-workbench-core-eslint-custom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "@amzn/swb-app",
@@ -172,19 +172,19 @@
     },
     {
       "name": "@rushstack/eslint-config",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "@rushstack/heft",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "@rushstack/heft-jest-plugin",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "@rushstack/heft-node-rig",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "@rushstack/node-core-library",
@@ -264,7 +264,7 @@
     },
     {
       "name": "depcheck",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "diff",
@@ -276,7 +276,7 @@
     },
     {
       "name": "eslint",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "eslint-config-next",
@@ -284,7 +284,7 @@
     },
     {
       "name": "eslint-plugin-import",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "eslint-plugin-security",
@@ -312,7 +312,7 @@
     },
     {
       "name": "jest",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "jest-fast-check",
@@ -352,11 +352,11 @@
     },
     {
       "name": "npm-package-json-lint",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "npm-package-json-lint-config-default",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "react",
@@ -376,7 +376,7 @@
     },
     {
       "name": "sort-package-json",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "source-map-support",
@@ -388,7 +388,7 @@
     },
     {
       "name": "ts-jest",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "ts-node",
@@ -396,7 +396,7 @@
     },
     {
       "name": "typescript",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tests" ]
     },
     {
       "name": "uuid",
