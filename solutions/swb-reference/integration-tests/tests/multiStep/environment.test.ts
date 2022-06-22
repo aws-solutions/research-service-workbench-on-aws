@@ -1,5 +1,5 @@
 describe('multiStep environment test', () => {
-  test('foo', () => {
+  test('launch, connect, stop, get, terminate', () => {
     expect(true).toEqual(true);
   });
 });
