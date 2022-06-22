@@ -66,5 +66,16 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
         - run test - `rushx test`
         - run lint:fix - `rushx lint:fix`
 
-## Getting Support for rush
+## Commands applicable for Amazon employees only
+Use the following commands with Code Defender enabled in your repository
+1. Use `rush cinstall` instead of `rush install`
+2. Use `rush cupdate` instead of `rush update`
+
+### Instructions for using `rush cinstall/cupdate`:
+1. `git checkout develop`
+2. `git checkout -b < your new branch >`
+3. `rush install --bypass-policy` (This will install the `cinstall` and `cupdate` commands)
+4. Start using `rush cinstall` or `rush cupdate`
+
+## Getting support for rush
 [Getting Support](https://rushjs.io/pages/help/support/)
