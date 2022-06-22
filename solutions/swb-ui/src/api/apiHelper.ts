@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const urlBase = process.env.API_BASE_URL;
+const urlBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const httpApiGet = async (urlPath: string, params: any): Promise<any> => {
   const options = {
