@@ -71,7 +71,7 @@ Use the following commands with Code Defender enabled in your repository
 1. Use `rush cinstall` instead of `rush install`
 2. Use `rush cupdate` instead of `rush update`
 
-### Instructions for using `rush cinstall/cupdate`:
+### `rush cinstall/cupdate` usage instructions:
 1. `git checkout develop`
 2. `git checkout -b < your new branch >`
 3. `rush install --bypass-policy` (This will install the `cinstall` and `cupdate` commands)
