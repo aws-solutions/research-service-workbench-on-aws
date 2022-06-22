@@ -14,6 +14,7 @@ import {
   StaticPermissionsPlugin
 } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
+import cookieParser from 'cookie-parser';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
@@ -31,6 +32,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   // parse application/json
   app.use(express.json());
+  app.use(cookieParser());
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     region: process.env.AWS_REGION!,
@@ -82,7 +84,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, apiRouteConfig.auth);
-  setUpUserRoutes(router, apiRouteConfig.auth);
+  setUpUserRoutes(router, apiRouteConfig.user);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

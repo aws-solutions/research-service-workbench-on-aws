@@ -259,6 +259,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cookie-parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },

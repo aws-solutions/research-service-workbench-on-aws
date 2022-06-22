@@ -1,31 +1,30 @@
 // User management
-// import { LoggingService } from '@amzn/workbench-core-logging';
+import { UserManagementService } from '@amzn/workbench-core-authentication';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 
-// Create Logger Service
-// const logger: LoggingService = new LoggingService();
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function setUpUserRoutes(router: Router, user: any): void {
+export function setUpUserRoutes(router: Router, user: UserManagementService): void {
   router.post(
     '/user',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(`Create User has not been implemented`);
+      const response = await user.createUser(req.body);
+      res.status(201).send(response);
     })
   );
 
   router.post(
     '/role',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(`Create Role has not been implemented`);
+      const response = await user.createRole(req.body);
+      res.status(201).send(response);
     })
   );
 
   router.put(
     '/user/:id/role/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(`Assign User to Role has not been implemented`);
+      const response = await user.addUserToRole(req.params.id, req.params.roleName);
+      res.send(response);
     })
   );
 }

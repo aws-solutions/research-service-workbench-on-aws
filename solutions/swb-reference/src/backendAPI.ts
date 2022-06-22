@@ -8,7 +8,9 @@ import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import {
   AuthenticationService,
   CognitoAuthenticationPlugin,
-  CognitoAuthenticationPluginOptions
+  CognitoAuthenticationPluginOptions,
+  UserManagementService,
+  CognitoUserManagementPlugin
 } from '@amzn/workbench-core-authentication';
 import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
@@ -46,7 +48,7 @@ const apiRouteConfig: ApiRouteConfig = {
   },
   account: new HostingAccountService(),
   auth: new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions)),
-  user: {},
+  user: new UserManagementService(new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)),
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   })

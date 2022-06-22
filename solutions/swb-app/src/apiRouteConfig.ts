@@ -4,7 +4,7 @@ import {
   EnvironmentLifecycleService,
   EnvironmentService
 } from '@amzn/environments';
-import { AuthenticationService } from '@amzn/workbench-core-authentication';
+import { AuthenticationService, UserManagementService } from '@amzn/workbench-core-authentication';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
@@ -12,8 +12,7 @@ export interface ApiRouteConfig {
   account: HostingAccountService;
   auth: AuthenticationService;
   environmentService: EnvironmentService;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  user: any;
+  user: UserManagementService;
 }
 
 export interface ApiRoute {
