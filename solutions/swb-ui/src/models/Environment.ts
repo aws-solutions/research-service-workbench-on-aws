@@ -14,4 +14,12 @@ export type EnvironmentActionResponse = {
   envId: string;
   status: EnvironmentStatus;
 };
+
+export type EnvironmentConnectResponse = {
+  authCredResponse: {
+    url: string;
+  };
+  instructionResponse: string;
+};
+
 export type EnvironmentStatus = 'STOPPED' | 'STOPPING' | 'FAILED' | 'COMPLETED' | 'PENDING' | 'TERMINATING';

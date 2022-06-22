@@ -16,7 +16,7 @@ const httpApiPost = async (urlPath: string, params: any): Promise<any> => {
     url: `${urlBase}${urlPath}`,
     data: params
   };
-  return true;
+  return await fetchData(options);
 };
 const httpApiPut = async (urlPath: string, params: any): Promise<any> => {
   const options = {

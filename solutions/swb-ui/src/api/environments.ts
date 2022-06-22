@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { httpApiGet, httpApiPut, httpApiDelete } from './apiHelper';
-import { EnvironmentItem } from '../models/Environment';
+import { EnvironmentItem, EnvironmentConnectResponse } from '../models/Environment';
 
 const useEnvironments = () => {
   const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
@@ -26,4 +26,8 @@ const terminate = async (id: string): Promise<void> => {
   await httpApiDelete(`environments/${id}`, {});
 };
 
-export { useEnvironments, start, stop, terminate };
+const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
+  return await httpApiGet(`environments/${id}/connections`, {});
+};
+
+export { useEnvironments, start, stop, terminate, connect };

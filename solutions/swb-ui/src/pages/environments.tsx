@@ -22,7 +22,7 @@ import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import React, { SetStateAction, useEffect, useState } from 'react';
-import { useEnvironments, terminate, start, stop } from '../api/environments';
+import { useEnvironments, terminate, start, stop, connect } from '../api/environments';
 import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
 import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
 import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
@@ -135,16 +135,18 @@ const Environment: NextPage = () => {
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
-  const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STOPPED'];
+  const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
+  const startButtonEnableStatuses: string[] = ['PENDING', 'STOPPED'];
   const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
   const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
   // Constant buttons should show loading based on statuses in the array
-  const connectButtonLoadingStatuses: string[] = ['STARTING'];
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];
+  const startButtonLoadingStatuses: string[] = ['STARTING'];
   const [terminatingIds, setTerminatingIds] = useState(new Set<string>());
   const [stoppingIds, setStoppingIds] = useState(new Set<string>());
   const [connectingIds, setConnectingIds] = useState(new Set<string>());
+  const [startingIds, setstartingIds] = useState(new Set<string>());
 
   const isOneItemSelected = (): boolean | undefined => {
     return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
@@ -183,9 +185,14 @@ const Environment: NextPage = () => {
             await stop(id);
             break;
           case 'START':
+            setstartingIds((prev) => new Set(prev.add(id)));
+            actionLabel = 'Start Workspace';
+            await start(id);
+            break;
+          case 'CONNECT':
             setConnectingIds((prev) => new Set(prev.add(id)));
             actionLabel = 'Connect to Workspace';
-            await start(id);
+            //TODO: implement Connect workflow
             break;
         }
         await mutate();
@@ -201,6 +208,10 @@ const Environment: NextPage = () => {
           return new Set(prev);
         });
         setConnectingIds((prev) => {
+          prev.delete(id);
+          return new Set(prev);
+        });
+        setstartingIds((prev) => {
           prev.delete(id);
           return new Set(prev);
         });
@@ -277,13 +288,23 @@ const Environment: NextPage = () => {
                             !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                             connectingIds.has(getSelectedId())
                           }
+                          loading={connectingIds.has(getSelectedId())}
+                          onClick={() => executeAction('CONNECT')}
+                        >
+                          Connect
+                        </Button>
+                        <Button
+                          disabled={
+                            !startButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                            startingIds.has(getSelectedId())
+                          }
                           loading={
-                            connectButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
-                            connectingIds.has(getSelectedId())
+                            startButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                            startingIds.has(getSelectedId())
                           }
                           onClick={() => executeAction('START')}
                         >
-                          Connect
+                          Start
                         </Button>
                         <Button
                           disabled={
