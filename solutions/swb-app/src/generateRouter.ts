@@ -20,10 +20,10 @@ import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
-import { setUpUserRoutes } from './userRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
+import { setUpUserRoutes } from './userRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();

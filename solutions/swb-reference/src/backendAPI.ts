@@ -46,6 +46,7 @@ const apiRouteConfig: ApiRouteConfig = {
   },
   account: new HostingAccountService(),
   auth: new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions)),
+  user: {},
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   })
