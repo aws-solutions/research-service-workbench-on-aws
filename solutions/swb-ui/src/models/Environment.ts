@@ -16,9 +16,7 @@ export type EnvironmentActionResponse = {
 };
 
 export type EnvironmentConnectResponse = {
-  authCredResponse: {
-    url: string;
-  };
+  authCredResponse: any;
   instructionResponse: string;
 };
 
