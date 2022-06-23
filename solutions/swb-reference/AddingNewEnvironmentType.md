@@ -184,6 +184,7 @@ The Status handler lambda writes new environment status and environment details 
 Run the following command in `solutions/swb-reference` directory to deploy the updated code to AWS
 ```
 STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
+STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 ```
 
 ## Step 6 (Optional): Update hosting account resources
