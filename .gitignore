@@ -92,6 +92,8 @@ solutions/swb-reference/src/config/*.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 solutions/swb-reference/.aws-sam/
 
+# local environment variables
+.env*.local
 
 # example package
 workbench-core/example/infrastructure/build

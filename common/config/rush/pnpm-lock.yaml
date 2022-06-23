@@ -96,17 +96,24 @@ importers:
     specifiers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-authentication': workspace:*
+      '@amzn/workbench-core-authorization': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
+      '@types/cors': ^2.8.12
+      '@types/cookie-parser': ^1.4.3
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       concurrently: ^7.0.0
+      cors: ^2.8.5
+      cookie-parser: ^1.4.6
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
@@ -122,7 +129,12 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
+      '@amzn/workbench-core-authorization': link:../../workbench-core/authorization
+      '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@hapi/boom': 10.0.0
+      cors: 2.8.5
+      cookie-parser: 1.4.6
       express: 4.18.1
       lodash: 4.17.21
     devDependencies:
@@ -131,6 +143,8 @@ importers:
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
       '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
+      '@types/cors': 2.8.12
+      '@types/cookie-parser': 1.4.3
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.5.2
@@ -154,6 +168,7 @@ importers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
+      '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-dynamodb': ^3.67.0
@@ -201,6 +216,7 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
+      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
       '@amzn/workbench-core-base': link:../../workbench-core/base
       '@aws-sdk/client-cloudformation': 3.100.0
       '@aws-sdk/client-dynamodb': 3.100.0
@@ -274,6 +290,7 @@ importers:
       '@types/jest': ^27.4.1
       '@types/node': ^14
       '@types/react': 17.0.38
+      axios: ^0.27.1
       babel-jest: 27.5.1
       concurrently: ^7.0.0
       date-fns: ^2.28.0
@@ -297,10 +314,12 @@ importers:
       sass: ^1.49.8
       sharp: ^0.30.4
       sort-package-json: ^1.57.0
+      swr: ^1.3.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      axios: 0.27.2
       date-fns: 2.28.0
       express: 4.18.1
       next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
@@ -309,6 +328,7 @@ importers:
       next-transpile-modules: 9.0.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      swr: 1.3.0_react@17.0.2
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@awsui/collection-hooks': 1.0.25_react@17.0.2
@@ -864,7 +884,7 @@ importers:
       '@vendia/serverless-express': 4.8.0
       aws-cdk: 2.26.0
       axios: 0.27.2
-      cdk-nag: 2.14.22_47b13785010171dab9c30d40a45387b9
+      cdk-nag: 2.14.26_47b13785010171dab9c30d40a45387b9
       depcheck: 1.4.3
       esbuild: 0.14.42
       eslint: 8.16.0
@@ -5768,6 +5788,16 @@ packages:
       '@types/node': 14.18.20
     dev: true
 
+  /@types/cors/2.8.12:
+    resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
+    dev: true
+
+  /@types/cookie-parser/1.4.3:
+    resolution: {integrity: sha512-CqSKwFwefj4PzZ5n/iwad/bow2hTCh0FlNAeWLtQM3JA/NX/iYagIpWG2cf1bQKQ2c9gU2log5VUCrn7LDOs0w==}
+    dependencies:
+      '@types/express': 4.17.13
+    dev: true
+
   /@types/diff/5.0.1:
     resolution: {integrity: sha512-XIpxU6Qdvp1ZE6Kr3yrkv1qgUab0fyf4mHYvW8N3Bx3PCsbN6or1q9/q72cv5jIFWolaGH08U9XyYoLLIykyKQ==}
     dev: true
@@ -6978,8 +7008,8 @@ packages:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
     engines: {node: '>= 0.8.0'}
 
-  /cdk-nag/2.14.22_47b13785010171dab9c30d40a45387b9:
-    resolution: {integrity: sha512-2h6d6jE4XW4dZIhgdEnKwEB1cphPCPxzm2hO+Q2Oj2IAB+E7cHI4u8UmR0QYVAItBbABWqC6tAXZmieBxt274g==}
+  /cdk-nag/2.14.26_47b13785010171dab9c30d40a45387b9:
+    resolution: {integrity: sha512-emOwacq+6kHgVcCqQWRGdznBYt+GlfYU0Bqh4q9XvvxCSXxRL0K5UKrTFDqXpcquvncryegh4Pa2UoFBVdOWgA==}
     peerDependencies:
       aws-cdk-lib: ^2.11.0
       constructs: ^10.0.5
@@ -7222,7 +7252,7 @@ packages:
 
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concurrently/7.2.1:
     resolution: {integrity: sha512-7cab/QyqipqghrVr9qZmoWbidu0nHsmxrpNqQ7r/67vfl1DWJElexehQnTH1p+87tDkihaAjM79xTZyBQh7HLw==}
@@ -7281,8 +7311,21 @@ packages:
       safe-buffer: 5.1.2
     dev: true
 
+  /cookie-parser/1.4.6:
+    resolution: {integrity: sha512-z3IzaNjdwUC2olLIB5/ITd0/setiaFMLYiZJle7xg5Fe9KWAceil7xszYfHHBtDFYLSgJduS2Ty0P1uJdPDJeA==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.1
+      cookie-signature: 1.0.6
+    dev: false
+
   /cookie-signature/1.0.6:
     resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
+
+  /cookie/0.4.1:
+    resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
+    engines: {node: '>= 0.6'}
+    dev: false
 
   /cookie/0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
@@ -7308,6 +7351,14 @@ packages:
 
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
+
+  /cors/2.8.5:
+    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
+    engines: {node: '>= 0.10'}
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
+    dev: false
 
   /cosmiconfig/7.0.1:
     resolution: {integrity: sha512-a1YWNUV2HwGimB7dU2s1wUMurNKjpx60HxBB6xUM8Re+2s1g1IIfJvFR0/iCF+XHdE0GMTKTuLR32UQff4TEyQ==}
@@ -12321,6 +12372,14 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  /swr/1.3.0_react@17.0.2:
+    resolution: {integrity: sha512-dkghQrOl2ORX9HYrMDtPa7LTVHJjCTeZoB1dqTbnnEDlSvN8JEKpYIYurDfvbQFUUS8Cg8PceFVZNkW0KNNYPw==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+    dev: false
+
   /symbol-tree/3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
     dev: true
@@ -12922,7 +12981,7 @@ packages:
 
 
   /vary/1.1.2:
-    resolution: {integrity: sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=}
+    resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
 

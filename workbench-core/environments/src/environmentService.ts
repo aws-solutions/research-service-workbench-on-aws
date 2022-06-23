@@ -234,7 +234,6 @@ export class EnvironmentService {
 
     queryParams = addPaginationToken(paginationToken, queryParams);
 
-
     try {
       const data = await this._aws.helpers.ddb.query(queryParams).execute();
 
@@ -251,8 +250,8 @@ export class EnvironmentService {
           });
         }
       }
-    const token = getPaginationToken(data);
-    return { data: environments, paginationToken: token };
+      const token = getPaginationToken(data);
+      return { data: environments, paginationToken: token };
     } catch (error) {
       throw Boom.badRequest(error);
     }

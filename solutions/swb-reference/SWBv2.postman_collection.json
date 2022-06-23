@@ -16,13 +16,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -50,12 +45,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["environments"]
             }
           },
           "response": []
@@ -67,14 +58,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments/:id/start",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "start"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "start"],
               "variable": [
                 {
                   "key": "id",
@@ -93,14 +78,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments/:id/stop",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "stop"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "stop"],
               "variable": [
                 {
                   "key": "id",
@@ -119,13 +98,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -144,12 +118,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments"],
               "query": [
                 {
                   "key": "status",
@@ -213,14 +183,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environments/:id/connections",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "connections"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "connections"],
               "variable": [
                 {
                   "key": "id",
@@ -253,12 +217,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes"]
             }
           },
           "response": []
@@ -279,13 +239,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -303,12 +258,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environmentTypes",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes"]
             }
           },
           "response": []
@@ -320,13 +271,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -359,14 +305,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":envTypeId",
-                "configurations"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
               "variable": [
                 {
                   "key": "envTypeId",
@@ -394,15 +334,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":envTypeId",
-                "configurations",
-                ":envTypeConfigId"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
               "variable": [
                 {
                   "key": "envTypeId",
@@ -426,15 +359,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":envTypeId",
-                "configurations",
-                ":envTypeConfigId"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
               "variable": [
                 {
                   "key": "envTypeId",
@@ -458,14 +384,8 @@
             "header": [],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":envTypeId",
-                "configurations"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
               "query": [
                 {
                   "key": "paginationToken",
@@ -507,12 +427,8 @@
         },
         "url": {
           "raw": "{{API_URL}}/aws-accounts",
-          "host": [
-            "{{API_URL}}"
-          ],
-          "path": [
-            "aws-accounts"
-          ]
+          "host": ["{{API_URL}}"],
+          "path": ["aws-accounts"]
         }
       },
       "response": []
