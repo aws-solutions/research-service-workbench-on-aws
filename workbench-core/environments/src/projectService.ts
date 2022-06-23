@@ -3,7 +3,6 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
-//import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 interface ProjectItemType {
   pk: string;
@@ -23,7 +22,7 @@ export default class ProjectService {
   }
 
   /**
-   * Get environment
+   * Get project
    * projectID - Project Id of project to retrieve
    */
   public async getProject(projectID: string): Promise<ProjectItemType> {

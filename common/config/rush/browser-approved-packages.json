@@ -223,6 +223,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "aws4",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "aws4-axios",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "axios",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -292,6 +300,10 @@
     },
     {
       "name": "generate-password",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "https",
       "allowedCategories": [ "production" ]
     },
     {

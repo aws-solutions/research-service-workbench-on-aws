@@ -5,11 +5,11 @@ import EnvironmentConnectionService from './environmentConnectionService';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import EnvironmentLifecycleService from './environmentLifecycleService';
 import EnvironmentService from './environmentService';
-import ProjectService from './projectService';
 import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
+import ProjectService from './projectService';
 import ServiceCatalogSetup from './serviceCatalogSetup';
 import StatusHandler from './statusHandler';
 
