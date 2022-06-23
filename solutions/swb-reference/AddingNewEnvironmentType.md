@@ -7,7 +7,7 @@ At a high level, we'll need to do the following steps
 * Set up API routes and provide IAM permissions for managing the environment
 * Set up environment status updates
 
-[Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/feat/environments...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
+[Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/develop...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
 
 ## Step 1: Define environment AWS resources 
 In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
