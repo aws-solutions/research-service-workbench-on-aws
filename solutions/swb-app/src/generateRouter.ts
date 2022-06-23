@@ -1,4 +1,3 @@
-import cors from 'cors';
 import {
   verifyToken,
   AuthenticationService,
@@ -16,6 +15,7 @@ import {
 } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
