@@ -15,6 +15,7 @@ function getConstants(): {
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
+  PCLUSTER_API_URL: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -30,6 +31,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+  const PCLUSTER_API_URL = config.parallelClusterApiURL;
 
   const AMI_IDS: string[] = [];
 
@@ -51,7 +53,8 @@ function getConstants(): {
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    STATUS_HANDLER_ARN_NAME
+    STATUS_HANDLER_ARN_NAME,
+    PCLUSTER_API_URL
   };
 }
 

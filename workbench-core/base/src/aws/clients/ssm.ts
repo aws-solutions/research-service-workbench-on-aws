@@ -14,7 +14,10 @@ import {
   SendCommandCommandOutput,
   StartAutomationExecutionCommandInput,
   StartAutomationExecutionCommand,
-  StartAutomationExecutionCommandOutput
+  StartAutomationExecutionCommandOutput,
+  GetCommandInvocationCommand,
+  GetCommandInvocationCommandInput,
+  GetCommandInvocationCommandOutput
 } from '@aws-sdk/client-ssm';
 
 // Documentation for client and methods
@@ -34,6 +37,12 @@ export default class SSM {
 
   public async sendCommand(params: SendCommandCommandInput): Promise<SendCommandCommandOutput> {
     return this._client.send(new SendCommandCommand(params));
+  }
+
+  public async getCommandInvocationCommand(
+    params: GetCommandInvocationCommandInput
+  ): Promise<GetCommandInvocationCommandOutput> {
+    return this._client.send(new GetCommandInvocationCommand(params));
   }
 
   public async startAutomationExecution(

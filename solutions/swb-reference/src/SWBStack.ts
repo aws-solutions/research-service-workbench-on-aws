@@ -24,6 +24,7 @@ export class SWBStack extends Stack {
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
+    PCLUSTER_API_URL: string;
   };
   public constructor(app: App) {
     const {
@@ -35,7 +36,8 @@ export class SWBStack extends Stack {
       SSM_DOC_NAME_SUFFIX,
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
-      SC_PORTFOLIO_NAME
+      SC_PORTFOLIO_NAME,
+      PCLUSTER_API_URL
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -54,7 +56,8 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
-      SC_PORTFOLIO_NAME
+      SC_PORTFOLIO_NAME,
+      PCLUSTER_API_URL
     };
 
     const statusHandler = this._createStatusHandlerLambda();

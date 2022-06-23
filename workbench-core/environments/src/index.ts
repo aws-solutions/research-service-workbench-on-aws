@@ -11,6 +11,7 @@ import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
 import ServiceCatalogSetup from './serviceCatalogSetup';
 import CognitoSetup from './cognitoSetup';
 import EnvironmentService from './environmentService';
+import ProjectService from './projectService';
 
 export {
   HostingAccountService,
@@ -26,5 +27,6 @@ export {
   isEnvironmentStatus,
   ServiceCatalogSetup,
   CognitoSetup,
-  EnvironmentService
+  EnvironmentService,
+  ProjectService
 };
