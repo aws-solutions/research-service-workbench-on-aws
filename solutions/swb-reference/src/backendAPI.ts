@@ -8,7 +8,7 @@ import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
 import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
-import HPCTest from './HPC/HPCTest';
+import HPC from './HPC/HPC';
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -16,31 +16,31 @@ const apiRouteConfig: ApiRouteConfig = {
       path: '/projects/:projectId/clusters',
       serviceAction: 'getAwsCluster',
       httpMethod: 'get',
-      service: new HPCTest()
+      service: new HPC()
     },
     {
       path: '/projects/:projectId/clusters/:clusterName',
       serviceAction: 'getAwsCluster',
       httpMethod: 'get',
-      service: new HPCTest()
+      service: new HPC()
     },
     {
       path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
       serviceAction: 'jobQueue',
       httpMethod: 'get',
-      service: new HPCTest()
+      service: new HPC()
     },
     {
       path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
       serviceAction: 'submitJob',
       httpMethod: 'post',
-      service: new HPCTest()
+      service: new HPC()
     },
     {
       path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs/:jobId/cancel',
       serviceAction: 'cancelJob',
       httpMethod: 'put',
-      service: new HPCTest()
+      service: new HPC()
     }
   ],
   environments: {

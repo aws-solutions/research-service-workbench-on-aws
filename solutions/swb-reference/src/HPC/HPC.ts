@@ -51,7 +51,7 @@ interface Cluster {
   version: string;
 }
 
-export default class HPCTest {
+export default class HPC {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async assumeRoleWithCredentials(params: {
     aws: AwsService;
