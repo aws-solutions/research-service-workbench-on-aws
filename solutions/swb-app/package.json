@@ -30,7 +30,8 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@hapi/boom": "^10.0.0",
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -41,6 +42,7 @@
     "@types/express": "^4.17.13",
     "@types/heft-jest": "1.0.2",
     "@types/jest": "^27.4.1",
+    "@types/lodash": "^4.14.181",
     "@types/node": "^14",
     "concurrently": "^7.0.0",
     "depcheck": "^1.4.3",
