@@ -21,13 +21,17 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
+    COGNITO_DOMAIN: string;
+    USER_POOL_ID: string;
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    WEBSITE_URL: string;
   };
   public constructor(app: App) {
     const {
@@ -40,7 +44,12 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      WEBSITE_URL
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -60,7 +69,12 @@ export class SWBStack extends Stack {
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      WEBSITE_URL
     };
 
     const statusHandler = this._createStatusHandlerLambda();
@@ -442,15 +456,22 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
-    const alias = new Alias(this, 'LiveAlias', {
-      aliasName: 'live',
-      version: apiLambda.currentVersion,
-      provisionedConcurrentExecutions: 1
-    });
-
-    API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(alias)
-    });
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      // SAM local start-api doesn't work with ALIAS so this is the workaround to allow us to run the code locally
+      // https://github.com/aws/aws-sam-cli/issues/2227
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(apiLambda)
+      });
+    } else {
+      const alias = new Alias(this, 'LiveAlias', {
+        aliasName: 'live',
+        version: apiLambda.currentVersion,
+        provisionedConcurrentExecutions: 1
+      });
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(alias)
+      });
+    }
   }
 
   // DynamoDB Table

@@ -74,11 +74,6 @@ Run the post deployment step
 ```
 STAGE=<STAGE> rushx run-postDeployment      # Setup Service Catalog portfolio and products
 ```
-Once the cdk creates the API Gateway, we need to specify the url of the API to the client application
-In `swb-ui` directory go to next.config.js and add APIGatewayAPIEndpoint value to API_BASE_URL
-```js
-API_BASE_URL: '<CFN_OUTPUT.APIGatewayAPIEndpoint>'
-```
 
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
@@ -193,6 +188,17 @@ the following values
 
 If you would like to launch a sagemaker instance with a different instance type than `ml.t3.medium`, you can replace that value
 in the JSON above.
+
+### Setup API URL in client Application
+
+Setup environment variable `NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"`
+
+For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
+
+```
+NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"
+```
+
 
 ### Setup Account Resources
 

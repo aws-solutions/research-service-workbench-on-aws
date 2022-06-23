@@ -16,6 +16,11 @@ function getConstants(): {
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
   ALLOWED_ORIGINS: string;
+  COGNITO_DOMAIN: string;
+  USER_POOL_ID: string;
+  CLIENT_ID: string;
+  CLIENT_SECRET: string;
+  WEBSITE_URL: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -31,6 +36,11 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+  const COGNITO_DOMAIN = config.cognitoDomain;
+  const USER_POOL_ID = config.userPoolId;
+  const CLIENT_ID = config.clientId;
+  const CLIENT_SECRET = config.clientSecret;
+  const WEBSITE_URL = config.websiteUrl;
 
   const AMI_IDS: string[] = [];
 
@@ -53,7 +63,12 @@ function getConstants(): {
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
-    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
+    COGNITO_DOMAIN,
+    USER_POOL_ID,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    WEBSITE_URL
   };
 }
 
