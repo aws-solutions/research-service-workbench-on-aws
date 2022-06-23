@@ -11,17 +11,22 @@ jest.mock('./authorizationService', () => {
               const operations: Operation[] = await permissionsPlugin.getOperationsByRoute(route, method);
               await authorizationPlugin.isAuthorized(permissions, operations);
             }
-          )
+          ),
+        isRouteIgnored: jest
+          .fn()
+          .mockImplementation(async (route: string, method: HTTPMethod): Promise<boolean> => {
+            return await permissionsPlugin.isRouteIgnored(route, method);
+          })
       };
     });
 });
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { Request, Response, NextFunction } from 'express';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
 import {
+  AuthenticatedUser,
   AuthorizationPlugin,
   HTTPMethod,
   Operation,
@@ -62,7 +67,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'GET',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -77,7 +82,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalled();
@@ -96,7 +101,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -117,7 +122,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/randomRoute'
+      path: '/randomRoute'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -138,12 +143,12 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'IncorrectMethod',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
-    expect(response.status).toBeCalledWith(400);
-    expect(response.json).toBeCalledWith({ error: 'Invalid request' });
+    expect(response.status).toBeCalledWith(403);
+    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
   });
   test('Request has no authenticatedUser for PUT on /sample', async () => {
     const next = jest.fn();
@@ -156,7 +161,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -179,7 +184,7 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
@@ -202,11 +207,22 @@ describe('authorization middleware', () => {
     } as unknown as Response;
     const request: Request = {
       method: 'PUT',
-      originalUrl: '/sample'
+      path: '/sample'
     } as Request;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(0);
     expect(response.status).toBeCalledWith(403);
     expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
+  });
+
+  test('GET Request for login should be ignored', async () => {
+    const next = jest.fn();
+    const request: Request = {
+      method: 'GET',
+      path: '/login'
+    } as Request;
+    const response: Response = {} as Response;
+    await authorizationMiddleware(request, response, next);
+    expect(next).toBeCalledTimes(1);
   });
 });

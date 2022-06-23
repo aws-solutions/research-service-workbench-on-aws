@@ -39,9 +39,18 @@ This step is necessary to setup Service Catalog portfolio and products
 ## FAQ
 **When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
 
-The `lib` folders for your project might have been deleted. Try running `rush rebuild` in the root 
+The `lib` folders for your project might have been deleted. Try running `rush purge; rush build` in the root 
 directory of this project to build the `lib` folders from scratch. 
 
 **How do I see which line of code my unit tests did not cover?**
 
 Run `rushx jest --coverage`
+
+**Cannot find module in `common/temp`**
+
+Your `node_modules`  might have been corrupted. Try the following command
+```
+rush purge
+rush install
+rush build
+```

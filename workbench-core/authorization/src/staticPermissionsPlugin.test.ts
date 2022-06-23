@@ -1,7 +1,7 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
 import {
+  AuthenticatedUser,
   PermissionsMap,
   Permission,
   Operation,
@@ -195,6 +195,15 @@ describe('StaticPermissionsPlugin', () => {
       } catch (err) {
         expect(err).toBeInstanceOf(Error);
       }
+    });
+  });
+
+  describe('isRouteIgnored', () => {
+    test(' /user with PUT request should be ignored', async () => {
+      expect(await staticPermissionsPlugin.isRouteIgnored('/user', 'PUT')).toBe(true);
+    });
+    test('/user with GET request should not be ignored', async () => {
+      expect(await staticPermissionsPlugin.isRouteIgnored('/user', 'GET')).toBe(false);
     });
   });
 });

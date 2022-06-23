@@ -3,6 +3,9 @@ import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpEnvRoutes } from './environmentRoutes';
+import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
+import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
+import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
@@ -25,10 +28,15 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   // TODO: Enable CORS so UI can make requests to backend
 
-  setUpEnvRoutes(router, apiRouteConfig.environments);
+  setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
+  setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
+  setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
 
-  // TODO: Add error handling: https://github.com/awslabs/fhir-works-on-aws-routing/blob/7f0681545b4f2dc18151e696a0da1e5c601ebb33/src/router/routes/errorHandling.ts
+  // Error handling. Order of the error handlers is important
+  router.use(boomErrorHandler);
+  router.use(unknownErrorHandler);
+
   app.use('/', router);
 
   return app;
