@@ -32,3 +32,4 @@ export {
   verifyToken
 } from './authenticationMiddleware';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
+export { UserManagementService } from './userManagementService';

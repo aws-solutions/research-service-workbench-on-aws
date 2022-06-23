@@ -27,6 +27,11 @@ export class SWBStack extends Stack {
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
+    COGNITO_DOMAIN: string;
+    USER_POOL_ID: string;
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    WEBSITE_URL: string;
   };
   public constructor(app: App) {
     const {
@@ -39,7 +44,12 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      WEBSITE_URL
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -59,7 +69,12 @@ export class SWBStack extends Stack {
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      WEBSITE_URL
     };
 
     const statusHandler = this._createStatusHandlerLambda();
