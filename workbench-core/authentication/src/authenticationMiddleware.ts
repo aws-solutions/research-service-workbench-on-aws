@@ -12,7 +12,7 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
 // app.use(express.json());
 
 /**
- * An Express middleware function used to exchange the authorization code received from the authentication server for authentication tokens.
+ * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
  * in the response body.
  *
@@ -22,7 +22,7 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -81,7 +81,7 @@ export function getTokensFromAuthorizationCode(
 }
 
 /**
- * An Express middleware function used to get the url to the authentication hosted UI.
+ * An Express route handler function used to get the url to the authentication hosted UI.
  * The `stateVerifier` and `codeChallenge` request query parameters are temporary values passed in by the client. The client will replace these values later
  * in order to keep them a client secret.
  *
@@ -90,7 +90,7 @@ export function getTokensFromAuthorizationCode(
  *  - a request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -167,7 +167,7 @@ export function verifyToken(
 }
 
 /**
- * An Express middleware function used to logout a user.
+ * An Express route handler function used to logout a user.
  *
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
@@ -175,7 +175,7 @@ export function verifyToken(
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -212,14 +212,14 @@ export function logoutUser(
 }
 
 /**
- * An Express middleware function used to refresh an expired access code.
+ * An Express route handler function used to refresh an expired access code.
  *
  * This function assumes:
  *  - the refresh token is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -266,7 +266,7 @@ export function refreshAccessToken(
 }
 
 /**
- * An Express middleware function used to check if there is a logged in user.
+ * An Express route handler function used to check if there is a logged in user.
  *
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
@@ -274,7 +274,7 @@ export function refreshAccessToken(
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
