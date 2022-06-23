@@ -23,7 +23,7 @@ export default class AuditService {
    * @param continueOnError - An optional flag indicating if the method should continue on error when audit entry
    * does not have all required values.
    * @param requiredAuditValues - A string of values required for auditing.
-   *  @param fieldsToMask - Fields to mask.
+   * @param fieldsToMask - Fields to mask.
    */
   public constructor(
     auditPlugin: AuditPlugin,
