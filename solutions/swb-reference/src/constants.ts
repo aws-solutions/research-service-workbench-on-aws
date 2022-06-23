@@ -15,6 +15,7 @@ function getConstants(): {
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
+  ALLOWED_ORIGINS: string;
   COGNITO_DOMAIN: string;
   USER_POOL_ID: string;
   CLIENT_ID: string;
@@ -62,6 +63,7 @@ function getConstants(): {
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
     COGNITO_DOMAIN,
     USER_POOL_ID,
     CLIENT_ID,

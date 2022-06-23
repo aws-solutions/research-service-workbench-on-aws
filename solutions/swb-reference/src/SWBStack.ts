@@ -26,7 +26,7 @@ export class SWBStack extends Stack {
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
-
+    ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
     USER_POOL_ID: string;
     CLIENT_ID: string;
@@ -44,6 +44,7 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
+      ALLOWED_ORIGINS,
       COGNITO_DOMAIN,
       USER_POOL_ID,
       CLIENT_ID,
@@ -68,6 +69,7 @@ export class SWBStack extends Stack {
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
+      ALLOWED_ORIGINS,
       COGNITO_DOMAIN,
       USER_POOL_ID,
       CLIENT_ID,

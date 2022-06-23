@@ -14,6 +14,7 @@ export interface ApiRouteConfig {
   account: HostingAccountService;
   auth: AuthenticationService;
   environmentService: EnvironmentService;
+  allowedOrigins: string[];
   user: UserManagementService;
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;

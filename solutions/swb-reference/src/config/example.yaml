@@ -2,7 +2,7 @@
 # awsRegion: us-east-1
 # awsRegionShortName: va #two or three letter abbreviation for the region. You can choose your own abbreviation
 # rootUserEmail: user@example.com    # SWB will automatically create this Cognito user for you.
-
+# allowedOrigins: ["http://localhost:3000","http://localhost:3002"] # SWB API will allow this domains to make requests.
 # cognitoDomain: '<Cognito Hosted UI Domain>'
 # userPoolId: '<Cognito User Pool ID>'
 # clientId: '<Cognito User Pool Client ID>'
