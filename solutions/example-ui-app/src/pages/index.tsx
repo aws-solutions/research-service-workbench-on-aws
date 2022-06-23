@@ -1,17 +1,17 @@
-import type { NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Box from '@awsui/components-react/box';
 import Cards from '@awsui/components-react/cards';
+import ExpandableSection from '@awsui/components-react/expandable-section';
 import Grid from '@awsui/components-react/grid';
+import Link from '@awsui/components-react/link';
 import PropertyFilter, { PropertyFilterProps } from '@awsui/components-react/property-filter';
 import SpaceBetween from '@awsui/components-react/space-between';
-import Link from '@awsui/components-react/link';
-import ExpandableSection from '@awsui/components-react/expandable-section';
+import type { NextPage } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import { useState } from 'react';
+import Hero from '../components/Hero';
 import { useNotifications } from '../context/NotificationContext';
 import { useSettings } from '../context/SettingsContext';
-import Hero from '../components/Hero';
-import { useState } from 'react';
 
 export interface HomeProps {
   locale: string;

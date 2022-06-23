@@ -1,9 +1,10 @@
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { AwsService } from '@amzn/workbench-core-base';
+import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
+import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-service-catalog';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
-import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import { Operation } from './environmentLifecycleHelper';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import EnvironmentLifecycleHelper, { Operation } from './environmentLifecycleHelper';
 
 describe('EnvironmentLifecycleHelper', () => {
   const ORIGINAL_ENV = process.env;
@@ -11,6 +12,7 @@ describe('EnvironmentLifecycleHelper', () => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
+    process.env.AWS_REGION = 'us-east-1';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
   });
 
@@ -40,6 +42,63 @@ describe('EnvironmentLifecycleHelper', () => {
       ]
     });
   }
+
+  test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
+    // BUILD
+    const helper = new EnvironmentLifecycleHelper();
+    const stsMock = mockClient(STSClient);
+    // Mock Modify Doc Permission
+    stsMock.on(AssumeRoleCommand).resolves({
+      Credentials: {
+        AccessKeyId: 'sampleAccessKey',
+        SecretAccessKey: 'sampleSecretAccessKey',
+        SessionToken: 'blah',
+        Expiration: undefined
+      }
+    });
+    const payload = {
+      envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+      operation: 'Launch',
+      envType: 'sagemaker'
+    };
+
+    helper.aws.getAwsServiceForRole = jest.fn(async () => {
+      return new AwsService({ region: 'us-east-1' });
+    });
+
+    // OPERATE & CHECK
+    await expect(helper.getAwsSdkForEnvMgmtRole(payload)).resolves.not.toThrowError();
+  });
+
+  test('getSSMDocArn finds SSM doc arn for valid output name', async () => {
+    // BUILD
+    const cfnMock = mockClient(CloudFormationClient);
+    // Mock Cloudformation describeStacks
+    mockCloudformationOutputs(cfnMock);
+    const helper = new EnvironmentLifecycleHelper();
+
+    const validOutputName = 'SagemakerLaunchSSMDoc';
+
+    // OPERATE & CHECK
+    await expect(helper.getSSMDocArn(validOutputName)).resolves.toEqual(
+      'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
+    );
+  });
+
+  test('getSSMDocArn does not SSM doc arn for invalid output name', async () => {
+    // BUILD
+    const cfnMock = mockClient(CloudFormationClient);
+    // Mock Cloudformation describeStacks
+    mockCloudformationOutputs(cfnMock);
+    const helper = new EnvironmentLifecycleHelper();
+
+    const invalidOutputName = 'SomeInvalidDocName';
+
+    // OPERATE & CHECK
+    await expect(helper.getSSMDocArn(invalidOutputName)).rejects.toThrow(
+      `Cannot find output name: ${invalidOutputName}`
+    );
+  });
 
   test('executeSSMDocument does not throw an error', async () => {
     // BUILD
@@ -74,124 +133,65 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.getSSMDocArn = jest.fn();
     helper.getAwsSdkForEnvMgmtRole = jest.fn();
 
-    // EXECUTE & CHECK
+    // OPERATE & CHECK
     await expect(helper.executeSSMDocument(payload)).resolves.not.toThrowError();
   });
 
-  // test('storeToDdb does not throw an error', async () => {
-  //   const helper = new EnvironmentLifecycleHelper();
-  //   const ddbMock = mockClient(DynamoDBClient);
+  test('launch does not throw an error', async () => {
+    const helper = new EnvironmentLifecycleHelper();
+    const stsMock = mockClient(STSClient);
+    const ssmMock = mockClient(SSMClient);
 
-  //   // Mock DDB
-  //   ddbMock.on(UpdateItemCommand).resolves({});
+    const cfnMock = mockClient(CloudFormationClient);
+    const mockSC = mockClient(ServiceCatalogClient);
+    mockSC.on(ListLaunchPathsCommand).resolves({
+      LaunchPathSummaries: [{ Id: 'launchPath' }]
+    });
+    // Mock Cloudformation describeStacks
+    mockCloudformationOutputs(cfnMock);
+    // Mock Modify Doc Permission
+    ssmMock.on(StartAutomationExecutionCommand).resolves({});
+    stsMock.on(AssumeRoleCommand).resolves({
+      Credentials: {
+        AccessKeyId: 'sampleAccessKey',
+        SecretAccessKey: 'sampleSecretAccessKey',
+        SessionToken: 'blah',
+        Expiration: undefined
+      }
+    });
+    helper.getAwsSdkForEnvMgmtRole = jest.fn(async () => {
+      return new AwsService({ region: 'us-east-1' });
+    });
+    helper.executeSSMDocument = jest.fn();
 
-  //   await expect(helper.storeToDdb('samplePk', 'sampleSk', {})).resolves.not.toThrowError();
-  // });
+    const launchParams = {
+      ssmParameters: {
+        InstanceName: [`basicnotebookinstance-${Date.now()}`],
+        VPC: ['vpcId'],
+        Subnet: ['subnetId'],
+        ProvisioningArtifactId: ['provisioningArtifactId'],
+        ProductId: ['sampleProductId'],
+        Namespace: [`sagemaker-${Date.now()}`],
+        EncryptionKeyArn: ['encryptionKeyArn'],
+        CIDR: ['1.1.1.1/32'],
+        EnvId: ['envId'],
+        EnvironmentInstanceFiles: ['environmentInstanceFiles'],
+        AutoStopIdleTimeInMinutes: ['0'],
+        EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!]
+      },
+      operation: 'Launch' as Operation,
+      envType: 'Sagemaker',
+      envMetadata: {
+        PROJ: {
+          envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+          externalId: 'workbench'
+        },
+        ETC: {
+          productId: 'sampleProductId'
+        }
+      }
+    };
 
-  // test('getEnvDDBEntry does not throw an error', async () => {
-  //   const helper = new EnvironmentLifecycleHelper();
-  //   const ddbMock = mockClient(DynamoDBClient);
-
-  //   // Mock DDB
-  //   ddbMock.on(GetItemCommand).resolves({ Item: {} });
-
-  //   await expect(helper.getEnvDDBEntry('sampleEnvId')).resolves.not.toThrowError();
-  // });
-
-  // test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
-  //   const helper = new EnvironmentLifecycleHelper();
-  //   const ddbMock = mockClient(DynamoDBClient);
-  //   const stsMock = mockClient(STSClient);
-  //   stsMock.on(AssumeRoleCommand).resolves({
-  //     Credentials: {
-  //       AccessKeyId: 'sampleAccessKey',
-  //       SecretAccessKey: 'sampleSecretAccessKey',
-  //       SessionToken: 'blah',
-  //       Expiration: undefined
-  //     }
-  //   });
-  //   ddbMock.on(GetItemCommand).resolves({
-  //     Item: {
-  //       pk: {
-  //         S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-  //       },
-  //       sk: {
-  //         S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-  //       },
-  //       envManagementRoleArn: {
-  //         S: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt'
-  //       }
-  //     }
-  //   });
-
-  //   // Mock DDB
-  //   ddbMock.on(UpdateItemCommand).resolves({});
-
-  //   await expect(
-  //     helper.storeToDdb('a425f28d-97cd-4237-bfc2-66d7a6806a7f', 'a425f28d-97cd-4237-bfc2-66d7a6806a7f', {})
-  //   ).resolves.not.toThrowError();
-  // });
-
-  // test('launch does not throw an error', async () => {
-  //   const helper = new EnvironmentLifecycleHelper();
-  //   const ddbMock = mockClient(DynamoDBClient);
-  //   const stsMock = mockClient(STSClient);
-  //   const ssmMock = mockClient(SSMClient);
-  //   const cfnMock = mockClient(CloudFormationClient);
-  //   const mockSC = mockClient(ServiceCatalogClient);
-  //   mockSC.on(ListLaunchPathsCommand).resolves({
-  //     LaunchPathSummaries: [{ Id: 'launchPath' }]
-  //   });
-  //   // Mock Cloudformation describeStacks
-  //   mockCloudformationOutputs(cfnMock);
-  //   // Mock Modify Doc Permission
-  //   ssmMock.on(StartAutomationExecutionCommand).resolves({});
-  //   stsMock.on(AssumeRoleCommand).resolves({
-  //     Credentials: {
-  //       AccessKeyId: 'sampleAccessKey',
-  //       SecretAccessKey: 'sampleSecretAccessKey',
-  //       SessionToken: 'blah',
-  //       Expiration: undefined
-  //     }
-  //   });
-  //   ddbMock.on(GetItemCommand).resolves({
-  //     Item: {
-  //       pk: {
-  //         S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-  //       },
-  //       sk: {
-  //         S: 'ACC#a425f28d-97cd-4237-bfc2-66d7a6806a7f'
-  //       },
-  //       envManagementRoleArn: {
-  //         S: 'sampleEnvManagementRoleArn'
-  //       }
-  //     }
-  //   });
-
-  //   // Mock DDB
-  //   ddbMock.on(UpdateItemCommand).resolves({});
-
-  //   const launchParams = {
-  //     ssmParameters: {
-  //       InstanceName: [`basicnotebookinstance-${Date.now()}`],
-  //       VPC: ['vpcId'],
-  //       Subnet: ['subnetId'],
-  //       ProvisioningArtifactId: ['provisioningArtifactId'],
-  //       ProductId: ['sampleProductId'],
-  //       Namespace: [`sagemaker-${Date.now()}`],
-  //       EncryptionKeyArn: ['encryptionKeyArn'],
-  //       CIDR: ['1.1.1.1/32'],
-  //       EnvId: ['envId'],
-  //       EnvironmentInstanceFiles: ['environmentInstanceFiles'],
-  //       AutoStopIdleTimeInMinutes: ['0'],
-  //       EnvStatusUpdateConstString: [process.env.ENV_STATUS_UPDATE!]
-  //     },
-  //     operation: 'Launch' as Operation,
-  //     envType: 'Sagemaker',
-  //     accountId: 'a425f28d-97cd-4237-bfc2-66d7a6806a7f',
-  //     productId: 'sampleProductId'
-  //   };
-
-  //   await expect(helper.launch(launchParams)).resolves.not.toThrowError();
-  // });
+    await expect(helper.launch(launchParams)).resolves.not.toThrowError();
+  });
 });

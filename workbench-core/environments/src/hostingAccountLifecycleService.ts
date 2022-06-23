@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ = require('lodash');
+import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
-import IamRoleCloneService from './iamRoleCloneService';
-import AccountService from './accountService';
-import { Readable } from 'stream';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import _ = require('lodash');
+import AccountService from './accountService';
 import { HostingAccountStatus } from './hostingAccountStatus';
+import IamRoleCloneService from './iamRoleCloneService';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
@@ -141,6 +141,7 @@ export default class HostingAccountLifecycleService {
     const describeStackResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
+
     const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
       StackName: hostingAccountStackName
     });
@@ -152,11 +153,26 @@ export default class HostingAccountLifecycleService {
       const subnetId = outputs.find((output) => {
         return output.OutputKey === 'VpcSubnet';
       })!.OutputValue;
+      const encryptionKeyArn = outputs.find((output) => {
+        return output.OutputKey === 'EncryptionKeyArn';
+      })!.OutputValue;
 
       if (removeCommentsAndSpaces(actualTemplate) === removeCommentsAndSpaces(expectedTemplate)) {
-        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'CURRENT', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'CURRENT',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       } else {
-        await this._writeAccountStatusToDDB({ ddbAccountId, status: 'NEEDS_UPDATE', vpcId, subnetId });
+        await this._writeAccountStatusToDDB({
+          ddbAccountId,
+          status: 'NEEDS_UPDATE',
+          vpcId,
+          subnetId,
+          encryptionKeyArn
+        });
       }
     } else if (describeStackResponse.Stacks![0]!.StackStatus! === 'FAILED') {
       await this._writeAccountStatusToDDB({ ddbAccountId, status: 'ERRORED' });
@@ -168,8 +184,15 @@ export default class HostingAccountLifecycleService {
     status: HostingAccountStatus;
     vpcId?: string;
     subnetId?: string;
+    encryptionKeyArn?: string;
   }): Promise<void> {
-    const updateParam: { id: string; status: string; vpcId?: string; subnetId?: string } = {
+    const updateParam: {
+      id: string;
+      status: string;
+      vpcId?: string;
+      subnetId?: string;
+      encryptionKeyArn?: string;
+    } = {
       id: param.ddbAccountId,
       status: param.status
     };
@@ -178,6 +201,9 @@ export default class HostingAccountLifecycleService {
     }
     if (param.subnetId) {
       updateParam.subnetId = param.subnetId;
+    }
+    if (param.encryptionKeyArn) {
+      updateParam.encryptionKeyArn = param.encryptionKeyArn;
     }
     console.log('_writeAccountStatusToDDB param', param);
     await this._accountService.update(updateParam);
@@ -278,6 +304,7 @@ export default class HostingAccountLifecycleService {
   }
 
   private async _shareAMIs(targetAccountId: string, amisToShare: string[]): Promise<void> {
+    console.log(`Sharing AMIs: [${amisToShare}] with account ${targetAccountId}`);
     if (amisToShare && amisToShare.length > 0) {
       for (const amiId of amisToShare) {
         const params = {
@@ -294,6 +321,7 @@ export default class HostingAccountLifecycleService {
    * Make an API call to SSM in the main account to share SSM documents for launch/terminate with the hosting account.
    */
   private async _shareSSMDocument(ssmDocuments: string[], accountId: string): Promise<void> {
+    console.log(`Sharing SSM documents: [${ssmDocuments}]`);
     for (const ssmDoc of ssmDocuments) {
       const params = { Name: ssmDoc, PermissionType: 'Share', AccountIdsToAdd: [accountId] };
       await this._aws.clients.ssm.modifyDocumentPermission(params);

@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
-import _ = require('lodash');
 import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
+import _ = require('lodash');
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
@@ -70,10 +70,14 @@ export async function handler(event: any) {
 
   // Map event to EventBridgeEventToDDB
   const ebToDDB: EventBridgeEventToDDB = {
-    envId: event.detail.EnvId,
+    envId: event.detail.EnvId || event.detail.Tags?.Env,
     instanceId,
     recordOutputKeys,
     status: status.toUpperCase(),
+    // TODO: This propagates error messages (if any) for launch/terminate failure events. Add logic for propagating start/stop failure event messages
+    errorMsg: _.isObject(event.detail.ErrorMessage)
+      ? JSON.stringify(event.detail.ErrorMessage)
+      : event.detail.ErrorMessage,
     operation: event.detail.Operation,
     metadata: event
   };

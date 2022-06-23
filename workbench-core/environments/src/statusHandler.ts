@@ -1,17 +1,14 @@
-import _ = require('lodash');
-import Boom from '@hapi/boom';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
-import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import { isEnvironmentStatus } from './environmentStatus';
-import EnvironmentService from './environmentService';
-import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { AwsService } from '@amzn/workbench-core-base';
+import Boom from '@hapi/boom';
+import _ = require('lodash');
+import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
+import envResourceTypeToKey from './environmentResourceTypeToKey';
+import EnvironmentService from './environmentService';
+import { isEnvironmentStatus } from './environmentStatus';
+import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 
 export default class StatusHandler {
   public async execute(event: EventBridgeEventToDDB): Promise<void> {
-    const envHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
-
     if (_.isUndefined(event.envId) && _.isUndefined(event.instanceId)) {
       console.log('Neither Env ID nor Instance ID was provided. Skipping status update.');
       return;
@@ -23,6 +20,8 @@ export default class StatusHandler {
       );
       return;
     }
+
+    const envService = this._getEnvService();
 
     // Check if this event is outdated
     const envId = event.envId ? event.envId : await this._getEnvId(event.instanceId!);
@@ -40,10 +39,20 @@ export default class StatusHandler {
       return;
     }
 
-    envDetails.status = event.status;
+    const updateRequest: { status: string; error?: { type: string; value: string } } = {
+      status: event.status
+    };
+    if (event.errorMsg) {
+      updateRequest.error = {
+        // We use event.operation for Launch/Terminate SSM doc events
+        // (for future) and event.status for automatic status update events (STARTING/STOPPING etc.)
+        type: event.operation?.toUpperCase() || event.status,
+        value: event.errorMsg!
+      };
+    }
 
     // Update env status using data from event bridge
-    await envService.updateEnvironment(envId, { status: event.status });
+    await envService.updateEnvironment(envId, updateRequest);
 
     // The next few DDB updates are only needed during environment provisioning
     if (event.operation !== 'Launch') {
@@ -54,6 +63,7 @@ export default class StatusHandler {
     }
 
     // Get hosting account SDK instance
+    const envHelper = this._getEnvHelper();
     const hostSdk = await envHelper.getAwsSdkForEnvMgmtRole({
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId,
@@ -65,9 +75,9 @@ export default class StatusHandler {
     const { RecordOutputs } = await hostSdk.clients.serviceCatalog.describeRecord({
       Id: event.metadata.detail.RecordId
     });
-    const instanceName = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceName })!
+    const instanceName = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceName })!
       .OutputValue!;
-    const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys.instanceArn })!
+    const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceArn })!
       .OutputValue!;
 
     // We store the provisioned product ID sent in event metadata
@@ -131,5 +141,19 @@ export default class StatusHandler {
     const instance = data.Items![0];
     const instanceSk = instance.sk as unknown as string;
     return instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
+  }
+
+  /** Get environment service instance
+   * @returns EnvironmentService instance
+   */
+  private _getEnvService(): EnvironmentService {
+    return new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+  }
+
+  /** Get environment helper instance
+   * @returns EnvironmentLifecycleHelper instance
+   */
+  private _getEnvHelper(): EnvironmentLifecycleHelper {
+    return new EnvironmentLifecycleHelper();
   }
 }

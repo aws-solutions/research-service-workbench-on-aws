@@ -1,7 +1,5 @@
 const envId = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 jest.mock('uuid', () => ({ v4: () => envId }));
-import EnvironmentService from './environmentService';
-import { mockClient } from 'aws-sdk-client-mock';
 import {
   BatchGetItemCommand,
   DynamoDBClient,
@@ -13,6 +11,8 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
+import EnvironmentService from './environmentService';
 
 describe('EnvironmentService', () => {
   beforeAll(() => {
@@ -87,7 +87,7 @@ describe('EnvironmentService', () => {
   };
   const projItem = {
     subnetId: 'subnet-07f475d83291a3603',
-    accountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
+    hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     createdAt: '2022-05-18T20:33:42.608Z',

@@ -1,9 +1,10 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
-import { CognitoSetup, ServiceCatalogSetup } from '@amzn/environments';
-import { getConstants } from './constants';
-import { join } from 'path';
 import fs from 'fs';
+import { join } from 'path';
+import { CognitoSetup, ServiceCatalogSetup } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
+import { getConstants } from './constants';
+
 async function run(): Promise<void> {
   const {
     AWS_REGION,

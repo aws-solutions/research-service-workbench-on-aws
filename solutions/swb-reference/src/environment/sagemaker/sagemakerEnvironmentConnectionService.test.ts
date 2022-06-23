@@ -1,7 +1,7 @@
-import { mockClient } from 'aws-sdk-client-mock';
-import SagemakerEnvironmentConnectionService from './sagemakerEnvironmentConnectionService';
 import { CreatePresignedNotebookInstanceUrlCommand, SageMakerClient } from '@aws-sdk/client-sagemaker';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
+import { mockClient } from 'aws-sdk-client-mock';
+import SagemakerEnvironmentConnectionService from './sagemakerEnvironmentConnectionService';
 
 describe('SagemakerEnvironmentConnectionService', () => {
   test('getAuthCreds should return mocked value', async () => {

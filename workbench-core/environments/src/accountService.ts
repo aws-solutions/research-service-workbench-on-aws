@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ = require('lodash');
-import { v4 as uuidv4 } from 'uuid';
-import Boom from '@hapi/boom';
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import Boom from '@hapi/boom';
+import _ = require('lodash');
+import { v4 as uuidv4 } from 'uuid';
 import environmentResourceTypeToKey from './environmentResourceTypeToKey';
 import { HostingAccountStatus } from './hostingAccountStatus';
 
@@ -16,7 +16,7 @@ interface Account {
   awsAccountId: string;
   envMgmtRoleArn: string;
   error: { type: string; value: string } | undefined;
-  accountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArn: string;
   vpcId: string;
   subnetId: string;
   cidr: string;
@@ -95,10 +95,6 @@ export default class AccountService {
   }
 
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
-    // Verify id is not provided
-    if (!_.isUndefined(accountMetadata.id))
-      throw new Error('Cannot specify id in request body when creating new account');
-
     // Verify awsAccountId is specified
     if (_.isUndefined(accountMetadata.awsAccountId))
       throw new Error('Missing AWS Account ID in request body');
@@ -115,9 +111,6 @@ export default class AccountService {
   }
 
   public async _validateUpdate(accountMetadata: { [key: string]: string }): Promise<void> {
-    // Verify id is provided
-    if (_.isUndefined(accountMetadata.id)) throw new Error('Please specify id in request body');
-
     // Check if AWS account ID is same as before
     if (!_.isUndefined(accountMetadata.awsAccountId)) {
       const ddbEntry = await this.getAccount(accountMetadata.id);
@@ -137,7 +130,7 @@ export default class AccountService {
         id: accountMetadata.id,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-        accountHandlerRoleArn: accountMetadata.accountHandlerRoleArn,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
         vpcId: accountMetadata.vpcId,
         subnetId: accountMetadata.subnetId,
         encryptionKeyArn: accountMetadata.encryptionKeyArn,

@@ -1,11 +1,11 @@
 /* eslint-disable security/detect-object-injection */
 
 import { AwsService } from '@amzn/workbench-core-base';
-import { EnvironmentStatus } from './environmentStatus';
-import { v4 as uuidv4 } from 'uuid';
-import Boom from '@hapi/boom';
-import envResourceTypeToKey from './environmentResourceTypeToKey';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import Boom from '@hapi/boom';
+import { v4 as uuidv4 } from 'uuid';
+import envResourceTypeToKey from './environmentResourceTypeToKey';
+import { EnvironmentStatus } from './environmentStatus';
 
 interface Environment {
   id: string | undefined;
@@ -291,7 +291,7 @@ export default class EnvironmentService {
       id: newEnv.projectId,
       name: project.name,
       envMgmtRoleArn: project.envMgmtRoleArn,
-      accountHandlerRoleArn: project.accountHandlerRoleArn,
+      hostingAccountHandlerRoleArn: project.hostingAccountHandlerRoleArn,
       encryptionKeyArn: project.encryptionKeyArn,
       vpcId: project.vpcId,
       subnetId: project.subnetId,

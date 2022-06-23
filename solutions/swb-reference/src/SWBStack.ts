@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
-import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { join } from 'path';
-import Workflow from './environment/workflow';
-import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
-import { getConstants } from './constants';
+import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+
+import * as targets from 'aws-cdk-lib/aws-events-targets';
+
+import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { getConstants } from './constants';
+import Workflow from './environment/workflow';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -19,6 +21,7 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
+
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
@@ -304,8 +307,8 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             sid: 'AssumeRole',
             actions: ['sts:AssumeRole'],
-            // Confirm the suffix `cross-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-            resources: ['arn:aws:iam::*:role/*cross-account-role']
+            // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+            resources: ['arn:aws:iam::*:role/*hosting-account-role']
           }),
           new PolicyStatement({
             sid: 'GetLaunchConstraint',
@@ -367,7 +370,8 @@ export class SWBStack extends Stack {
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      timeout: Duration.seconds(30)
+      timeout: Duration.seconds(30),
+      memorySize: 832
     });
     apiLambda.role?.attachInlinePolicy(
       new Policy(this, 'apiLambdaPolicy', {
@@ -395,7 +399,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
-            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*cross-account-role'],
+            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
@@ -438,8 +442,14 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
+    const alias = new Alias(this, 'LiveAlias', {
+      aliasName: 'live',
+      version: apiLambda.currentVersion,
+      provisionedConcurrentExecutions: 1
+    });
+
     API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(apiLambda)
+      defaultIntegration: new LambdaIntegration(alias)
     });
   }
 
