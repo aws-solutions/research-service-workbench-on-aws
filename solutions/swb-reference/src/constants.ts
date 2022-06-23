@@ -27,7 +27,7 @@ function getConstants(): {
     // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
     // correct file
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(join(__dirname, `../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
+    fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
   );
 
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
