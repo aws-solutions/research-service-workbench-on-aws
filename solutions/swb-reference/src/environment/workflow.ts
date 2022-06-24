@@ -28,7 +28,7 @@ export default class Workflow {
           // eslint-disable-next-line security/detect-non-literal-fs-filename
           content: fs // nosemgrep
             .readFileSync(
-              join(__dirname, `../../src/environment/${envType}/${envType}${docType}SSM.yaml`),
+              join(__dirname, `../../../src/environment/${envType}/${envType}${docType}SSM.yaml`),
               'utf8'
             )
             .toString()

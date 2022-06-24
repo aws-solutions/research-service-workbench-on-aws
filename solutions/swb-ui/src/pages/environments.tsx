@@ -14,13 +14,15 @@ import {
   PropertyFilterProps,
   SpaceBetween,
   SplitPanel,
-  Table
+  Table,
+  StatusIndicator
 } from '@awsui/components-react';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import React, { SetStateAction, useEffect, useState } from 'react';
+import { useEnvironments, terminate, start, stop, connect } from '../api/environments';
 import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
 import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
 import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
@@ -34,7 +36,6 @@ import {
   columnDefinitions,
   searchableColumns
 } from '../environments-table-config/workspacesColumnDefinitions';
-import { allItems } from '../environments-table-config/workspacesData';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
 import styles from '../styles/BaseLayout.module.scss';
@@ -52,12 +53,14 @@ export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<
 const Environment: NextPage = () => {
   // For functions to return content specific to the table
   const itemType: string = 'workspace';
-
   // App settings constant
   const { settings } = useSettings();
   const [preferences] = useState({
     pageSize: 20
   });
+  const { environments, mutate } = useEnvironments();
+
+  const [error, setError] = useState('');
 
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
@@ -91,12 +94,12 @@ const Environment: NextPage = () => {
 
   // Property and date filter collections
   const { items, filteredItemsCount, collectionProps, filterProps, paginationProps, propertyFilterProps } =
-    useCollection(allItems, {
+    useCollection(environments, {
       filtering: {
         empty: TableEmptyDisplay(itemType),
         noMatch: TableNoMatchDisplay(itemType),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        filteringFunction: (item, filteringText): any => {
+        filteringFunction: (item: any, filteringText): any => {
           if (dateFilter !== null) {
             const range = convertToAbsoluteRange(dateFilter);
             if (!isWithinInterval(new Date(item.date), range)) {
@@ -132,17 +135,23 @@ const Environment: NextPage = () => {
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
-  const connectButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STOPPED'];
-  const stopButtonStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED'];
-  const terminateButtonStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
+  const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
+  const startButtonEnableStatuses: string[] = ['PENDING', 'STOPPED'];
+  const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
+  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
   // Constant buttons should show loading based on statuses in the array
-  const connectButtonLoadingStatuses: string[] = ['STARTING'];
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];
+  const startButtonLoadingStatuses: string[] = ['STARTING'];
+  const [terminatingIds, setTerminatingIds] = useState(new Set<string>());
+  const [stoppingIds, setStoppingIds] = useState(new Set<string>());
+  const [connectingIds, setConnectingIds] = useState(new Set<string>());
+  const [startingIds, setstartingIds] = useState(new Set<string>());
+
   const isOneItemSelected = (): boolean | undefined => {
     return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
   };
-  const getWorkspaceStatus = (): string => {
+  const getEnvironmentStatus = (): string => {
     const selectedItems = collectionProps.selectedItems;
     if (selectedItems !== undefined && isOneItemSelected()) {
       const status = collectionProps.selectedItems?.at(0).workspaceStatus;
@@ -151,6 +160,64 @@ const Environment: NextPage = () => {
     return '';
   };
 
+  const getSelectedId = (): string => {
+    if (isOneItemSelected()) {
+      return collectionProps.selectedItems?.at(0).id;
+    }
+    return '';
+  };
+
+  const executeAction = async (action: string): Promise<void> => {
+    let actionLabel = 'Retrieve Workspaces Data';
+    if (isOneItemSelected()) {
+      const id = collectionProps.selectedItems?.at(0).id;
+      try {
+        setError('');
+        switch (action) {
+          case 'TERMINATE':
+            setTerminatingIds((prev) => new Set(prev.add(id)));
+            actionLabel = 'Terminate Workspace';
+            await terminate(id);
+            break;
+          case 'STOP':
+            setStoppingIds((prev) => new Set(prev.add(id)));
+            actionLabel = 'Stop Workspace';
+            await stop(id);
+            break;
+          case 'START':
+            setstartingIds((prev) => new Set(prev.add(id)));
+            actionLabel = 'Start Workspace';
+            await start(id);
+            break;
+          case 'CONNECT':
+            setConnectingIds((prev) => new Set(prev.add(id)));
+            actionLabel = 'Connect to Workspace';
+            //TODO: implement Connect workflow
+            break;
+        }
+        await mutate();
+      } catch {
+        setError(`There was a problem trying to ${actionLabel}.`);
+      } finally {
+        setTerminatingIds((prev) => {
+          prev.delete(id);
+          return new Set(prev);
+        });
+        setStoppingIds((prev) => {
+          prev.delete(id);
+          return new Set(prev);
+        });
+        setConnectingIds((prev) => {
+          prev.delete(id);
+          return new Set(prev);
+        });
+        setstartingIds((prev) => {
+          prev.delete(id);
+          return new Set(prev);
+        });
+      }
+    }
+  };
   // Split panel constants
   const { header: panelHeader, body: panelBody } = getPanelContent(collectionProps.selectedItems, itemType);
   const { splitPanelOpen, onSplitPanelToggle, splitPanelSize, onSplitPanelResize } = useSplitPanel(
@@ -191,7 +258,7 @@ const Environment: NextPage = () => {
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />
           </Head>
-
+          {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
           <Table
             {...collectionProps}
             selectionType="multi"
@@ -210,27 +277,58 @@ const Environment: NextPage = () => {
                 <Header
                   counter={
                     collectionProps.selectedItems?.length
-                      ? `(${collectionProps.selectedItems.length}/${allItems.length})`
-                      : `(${allItems.length})`
+                      ? `(${collectionProps.selectedItems.length}/${environments.length})`
+                      : `(${environments.length})`
                   }
                   actions={
                     <Box float="right">
                       <SpaceBetween direction="horizontal" size="xs">
                         <Button
-                          disabled={!connectButtonStatuses.includes(getWorkspaceStatus())}
-                          loading={connectButtonLoadingStatuses.includes(getWorkspaceStatus())}
+                          disabled={
+                            !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                            connectingIds.has(getSelectedId())
+                          }
+                          loading={connectingIds.has(getSelectedId())}
+                          onClick={() => executeAction('CONNECT')}
                         >
                           Connect
                         </Button>
                         <Button
-                          disabled={!stopButtonStatuses.includes(getWorkspaceStatus())}
-                          loading={stopButtonLoadingStatuses.includes(getWorkspaceStatus())}
+                          disabled={
+                            !startButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                            startingIds.has(getSelectedId())
+                          }
+                          loading={
+                            startButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                            startingIds.has(getSelectedId())
+                          }
+                          onClick={() => executeAction('START')}
+                        >
+                          Start
+                        </Button>
+                        <Button
+                          disabled={
+                            !stopButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                            stoppingIds.has(getSelectedId())
+                          }
+                          loading={
+                            stopButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                            stoppingIds.has(getSelectedId())
+                          }
+                          onClick={() => executeAction('STOP')}
                         >
                           Stop
                         </Button>
                         <Button
-                          disabled={!terminateButtonStatuses.includes(getWorkspaceStatus())}
-                          loading={terminateButtonLoadingStatuses.includes(getWorkspaceStatus())}
+                          disabled={
+                            !terminateButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                            terminatingIds.has(getSelectedId())
+                          }
+                          loading={
+                            terminateButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                            terminatingIds.has(getSelectedId())
+                          }
+                          onClick={() => executeAction('TERMINATE')}
                         >
                           Terminate
                         </Button>
