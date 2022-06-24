@@ -267,6 +267,8 @@ export function refreshAccessToken(
 
 /**
  * An Express route handler function used to check if there is a logged in user.
+ * If there is valid refresh_token cookie present, the function will set a new access_token cookie
+ * and return a new idToken as well as the logged in status in the response body.
  *
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
@@ -291,11 +293,7 @@ export function isUserLoggedIn(
     const refreshToken = req.cookies.refresh_token;
 
     try {
-      if (typeof accessToken === 'string') {
-        const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
-
-        res.status(200).json({ loggedIn });
-      } else if (typeof refreshToken === 'string') {
+      if (typeof refreshToken === 'string') {
         const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
 
         // set access cookie
@@ -307,6 +305,10 @@ export function isUserLoggedIn(
         });
 
         res.status(200).json({ idToken: idToken.token, loggedIn: true });
+      } else if (typeof accessToken === 'string') {
+        const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
+
+        res.status(200).json({ loggedIn });
       } else {
         res.status(200).json({ loggedIn: false });
       }

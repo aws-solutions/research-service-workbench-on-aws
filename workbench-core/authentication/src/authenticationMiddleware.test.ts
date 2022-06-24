@@ -55,10 +55,10 @@ describe('authenticationMiddleware integration tests', () => {
   });
 
   describe('getTokensFromAuthorizationCode tests', () => {
-    let getTokensFromAuthorizationCodeMiddleware: (req: Request, res: Response) => Promise<void>;
+    let getTokensFromAuthorizationCodeRouteHandler: (req: Request, res: Response) => Promise<void>;
 
     beforeEach(() => {
-      getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(authenticationService);
+      getTokensFromAuthorizationCodeRouteHandler = getTokensFromAuthorizationCode(authenticationService);
     });
 
     it('should return 200, the id token in the response body, and set the access and refresh tokens as cookies when the code and codeVerifier params are valid', async () => {
@@ -72,7 +72,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
         ...cookieOpts,
@@ -106,7 +106,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       });
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
         ...cookieOpts
@@ -125,7 +125,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -138,7 +138,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -150,7 +150,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -163,7 +163,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -176,7 +176,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
     });
@@ -189,7 +189,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
     });
@@ -205,13 +205,13 @@ describe('authenticationMiddleware integration tests', () => {
         .spyOn(authenticationService, 'handleAuthorizationCode')
         .mockRejectedValueOnce(new IdpUnavailableError());
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      getTokensFromAuthorizationCodeMiddleware = getTokensFromAuthorizationCode(authenticationService, {
+      getTokensFromAuthorizationCodeRouteHandler = getTokensFromAuthorizationCode(authenticationService, {
         loggingService
       });
       const req: Request = {
@@ -222,7 +222,7 @@ describe('authenticationMiddleware integration tests', () => {
       } as Request;
       const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
 
-      await getTokensFromAuthorizationCodeMiddleware(req, res);
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
       expect(loggingSpy).toHaveBeenCalledTimes(1);
@@ -230,10 +230,10 @@ describe('authenticationMiddleware integration tests', () => {
   });
 
   describe('getAuthorizationCodeUrl tests', () => {
-    let getAuthorizationCodeUrlMiddleware: (req: Request, res: Response) => Promise<void>;
+    let getAuthorizationCodeUrlRouteHandler: (req: Request, res: Response) => Promise<void>;
 
     beforeEach(() => {
-      getAuthorizationCodeUrlMiddleware = getAuthorizationCodeUrl(authenticationService);
+      getAuthorizationCodeUrlRouteHandler = getAuthorizationCodeUrl(authenticationService);
     });
 
     it('should return 200 and the authorization code url when the stateVerifier and codeChallenge params are valid', async () => {
@@ -247,7 +247,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as unknown as Request;
 
-      await getAuthorizationCodeUrlMiddleware(req, res);
+      await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -262,7 +262,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as unknown as Request;
 
-      await getAuthorizationCodeUrlMiddleware(req, res);
+      await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -275,7 +275,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as unknown as Request;
 
-      await getAuthorizationCodeUrlMiddleware(req, res);
+      await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -287,7 +287,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as unknown as Request;
 
-      await getAuthorizationCodeUrlMiddleware(req, res);
+      await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -300,7 +300,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as unknown as Request;
 
-      await getAuthorizationCodeUrlMiddleware(req, res);
+      await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
     });
@@ -441,10 +441,10 @@ describe('authenticationMiddleware integration tests', () => {
   });
 
   describe('logoutUser tests', () => {
-    let logoutUserMiddleware: (req: Request, res: Response) => Promise<void>;
+    let logoutUserRouteHandler: (req: Request, res: Response) => Promise<void>;
 
     beforeEach(() => {
-      logoutUserMiddleware = logoutUser(authenticationService);
+      logoutUserRouteHandler = logoutUser(authenticationService);
     });
 
     it('should return 200, clear cookies, and revoke refresh token when refresh_token cookie is present and valid', async () => {
@@ -454,7 +454,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
         sameSite: 'lax',
@@ -475,7 +475,7 @@ describe('authenticationMiddleware integration tests', () => {
         cookies: {}
       } as Request;
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
         sameSite: 'lax',
@@ -498,7 +498,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
         sameSite: 'lax',
@@ -521,7 +521,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
         sameSite: 'lax',
@@ -545,13 +545,13 @@ describe('authenticationMiddleware integration tests', () => {
       } as Request;
       jest.spyOn(authenticationService, 'revokeToken').mockRejectedValueOnce(new IdpUnavailableError());
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      logoutUserMiddleware = logoutUser(authenticationService, { loggingService });
+      logoutUserRouteHandler = logoutUser(authenticationService, { loggingService });
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
@@ -560,7 +560,7 @@ describe('authenticationMiddleware integration tests', () => {
 
       const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
 
-      await logoutUserMiddleware(req, res);
+      await logoutUserRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
         sameSite: 'lax',
@@ -579,10 +579,10 @@ describe('authenticationMiddleware integration tests', () => {
   });
 
   describe('refreshAccessToken tests', () => {
-    let refreshAccessTokenMiddleware: (req: Request, res: Response) => Promise<void>;
+    let refreshAccessTokenRouteHandler: (req: Request, res: Response) => Promise<void>;
 
     beforeEach(() => {
-      refreshAccessTokenMiddleware = refreshAccessToken(authenticationService);
+      refreshAccessTokenRouteHandler = refreshAccessToken(authenticationService);
     });
 
     it('should return 200, the id token in the response body, and set the access token as a cookie when the refresh_token cookie is present and valid', async () => {
@@ -594,7 +594,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...cookieOpts,
@@ -620,7 +620,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       });
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, { ...cookieOpts });
       expect(res.status).toHaveBeenCalledWith(200);
@@ -632,7 +632,7 @@ describe('authenticationMiddleware integration tests', () => {
         cookies: {}
       } as Request;
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
     });
@@ -644,7 +644,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
     });
@@ -656,7 +656,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
     });
@@ -671,13 +671,13 @@ describe('authenticationMiddleware integration tests', () => {
         .spyOn(authenticationService, 'refreshAccessToken')
         .mockRejectedValueOnce(new IdpUnavailableError());
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      refreshAccessTokenMiddleware = refreshAccessToken(authenticationService, { loggingService });
+      refreshAccessTokenRouteHandler = refreshAccessToken(authenticationService, { loggingService });
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
@@ -686,7 +686,7 @@ describe('authenticationMiddleware integration tests', () => {
 
       const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
 
-      await refreshAccessTokenMiddleware(req, res);
+      await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
       expect(loggingSpy).toHaveBeenCalledTimes(1);
@@ -694,10 +694,10 @@ describe('authenticationMiddleware integration tests', () => {
   });
 
   describe('isUserLoggedIn tests', () => {
-    let isUserLoggedInMiddleware: (req: Request, res: Response) => Promise<void>;
+    let isUserLoggedInRouteHandler: (req: Request, res: Response) => Promise<void>;
 
     beforeEach(() => {
-      isUserLoggedInMiddleware = isUserLoggedIn(authenticationService);
+      isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService);
     });
 
     it('should return 200 and set loggedIn to true in the response body when the access_token cookie is present and valid', async () => {
@@ -707,7 +707,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: true });
@@ -720,7 +720,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
@@ -735,7 +735,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
@@ -761,7 +761,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       });
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
@@ -773,7 +773,7 @@ describe('authenticationMiddleware integration tests', () => {
         cookies: {}
       } as Request;
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
@@ -786,7 +786,7 @@ describe('authenticationMiddleware integration tests', () => {
         }
       } as Request;
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
@@ -800,7 +800,7 @@ describe('authenticationMiddleware integration tests', () => {
       } as Request;
       jest.spyOn(authenticationService, 'isUserLoggedIn').mockRejectedValueOnce(new IdpUnavailableError());
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
@@ -815,13 +815,13 @@ describe('authenticationMiddleware integration tests', () => {
         .spyOn(authenticationService, 'refreshAccessToken')
         .mockRejectedValueOnce(new IdpUnavailableError());
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(503);
     });
 
     it('should log to the LoggingService when it is provided and an AuthenticationService error occurs', async () => {
-      isUserLoggedInMiddleware = isUserLoggedIn(authenticationService, { loggingService });
+      isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService, { loggingService });
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
@@ -830,7 +830,7 @@ describe('authenticationMiddleware integration tests', () => {
 
       const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
 
-      await isUserLoggedInMiddleware(req, res);
+      await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
