@@ -13,11 +13,6 @@ describe('CDKStack', () => {
       })
     );
     expectCDK(infraStack).to(
-      haveResourceLike('AWS::ApiGateway::Resource', {
-        PathPart: 'consent'
-      })
-    );
-    expectCDK(infraStack).to(
       haveResourceLike('AWS::ApiGateway::RestApi', {
         Name: 'RestApi'
       })
