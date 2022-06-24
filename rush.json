@@ -124,6 +124,12 @@
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/patient-consent-infrastructure",
+      "projectFolder": "solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
