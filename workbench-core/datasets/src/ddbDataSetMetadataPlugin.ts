@@ -9,8 +9,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
   private _dataSetKeyType: string;
 
-  public constructor(options: { region: string; tableName: string }, dataSetKeyTypeId: string) {
-    this._aws = new AwsService(options);
+  public constructor(aws: AwsService, dataSetKeyTypeId: string) {
+    this._aws = aws;
     this._dataSetKeyType = dataSetKeyTypeId;
   }
 
@@ -82,7 +82,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       pk: `${this._dataSetKeyType}#${dataSet.name}`,
       sk: `${this._dataSetKeyType}#${dataSet.name}`
     };
-    const dataSetParams: { item: { [key: string]: string | string[] } } = {
+    const dataSetParams = {
       item: {
         id: dataSet.Id as string,
         name: dataSet.name,
@@ -93,8 +93,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       }
     };
 
-    if (dataSet.externalEndpoints)
-      dataSetParams.item.externalEndpoints = dataSet.externalEndpoints as string[];
+    if (dataSet.externalEndpoints) _.set(dataSetParams.item, 'externalEndpoints', dataSet.externalEndpoints);
 
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 

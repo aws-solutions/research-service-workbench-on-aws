@@ -28,7 +28,7 @@ export interface DataSetMetadataPlugin {
   listDataSetObjects(dataSetName: string): Promise<string[]>;
 
   /**
-   * Get the metadata assoicated with a given object in a given DataSet.
+   * Get the metadata associated with a given object in a given DataSet.
    *
    * @param dataSetName - the name of the DataSet which contains the object.
    * @param objectName - the name of the object.
@@ -44,7 +44,7 @@ export interface DataSetMetadataPlugin {
   addDataSet(dataSet: DataSet): Promise<DataSet>;
 
   /**
-   * Udpate a DataSet
+   * Update a DataSet
    * @param dataSet - the updated DataSet data.
    */
   updateDataSet(dataSet: DataSet): Promise<DataSet>;
