@@ -70,6 +70,6 @@ export class AuthenticationService {
   }
 
   public getLogoutUrl(state: string, codeChallenge: string): string {
-    return `https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com`;
+    return 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com';
   }
 }
