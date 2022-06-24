@@ -33,7 +33,7 @@ export interface DataSetMetadataPlugin {
    * @param dataSetName - the name of the DataSet which contains the object.
    * @param objectName - the name of the object.
    *
-   * @returns the metadata assoicated with the object.
+   * @returns the metadata associated with the object.
    */
   getDataSetObjectMetadata(dataSetName: string, objectName: string): Promise<Record<string, string>>;
 
