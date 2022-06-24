@@ -40,7 +40,7 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -244,7 +244,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -259,14 +259,11 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-
-      "name": "cors",
-
+      "name": "cookie-parser",
       "allowedCategories": [ "production" ]
-
     },
     {
-      "name": "cookie-parser",
+      "name": "cors",
       "allowedCategories": [ "production" ]
     },
     {
@@ -391,14 +388,11 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
-
       "name": "swr",
-
       "allowedCategories": [ "production" ]
-
     },
     {
       "name": "triple-beam",

@@ -20,6 +20,7 @@
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "compile": "scripts/buildLambda.js",
     "depcheck": "depcheck",
+    "integration-tests": "jest integration-tests",
     "jest": "jest",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
@@ -27,8 +28,7 @@
     "run-postDeployment": "rush build && node lib/postDeployment.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "test:only": "heft test --clean --no-build",
-    "integration-tests": "jest integration-tests"
+    "test:only": "heft test --clean --no-build"
   },
   "jest": {
     "moduleFileExtensions": [
