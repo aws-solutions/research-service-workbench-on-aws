@@ -5,19 +5,19 @@ import ClientSession from './clientSession';
 import Settings from './utils/settings';
 
 export default class Setup {
-  public settings: Settings;
+  private _settings: Settings;
   private _sessions: ClientSession[] = [];
 
   public constructor() {
     // @ts-ignore
-    this.settings = new Settings(global['__settings__']);
+    this._settings = new Settings(global['__settings__']);
 
     // Retry failed tests up to three times
     jest.retryTimes(3);
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
-    const session = await this._getClientSession(this.settings);
+    const session = await this._getClientSession(this._settings);
     this._sessions.push(session);
 
     return session;
@@ -36,6 +36,10 @@ export default class Setup {
     }
 
     this._sessions = []; // This way if the cleanup() method is called again, we don't need to cleanup again
+  }
+
+  public getSettings(): Settings {
+    return this._settings;
   }
 
   // TODO: Implement once Auth is integrated in SWB

@@ -7,7 +7,7 @@ export default class ClientSession {
   private _settings: Settings;
   private _cleanupQueue: CleanupTask[];
   private _isAnonymousSession: boolean;
-  private _axiosClient: AxiosInstance;
+  private _axiosInstance: AxiosInstance;
   private _resources: Resources;
 
   public constructor(settings: Settings, idToken?: string) {
@@ -26,7 +26,7 @@ export default class ClientSession {
       headers.Authorization = idToken;
     }
 
-    this._axiosClient = axios.create({
+    this._axiosInstance = axios.create({
       baseURL: this._settings.get('apiBaseUrl'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
@@ -42,7 +42,7 @@ export default class ClientSession {
     // this.user = await this.resources.currentUser.get();
   }
 
-  public async cleanup() {
+  public async cleanup(): Promise<void> {
     // We need to reverse the order of the queue before we execute the cleanup tasks
     const items = _.reverse(_.slice(this._cleanupQueue));
 
@@ -68,6 +68,14 @@ export default class ClientSession {
   // id in the queue, all of the tasks with the matching id will be removed.
   public removeCleanupTask(id: string): CleanupTask[] {
     return _.remove(this._cleanupQueue, ['id', id]);
+  }
+
+  public getAxiosInstance(): AxiosInstance {
+    return this._axiosInstance;
+  }
+
+  public getSettings(): Settings {
+    return this._settings;
   }
 }
 
