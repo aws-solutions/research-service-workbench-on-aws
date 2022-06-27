@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "56b7ea82-f4d0-4860-b94c-8a55fb4c4fb8",
+    "_postman_id": "94dc7ac2-7e3f-4ac5-8ae8-ffe85734bffb",
     "name": "SWBv2",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "4320586"
@@ -21,7 +21,8 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": null
+                  "value": null,
+                  "description": "ID of environment to terminate"
                 }
               ]
             }
@@ -62,7 +63,8 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": null
+                  "value": null,
+                  "description": "ID of environment to start"
                 }
               ]
             }
@@ -81,7 +83,8 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": null
+                  "value": null,
+                  "description": "ID of environment to stop"
                 }
               ]
             }
@@ -100,7 +103,8 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": null
+                  "value": null,
+                  "description": "ID of environment to GET metadata"
                 }
               ]
             }
@@ -123,14 +127,49 @@
                   "disabled": true
                 },
                 {
+                  "key": "name",
+                  "value": "testEnv",
+                  "disabled": true
+                },
+                {
+                  "key": "createdAt",
+                  "value": "2022-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "owner",
+                  "value": "user-123",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "envType-123",
+                  "disabled": true
+                },
+                {
+                  "key": "project",
+                  "value": "project-123",
+                  "disabled": true
+                },
+                {
+                  "key": "ascending",
+                  "value": "name",
+                  "disabled": true
+                },
+                {
+                  "key": "descending",
+                  "value": "name",
+                  "disabled": true
+                },
+                {
                   "key": "paginationToken",
                   "value": null,
-                  "diasbled": true
+                  "disabled": true
                 },
                 {
                   "key": "pageSize",
-                  "value": 50,
-                  "diasbled": true
+                  "value": null,
+                  "disabled": true
                 }
               ]
             }
@@ -149,7 +188,221 @@
               "variable": [
                 {
                   "key": "id",
+                  "value": null,
+                  "description": "ID of environment to get connection information"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "envType",
+      "item": [
+        {
+          "name": "Create envType",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemaker\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update envType",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
                   "value": null
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All envTypes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get envType",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:id",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "ID of envType to get metadata"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "envTypeConfig",
+      "item": [
+        {
+          "name": "Create envTypeConfig",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"productId\": \"prod-77ncg2cb3bx4g\",\n    \"provisioningArtifactId\": \"pa-hs4ex4okpbl7e\",\n    \"allowRoleIds\": [],\n    \"type\": \"sagemaker\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create envTypeConfig",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"allowRoleIds\": [],\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get envTypeConfig",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All envTypeConfigs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "eyJwayI6IkVUQyIsInNrIjoiRVQjNmM3MzJlMTEtODdmYi00MGU3LWFlM2ItMjU1MTY1OGQ3OGYwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
                 }
               ]
             }
@@ -166,7 +419,6 @@
         "body": {
           "mode": "raw",
           "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
-
           "options": {
             "raw": {
               "language": "json"

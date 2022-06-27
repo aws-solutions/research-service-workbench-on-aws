@@ -23,6 +23,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authorization",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
       "allowedCategories": [ "production" ]
     },
@@ -259,6 +263,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cors",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -393,6 +401,10 @@
     {
       "name": "source-map-support",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "swr",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

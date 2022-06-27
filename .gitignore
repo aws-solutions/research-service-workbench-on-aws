@@ -97,6 +97,8 @@ solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/.aws-sam/
 solutions/managed-blockchain-for-patient-consent/*/build
 
+# local environment variables
+.env*.local
 
 # example package
 workbench-core/example/infrastructure/build

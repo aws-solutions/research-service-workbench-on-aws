@@ -1,14 +1,18 @@
+import cors from 'cors';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpEnvRoutes } from './environmentRoutes';
+import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
+import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   const router: Router = express.Router();
 
+  app.use(cors({ origin: apiRouteConfig.allowedOrigins }));
   // parse application/json
   app.use(express.json());
 
@@ -24,10 +28,10 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     });
   });
 
-  // TODO: Enable CORS so UI can make requests to backend
-
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
+  setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
+  setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

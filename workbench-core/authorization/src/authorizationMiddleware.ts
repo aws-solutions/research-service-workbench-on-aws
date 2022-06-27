@@ -1,5 +1,5 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { NextFunction, Request, Response } from 'express';
+import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationService from './authorizationService';
 import { HTTPMethod, HTTPMethods } from './routesMap';
 /**
@@ -46,7 +46,7 @@ export default function withAuth(
    */
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const route: string = req.originalUrl;
+      const route: string = req.path;
       const method: string = req.method;
       if (checkMethod(method)) {
         if (await authorizationService.isRouteIgnored(route, method)) {

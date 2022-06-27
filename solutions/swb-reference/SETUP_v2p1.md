@@ -189,6 +189,17 @@ the following values
 If you would like to launch a sagemaker instance with a different instance type than `ml.t3.medium`, you can replace that value
 in the JSON above.
 
+### Setup API URL in client Application
+
+Setup environment variable `NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"`
+
+For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
+
+```
+NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"
+```
+
+
 ### Setup Account Resources
 
 #### POSTMAN Setup

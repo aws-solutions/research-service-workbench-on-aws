@@ -3,7 +3,7 @@
 import { join } from 'path';
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -21,7 +21,6 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
@@ -231,7 +230,7 @@ export class SWBStack extends Stack {
 
   private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
+      code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -278,7 +277,7 @@ export class SWBStack extends Stack {
     ddbTableArn: string
   ): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
+      code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -363,7 +362,7 @@ export class SWBStack extends Stack {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
+      code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -439,25 +438,38 @@ export class SWBStack extends Stack {
       value: API.url
     });
 
-    const alias = new Alias(this, 'LiveAlias', {
-      aliasName: 'live',
-      version: apiLambda.currentVersion,
-      provisionedConcurrentExecutions: 1
-    });
-
-    API.root.addProxy({
-      defaultIntegration: new LambdaIntegration(alias)
-    });
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      // SAM local start-api doesn't work with ALIAS so this is the workaround to allow us to run the code locally
+      // https://github.com/aws/aws-sam-cli/issues/2227
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(apiLambda)
+      });
+    } else {
+      const alias = new Alias(this, 'LiveAlias', {
+        aliasName: 'live',
+        version: apiLambda.currentVersion,
+        provisionedConcurrentExecutions: 1
+      });
+      API.root.addProxy({
+        defaultIntegration: new LambdaIntegration(alias)
+      });
+    }
   }
 
   // DynamoDB Table
   private _createDDBTable(apiLambda: Function): Table {
-    // Ideally, this needs to involve the solution name
     const tableName: string = `${this.stackName}`;
     const table = new Table(this, tableName, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
-      tableName: tableName
+      tableName: tableName,
+      billingMode: BillingMode.PAY_PER_REQUEST
+    });
+    // Add GSI for get resource by name
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByName',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'name', type: AttributeType.STRING }
     });
     // Add GSI for get resource by status
     table.addGlobalSecondaryIndex({
@@ -465,17 +477,30 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'status', type: AttributeType.STRING }
     });
+    // Add GSI for get resource by createdAt
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByCreatedAt',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'createdAt', type: AttributeType.STRING }
+    });
+    // Add GSI for get resource by dependency
+    table.addGlobalSecondaryIndex({
+      indexName: 'getResourceByDependency',
+      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+      sortKey: { name: 'dependency', type: AttributeType.STRING }
+    });
     // Add GSI for get resource by owner
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByOwner',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'owner', type: AttributeType.STRING }
     });
-    // Add GSI for get resource by updatedAt
+    // TODO Add GSI for get resource by cost
+    // Add GSI for get resource by type
     table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByUpdatedAt',
+      indexName: 'getResourceByType',
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'updatedAt', type: AttributeType.STRING }
+      sortKey: { name: 'type', type: AttributeType.STRING }
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
