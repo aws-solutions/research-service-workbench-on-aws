@@ -30,7 +30,7 @@ async function run(): Promise<void> {
     USER_POOL_NAME
   });
 
-  const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../src/environment'));
+  const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../../src/environment'));
   await scSetup.run(cfnFilePaths);
   await cognitoSetup.run();
   await uploadOnboardAccountCfnToS3();
@@ -44,7 +44,7 @@ async function uploadOnboardAccountCfnToS3(): Promise<void> {
   const { [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn } = await cfService.getCfnOutput(STACK_NAME, [
     S3_ARTIFACT_BUCKET_ARN_NAME
   ]);
-  const onboardAccountFilePath = join(__dirname, '../src/templates/onboard-account.cfn.yaml');
+  const onboardAccountFilePath = join(__dirname, '../../src/templates/onboard-account.cfn.yaml');
   const onboardAccountFile = fs.readFileSync(onboardAccountFilePath);
   const s3Service = awsService.helpers.s3;
   await s3Service.uploadFiles(s3ArtifactBucketArn, [
