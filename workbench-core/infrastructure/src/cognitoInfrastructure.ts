@@ -1,11 +1,12 @@
 import {
   AccountRecovery,
+  IUserPoolIdentityProvider,
   Mfa,
   OAuthScope,
   UserPool,
   UserPoolClient,
   UserPoolClientOptions,
-  UserPoolClientProps,
+  UserPoolDomain,
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { Construct } from 'constructs';
@@ -22,25 +23,19 @@ const userPoolDefaults: UserPoolProps = {
     username: false,
     email: true
   },
-  signInCaseSensitive: false
-};
-
-/**
- * Defines a Cognito User Pool with Workbech defaults
- */
-export class WorkbenchUserPool extends UserPool {
-  /**
-   *
-   * @param scope - the scope of the user pool
-   * @param id - the id of the user pool
-   * @param props - the {@link UserPoolProps} object
-   */
-  public constructor(scope: Construct, id: string, props?: UserPoolProps) {
-    const completeProps = merge(props, userPoolDefaults);
-
-    super(scope, id, completeProps);
+  signInCaseSensitive: false,
+  standardAttributes: {
+    givenName: {
+      required: true
+    },
+    familyName: {
+      required: true
+    },
+    email: {
+      required: true
+    }
   }
-}
+};
 
 const userPoolClientDefaults: UserPoolClientOptions = {
   generateSecret: true,
@@ -59,19 +54,41 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   enableTokenRevocation: true
 };
 
-/**
- * Defines a Cognito User Pool Client with Workbech defaults
- */
-export class WorkbenchUserPoolClient extends UserPoolClient {
-  /**
-   *
-   * @param scope - the scope of the user pool
-   * @param id - the id of the user pool
-   * @param props - the {@link UserPoolClientProps} object
-   */
-  public constructor(scope: Construct, id: string, props: UserPoolClientProps) {
-    const completeProps = merge(props, userPoolClientDefaults);
+export interface WorkbenchCognitoProps {
+  domainPrefix: string;
+  websiteUrl: string;
+  userPoolName?: string;
+  identityProviders?: IUserPoolIdentityProvider[];
+}
 
-    super(scope, id, completeProps);
+export class WorkbenchCognito extends Construct {
+  public readonly userPool: UserPool;
+  public readonly userPoolClient: UserPoolClient;
+  public readonly userPoolDomain: UserPoolDomain;
+
+  public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
+    const { domainPrefix, websiteUrl, userPoolName, identityProviders } = props;
+    super(scope, id);
+
+    this.userPool = new UserPool(this, 'WorkbenchUserPool', { ...userPoolDefaults, userPoolName });
+
+    this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
+      userPool: this.userPool,
+      cognitoDomain: { domainPrefix: domainPrefix }
+    });
+
+    const tempProps: UserPoolClientOptions = {
+      oAuth: {
+        callbackUrls: [websiteUrl],
+        logoutUrls: [websiteUrl]
+      }
+    };
+    const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
+    this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
+      ...userPoolClientProps,
+      userPool: this.userPool
+    });
+
+    identityProviders?.forEach((provider) => this.userPool.registerIdentityProvider(provider));
   }
 }
