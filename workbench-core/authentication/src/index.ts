@@ -27,9 +27,9 @@ export { getTimeInSeconds } from './utils';
 export {
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
+  isUserLoggedIn,
   logoutUser,
   refreshAccessToken,
   verifyToken
 } from './authenticationMiddleware';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
-export { UserManagementService } from './userManagementService';

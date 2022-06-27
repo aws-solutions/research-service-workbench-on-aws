@@ -44,7 +44,7 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -248,7 +248,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -261,10 +261,6 @@
     {
       "name": "constructs",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "cookie-parser",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "cors",
@@ -392,7 +388,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "swr",
