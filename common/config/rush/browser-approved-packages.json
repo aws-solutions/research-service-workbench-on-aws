@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@amzn/patient-consent-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/swb-app",
       "allowedCategories": [ "production" ]
     },

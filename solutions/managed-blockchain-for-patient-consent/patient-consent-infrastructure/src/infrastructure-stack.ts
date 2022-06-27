@@ -88,37 +88,7 @@ export class InfrastructureStack extends Stack {
       validateRequestParameters: false
     });
 
-    const patient = restApi.root.addResource('patient');
-    patient.addResource('signup').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
-
-    const organization = restApi.root.addResource('organization');
-    organization.addResource('set-org').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
-    organization.addResource('get-org').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
-
-    const consent = restApi.root.addResource('consent');
-    consent.addResource('set-consent').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
-    consent.addResource('get-consent').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
-    consent.addResource('revoke').addMethod('POST', new LambdaIntegration(lambdaService), {
+    restApi.root.addResource('patient-consent').addMethod('POST', new LambdaIntegration(lambdaService), {
       requestValidator: requestValidator,
       authorizationType: AuthorizationType.IAM,
       apiKeyRequired: false
@@ -139,34 +109,34 @@ export class InfrastructureStack extends Stack {
     );
     NagSuppressions.addResourceSuppressionsByPath(
       this,
-      '/InfrastructureStack/RestApi/Default/organization/set-org/POST/Resource',
+      '/InfrastructureStack/RestApi/Default/patient-consent/POST/Resource',
       [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
     );
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/RestApi/Default/organization/get-org/POST/Resource',
-      [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
-    );
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/RestApi/Default/consent/revoke/POST/Resource',
-      [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
-    );
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/RestApi/Default/consent/set-consent/POST/Resource',
-      [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
-    );
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/RestApi/Default/consent/get-consent/POST/Resource',
-      [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
-    );
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/RestApi/Default/patient/signup/POST/Resource',
-      [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
-    );
+    // NagSuppressions.addResourceSuppressionsByPath(
+    //   this,
+    //   '/InfrastructureStack/RestApi/Default/organization/get-org/POST/Resource',
+    //   [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
+    // );
+    // NagSuppressions.addResourceSuppressionsByPath(
+    //   this,
+    //   '/InfrastructureStack/RestApi/Default/consent/revoke/POST/Resource',
+    //   [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
+    // );
+    // NagSuppressions.addResourceSuppressionsByPath(
+    //   this,
+    //   '/InfrastructureStack/RestApi/Default/consent/set-consent/POST/Resource',
+    //   [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
+    // );
+    // NagSuppressions.addResourceSuppressionsByPath(
+    //   this,
+    //   '/InfrastructureStack/RestApi/Default/consent/get-consent/POST/Resource',
+    //   [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
+    // );
+    // NagSuppressions.addResourceSuppressionsByPath(
+    //   this,
+    //   '/InfrastructureStack/RestApi/Default/patient/signup/POST/Resource',
+    //   [{ id: 'AwsSolutions-COG4', reason: 'We will use IAM and API key' }]
+    // );
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/InfrastructureStack/RestApi/DeploymentStage.prod/Resource',

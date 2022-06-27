@@ -1,7 +1,7 @@
 {
   "name": "@amzn/patient-consent-express",
   "version": "0.0.1",
-  "description": "Patient Consent Express App",
+  "description": "Example Express App",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
     "type": "git",
@@ -26,7 +26,10 @@
     "test": "rushx test:only",
     "test:only": "heft test --clean --no-build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*"
+  },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
