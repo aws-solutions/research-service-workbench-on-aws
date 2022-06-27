@@ -19,9 +19,13 @@ export class InfrastructureStack extends Stack {
     const availabilityZone = isEmpty(this.node.tryGetContext('availabilityZone'))
       ? Stack.of(this).availabilityZones[0]
       : this.node.tryGetContext('availabilityZone');
+    const prefix = isEmpty(this.node.tryGetContext('prefix'))
+      ? Stack.of(this).availabilityZones[0]
+      : 'consent-mgmt';
     const accountId = cdk.Stack.of(this).account;
     const network = new hyperledger.HyperledgerFabricNetwork(this, 'V2TestNetwork', {
       networkName: 'TestNetwork',
+      prefix,
       memberName: `TestMember-${accountId}`,
       networkEdition: hyperledger.NetworkEdition.STARTER,
       networkId,

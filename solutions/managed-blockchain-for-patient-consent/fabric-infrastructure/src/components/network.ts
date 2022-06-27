@@ -77,6 +77,11 @@ export interface HyperledgerFabricNetworkProps {
   readonly memberName: string;
 
   /**
+   * Prefix for resource naming
+   */
+  readonly prefix: string;
+
+  /**
    * Managed Blockchain member description
    *
    * default - Set to match member name
@@ -262,6 +267,11 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
    */
   public readonly additionalMembers: string[];
 
+  /**
+   * Prefix for resource naming
+   */
+  public readonly prefix: string;
+
   public constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
     super(scope, id);
 
@@ -274,6 +284,7 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
     this.networkName = props.networkName;
     this.networkDescription = props.networkDescription ?? props.networkName;
     this.memberName = props.memberName;
+    this.prefix = props.prefix;
     this.memberDescription = props.memberDescription ?? props.memberName;
     this.frameworkVersion = props.frameworkVersion ?? FrameworkVersion.VERSION_2_2;
     this.networkEdition = props.networkEdition ?? NetworkEdition.STANDARD;

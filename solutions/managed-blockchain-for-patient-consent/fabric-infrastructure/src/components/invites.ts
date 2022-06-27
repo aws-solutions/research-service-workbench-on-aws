@@ -35,8 +35,8 @@ export class HyperledgerFabricInvite extends constructs.Construct {
     super(scope, id);
 
     // Collect metadata on the stack
-    const partition = cdk.Stack.of(this).partition;
-    const region = cdk.Stack.of(this).region;
+    const partition = cdk.Aws.PARTITION;
+    const region = cdk.Aws.REGION;
 
     const memberId = scope.memberId;
     const networkId = scope.networkId;

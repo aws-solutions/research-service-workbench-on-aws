@@ -118,7 +118,7 @@ export class HyperledgerFabricNode extends constructs.Construct {
     super(scope, id);
 
     // Collect metadata on the stack
-    const region = cdk.Stack.of(this).region;
+    const region = cdk.Aws.REGION;
 
     // Populate instance variables from input properties, using defaults if values not provided
     if (typeof props === 'undefined') props = {};

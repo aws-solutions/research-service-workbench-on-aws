@@ -46,14 +46,16 @@ export class HyperledgerFabricClient extends constructs.Construct {
     super(scope, id);
 
     // Collect metadata on the stack
-    const region = cdk.Stack.of(this).region;
+    const region = cdk.Aws.REGION;
 
     // Populate instance variables from input properties, using defaults if values not provided
     props = props ?? {};
     this.vpc =
       props.vpc ??
       new ec2.Vpc(this, 'ClientVpc', {
-        subnetConfiguration: [{ name: `Private`, subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]
+        subnetConfiguration: [
+          { name: `${scope.prefix}-Private`, subnetType: ec2.SubnetType.PRIVATE_ISOLATED }
+        ]
       });
     const vpcEndpointServiceName = scope.vpcEndpointServiceName.replace(`com.amazonaws.${region}.`, '');
 
