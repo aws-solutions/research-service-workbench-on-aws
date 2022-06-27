@@ -11,6 +11,7 @@ import { InfrastructureStack } from './infrastructure-stack';
 const app: App = new cdk.App();
 // eslint-disable-next-line no-new
 new InfrastructureStack(app, 'HyperledgerTestStack', {
+  terminationProtection: true,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION
