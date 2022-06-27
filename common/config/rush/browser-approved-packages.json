@@ -263,6 +263,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cors",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -385,6 +389,10 @@
     {
       "name": "source-map-support",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "swr",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

@@ -1,28 +1,46 @@
 jest.mock('uuid', () => ({
-  v4: jest.fn()
+  v4: jest.fn(() => {
+    return 'sampleDataSetId';
+  })
 }));
-const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
+// const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { AwsService } from '@amzn/workbench-core-base';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  QueryCommand,
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  UpdateItemCommand
+} from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
-import { mockClient } from 'aws-sdk-client-mock';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
 import { DataSet, DdbDataSetMetadataPlugin } from '.';
 
 describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
+
+  const mockDataSetId = 'sampleDataSetId';
+  const mockDataSetName = 'Sample-DataSet';
+  const mockDataSetPath = 'sample-s3-prefix';
+  const mockAwsAccountId = 'Sample-AWS-Account';
+  const mockDataSetStorageType = 'S3';
+  const mockDataSetStorageName = 'S3-Bucket';
+
+  let aws: AwsService;
   let plugin: DdbDataSetMetadataPlugin;
+  let mockDdb: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
 
   beforeEach(() => {
     jest.resetModules();
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
-    mockUuid.v4.mockImplementationOnce(() => 'sampleDataSetId');
-    plugin = new DdbDataSetMetadataPlugin(
-      { region: 'us-east-1', ddbTableName: 'DataSetsTable' },
-      'DS',
-      'endpointKeyId'
-    );
+    // mockUuid.v4.mockImplementationOnce(() => 'sampleDataSetId');
+    aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
+    plugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
+    mockDdb = mockClient(DynamoDBClient);
   });
 
   afterAll(() => {
@@ -31,15 +49,15 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('listDataSets', () => {
     it('returns a DataSet stored in the Database', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(QueryCommand).resolves({
         Items: [
           {
-            id: { S: 'sampleDataSetId' },
-            name: { S: 'Sample-DataSet' },
-            path: { S: 'sample-s3-prefix' },
-            awsAccountId: { S: 'Sample-AWS-Account' },
-            storageType: { S: 'S3' }
+            id: { S: mockDataSetId },
+            name: { S: mockDataSetName },
+            path: { S: mockDataSetPath },
+            awsAccountId: { S: mockAwsAccountId },
+            storageType: { S: mockDataSetStorageType },
+            storageName: { S: mockDataSetStorageName }
           }
         ]
       });
@@ -49,11 +67,12 @@ describe('DdbDataSetMetadataPlugin', () => {
       expect(response).toHaveLength(1);
       expect(response).toEqual([
         {
-          id: 'sampleDataSetId',
-          name: 'Sample-DataSet',
-          path: 'sample-s3-prefix',
-          awsAccountId: 'Sample-AWS-Account',
-          storageType: 'S3'
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
         }
       ]);
     });
@@ -61,57 +80,58 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('getDataSetsMetadata', () => {
     it('returns the sample DataSet when it is found in the database.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(GetItemCommand).resolves({
         Item: {
-          id: { S: 'sampleDataSetId' },
-          name: { S: 'Sample-DataSet' },
-          path: { S: 'sample-s3-prefix' },
-          awsAccountId: { S: 'Sample-AWS-Account' },
-          storageType: { S: 'S3' }
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName }
         }
       });
       const response = await plugin.getDataSetMetadata('Sample-DataSet');
 
       await expect(response).toEqual({
-        id: 'sampleDataSetId',
-        name: 'Sample-DataSet',
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3'
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
       });
     });
 
     it('throws not found when an undefined DataSet item is returned.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(GetItemCommand).resolves({
         Item: undefined
       });
       let response;
 
       try {
-        response = await plugin.getDataSetMetadata('Sample-DataSet');
+        response = await plugin.getDataSetMetadata(mockDataSetName);
+        expect.hasAssertions();
       } catch (err) {
         response = err;
       }
 
       expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual("Could not find DataSet 'Sample-DataSet'.");
+      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetName}'.`);
     });
 
     it('throws not found when no DB response is returned.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(GetItemCommand).resolves({});
       let response;
 
       try {
-        response = await plugin.getDataSetMetadata('Sample-DataSet');
+        response = await plugin.getDataSetMetadata(mockDataSetName);
+        expect.hasAssertions();
       } catch (err) {
         response = err;
       }
 
       expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual("Could not find DataSet 'Sample-DataSet'.");
+      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetName}'.`);
     });
   });
 
@@ -133,32 +153,30 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('addDataSet', () => {
     it("Adds an 'id' to the created DataSet.", async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(UpdateItemCommand).resolves({});
       const exampleDS: DataSet = {
-        name: 'Sample-DataSet',
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3',
-        storageName: 's3 buck'
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
       };
 
       mockDdb.on(GetItemCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
       expect(newDataSet).toEqual(exampleDS);
-      expect(newDataSet.id).toEqual('sampleDataSetId');
+      expect(newDataSet.id).toEqual(mockDataSetId);
     });
 
     it('Does not create a DataSet with no name.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(GetItemCommand).resolves({});
 
       const exampleDS = {
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3'
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
       };
 
       // @ts-ignore
@@ -168,53 +186,53 @@ describe('DdbDataSetMetadataPlugin', () => {
     });
 
     it('Does not create a DataSet with a duplicate name.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(GetItemCommand).resolves({
         Item: {
-          id: { S: 'sampleDataSetId' },
-          name: { S: 'Sample-DataSet' },
-          path: { S: 'sample-s3-prefix' },
-          awsAccountId: { S: 'Sample-AWS-Account' },
-          storageType: { S: 'S3' }
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName }
         }
       });
 
-      const exampleDS: DataSet = {
-        name: 'Sample-DataSet',
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3',
-        storageName: 's3 buck'
+      const exampleDS = {
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
       };
 
       await expect(plugin.addDataSet(exampleDS)).rejects.toThrow(
-        "Cannot create the DataSet. A DataSet must have a unique 'name', and  'Sample-DataSet' already exists. "
+        `Cannot create the DataSet. A DataSet must have a unique 'name', and  '${mockDataSetName}' already exists. `
       );
     });
   });
 
   describe('udpateDataSet', () => {
     it('Returns the updated DataSet when complete.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(GetItemCommand).resolves({
         Item: {
-          id: { S: 'sampleDataSetId' },
-          name: { S: 'Sample-DataSet' },
-          path: { S: 'sample-s3-prefix' },
-          awsAccountId: { S: 'Sample-AWS-Account' },
-          storageType: { S: 'S3' }
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName }
         }
       });
 
-      const exampleDS: DataSet = {
-        id: 'sampleDataSet',
-        name: 'Sample-DataSet',
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3',
-        storageName: 's3 buck'
+      const exampleDS = {
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
@@ -222,26 +240,26 @@ describe('DdbDataSetMetadataPlugin', () => {
   });
   describe('udpateDataSet', () => {
     it('adds optional external endpoints.', async () => {
-      const mockDdb = mockClient(DynamoDBClient);
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(GetItemCommand).resolves({
         Item: {
-          id: { S: 'sampleDataSetId' },
-          name: { S: 'Sample-DataSet' },
-          path: { S: 'sample-s3-prefix' },
-          awsAccountId: { S: 'Sample-AWS-Account' },
-          storageType: { S: 'S3' }
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName }
         }
       });
 
-      const exampleDS: DataSet = {
-        id: 'sampleDataSet',
-        name: 'Sample-DataSet',
-        path: 'sample-s3-prefix',
-        awsAccountId: 'Sample-AWS-Account',
+      const exampleDS = {
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
         externalEndpoints: ['some-endpoint'],
-        storageType: 'S3',
-        storageName: 's3 buck'
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);

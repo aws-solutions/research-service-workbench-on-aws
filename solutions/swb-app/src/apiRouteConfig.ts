@@ -2,7 +2,9 @@ import {
   HostingAccountService,
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
-  EnvironmentService
+  EnvironmentService,
+  EnvironmentTypeService,
+  EnvironmentTypeConfigService
 } from '@amzn/environments';
 import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
 
@@ -13,6 +15,9 @@ export interface ApiRouteConfig {
   environmentService: EnvironmentService;
   dataSetService: DataSetService;
   dataSetsStoragePlugin: DataSetsStoragePlugin;
+  allowedOrigins: string[];
+  environmentTypeService: EnvironmentTypeService;
+  environmentTypeConfigService: EnvironmentTypeConfigService;
 }
 
 export interface ApiRoute {

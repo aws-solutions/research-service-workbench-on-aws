@@ -3,7 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HostingAccountService, EnvironmentService } from '@amzn/environments';
+import {
+  HostingAccountService,
+  EnvironmentService,
+  EnvironmentTypeService,
+  EnvironmentTypeConfigService
+} from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { AuditService, BaseAuditPlugin, Writer, AuditEntry } from '@amzn/workbench-core-audit';
 import {
@@ -63,7 +68,14 @@ const apiRouteConfig: ApiRouteConfig = {
       'ENDPOINT'
     )
   ),
-  dataSetsStoragePlugin: new S3DataSetStoragePlugin({ region: 'us-east-1' })
+  dataSetsStoragePlugin: new S3DataSetStoragePlugin({ region: 'us-east-1' }),
+  allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
+  environmentTypeService: new EnvironmentTypeService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  })
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

@@ -10,15 +10,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _dataSetKeyType: string;
   private _endPointKeyType: string;
 
-  public constructor(
-    options: {
-      region: string;
-      ddbTableName: string;
-    },
-    dataSetKeyTypeId: string,
-    endPointKeyTypeId: string
-  ) {
-    this._aws = new AwsService(options);
+  public constructor(aws: AwsService, dataSetKeyTypeId: string, endPointKeyTypeId: string) {
+    this._aws = aws;
     this._dataSetKeyType = dataSetKeyTypeId;
     this._endPointKeyType = endPointKeyTypeId;
   }

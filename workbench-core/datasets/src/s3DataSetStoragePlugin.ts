@@ -13,7 +13,6 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
-import { Credentials } from '@aws-sdk/types';
 import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
@@ -26,11 +25,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   /**
    *
-   * @param s3Options - options needed to create and maintain the S3 bucket associated with this provider.
+   * @param aws - {@link AwsService}
+   * @param kmsKeyArn - KMS Key ARN.
    */
-  public constructor(s3Options: { region: string; kmsKeyArn?: string }) {
-    this._aws = new AwsService({ region: s3Options.region });
-    this._kmsKeyArn = s3Options.kmsKeyArn;
+  public constructor(aws: AwsService, kmsKeyArn: string) {
+    this._aws = aws;
+    this._kmsKeyArn = kmsKeyArn;
   }
 
   public getStorageType(): string {

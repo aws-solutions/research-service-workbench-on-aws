@@ -20,6 +20,7 @@
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "compile": "scripts/buildLambda.js",
     "depcheck": "depcheck",
+    "integration-tests": "jest integration-tests",
     "jest": "jest",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
