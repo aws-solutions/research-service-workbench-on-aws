@@ -259,14 +259,7 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-
       "name": "cors",
-
-      "allowedCategories": [ "production" ]
-
-    },
-    {
-      "name": "cookie-parser",
       "allowedCategories": [ "production" ]
     },
     {
@@ -394,11 +387,8 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
-
       "name": "swr",
-
       "allowedCategories": [ "production" ]
-
     },
     {
       "name": "triple-beam",
