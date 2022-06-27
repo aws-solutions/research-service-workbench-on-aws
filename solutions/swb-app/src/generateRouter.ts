@@ -2,6 +2,7 @@ import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import { setUpDSRoutes } from './datasetRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
 
@@ -27,6 +28,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // TODO: Enable CORS so UI can make requests to backend
 
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
+  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
   setUpAccountRoutes(router, apiRouteConfig.account);
 
   // Error handling. Order of the error handlers is important

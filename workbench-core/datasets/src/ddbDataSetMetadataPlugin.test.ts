@@ -18,7 +18,11 @@ describe('DdbDataSetMetadataPlugin', () => {
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     mockUuid.v4.mockImplementationOnce(() => 'sampleDataSetId');
-    plugin = new DdbDataSetMetadataPlugin({ region: 'us-east-1', tableName: 'DataSetsTable' }, 'DS');
+    plugin = new DdbDataSetMetadataPlugin(
+      { region: 'us-east-1', ddbTableName: 'DataSetsTable' },
+      'DS',
+      'endpointKeyId'
+    );
   });
 
   afterAll(() => {
@@ -135,7 +139,8 @@ describe('DdbDataSetMetadataPlugin', () => {
         name: 'Sample-DataSet',
         path: 'sample-s3-prefix',
         awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3'
+        storageType: 'S3',
+        storageName: 's3 buck'
       };
 
       mockDdb.on(GetItemCommand).resolves({});
@@ -175,11 +180,12 @@ describe('DdbDataSetMetadataPlugin', () => {
         }
       });
 
-      const exampleDS = {
+      const exampleDS: DataSet = {
         name: 'Sample-DataSet',
         path: 'sample-s3-prefix',
         awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3'
+        storageType: 'S3',
+        storageName: 's3 buck'
       };
 
       await expect(plugin.addDataSet(exampleDS)).rejects.toThrow(
@@ -202,12 +208,13 @@ describe('DdbDataSetMetadataPlugin', () => {
         }
       });
 
-      const exampleDS = {
+      const exampleDS: DataSet = {
         id: 'sampleDataSet',
         name: 'Sample-DataSet',
         path: 'sample-s3-prefix',
         awsAccountId: 'Sample-AWS-Account',
-        storageType: 'S3'
+        storageType: 'S3',
+        storageName: 's3 buck'
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
@@ -227,13 +234,14 @@ describe('DdbDataSetMetadataPlugin', () => {
         }
       });
 
-      const exampleDS = {
+      const exampleDS: DataSet = {
         id: 'sampleDataSet',
         name: 'Sample-DataSet',
         path: 'sample-s3-prefix',
         awsAccountId: 'Sample-AWS-Account',
         externalEndpoints: ['some-endpoint'],
-        storageType: 'S3'
+        storageType: 'S3',
+        storageName: 's3 buck'
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);

@@ -31,6 +31,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-datasets",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-example-express",
       "allowedCategories": [ "prototypes" ]
     },

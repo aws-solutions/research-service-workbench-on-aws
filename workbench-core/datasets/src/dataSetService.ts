@@ -2,7 +2,7 @@ import { AuditService } from '@amzn/workbench-core-audit';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
+import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -132,7 +132,7 @@ export class DataSetService {
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
     targetDS.externalEndpoints.push(externalRoleName);
-    this._dbProvider.updateDataSet(targetDS);
+    await this._dbProvider.updateDataSet(targetDS);
     return mountString;
   }
 }

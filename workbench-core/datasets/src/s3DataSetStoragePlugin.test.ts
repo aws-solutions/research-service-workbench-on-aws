@@ -27,7 +27,6 @@ describe('S3DataSetStoragePlugin', () => {
 
         const plugin = new S3DataSetStoragePlugin({
           region: 'us-east-1',
-          credentials: awsCreds,
           kmsKeyArn: kmsKeyArn
         });
 
@@ -48,7 +47,6 @@ describe('S3DataSetStoragePlugin', () => {
 
         const plugin = new S3DataSetStoragePlugin({
           region: 'us-east-1',
-          credentials: awsCreds,
           kmsKeyArn: 'not an Arn'
         });
 
@@ -72,7 +70,6 @@ describe('S3DataSetStoragePlugin', () => {
 
         const plugin = new S3DataSetStoragePlugin({
           region: 'us-east-1',
-          credentials: awsCreds,
           kmsKeyArn: 'not an Arn'
         });
 
@@ -100,7 +97,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -168,7 +164,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -240,7 +235,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:s3:us-east-1:123456789012:accesspoint/${endPointNameNoColon}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -308,7 +302,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -348,7 +341,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -416,7 +408,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -491,7 +482,6 @@ describe('S3DataSetStoragePlugin', () => {
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -565,7 +555,6 @@ describe('S3DataSetStoragePlugin', () => {
 
         const plugin = new S3DataSetStoragePlugin({
           region: 'us-east-1',
-          credentials: awsCreds,
           kmsKeyArn: 'not an Arn'
         });
 
@@ -588,7 +577,6 @@ describe('S3DataSetStoragePlugin', () => {
 
         const plugin = new S3DataSetStoragePlugin({
           region: 'us-east-1',
-          credentials: awsCreds,
           kmsKeyArn: 'not an Arn'
         });
 
@@ -629,7 +617,6 @@ describe('S3DataSetStoragePlugin', () => {
 
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -648,7 +635,6 @@ describe('S3DataSetStoragePlugin', () => {
 
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 
@@ -667,7 +653,6 @@ describe('S3DataSetStoragePlugin', () => {
 
       const plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: awsCreds,
         kmsKeyArn: 'not an Arn'
       });
 

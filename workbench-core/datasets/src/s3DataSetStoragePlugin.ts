@@ -22,14 +22,14 @@ import { DataSetsStoragePlugin } from '.';
  */
 export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _aws: AwsService;
-  private _kmsKeyArn: string;
+  private _kmsKeyArn?: string;
 
   /**
    *
    * @param s3Options - options needed to create and maintain the S3 bucket associated with this provider.
    */
-  public constructor(s3Options: { region: string; credentials: Credentials; kmsKeyArn: string }) {
-    this._aws = new AwsService({ region: s3Options.region, credentials: s3Options.credentials });
+  public constructor(s3Options: { region: string; kmsKeyArn?: string }) {
+    this._aws = new AwsService({ region: s3Options.region });
     this._kmsKeyArn = s3Options.kmsKeyArn;
   }
 
@@ -38,7 +38,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   /**
-   * Create a new DataSet storage location. For S3, this is a prefix within a bucket.
+   * Create a new DataSet storage location. For S3, this is a prefix within an existing S3 bucket.
    * @param name - the name of the S3 bucket where the storage should reside.
    * @param path - the prefix to create for the dataset.
    *
@@ -49,8 +49,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     const params: PutObjectCommandInput = {
       Bucket: name,
       ContentLength: 0,
-      Key: objectKey,
-      ServerSideEncryption: this._kmsKeyArn
+      Key: objectKey
     };
 
     await this._aws.clients.s3.putObject(params);

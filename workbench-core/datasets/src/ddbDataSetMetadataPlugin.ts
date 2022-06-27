@@ -13,7 +13,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public constructor(
     options: {
       region: string;
-      tableName: string;
+      ddbTableName: string;
     },
     dataSetKeyTypeId: string,
     endPointKeyTypeId: string
@@ -25,7 +25,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   public async listDataSets(): Promise<DataSet[]> {
     const params: QueryParams = {
-      index: 'getResourceByUpdatedAt',
+      index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'dataset' }
     };
     const response: QueryCommandOutput = await this._aws.helpers.ddb.query(params).execute();
@@ -72,10 +72,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return dataSet;
   }
 
-  public async addExternalEndpoint(endPoint: ExternalEndpoint) {
+  public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
-    endPoint.Id = uuidv4();
+    endPointParam.Id = uuidv4();
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
   }
 

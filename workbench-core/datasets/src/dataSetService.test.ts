@@ -3,6 +3,7 @@ jest.mock('@amzn/workbench-core-logging');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
 import { LoggingService } from '@amzn/workbench-core-logging';
+import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetService, S3DataSetStoragePlugin } from '.';
 
 describe('DataSetService', () => {
@@ -10,6 +11,7 @@ describe('DataSetService', () => {
   let audit: AuditService;
   let log: LoggingService;
   const notImplementedText: string = 'Not yet implemented.';
+  let metaPlugin: DdbDataSetMetadataPlugin;
 
   beforeEach(() => {
     writer = {
@@ -19,11 +21,16 @@ describe('DataSetService', () => {
     audit = new AuditService(new BaseAuditPlugin(writer), true);
 
     log = new LoggingService();
+    metaPlugin = new DdbDataSetMetadataPlugin(
+      { region: 'us-east-1', ddbTableName: 'DataSetsTable' },
+      'DS',
+      'endpointKeyId'
+    );
   });
 
   describe('constructor', () => {
     it('sets a private audit and log service', () => {
-      const service = new DataSetService(audit, log);
+      const service = new DataSetService(audit, log, metaPlugin);
 
       expect(service[`_audit`]).toBe(audit);
       expect(service[`_log`]).toBe(log);
@@ -35,21 +42,17 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log);
+      service = new DataSetService(audit, log, metaPlugin);
       plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: {
-          accessKeyId: 'fakeKey',
-          secretAccessKey: 'fakeSecret'
-        },
         kmsKeyArn: 'not an arn!'
       });
     });
 
     it('throws not implemented when called', async () => {
-      await expect(async () => service.provisionDataSet('name', plugin)).rejects.toThrow(
-        new Error(notImplementedText)
-      );
+      await expect(async () =>
+        service.provisionDataSet('name', 'storageName', 'path', 'accountId', plugin)
+      ).rejects.toThrow(new Error(notImplementedText));
     });
   });
 
@@ -58,21 +61,17 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log);
+      service = new DataSetService(audit, log, metaPlugin);
       plugin = new S3DataSetStoragePlugin({
         region: 'us-east-1',
-        credentials: {
-          accessKeyId: 'fakeKey',
-          secretAccessKey: 'fakeSecret'
-        },
         kmsKeyArn: 'not an arn!'
       });
     });
 
     it('throws not implemented when called', async () => {
-      await expect(async () => service.importDataSet('name', plugin)).rejects.toThrow(
-        new Error(notImplementedText)
-      );
+      await expect(async () =>
+        service.provisionDataSet('name', 'storageName', 'path', 'accountId', plugin)
+      ).rejects.toThrow(new Error(notImplementedText));
     });
   });
 
@@ -80,7 +79,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log);
+      service = new DataSetService(audit, log, metaPlugin);
     });
 
     it('throws not implemented when called', async () => {
@@ -92,7 +91,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log);
+      service = new DataSetService(audit, log, metaPlugin);
     });
 
     it('throws not implemented when called', async () => {
