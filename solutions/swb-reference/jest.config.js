@@ -1,39 +1,37 @@
+const path = require('path');
+const yaml = require('js-yaml');
+const { join } = require('path');
+const fs = require('fs');
 const options = {
-  // extends: '@rushstack/heft-node-rig/profiles/default/config/jest.config.json',
-  collectCoverage: true,
   transform: {
     '\\.(ts)$': 'ts-jest'
   },
-  moduleFileExtensions: ['ts', 'js'],
-  coveragePathIgnorePatterns: [
-    '<rootDir>/src/SWBStack.ts',
-    '<rootDir>/src/backendAPI.ts',
-    '<rootDir>/src/accountHandlerWrapper.ts',
-    '<rootDir>/src/index.ts',
-    '<rootDir>/src/environment/workflow.ts',
-    '<rootDir>/src/accountHandlerLambda.ts',
-    '<rootDir>/src/environment/statusHandlerLambda.ts',
-    '<rootDir>/src/backendAPILambda.ts',
-    '<rootDir>/src/constants.ts',
-    '<rootDir>/src/postDeployment.ts'
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
-    }
-  },
-  coverageReporters: ['json-summary', 'json']
+  moduleFileExtensions: ['ts', 'js']
 };
 
+let settings;
+async function init() {
+  // jest might call the jest.config exported async function multiple times, we don't need to be doing
+  // the global initialization logic multiple times.
+  if (settings) return;
+
+  const stage = process.env.STAGE;
+
+  const config = yaml.load(
+    fs.readFileSync(join(__dirname, `integration-tests/config/${stage}.yaml`), 'utf8')
+  );
+
+  settings = {
+    apiBaseUrl: config.apiBaseUrl
+  };
+}
+
 module.exports = async () => {
-  console.log('inside jest config');
+  await init();
   return {
     ...options,
     globals: {
-      __settings__: { message: 'Hello world 2' }
+      __settings__: settings
     }
   };
 };
