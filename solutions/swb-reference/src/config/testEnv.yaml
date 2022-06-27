@@ -4,3 +4,9 @@ awsRegion: us-east-1
 awsRegionShortName: va
 rootUserEmail: aws-chamonix-dev+testEnvRoot@amazon.com
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+
+cognitoDomain: 'sample-domain'
+userPoolId: 'sampleUserPoolId'
+clientId: 'sampleClientId'
+clientSecret: 'sampleClientSecret'
+websiteUrl: 'http://localhost:3000'
