@@ -15,6 +15,7 @@ import {
 } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
@@ -32,6 +33,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   const router: Router = express.Router();
 
+  app.use(cors({ origin: apiRouteConfig.allowedOrigins }));
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
@@ -80,8 +82,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
       res.send(response);
     });
   });
-
-  // TODO: Enable CORS so UI can make requests to backend
 
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);

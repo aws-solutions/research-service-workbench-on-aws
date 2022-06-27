@@ -3,7 +3,10 @@
   "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
   "compilerOptions": {
     "types": ["heft-jest", "node"],
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
+    "rootDirs": ["src", "integration-tests"],
+    "rootDir": ""
   },
+  "include": ["src/**/*.ts", "integration-tests/**/*.ts"],
   "exclude": ["node_modules", "lib"]
 }
