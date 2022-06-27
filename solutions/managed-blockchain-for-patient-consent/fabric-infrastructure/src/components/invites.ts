@@ -3,9 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import * as cdk from 'aws-cdk-lib';
 import { join } from 'path';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejsLambda from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -14,7 +13,6 @@ import * as customresources from 'aws-cdk-lib/custom-resources';
 import * as constructs from 'constructs';
 
 import * as network from './network';
-import * as utilities from './utilities';
 
 /**
  * Creates custom resources to enroll admin and register user
@@ -33,7 +31,7 @@ export class HyperledgerFabricInvite extends constructs.Construct {
    */
   public inviteProvider: customresources.Provider;
 
-  constructor(scope: network.HyperledgerFabricNetwork, id: string) {
+  public constructor(scope: network.HyperledgerFabricNetwork, id: string) {
     super(scope, id);
 
     // Collect metadata on the stack

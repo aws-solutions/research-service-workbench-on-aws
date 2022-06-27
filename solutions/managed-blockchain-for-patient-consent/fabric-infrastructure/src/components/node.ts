@@ -32,7 +32,10 @@ export enum InstanceType {
 /**
  * Valid instance types for starter networks
  */
-export const STARTER_INSTANCE_TYPES = [InstanceType.BURSTABLE3_SMALL, InstanceType.BURSTABLE3_MEDIUM];
+export const STARTER_INSTANCE_TYPES: InstanceType[] = [
+  InstanceType.BURSTABLE3_SMALL,
+  InstanceType.BURSTABLE3_MEDIUM
+];
 
 /**
  * Construct properties for `HyperledgerFabricNode`
@@ -40,25 +43,25 @@ export const STARTER_INSTANCE_TYPES = [InstanceType.BURSTABLE3_SMALL, InstanceTy
 export interface HyperledgerFabricNodeProps {
   /**
    * The Availability Zone in which the node will be created
-   * @default - The first AZ in the region
+   * default - The first AZ in the region
    */
   readonly availabilityZone?: string;
 
   /**
    * The Amazon Managed Blockchain instance type for the node
-   * @default - BURSTABLE3_SMALL
+   * default - BURSTABLE3_SMALL
    */
   readonly instanceType?: InstanceType;
 
   /**
    * The configuration to enable or disable chaincode logging
-   * @default - true
+   * default - true
    */
   readonly enableChaincodeLogging?: boolean;
 
   /**
    * The configuration to enable or disable node logging
-   * @default - true
+   * default - true
    */
   readonly enableNodeLogging?: boolean;
 }
@@ -67,28 +70,6 @@ export interface HyperledgerFabricNodeProps {
  * Creates a Hyperledger Fabric node on an Amazon Managed Blockchain network
  */
 export class HyperledgerFabricNode extends constructs.Construct {
-  /*
-   * Build out a list of HyperledgerFabricNode constructs given a list of input property
-   * objects; additionally checks to ensure node count is supported given the network type
-   */
-  public static constructNodes(
-    scope: network.HyperledgerFabricNetwork,
-    nodeProps?: Array<HyperledgerFabricNodeProps>
-  ) {
-    // If no node configurations are provided, create one; the empty object
-    // will be populated with defaults when passed to the node constructor
-    if (typeof nodeProps === 'undefined') nodeProps = [{}];
-    const starter = scope.networkEdition === network.NetworkEdition.STARTER;
-    if (starter && nodeProps.length > 2) {
-      throw new Error('A starter network can have at most 2 nodes per member.');
-    }
-    if (!starter && nodeProps.length > 3) {
-      throw new Error('A standard network can have at most 3 nodes per member.');
-    }
-    // Construct the node list, using an index value in the identifier
-    return Array.from(nodeProps.entries()).map((e) => new HyperledgerFabricNode(scope, `Node${e[0]}`, e[1]));
-  }
-
   /**
    * Managed Blockchain network identifier
    */
@@ -129,7 +110,11 @@ export class HyperledgerFabricNode extends constructs.Construct {
   public endpoint: string = '';
   public eventEndpoint: string = '';
 
-  constructor(scope: network.HyperledgerFabricNetwork, id: string, props?: HyperledgerFabricNodeProps) {
+  public constructor(
+    scope: network.HyperledgerFabricNetwork,
+    id: string,
+    props?: HyperledgerFabricNodeProps
+  ) {
     super(scope, id);
 
     // Collect metadata on the stack
@@ -173,10 +158,32 @@ export class HyperledgerFabricNode extends constructs.Construct {
   }
 
   /*
+   * Build out a list of HyperledgerFabricNode constructs given a list of input property
+   * objects; additionally checks to ensure node count is supported given the network type
+   */
+  public static constructNodes(
+    scope: network.HyperledgerFabricNetwork,
+    nodeProps?: Array<HyperledgerFabricNodeProps>
+  ): HyperledgerFabricNode[] {
+    // If no node configurations are provided, create one; the empty object
+    // will be populated with defaults when passed to the node constructor
+    if (typeof nodeProps === 'undefined') nodeProps = [{}];
+    const starter = scope.networkEdition === network.NetworkEdition.STARTER;
+    if (starter && nodeProps.length > 2) {
+      throw new Error('A starter network can have at most 2 nodes per member.');
+    }
+    if (!starter && nodeProps.length > 3) {
+      throw new Error('A standard network can have at most 3 nodes per member.');
+    }
+    // Construct the node list, using an index value in the identifier
+    return Array.from(nodeProps.entries()).map((e) => new HyperledgerFabricNode(scope, `Node${e[0]}`, e[1]));
+  }
+
+  /*
    * Configure logging for the node via SDK call; this function
    * should be merged back into the constructor once the race condition is solved
    */
-  public configureLogging(sdkCallPolicy: customresources.AwsCustomResourcePolicy) {
+  public configureLogging(sdkCallPolicy: customresources.AwsCustomResourcePolicy): void {
     // This call doesn't really need all the permissions its using in the
     // provided policy, but since the policy must be constructed all at once
     // this is the only way to do it effectively
@@ -201,6 +208,7 @@ export class HyperledgerFabricNode extends constructs.Construct {
       },
       physicalResourceId: customresources.PhysicalResourceId.of('Id')
     };
+    // eslint-disable-next-line no-new
     new customresources.AwsCustomResource(this, 'ConfigureNodeLogResource', {
       policy: sdkCallPolicy,
       onCreate: configureNodeLogSdkCall,
@@ -212,7 +220,7 @@ export class HyperledgerFabricNode extends constructs.Construct {
    * Populate the output properties that must be fetched via SDK call; this function
    * should be merged back into the constructor once the race condition is solved
    */
-  public fetchData(dataSdkCallPolicy: customresources.AwsCustomResourcePolicy) {
+  public fetchData(dataSdkCallPolicy: customresources.AwsCustomResourcePolicy): void {
     // This call doesn't really need all the permissions its using in the
     // provided policy, but since the policy must be constructed all at once
     // this is the only way to do it effectively

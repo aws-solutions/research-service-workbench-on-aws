@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import { NagSuppressions } from 'cdk-nag';
-
 import * as cdk from 'aws-cdk-lib';
+import { NagSuppressions } from 'cdk-nag';
+import { Construct } from 'constructs';
+import { isEmpty } from 'lodash';
 
 import * as hyperledger from './components';
 
@@ -16,6 +16,9 @@ export class InfrastructureStack extends Stack {
     const networkId = this.node.tryGetContext('networkId');
     const invitationId = this.node.tryGetContext('invitationId');
     const additionalMembers = this.node.tryGetContext('additionalMembers');
+    const availabilityZone = isEmpty(this.node.tryGetContext('availabilityZone'))
+      ? Stack.of(this).availabilityZones[0]
+      : this.node.tryGetContext('availabilityZone');
     const accountId = cdk.Stack.of(this).account;
     const network = new hyperledger.HyperledgerFabricNetwork(this, 'V2TestNetwork', {
       networkName: 'TestNetwork',
@@ -26,12 +29,13 @@ export class InfrastructureStack extends Stack {
       additionalMembers,
       nodes: [
         {
-          availabilityZone: 'us-east-1a',
+          availabilityZone,
           instanceType: hyperledger.InstanceType.BURSTABLE3_MEDIUM
         }
       ]
     });
 
+    /* eslint-disable no-new */
     new cdk.CfnOutput(this, 'NetworkId', {
       description: 'Managed Blockchain network identifier',
       value: network.networkId

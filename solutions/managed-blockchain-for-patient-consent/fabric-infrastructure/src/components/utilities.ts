@@ -7,7 +7,7 @@
  * Regions where Managed Blockchain is supported, for details see
  * https://aws.amazon.com/managed-blockchain/pricing/hyperledger/
  */
-export const SUPPORTED_REGIONS = [
+export const SUPPORTED_REGIONS: string[] = [
   'ap-northeast-1',
   'ap-northeast-2',
   'ap-southeast-1',
@@ -29,26 +29,9 @@ export const SUPPORTED_AVAILABILITY_ZONES: Record<string, Array<string>> = {
 };
 
 /*
- * Starting port of the Network port range
- */
-export const STARTING_PORT = 30001;
-
-/*
- * Ending port of the Network port range
- */
-export const ENDING_PORT = 30004;
-
-/*
- * Returns the S3 Bucket and key that contains the TLS cert file
- */
-export function getTlsBucket(region: string) {
-  return { bucketName: `${region}.managedblockchain`, key: 'etc/managedblockchain-tls-chain.pem' };
-}
-
-/*
  * Throw an error if provided region is not in the supported list
  */
-export function validateRegion(region: string) {
+export function validateRegion(region: string): void {
   if (!SUPPORTED_REGIONS.includes(region)) {
     const regionList = SUPPORTED_REGIONS.join(', ');
     throw new Error(`Managed Blockchain is only available in the following regions: ${regionList}.`);
@@ -58,7 +41,8 @@ export function validateRegion(region: string) {
 /*
  * Throw an error if provided availability is not in the supported list
  */
-export function validateAvailabilityZone(region: string, availabilityZone?: string) {
+export function validateAvailabilityZone(region: string, availabilityZone?: string): void {
+  // eslint-disable-next-line security/detect-object-injection
   const availabililtyZonesForRegion = SUPPORTED_AVAILABILITY_ZONES[region];
   if (typeof availabilityZone === 'undefined' || !availabililtyZonesForRegion.includes(availabilityZone)) {
     const availabilityZoneList = availabililtyZonesForRegion.join(', ');
@@ -71,18 +55,21 @@ export function validateAvailabilityZone(region: string, availabilityZone?: stri
 /*
  * Throw an error if provided number is not an integer, or not with the given range (inclusive)
  */
-export function validateInteger(value: number, min: number, max: number) {
+export function validateInteger(value: number, min: number, max: number): boolean {
   if (!Number.isInteger(value)) return false;
-  if (value < min || value > max) return false;
-  return true;
+  return !(value < min || value > max);
 }
 
 /*
  * Throw an error if provided string has length with a given range (inclusive),
  * and optionally matches a provided regular expression pattern
  */
-export function validateString(value: string, min: number, max: number, regexp?: RegExp | undefined) {
+export function validateString(
+  value: string,
+  min: number,
+  max: number,
+  regexp?: RegExp | undefined
+): boolean {
   if (value.length < min || value.length > max) return false;
-  if (typeof regexp !== 'undefined' && !value.match(regexp)) return false;
-  return true;
+  return !(typeof regexp !== 'undefined' && !value.match(regexp));
 }

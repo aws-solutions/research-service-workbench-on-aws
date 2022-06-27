@@ -6,8 +6,8 @@
 import * as cdk from 'aws-cdk-lib';
 import * as assertions from 'aws-cdk-lib/assertions';
 
-import { InfrastructureStack } from '../infrastructure-stack';
 import * as cdknag from 'cdk-nag';
+import { InfrastructureStack } from '../infrastructure-stack';
 
 const DEFAULT_ENV = { env: { region: 'us-east-1', account: '1234567890' } };
 

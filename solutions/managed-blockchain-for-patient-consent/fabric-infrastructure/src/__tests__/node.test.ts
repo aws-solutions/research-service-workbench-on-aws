@@ -196,7 +196,7 @@ describe('HyperledgerFabricNode', () => {
 
   test('Fail to create a network with an invalid node availability zone', () => {
     expect(hyperledger.SUPPORTED_AVAILABILITY_ZONES).not.toContain('us-west-1a');
-    const mismatchedAvailabilityZone = () => {
+    const mismatchedAvailabilityZone = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -210,7 +210,7 @@ describe('HyperledgerFabricNode', () => {
       });
     };
     expect(hyperledger.SUPPORTED_AVAILABILITY_ZONES['us-east-1']).not.toContain('us-east-1z');
-    const nonexistantAvailabilityZone = () => {
+    const nonexistantAvailabilityZone = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -228,7 +228,7 @@ describe('HyperledgerFabricNode', () => {
   });
 
   test('Fail to create a network with too many nodes', () => {
-    const unsupportedInstanceType = () => {
+    const unsupportedInstanceType = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -241,7 +241,7 @@ describe('HyperledgerFabricNode', () => {
   });
 
   test('Fail to create a starter network with too many nodes', () => {
-    const unsupportedInstanceType = () => {
+    const unsupportedInstanceType = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -256,7 +256,7 @@ describe('HyperledgerFabricNode', () => {
 
   test('Fail to create a starter network with an unsupported instance type', () => {
     expect(hyperledger.STARTER_INSTANCE_TYPES).not.toContain(hyperledger.InstanceType.STANDARD5_LARGE);
-    const unsupportedInstanceType = () => {
+    const unsupportedInstanceType = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {

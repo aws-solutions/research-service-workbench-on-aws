@@ -1,15 +1,15 @@
-import { inviteMemberHandler } from '../lambdas/invite-member';
-import { mockClient } from 'aws-sdk-client-mock';
 import {
   ManagedBlockchainClient,
   CreateProposalCommand,
   VoteOnProposalCommand
 } from '@aws-sdk/client-managedblockchain';
+import { mockClient } from 'aws-sdk-client-mock';
+import { inviteMemberHandler } from '../lambdas/invite-member';
 
 describe('inviteMemberHandler', () => {
   const ORIGINAL_ENV = process.env;
-  let mockCreateProposal: any;
-  let mockVoteProposal: any;
+  let mockCreateProposal: jest.Mock;
+  let mockVoteProposal: jest.Mock;
   beforeAll(() => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.MEMBER_ID = 'm-somefakememberid';

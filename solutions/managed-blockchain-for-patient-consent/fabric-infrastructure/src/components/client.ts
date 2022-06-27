@@ -38,18 +38,22 @@ export class HyperledgerFabricClient extends constructs.Construct {
    */
   public readonly vpcEndpoint: ec2.InterfaceVpcEndpoint;
 
-  constructor(scope: network.HyperledgerFabricNetwork, id: string, props?: HyperledgerFabricClientProps) {
+  public constructor(
+    scope: network.HyperledgerFabricNetwork,
+    id: string,
+    props?: HyperledgerFabricClientProps
+  ) {
     super(scope, id);
 
     // Collect metadata on the stack
     const region = cdk.Stack.of(this).region;
 
     // Populate instance variables from input properties, using defaults if values not provided
-    if (typeof props === 'undefined') props = {};
+    props = props ?? {};
     this.vpc =
       props.vpc ??
       new ec2.Vpc(this, 'ClientVpc', {
-        subnetConfiguration: [{ name: 'Private', subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]
+        subnetConfiguration: [{ name: `Private`, subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]
       });
     const vpcEndpointServiceName = scope.vpcEndpointServiceName.replace(`com.amazonaws.${region}.`, '');
 

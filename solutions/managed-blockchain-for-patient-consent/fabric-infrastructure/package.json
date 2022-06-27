@@ -2,6 +2,11 @@
   "name": "@amzn/fabric-infrastructure",
   "version": "0.0.1",
   "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
+  "description": "CDK construct, scripts and instructions to create a 3-member Hyperledger Fabric using Managed Blockchain. ",
   "repository": {
     "type": "git",
     "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
@@ -11,14 +16,16 @@
     "infrastructure": "lib/index.js"
   },
   "scripts": {
-    "compile": "echo 'ts-node scripts/buildLambda.ts'",
-    "build": "rushx compile && heft build --clean",
+    "build": "heft build --clean",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test -u --clean",
-    "build:test": "rushx build && rushx test:only && rushx make-badges",
-    "test:integration": "heft test -u --clean",
+    "build:test": "rushx build && rushx test:only && rushx pkg-json-lint && rushx make-badges",
+    "depcheck": "depcheck",
+    "lint:fix": "eslint . --fix",
     "watch": "tsc -w",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
+    "sort-package-json": "sort-package-json package.json",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
     "cdk:context": "cdk context",
@@ -55,6 +62,9 @@
     "axios": "^0.27.1",
     "cdk-nag": "^2.12.25",
     "esbuild": "^0.14.21",
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
+    "sort-package-json": "^1.57.0",
     "@types/lodash": "^4.14.181"
   },
   "dependencies": {

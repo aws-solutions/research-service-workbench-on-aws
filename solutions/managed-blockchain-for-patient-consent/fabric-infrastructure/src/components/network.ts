@@ -9,11 +9,11 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as customresources from 'aws-cdk-lib/custom-resources';
 import * as constructs from 'constructs';
 
+import { isEmpty } from 'lodash';
 import * as client from './client';
 import * as invites from './invites';
 import * as node from './node';
 import * as utilities from './utilities';
-import { isEmpty } from 'lodash';
 
 /*
  * Define which Hyperledger Fabric framework to use
@@ -53,21 +53,21 @@ export interface HyperledgerFabricNetworkProps {
   /**
    * Managed Blockchain network description
    *
-   * @default - Set to match network name
+   * default - Set to match network name
    */
   readonly networkDescription?: string;
 
   /**
    * Managed Blockchain network id for additional members
    *
-   * @default - Set to match network name
+   * default - Set to match network name
    */
   readonly networkId?: string;
 
   /**
    * Managed Blockchain invitation id for additional members
    *
-   * @default - Set to match network name
+   * default - Set to match network name
    */
   readonly invitationId?: string;
 
@@ -79,59 +79,59 @@ export interface HyperledgerFabricNetworkProps {
   /**
    * Managed Blockchain member description
    *
-   * @default - Set to match member name
+   * default - Set to match member name
    */
   readonly memberDescription?: string;
 
   /**
    * Hyperledger Fabric framework version
    *
-   * @default - FrameworkVersion.VERSION_1_4
+   * default - FrameworkVersion.VERSION_1_4
    */
   readonly frameworkVersion?: FrameworkVersion;
 
   /**
    * Managed Blockchain network edition
    *
-   * @default - NetworkEdition.STANDARD
+   * default - NetworkEdition.STANDARD
    */
   readonly networkEdition?: NetworkEdition;
 
   /**
    * The duration from the time that a proposal is created until it expires
-   * @default - 24 hours
+   * default - 24 hours
    */
   readonly proposalDurationInHours?: number;
 
   /**
    * The percentage of votes among all members that must be yes for a proposal to be approved
-   * @default - 50 percent
+   * default - 50 percent
    */
   readonly thresholdPercentage?: number;
 
   /**
    * Determines whether the yes votes must be greater than the threshold percentage
    * or must be greater than or equal to the threhold percentage to be approved
-   * @default - GREATER_THAN
+   * default - GREATER_THAN
    */
   readonly thresholdComparator?: ThresholdComparator;
 
   /**
    * The configuration to enable or disable certificate authority logging
-   * @default - true
+   * default - true
    */
   readonly enableCaLogging?: boolean;
 
   /**
    * List of nodes to create on the network
    *
-   * @default - One node with default configuration
+   * default - One node with default configuration
    */
   readonly nodes?: Array<node.HyperledgerFabricNodeProps>;
 
   /**
    * The Client network to interact with the Hyperledger Fabric network
-   * @default - Client network with Default properties
+   * default - Client network with Default properties
    * (CIDR-`10.0.0.0/16` and subnets of type `PRIVATE_ISOLATED`)
    */
   readonly client?: client.HyperledgerFabricClientProps;
@@ -262,13 +262,13 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
    */
   public readonly additionalMembers: string[];
 
-  constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
+  public constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
     super(scope, id);
 
     // Collect metadata on the stack
-    const partition = cdk.Stack.of(this).partition;
-    const region = cdk.Stack.of(this).region;
-    const account = cdk.Stack.of(this).account;
+    const partition = cdk.Aws.PARTITION;
+    const region = cdk.Aws.REGION;
+    const account = cdk.Aws.ACCOUNT_ID;
 
     // Populate instance variables from input properties, using defaults if values not provided
     this.networkName = props.networkName;
@@ -442,6 +442,7 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
       },
       physicalResourceId: customresources.PhysicalResourceId.of('Id')
     };
+    // eslint-disable-next-line no-new
     new customresources.AwsCustomResource(this, 'ConfigureCaLogResource', {
       policy: sdkCallPolicy,
       onCreate: configureCaLogSdkCall,
@@ -470,6 +471,7 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
     if (this.createNewNetwork) {
       const inviteResources = new invites.HyperledgerFabricInvite(this, 'Invite');
 
+      // eslint-disable-next-line no-new
       new cdk.CustomResource(this, 'InviteCustomResource', {
         serviceToken: inviteResources.inviteProvider.serviceToken
       });

@@ -2,14 +2,14 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { CdkCustomResourceEvent } from 'aws-lambda';
 import {
   ManagedBlockchainClient,
   CreateProposalCommand,
   VoteOnProposalCommand
 } from '@aws-sdk/client-managedblockchain';
+import { CdkCustomResourceEvent } from 'aws-lambda';
 
-const client = new ManagedBlockchainClient({});
+const client: ManagedBlockchainClient = new ManagedBlockchainClient({});
 
 export const inviteMemberHandler = async (event: CdkCustomResourceEvent): Promise<void> => {
   const {

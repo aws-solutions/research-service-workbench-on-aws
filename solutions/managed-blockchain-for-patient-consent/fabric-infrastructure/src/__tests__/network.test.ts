@@ -9,8 +9,8 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 import * as cdknag from 'cdk-nag';
 
-import * as hyperledger from '../components';
 import { NagSuppressions } from 'cdk-nag';
+import * as hyperledger from '../components';
 
 const DEFAULT_ENV = { env: { region: 'us-east-1' } };
 
@@ -212,7 +212,7 @@ describe('HyperledgerFabricNetwork', () => {
 
   test('Fail to create a network in an unsupported region', () => {
     expect(hyperledger.SUPPORTED_REGIONS).not.toContain('us-west-1');
-    const unsupportedRegion = () => {
+    const unsupportedRegion = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', { env: { region: 'us-west-1' } });
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -224,7 +224,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with invalid network name', () => {
-    const nameTooShort = () => {
+    const nameTooShort = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -232,7 +232,7 @@ describe('HyperledgerFabricNetwork', () => {
         memberName: 'TestMember'
       });
     };
-    const nameTooLong = () => {
+    const nameTooLong = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -245,7 +245,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with invalid network description', () => {
-    const descriptionTooLong = () => {
+    const descriptionTooLong = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -259,7 +259,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with invalid member name', () => {
-    const nameTooShort = () => {
+    const nameTooShort = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -267,7 +267,7 @@ describe('HyperledgerFabricNetwork', () => {
         memberName: ''
       });
     };
-    const nameTooLong = () => {
+    const nameTooLong = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -275,7 +275,7 @@ describe('HyperledgerFabricNetwork', () => {
         memberName: 'ThisMemberNameIsSixtyFiveCharactersLongAndThatIsTooLongToWork1234'
       });
     };
-    const nameStartsWithNumber = () => {
+    const nameStartsWithNumber = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -283,7 +283,7 @@ describe('HyperledgerFabricNetwork', () => {
         memberName: '0TestMember'
       });
     };
-    const nameStartsAndEndsWithHyphen = () => {
+    const nameStartsAndEndsWithHyphen = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -291,7 +291,7 @@ describe('HyperledgerFabricNetwork', () => {
         memberName: '-TestMember-'
       });
     };
-    const nameHasConsecutiveHyphens = () => {
+    const nameHasConsecutiveHyphens = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -307,7 +307,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with invalid member description', () => {
-    const descriptionTooLong = () => {
+    const descriptionTooLong = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -321,7 +321,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with an invalid voting policy proposal duration', () => {
-    const durationTooShort = () => {
+    const durationTooShort = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -330,7 +330,7 @@ describe('HyperledgerFabricNetwork', () => {
         proposalDurationInHours: 0
       });
     };
-    const durationTooLong = () => {
+    const durationTooLong = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -339,7 +339,7 @@ describe('HyperledgerFabricNetwork', () => {
         proposalDurationInHours: 169
       });
     };
-    const durationNotInteger = () => {
+    const durationNotInteger = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -354,7 +354,7 @@ describe('HyperledgerFabricNetwork', () => {
   });
 
   test('Fail to create a network with an invalid voting policy threshold percentage', () => {
-    const thresholdTooSmall = () => {
+    const thresholdTooSmall = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -363,7 +363,7 @@ describe('HyperledgerFabricNetwork', () => {
         thresholdPercentage: -1
       });
     };
-    const thresholdTooLarge = () => {
+    const thresholdTooLarge = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
@@ -372,7 +372,7 @@ describe('HyperledgerFabricNetwork', () => {
         thresholdPercentage: 101
       });
     };
-    const thresholdNotInteger = () => {
+    const thresholdNotInteger = (): void => {
       const app = new cdk.App();
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {

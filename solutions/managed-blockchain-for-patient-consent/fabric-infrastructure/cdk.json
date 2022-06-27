@@ -9,7 +9,6 @@
       "**/*.js",
       "tsconfig.json",
       "package*.json",
-      "yarn.lock",
       "node_modules",
       "test"
     ]
@@ -20,6 +19,7 @@
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
     "@aws-cdk/aws-lambda:recognizeVersionProps": true,
     "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": true,
+    "availabilityZone": "",
     "additionalMembers": [],
     "networkId": "",
     "invitationId": ""
