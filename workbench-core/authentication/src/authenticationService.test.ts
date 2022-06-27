@@ -108,4 +108,12 @@ describe('AuthenticationService tests', () => {
       }
     });
   });
+
+  it('getLogoutUrl should return the full URL of the authentication servers logout endpoint', () => {
+    const url = service.getLogoutUrl();
+
+    expect(url).toBe(
+      'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
+    );
+  });
 });
