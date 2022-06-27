@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express = require('express');
 import { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
