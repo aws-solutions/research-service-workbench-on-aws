@@ -1,5 +1,6 @@
 jest.mock('@amzn/workbench-core-audit');
 jest.mock('@amzn/workbench-core-logging');
+jest.mock('./dataSetMetadataPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
 import { AwsService } from '@amzn/workbench-core-base';
@@ -15,7 +16,15 @@ describe('DataSetService', () => {
   const notImplementedText: string = 'Not yet implemented.';
   let metaPlugin: DdbDataSetMetadataPlugin;
 
+  const mockDataSetId = 'sampleDataSetId';
+  const mockDataSetName = 'Sample-DataSet';
+  const mockDataSetPath = 'sample-s3-prefix';
+  const mockAwsAccountId = 'Sample-AWS-Account';
+  const mockDataSetStorageType = 'S3';
+  const mockDataSetStorageName = 'S3-Bucket';
+
   beforeEach(() => {
+    jest.resetAllMocks();
     writer = {
       prepare: jest.fn(),
       write: jest.fn()
@@ -29,7 +38,33 @@ describe('DataSetService', () => {
       }
     });
     log = new LoggingService();
-    metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'endpointKeyId');
+    metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockImplementation(async () => {
+      return [
+        {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        }
+      ];
+    });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet').mockImplementation(async () => {
+      return {
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
+      };
+    });
+
+    jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
+      return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
+    });
   });
 
   describe('constructor', () => {
@@ -51,10 +86,18 @@ describe('DataSetService', () => {
       plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
     });
 
-    it('throws not implemented when called', async () => {
-      await expect(async () =>
-        service.provisionDataSet('name', 'storageName', 'path', 'accountId', plugin)
-      ).rejects.toThrow(new Error(notImplementedText));
+    it('returns the S3 URL to the new DataSet', async () => {
+      await expect(
+        service.provisionDataSet(
+          mockDataSetName,
+          mockDataSetStorageName,
+          mockDataSetPath,
+          mockAwsAccountId,
+          plugin
+        )
+      ).resolves.toBeUndefined();
+      expect(metaPlugin.addDataSet).toBeCalledTimes(1);
+      expect(plugin.createStorage).toBeCalledTimes(1);
     });
   });
 
@@ -69,9 +112,11 @@ describe('DataSetService', () => {
     });
 
     it('throws not implemented when called', async () => {
-      await expect(async () =>
-        service.provisionDataSet('name', 'storageName', 'path', 'accountId', plugin)
-      ).rejects.toThrow(new Error(notImplementedText));
+      await expect(
+        service.importDataSet('name', 'storageName', 'path', 'accountId', plugin)
+      ).resolves.toBeUndefined();
+      expect(metaPlugin.addDataSet).toBeCalledTimes(1);
+      expect(plugin.importStorage).toBeCalledTimes(1);
     });
   });
 
