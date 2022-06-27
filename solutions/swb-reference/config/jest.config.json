@@ -1,6 +1,13 @@
 {
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
+  "transform": {
+    "\\.(ts)$": "ts-jest"
+  },
+  "moduleFileExtensions": [
+    "ts",
+    "js"
+  ],
   "coveragePathIgnorePatterns": [
     "<rootDir>/src/SWBStack.ts",
     "<rootDir>/src/backendAPI.ts",

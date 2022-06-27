@@ -259,7 +259,7 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "cookie-parser",
+      "name": "cors",
       "allowedCategories": [ "production" ]
     },
     {
@@ -385,6 +385,10 @@
     {
       "name": "source-map-support",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "swr",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

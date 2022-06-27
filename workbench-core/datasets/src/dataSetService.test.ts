@@ -2,6 +2,7 @@ jest.mock('@amzn/workbench-core-audit');
 jest.mock('@amzn/workbench-core-logging');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
+import { AwsService } from '@amzn/workbench-core-base';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { DataSetService, S3DataSetStoragePlugin } from '.';
 
@@ -9,6 +10,7 @@ describe('DataSetService', () => {
   let writer: Writer;
   let audit: AuditService;
   let log: LoggingService;
+  let aws: AwsService;
   const notImplementedText: string = 'Not yet implemented.';
 
   beforeEach(() => {
@@ -36,14 +38,15 @@ describe('DataSetService', () => {
 
     beforeEach(() => {
       service = new DataSetService(audit, log);
-      plugin = new S3DataSetStoragePlugin({
+      aws = new AwsService({
         region: 'us-east-1',
         credentials: {
           accessKeyId: 'fakeKey',
           secretAccessKey: 'fakeSecret'
-        },
-        kmsKeyArn: 'not an arn!'
+        }
       });
+      const kmsKeyArn = 'not an arn!';
+      plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
     });
 
     it('throws not implemented when called', async () => {
@@ -59,14 +62,15 @@ describe('DataSetService', () => {
 
     beforeEach(() => {
       service = new DataSetService(audit, log);
-      plugin = new S3DataSetStoragePlugin({
+      aws = new AwsService({
         region: 'us-east-1',
         credentials: {
           accessKeyId: 'fakeKey',
           secretAccessKey: 'fakeSecret'
-        },
-        kmsKeyArn: 'not an arn!'
+        }
       });
+      const kmsKeyArn = 'not an arn!';
+      plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
     });
 
     it('throws not implemented when called', async () => {

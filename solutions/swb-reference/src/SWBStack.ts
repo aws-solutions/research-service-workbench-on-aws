@@ -26,12 +26,6 @@ export class SWBStack extends Stack {
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
-
-    COGNITO_DOMAIN: string;
-    USER_POOL_ID: string;
-    CLIENT_ID: string;
-    CLIENT_SECRET: string;
-    WEBSITE_URL: string;
   };
   public constructor(app: App) {
     const {
@@ -43,12 +37,7 @@ export class SWBStack extends Stack {
       SSM_DOC_NAME_SUFFIX,
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
-      SC_PORTFOLIO_NAME,
-      COGNITO_DOMAIN,
-      USER_POOL_ID,
-      CLIENT_ID,
-      CLIENT_SECRET,
-      WEBSITE_URL
+      SC_PORTFOLIO_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -67,12 +56,7 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
-      SC_PORTFOLIO_NAME,
-      COGNITO_DOMAIN,
-      USER_POOL_ID,
-      CLIENT_ID,
-      CLIENT_SECRET,
-      WEBSITE_URL
+      SC_PORTFOLIO_NAME
     };
 
     const statusHandler = this._createStatusHandlerLambda();
@@ -246,7 +230,7 @@ export class SWBStack extends Stack {
 
   private _createStatusHandlerLambda(): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/statusHandler')),
+      code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -293,7 +277,7 @@ export class SWBStack extends Stack {
     ddbTableArn: string
   ): void {
     const lambda = new Function(this, 'accountHandlerLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/accountHandler')),
+      code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
@@ -378,7 +362,7 @@ export class SWBStack extends Stack {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
-      code: Code.fromAsset(join(__dirname, '../build/backendAPI')),
+      code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
