@@ -79,7 +79,7 @@ export interface HyperledgerFabricNetworkProps {
   /**
    * Prefix for resource naming
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * Managed Blockchain member description
@@ -276,15 +276,15 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
     super(scope, id);
 
     // Collect metadata on the stack
-    const partition = cdk.Aws.PARTITION;
-    const region = cdk.Aws.REGION;
-    const account = cdk.Aws.ACCOUNT_ID;
+    const partition = cdk.Stack.of(this).partition;
+    const region = cdk.Stack.of(this).region;
+    const account = cdk.Stack.of(this).account;
 
     // Populate instance variables from input properties, using defaults if values not provided
     this.networkName = props.networkName;
     this.networkDescription = props.networkDescription ?? props.networkName;
     this.memberName = props.memberName;
-    this.prefix = props.prefix;
+    this.prefix = props.prefix ?? props.networkName;
     this.memberDescription = props.memberDescription ?? props.memberName;
     this.frameworkVersion = props.frameworkVersion ?? FrameworkVersion.VERSION_2_2;
     this.networkEdition = props.networkEdition ?? NetworkEdition.STANDARD;

@@ -47,7 +47,7 @@ export function validateAvailabilityZone(region: string, availabilityZone?: stri
   if (typeof availabilityZone === 'undefined' || !availabililtyZonesForRegion.includes(availabilityZone)) {
     const availabilityZoneList = availabililtyZonesForRegion.join(', ');
     throw new Error(
-      `Managed Blockchain in ${region} is only available in the following availability zones: ${availabilityZoneList}.`
+      `Managed Blockchain in ${region} is only available in the following availability zones: ${availabilityZoneList}.Not ${availabilityZone}`
     );
   }
 }

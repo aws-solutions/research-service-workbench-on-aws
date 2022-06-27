@@ -19,4 +19,4 @@ networkId and inviteId into `cdk.json`. Build and deploy with `rushx build && ru
 ### Test Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-97.7%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-90.62%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-96.15%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-97.58%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-99.21%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-94.89%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-99.18%25-brightgreen.svg?style=flat) |

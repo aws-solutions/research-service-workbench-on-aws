@@ -14,7 +14,8 @@ describe('HyperledgerFabricClient', () => {
     const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
-      memberName: 'TestMember'
+      memberName: 'TestMember',
+      prefix: 'patient-consent'
     });
 
     const template = assertions.Template.fromStack(stack);
@@ -44,6 +45,7 @@ describe('HyperledgerFabricClient', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      prefix: 'patient-consent',
       client: {
         vpc: vpc
       }

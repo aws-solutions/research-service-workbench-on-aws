@@ -21,8 +21,11 @@ describe('inviteMemberHandler', () => {
     mockCreateProposal = jest.fn().mockResolvedValue({ ProposalId: 'p-1234567' });
     mockVoteProposal = jest.fn().mockResolvedValue({});
 
+    // @ts-ignore
     const mockBlockchainClient = mockClient(ManagedBlockchainClient);
+    // @ts-ignore
     mockBlockchainClient.on(CreateProposalCommand).callsFake(mockCreateProposal);
+    // @ts-ignore
     mockBlockchainClient.on(VoteOnProposalCommand).callsFake(mockVoteProposal);
   });
 

@@ -137,6 +137,8 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws-sdk/client-managedblockchain': 3.118.0
+      '@aws-sdk/client-s3': 3.100.0
+      '@aws-sdk/types': 3.78.0
       aws-cdk-lib: 2.26.0_constructs@10.1.25
       constructs: 10.1.25
       fabric-ca-client: 2.2.12
@@ -150,8 +152,6 @@ importers:
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_47b13785010171dab9c30d40a45387b9
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_15bb583c0b2f1331ba42a53a8128ee01
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_15bb583c0b2f1331ba42a53a8128ee01
-      '@aws-sdk/client-s3': 3.100.0
-      '@aws-sdk/types': 3.78.0
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_04f3c65f6de4a5e5529a6fededa44e1d
