@@ -43,7 +43,6 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@amzn/swb-app": "workspace:*",
-    "@amzn/workbench-core-authentication": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.58.0",
     "@aws-sdk/client-dynamodb": "^3.67.0",
