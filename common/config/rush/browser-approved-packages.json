@@ -259,14 +259,11 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-
-      "name": "cors",
-
+      "name": "cookie-parser",
       "allowedCategories": [ "production" ]
-
     },
     {
-      "name": "cookie-parser",
+      "name": "cors",
       "allowedCategories": [ "production" ]
     },
     {
@@ -324,6 +321,10 @@
     {
       "name": "jest",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "jest-circus",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "jest-fast-check",
@@ -394,11 +395,8 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
-
       "name": "swr",
-
       "allowedCategories": [ "production" ]
-
     },
     {
       "name": "triple-beam",
@@ -426,6 +424,10 @@
     },
     {
       "name": "winston-transport",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "yargs-parser",
       "allowedCategories": [ "production" ]
     }
   ]

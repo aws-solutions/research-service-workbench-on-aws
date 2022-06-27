@@ -5,3 +5,5 @@ temp
 cdk.out
 build
 buildLambda.js
+config/jest.config.js
+jest.config.js

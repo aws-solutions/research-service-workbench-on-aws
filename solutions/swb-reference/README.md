@@ -37,6 +37,10 @@ This step is necessary to setup Service Catalog portfolio and products
 `STAGE=<STAGE> rushx run-postDeployment`
 
 ## FAQ
+**Why is there `jest.config.js` and `config/jest.config.json`?**
+* `config/jest.config.json` is the settings for unit tests in the `src` folder
+* `jest.config.js` is the settings for tests in `integration-tests`. These tests require setup steps that are not required by unit tests in the `src` folder.
+
 **When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
 
 The `lib` folders for your project might have been deleted. Try running `rush purge; rush build` in the root 
