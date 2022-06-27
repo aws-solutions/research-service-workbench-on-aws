@@ -6,7 +6,9 @@ const options = {
   transform: {
     '\\.(ts)$': 'ts-jest'
   },
-  moduleFileExtensions: ['ts', 'js']
+  moduleFileExtensions: ['ts', 'js'],
+  testEnvironment: 'node',
+  testTimeout: 30 * 60 * 1000
 };
 
 let settings;

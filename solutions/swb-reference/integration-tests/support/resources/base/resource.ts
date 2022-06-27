@@ -1,1 +1,1 @@
-//TODO: Import this class from SWBv1
+export default class Resource {}
