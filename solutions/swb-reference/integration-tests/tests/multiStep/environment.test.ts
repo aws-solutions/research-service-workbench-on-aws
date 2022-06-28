@@ -8,7 +8,7 @@ describe('multiStep environment test', () => {
     // console.log('settings', __settings__);
 
     const setup = new Setup();
-    const apiBaseUrl = setup.settings.get('apiBaseUrl');
+    const apiBaseUrl = setup.getSettings().get('apiBaseUrl');
     console.log('apiBaseUrl', apiBaseUrl);
     expect(true).toEqual(true);
   });

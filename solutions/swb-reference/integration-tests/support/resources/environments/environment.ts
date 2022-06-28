@@ -1,7 +1,7 @@
 import ClientSession from '../../clientSession';
 import Resource from '../base/resource';
 
-class Environment extends Resource {
+export default class Environment extends Resource {
   public constructor(
     clientSession: ClientSession,
     defaultAdminSession: ClientSession,

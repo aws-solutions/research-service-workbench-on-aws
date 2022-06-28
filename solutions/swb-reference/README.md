@@ -37,20 +37,20 @@ This step is necessary to setup Service Catalog portfolio and products
 `STAGE=<STAGE> rushx run-postDeployment`
 
 ## FAQ
-**Why is there `jest.config.js` and `config/jest.config.json`?**
+1. **Why is there `jest.config.js` and `config/jest.config.json`?**
 * `config/jest.config.json` is the settings for unit tests in the `src` folder
 * `jest.config.js` is the settings for tests in `integration-tests`. These tests require setup steps that are not required by unit tests in the `src` folder.
 
-**When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
+2. **When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
 
 The `lib` folders for your project might have been deleted. Try running `rush purge; rush build` in the root 
 directory of this project to build the `lib` folders from scratch. 
 
-**How do I see which line of code my unit tests did not cover?**
+3. **How do I see which line of code my unit tests did not cover?**
 
 Run `rushx jest --coverage`
 
-**Cannot find module in `common/temp`**
+4. **Why am I'm getting the error "Cannot find module in `common/temp`"?**
 
 Your `node_modules`  might have been corrupted. Try the following command
 ```
