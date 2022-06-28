@@ -37,7 +37,7 @@ function replacePathParams(pathUrl: string, pathParams: object): string {
  * @throws {@link AuthenticatedUserNotFoundError}
  * Throws an error when authenticated user is not found.
  */
-function retrieveUser(res: Response): AuthenticatedUser {
+export function retrieveUser(res: Response): AuthenticatedUser {
   if (instanceOfAuthenticatedUser(res.locals.user)) {
     return res.locals.user;
   }

@@ -34,7 +34,8 @@ import {
   Permission,
   PermissionsPlugin,
   withAuth,
-  AuthorizationService
+  AuthorizationService,
+  retrieveUser
 } from '.';
 
 describe('authorization middleware', () => {
