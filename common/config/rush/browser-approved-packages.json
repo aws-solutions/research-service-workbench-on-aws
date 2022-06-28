@@ -91,6 +91,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-kms",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-lambda",
       "allowedCategories": [ "production" ]
     },
