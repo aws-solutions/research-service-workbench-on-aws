@@ -16,7 +16,6 @@ import { fc, itProp } from 'jest-fast-check';
 import { S3DataSetStoragePlugin } from './';
 
 describe('S3DataSetStoragePlugin', () => {
-  const kmsKeyArn: string = 'not an Arn';
   const region: string = 'us-east-1';
   const awsCreds = {
     accessKeyId: 'fakeKey',
@@ -43,9 +42,9 @@ describe('S3DataSetStoragePlugin', () => {
           region,
           credentials: randomAwsCreds
         });
-        const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+        const plugin = new S3DataSetStoragePlugin(aws);
 
-        expect(plugin).toHaveProperty('_kmsKeyArn', kmsKeyArn);
+        expect(plugin).toHaveProperty('_aws', aws);
       }
     );
   });
@@ -55,7 +54,7 @@ describe('S3DataSetStoragePlugin', () => {
       "Appends '/' to the end of the path when not supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+        const plugin = new S3DataSetStoragePlugin(aws);
 
         const s3Mock = mockClient(S3Client);
         s3Mock.on(PutObjectCommand).resolves({});
@@ -70,7 +69,7 @@ describe('S3DataSetStoragePlugin', () => {
       "Doesn't append '/' to the end of the path when supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+        const plugin = new S3DataSetStoragePlugin(aws);
 
         const s3Mock = mockClient(S3Client);
         s3Mock.on(PutObjectCommand).resolves({});
@@ -91,7 +90,7 @@ describe('S3DataSetStoragePlugin', () => {
       // const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
 
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock
@@ -137,7 +136,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(0);
     });
@@ -151,7 +150,7 @@ describe('S3DataSetStoragePlugin', () => {
       // const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
 
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock
@@ -197,7 +196,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)[0].firstArg.input.Bucket).toEqual(name);
@@ -215,7 +214,7 @@ describe('S3DataSetStoragePlugin', () => {
       const endPointNameNoColon = externalEndpointName.replace(/\:/g, '_');
       const accessPointArn = `arn:s3:us-east-1:123456789012:accesspoint/${endPointNameNoColon}`;
 
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock
@@ -275,7 +274,7 @@ describe('S3DataSetStoragePlugin', () => {
       // const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
 
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
@@ -293,7 +292,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -307,7 +306,7 @@ describe('S3DataSetStoragePlugin', () => {
       const externalEndpointName: string = 'someEndpoint';
       const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
@@ -354,7 +353,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(0);
     });
@@ -366,7 +365,7 @@ describe('S3DataSetStoragePlugin', () => {
       const externalEndpointName: string = 'someEndpoint';
       const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
@@ -410,7 +409,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(1);
@@ -432,7 +431,7 @@ describe('S3DataSetStoragePlugin', () => {
       const externalEndpointName: string = 'someEndpoint';
       const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
@@ -476,7 +475,7 @@ describe('S3DataSetStoragePlugin', () => {
 
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
-      ).resolves.toEqual(`s3://${accessPointArn}/${path}/`);
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(1);
@@ -497,7 +496,7 @@ describe('S3DataSetStoragePlugin', () => {
       'throws not implemented error.',
       [fc.string(), fc.string(), fc.string()],
       async (name, externalEndpointName, externalRoleName) => {
-        const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+        const plugin = new S3DataSetStoragePlugin(aws);
 
         await expect(
           plugin.addRoleToExternalEndpoint(name, externalEndpointName, externalRoleName)
@@ -511,7 +510,7 @@ describe('S3DataSetStoragePlugin', () => {
       'throws not implemented error.',
       [fc.string(), fc.string(), fc.string()],
       async (name, externalEndpointName, externalRoleName) => {
-        const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+        const plugin = new S3DataSetStoragePlugin(aws);
 
         await expect(
           plugin.removeRoleFromExternalEndpoint(name, externalEndpointName, externalRoleName)
@@ -520,30 +519,9 @@ describe('S3DataSetStoragePlugin', () => {
     );
   });
 
-  // describe('getExternalEndpoint', () => {
-  //   itProp('throws not implemented error.',
-  //   [fc.string(), fc.string()],
-  //   async(name, externalEndpointName) => {
-  //     const awsCreds = {
-  //       accessKeyId: 'fakeKey',
-  //       secretAccessKey: 'fakeSecret'
-  //     };
-
-  //     const plugin = new S3DataSetStoragePlugin({
-  //       region: 'us-east-1',
-  //       credentials: awsCreds,
-  //       kmsKeyArn: 'not an Arn',
-  //     });
-
-  //     await expect(plugin.getExternalEndpoint(name, externalEndpointName))
-  //     .rejects
-  //     .toEqual(new Error('Method not implemented.'));
-  //   });
-  // });
-
   describe('createPresignedUploadUrl', () => {
     itProp('throws not implemented error.', [fc.string(), fc.nat()], async (name, ttl) => {
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       await expect(plugin.createPresignedUploadUrl(name, ttl)).rejects.toEqual(
         new Error('Method not implemented.')
@@ -553,7 +531,7 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('createPresignedMultiPartUploadUrls', () => {
     itProp('throws not implemented error.', [fc.string(), fc.nat(), fc.nat()], async (name, parts, ttl) => {
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       await expect(plugin.createPresignedMultiPartUploadUrls(name, parts, ttl)).rejects.toEqual(
         new Error('Method not implemented.')
@@ -563,7 +541,7 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('_awsAccountIdFromArn', () => {
     it('throws when the supplied arn contains an empty accountId', () => {
-      const plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      const plugin = new S3DataSetStoragePlugin(aws);
 
       // @tsignore
       expect(() => plugin[`_awsAccountIdFromArn`]('arn:aws:s3:us-east-1::accessPoint/someName')).toThrow(
