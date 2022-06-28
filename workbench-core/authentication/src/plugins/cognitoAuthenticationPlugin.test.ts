@@ -23,7 +23,6 @@ import {
 } from '..';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'us-west-2',
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
