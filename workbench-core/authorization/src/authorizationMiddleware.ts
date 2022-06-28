@@ -18,7 +18,7 @@ function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
  * @throws {@link Error}
  * Throws an error when authenticated user is not found.
  */
-function retrieveUser(res: Response): AuthenticatedUser {
+export function retrieveUser(res: Response): AuthenticatedUser {
   if (instanceOfAuthenticatedUser(res.locals.user)) {
     return res.locals.user;
   }
