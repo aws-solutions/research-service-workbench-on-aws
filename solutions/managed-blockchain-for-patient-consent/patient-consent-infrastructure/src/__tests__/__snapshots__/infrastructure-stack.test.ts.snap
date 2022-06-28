@@ -132,7 +132,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "3f90ad3eed65ab756e067bc44cea74a5bfe61ac2317553dd61f2d2a7b79de088.zip",
+          "S3Key": "6a9069c1b98845612a0b01f00e36dcfd948d0d23cef4df7c67b0065a7018bbfa.zip",
         },
         "FunctionName": "LambdaService",
         "Handler": "buildLambda.handler",
@@ -204,24 +204,11 @@ Object {
       },
       "Type": "AWS::ApiGateway::RestApi",
     },
-    "RestApiDeployment180EC50389ecf6815550b742e8a5b3ac78237da1": Object {
+    "RestApiDeployment180EC503284b8274541a60e4da0ef0aab2849569": Object {
       "DependsOn": Array [
         "MyRequestValidator838D6595",
-        "RestApiconsentgetconsentPOSTB1D99DC5",
-        "RestApiconsentgetconsent705C66AA",
-        "RestApiconsentF5BB438B",
-        "RestApiconsentrevokePOST52673AF7",
-        "RestApiconsentrevoke75DB2446",
-        "RestApiconsentsetconsentPOSTB592923B",
-        "RestApiconsentsetconsent4520F1BF",
-        "RestApiorganizationgetorgPOST704338BC",
-        "RestApiorganizationgetorgBDDBEAB0",
-        "RestApiorganizationFCB96BF2",
-        "RestApiorganizationsetorgPOST31FF5F65",
-        "RestApiorganizationsetorg40D6057E",
-        "RestApipatient2BDDF037",
-        "RestApipatientsignupPOSTFF7D2CEF",
-        "RestApipatientsignupA67D8267",
+        "RestApipatientconsentPOST37CC2902",
+        "RestApipatientconsent33532C2B",
       ],
       "Properties": Object {
         "Description": "Automatically created by the RestApi construct",
@@ -257,7 +244,7 @@ Object {
           "Format": "$context.requestId $context.error.message $context.error.messageString",
         },
         "DeploymentId": Object {
-          "Ref": "RestApiDeployment180EC50389ecf6815550b742e8a5b3ac78237da1",
+          "Ref": "RestApiDeployment180EC503284b8274541a60e4da0ef0aab2849569",
         },
         "RestApiId": Object {
           "Ref": "RestApi0C43BF4B",
@@ -266,7 +253,7 @@ Object {
       },
       "Type": "AWS::ApiGateway::Stage",
     },
-    "RestApiconsentF5BB438B": Object {
+    "RestApipatientconsent33532C2B": Object {
       "Properties": Object {
         "ParentId": Object {
           "Fn::GetAtt": Array [
@@ -274,104 +261,14 @@ Object {
             "RootResourceId",
           ],
         },
-        "PathPart": "consent",
+        "PathPart": "patient-consent",
         "RestApiId": Object {
           "Ref": "RestApi0C43BF4B",
         },
       },
       "Type": "AWS::ApiGateway::Resource",
     },
-    "RestApiconsentgetconsent705C66AA": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApiconsentF5BB438B",
-        },
-        "PathPart": "get-consent",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiconsentgetconsentPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTconsentgetconsent78ACC321": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/",
-              Object {
-                "Ref": "RestApiDeploymentStageprod3855DE66",
-              },
-              "/POST/consent/get-consent",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiconsentgetconsentPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTconsentgetconsent152B2611": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/test-invoke-stage/POST/consent/get-consent",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiconsentgetconsentPOSTB1D99DC5": Object {
+    "RestApipatientconsentPOST37CC2902": Object {
       "Metadata": Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
@@ -416,7 +313,7 @@ Object {
           "Ref": "MyRequestValidator838D6595",
         },
         "ResourceId": Object {
-          "Ref": "RestApiconsentgetconsent705C66AA",
+          "Ref": "RestApipatientconsent33532C2B",
         },
         "RestApiId": Object {
           "Ref": "RestApi0C43BF4B",
@@ -424,72 +321,7 @@ Object {
       },
       "Type": "AWS::ApiGateway::Method",
     },
-    "RestApiconsentrevoke75DB2446": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApiconsentF5BB438B",
-        },
-        "PathPart": "revoke",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiconsentrevokePOST52673AF7": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-COG4",
-              "reason": "We will use IAM and API key",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod": "POST",
-        "Integration": Object {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                Object {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                Object {
-                  "Fn::GetAtt": Array [
-                    "LambdaService68B9B9DF",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "RequestValidatorId": Object {
-          "Ref": "MyRequestValidator838D6595",
-        },
-        "ResourceId": Object {
-          "Ref": "RestApiconsentrevoke75DB2446",
-        },
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "RestApiconsentrevokePOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTconsentrevokeD32B02AA": Object {
+    "RestApipatientconsentPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTpatientconsentAB663694": Object {
       "Properties": Object {
         "Action": "lambda:InvokeFunction",
         "FunctionName": Object {
@@ -523,14 +355,14 @@ Object {
               Object {
                 "Ref": "RestApiDeploymentStageprod3855DE66",
               },
-              "/POST/consent/revoke",
+              "/POST/patient-consent",
             ],
           ],
         },
       },
       "Type": "AWS::Lambda::Permission",
     },
-    "RestApiconsentrevokePOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTconsentrevoke048B8974": Object {
+    "RestApipatientconsentPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTpatientconsent7FAB316D": Object {
       "Properties": Object {
         "Action": "lambda:InvokeFunction",
         "FunctionName": Object {
@@ -560,614 +392,12 @@ Object {
               Object {
                 "Ref": "RestApi0C43BF4B",
               },
-              "/test-invoke-stage/POST/consent/revoke",
+              "/test-invoke-stage/POST/patient-consent",
             ],
           ],
         },
       },
       "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiconsentsetconsent4520F1BF": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApiconsentF5BB438B",
-        },
-        "PathPart": "set-consent",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiconsentsetconsentPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTconsentsetconsent6A6C1588": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/",
-              Object {
-                "Ref": "RestApiDeploymentStageprod3855DE66",
-              },
-              "/POST/consent/set-consent",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiconsentsetconsentPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTconsentsetconsent4686543B": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/test-invoke-stage/POST/consent/set-consent",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiconsentsetconsentPOSTB592923B": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-COG4",
-              "reason": "We will use IAM and API key",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod": "POST",
-        "Integration": Object {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                Object {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                Object {
-                  "Fn::GetAtt": Array [
-                    "LambdaService68B9B9DF",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "RequestValidatorId": Object {
-          "Ref": "MyRequestValidator838D6595",
-        },
-        "ResourceId": Object {
-          "Ref": "RestApiconsentsetconsent4520F1BF",
-        },
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "RestApiorganizationFCB96BF2": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Fn::GetAtt": Array [
-            "RestApi0C43BF4B",
-            "RootResourceId",
-          ],
-        },
-        "PathPart": "organization",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiorganizationgetorgBDDBEAB0": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApiorganizationFCB96BF2",
-        },
-        "PathPart": "get-org",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiorganizationgetorgPOST704338BC": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-COG4",
-              "reason": "We will use IAM and API key",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod": "POST",
-        "Integration": Object {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                Object {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                Object {
-                  "Fn::GetAtt": Array [
-                    "LambdaService68B9B9DF",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "RequestValidatorId": Object {
-          "Ref": "MyRequestValidator838D6595",
-        },
-        "ResourceId": Object {
-          "Ref": "RestApiorganizationgetorgBDDBEAB0",
-        },
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "RestApiorganizationgetorgPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTorganizationgetorgB45BBDA2": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/",
-              Object {
-                "Ref": "RestApiDeploymentStageprod3855DE66",
-              },
-              "/POST/organization/get-org",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiorganizationgetorgPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTorganizationgetorg3A85C53B": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/test-invoke-stage/POST/organization/get-org",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiorganizationsetorg40D6057E": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApiorganizationFCB96BF2",
-        },
-        "PathPart": "set-org",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApiorganizationsetorgPOST31FF5F65": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-COG4",
-              "reason": "We will use IAM and API key",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod": "POST",
-        "Integration": Object {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                Object {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                Object {
-                  "Fn::GetAtt": Array [
-                    "LambdaService68B9B9DF",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "RequestValidatorId": Object {
-          "Ref": "MyRequestValidator838D6595",
-        },
-        "ResourceId": Object {
-          "Ref": "RestApiorganizationsetorg40D6057E",
-        },
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
-    },
-    "RestApiorganizationsetorgPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTorganizationsetorg2C004A90": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/",
-              Object {
-                "Ref": "RestApiDeploymentStageprod3855DE66",
-              },
-              "/POST/organization/set-org",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApiorganizationsetorgPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTorganizationsetorgA51382CB": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/test-invoke-stage/POST/organization/set-org",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApipatient2BDDF037": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Fn::GetAtt": Array [
-            "RestApi0C43BF4B",
-            "RootResourceId",
-          ],
-        },
-        "PathPart": "patient",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApipatientsignupA67D8267": Object {
-      "Properties": Object {
-        "ParentId": Object {
-          "Ref": "RestApipatient2BDDF037",
-        },
-        "PathPart": "signup",
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Resource",
-    },
-    "RestApipatientsignupPOSTApiPermissionInfrastructureStackRestApi00A379FAPOSTpatientsignup5A3FA579": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/",
-              Object {
-                "Ref": "RestApiDeploymentStageprod3855DE66",
-              },
-              "/POST/patient/signup",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApipatientsignupPOSTApiPermissionTestInfrastructureStackRestApi00A379FAPOSTpatientsignupF02DA67A": Object {
-      "Properties": Object {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": Object {
-          "Fn::GetAtt": Array [
-            "LambdaService68B9B9DF",
-            "Arn",
-          ],
-        },
-        "Principal": "apigateway.amazonaws.com",
-        "SourceArn": Object {
-          "Fn::Join": Array [
-            "",
-            Array [
-              "arn:",
-              Object {
-                "Ref": "AWS::Partition",
-              },
-              ":execute-api:",
-              Object {
-                "Ref": "AWS::Region",
-              },
-              ":",
-              Object {
-                "Ref": "AWS::AccountId",
-              },
-              ":",
-              Object {
-                "Ref": "RestApi0C43BF4B",
-              },
-              "/test-invoke-stage/POST/patient/signup",
-            ],
-          ],
-        },
-      },
-      "Type": "AWS::Lambda::Permission",
-    },
-    "RestApipatientsignupPOSTFF7D2CEF": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-COG4",
-              "reason": "We will use IAM and API key",
-            },
-          ],
-        },
-      },
-      "Properties": Object {
-        "AuthorizationType": "AWS_IAM",
-        "HttpMethod": "POST",
-        "Integration": Object {
-          "IntegrationHttpMethod": "POST",
-          "Type": "AWS_PROXY",
-          "Uri": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":apigateway:",
-                Object {
-                  "Ref": "AWS::Region",
-                },
-                ":lambda:path/2015-03-31/functions/",
-                Object {
-                  "Fn::GetAtt": Array [
-                    "LambdaService68B9B9DF",
-                    "Arn",
-                  ],
-                },
-                "/invocations",
-              ],
-            ],
-          },
-        },
-        "RequestValidatorId": Object {
-          "Ref": "MyRequestValidator838D6595",
-        },
-        "ResourceId": Object {
-          "Ref": "RestApipatientsignupA67D8267",
-        },
-        "RestApiId": Object {
-          "Ref": "RestApi0C43BF4B",
-        },
-      },
-      "Type": "AWS::ApiGateway::Method",
     },
     "log751C81CB": Object {
       "DeletionPolicy": "Retain",
