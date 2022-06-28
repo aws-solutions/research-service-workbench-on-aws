@@ -1,4 +1,4 @@
-import { DataSet } from '.';
+import { DataSet, ExternalEndpoint } from '.';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -40,12 +40,26 @@ export interface DataSetMetadataPlugin {
   /**
    * Add a DataSet to the solution.
    * @param dataSet - the DataSet to add.
+   *
+   * @returns the DataSet object added to the database.
    */
   addDataSet(dataSet: DataSet): Promise<DataSet>;
 
   /**
    * Update a DataSet
    * @param dataSet - the updated DataSet data.
+   *
+   * @returns the updated DataSet object.
    */
   updateDataSet(dataSet: DataSet): Promise<DataSet>;
+
+  /**
+   * Return the details on a specific DataSet endpoint.
+   *
+   * @param dataSetName - the name of the DataSet for which the endpoint data is to be returned.
+   * @param endPointName - the name which identifies the endpoint for which details are to be returned.
+   *
+   * @returns details about the specified endpoint.
+   */
+  getDataSetEndPointDetails(dataSetName: string, endPointName: string): Promise<ExternalEndpoint>;
 }
