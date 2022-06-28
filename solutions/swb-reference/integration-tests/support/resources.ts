@@ -1,14 +1,14 @@
 import ClientSession from './clientSession';
+import Environments from './resources/environments/environments';
 
 function getResources(clientSession: ClientSession): Resources {
   return {
-    environments: {}
+    environments: new Environments(clientSession)
   };
 }
 
 interface Resources {
-  // eslint-disable-next-line
-  environments: any;
+  environments: Environments;
 }
 
 export { getResources, Resources };

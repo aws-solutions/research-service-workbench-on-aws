@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
+import Setup from './setup';
 import Settings from './utils/settings';
 
 export default class ClientSession {
@@ -8,10 +9,12 @@ export default class ClientSession {
   private _cleanupQueue: CleanupTask[];
   private _isAnonymousSession: boolean;
   private _axiosInstance: AxiosInstance;
-  private _resources: Resources;
+  public resources: Resources;
+  private _setup: Setup;
 
-  public constructor(settings: Settings, idToken?: string) {
-    this._settings = settings;
+  public constructor(setup: Setup, idToken?: string) {
+    this._settings = setup.getSettings();
+    this._setup = setup;
     this._isAnonymousSession = idToken === undefined;
     // Each element is an object (cleanupTask) of shape { id, command = async fn() }
     this._cleanupQueue = [];
@@ -31,7 +34,7 @@ export default class ClientSession {
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });
-    this._resources = getResources(this);
+    this.resources = getResources(this);
   }
 
   public async init(): Promise<void> {
@@ -76,6 +79,10 @@ export default class ClientSession {
 
   public getSettings(): Settings {
     return this._settings;
+  }
+
+  public getSetup(): Setup {
+    return this._setup;
   }
 }
 

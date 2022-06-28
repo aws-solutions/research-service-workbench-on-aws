@@ -7,6 +7,7 @@ import Settings from './utils/settings';
 export default class Setup {
   private _settings: Settings;
   private _sessions: ClientSession[] = [];
+  private _adminSession: ClientSession | undefined = undefined;
 
   public constructor() {
     // @ts-ignore
@@ -17,10 +18,26 @@ export default class Setup {
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
-    const session = await this._getClientSession(this._settings);
+    const session = await this._getClientSession();
     this._sessions.push(session);
 
     return session;
+  }
+
+  public async createAdminSession(): Promise<ClientSession> {
+    // TODO: Authenticate and get actual Admin Session
+    const session = await this._getClientSession();
+    this._sessions.push(session);
+
+    return session;
+  }
+
+  public async getDefaultAdminSession(): Promise<ClientSession> {
+    // TODO: Handle token expiration
+    if (this._adminSession === undefined) {
+      this._adminSession = await this.createAdminSession();
+    }
+    return this._adminSession;
   }
 
   public async cleanup(): Promise<void> {
@@ -45,8 +62,8 @@ export default class Setup {
   // TODO: Implement once Auth is integrated in SWB
   // public async getDefaultAdmissionSession() : Promise<ClientSession>{}
 
-  private async _getClientSession(settings: Settings, idToken?: string): Promise<ClientSession> {
-    const session = new ClientSession(settings, idToken);
+  private async _getClientSession(idToken?: string): Promise<ClientSession> {
+    const session = new ClientSession(this, idToken);
     await session.init();
     return session;
   }
