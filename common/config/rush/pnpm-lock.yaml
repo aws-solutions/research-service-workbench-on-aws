@@ -520,7 +520,7 @@ importers:
       '@aws-sdk/client-ec2': ^3.60.0
       '@aws-sdk/client-eventbridge': ^3.66.0
       '@aws-sdk/client-iam': ^3.58.0
-      '@aws-sdk/client-kms': ~3.118.1
+      '@aws-sdk/client-kms': ^3.118.1
       '@aws-sdk/client-lambda': ^3.82.0
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-s3-control': ^3.100.0
@@ -597,9 +597,9 @@ importers:
       '@amzn/workbench-core-audit': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@amzn/workbench-core-logging': workspace:*
-      '@aws-cdk/aws-iam': ~1.159.0
+      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-dynamodb': ^3.67.0
-      '@aws-sdk/client-kms': ~3.118.1
+      '@aws-sdk/client-kms': ^3.118.1
       '@aws-sdk/client-s3': ^3.58.0
       '@aws-sdk/client-s3-control': ^3.100.0
       '@aws-sdk/types': ^3.55.0
@@ -1520,14 +1520,14 @@ packages:
     resolution: {integrity: sha512-TvE1r2CUueyXOuHdEigYjIZVesInd9KN+K/TFFNfkkxRThiNxO6i4ZqqAVMoEjAamZZ1AA8WXJkjCz7YShHPQA==}
     dependencies:
       '@aws-crypto/util': 2.0.1
-      '@aws-sdk/types': 3.78.0
+      '@aws-sdk/types': 3.110.0
       tslib: 1.14.1
 
   /@aws-crypto/crc32c/2.0.0:
     resolution: {integrity: sha512-vF0eMdMHx3O3MoOXUfBZry8Y4ZDtcuskjjKgJz8YfIDjLStxTZrYXk+kZqtl6A0uCmmiN/Eb/JbC/CndTV1MHg==}
     dependencies:
       '@aws-crypto/util': 2.0.1
-      '@aws-sdk/types': 3.78.0
+      '@aws-sdk/types': 3.110.0
       tslib: 1.14.1
 
   /@aws-crypto/ie11-detection/2.0.0:
@@ -1540,9 +1540,9 @@ packages:
     dependencies:
       '@aws-crypto/ie11-detection': 2.0.0
       '@aws-crypto/supports-web-crypto': 2.0.0
-      '@aws-sdk/types': 3.78.0
+      '@aws-sdk/types': 3.110.0
       '@aws-sdk/util-locate-window': 3.55.0
-      '@aws-sdk/util-utf8-browser': 3.55.0
+      '@aws-sdk/util-utf8-browser': 3.109.0
       tslib: 1.14.1
 
   /@aws-crypto/sha256-browser/2.0.0:
