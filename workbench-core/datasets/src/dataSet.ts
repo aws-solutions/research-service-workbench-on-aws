@@ -16,7 +16,7 @@ export interface DataSet {
   createdAt?: string;
 
   /**
-   * a string which identifies the storage location such as an S3 bucket.
+   * a string which identifies the storage specific location such the URL to an S3 bucket.
    */
   storageName: string;
 
