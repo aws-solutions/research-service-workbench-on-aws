@@ -128,7 +128,7 @@ export class DataSetService {
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetName}'.`);
 
-    const apUrl = await storageProvider.addExternalEndpoint(
+    const mountString = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
@@ -139,7 +139,7 @@ export class DataSetService {
 
     targetDS.externalEndpoints.push(externalEndpointName);
     await this._dbProvider.updateDataSet(targetDS);
-    return this._generateMountString(dataSetName, apUrl, targetDS.path);
+    return mountString;
   }
 
   public async getExternalEndPoint(dataSetName: string, endPointName: string): Promise<ExternalEndpoint> {
