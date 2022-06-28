@@ -1,3 +1,4 @@
+import { SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -10,8 +11,6 @@ import {
   UserPoolIdentityProviderOidcProps,
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import { CfnOutput, SecretValue, Stack } from 'aws-cdk-lib/core';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import merge from 'lodash/merge';
@@ -60,12 +59,17 @@ export interface WorkbenchCognitoProps {
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
-  extends Omit<UserPoolIdentityProviderOidcProps, 'userPool'> {}
+  extends Omit<UserPoolIdentityProviderOidcProps, 'userPool' | 'scopes'> {}
 
 export class WorkbenchCognito extends Construct {
   public readonly userPool: UserPool;
   public readonly userPoolClient: UserPoolClient;
   public readonly userPoolDomain: UserPoolDomain;
+
+  public readonly cognitoDomain: string;
+  public readonly userPoolId: string;
+  public readonly userPoolClientId: string;
+  public readonly userPoolClientSecret: SecretValue;
 
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
@@ -75,8 +79,6 @@ export class WorkbenchCognito extends Construct {
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
-
-    const region = Stack.of(this).region;
 
     this.userPool = new UserPool(this, 'WorkbenchUserPool', { ...userPoolDefaults, userPoolName });
 
@@ -111,7 +113,7 @@ export class WorkbenchCognito extends Construct {
     const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
       resourceType: 'Custom::DescribeCognitoUserPoolClient',
       onCreate: {
-        region,
+        region: Stack.of(this).region,
         service: 'CognitoIdentityServiceProvider',
         action: 'describeUserPoolClient',
         parameters: {
@@ -129,12 +131,9 @@ export class WorkbenchCognito extends Construct {
       'UserPoolClient.ClientSecret'
     );
 
-    new CfnOutput(this, 'WorkbenchUserPoolDomainName', { value: this.userPoolDomain.baseUrl() });
-    new CfnOutput(this, 'WorkbenchUserPoolId', { value: this.userPool.userPoolId });
-    new CfnOutput(this, 'WorkbenchUserPoolClientId', { value: this.userPoolClient.userPoolClientId });
-    new Secret(this, 'WorkbenchUserPoolClientSecret', {
-      secretName: 'WorkbenchUserPoolClientSecret',
-      secretStringValue: SecretValue.unsafePlainText(userPoolClientSecret)
-    });
+    this.cognitoDomain = this.userPoolDomain.baseUrl();
+    this.userPoolId = this.userPool.userPoolId;
+    this.userPoolClientId = this.userPoolClient.userPoolClientId;
+    this.userPoolClientSecret = SecretValue.unsafePlainText(userPoolClientSecret);
   }
 }
