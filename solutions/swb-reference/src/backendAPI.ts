@@ -11,6 +11,7 @@ import {
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { AuditService, BaseAuditPlugin, Writer, AuditEntry } from '@amzn/workbench-core-audit';
+import { AwsService } from '@amzn/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
@@ -21,7 +22,8 @@ import { Express } from 'express';
 import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
 import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
 
-const logger = new LoggingService();
+const logger: LoggingService = new LoggingService();
+const aws: AwsService = new AwsService({ region: 'us-east-1', ddbTableName: process.env.STACK_NAME! });
 
 class AuditLogger implements Writer {
   private _logger: LoggingService;
@@ -62,13 +64,9 @@ const apiRouteConfig: ApiRouteConfig = {
   dataSetService: new DataSetService(
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
-    new DdbDataSetMetadataPlugin(
-      { region: 'us-east-1', ddbTableName: process.env.STACK_NAME! },
-      'DATASET',
-      'ENDPOINT'
-    )
+    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
   ),
-  dataSetsStoragePlugin: new S3DataSetStoragePlugin({ region: 'us-east-1' }),
+  dataSetsStoragePlugin: new S3DataSetStoragePlugin(aws),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!
