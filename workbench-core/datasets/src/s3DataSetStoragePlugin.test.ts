@@ -1,4 +1,5 @@
 import { AwsService } from '@amzn/workbench-core-base';
+import { GetKeyPolicyCommand, KMSClient, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
@@ -488,6 +489,34 @@ describe('S3DataSetStoragePlugin', () => {
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
         '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint/object/dataset-prefix/*"}],"Version":"2012-10-17"}'
       );
+    });
+
+    it("doesn't add a key policy if the key arn is not specified.", async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
     });
   });
 
