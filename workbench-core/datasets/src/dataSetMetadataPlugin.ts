@@ -1,4 +1,4 @@
-import { DataSet } from '.';
+import { DataSet, ExternalEndpoint } from '.';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -48,4 +48,11 @@ export interface DataSetMetadataPlugin {
    * @param dataSet - the updated DataSet data.
    */
   updateDataSet(dataSet: DataSet): Promise<DataSet>;
+
+  /**
+   * Return the details on a specific DataSet endpoint.
+   *
+   * @param dataSet - the name of the DataSet for which the endpoint data is to be returned.
+   */
+  getDataSetEndPointDetails(dataSetName: string, endPointName: string): Promise<ExternalEndpoint>;
 }

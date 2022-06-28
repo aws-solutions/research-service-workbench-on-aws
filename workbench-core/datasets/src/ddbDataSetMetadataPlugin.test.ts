@@ -17,7 +17,7 @@ import {
 import Boom from '@hapi/boom';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';
-import { DataSet, DdbDataSetMetadataPlugin } from '.';
+import { DataSet, DdbDataSetMetadataPlugin, ExternalEndpoint } from '.';
 
 describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
@@ -28,6 +28,9 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockAwsAccountId = 'Sample-AWS-Account';
   const mockDataSetStorageType = 'S3';
   const mockDataSetStorageName = 'S3-Bucket';
+  const mockEndPointName = 'Sample-Access-Point';
+  const mockEndPointRole = 'Sample-Role';
+  const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndPointName}/${mockDataSetPath}/`;
 
   let aws: AwsService;
   let plugin: DdbDataSetMetadataPlugin;
@@ -238,7 +241,8 @@ describe('DdbDataSetMetadataPlugin', () => {
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
     });
   });
-  describe('udpateDataSet', () => {
+
+  describe('updateDataSet', () => {
     it('adds optional external endpoints.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
       mockDdb.on(GetItemCommand).resolves({
@@ -263,6 +267,74 @@ describe('DdbDataSetMetadataPlugin', () => {
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
+    });
+  });
+
+  describe('addExternalEndpoint', () => {
+    it("succeeds when endpoint doesn't exist and no id is provided.", async () => {
+      mockDdb.on(GetItemCommand).resolves({
+        Item: {
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName }
+        }
+      });
+      mockDdb.on(UpdateItemCommand).resolves({});
+
+      const exampleEndpoint: ExternalEndpoint = {
+        name: mockEndPointName,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        allowedRoles: [mockEndPointRole]
+      };
+
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toBeUndefined();
+    });
+
+    it('throws if the endpoint id is already defined.', async () => {
+      const exampleEndpoint: ExternalEndpoint = {
+        name: mockEndPointName,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        allowedRoles: [mockEndPointRole],
+        id: mockEndPointName
+      };
+
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
+        new Error("Cannot create the Endpoint. 'Id' already exists.")
+      );
+    });
+
+    it('throws if the endpoint already exists within the DataSet', async () => {
+      mockDdb.on(GetItemCommand).resolves({
+        Item: {
+          id: { S: mockDataSetId },
+          name: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          awsAccountId: { S: mockAwsAccountId },
+          storageType: { S: mockDataSetStorageType },
+          storageName: { S: mockDataSetStorageName },
+          externalEndpoints: { L: [{ S: mockEndPointName }] }
+        }
+      });
+      const exampleEndpoint: ExternalEndpoint = {
+        name: mockEndPointName,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        allowedRoles: [mockEndPointRole]
+      };
+
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
+        new Error(
+          `Cannot create the EndPoint. EndPoint with name '${mockEndPointName}' already exists on DataSet '${mockDataSetName}'.`
+        )
+      );
     });
   });
 });

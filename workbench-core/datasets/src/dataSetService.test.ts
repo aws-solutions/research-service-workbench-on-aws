@@ -27,6 +27,7 @@ describe('DataSetService', () => {
   const mockRoleArn = 'Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
+  const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -101,12 +102,26 @@ describe('DataSetService', () => {
           storageName: mockDataSetStorageName
         };
       });
-
+    jest
+      .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
+      .mockImplementation(async () => {
+        return {
+          name: mockExistingEndpointName,
+          dataSetName: mockDataSetName,
+          path: mockDataSetPath,
+          endPointUrl: mockEndPointUrl,
+          allowedRoles: [mockRoleArn]
+        };
+      });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
     });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'addExternalEndpoint').mockImplementation(async () => {
-      return `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
+      return JSON.stringify({
+        name: mockDataSetName,
+        bucket: mockEndPointUrl,
+        prefix: mockDataSetPath
+      });
     });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'importStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
@@ -185,9 +200,9 @@ describe('DataSetService', () => {
       service = new DataSetService(audit, log, metaPlugin);
     });
 
-    it('throws not implemented when called', async () => {
-      await expect(service.getDataSetMountString('name', 'fakeRoleArn')).rejects.toThrow(
-        new Error(notImplementedText)
+    it("throws when called with a name that doesn't exists.", async () => {
+      await expect(service.getDataSetMountString('name', 'endPointName')).rejects.toThrow(
+        new Error(`'endPointName' not found on DataSet 'name'.`)
       );
     });
   });
@@ -242,11 +257,15 @@ describe('DataSetService', () => {
       plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
     });
 
-    it('returns the S3 URL for the DataSet mount point', async () => {
+    it('returns the mount string for the DataSet mount point', async () => {
       await expect(
         service.addDataSetExternalEndpoint(mockDataSetName, mockAccessPointName, mockRoleArn, plugin)
       ).resolves.toEqual(
-        `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`
+        JSON.stringify({
+          name: mockDataSetName,
+          bucket: mockEndPointUrl,
+          prefix: mockDataSetPath
+        })
       );
     });
 
@@ -263,9 +282,6 @@ describe('DataSetService', () => {
       } catch (err) {
         response = err;
       }
-
-      console.log(response);
-
       expect(Boom.isBoom(response, 400)).toBe(true);
       expect(response.message).toEqual(
         `'${mockExistingEndpointName}' already exists in '${mockDataSetWithEndpointId}'.`

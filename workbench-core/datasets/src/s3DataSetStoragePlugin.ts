@@ -86,7 +86,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       accessPointArn,
       externalRoleName
     );
-    return `s3://${accessPointArn}/${path}/`;
+    return `s3://${accessPointArn}/`;
   }
 
   public async addRoleToExternalEndpoint(

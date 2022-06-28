@@ -2,7 +2,7 @@ import { AuditService } from '@amzn/workbench-core-audit';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin } from '.';
+import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -95,12 +95,18 @@ export class DataSetService {
   /**
    * Get the mount configuration string for a DataSet.
    * @param dataSetName - the name of the DataSet.
-   * @param environmentRoleArn - an arn with which the DataSet will be accessed from the external environment.
+   * @param endPointName - an arn with which the DataSet will be accessed from the external environment.
    *
    * @returns the string needed to mount the Dataset in an external environment.
    */
-  public async getDataSetMountString(dataSetName: string, environmentRoleArn: string): Promise<string> {
-    throw new Error(notImplementedText);
+  public async getDataSetMountString(dataSetName: string, endPointName: string): Promise<string> {
+    const targetDS: DataSet = await this.getDataSet(dataSetName);
+
+    if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointName))
+      throw Boom.notFound(`'${endPointName}' not found on DataSet '${dataSetName}'.`);
+
+    const endPoint = await this.getExternalEndPoint(dataSetName, endPointName);
+    return this._generateMountString(dataSetName, endPoint.endPointUrl, targetDS.path);
   }
 
   public async listDataSets(): Promise<DataSet[]> {
@@ -122,7 +128,7 @@ export class DataSetService {
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetName}'.`);
 
-    const mountString = storageProvider.addExternalEndpoint(
+    const apUrl = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
@@ -133,6 +139,18 @@ export class DataSetService {
 
     targetDS.externalEndpoints.push(externalEndpointName);
     await this._dbProvider.updateDataSet(targetDS);
-    return mountString;
+    return this._generateMountString(dataSetName, apUrl, targetDS.path);
+  }
+
+  public async getExternalEndPoint(dataSetName: string, endPointName: string): Promise<ExternalEndpoint> {
+    return await this._dbProvider.getDataSetEndPointDetails(dataSetName, endPointName);
+  }
+
+  private _generateMountString(dataSetName: string, endPointURL: string, path: string): string {
+    return JSON.stringify({
+      name: dataSetName,
+      bucket: endPointURL,
+      prefix: path
+    });
   }
 }

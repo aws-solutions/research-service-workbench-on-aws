@@ -16,6 +16,22 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     this._endPointKeyType = endPointKeyTypeId;
   }
 
+  public async getDataSetEndPointDetails(
+    dataSetName: string,
+    endPointName: string
+  ): Promise<ExternalEndpoint> {
+    const response: GetItemCommandOutput = (await this._aws.helpers.ddb
+      .get({
+        pk: `${this._dataSetKeyType}#${dataSetName}`,
+        sk: `${this._endPointKeyType}#${endPointName}`
+      })
+      .execute()) as GetItemCommandOutput;
+
+    if (!response || !response.Item)
+      throw Boom.notFound(`Could not find the endpoint '${endPointName}' on '${dataSetName}'.`);
+    return response.Item as unknown as ExternalEndpoint;
+  }
+
   public async listDataSets(): Promise<DataSet[]> {
     const params: QueryParams = {
       index: 'getResourceByCreatedAt',
@@ -70,9 +86,17 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._validateCreateExternalEndpoint(endPoint);
     endPointParam.Id = uuidv4();
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
+    await this._storeEndPointToDdb(endPoint);
   }
 
-  private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {}
+  private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
+    if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
+    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetName);
+    if (_.find(targetDS.externalEndpoints, (ep) => ep === endPoint.name))
+      throw new Error(
+        `Cannot create the EndPoint. EndPoint with name '${endPoint.name}' already exists on DataSet '${targetDS.name}'.`
+      );
+  }
 
   private async _validateCreateDataSet(dataSet: DataSet): Promise<void> {
     if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
