@@ -92,6 +92,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     this._clientSecret = clientSecret;
     this._baseUrl = cognitoDomain;
 
+    // eslint-disable-next-line security/detect-unsafe-regex
     const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
     if (!regionMatch) {
       throw new PluginConfigurationError('Invalid Cognito user pool id');

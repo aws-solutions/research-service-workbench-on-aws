@@ -39,6 +39,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   public constructor(userPoolId: string) {
     this._userPoolId = userPoolId;
 
+    // eslint-disable-next-line security/detect-unsafe-regex
     const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
 
     if (!regionMatch) {
