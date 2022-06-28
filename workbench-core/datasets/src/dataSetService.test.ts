@@ -143,8 +143,7 @@ describe('DataSetService', () => {
 
     beforeEach(() => {
       service = new DataSetService(audit, log, metaPlugin);
-      const kmsKeyArn = 'not an arn!';
-      plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      plugin = new S3DataSetStoragePlugin(aws);
     });
 
     it('calls createStorage and addDataSet', async () => {
@@ -168,8 +167,7 @@ describe('DataSetService', () => {
 
     beforeEach(() => {
       service = new DataSetService(audit, log, metaPlugin);
-      const kmsKeyArn = 'not an arn!';
-      plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      plugin = new S3DataSetStoragePlugin(aws);
     });
 
     it('calls importStorage and addDataSet ', async () => {
@@ -253,8 +251,7 @@ describe('DataSetService', () => {
 
     beforeEach(() => {
       service = new DataSetService(audit, log, metaPlugin);
-      const kmsKeyArn = 'not an arn!';
-      plugin = new S3DataSetStoragePlugin(aws, kmsKeyArn);
+      plugin = new S3DataSetStoragePlugin(aws);
     });
 
     it('returns the mount string for the DataSet mount point', async () => {
