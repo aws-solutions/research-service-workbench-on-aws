@@ -1,8 +1,28 @@
 import TopNavigation from '@awsui/components-react/top-navigation';
 import { useTranslation } from 'next-i18next';
+import { logout } from '../api/auth';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
 import styles from '../styles/Header.module.scss';
+
+async function logoutEvent(): Promise<void> {
+  try {
+    const response = await logout();
+    const logoutUrl = response.data.logoutUrl;
+    window.location.assign(logoutUrl);
+
+    // TODO: State management
+
+    // setLoggedIn(false);
+    // setInfo(undefined);
+    // setGuestLogin(false);
+    // setAdminLogin(false);
+
+    window.localStorage.removeItem('idToken');
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 export default function Header(): JSX.Element {
   const { t } = useTranslation();
@@ -17,7 +37,9 @@ export default function Header(): JSX.Element {
     overflowMenuBackIconAriaLabel: t('Header.Back'),
     overflowMenuDismissIconAriaLabel: t('Header.CloseMenu')
   };
-  const profileActions = [{ type: 'button', id: 'signout', text: t('Header.SignOut') }];
+  const profileActions = [
+    { type: 'button', id: 'signout', text: t('Header.SignOut'), onclick: async () => await logoutEvent() }
+  ];
   return (
     <TopNavigation
       id="header"
