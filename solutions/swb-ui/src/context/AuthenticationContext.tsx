@@ -9,10 +9,7 @@ export interface AuthenticationProps {
 
 const AuthenticationContext: Context<AuthenticationProps> = createContext<AuthenticationProps>({
   user: researcherUser,
-  signIn: (user: User) => {
-    // const token = localStorage.getItem('idToken');
-    // const {sub, email} = decodeToken(token);
-  },
+  signIn: (user: User) => {},
   signOut: () => {}
 });
 

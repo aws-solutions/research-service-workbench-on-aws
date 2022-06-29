@@ -331,6 +331,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jwt-decode",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -377,6 +381,10 @@
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "react-router-dom",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",

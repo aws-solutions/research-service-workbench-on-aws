@@ -5,8 +5,7 @@ import {
   getTokensFromAuthorizationCode,
   isUserLoggedIn,
   logoutUser,
-  refreshAccessToken,
-  verifyToken
+  refreshAccessToken
 } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Router } from 'express';
@@ -22,8 +21,6 @@ export function setUpAuthRoutes(router: Router, auth: AuthenticationService, log
   router.get('/logout', wrapAsync(logoutUser(auth, { loggingService: logger })));
 
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger })));
-
-  router.get('/user', wrapAsync(verifyToken(auth, { loggingService: logger })));
 
   router.get('/loggedIn', wrapAsync(isUserLoggedIn(auth, { loggingService: logger })));
 }

@@ -16,8 +16,4 @@ const checkIfloggedIn = async (): Promise<any> => {
   return await httpApiGet('loggedIn', {});
 };
 
-const verifyToken = async (): Promise<any> => {
-  return await httpApiGet('user', {});
-};
-
-export { login, logout, token, checkIfloggedIn, verifyToken };
+export { login, logout, token, checkIfloggedIn };

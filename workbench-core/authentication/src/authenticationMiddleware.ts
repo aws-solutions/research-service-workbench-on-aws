@@ -292,9 +292,6 @@ export function isUserLoggedIn(
     const accessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;
 
-    loggingService?.info(`accessToken - ${accessToken}`);
-    loggingService?.info(`refreshToken - ${refreshToken}`);
-
     try {
       if (typeof refreshToken === 'string') {
         const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);

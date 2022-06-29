@@ -34,7 +34,7 @@ function Hero(): JSX.Element {
                 <span className="custom-home__header-sub-title">{settings.description}</span>
               </Box>
             )}
-            {Login()}
+            <Login />
           </div>
           <div className="custom-home__header-cta">
             <Container>

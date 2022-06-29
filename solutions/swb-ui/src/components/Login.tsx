@@ -26,6 +26,10 @@ function getFragmentParam(location: Location, key: string): string {
 
 function Login(): JSX.Element {
   const [loggedIn, setLoggedIn] = useState(false);
+
+  // TODO: Get user's role from Cognito group information
+  // Assign admin/guest roles using useState accordingly
+
   // const [info, setInfo] = useState<Record<string, string> | undefined>(undefined);
   // const [guestLogin, setGuestLogin] = useState(false);
   // const [adminLogin, setAdminLogin] = useState(false);
@@ -33,14 +37,13 @@ function Login(): JSX.Element {
   useEffect(() => {
     async function isUserLoggedIn(): Promise<void> {
       try {
+        // TODO: Cannot store access_token and refresh_token in cookies yet
+        // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value
         const isLoggedIn = await checkIfloggedIn();
         setLoggedIn(isLoggedIn.loggedIn);
       } catch (e) {
         console.log(e);
       }
-
-      // TODO: Get user's role from Cognito group information
-      // Assign admin/guest roles using useState accordingly
     }
 
     isUserLoggedIn().catch((e) => console.log(e));
@@ -69,7 +72,7 @@ function Login(): JSX.Element {
 
           setLoggedIn(true);
 
-          // TODO: Use signIn() from authenticationContext - read idToken and decode to create User obj
+          // TODO: Use signIn() just so header gets user info from Cognito
           // const { signIn } = useAuthentication();
 
           localStorage.removeItem('stateVerifier');
@@ -89,7 +92,6 @@ function Login(): JSX.Element {
   async function loginEvent(): Promise<void> {
     try {
       const response = await login();
-      console.log(response.redirectUrl);
       let signInUrl: string = response.redirectUrl;
 
       const challenge = pkceChallenge(128);
