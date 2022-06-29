@@ -81,7 +81,7 @@ describe('S3DataSetStoragePlugin', () => {
     );
   });
 
-  describe('importStroage', () => {
+  describe('importStorage', () => {
     itProp(
       "Appends '/' to the end of the path when not supplied",
       [fc.string(), fc.string()],
