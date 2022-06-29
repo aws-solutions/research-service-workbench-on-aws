@@ -17,7 +17,12 @@ and sufficent permissions for a provided IAM role to access the files.
 
 At minimum, DataSets requires
 - an AWS account
-- a DynamoDb table within that account using a primary key named "pk" and a sort key named "sk".
+- a DynamoDb table within that account using
+  - partition key named "pk"
+  - a sort key named "sk"
+  - a GSI: "getResourceByCreatedAt"
+    - partition key: resource type
+    - sort key: createdAt
 - an S3 bucket to hold your DataSet prefixes
 
 ### Initializaton
