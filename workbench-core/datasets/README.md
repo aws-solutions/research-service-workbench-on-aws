@@ -111,7 +111,7 @@ const dataSet = await service.provisionDataSet(
   storagePlugin);
 
 // add an endpoint to the dataset and get the string needed to mount it to an
-// external enviornment.
+// external environment.
 const mountString = await service.addDataSetExternalEndpoint(
   'my-data-set'
   'my-access-point',
