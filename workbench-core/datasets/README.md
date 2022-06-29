@@ -86,7 +86,7 @@ const aws: AwsService = new AwsService( {region: 'us-east-1', DdbTableName: 'my-
 // 'DS': this is the prefix used to distinguish DataSet keys from others in the database.
 //       In this case, all DataSet keys will have the form: DS#...
 // 'EP': DataSet Endpoints are another entity stored in DynamoDb, and this is the prefix
-//       for thos keys (EP#...).
+//       for those keys (EP#...).
 // Alter these values as needed to avoid collisions with any other components which may
 // share the same table.
 const metadataPlugin: DdbDataSetMetadataPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
