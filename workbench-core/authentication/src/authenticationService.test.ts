@@ -3,7 +3,6 @@ jest.mock('./plugins/cognitoAuthenticationPlugin');
 import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticationPluginOptions } from '.';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'fake-region',
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
