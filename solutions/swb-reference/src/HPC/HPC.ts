@@ -9,7 +9,7 @@ import { AwsService } from '@amzn/workbench-core-base';
 import aws4 from 'aws4';
 import { Request } from 'express';
 
-interface JobParameters {
+export interface JobParameters {
   command: string;
   job_name: string;
   nodes: number;
@@ -17,7 +17,7 @@ interface JobParameters {
   partition: string;
 }
 
-interface AwsServiceWithCredentials {
+export interface AwsServiceWithCredentials {
   awsService: AwsService;
   credentials: {
     AccessKeyId: string;
@@ -26,7 +26,7 @@ interface AwsServiceWithCredentials {
   };
 }
 
-interface SSMCommandStatus {
+export interface SSMCommandStatus {
   CommandId: string;
   InstanceId: string;
   ResponseCode: number;
@@ -35,10 +35,10 @@ interface SSMCommandStatus {
   StatusDetails: string;
 }
 
-interface Cluster {
+export interface Cluster {
   cloudformationStackArn: string;
   clusterName: string;
-  creationTime: string;
+  creationTime?: string;
   headNode?: {
     instanceId: string;
     instanceType: string;
@@ -53,7 +53,7 @@ interface Cluster {
 
 export default class HPC {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async assumeRoleWithCredentials(params: {
+  private async _assumeRoleWithCredentials(params: {
     aws: AwsService;
     roleArn: string;
     roleSessionName: string;
@@ -83,7 +83,7 @@ export default class HPC {
     }
   }
 
-  public async awsAssumeEnvMgt(projectId: string): Promise<AwsServiceWithCredentials> {
+  private async _awsAssumeEnvMgt(projectId: string): Promise<AwsServiceWithCredentials> {
     const aws = new AwsService({ region: process.env.AWS_REGION! });
 
     const timestamp = new Date().getTime();
@@ -100,34 +100,12 @@ export default class HPC {
       externalId: projItem.externalId
     };
 
-    const envMgtAWS = await this.assumeRoleWithCredentials(assumeRoleParams);
+    const envMgtAWS = await this._assumeRoleWithCredentials(assumeRoleParams);
 
     return envMgtAWS;
   }
 
-  public async getAwsCluster(req: Request): Promise<Cluster | Cluster[]> {
-    const awsEnvMgt = await this.awsAssumeEnvMgt(req.params.projectId);
-
-    const opts = {
-      host: process.env.PCLUSTER_API_URL!,
-      service: 'execute-api',
-      region: 'us-east-1',
-      method: 'GET',
-      path: '/prod/v3/clusters'
-    };
-
-    if (req.params.clusterName) {
-      opts.path = `/prod/v3/clusters/${req.params.clusterName}`;
-    }
-
-    const secs = {
-      accessKeyId: awsEnvMgt.credentials.AccessKeyId,
-      secretAccessKey: awsEnvMgt.credentials.SecretAccessKey,
-      sessionToken: awsEnvMgt.credentials.SessionToken
-    };
-
-    const signed: aws4.Request = aws4.sign(opts, secs);
-
+  private async _sendSignedClusterRequest(req: Request, signed: aws4.Request): Promise<Cluster | Cluster[]> {
     return new Promise((resolve, reject) => {
       const https_req = https.request(signed, function (res: IncomingMessage) {
         let response_body = '';
@@ -160,13 +138,39 @@ export default class HPC {
     });
   }
 
-  public async performSSMCommand(
+  public async getAwsCluster(req: Request): Promise<Cluster | Cluster[]> {
+    const awsEnvMgt = await this._awsAssumeEnvMgt(req.params.projectId);
+
+    const opts = {
+      host: process.env.PCLUSTER_API_URL!,
+      service: 'execute-api',
+      region: process.env.AWS_REGION!,
+      method: 'GET',
+      path: '/prod/v3/clusters'
+    };
+
+    if (req.params.clusterName) {
+      opts.path = `/prod/v3/clusters/${req.params.clusterName}`;
+    }
+
+    const secs = {
+      accessKeyId: awsEnvMgt.credentials.AccessKeyId,
+      secretAccessKey: awsEnvMgt.credentials.SecretAccessKey,
+      sessionToken: awsEnvMgt.credentials.SessionToken
+    };
+
+    const signed: aws4.Request = aws4.sign(opts, secs);
+
+    return this._sendSignedClusterRequest(req, signed);
+  }
+
+  private async _performSSMCommand(
     projectId: string,
     instanceId: string,
     slurmCommand: string,
     slurmFullCommand: string
   ): Promise<SSMCommandStatus> {
-    const awsEnvMgt = await this.awsAssumeEnvMgt(projectId);
+    const awsEnvMgt = await this._awsAssumeEnvMgt(projectId);
 
     const ssm_command = {
       InstanceIds: [instanceId],
@@ -181,6 +185,8 @@ export default class HPC {
 
     const sendCommandResponse = await awsEnvMgt.awsService.clients.ssm.sendCommand(ssm_command);
 
+    console.log(JSON.stringify(sendCommandResponse));
+
     const ssmStatusCommand = {
       CommandId: sendCommandResponse.Command?.CommandId,
       InstanceId: instanceId
@@ -190,7 +196,7 @@ export default class HPC {
       return new Promise<unknown>((resolve) => setTimeout(resolve, ms));
     }
 
-    await sleep(1000);
+    await sleep(2000);
 
     const commandStatusResponse = await awsEnvMgt.awsService.clients.ssm.getCommandInvocationCommand(
       ssmStatusCommand
@@ -217,7 +223,7 @@ export default class HPC {
   }
 
   public async jobQueue(req: Request): Promise<SSMCommandStatus> {
-    return this.performSSMCommand(
+    return this._performSSMCommand(
       req.params.projectId,
       req.params.instanceId,
       'squeue',
@@ -230,7 +236,7 @@ export default class HPC {
 
     console.log(JSON.stringify(jobParams));
 
-    return this.performSSMCommand(
+    return this._performSSMCommand(
       req.params.projectId,
       req.params.instanceId,
       'sbatch',
@@ -239,7 +245,7 @@ export default class HPC {
   }
 
   public async cancelJob(req: Request): Promise<SSMCommandStatus> {
-    return this.performSSMCommand(
+    return this._performSSMCommand(
       req.params.projectId,
       req.params.instanceId,
       'scancel',
