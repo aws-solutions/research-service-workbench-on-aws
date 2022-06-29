@@ -124,6 +124,12 @@
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/fabric-infrastructure",
+      "projectFolder": "solutions/managed-blockchain-for-patient-consent/fabric-infrastructure",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
     }
   ]
 }
