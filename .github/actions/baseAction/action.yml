@@ -35,6 +35,11 @@ runs:
           ${{ runner.os }}-pnpm-
           ${{ runner.os }}-
 
+    - name: install pnpm
+      uses: pnpm/action-setup@v2.2.2
+      with:
+        version: 6.32
+
     - name: Install dependecies
       shell: bash
       run: node common/scripts/install-run-rush.js install

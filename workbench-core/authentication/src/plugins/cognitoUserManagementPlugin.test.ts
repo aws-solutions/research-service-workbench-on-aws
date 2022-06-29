@@ -53,6 +53,14 @@ describe('CognitoUserManagementPlugin tests', () => {
     roles = ['Role1', 'Role2'];
   });
 
+  describe('constructor tests', () => {
+    it('should throw PluginConfigurationError when the userPoolId is invalid', async () => {
+      expect(() => {
+        new CognitoUserManagementPlugin('bad-user-pool-id');
+      }).toThrow(PluginConfigurationError);
+    });
+  });
+
   describe('getUser tests', () => {
     it('should return the requested User when it exists', async () => {
       cognitoMock.on(AdminGetUserCommand).resolves({
