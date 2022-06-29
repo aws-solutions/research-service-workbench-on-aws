@@ -1,4 +1,5 @@
 import { AwsService } from '@amzn/workbench-core-base';
+import { GetKeyPolicyCommand, KMSClient, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
@@ -75,6 +76,33 @@ describe('S3DataSetStoragePlugin', () => {
         s3Mock.on(PutObjectCommand).resolves({});
         const pathWithSlash: string = `${path}/`;
         const s3Uri = await plugin.createStorage(name, pathWithSlash);
+        expect(s3Uri).toMatch(`s3://${name}/${pathWithSlash}`);
+      }
+    );
+  });
+
+  describe('importStorage', () => {
+    itProp(
+      "Appends '/' to the end of the path when not supplied",
+      [fc.string(), fc.string()],
+      async (name, path) => {
+        const plugin = new S3DataSetStoragePlugin(aws);
+
+        const pathNoSlash: string = path.replace(/\//g, '_');
+        const nameNoSlash: string = name.replace(/\//g, '_');
+        const s3Uri = await plugin.importStorage(nameNoSlash, pathNoSlash);
+        expect(s3Uri).toMatch(`s3://${nameNoSlash}/${pathNoSlash}/`);
+      }
+    );
+
+    itProp(
+      "Doesn't append '/' to the end of the path when supplied",
+      [fc.string(), fc.string()],
+      async (name, path) => {
+        const plugin = new S3DataSetStoragePlugin(aws);
+
+        const pathWithSlash: string = `${path}/`;
+        const s3Uri = await plugin.importStorage(name, pathWithSlash);
         expect(s3Uri).toMatch(`s3://${name}/${pathWithSlash}`);
       }
     );
@@ -487,6 +515,256 @@ describe('S3DataSetStoragePlugin', () => {
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
         '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someEndpoint/object/dataset-prefix/*"}],"Version":"2012-10-17"}'
+      );
+    });
+
+    it("doesn't add a key policy if the key arn is not specified.", async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
+      expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(0);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
+    });
+
+    it('adds a key policy if the key arn is specified, and no key policy exists.', async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
+      expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
+    });
+
+    it('adds a key policy if the key arn is specified, and only a grant policy exists.', async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock
+        .on(GetKeyPolicyCommand)
+        .resolves({
+          Policy: `
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS":"arn:aws:iam::123456789012:root"
+                },
+                "Action": [
+                  "kms:CreateGrant",
+                  "kms:ListGrant",
+                  "kms:RevokeGrant"
+                ],
+                "Resource": "*",
+                "Condition": {
+                  "Bool": {
+                    "kms:GrantIsForAWSResource": "true"
+                  }
+                }
+              }
+          ]
+        }`
+        })
+        .on(PutKeyPolicyCommand)
+        .resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
+      expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)[0].firstArg.input.Policy).toEqual(
+        '{"Statement":[{"Action":["kms:CreateGrant","kms:ListGrant","kms:RevokeGrant"],"Condition":{"Bool":{"kms:GrantIsForAWSResource":"true"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"},{"Action":["kms:Encrypt","kms:Decrypt","kms:ReEncrypt*","kms:GenerateDataKey*","kms:DescribeKey"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"}],"Version":"2012-10-17"}'
+      );
+    });
+
+    it('does not add a key policy if the key arn is specified, and both usage and resource grant statements exist.', async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock
+        .on(GetKeyPolicyCommand)
+        .resolves({
+          Policy: `
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::123456789012:root"
+              },
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS":"arn:aws:iam::123456789012:root"
+              },
+              "Action": [
+                "kms:CreateGrant",
+                "kms:ListGrant",
+                "kms:RevokeGrant"
+              ],
+              "Resource": "*",
+              "Condition": {
+                "Bool": {
+                  "kms:GrantIsForAWSResource": "true"
+                }
+              }
+            }
+          ]
+      }`
+        })
+        .on(PutKeyPolicyCommand)
+        .resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
+      expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
+    });
+
+    it('adds a key policy if the key arn is specified, and only a usage policy exists.', async () => {
+      const name: string = 'bucketName';
+      const path: string = 'dataset-prefix';
+      const externalRoleName: string = 'someRole';
+      const externalEndpointName: string = 'someEndpoint';
+      const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
+      const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
+      const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+      const kmsMock = mockClient(KMSClient);
+      kmsMock
+        .on(GetKeyPolicyCommand)
+        .resolves({
+          Policy: `
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::123456789012:root"
+              },
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource": "*"
+            }
+          ]
+      }`
+        })
+        .on(PutKeyPolicyCommand)
+        .resolves({});
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+      ).resolves.toEqual(`s3://${accessPointArn}/`);
+      expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
+      expect(kmsMock.commandCalls(PutKeyPolicyCommand)[0].firstArg.input.Policy).toEqual(
+        '{"Statement":[{"Action":["kms:Encrypt","kms:Decrypt","kms:ReEncrypt*","kms:GenerateDataKey*","kms:DescribeKey"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"},{"Action":["kms:CreateGrant","kms:ListGrant","kms:RevokeGrant"],"Condition":{"Bool":{"kms:GrantIsForAWSResource":"true"}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:root"},"Resource":"*"}],"Version":"2012-10-17"}'
       );
     });
   });

@@ -27,11 +27,6 @@ interface TokensExpiration {
 
 export interface CognitoAuthenticationPluginOptions {
   /**
-   * The user pool's region
-   */
-  region: string;
-
-  /**
    * The Cognito domain. Follows the format: "https://\<domain prefix\>.auth.\<region\>.amazoncognito.com"
    */
   cognitoDomain: string;
@@ -47,7 +42,7 @@ export interface CognitoAuthenticationPluginOptions {
   clientId: string;
 
   /**
-   * The Cognito app client secret
+   * The Cognito app client secret.
    */
   clientSecret: string;
 
@@ -81,21 +76,28 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   /**
    *
    * @param options - a {@link CognitoAuthenticationPluginOptions} object holding the Cognito user pool information
+   *
+   * @throws {@link PluginConfigurationError} if a parameter is invalid
    */
   public constructor({
-    region,
     cognitoDomain,
     websiteUrl,
     userPoolId,
     clientId,
     clientSecret
   }: CognitoAuthenticationPluginOptions) {
-    this._region = region;
     this._websiteUrl = websiteUrl;
     this._userPoolId = userPoolId;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
     this._baseUrl = cognitoDomain;
+
+    // eslint-disable-next-line security/detect-unsafe-regex
+    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
+    if (!regionMatch) {
+      throw new PluginConfigurationError('Invalid Cognito user pool id');
+    }
+    this._region = regionMatch.groups!.region;
 
     try {
       this._verifier = CognitoJwtVerifier.create({
