@@ -62,7 +62,7 @@ export default class AccountService {
 
   public async getAccounts(): Promise<Account[]> {
     const queryParams = {
-      index: 'getResourceByUpdatedAt',
+      index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     };
     const response = await this._aws.helpers.ddb.query(queryParams).execute();

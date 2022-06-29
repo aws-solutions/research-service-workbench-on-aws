@@ -5,6 +5,12 @@
  */
 export interface DataSetsStoragePlugin {
   /**
+   * Returns a constient identifier for the type of storage associated with the plugin.
+   * This value should be unique for each storage plugin type.
+   */
+  getStorageType(): string;
+
+  /**
    * Create a storage destination for a dataSet.
    *
    * @param name - A name identifying the stroage destination. This should be consistent
@@ -17,9 +23,21 @@ export interface DataSetsStoragePlugin {
   createStorage(name: string, path: string): Promise<string>;
 
   /**
+   * Complete any operations needed in the storage provider to import an existing
+   * location as a DataSet.
+   * @param name - A name identifying the storage destination.
+   * @param path - the storage specific path for the destination.
+   *
+   * @returns a URL to access the storage location.
+   */
+  importStorage(name: string, path: string): Promise<string>;
+
+  /**
    * Configures an existing dataset to be connected to an external environment.
    *
-   * @param dataSetName - the name of the dataSet to be accessed
+   * @param name - the name of the storage destination to be accessed
+   * @param path - a string which locates to root of the dataset within the storage medium
+   * such as a prefix in an S3 bucket.
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param externalRoleName - the role name which the external environment will assume to
    * access the DataSet
@@ -27,49 +45,63 @@ export interface DataSetsStoragePlugin {
    * @returns a string which can be used to mount the DataSet to an external environment.
    */
   addExternalEndpoint(
-    dataSetName: string,
+    name: string,
+    path: string,
     externalEndpointName: string,
     externalRoleName: string
   ): Promise<string>;
 
   /**
-   * Changes the role used to access an external endpoint.
+   * Add a role used to access an external endpoint.
    *
-   * @param dataSetName - the name of the dataSet accessed by the external endpoint.
+   * @param name - the name of the storage destination accessed by the external endpoint.
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
    * @param externalRoleName - the name of the role which will replace the current role accessing the endpoint.
 
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
-  updateExternalEndpoint(
-    dataSetName: string,
+  addRoleToExternalEndpoint(
+    name: string,
+    path: string,
     externalEndpointName: string,
     externalRoleName: string
   ): Promise<string>;
 
   /**
+   * Remove a role from an external endpoint.
+   * @param name - the name of the storage destination accessed by the external endpoint.
+   * @param externalEndpointName - the name which uniquely identifies the external endpoint.
+   * @param externalRoleArn - the arn of the role to remove from the endpoint.
+   */
+  removeRoleFromExternalEndpoint(
+    name: string,
+    externalEndpointName: string,
+    externalRoleArn: string
+  ): Promise<void>;
+
+  /**
    *
-   * @param dataSetName - the name of the DataSet which will be mounted to the environment.
+   * @param name - the name of the DataSet which will be mounted to the environment.
    * @param externalEndpointName - the unique name used to identify the endpont.
    *
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
-  getExternalEndpoint(dataSetName: string, externalEndpointName: string): Promise<string>;
+  // getExternalEndpoint(name: string, externalEndpointName: string): Promise<string>;
 
   /**
    * Create a presigned URL to be used to upload a file to a Dataset.
    *
-   * @param dataSetName - the name of the Dataset to which to make an upload.
+   * @param name - the name of the Dataset to which to make an upload.
    * @param timeToLiveMilliseconds - the maximum time before the URL expires.
    *
    * @returns a URL which can be used to upload a file directly to the DataSet destination.
    */
-  createPresignedUploadUrl(dataSetName: string, timeToLiveMilliseconds: number): Promise<string>;
+  createPresignedUploadUrl(name: string, timeToLiveMilliseconds: number): Promise<string>;
 
   /**
    * Create a set of presigned URLs to be used to make a multipart upload to a DataSet.
    *
-   * @param storageLocation - the DataSet to which files will be uploaded.
+   * @param name - the DataSet to which files will be uploaded.
    * @param numberOfParts - the number of parts in which the file will be divided.
    * @param timeToLiveMilliseconds - the length of time in milliseconds for which the URLs will be valid.
    *
@@ -77,7 +109,7 @@ export interface DataSetsStoragePlugin {
    * of the upload.
    */
   createPresignedMultiPartUploadUrls(
-    dataSetName: string,
+    name: string,
     numberOfParts: number,
     timeToLiveMilliseconds: number
   ): Promise<string[]>;

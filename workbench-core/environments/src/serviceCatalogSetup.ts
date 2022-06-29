@@ -172,7 +172,7 @@ export default class ServiceCatalogSetup {
       Prefix: prefix
     };
 
-    const listObjectOutput = await this._aws.clients.s3.listObject(listS3ObjectsParam);
+    const listObjectOutput = await this._aws.clients.s3.listObjects(listS3ObjectsParam);
 
     const S3FileNameToEtag: { [key: string]: string } = {};
     if (listObjectOutput.Contents) {
@@ -312,6 +312,6 @@ export default class ServiceCatalogSetup {
       ProductId: productId
     };
 
-    await this._aws.clients.serviceCatalog.associateProductWithPorfolio(associateProductParam);
+    await this._aws.clients.serviceCatalog.associateProductWithPortfolio(associateProductParam);
   }
 }

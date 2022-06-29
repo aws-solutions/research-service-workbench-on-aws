@@ -23,7 +23,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-authorization",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@amzn/workbench-core-datasets",
       "allowedCategories": [ "production" ]
     },
     {
@@ -55,6 +63,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-cdk/aws-iam",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-cloudformation",
       "allowedCategories": [ "production" ]
     },
@@ -79,11 +91,19 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-kms",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-lambda",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-s3",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws-sdk/client-s3-control",
       "allowedCategories": [ "production" ]
     },
     {
@@ -255,6 +275,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cors",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -381,6 +405,10 @@
     {
       "name": "source-map-support",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "swr",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "triple-beam",

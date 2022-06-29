@@ -1,5 +1,5 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
-import { HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
+import { AuthenticatedUser, HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
+import { RoutesIgnored } from '../routesMap';
 import {
   mockAdminPermissions,
   mockGetOperations,
@@ -8,6 +8,8 @@ import {
 } from './mockPermissions';
 
 export class MockPermissionsPlugin implements PermissionsPlugin {
+  private _routesIgnored: RoutesIgnored = { '/login': { GET: true } };
+
   public async getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]> {
     if (user.roles.includes('admin')) {
       return mockAdminPermissions;
@@ -21,5 +23,12 @@ export class MockPermissionsPlugin implements PermissionsPlugin {
       else if (method === 'PUT') return mockPutOperations;
     }
     throw new Error('Route not secured');
+  }
+  public async isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean> {
+    // eslint-disable-next-line security/detect-object-injection
+    if (this._routesIgnored.hasOwnProperty(route) && this._routesIgnored[route][method]) {
+      return true;
+    }
+    return false;
   }
 }

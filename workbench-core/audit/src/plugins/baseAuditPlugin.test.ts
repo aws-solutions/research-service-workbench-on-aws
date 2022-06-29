@@ -10,7 +10,12 @@ describe('BaseAuditPlugin', () => {
   let baseAuditPlugin: BaseAuditPlugin;
   beforeEach(async () => {
     auditEntry = {};
-    metadata = {};
+    metadata = {
+      statusCode: 200,
+      action: 'GET /user',
+      source: { ip: 'sampleIP' },
+      actor: { uid: 'sampleID' }
+    };
     writer = {
       write: jest.fn(),
       prepare: jest.fn()
@@ -21,6 +26,10 @@ describe('BaseAuditPlugin', () => {
     test('Prepare audit entry', async () => {
       await baseAuditPlugin.prepare(metadata, auditEntry);
       expect(auditEntry.logEventType).toBe('audit');
+      expect(auditEntry.action).toBe(metadata.action);
+      expect(auditEntry.source).toBe(metadata.source);
+      expect(auditEntry.statusCode).toBe(metadata.statusCode);
+      expect(auditEntry.actor).toBe(metadata.actor);
     });
   });
 

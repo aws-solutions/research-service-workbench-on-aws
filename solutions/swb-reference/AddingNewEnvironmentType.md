@@ -7,7 +7,7 @@ At a high level, we'll need to do the following steps
 * Set up API routes and provide IAM permissions for managing the environment
 * Set up environment status updates
 
-[Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/feat/environments...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
+[Code Sample](https://github.com/awslabs/monorepo-for-service-workbench/compare/develop...feat/sagemakerNotebook) for adding `sagemakerNotebook` environment. This is the code to add `sagemakerNotebook` for step 1 through 4. 
 
 ## Step 1: Define environment AWS resources 
 In this step we'll define the AWS resources that are required for our new environment type. The resources will be defined in a `.cfn.yaml` file. And that file will be used to create a Service Catalog product, which will be added to SWB's Service Catalog portfolio.
@@ -20,8 +20,8 @@ In this step we'll define the AWS resources that are required for our new enviro
         Description: Sagemaker instance type to launch
         Default: ml.t3.xlarge
     ```
-3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
 
+   
 ## Step 2: Set up environment management workflow 
 In this step we set up the workflow for managing environment launch and terminate. These workflows are defined by SSM documents. We will also implement **environment services** to handle start/stop/connecting to the new environment. These three actions do not require SSM documents, and will make AWS API calls in the hosting account to start/stop/connect to the environment. 
 ### SSM documents
@@ -184,6 +184,7 @@ The Status handler lambda writes new environment status and environment details 
 Run the following command in `solutions/swb-reference` directory to deploy the updated code to AWS
 ```
 STAGE=<STAGE> rushx cdk-deploy              # Deploy code to `Main Account` on AWS
+STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 ```
 
 ## Step 6 (Optional): Update hosting account resources

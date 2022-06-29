@@ -533,6 +533,7 @@ Resources:
       TargetKeyId: !Ref EncryptionKey
 
   StateChangeEventRuleMainRouting:
+
     Type: 'AWS::Events::Rule'
     Properties:
       Description: Routes environment state changes to the main event bus

@@ -1,6 +1,6 @@
-import { AuthenticatedUser } from '@amzn/workbench-core-authentication';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import _ from 'lodash';
+import { AuthenticatedUser } from './authenticatedUser';
 import Operation from './operation';
 import Permission, { PermissionsMap } from './permission';
 import PermissionsPlugin from './permissionsPlugin';
@@ -44,7 +44,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
   }
 
   public async getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]> {
-    if (this._isRouteIgnored(route, method)) {
+    if (await this.isRouteIgnored(route, method)) {
       return [];
     } else if (_.has(this._routesMap, route)) {
       const methodToOperations = _.get(_.get(this._routesMap, route), method);
@@ -58,7 +58,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
    * @param method - {@link HTTPMethod}.
    * @returns boolean stating if the route is ignored.
    */
-  private _isRouteIgnored(route: string, method: HTTPMethod): boolean {
+  public async isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean> {
     return _.has(this._routesIgnored, route) && _.get(_.get(this._routesIgnored, route), method) === true;
   }
 }

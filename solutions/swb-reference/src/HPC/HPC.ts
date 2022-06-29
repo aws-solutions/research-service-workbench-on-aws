@@ -198,7 +198,7 @@ export default class HPC {
 
     await sleep(2000);
 
-    const commandStatusResponse = await awsEnvMgt.awsService.clients.ssm.getCommandInvocationCommand(
+    const commandStatusResponse = await awsEnvMgt.awsService.clients.ssm.getCommandInvocation(
       ssmStatusCommand
     );
 

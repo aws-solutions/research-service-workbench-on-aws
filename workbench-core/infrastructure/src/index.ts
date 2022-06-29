@@ -1,1 +1,1 @@
-export { WorkbenchUserPool, WorkbenchUserPoolClient } from './cognitoInfrastructure';
+export { WorkbenchCognito, WorkbenchCognitoProps } from './cognitoInfrastructure';

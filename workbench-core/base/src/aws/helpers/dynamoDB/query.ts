@@ -3,10 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AttributeValue, QueryCommandInput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, QueryCommandInput, QueryCommandOutput, DynamoDB } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ = require('lodash');
-import DynamoDB from '../../clients/dynamoDB';
 
 /**
  * This class helps with building queries to a DDB table
@@ -84,7 +83,6 @@ class Query {
    */
   public sortKey(name: string): Query {
     this._sortKeyName = name;
-    this.names({ [`#${name}`]: name });
 
     return this;
   }
@@ -101,6 +99,7 @@ class Query {
     if (!this._sortKeyName) {
       throw new Error('You tried to call Query.eq(), however, you must call Query.sortKey() first.');
     }
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this._internalExpression('=', value);
   }
 
@@ -116,6 +115,7 @@ class Query {
     if (!this._sortKeyName) {
       throw new Error('You tried to call Query.lt(), however, you must call Query.sortKey() first.');
     }
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this._internalExpression('<', value);
   }
 
@@ -131,6 +131,7 @@ class Query {
     if (!this._sortKeyName) {
       throw new Error('You tried to call Query.lte(), however, you must call Query.sortKey() first.');
     }
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this._internalExpression('<=', value);
   }
 
@@ -146,6 +147,7 @@ class Query {
     if (!this._sortKeyName) {
       throw new Error('You tried to call Query.gt(), however, you must call Query.sortKey() first.');
     }
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this._internalExpression('>', value);
   }
 
@@ -161,6 +163,7 @@ class Query {
     if (!this._sortKeyName) {
       throw new Error('You tried to call Query.gte(), however, you must call Query.sortKey() first.');
     }
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this._internalExpression('>=', value);
   }
 
@@ -183,6 +186,7 @@ class Query {
       [`:${this._sortKeyName}1`]: value1,
       [`:${this._sortKeyName}2`]: value2
     });
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this;
   }
 
@@ -201,6 +205,7 @@ class Query {
     const expression = `begins_with ( #${this._sortKeyName}, :${this._sortKeyName} )`;
     this._setCondition(expression);
     this.values({ [`:${this._sortKeyName}`]: value });
+    this.names({ [`#${this._sortKeyName}`]: this._sortKeyName });
     return this;
   }
 

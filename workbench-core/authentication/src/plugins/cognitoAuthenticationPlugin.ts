@@ -27,11 +27,6 @@ interface TokensExpiration {
 
 export interface CognitoAuthenticationPluginOptions {
   /**
-   * The user pool's region
-   */
-  region: string;
-
-  /**
    * The Cognito domain. Follows the format: "https://\<domain prefix\>.auth.\<region\>.amazoncognito.com"
    */
   cognitoDomain: string;
@@ -47,7 +42,7 @@ export interface CognitoAuthenticationPluginOptions {
   clientId: string;
 
   /**
-   * The Cognito app client secret
+   * The Cognito app client secret.
    */
   clientSecret: string;
 
@@ -71,7 +66,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _clientId: string;
   private _clientSecret: string;
 
-  private _oAuth2BaseUrl: string;
+  private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
     tokenUse: null;
@@ -81,22 +76,29 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   /**
    *
    * @param options - a {@link CognitoAuthenticationPluginOptions} object holding the Cognito user pool information
+   *
+   * @throws {@link PluginConfigurationError} if a parameter is invalid
    */
   public constructor({
-    region,
     cognitoDomain,
     websiteUrl,
     userPoolId,
     clientId,
     clientSecret
   }: CognitoAuthenticationPluginOptions) {
-    this._region = region;
     this._websiteUrl = websiteUrl;
     this._userPoolId = userPoolId;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
+    this._baseUrl = cognitoDomain;
 
-    this._oAuth2BaseUrl = `${cognitoDomain}/oauth2`;
+    // eslint-disable-next-line security/detect-unsafe-regex
+    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
+    if (!regionMatch) {
+      throw new PluginConfigurationError('Invalid Cognito user pool id');
+    }
+    this._region = regionMatch.groups!.region;
+
     try {
       this._verifier = CognitoJwtVerifier.create({
         userPoolId,
@@ -119,7 +121,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
     try {
       // A get call to the IDP oauth2/userInfo endpoint will return the access token's user info if the token isn't expired, revoked, malformed, or invalid.
-      await axios.get(`${this._oAuth2BaseUrl}/userInfo`, {
+      await axios.get(`${this._baseUrl}/oauth2/userInfo`, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
@@ -166,7 +168,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     try {
       // A post call to the IDP oauth2/revoke endpoint revokes the refresh token and all access tokens generated from it.
       await axios.post(
-        `${this._oAuth2BaseUrl}/revoke`,
+        `${this._baseUrl}/oauth2/revoke`,
         new URLSearchParams({
           token: refreshToken
         }),
@@ -239,7 +241,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
 
       // A post call to the IDP oauth2/token endpoint trades the code for a set of tokens.
       const response = await axios.post(
-        `${this._oAuth2BaseUrl}/token`,
+        `${this._baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
@@ -291,7 +293,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   }
 
   /**
-   * Takes temporary state and codeChallenge values and returns the URL of the endpoint used to retreive the authorization code.
+   * Takes temporary state and codeChallenge values and returns the URL of the endpoint used to retrieve the authorization code.
    *
    * The state and codeChallenge parameters should be temporary strings, such as TEMP_STATE and TEMP_CODE_CHALLENGE.
    * These values will be replaced on the frontend with the real values to keep them secure.
@@ -301,7 +303,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @returns the endpoint URL string
    */
   public getAuthorizationCodeUrl(state: string, codeChallenge: string): string {
-    return `${this._oAuth2BaseUrl}/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
   /**
@@ -320,7 +322,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
 
       // A post call to the IDP oauth2/token endpoint uses the refresh token to get new access and id tokens.
       const response = await axios.post(
-        `${this._oAuth2BaseUrl}/token`,
+        `${this._baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: refreshToken
@@ -360,6 +362,15 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       }
       throw error;
     }
+  }
+
+  /**
+   * Gets the URL of the endpoint used to logout the user.
+   *
+   * @returns the endpoint URL string
+   */
+  public getLogoutUrl(): string {
+    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${this._websiteUrl}`;
   }
 
   /**
