@@ -31,10 +31,12 @@ export default class StatusHandler {
 
     // Check if status already applied, or if this is an outdated event, or if instanceId has not been updated for the env.
     // We need to wait for "Launch" event to propagate `instanceId` value in DDB before environment status can be updated
+    // Perform status update regardless if operation is "Launch" since SSM doc sends important details
     if (
-      Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) ||
-      envDetails.status === event.status ||
-      envDetails.instanceId === ''
+      (Date.parse(lastDDBUpdate) > Date.parse(eventBusTime) ||
+        envDetails.status === event.status ||
+        envDetails.instanceId === '') &&
+      event.operation !== 'Launch'
     ) {
       console.log('Latest status already applied. Skipping status update.');
       return;

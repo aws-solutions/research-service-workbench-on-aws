@@ -46,6 +46,7 @@ parameters:
 mainSteps:
   - name: LaunchSagemaker
     action: 'aws:executeAwsApi'
+    maxAttempts: 3
     inputs:
       Service: servicecatalog
       Api: ProvisionProduct

@@ -6,12 +6,10 @@ describe('multiStep environment test', () => {
   let adminSession: ClientSession;
 
   beforeAll(async () => {
-    console.log('before all');
     adminSession = await setup.createAdminSession();
   });
 
   afterAll(async () => {
-    console.log('after all');
     await setup.cleanup();
   });
 

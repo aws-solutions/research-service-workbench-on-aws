@@ -13,6 +13,7 @@ parameters:
 mainSteps:
   - name: TerminateSagemaker
     action: 'aws:executeAwsApi'
+    maxAttempts: 3
     inputs:
       Service: servicecatalog
       Api: TerminateProvisionedProduct
