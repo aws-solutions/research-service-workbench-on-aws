@@ -13,11 +13,11 @@ const logout = async (): Promise<any> => {
 };
 
 const checkIfloggedIn = async (): Promise<any> => {
-  return await httpApiGet('loggedIn', {}, true);
+  return await httpApiGet('loggedIn', {});
 };
 
 const verifyToken = async (): Promise<any> => {
-  return await httpApiGet('verifyToken', {});
+  return await httpApiGet('user', {});
 };
 
 export { login, logout, token, checkIfloggedIn, verifyToken };

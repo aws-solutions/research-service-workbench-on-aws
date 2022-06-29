@@ -39,5 +39,14 @@ export const routesIgnored: RoutesIgnored = {
   },
   '/refresh': {
     GET: true
+  },
+  '/loggedIn': {
+    GET: true
+  },
+  '/user': {
+    GET: true
+  },
+  '/environments': {
+    GET: true
   }
 };

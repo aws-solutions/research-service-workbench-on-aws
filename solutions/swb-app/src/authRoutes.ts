@@ -23,7 +23,7 @@ export function setUpAuthRoutes(router: Router, auth: AuthenticationService, log
 
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger })));
 
-  router.get('/user', wrapAsync(verifyToken(auth)));
+  router.get('/user', wrapAsync(verifyToken(auth, { loggingService: logger })));
 
   router.get('/loggedIn', wrapAsync(isUserLoggedIn(auth, { loggingService: logger })));
 }

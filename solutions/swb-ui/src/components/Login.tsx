@@ -69,10 +69,14 @@ function Login(): JSX.Element {
 
           setLoggedIn(true);
 
+          // TODO: Use signIn() from authenticationContext - read idToken and decode to create User obj
+          // const { signIn } = useAuthentication();
+
           localStorage.removeItem('stateVerifier');
           localStorage.removeItem('pkceVerifier');
 
           window.history.replaceState({}, '', window.location.origin + window.location.pathname);
+          window.location.assign(window.location.origin + window.location.pathname + 'environments');
         } catch (e) {
           console.log(e);
         }

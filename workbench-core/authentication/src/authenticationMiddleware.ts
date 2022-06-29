@@ -51,14 +51,14 @@ export function getTokensFromAuthorizationCode(
         res.cookie('access_token', accessToken.token, {
           httpOnly: true,
           secure: true,
-          // sameSite: 'strict',
+          sameSite: 'strict',
           expires: accessToken.expiresIn ? new Date(now + accessToken.expiresIn * 1000) : undefined
         });
         if (refreshToken) {
           res.cookie('refresh_token', refreshToken.token, {
             httpOnly: true,
             secure: true,
-            // sameSite: 'strict',
+            sameSite: 'strict',
             expires: refreshToken.expiresIn ? new Date(now + refreshToken.expiresIn * 1000) : undefined
           });
         }
@@ -291,6 +291,9 @@ export function isUserLoggedIn(
     const { loggingService } = options || {};
     const accessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;
+
+    loggingService?.info(`accessToken - ${accessToken}`);
+    loggingService?.info(`refreshToken - ${refreshToken}`);
 
     try {
       if (typeof refreshToken === 'string') {
