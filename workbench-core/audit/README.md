@@ -97,7 +97,7 @@ const auditService:AuditService = new AuditService(
 ```
 
 ## Integrating with ExpressJS using Middleware
-Audit implemented as a middleware is a common use case. This library contains an authorization middleware that integrates with ExpressJS.
+Audit implemented as a middleware is a common use case. This library contains an audit middleware that integrates with ExpressJS.
 
 The audit middleware requires a config. 
 
@@ -127,4 +127,4 @@ app.use(WithAudit({
 	excludePaths
 }));
 ```
-**REQUIRED**: The middleware function needs to be mounted with no path, as it should execute every time a request is received. Click [here](https://expressjs.com/en/guide/using-middleware.html) for more information about ExpressJS middleware.
+**REQUIRED**: The middleware function needs to be mounted at the [app](https://expressjs.com/en/guide/using-middleware.html#middleware.application) level with no path, as it should execute every time a request is received. Click [here](https://expressjs.com/en/guide/using-middleware.html) for more information about ExpressJS middleware.
