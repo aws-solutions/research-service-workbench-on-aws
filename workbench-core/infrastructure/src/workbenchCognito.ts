@@ -89,12 +89,16 @@ export class WorkbenchCognito extends Construct {
       cognitoDomain: { domainPrefix: domainPrefix }
     });
 
-    oidcIdentityProviderProps?.forEach((props) => {
-      const provider = new UserPoolIdentityProviderOidc(this, 'WorkbenchUserPoolIdentityProviderOidc', {
-        ...props,
-        userPool: this.userPool,
-        scopes: ['openid', 'profile', 'email']
-      });
+    oidcIdentityProviderProps?.forEach((props, index) => {
+      const provider = new UserPoolIdentityProviderOidc(
+        this,
+        `WorkbenchUserPoolIdentityProviderOidc${index}`,
+        {
+          ...props,
+          userPool: this.userPool,
+          scopes: ['openid', 'profile', 'email']
+        }
+      );
       this.userPool.registerIdentityProvider(provider);
     });
 
