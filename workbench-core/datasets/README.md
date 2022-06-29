@@ -11,7 +11,7 @@
 
 The DataSet Service provides configuration and tracking for sharing data among researchers. The reference implementation
 given assumes data is stored under prefixes in S3 buckets. S3 Buckets are shared with others by adding an access point
-and sufficent permissions for a provided IAM role to access the files.
+and sufficient permissions for a provided IAM role to access the files.
 
 ## Usage
 
