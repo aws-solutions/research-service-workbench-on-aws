@@ -1,8 +1,8 @@
 import Button from '@awsui/components-react/button';
 import pkceChallenge from 'pkce-challenge';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { login, checkIfloggedIn, token } from '../api/auth';
+import { login, token } from '../api/auth';
 import styles from '../styles/Hero.module.scss';
 
 function getFragmentParam(location: Location, key: string): string {
@@ -25,29 +25,11 @@ function getFragmentParam(location: Location, key: string): string {
 }
 
 function Login(): JSX.Element {
-  const [loggedIn, setLoggedIn] = useState(false);
-
   // TODO: Get user's role from Cognito group information
-  // Assign admin/guest roles using useState accordingly
+  // const { signIn } = useAuthentication();
 
-  // const [info, setInfo] = useState<Record<string, string> | undefined>(undefined);
-  // const [guestLogin, setGuestLogin] = useState(false);
-  // const [adminLogin, setAdminLogin] = useState(false);
-
-  useEffect(() => {
-    async function isUserLoggedIn(): Promise<void> {
-      try {
-        // TODO: Cannot store access_token and refresh_token in cookies yet
-        // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value
-        const isLoggedIn = await checkIfloggedIn();
-        setLoggedIn(isLoggedIn.loggedIn);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    isUserLoggedIn().catch((e) => console.log(e));
-  }, [loggedIn]);
+  // TODO: Fix API Lambda to store access_token and refresh_token in cookies correctly
+  // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value
 
   useEffect(() => {
     async function getTokens(): Promise<void> {
@@ -59,7 +41,8 @@ function Login(): JSX.Element {
         const codeVerifier = localStorage.getItem('pkceVerifier');
 
         if (state !== stateVerifier) {
-          console.log('ERROR');
+          // TODO: Implement error page and apply here
+          throw new Error('State verification was not successful, login denied.');
         }
 
         try {
@@ -69,12 +52,6 @@ function Login(): JSX.Element {
           });
 
           localStorage.setItem('idToken', response.idToken);
-
-          setLoggedIn(true);
-
-          // TODO: Use signIn() just so header gets user info from Cognito
-          // const { signIn } = useAuthentication();
-
           localStorage.removeItem('stateVerifier');
           localStorage.removeItem('pkceVerifier');
 
@@ -106,8 +83,6 @@ function Login(): JSX.Element {
       console.log(e);
     }
   }
-
-  // TODO: If logged in, route to "/environments" page
 
   return (
     <Button className={styles.primaryButton} variant="primary" onClick={async () => await loginEvent()}>
