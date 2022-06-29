@@ -3,7 +3,7 @@ import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
 import Settings from '../../utils/settings';
-import { doCall, sleep } from '../../utils/utilities';
+import { sleep } from '../../utils/utilities';
 
 export default class CollectionResource {
   protected _axiosInstance: AxiosInstance;
@@ -44,7 +44,7 @@ export default class CollectionResource {
 
     try {
       const requestBody = applyDefault ? this.defaults(body) : body;
-      const resource = await doCall(async () => this._axiosInstance.post(this._api, requestBody));
+      const { data: resource } = await this._axiosInstance.post(this._api, requestBody);
       const id = resource.id;
       const taskId = `${this._childType}-${id}`;
       // @ts-ignore
@@ -64,7 +64,8 @@ export default class CollectionResource {
   // Because this is a collection resource, the GET method returns an array of the instance child resources
   // eslint-disable-next-line
   public async get(queryParams: { [key: string]: string }): Promise<any[]> {
-    return doCall(async () => this._axiosInstance.get(this._api, { params: queryParams }));
+    const { data: response } = await this._axiosInstance.get(this._api, { params: queryParams });
+    return response;
   }
 
   // This method should be overriden by the class extending `CollectionResource`

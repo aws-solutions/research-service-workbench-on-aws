@@ -3,7 +3,7 @@ import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
 import Settings from '../../utils/settings';
-import { doCall, sleep } from '../../utils/utilities';
+import { sleep } from '../../utils/utilities';
 
 export default class Resource {
   protected _axiosInstance: AxiosInstance;
@@ -36,12 +36,13 @@ export default class Resource {
 
   //eslint-disable-next-line
   public async get(): Promise<any> {
-    return doCall(async () => this._axiosInstance.get(this._api));
+    const { data: response } = await this._axiosInstance.get(this._api);
+    return response;
   }
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async update(body: { [key: string]: string }): Promise<any> {
-    const response = await doCall(async () => this._axiosInstance.put(this._api, body));
+    const { data: response } = await this._axiosInstance.put(this._api, body);
 
     await sleep(this._deflakeDelayInMs);
     return response;
@@ -49,10 +50,8 @@ export default class Resource {
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async delete(): Promise<void> {
-    const response = await doCall(async () => this._axiosInstance.delete(this._api));
-
+    await this._axiosInstance.delete(this._api);
     await sleep(this._deflakeDelayInMs);
-    return response;
   }
 
   // This method should be overriden by the class extending `resource`

@@ -1,17 +1,4 @@
-// We wrap the call to axios so that we can capture the boom code and payload attributes passed from the
-// server
-// eslint-disable-next-line
-import _ from 'lodash';
-
-// eslint-disable-next-line
-async function doCall(fn: Function): Promise<any> {
-  try {
-    const response = await fn();
-    return response.data;
-  } catch (error) {
-    console.log('Error is', error);
-  }
-}
+import HttpError from './HttpError';
 
 /**
  * Returns a promise that will be resolved in the requested time, ms.
@@ -26,4 +13,8 @@ async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export { doCall, sleep };
+function checkHttpError(actualError: Error, expectedError: HttpError): void {
+  expect(actualError instanceof HttpError).toBeTruthy();
+  expect(expectedError.isEqual(actualError)).toBeTruthy();
+}
+export { sleep, checkHttpError };

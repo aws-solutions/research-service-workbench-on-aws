@@ -32,9 +32,7 @@ export default class Environment extends Resource {
         `Cleanup for environments. Trying to delete env ${this._id}. Current env status is "${envStatus}". Waiting till environment is in valid state for deleting. Total waited time so far is ${totalTimeWaitedInSeconds} seconds`
       );
     }
-    // Provide some time for StatusHandler to propagate instanceId to DDB so termination can succeed
-    // await sleep(10000);
-    const response = await defAdminSession.resources.environments.environment(this._id).delete();
-    console.log('Delete response', response);
+    await defAdminSession.resources.environments.environment(this._id).delete();
+    console.log(`Deleted environment ${this._id}`);
   }
 }

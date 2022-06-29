@@ -1,7 +1,8 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
+import HttpError from './utils/HttpError';
 import Settings from './utils/settings';
 
 export default class ClientSession {
@@ -34,6 +35,19 @@ export default class ClientSession {
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });
+
+    // Convert AxiosError to HttpError for easier error checking in tests
+    this._axiosInstance.interceptors.response.use(
+      function (response: AxiosResponse) {
+        return response;
+      },
+      function (error: AxiosError) {
+        if (error.response) {
+          return Promise.reject(new HttpError(error.response.status, error.response.data));
+        }
+        return Promise.reject(error);
+      }
+    );
     this.resources = getResources(this);
   }
 

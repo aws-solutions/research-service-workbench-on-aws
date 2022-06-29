@@ -14,7 +14,6 @@ describe('multiStep environment test', () => {
   });
 
   test('launch, connect, stop, get, terminate', async () => {
-    console.log('inside test');
     const createEnvBody = {
       description: 'test 123',
       name: 'testEnv1',
@@ -25,6 +24,7 @@ describe('multiStep environment test', () => {
       envType: 'sagemaker'
     };
     const response = await adminSession.resources.environments.create(createEnvBody);
+    //TODO: Check create response is as expected
     console.log('response', response);
     expect(true).toEqual(true);
   });
