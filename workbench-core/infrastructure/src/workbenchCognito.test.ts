@@ -141,6 +141,7 @@ describe('WorkbenchCognito tests', () => {
         client_id: oidcProvider1.clientId,
         client_secret: oidcProvider1.clientSecret,
         authorize_scopes: 'openid profile email',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         attributes_request_method: 'GET',
         oidc_issuer: oidcProvider1.issuerUrl
       }
@@ -157,7 +158,7 @@ describe('WorkbenchCognito tests', () => {
         client_id: oidcProvider2.clientId,
         client_secret: oidcProvider2.clientSecret,
         authorize_scopes: 'openid profile email',
-        // todo eslint ignore next line @typescript-eslint/naming-convention
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         attributes_request_method: 'GET',
         oidc_issuer: oidcProvider2.issuerUrl
       }
