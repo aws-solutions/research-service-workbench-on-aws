@@ -74,7 +74,7 @@ const audit = new AuditService({
 // initialize an instance of AwsService. This instance should have access to the DynamoDb
 // table you intend to use to store DataSets metadata.
 // for simplicity, it will be assumed this service also has access to the S3 bucket where
-// DataSets data is stored however a different AwsService instances intitialized to a different
+// DataSets data is stored however a different AwsService instance initialized to a different
 // account could be used in that case.
 const aws: AwsService = new AwsService( {region: 'us-east-1', DdbTableName: 'my-datasets-table' });
 
