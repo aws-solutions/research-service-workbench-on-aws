@@ -12,6 +12,7 @@ interface Setting {
   envTypeConfigId: string;
   projectId: string;
   envType: string;
+  runId: string;
 }
 
 type SettingKey = keyof Setting;

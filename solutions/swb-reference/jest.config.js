@@ -26,7 +26,8 @@ async function init() {
   );
 
   settings = {
-    ...config
+    ...config,
+    runId: `${Date.now()}`
   };
 }
 

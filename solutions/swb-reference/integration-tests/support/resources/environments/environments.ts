@@ -1,4 +1,5 @@
 import ClientSession from '../../clientSession';
+import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
 import Environment from './environment';
 
@@ -13,15 +14,26 @@ export default class Environments extends CollectionResource {
     return new Environment(id, this._clientSession, this._api);
   }
 
-  protected _buildDefaults(resource: any = {}): any {
+  protected _buildDefaults(resource: EnvironmentCreateRequest): EnvironmentCreateRequest {
+    const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     return {
-      description: resource.description ?? 'test 123',
-      name: 'testEnv1',
-      envTypeId: this._settings.get('envTypeId'),
-      envTypeConfigId: this._settings.get('envTypeConfigId'),
-      projectId: this._settings.get('projectId'),
-      datasetIds: [],
-      envType: this._settings.get('envType')
+      description: resource.description ?? randomTextGenerator.getFakeText('fakeDescription'),
+      name: resource.name ?? randomTextGenerator.getFakeText('fakeName'),
+      envTypeId: resource.envTypeId ?? this._settings.get('envTypeId'),
+      envTypeConfigId: resource.envTypeConfigId ?? this._settings.get('envTypeConfigId'),
+      projectId: resource.projectId ?? this._settings.get('projectId'),
+      datasetIds: resource.datasetIds ?? [],
+      envType: resource.envType ?? this._settings.get('envType')
     };
   }
+}
+
+interface EnvironmentCreateRequest {
+  description: string;
+  name: string;
+  envTypeId: string;
+  envTypeConfigId: string;
+  projectId: string;
+  datasetIds: string[];
+  envType: string;
 }

@@ -70,7 +70,7 @@ export default class CollectionResource {
 
   // This method should be overridden by the class extending `CollectionResource`
   // eslint-disable-next-line
-  public _buildDefaults(resource: any = {}): any {
+  protected _buildDefaults(resource: any = {}): any {
     return resource;
   }
 }
