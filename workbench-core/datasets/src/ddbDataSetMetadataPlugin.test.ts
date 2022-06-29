@@ -272,6 +272,7 @@ describe('DdbDataSetMetadataPlugin', () => {
 
   describe('addExternalEndpoint', () => {
     it("succeeds when endpoint doesn't exist and no id is provided.", async () => {
+      const mockCreatedDate = new Date().toISOString();
       mockDdb.on(GetItemCommand).resolves({
         Item: {
           id: { S: mockDataSetId },
@@ -289,10 +290,19 @@ describe('DdbDataSetMetadataPlugin', () => {
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
-        allowedRoles: [mockEndPointRole]
+        allowedRoles: [mockEndPointRole],
+        createdAt: mockCreatedDate
       };
 
-      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toBeUndefined();
+      await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
+        Id: mockDataSetId,
+        dataSetName: mockDataSetName,
+        endPointUrl: mockEndPointUrl,
+        name: mockEndPointName,
+        path: mockDataSetPath,
+        allowedRoles: [mockEndPointRole],
+        createdAt: mockCreatedDate
+      });
     });
 
     it('throws if the endpoint id is already defined.', async () => {
@@ -335,6 +345,55 @@ describe('DdbDataSetMetadataPlugin', () => {
           `Cannot create the EndPoint. EndPoint with name '${mockEndPointName}' already exists on DataSet '${mockDataSetName}'.`
         )
       );
+    });
+  });
+
+  describe('getDataSetEndPointDetails', () => {
+    it('throws when an empty response is given.', async () => {
+      mockDdb.on(GetItemCommand).resolves({});
+      let response;
+      try {
+        await plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName);
+      } catch (error) {
+        response = error;
+      }
+      expect(Boom.isBoom(response, 404)).toBe(true);
+      expect(response.message).toEqual(
+        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetName}'.`
+      );
+    });
+
+    it('throws when an empty item is given.', async () => {
+      mockDdb.on(GetItemCommand).resolves({ Item: undefined });
+      let response;
+      try {
+        await plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName);
+      } catch (error) {
+        response = error;
+      }
+      expect(Boom.isBoom(response, 404)).toBe(true);
+      expect(response.message).toEqual(
+        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetName}'.`
+      );
+    });
+
+    it('returns the external endpoint from the database.', async () => {
+      mockDdb.on(GetItemCommand).resolves({
+        Item: {
+          name: { S: mockEndPointName },
+          dataSetName: { S: mockDataSetName },
+          path: { S: mockDataSetPath },
+          endPointUrl: { S: mockEndPointUrl },
+          allowedRoles: { L: [{ S: mockEndPointRole }] }
+        }
+      });
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName)).resolves.toEqual({
+        name: mockEndPointName,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        allowedRoles: [mockEndPointRole]
+      });
     });
   });
 });

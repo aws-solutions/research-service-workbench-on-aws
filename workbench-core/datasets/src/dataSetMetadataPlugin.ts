@@ -62,4 +62,12 @@ export interface DataSetMetadataPlugin {
    * @returns details about the specified endpoint.
    */
   getDataSetEndPointDetails(dataSetName: string, endPointName: string): Promise<ExternalEndpoint>;
+
+  /**
+   * Add an external endpoint to a DataSet.
+   * @param endPoint - the details of the endpoint to add.
+   *
+   * @returns the details of the endpoint added.
+   */
+  addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
 }
