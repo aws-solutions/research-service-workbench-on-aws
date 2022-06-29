@@ -1,16 +1,18 @@
+import { SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
-  IUserPoolIdentityProvider,
   Mfa,
   OAuthScope,
   UserPool,
   UserPoolClient,
   UserPoolClientOptions,
   UserPoolDomain,
+  UserPoolIdentityProviderOidc,
+  UserPoolIdentityProviderOidcProps,
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
+import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-
 import merge from 'lodash/merge';
 
 const userPoolDefaults: UserPoolProps = {
@@ -39,16 +41,11 @@ const userPoolDefaults: UserPoolProps = {
 
 const userPoolClientDefaults: UserPoolClientOptions = {
   generateSecret: true,
-  authFlows: {
-    adminUserPassword: true,
-    custom: true,
-    userSrp: true
-  },
   oAuth: {
     flows: {
       authorizationCodeGrant: true
     },
-    scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PHONE]
+    scopes: [OAuthScope.OPENID]
   },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true
@@ -58,16 +55,29 @@ export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrl: string;
   userPoolName?: string;
-  identityProviders?: IUserPoolIdentityProvider[];
+  oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
 }
+
+export interface WorkbenchUserPoolOidcIdentityProvider
+  extends Omit<UserPoolIdentityProviderOidcProps, 'userPool' | 'scopes'> {}
 
 export class WorkbenchCognito extends Construct {
   public readonly userPool: UserPool;
   public readonly userPoolClient: UserPoolClient;
   public readonly userPoolDomain: UserPoolDomain;
 
+  public readonly cognitoDomain: string;
+  public readonly userPoolId: string;
+  public readonly userPoolClientId: string;
+  public readonly userPoolClientSecret: SecretValue;
+
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
-    const { domainPrefix, websiteUrl, userPoolName, identityProviders } = props;
+    const {
+      domainPrefix,
+      websiteUrl,
+      userPoolName,
+      oidcIdentityProviders: oidcIdentityProviderProps
+    } = props;
     super(scope, id);
 
     this.userPool = new UserPool(this, 'WorkbenchUserPool', { ...userPoolDefaults, userPoolName });
@@ -75,6 +85,15 @@ export class WorkbenchCognito extends Construct {
     this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
       userPool: this.userPool,
       cognitoDomain: { domainPrefix: domainPrefix }
+    });
+
+    oidcIdentityProviderProps?.forEach((props) => {
+      const provider = new UserPoolIdentityProviderOidc(this, 'WorkbenchUserPoolIdentityProviderOidc', {
+        ...props,
+        userPool: this.userPool,
+        scopes: ['openid', 'profile', 'email']
+      });
+      this.userPool.registerIdentityProvider(provider);
     });
 
     const tempProps: UserPoolClientOptions = {
@@ -89,6 +108,32 @@ export class WorkbenchCognito extends Construct {
       userPool: this.userPool
     });
 
-    identityProviders?.forEach((provider) => this.userPool.registerIdentityProvider(provider));
+    this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
+
+    const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
+      resourceType: 'Custom::DescribeCognitoUserPoolClient',
+      onCreate: {
+        region: Stack.of(this).region,
+        service: 'CognitoIdentityServiceProvider',
+        action: 'describeUserPoolClient',
+        parameters: {
+          UserPoolId: this.userPool.userPoolId,
+          ClientId: this.userPoolClient.userPoolClientId
+        },
+        physicalResourceId: PhysicalResourceId.of(this.userPoolClient.userPoolClientId)
+      },
+      policy: AwsCustomResourcePolicy.fromSdkCalls({
+        resources: [this.userPool.userPoolArn]
+      })
+    });
+
+    const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(
+      'UserPoolClient.ClientSecret'
+    );
+
+    this.cognitoDomain = this.userPoolDomain.baseUrl();
+    this.userPoolId = this.userPool.userPoolId;
+    this.userPoolClientId = this.userPoolClient.userPoolClientId;
+    this.userPoolClientSecret = SecretValue.unsafePlainText(userPoolClientSecret);
   }
 }
