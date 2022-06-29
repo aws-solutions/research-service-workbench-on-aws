@@ -29,13 +29,13 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "test:only": "heft test -u --clean",
+    "test:only": "heft test -u --clean --no-build 2>&1",
     "watch": "tsc -w"
   },
   "dependencies": {
     "@aws-sdk/client-managedblockchain": "^3.53.0",
-    "@aws-sdk/types": "^3.55.0",
     "@aws-sdk/client-s3": "^3.58.0",
+    "@aws-sdk/types": "^3.55.0",
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0",
     "fabric-ca-client": "2.2.12",

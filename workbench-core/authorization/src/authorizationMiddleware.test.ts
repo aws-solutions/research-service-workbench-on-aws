@@ -33,7 +33,8 @@ import {
   Permission,
   PermissionsPlugin,
   withAuth,
-  AuthorizationService
+  AuthorizationService,
+  retrieveUser
 } from '.';
 
 describe('authorization middleware', () => {
@@ -224,5 +225,45 @@ describe('authorization middleware', () => {
     const response: Response = {} as Response;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(1);
+  });
+
+  describe('retrieveUser', () => {
+    test('retrieveUser with correct schema', () => {
+      const response: Response = {
+        locals: {
+          user: mockAdmin
+        }
+      } as unknown as Response;
+      const user: AuthenticatedUser = retrieveUser(response);
+      expect(user).toStrictEqual(mockAdmin);
+    });
+
+    test('retrieveUser with incorrect schema', () => {
+      const response: Response = {
+        locals: {
+          user: {
+            id: 'sampleId'
+          }
+        }
+      } as unknown as Response;
+      try {
+        retrieveUser(response);
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err.message).toBe('Authenticated user is not found');
+      }
+    });
+
+    test('retrieveUser without AuthenticatedUser', () => {
+      const response: Response = {
+        locals: {}
+      } as unknown as Response;
+      try {
+        retrieveUser(response);
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err.message).toBe('Authenticated user is not found');
+      }
+    });
   });
 });

@@ -20,8 +20,7 @@ In this step we'll define the AWS resources that are required for our new enviro
         Description: Sagemaker instance type to launch
         Default: ml.t3.xlarge
     ```
-3. Run the post deployment step by executing the command `STAGE=<STAGE> rushx run-postDeployment` inside `solutions/swb-reference` folder. This script will create/update the Service Catalog portfolio in the `Main account` with all environments listed in the `environment` folder.
-
+   
 ## Step 2: Set up environment management workflow 
 In this step we set up the workflow for managing environment launch and terminate. These workflows are defined by SSM documents. We will also implement **environment services** to handle start/stop/connecting to the new environment. These three actions do not require SSM documents, and will make AWS API calls in the hosting account to start/stop/connect to the environment. 
 ### SSM documents
