@@ -3,18 +3,14 @@ import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
 import Settings from '../../utils/settings';
-import { sleep } from '../../utils/utilities';
 
 export default class Resource {
-  protected _axiosInstance: AxiosInstance;
-  private _settings: Settings;
   private _type: string;
-  protected _id: string;
   private _parentApi: string;
+  protected _settings: Settings;
+  protected _axiosInstance: AxiosInstance;
+  protected _id: string;
   protected _api: string = '';
-  // Specifies the delay duration in milliseconds needed to minimize the usage of stale data due to eventual
-  // consistency.
-  protected _deflakeDelayInMs: number = 2000;
   protected _setup: Setup;
 
   public constructor(clientSession: ClientSession, type: string, id: string, parentApi: string) {
@@ -44,14 +40,12 @@ export default class Resource {
   public async update(body: { [key: string]: string }): Promise<any> {
     const { data: response } = await this._axiosInstance.put(this._api, body);
 
-    await sleep(this._deflakeDelayInMs);
     return response;
   }
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async delete(): Promise<void> {
     await this._axiosInstance.delete(this._api);
-    await sleep(this._deflakeDelayInMs);
   }
 
   // This method should be overriden by the class extending `resource`

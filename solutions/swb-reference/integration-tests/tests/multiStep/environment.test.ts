@@ -14,15 +14,18 @@ describe('multiStep environment test', () => {
   });
 
   test('launch, connect, stop, get, terminate', async () => {
+    const settings = adminSession.getSettings();
+    // TODO: Pull these values from config
     const createEnvBody = {
       description: 'test 123',
       name: 'testEnv1',
-      envTypeId: 'envType-123',
-      envTypeConfigId: 'envTypeConfig-123',
-      projectId: 'proj-123',
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      projectId: settings.get('projectId'),
       datasetIds: [],
-      envType: 'sagemaker'
+      envType: settings.get('envType')
     };
+    adminSession.resources.environments._buildDefaults();
     const response = await adminSession.resources.environments.create(createEnvBody);
     //TODO: Check create response is as expected
     console.log('response', response);

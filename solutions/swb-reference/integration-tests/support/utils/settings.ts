@@ -8,6 +8,10 @@ import _ from 'lodash';
 
 interface Setting {
   apiBaseUrl: string;
+  envTypeId: string;
+  envTypeConfigId: string;
+  projectId: string;
+  envType: string;
 }
 
 type SettingKey = keyof Setting;
@@ -33,7 +37,7 @@ export default class Settings {
   public get(key: SettingKey): string {
     const value = this._content[key];
     if (_.isEmpty(value) && !_.isBoolean(value))
-      throw new Error(`The "${key}" setting value is required but it is either empty`);
+      throw new Error(`The "${key}" setting value is required but it is either empty or not a boolean`);
 
     return value;
   }

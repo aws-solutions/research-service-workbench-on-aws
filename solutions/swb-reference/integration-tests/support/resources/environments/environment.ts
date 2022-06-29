@@ -22,7 +22,12 @@ export default class Environment extends Resource {
     const startTimeInMs = Date.now();
     let totalTimeWaitedInSeconds = 0;
 
-    let envStatus: EnvironmentStatus = 'PENDING';
+    const resource = await defAdminSession.resources.environments.environment(this._id).get();
+    let envStatus: EnvironmentStatus = resource.status;
+    if (['TERMINATED', 'TERMINATING'].includes(envStatus)) {
+      // Exit early because environment has already been terminated
+      return;
+    }
     while (envStatus === 'PENDING' && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
       await sleep(15000);
       const resource = await defAdminSession.resources.environments.environment(this._id).get();
@@ -33,6 +38,6 @@ export default class Environment extends Resource {
       );
     }
     await defAdminSession.resources.environments.environment(this._id).delete();
-    console.log(`Deleted environment ${this._id}`);
+    console.log(`Deleting environment ${this._id}`);
   }
 }

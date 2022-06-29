@@ -2,6 +2,8 @@ const path = require('path');
 const yaml = require('js-yaml');
 const { join } = require('path');
 const fs = require('fs');
+// const Settings = require('./integration-tests/support/utils/settings');
+
 const options = {
   transform: {
     '\\.(ts)$': 'ts-jest'
@@ -24,7 +26,7 @@ async function init() {
   );
 
   settings = {
-    apiBaseUrl: config.apiBaseUrl
+    ...config
   };
 }
 

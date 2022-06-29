@@ -6,11 +6,11 @@ import Settings from '../../utils/settings';
 import { sleep } from '../../utils/utilities';
 
 export default class CollectionResource {
+  private _type: string;
+  private _childType: string;
   protected _axiosInstance: AxiosInstance;
   protected _clientSession: ClientSession;
   protected _settings: Settings;
-  protected _type: string;
-  protected _childType: string;
   protected _parentApi: string;
   protected _api: string;
   // Specifies the delay duration in milliseconds needed to minimize the usage of stale data due to eventual
@@ -43,7 +43,7 @@ export default class CollectionResource {
     }
 
     try {
-      const requestBody = applyDefault ? this.defaults(body) : body;
+      const requestBody = applyDefault ? this._buildDefaults(body) : body;
       const { data: resource } = await this._axiosInstance.post(this._api, requestBody);
       const id = resource.id;
       const taskId = `${this._childType}-${id}`;
@@ -68,9 +68,9 @@ export default class CollectionResource {
     return response;
   }
 
-  // This method should be overriden by the class extending `CollectionResource`
+  // This method should be overridden by the class extending `CollectionResource`
   // eslint-disable-next-line
-  protected defaults(resource: any = {}): any {
+  public _buildDefaults(resource: any = {}): any {
     return resource;
   }
 }

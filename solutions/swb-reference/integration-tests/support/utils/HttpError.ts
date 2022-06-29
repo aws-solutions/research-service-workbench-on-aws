@@ -7,7 +7,7 @@ export default class HttpError extends Error {
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public constructor(statusCode: number, body: any) {
-    super();
+    super(`HttpError with statusCode ${statusCode}`);
     this.statusCode = statusCode;
     this.body = body;
   }
