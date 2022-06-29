@@ -23,7 +23,6 @@ import {
 } from '..';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'us-west-2',
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
@@ -51,14 +50,30 @@ const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
 } as const;
 
 describe('CognitoAuthenticationPlugin tests', () => {
-  const plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
+  let plugin: CognitoAuthenticationPlugin;
 
-  it('constructor should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
-    const badUserPoolIdConfig = { ...cognitoPluginOptions, userPoolId: 'badId' };
+  beforeEach(() => {
+    plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
+  });
 
-    expect(() => {
-      new CognitoAuthenticationPlugin(badUserPoolIdConfig);
-    }).toThrow(PluginConfigurationError);
+  describe('constructor tests', () => {
+    it('should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
+      const badUserPoolIdConfig = { ...cognitoPluginOptions, userPoolId: 'badId' };
+
+      expect(() => {
+        new CognitoAuthenticationPlugin(badUserPoolIdConfig);
+      }).toThrow(PluginConfigurationError);
+    });
+
+    it('should throw PluginConfigurationError when the verifier throws an error', () => {
+      jest.spyOn(CognitoJwtVerifier, 'create').mockImplementationOnce(() => {
+        throw new Error();
+      });
+
+      expect(() => {
+        new CognitoAuthenticationPlugin(cognitoPluginOptions);
+      }).toThrow(PluginConfigurationError);
+    });
   });
 
   describe('isUserLoggedIn tests', () => {
