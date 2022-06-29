@@ -109,14 +109,35 @@ export class DataSetService {
     return this._generateMountString(dataSetName, endPoint.endPointUrl, targetDS.path);
   }
 
+  /**
+   * List the currently known DataSets.
+   *
+   * @returns an array of DataSet objects.
+   */
   public async listDataSets(): Promise<DataSet[]> {
     return await this._dbProvider.listDataSets();
   }
 
+  /**
+   * Get details on a particular DataSet.
+   *
+   * @param dataSetName - the name of the DataSet for which details are desired.
+   * @returns - the DataSet object associated with that DataSet.
+   */
   public async getDataSet(dataSetName: string): Promise<DataSet> {
     return await this._dbProvider.getDataSetMetadata(dataSetName);
   }
 
+  /**
+   * Add an external endpoint to a DataSet.
+   *
+   * @param dataSetName - the name of the DataSet to which the endpoint will be added.
+   * @param externalEndpointName - the name of the endpoint to add.
+   * @param externalRoleName - a role which will interact with the endpoint.
+   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
+   * to modify the target DataSet's underlying storage.
+   * @returns a JSON object which contains a URL to the storage, the DataSet's name and the storage path.
+   */
   public async addDataSetExternalEndpoint(
     dataSetName: string,
     externalEndpointName: string,
@@ -142,6 +163,12 @@ export class DataSetService {
     return mountString;
   }
 
+  /**
+   * Get the details of an external endpoint.
+   * @param dataSetName - the name of the DataSet.
+   * @param endPointName - the name of the EndPoint.
+   * @returns - the details of the endpoint.
+   */
   public async getExternalEndPoint(dataSetName: string, endPointName: string): Promise<ExternalEndpoint> {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetName, endPointName);
   }
