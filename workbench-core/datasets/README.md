@@ -62,7 +62,7 @@ class AuditLogger implements Writer {
 }
 
 const writer: Writer = new AuditLogger(logger);  
-const baseAuditPlugin:BaseAuditPlugin = new BaseAuditPlugin(writer);
+const baseAuditPlugin: BaseAuditPlugin = new BaseAuditPlugin(writer);
 
 const audit = new AuditService({
   continueOnError: true,
