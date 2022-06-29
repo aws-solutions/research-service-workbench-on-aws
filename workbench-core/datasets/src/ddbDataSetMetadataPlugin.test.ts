@@ -354,6 +354,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       let response;
       try {
         await plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName);
+        expect.hasAssertions();
       } catch (error) {
         response = error;
       }
