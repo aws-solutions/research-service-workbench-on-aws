@@ -276,6 +276,7 @@ describe('DataSetService', () => {
           mockRoleArn,
           plugin
         );
+        expect.hasAssertions();
       } catch (err) {
         response = err;
       }
