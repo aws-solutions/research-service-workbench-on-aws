@@ -80,7 +80,7 @@
     "@types/node": "^14",
     "@types/uuid": "^8.3.4",
     "aws-cdk": "^2.12.0",
-    "aws-cdk-lib": "^2.0.0",
+    "aws-cdk-lib": "^2.29.1",
     "aws-lambda": "^1.0.7",
     "aws-sdk-client-mock": "^0.6.2",
     "cdk-ssm-document": "^3.1.1",
