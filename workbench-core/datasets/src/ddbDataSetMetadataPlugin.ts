@@ -86,7 +86,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._validateCreateExternalEndpoint(endPoint);
     endPointParam.Id = uuidv4();
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
-    await this._storeEndPointToDdb(endPoint);
+    await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
   }
 
