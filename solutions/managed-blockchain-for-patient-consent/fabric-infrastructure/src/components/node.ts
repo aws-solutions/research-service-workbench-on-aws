@@ -86,23 +86,11 @@ export class HyperledgerFabricNode extends constructs.Construct {
   public readonly nodeId: string;
 
   /**
-   * The Availability Zone in which the node exists
+   * See definition of Interface HyperledgerFabricNodeProps for descriptions of the following variables
    */
   public readonly availabilityZone: string;
-
-  /**
-   * The Amazon Managed Blockchain instance type for the node
-   */
   public readonly instanceType: InstanceType;
-
-  /**
-   * The configuration to enable or disable chaincode logging
-   */
   public readonly enableChaincodeLogging: boolean;
-
-  /**
-   * The configuration to enable or disable node logging
-   */
   public readonly enableNodeLogging: boolean;
 
   // These cannot be readonly since they have to be set after construction

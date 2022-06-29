@@ -60,14 +60,12 @@ export interface HyperledgerFabricNetworkProps {
   /**
    * Managed Blockchain network id for additional members
    *
-   * default - Set to match network name
    */
   readonly networkId?: string;
 
   /**
    * Managed Blockchain invitation id for additional members
    *
-   * default - Set to match network name
    */
   readonly invitationId?: string;
 
@@ -152,124 +150,32 @@ export interface HyperledgerFabricNetworkProps {
  */
 export class HyperledgerFabricNetwork extends constructs.Construct {
   /**
-   * Managed Blockchain network name
+   * Managed Blockchain network variables
+   * Please check HyperledgerFabricNetworkProps definition for descriptions
    */
   public readonly networkName: string;
-
-  /**
-   * Managed Blockchain network description
-   */
   public readonly networkDescription: string;
-
-  /**
-   * Managed Blockchain network identifier
-   */
   public readonly networkId: string;
-
-  /**
-   * Managed Blockchain member name
-   */
   public readonly memberName: string;
-
-  /**
-   * Managed Blockchain member description
-   */
   public readonly memberDescription: string;
-
-  /**
-   * Managed Blockchain member identifier
-   */
   public readonly memberId: string;
-
-  /**
-   * Managed Blockchain invitation ID
-   */
   public readonly invitationId: string;
-
-  /**
-   * Hyperledger Fabric framework version
-   */
   public readonly frameworkVersion: FrameworkVersion;
-
-  /**
-   * Managed Blockchain network edition
-   */
   public readonly networkEdition: NetworkEdition;
-
-  /**
-   * The duration from the time that a proposal is created until it expires
-   */
   public readonly proposalDurationInHours: number;
-
-  /**
-   * The percentage of votes among all members that must be yes for a proposal to be approved
-   */
   public readonly thresholdPercentage: number;
-
-  /**
-   * Determines whether the yes votes must be greater than the threshold percentage
-   * or must be greater than or equal to the threhold percentage to be approved
-   */
   public readonly thresholdComparator: ThresholdComparator;
-
-  /**
-   * The configuration to enable or disable certificate authority logging
-   */
   public readonly enableCaLogging: boolean;
-
-  /**
-   * Managed Blockchain network VPC endpoint service name
-   */
   public readonly vpcEndpointServiceName: string;
-
-  /**
-   * Managed Blockchain network ordering service endpoint
-   */
   public readonly ordererEndpoint: string;
-
-  /**
-   * Managed Blockchain member CA endpoint
-   */
   public readonly caEndpoint: string;
-
-  /**
-   * Secret ARN for the Hyperledger Fabric admin password
-   */
   public readonly adminPasswordSecret: secretsmanager.Secret;
-
-  /**
-   * Secret for Hyperledger Fabric admin private key
-   */
   public readonly adminPrivateKeySecret: secretsmanager.Secret;
-
-  /**
-   * Secret for Hyperledger Fabric admin signed certificate
-   */
   public readonly adminSignedCertSecret: secretsmanager.Secret;
-
-  /**
-   * List of nodes created in the network
-   */
   public readonly nodes: Array<node.HyperledgerFabricNode>;
-
-  /**
-   * The client network to interact with the Hyperledger Fabric network
-   */
   public readonly client: client.HyperledgerFabricClient;
-
-  /**
-   * Create new network or join existing network
-   */
   public readonly createNewNetwork: boolean;
-
-  /**
-   * Create new network or join existing network
-   */
   public readonly additionalMembers: string[];
-
-  /**
-   * Prefix for resource naming
-   */
   public readonly prefix: string;
 
   public constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {

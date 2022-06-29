@@ -90,7 +90,7 @@ export class HyperledgerFabricInvite extends constructs.Construct {
     // Custom Resource provider
     this.inviteProvider = new customresources.Provider(this, 'InviteProvider', {
       onEventHandler: inviteFunction,
-      logRetention: logs.RetentionDays.ONE_DAY
+      logRetention: logs.RetentionDays.ONE_YEAR
     });
 
     // Populate the custom role static variable
