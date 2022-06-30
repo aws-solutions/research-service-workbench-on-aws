@@ -97,3 +97,6 @@ solutions/swb-reference/.aws-sam/
 
 # example package
 workbench-core/example/infrastructure/build
+
+#patient consent app cdk-outputs
+solutions/manage-blockchain-for-patient-consent/patient-consent-infrastructure/cdk-outputs.json
