@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@amzn/workbench-core-example-express": "workspace:*",
-    "aws-cdk-lib": "^2.0.0",
+    "aws-cdk-lib": "^2.29.1",
     "constructs": "^10.0.0",
     "lodash": "^4.17.21",
     "source-map-support": "^0.5.16"

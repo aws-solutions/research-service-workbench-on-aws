@@ -5,6 +5,12 @@
  */
 export interface DataSetsStoragePlugin {
   /**
+   * Returns a constient identifier for the type of storage associated with the plugin.
+   * This value should be unique for each storage plugin type.
+   */
+  getStorageType(): string;
+
+  /**
    * Create a storage destination for a dataSet.
    *
    * @param name - A name identifying the stroage destination. This should be consistent
@@ -15,6 +21,16 @@ export interface DataSetsStoragePlugin {
    * @returns a URL to access the new storage location.
    */
   createStorage(name: string, path: string): Promise<string>;
+
+  /**
+   * Complete any operations needed in the storage provider to import an existing
+   * location as a DataSet.
+   * @param name - A name identifying the storage destination.
+   * @param path - the storage specific path for the destination.
+   *
+   * @returns a URL to access the storage location.
+   */
+  importStorage(name: string, path: string): Promise<string>;
 
   /**
    * Configures an existing dataset to be connected to an external environment.
