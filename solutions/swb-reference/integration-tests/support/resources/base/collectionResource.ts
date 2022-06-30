@@ -50,11 +50,8 @@ export default class CollectionResource {
     return response;
   }
 
-  // Because this is a collection resource, the GET method returns an array of the instance child resources
-  // eslint-disable-next-line
-  public async get(queryParams: { [key: string]: string }): Promise<any[]> {
-    const { data: response } = await this._axiosInstance.get(this._api, { params: queryParams });
-    return response;
+  public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+    return this._axiosInstance.get(this._api, { params: queryParams });
   }
 
   // This method should be overridden by the class extending `CollectionResource`

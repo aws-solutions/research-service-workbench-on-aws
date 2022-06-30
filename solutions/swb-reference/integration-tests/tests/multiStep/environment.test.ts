@@ -24,5 +24,7 @@ describe('multiStep environment test', () => {
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
     });
+
+    // TODO: Add connect, stop, get, terminate test
   });
 });

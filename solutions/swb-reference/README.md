@@ -36,6 +36,39 @@ This step is necessary to setup Service Catalog portfolio and products
 
 `STAGE=<STAGE> rushx run-postDeployment`
 
+## Integration Tests
+To run integration tests 
+1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config value.
+2. In this root directory run `STAGE=<STAGE> rushx integration-tests`
+
+To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
+
+Example code for creating new environment
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+const { data: response } = await adminSession.resources.environments.create();
+```
+
+Example code for GET one environment
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+const envId='abc';
+const { data: response } = await adminSession.resources.environments.environment(envId).get();
+```
+
+
+Example code for GETTING all environment with status "COMPLETED"
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+envId='abc';
+const { data: response } = await adminSession.resources.environments.environment(envId).get();
+```
+
+
+
 ## FAQ
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**
 * `config/jest.config.json` is the settings for unit tests in the `src` folder
