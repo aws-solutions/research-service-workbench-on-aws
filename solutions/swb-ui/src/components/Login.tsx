@@ -1,8 +1,10 @@
 import Button from '@awsui/components-react/button';
+import jwt from 'jwt-decode';
 import pkceChallenge from 'pkce-challenge';
 import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { login, token } from '../api/auth';
+import { User } from '../models/User';
 import styles from '../styles/Hero.module.scss';
 
 function getFragmentParam(location: Location, key: string): string {
@@ -25,9 +27,6 @@ function getFragmentParam(location: Location, key: string): string {
 }
 
 function Login(): JSX.Element {
-  // TODO: Get user's role from Cognito group information
-  // const { signIn } = useAuthentication();
-
   // TODO: Fix API Lambda to store access_token and refresh_token in cookies correctly
   // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value
 
@@ -52,6 +51,27 @@ function Login(): JSX.Element {
           });
 
           localStorage.setItem('idToken', response.idToken);
+
+          const decodedToken: { [id: string]: string | Array<string> } = jwt(response.idToken);
+          // Assuming only one group is assigned for the user, if any
+          const userGroup =
+            decodedToken['cognito:groups']?.length > 0 ? decodedToken['cognito:groups'][0] : 'N/A';
+          const user: User = {
+            id: decodedToken.sub as string,
+            name: decodedToken.name as string,
+            email: decodedToken.email as string,
+            avatar: { name: 'user-profile' },
+            claims: [],
+            role: userGroup
+          };
+
+          // TODO: Send user to AuthenticationContext for SWB header
+          // This will be used for authorization throughout the application
+          // const { signIn } = useAuthentication();
+
+          // Temporary log statement, remove when AuthZ consumes this
+          console.log(user);
+
           localStorage.removeItem('stateVerifier');
           localStorage.removeItem('pkceVerifier');
 
