@@ -318,11 +318,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       kmsPolicy.addStatements(usageStatement);
     }
 
-    if (!isDirty && IamHelper.policyDocumentContainsStatement(kmsPolicy, attachStatement)) {
-      return;
+    if (IamHelper.policyDocumentContainsStatement(kmsPolicy, attachStatement)) {
+      if (!isDirty) return;
+    } else {
+      kmsPolicy.addStatements(attachStatement);
     }
 
-    kmsPolicy.addStatements(attachStatement);
     const putPolicyParams: PutKeyPolicyCommandInput = {
       KeyId: kmsKeyArn,
       PolicyName: 'default',
