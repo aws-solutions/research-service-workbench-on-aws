@@ -25,6 +25,7 @@ export default class CollectionResource {
     this._api = '';
   }
 
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async create(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
     // Because of the cleanup logic, before we do the create, we need to ensure that the extender of this collection
     // resource class has a method that returns the resource operations helper for the child resource.
