@@ -19,6 +19,7 @@ import {
   ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import * as nodejsLambda from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
@@ -27,11 +28,17 @@ export class InfrastructureStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const lambdaService = new Function(this, 'LambdaService', {
-      runtime: Runtime.NODEJS_14_X,
-      handler: 'buildLambda.handler',
-      code: Code.fromAsset(join(__dirname, '../build')),
-      functionName: 'LambdaService'
+    const partition = Stack.of(this).partition;
+    const region = Stack.of(this).region;
+
+    const lambdaService = new nodejsLambda.NodejsFunction(this, 'LambdaService', {
+      runtime: Runtime.NODEJS_16_X,
+      handler: 'clientAppHandler',
+      depsLockFilePath: join(__dirname, '/../../../../common/config/rush/pnpm-lock.yaml'),
+      entry: join(__dirname, '/../src/lambdas/client-app.ts'),
+      bundling: {
+        externalModules: ['aws-sdk']
+      }
     });
 
     const kmsKeyPolicyDocument = new PolicyDocument({
@@ -52,7 +59,7 @@ export class InfrastructureStack extends Stack {
           ],
           effect: Effect.ALLOW,
           principals: [new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))],
-          resources: ['*']
+          resources: [`arn:${partition}:logs:${region}:*:*`]
         })
       ]
     });
@@ -74,6 +81,7 @@ export class InfrastructureStack extends Stack {
       proxy: false,
       cloudWatchRole: false,
       deployOptions: {
+        tracingEnabled: true,
         accessLogDestination: new LogGroupLogDestination(logGroup),
         accessLogFormat: AccessLogFormat.custom(
           `${AccessLogField.contextRequestId()} ${AccessLogField.contextErrorMessage()} ${AccessLogField.contextErrorMessageString()}`
@@ -127,11 +135,11 @@ export class InfrastructureStack extends Stack {
         }
       ]
     );
-    NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/LambdaService/Resource', [
-      {
-        id: 'AwsSolutions-L1',
-        reason: 'We are using Node14 for Lambda functions'
-      }
-    ]);
+    // NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/LambdaService/Resource', [
+    //   {
+    //     id: 'AwsSolutions-L1',
+    //     reason: 'We are using Node14 for Lambda functions'
+    //   }
+    // ]);
   }
 }

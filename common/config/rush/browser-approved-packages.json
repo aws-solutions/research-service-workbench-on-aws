@@ -391,6 +391,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "pnpm",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
