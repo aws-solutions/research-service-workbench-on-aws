@@ -1,4 +1,3 @@
-const path = require('path');
 const yaml = require('js-yaml');
 const { join } = require('path');
 const fs = require('fs');

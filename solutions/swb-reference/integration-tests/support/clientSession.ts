@@ -10,14 +10,13 @@ export default class ClientSession {
   private _cleanupQueue: CleanupTask[];
   private _isAnonymousSession: boolean;
   private _axiosInstance: AxiosInstance;
-  public resources: Resources;
   private _setup: Setup;
+  public resources: Resources;
 
   public constructor(setup: Setup, idToken?: string) {
     this._settings = setup.getSettings();
     this._setup = setup;
     this._isAnonymousSession = idToken === undefined;
-    // Each element is an object (cleanupTask) of shape { id, command = async fn() }
     this._cleanupQueue = [];
 
     const headers: {
@@ -49,14 +48,6 @@ export default class ClientSession {
       }
     );
     this.resources = getResources(this);
-  }
-
-  public async init(): Promise<void> {
-    // Load the user associated with this idToken unless it is an anonymous session
-    if (this._isAnonymousSession) return;
-
-    // TODO: Implement this once auth is added
-    // this.user = await this.resources.currentUser.get();
   }
 
   public async cleanup(): Promise<void> {

@@ -1,5 +1,6 @@
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
+import { uuidRegExp } from '../../support/utils/regExpressions';
 
 describe('multiStep environment test', () => {
   const setup: Setup = new Setup();
@@ -14,9 +15,14 @@ describe('multiStep environment test', () => {
   });
 
   test('launch, connect, stop, get, terminate', async () => {
-    const response = await adminSession.resources.environments.create();
-    //TODO: Check create response is as expected
-    console.log('response', response);
-    expect(true).toEqual(true);
+    const { data: response } = await adminSession.resources.environments.create();
+    expect(response).toMatchObject({
+      id: expect.stringMatching(uuidRegExp),
+      instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
+      provisionedProductId: '', // empty string because provisionedProductId  has not been propagated by statusHandler yet
+      status: 'PENDING',
+      ETC: expect.anything(), //ETC should be defined
+      PROJ: expect.anything() // PROJ should be defined
+    });
   });
 });

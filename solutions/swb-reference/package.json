@@ -43,14 +43,13 @@
     "@aws-sdk/types": "^3.110.0",
     "@vendia/serverless-express": "^4.5.4",
     "aws-sdk-client-mock": "^0.6.2",
-    "axios": "^0.27.1",
     "express": "^4.17.3",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2",
-    "yargs-parser": "^20.2.9"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "axios": "^0.27.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-s3": "^3.118.1",

@@ -1,9 +1,8 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
 import Settings from '../../utils/settings';
-import { sleep } from '../../utils/utilities';
 
 export default class CollectionResource {
   private _type: string;
@@ -13,9 +12,6 @@ export default class CollectionResource {
   protected _settings: Settings;
   protected _parentApi: string;
   protected _api: string;
-  // Specifies the delay duration in milliseconds needed to minimize the usage of stale data due to eventual
-  // consistency.
-  protected _deflakeDelayInMs: number = 2000;
   protected _setup: Setup;
 
   public constructor(clientSession: ClientSession, type: string, childType: string, parentApi: string = '') {
@@ -29,8 +25,7 @@ export default class CollectionResource {
     this._api = '';
   }
 
-  // eslint-disable-next-line
-  public async create(body: any = {}, applyDefault: boolean = true): Promise<any> {
+  public async create(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
     // Because of the cleanup logic, before we do the create, we need to ensure that the extender of this collection
     // resource class has a method that returns the resource operations helper for the child resource.
     // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
@@ -42,23 +37,17 @@ export default class CollectionResource {
       );
     }
 
-    try {
-      const requestBody = applyDefault ? this._buildDefaults(body) : body;
-      const { data: resource } = await this._axiosInstance.post(this._api, requestBody);
-      const id = resource.id;
-      const taskId = `${this._childType}-${id}`;
-      // @ts-ignore
-      const resourceNode = this[this._childType](id);
+    const requestBody = applyDefault ? this._buildDefaults(body) : body;
+    const response = await this._axiosInstance.post(this._api, requestBody);
+    const id = response.data.id;
+    const taskId = `${this._childType}-${id}`;
+    // @ts-ignore
+    const resourceNode = this[this._childType](id);
 
-      // We add a cleanup task to the cleanup queue for the session
-      this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
+    // We add a cleanup task to the cleanup queue for the session
+    this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
 
-      await sleep(this._deflakeDelayInMs);
-      return resource;
-    } catch (error) {
-      console.error(error);
-      // throw transform(error);
-    }
+    return response;
   }
 
   // Because this is a collection resource, the GET method returns an array of the instance child resources

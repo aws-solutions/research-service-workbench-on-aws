@@ -18,7 +18,7 @@ export default class Setup {
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {
-    const session = await this._getClientSession();
+    const session = this._getClientSession();
     this._sessions.push(session);
 
     return session;
@@ -26,14 +26,14 @@ export default class Setup {
 
   public async createAdminSession(): Promise<ClientSession> {
     // TODO: Authenticate and get actual Admin Session
-    const session = await this._getClientSession();
+    const session = this._getClientSession();
     this._sessions.push(session);
 
     return session;
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {
-    // TODO: Handle token expiration
+    // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
       this._defaultAdminSession = await this.createAdminSession();
     }
@@ -59,9 +59,7 @@ export default class Setup {
     return this._settings;
   }
 
-  private async _getClientSession(idToken?: string): Promise<ClientSession> {
-    const session = new ClientSession(this, idToken);
-    await session.init();
-    return session;
+  private _getClientSession(idToken?: string): ClientSession {
+    return new ClientSession(this, idToken);
   }
 }

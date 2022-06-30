@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
@@ -22,7 +22,7 @@ export default class Resource {
     this._parentApi = parentApi;
 
     // Most child resources have standard api patterns: /api/<parent resource type>/{id}
-    // But we can only assume this if both the 'id' and 'parent' are provided. In addition,
+    // But we can only assume this if both the 'id' and 'parentApi' are provided. In addition,
     // the extending class can simply choose to construct their own specialized api path
     // and do so in their own constructor functions.
     if (!_.isEmpty(id) && !_.isEmpty(parentApi)) {
@@ -30,17 +30,12 @@ export default class Resource {
     }
   }
 
-  //eslint-disable-next-line
-  public async get(): Promise<any> {
-    const { data: response } = await this._axiosInstance.get(this._api);
-    return response;
+  public async get(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(this._api);
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async update(body: { [key: string]: string }): Promise<any> {
-    const { data: response } = await this._axiosInstance.put(this._api, body);
-
-    return response;
+  public async update(body: { [key: string]: string }): Promise<AxiosResponse> {
+    return this._axiosInstance.put(this._api, body);
   }
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,7 +43,9 @@ export default class Resource {
     await this._axiosInstance.delete(this._api);
   }
 
-  // This method should be overriden by the class extending `resource`
-  // Delete the resource that was created
+  // This method should be overridden by the class extending `resource`
+  /**
+   * Delete any resource that was created
+   */
   protected async cleanup(): Promise<void> {}
 }

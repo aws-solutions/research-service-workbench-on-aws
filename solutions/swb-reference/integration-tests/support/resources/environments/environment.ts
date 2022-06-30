@@ -1,4 +1,5 @@
 import { EnvironmentStatus } from '@amzn/environments';
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { sleep } from '../../utils/utilities';
 import Resource from '../base/resource';
@@ -8,11 +9,11 @@ export default class Environment extends Resource {
     super(clientSession, 'environment', id, parentApi);
   }
 
-  public async stopEnvironment(): Promise<void> {
+  public async stopEnvironment(): Promise<AxiosResponse> {
     return this._axiosInstance.put(`${this._api}/stop`);
   }
 
-  public async startEnvironment(): Promise<void> {
+  public async startEnvironment(): Promise<AxiosResponse> {
     return this._axiosInstance.put(`${this._api}/start`);
   }
 
@@ -22,7 +23,7 @@ export default class Environment extends Resource {
     const startTimeInMs = Date.now();
     let totalTimeWaitedInSeconds = 0;
 
-    const resource = await defAdminSession.resources.environments.environment(this._id).get();
+    const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
     let envStatus: EnvironmentStatus = resource.status;
     if (['TERMINATED', 'TERMINATING'].includes(envStatus)) {
       // Exit early because environment has already been terminated
@@ -30,7 +31,7 @@ export default class Environment extends Resource {
     }
     while (envStatus === 'PENDING' && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
       await sleep(15000);
-      const resource = await defAdminSession.resources.environments.environment(this._id).get();
+      const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
       envStatus = resource.status;
       totalTimeWaitedInSeconds = (Date.now() - startTimeInMs) / 1000;
       console.log(

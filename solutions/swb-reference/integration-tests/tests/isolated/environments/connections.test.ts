@@ -1,5 +1,5 @@
 describe('environments connection negative tests', () => {
-  test('environment does not exist', async () => {
+  test('environment does not exist', () => {
     expect(true).toEqual(true);
   });
 });

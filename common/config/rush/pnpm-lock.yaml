@@ -291,7 +291,6 @@ importers:
       ts-node: ^10.4.0
       typescript: ^4.5.2
       uuid: ^8.3.2
-      yargs-parser: ^20.2.9
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
@@ -305,12 +304,10 @@ importers:
       '@aws-sdk/types': 3.110.0
       '@vendia/serverless-express': 4.8.2
       aws-sdk-client-mock: 0.6.2_186c47bf154802e3879e62ee3def12b3
-      axios: 0.27.2
       express: 4.18.1
       js-yaml: 4.1.0
       lodash: 4.17.21
       uuid: 8.3.2
-      yargs-parser: 20.2.9
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@aws-sdk/client-sagemaker': 3.118.1
@@ -329,6 +326,7 @@ importers:
       aws-cdk: 2.29.1
       aws-cdk-lib: 2.29.1_constructs@10.1.42
       aws-lambda: 1.0.7
+      axios: 0.27.2
       cdk-ssm-document: 3.1.1_b58070d5c904f2e35eeee41952391c50
       constructs: 10.1.42
       depcheck: 1.4.3
