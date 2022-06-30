@@ -259,14 +259,11 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-
-      "name": "cors",
-
+      "name": "cookie-parser",
       "allowedCategories": [ "production" ]
-
     },
     {
-      "name": "cookie-parser",
+      "name": "cors",
       "allowedCategories": [ "production" ]
     },
     {
@@ -334,6 +331,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jwt-decode",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -370,12 +371,20 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "pkce-challenge",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "react-router-dom",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",
@@ -394,11 +403,8 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
-
       "name": "swr",
-
       "allowedCategories": [ "production" ]
-
     },
     {
       "name": "triple-beam",

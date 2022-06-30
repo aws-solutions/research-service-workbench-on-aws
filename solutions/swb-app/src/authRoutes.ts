@@ -3,6 +3,7 @@ import {
   AuthenticationService,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
+  isUserLoggedIn,
   logoutUser,
   refreshAccessToken
 } from '@amzn/workbench-core-authentication';
@@ -11,12 +12,15 @@ import { Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 
 export function setUpAuthRoutes(router: Router, auth: AuthenticationService, logger: LoggingService): void {
-  // Exchange auth code for token
-  router.post('/token', wrapAsync(getTokensFromAuthorizationCode(auth, { loggingService: logger })));
-
+  // Get auth provider's login URL with temporary state and PKCE strings
   router.get('/login', wrapAsync(getAuthorizationCodeUrl(auth)));
+
+  // User would have manually logged in at this point, and received an auth code. Exchange auth code for token
+  router.post('/token', wrapAsync(getTokensFromAuthorizationCode(auth, { loggingService: logger })));
 
   router.get('/logout', wrapAsync(logoutUser(auth, { loggingService: logger })));
 
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger })));
+
+  router.get('/loggedIn', wrapAsync(isUserLoggedIn(auth, { loggingService: logger })));
 }

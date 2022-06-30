@@ -39,5 +39,13 @@ export const routesIgnored: RoutesIgnored = {
   },
   '/refresh': {
     GET: true
+  },
+  '/loggedIn': {
+    GET: true
+  },
+
+  // TODO: Ignoring these routes right now, but eventually will need to send token in Authorization header and validate
+  '/environments': {
+    GET: true
   }
 };

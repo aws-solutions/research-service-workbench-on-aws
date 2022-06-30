@@ -1,11 +1,11 @@
 import Box from '@awsui/components-react/box';
-import Button from '@awsui/components-react/button';
 import Container from '@awsui/components-react/container';
 import Grid from '@awsui/components-react/grid';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
+import React from 'react';
 import { useSettings } from '../context/SettingsContext';
-import styles from '../styles/Hero.module.scss';
+import Login from './Login';
 
 function Hero(): JSX.Element {
   const { t } = useTranslation();
@@ -34,9 +34,7 @@ function Hero(): JSX.Element {
                 <span className="custom-home__header-sub-title">{settings.description}</span>
               </Box>
             )}
-            <Button className={styles.primaryButton} variant="primary" href="/environments">
-              Login
-            </Button>
+            <Login />
           </div>
           <div className="custom-home__header-cta">
             <Container>

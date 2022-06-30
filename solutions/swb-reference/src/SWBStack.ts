@@ -412,6 +412,11 @@ export class SWBStack extends Stack {
             sid: 'ScAccess'
           }),
           new PolicyStatement({
+            actions: ['cognito-idp:DescribeUserPoolClient'],
+            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            sid: 'CognitoAccess'
+          }),
+          new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
