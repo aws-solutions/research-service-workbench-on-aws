@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`inviteMemberHandler Invite 2 members on RequestType Create 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "Actions": Object {
+          "Invitations": Array [
+            Object {
+              "Principal": "1234567890",
+            },
+          ],
+        },
+        "Description": "Invite new member ",
+        "MemberId": "m-somefakememberid",
+        "NetworkId": "n-somefakenetworkid",
+      },
+    ],
+    Array [
+      Object {
+        "Actions": Object {
+          "Invitations": Array [
+            Object {
+              "Principal": " 0987654321",
+            },
+          ],
+        },
+        "Description": "Invite new member ",
+        "MemberId": "m-somefakememberid",
+        "NetworkId": "n-somefakenetworkid",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;
+
+exports[`inviteMemberHandler Invite 2 members on RequestType Create 2`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "NetworkId": "n-somefakenetworkid",
+        "ProposalId": "p-1234567",
+        "Vote": "YES",
+        "VoterMemberId": "m-somefakememberid",
+      },
+    ],
+    Array [
+      Object {
+        "NetworkId": "n-somefakenetworkid",
+        "ProposalId": "p-1234567",
+        "Vote": "YES",
+        "VoterMemberId": "m-somefakememberid",
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+    Object {
+      "type": "return",
+      "value": Promise {},
+    },
+  ],
+}
+`;

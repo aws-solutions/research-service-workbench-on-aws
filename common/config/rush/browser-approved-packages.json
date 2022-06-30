@@ -35,6 +35,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/workbench-core-datasets",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-example-express",
       "allowedCategories": [ "prototypes" ]
     },
@@ -91,12 +95,20 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-kms",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-lambda",
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-managedblockchain",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
@@ -120,7 +132,7 @@
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -236,7 +248,7 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "axios",
@@ -307,6 +319,14 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "fabric-ca-client",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "fabric-common",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "fast-check",
       "allowedCategories": [ "production" ]
     },
@@ -337,6 +357,10 @@
     {
       "name": "md5-file",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nconf",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next",
@@ -404,7 +428,7 @@
     },
     {
       "name": "ts-node",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "typescript",

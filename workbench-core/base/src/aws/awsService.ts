@@ -9,6 +9,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { EC2 } from '@aws-sdk/client-ec2';
 import { EventBridge } from '@aws-sdk/client-eventbridge';
 import { IAM } from '@aws-sdk/client-iam';
+import { KMS } from '@aws-sdk/client-kms';
 import { Lambda } from '@aws-sdk/client-lambda';
 import { S3 } from '@aws-sdk/client-s3';
 import { S3Control } from '@aws-sdk/client-s3-control';
@@ -37,6 +38,7 @@ export default class AwsService {
     s3Control: S3Control;
     lambda: Lambda;
     sagemaker: SageMaker;
+    kms: KMS;
   };
   public helpers: {
     cloudformation: CloudformationService;
@@ -60,7 +62,8 @@ export default class AwsService {
       s3Control: new S3Control(options),
       ddb: new DynamoDB(options),
       lambda: new Lambda(options),
-      sagemaker: new SageMaker(options)
+      sagemaker: new SageMaker(options),
+      kms: new KMS(options)
     };
 
     this.helpers = {

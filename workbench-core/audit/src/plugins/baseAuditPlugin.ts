@@ -12,15 +12,18 @@ class BaseAuditPlugin implements AuditPlugin {
     this._writer = writer;
   }
   /**
-   * Modifies the audit entry to add audit as the logEventType and prepares the {@link AuditEntry} for output.
+   * Modifies the audit entry to include recommended values for auditing
+   * and prepares the {@link AuditEntry} for output.
    *
    * @param metadata - {@link Metadata}
    * @param auditEntry - {@link AuditEntry}
    */
   public async prepare(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
-    if (!auditEntry.logEventType) {
-      auditEntry.logEventType = 'audit';
-    }
+    auditEntry.logEventType = 'audit';
+    auditEntry.statusCode = metadata.statusCode;
+    auditEntry.action = metadata.action;
+    auditEntry.actor = metadata.actor;
+    auditEntry.source = metadata.source;
     if (this._writer.prepare !== undefined) {
       await this._writer.prepare(metadata, auditEntry);
     }
@@ -29,9 +32,9 @@ class BaseAuditPlugin implements AuditPlugin {
    * Writes the audit entry using the writer
    *
    * @param metadata - {@link Metadata}
-   * @param auditEntry - {@link AuditEntry}
+   * @param auditEntry - {@link Readonly} {@link AuditEntry}
    */
-  public async write(metadata: Metadata, auditEntry: AuditEntry): Promise<void> {
+  public async write(metadata: Metadata, auditEntry: Readonly<AuditEntry>): Promise<void> {
     await this._writer.write(metadata, auditEntry);
   }
 }
