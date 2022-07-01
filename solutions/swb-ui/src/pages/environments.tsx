@@ -102,7 +102,7 @@ const Environment: NextPage = () => {
         filteringFunction: (item: any, filteringText): any => {
           if (dateFilter !== null) {
             const range = convertToAbsoluteRange(dateFilter);
-            if (!isWithinInterval(new Date(item.date), range)) {
+            if (!isWithinInterval(new Date(item.createdAt), range)) {
               return false;
             }
           }
