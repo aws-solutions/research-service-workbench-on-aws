@@ -21,21 +21,21 @@ export interface DataSetMetadataPlugin {
   /**
    * Get a list of objects in the DataSet as stored in the backend.
    *
-   * @param dataSetName - the name of the DataSet for which the objects are to be returned.
+   * @param dataSetId - the ID of the DataSet for which the objects are to be returned.
    *
    * @returns a list of objects in a DataSet.
    */
-  listDataSetObjects(dataSetName: string): Promise<string[]>;
+  listDataSetObjects(dataSetId: string): Promise<string[]>;
 
   /**
    * Get the metadata associated with a given object in a given DataSet.
    *
-   * @param dataSetName - the name of the DataSet which contains the object.
-   * @param objectName - the name of the object.
+   * @param dataSetId - the ID of the DataSet which contains the object.
+   * @param objectId - the ID of the object.
    *
    * @returns the metadata associated with the object.
    */
-  getDataSetObjectMetadata(dataSetName: string, objectName: string): Promise<Record<string, string>>;
+  getDataSetObjectMetadata(dataSetId: string, objectId: string): Promise<Record<string, string>>;
 
   /**
    * Add a DataSet to the solution.
@@ -56,12 +56,12 @@ export interface DataSetMetadataPlugin {
   /**
    * Return the details on a specific DataSet endpoint.
    *
-   * @param dataSetName - the name of the DataSet for which the endpoint data is to be returned.
-   * @param endPointName - the name which identifies the endpoint for which details are to be returned.
+   * @param dataSetId - the Id of the DataSet for which the endpoint data is to be returned.
+   * @param endPointId - the Id of the endpoint for which details are to be returned.
    *
    * @returns details about the specified endpoint.
    */
-  getDataSetEndPointDetails(dataSetName: string, endPointName: string): Promise<ExternalEndpoint>;
+  getDataSetEndPointDetails(dataSetId: string, endPointId: string): Promise<ExternalEndpoint>;
 
   /**
    * Add an external endpoint to a DataSet.
@@ -70,4 +70,13 @@ export interface DataSetMetadataPlugin {
    * @returns the details of the endpoint added.
    */
   addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  /**
+   * Get the endpoint details for a given DataSet.
+   *
+   * @param dataSetId - the ID of the Dataset for which endpoints are to be returned.
+   *
+   * @returns an array of ExternalEndpoint objects.
+   */
+  listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpoint[]>;
 }

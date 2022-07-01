@@ -262,6 +262,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         }
       });
       mockDdb.on(UpdateItemCommand).resolves({});
+      mockDdb.on(QueryCommand).resolves({});
 
       const exampleEndpoint: ExternalEndpoint = {
         name: mockEndPointName,
@@ -313,6 +314,20 @@ describe('DdbDataSetMetadataPlugin', () => {
           externalEndpoints: { L: [{ S: mockEndPointName }] }
         }
       });
+      mockDdb.on(QueryCommand).resolves({
+        Items: [
+          {
+            name: { S: mockEndPointName },
+            dataSetId: { S: mockDataSetId },
+            dataSetName: { S: mockDataSetName },
+            path: { S: mockDataSetPath },
+            endPointUrl: { S: mockEndPointUrl },
+            allowedRoles: { L: [{ S: mockEndPointRole }] },
+            id: { S: mockEndPointName }
+          }
+        ]
+      });
+
       const exampleEndpoint: ExternalEndpoint = {
         name: mockEndPointName,
         dataSetId: mockDataSetId,

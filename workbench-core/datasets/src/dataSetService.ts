@@ -86,27 +86,27 @@ export class DataSetService {
 
   /**
    * Removes a DataSet from the solution however it does not delete the storage.
-   * @param dataSetName - the name of the DataSet to remove.
+   * @param dataSetId - the ID of the DataSet to remove.
    */
-  public async removeDataSet(dataSetName: string): Promise<void> {
+  public async removeDataSet(dataSetId: string): Promise<void> {
     throw new Error(notImplementedText);
   }
 
   /**
    * Get the mount configuration string for a DataSet.
-   * @param dataSetName - the name of the DataSet.
-   * @param endPointName - an arn with which the DataSet will be accessed from the external environment.
+   * @param dataSetId - the ID of the DataSet.
+   * @param endPointId - the ID of the endpoint to remove.
    *
    * @returns the string needed to mount the Dataset in an external environment.
    */
-  public async getDataSetMountString(dataSetName: string, endPointName: string): Promise<string> {
-    const targetDS: DataSet = await this.getDataSet(dataSetName);
+  public async getDataSetMountString(dataSetId: string, endPointId: string): Promise<string> {
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
 
-    if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointName))
-      throw Boom.notFound(`'${endPointName}' not found on DataSet '${dataSetName}'.`);
+    if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
+      throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
 
-    const endPoint = await this.getExternalEndPoint(dataSetName, endPointName);
-    return this._generateMountString(dataSetName, endPoint.endPointUrl, targetDS.path);
+    const endPoint = await this.getExternalEndPoint(dataSetId, endPointId);
+    return this._generateMountString(dataSetId, endPoint.endPointUrl, targetDS.path);
   }
 
   /**
@@ -179,17 +179,17 @@ export class DataSetService {
 
   /**
    * Get the details of an external endpoint.
-   * @param dataSetName - the name of the DataSet.
-   * @param endPointName - the name of the EndPoint.
+   * @param dataSetId - the name of the DataSet.
+   * @param endPointId - the name of the EndPoint.
    * @returns - the details of the endpoint.
    */
-  public async getExternalEndPoint(dataSetName: string, endPointName: string): Promise<ExternalEndpoint> {
-    return await this._dbProvider.getDataSetEndPointDetails(dataSetName, endPointName);
+  public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
+    return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
-  private _generateMountString(dataSetName: string, endPointURL: string, path: string): string {
+  private _generateMountString(dataSetId: string, endPointURL: string, path: string): string {
     return JSON.stringify({
-      name: dataSetName,
+      name: dataSetId,
       bucket: endPointURL,
       prefix: path
     });
