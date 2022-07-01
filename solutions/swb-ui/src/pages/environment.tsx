@@ -19,33 +19,34 @@ import {
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect, useState } from 'react';
+import { envTypeConfigs, envTypes } from '../api/environments';
 import { layoutLabels } from '../common/labels';
-import Navigation from '../components/Navigation';
 import EnvTypeCards, { EnvTypeItem } from '../components/EnvTypeCards';
 import EnvTypeConfigCards, { EnvTypeConfigItem } from '../components/EnvTypeConfigCards';
+import Navigation from '../components/Navigation';
 import { useSettings } from '../context/SettingsContext';
-import { envTypeConfigs, envTypes } from '../api/environments';
-export interface EnvironmentProps {
-  locale: string;
-}
 
-type CreateEnvironmentForm = {
+interface CreateEnvironmentForm {
   envTypeId?: string;
   name?: string;
   restrictedCIDR?: string;
   projectId?: string;
   envTypeConfigId?: string;
   description?: string;
-};
+}
 
-type CreateEnvironmentFormValidation = {
+interface CreateEnvironmentFormValidation {
   envTypeIdError?: string;
   nameError?: string;
   restrictedCIDRError?: string;
   projectIdError?: string;
   envTypeConfigIdError?: string;
   descriptionError?: string;
-};
+}
+
+export interface EnvironmentProps {
+  locale: string;
+}
 
 export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => ({
   props: {
@@ -60,25 +61,21 @@ const Environment: NextPage = () => {
   const [preferences] = useState({
     pageSize: 20
   });
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const [selectedEnvType, setselectedEnvType] = useState<EnvTypeItem>();
-
   const [error, setError] = useState('');
+  const [formData, setFormData] = useState<CreateEnvironmentForm>({});
+  const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
 
-  const OnSelectEnvType = (selection: EnvTypeItem[]) => {
+  const OnSelectEnvType = (selection: EnvTypeItem[]): void => {
     const selected = (selection && selection.at(0)) || undefined;
     setselectedEnvType(selected);
     setFormData({ ...formData, envTypeId: selected?.id, envTypeConfigId: undefined });
   };
-  const OnSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]) => {
+  const OnSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
     const selected = (selection && selection.at(0)) || undefined;
     setFormData({ ...formData, envTypeConfigId: selected?.id });
   };
-
-  const [formData, setFormData] = useState<CreateEnvironmentForm>({});
-  const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
-  // eslint-disable-next-line prefer-const
-  let [navigationOpen, setNavigationOpen] = useState(false);
-  // App layout constants
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -97,53 +94,65 @@ const Environment: NextPage = () => {
   const validationRules = [
     {
       field: 'name',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'Workspace Name is Required'
     },
     {
       field: 'name',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Workspace Name cannot be longer than 128 characters'
     },
     {
       field: 'restrictedCIDR',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'restrictedCIDR is Required'
     },
     {
       field: 'restrictedCIDR',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Restricted CIDR cannot be longer than 128 characters'
     },
     {
       field: 'projectId',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'Project ID is Required'
     },
     {
       field: 'envTypeId',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'Compute Platform is Required'
     },
     {
       field: 'envTypeConfigId',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'Configuration is Required'
     },
     {
       field: 'description',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !a || a.length <= 128,
       message: 'Description cannot be longer than 128 characters'
     }
   ];
   const validateField = (field: keyof CreateEnvironmentForm): boolean => {
-    for (let rule of validationRules.filter((f) => f.field == field)) {
+    for (const rule of validationRules.filter((f) => f.field === field)) {
+      // eslint-disable-next-line security/detect-object-injection
       if (!rule.condition(formData[field])) {
-        setFormErrors((prevState) => ({ ...prevState, [`${field}Error`]: rule.message }));
+        setFormErrors((prevState: CreateEnvironmentFormValidation) => ({
+          ...prevState,
+          [`${field}Error`]: rule.message
+        }));
         return false;
       }
     }
-    setFormErrors((prevState) => ({ ...prevState, [`${field}Error`]: '' }));
+    setFormErrors((prevState: CreateEnvironmentFormValidation) => ({ ...prevState, [`${field}Error`]: '' }));
     return true;
   };
   const validateForm = (): boolean => {
@@ -171,7 +180,8 @@ const Environment: NextPage = () => {
   useEffect(() => {
     validateField('envTypeId');
     validateField('envTypeConfigId');
-  }, [formData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.envTypeConfigId, formData.envTypeId]);
 
   return (
     <AppLayout
@@ -310,7 +320,6 @@ const Environment: NextPage = () => {
       onNavigationChange={({ detail }) => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         setNavigationOpen(detail.open);
-        navigationOpen = true;
       }}
       minContentWidth={1300}
     />

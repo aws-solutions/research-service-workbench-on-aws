@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
-import {
-  CollectionPreferences,
-  Header,
-  Cards,
-  Pagination,
-  Box,
-  TextFilter,
-  CardsProps,
-  TextContent
-} from '@awsui/components-react';
 import { useCollection } from '@awsui/collection-hooks';
+import { Cards, Box, CardsProps } from '@awsui/components-react';
+import React, { useState } from 'react';
 
 interface OnSelectEnvTypeConfigFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeConfigItem>): void;
@@ -20,19 +11,18 @@ export interface EnvTypeConfigsProps {
   selectedItem?: string;
 }
 
-export type EnvTypeConfigItem = {
+export interface EnvTypeConfigItem {
   id: string;
   name: string;
   estimatedCost: string;
   instanceType: string;
-};
+}
 
-export default (props: EnvTypeConfigsProps) => {
+export default function EnvTypeConfigCards(props: EnvTypeConfigsProps): JSX.Element {
   const itemType: string = 'Environment Type Configuration';
   const { items } = useCollection(props.allItems, {});
-  //let selected = props.allItems.filter(i=>i.id === props.selectedItem);
-  const [selectedItems, setSelectedItems] = useState<EnvTypeConfigItem[]>();
-
+  const selected = props.allItems.filter((i) => i.id === props.selectedItem);
+  const [selectedItems, setSelectedItems] = useState<EnvTypeConfigItem[]>(selected);
   return (
     <Cards
       onSelectionChange={({ detail }) => {
@@ -71,4 +61,4 @@ export default (props: EnvTypeConfigsProps) => {
       }
     />
   );
-};
+}

@@ -6,7 +6,7 @@ import { EnvTypeConfigItem } from '../components/EnvTypeConfigCards';
 const useEnvironments = () => {
   const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
 
-  let environments = (data && data.envs) || [];
+  let environments = (data && data.data) || [];
   environments.forEach((item: EnvironmentItem) => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;

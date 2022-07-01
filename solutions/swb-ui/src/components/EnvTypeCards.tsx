@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useCollection } from '@awsui/collection-hooks';
 import {
   CollectionPreferences,
-  Header,
   Cards,
   Pagination,
   Box,
@@ -9,9 +8,9 @@ import {
   CardsProps,
   TextContent
 } from '@awsui/components-react';
+import { useState } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../common/tableNoMatchState';
-import { useCollection } from '@awsui/collection-hooks';
 
 interface OnSelectEnvTypeFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeItem>): void;
@@ -22,14 +21,14 @@ export interface EnvTypesProps {
   selectedItem?: string;
 }
 
-export type EnvTypeItem = {
+export interface EnvTypeItem {
   id: string;
   name: string;
   description: string;
-};
+}
 
 export const searchableColumns: string[] = ['name', 'description'];
-export default (props: EnvTypesProps) => {
+export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
   const [preferences, setPreferences] = useState({
     pageSize: 10
   });
@@ -38,6 +37,7 @@ export default (props: EnvTypesProps) => {
     filtering: {
       empty: TableEmptyDisplay(itemType),
       noMatch: TableNoMatchDisplay(itemType),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filteringFunction: (item: any, filteringText: string): any => {
         const filteringTextLowerCase = filteringText.toLowerCase();
         return (
@@ -53,7 +53,7 @@ export default (props: EnvTypesProps) => {
     pagination: { pageSize: preferences.pageSize }
   });
 
-  let selected = props.allItems.filter((i) => i.id === props.selectedItem);
+  const selected = props.allItems.filter((i) => i.id === props.selectedItem);
   const [selectedItems, setSelectedItems] = useState(selected);
 
   return (
@@ -95,7 +95,7 @@ export default (props: EnvTypesProps) => {
           confirmLabel="Confirm"
           cancelLabel="Cancel"
           preferences={preferences}
-          onConfirm={({ detail }) => setPreferences(detail)}
+          onConfirm={({ detail: { pageSize } }) => setPreferences({ pageSize: pageSize || 10 })}
           pageSizePreference={{
             title: 'Page size',
             options: [
@@ -108,4 +108,4 @@ export default (props: EnvTypesProps) => {
       }
     />
   );
-};
+}
