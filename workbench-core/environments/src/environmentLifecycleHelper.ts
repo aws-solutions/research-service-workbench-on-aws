@@ -51,7 +51,7 @@ export default class EnvironmentLifecycleHelper {
               `${datasetId}-mounted-on-${envId}`,
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await datasetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
+          : await datasetService.getDataSetMountString(datasetId, `${datasetId}-mounted-on-${envId}`);
 
         return {
           datasetId,

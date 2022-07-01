@@ -12,7 +12,7 @@ const envResourceTypeToKey: {
   project: 'PROJ',
   envType: 'ET',
   envTypeConfig: 'ETC',
-  dataset: 'DS',
+  dataset: 'DATASET',
   instance: 'INID',
   awsAccount: 'AWSACC',
   account: 'ACC'
