@@ -28,6 +28,7 @@ export class SWBStack extends Stack {
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     PCLUSTER_API_URL: string;
+    ALLOWED_ORIGINS: string;
   };
   public constructor(app: App) {
     const {
@@ -41,6 +42,7 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       PCLUSTER_API_URL
+      ALLOWED_ORIGINS
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -61,6 +63,7 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       PCLUSTER_API_URL
+      ALLOWED_ORIGINS
     };
 
     const statusHandler = this._createStatusHandlerLambda();

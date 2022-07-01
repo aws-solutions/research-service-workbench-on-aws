@@ -17,6 +17,7 @@ function getConstants(): {
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
   PCLUSTER_API_URL: string;
+  ALLOWED_ORIGINS: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -58,6 +59,7 @@ function getConstants(): {
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
     PCLUSTER_API_URL
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
   };
 }
 

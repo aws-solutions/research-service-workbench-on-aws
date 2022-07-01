@@ -55,6 +55,7 @@ export interface WorkbenchCognitoProps {
   domainPrefix: string;
   websiteUrl: string;
   userPoolName?: string;
+  userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
 }
 
@@ -76,6 +77,7 @@ export class WorkbenchCognito extends Construct {
       domainPrefix,
       websiteUrl,
       userPoolName,
+      userPoolClientName,
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
@@ -87,12 +89,16 @@ export class WorkbenchCognito extends Construct {
       cognitoDomain: { domainPrefix: domainPrefix }
     });
 
-    oidcIdentityProviderProps?.forEach((props) => {
-      const provider = new UserPoolIdentityProviderOidc(this, 'WorkbenchUserPoolIdentityProviderOidc', {
-        ...props,
-        userPool: this.userPool,
-        scopes: ['openid', 'profile', 'email']
-      });
+    oidcIdentityProviderProps?.forEach((props, index) => {
+      const provider = new UserPoolIdentityProviderOidc(
+        this,
+        `WorkbenchUserPoolIdentityProviderOidc${index}`,
+        {
+          ...props,
+          userPool: this.userPool,
+          scopes: ['openid', 'profile', 'email']
+        }
+      );
       this.userPool.registerIdentityProvider(provider);
     });
 
@@ -105,7 +111,8 @@ export class WorkbenchCognito extends Construct {
     const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
     this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
       ...userPoolClientProps,
-      userPool: this.userPool
+      userPool: this.userPool,
+      userPoolClientName
     });
 
     this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
