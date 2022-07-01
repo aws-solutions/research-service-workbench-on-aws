@@ -49,7 +49,6 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "axios": "^0.27.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-s3": "^3.118.1",
@@ -74,6 +73,7 @@
     "aws-cdk-lib": "^2.29.1",
     "aws-lambda": "^1.0.7",
     "aws-sdk-client-mock": "^0.6.2",
+    "axios": "^0.27.1",
     "cdk-ssm-document": "^3.1.1",
     "constructs": "^10.0.0",
     "depcheck": "^1.4.3",

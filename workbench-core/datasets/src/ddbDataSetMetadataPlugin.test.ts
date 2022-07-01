@@ -3,7 +3,6 @@ jest.mock('uuid', () => ({
     return 'sampleDataSetId';
   })
 }));
-// const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
 import { AwsService } from '@amzn/workbench-core-base';
 import {
@@ -40,7 +39,6 @@ describe('DdbDataSetMetadataPlugin', () => {
     jest.resetModules();
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
-    // mockUuid.v4.mockImplementationOnce(() => 'sampleDataSetId');
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
     plugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
     mockDdb = mockClient(DynamoDBClient);

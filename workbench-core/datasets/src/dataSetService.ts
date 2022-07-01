@@ -131,7 +131,7 @@ export class DataSetService {
   /**
    * Add an external endpoint to a DataSet.
    *
-   * @param dataSetName - the name of the DataSet to which the endpoint will be added.
+   * @param dataSetId - the name of the DataSet to which the endpoint will be added.
    * @param externalEndpointName - the name of the endpoint to add.
    * @param externalRoleName - a role which will interact with the endpoint.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
@@ -139,28 +139,42 @@ export class DataSetService {
    * @returns a string representation of a JSON object which contains a URL to the storage, the DataSet's name and the storage path.
    */
   public async addDataSetExternalEndpoint(
-    dataSetName: string,
+    dataSetId: string,
     externalEndpointName: string,
     storageProvider: DataSetsStoragePlugin,
     externalRoleName?: string
   ): Promise<string> {
-    const targetDS: DataSet = await this.getDataSet(dataSetName);
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
 
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
-      throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetName}'.`);
+      throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
-    const mountString = await storageProvider.addExternalEndpoint(
+    const storageUrl = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
       externalRoleName
     );
 
+    const endPointParam: ExternalEndpoint = {
+      name: externalEndpointName,
+      dataSetId: targetDS.id as string,
+      dataSetName: targetDS.name,
+      path: targetDS.path,
+      endPointUrl: storageUrl
+    };
+
+    if (externalRoleName) {
+      endPointParam.allowedRoles = [externalRoleName];
+    }
+
+    const endPoint: ExternalEndpoint = await this._dbProvider.addExternalEndpoint(endPointParam);
+
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
-    targetDS.externalEndpoints.push(externalEndpointName);
+    targetDS.externalEndpoints.push(endPoint.id as string);
     await this._dbProvider.updateDataSet(targetDS);
-    return mountString;
+    return this._generateMountString(endPoint.dataSetName, endPoint.endPointUrl, endPoint.path);
   }
 
   /**
