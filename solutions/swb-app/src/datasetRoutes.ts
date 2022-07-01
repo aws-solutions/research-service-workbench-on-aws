@@ -10,7 +10,7 @@ export function setUpDSRoutes(
 ): void {
   // create new prefix
   router.post(
-    '/data-set',
+    '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       // We check that envType is in list of supportedEnvs before calling the environments object
       //eslint-disable-next-line security/detect-object-injection
@@ -27,7 +27,7 @@ export function setUpDSRoutes(
 
   // import new prefix
   router.post(
-    '/data-set/import',
+    '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       // We check that envType is in list of supportedEnvs before calling the environments object
       //eslint-disable-next-line security/detect-object-injection
@@ -43,7 +43,7 @@ export function setUpDSRoutes(
   );
   // share dataset
   router.post(
-    '/data-set/share',
+    '/datasets/share',
     wrapAsync(async (req: Request, res: Response) => {
       // We check that envType is in list of supportedEnvs before calling the environments object
       //eslint-disable-next-line security/detect-object-injection
