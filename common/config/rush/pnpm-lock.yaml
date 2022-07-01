@@ -183,6 +183,7 @@ importers:
     specifiers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-datasets': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -211,6 +212,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
+      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
       '@hapi/boom': 10.0.0
       cors: 2.8.5
       express: 4.18.1
@@ -245,7 +247,10 @@ importers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-datasets': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-dynamodb': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
@@ -292,7 +297,10 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
+      '@amzn/workbench-core-audit': link:../../workbench-core/audit
       '@amzn/workbench-core-base': link:../../workbench-core/base
+      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
+      '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@aws-sdk/client-cloudformation': 3.118.1
       '@aws-sdk/client-dynamodb': 3.118.1
       '@aws-sdk/client-s3': 3.118.1
@@ -4448,7 +4456,6 @@ packages:
 
   /@balena/dockerignore/1.0.2:
     resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
-    dev: false
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -6703,7 +6710,16 @@ packages:
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.42
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.7
+      yaml: 1.10.2
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -7088,6 +7104,10 @@ packages:
 
   /caniuse-lite/1.0.30001359:
     resolution: {integrity: sha512-Xln/BAsPzEuiVLgJ2/45IaqD9jShtk3Y33anKb4+yLwQzws3+v6odKfpgES/cDEaZMLzSChpIGdbOYtH9MyuHw==}
+
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
 
   /cdk-nag/2.14.47_b58070d5c904f2e35eeee41952391c50:
     resolution: {integrity: sha512-AmXLZal9EHfAMr+8nsLTTDRYfkG7LoCqfgaOfVQ9Urr7sirgXghfU8BfZvUhM7fFHd4a+LDuzDVe3Xu7OOK4yQ==}
@@ -10431,7 +10451,6 @@ packages:
 
   /jsonschema/1.4.1:
     resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
-    dev: false
 
   /jsrsasign/10.5.25:
     resolution: {integrity: sha512-N7zxHaCwYvFlXsybq4p4RxRwn4AbEq3cEiyjbCrWmwA7g8aS4LTKDJ9AJmsXxwtYesYx0imJ+ITtkyyxLCgeIg==}
@@ -13373,7 +13392,6 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
-    dev: true
 
   /yargs-parser/20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}

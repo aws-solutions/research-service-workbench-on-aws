@@ -406,6 +406,12 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
+          }),
+          // TODO: Narrow down permissions (dmmadse working on it)
+          new PolicyStatement({
+            sid: 'datasetS3Bucket',
+            actions: ['*'],
+            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*']
           })
         ]
       })
