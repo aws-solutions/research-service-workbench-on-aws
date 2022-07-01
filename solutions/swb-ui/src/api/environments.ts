@@ -3,10 +3,14 @@ import { httpApiGet, httpApiPut, httpApiDelete } from './apiHelper';
 import { EnvironmentItem, EnvironmentConnectResponse } from '../models/Environment';
 import { EnvTypeItem } from '../components/EnvTypeCards';
 import { EnvTypeConfigItem } from '../components/EnvTypeConfigCards';
+
 const useEnvironments = () => {
   const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
 
-  let environments = (data && data.data) || [];
+  // `/environments` API returns a JSON in this format
+  // { data: [], paginationToken: ''}
+  // The paginationToken attribute is only provided if there are more than one page of result
+  const environments = (data && data.data) || [];
   environments.forEach((item: EnvironmentItem) => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;

@@ -36,17 +36,53 @@ This step is necessary to setup Service Catalog portfolio and products
 
 `STAGE=<STAGE> rushx run-postDeployment`
 
+## Integration Tests
+To run integration tests 
+1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config value.
+2. In this root directory run `STAGE=<STAGE> rushx integration-tests`
+
+To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
+
+Example code for creating new environment
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+const { data: response } = await adminSession.resources.environments.create();
+```
+
+Example code for GET one environment
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+const envId='abc';
+const { data: response } = await adminSession.resources.environments.environment(envId).get();
+```
+
+
+Example code for GETTING all environment with status "COMPLETED"
+```ts
+const setup: Setup = new Setup();
+const adminSession = await setup.createAdminSession();
+const { data: response } = await adminSession.resources.environments.get({status: 'COMPLETED'});
+```
+
+
+
 ## FAQ
-**When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
+1. **Why is there `jest.config.js` and `config/jest.config.json`?**
+* `config/jest.config.json` is the settings for unit tests in the `src` folder
+* `jest.config.js` is the settings for tests in `integration-tests`. These tests require setup steps that are not required by unit tests in the `src` folder.
+
+2. **When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
 
 The `lib` folders for your project might have been deleted. Try running `rush purge; rush build` in the root 
 directory of this project to build the `lib` folders from scratch. 
 
-**How do I see which line of code my unit tests did not cover?**
+3. **How do I see which line of code my unit tests did not cover?**
 
 Run `rushx jest --coverage`
 
-**Cannot find module in `common/temp`**
+4. **Why am I'm getting the error "Cannot find module in `common/temp`"?**
 
 Your `node_modules`  might have been corrupted. Try the following command
 ```
