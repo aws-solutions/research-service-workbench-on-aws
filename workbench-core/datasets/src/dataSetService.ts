@@ -120,8 +120,8 @@ export class DataSetService {
   public async addDataSetExternalEndpoint(
     dataSetName: string,
     externalEndpointName: string,
-    externalRoleName: string,
-    storageProvider: DataSetsStoragePlugin
+    storageProvider: DataSetsStoragePlugin,
+    externalRoleName?: string
   ): Promise<string> {
     const targetDS: DataSet = await this.getDataSet(dataSetName);
 

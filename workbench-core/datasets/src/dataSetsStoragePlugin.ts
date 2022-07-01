@@ -48,7 +48,7 @@ export interface DataSetsStoragePlugin {
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string
+    externalRoleName?: string
   ): Promise<string>;
 
   /**

@@ -407,10 +407,11 @@ export class SWBStack extends Stack {
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
           }),
+          // TODO: Narrow down permissions for dataset bucket (if possible)
           new PolicyStatement({
             sid: 'datasetS3Bucket',
             actions: ['*'],
-            resources: ['arn:aws:s3:::dataset-test-acl-off', 'arn:aws:s3:::dataset-test-acl-off/*']
+            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*']
           })
         ]
       })

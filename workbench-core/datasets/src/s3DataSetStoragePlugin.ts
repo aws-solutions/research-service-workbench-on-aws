@@ -18,6 +18,7 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
+import _ from 'lodash';
 import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
@@ -78,19 +79,26 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string,
+    externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<string> {
     const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName);
     await this._configureBucketPolicy(name, accessPointArn);
-    await this._configureAccessPointPolicy(
-      name,
-      path,
-      externalEndpointName,
-      accessPointArn,
-      externalRoleName
-    );
-    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+
+    // skip this if externalRoleName is undefined
+    // TODO: Cover these in workspace mount script
+    if (!_.isUndefined(externalRoleName)) {
+      await this._configureAccessPointPolicy(
+        name,
+        path,
+        externalEndpointName,
+        accessPointArn,
+        externalRoleName
+      );
+
+      if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+    }
+
     return `s3://${accessPointArn}/`;
   }
 
