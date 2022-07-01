@@ -1,5 +1,4 @@
 import { AwsService } from '@amzn/workbench-core-base';
-import { DataSetService } from '@amzn/workbench-core-datasets';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-service-catalog';
 import { SSMClient, StartAutomationExecutionCommand } from '@aws-sdk/client-ssm';
