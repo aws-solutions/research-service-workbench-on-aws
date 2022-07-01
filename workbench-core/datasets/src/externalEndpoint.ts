@@ -7,6 +7,8 @@ export interface ExternalEndpoint {
 
   createdAt?: string;
 
+  dataSetId: string;
+
   dataSetName: string;
 
   path: string;

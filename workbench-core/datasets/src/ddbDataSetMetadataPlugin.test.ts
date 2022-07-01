@@ -93,7 +93,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           storageName: { S: mockDataSetStorageName }
         }
       });
-      const response = await plugin.getDataSetMetadata('Sample-DataSet');
+      const response = await plugin.getDataSetMetadata(mockDataSetId);
 
       await expect(response).toEqual({
         id: mockDataSetId,
@@ -112,14 +112,14 @@ describe('DdbDataSetMetadataPlugin', () => {
       let response;
 
       try {
-        response = await plugin.getDataSetMetadata(mockDataSetName);
+        response = await plugin.getDataSetMetadata(mockDataSetId);
         expect.hasAssertions();
       } catch (err) {
         response = err;
       }
 
       expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetName}'.`);
+      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
     });
 
     it('throws not found when no DB response is returned.', async () => {
@@ -127,14 +127,14 @@ describe('DdbDataSetMetadataPlugin', () => {
       let response;
 
       try {
-        response = await plugin.getDataSetMetadata(mockDataSetName);
+        response = await plugin.getDataSetMetadata(mockDataSetId);
         expect.hasAssertions();
       } catch (err) {
         response = err;
       }
 
       expect(Boom.isBoom(response, 404)).toBe(true);
-      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetName}'.`);
+      expect(response.message).toEqual(`Could not find DataSet '${mockDataSetId}'.`);
     });
   });
 
@@ -165,7 +165,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         storageName: mockDataSetStorageName
       };
 
-      mockDdb.on(GetItemCommand).resolves({});
+      mockDdb.on(QueryCommand).resolves({});
 
       const newDataSet = await plugin.addDataSet(exampleDS);
       expect(newDataSet).toEqual(exampleDS);
@@ -174,7 +174,7 @@ describe('DdbDataSetMetadataPlugin', () => {
 
     it('Does not create a DataSet with no name.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(GetItemCommand).resolves({});
+      mockDdb.on(QueryCommand).resolves({});
 
       const exampleDS = {
         path: mockDataSetPath,
@@ -190,15 +190,17 @@ describe('DdbDataSetMetadataPlugin', () => {
 
     it('Does not create a DataSet with a duplicate name.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(GetItemCommand).resolves({
-        Item: {
-          id: { S: mockDataSetId },
-          name: { S: mockDataSetName },
-          path: { S: mockDataSetPath },
-          awsAccountId: { S: mockAwsAccountId },
-          storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName }
-        }
+      mockDdb.on(QueryCommand).resolves({
+        Items: [
+          {
+            id: { S: mockDataSetId },
+            name: { S: mockDataSetName },
+            path: { S: mockDataSetPath },
+            awsAccountId: { S: mockAwsAccountId },
+            storageType: { S: mockDataSetStorageType },
+            storageName: { S: mockDataSetStorageName }
+          }
+        ]
       });
 
       const exampleDS = {
@@ -218,16 +220,6 @@ describe('DdbDataSetMetadataPlugin', () => {
   describe('udpateDataSet', () => {
     it('Returns the updated DataSet when complete.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(GetItemCommand).resolves({
-        Item: {
-          id: { S: mockDataSetId },
-          name: { S: mockDataSetName },
-          path: { S: mockDataSetPath },
-          awsAccountId: { S: mockAwsAccountId },
-          storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName }
-        }
-      });
 
       const exampleDS = {
         id: mockDataSetId,
@@ -240,21 +232,9 @@ describe('DdbDataSetMetadataPlugin', () => {
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
     });
-  });
 
-  describe('updateDataSet', () => {
     it('adds optional external endpoints.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
-      mockDdb.on(GetItemCommand).resolves({
-        Item: {
-          id: { S: mockDataSetId },
-          name: { S: mockDataSetName },
-          path: { S: mockDataSetPath },
-          awsAccountId: { S: mockAwsAccountId },
-          storageType: { S: mockDataSetStorageType },
-          storageName: { S: mockDataSetStorageName }
-        }
-      });
 
       const exampleDS = {
         id: mockDataSetId,
@@ -287,6 +267,7 @@ describe('DdbDataSetMetadataPlugin', () => {
 
       const exampleEndpoint: ExternalEndpoint = {
         name: mockEndPointName,
+        dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
@@ -296,6 +277,7 @@ describe('DdbDataSetMetadataPlugin', () => {
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
         Id: mockDataSetId,
+        dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         endPointUrl: mockEndPointUrl,
         name: mockEndPointName,
@@ -308,6 +290,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     it('throws if the endpoint id is already defined.', async () => {
       const exampleEndpoint: ExternalEndpoint = {
         name: mockEndPointName,
+        dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
@@ -334,6 +317,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       });
       const exampleEndpoint: ExternalEndpoint = {
         name: mockEndPointName,
+        dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
@@ -353,14 +337,14 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(GetItemCommand).resolves({});
       let response;
       try {
-        await plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName);
+        await plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName);
         expect.hasAssertions();
       } catch (error) {
         response = error;
       }
       expect(Boom.isBoom(response, 404)).toBe(true);
       expect(response.message).toEqual(
-        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetName}'.`
+        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetId}'.`
       );
     });
 
@@ -368,14 +352,14 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(GetItemCommand).resolves({ Item: undefined });
       let response;
       try {
-        await plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName);
+        await plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName);
         expect.hasAssertions();
       } catch (error) {
         response = error;
       }
       expect(Boom.isBoom(response, 404)).toBe(true);
       expect(response.message).toEqual(
-        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetName}'.`
+        `Could not find the endpoint '${mockEndPointName}' on '${mockDataSetId}'.`
       );
     });
 
@@ -383,14 +367,16 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(GetItemCommand).resolves({
         Item: {
           name: { S: mockEndPointName },
+          dataSetId: { S: mockDataSetId },
           dataSetName: { S: mockDataSetName },
           path: { S: mockDataSetPath },
           endPointUrl: { S: mockEndPointUrl },
           allowedRoles: { L: [{ S: mockEndPointRole }] }
         }
       });
-      await expect(plugin.getDataSetEndPointDetails(mockDataSetName, mockEndPointName)).resolves.toEqual({
+      await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)).resolves.toEqual({
         name: mockEndPointName,
+        dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,

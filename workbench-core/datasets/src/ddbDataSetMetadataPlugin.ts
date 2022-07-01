@@ -16,19 +16,16 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     this._endPointKeyType = endPointKeyTypeId;
   }
 
-  public async getDataSetEndPointDetails(
-    dataSetName: string,
-    endPointName: string
-  ): Promise<ExternalEndpoint> {
+  public async getDataSetEndPointDetails(dataSetId: string, endPointName: string): Promise<ExternalEndpoint> {
     const response: GetItemCommandOutput = (await this._aws.helpers.ddb
       .get({
-        pk: `${this._dataSetKeyType}#${dataSetName}`,
+        pk: `${this._dataSetKeyType}#${dataSetId}`,
         sk: `${this._endPointKeyType}#${endPointName}`
       })
       .execute()) as GetItemCommandOutput;
 
     if (!response || !response.Item)
-      throw Boom.notFound(`Could not find the endpoint '${endPointName}' on '${dataSetName}'.`);
+      throw Boom.notFound(`Could not find the endpoint '${endPointName}' on '${dataSetId}'.`);
     return response.Item as unknown as ExternalEndpoint;
   }
 
@@ -43,15 +40,15 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return response.Items as unknown as DataSet[];
   }
 
-  public async getDataSetMetadata(name: string): Promise<DataSet> {
+  public async getDataSetMetadata(id: string): Promise<DataSet> {
     const response: GetItemCommandOutput = (await this._aws.helpers.ddb
       .get({
-        pk: `${this._dataSetKeyType}#${name}`,
-        sk: `${this._dataSetKeyType}#${name}`
+        pk: `${this._dataSetKeyType}#${id}`,
+        sk: `${this._dataSetKeyType}#${id}`
       })
       .execute()) as GetItemCommandOutput;
 
-    if (!response || !response.Item) throw Boom.notFound(`Could not find DataSet '${name}'.`);
+    if (!response || !response.Item) throw Boom.notFound(`Could not find DataSet '${id}'.`);
     return response.Item as unknown as DataSet;
   }
 
@@ -103,19 +100,25 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!_.isUndefined(dataSet.id)) throw new Error("Cannot create the DataSet. 'Id' already exists.");
     if (_.isUndefined(dataSet.name))
       throw new Error("Cannot create the DataSet. A 'name' was not supplied but it is required.");
-    try {
-      await this.getDataSetMetadata(dataSet.name);
+
+    const queryParams: QueryParams = {
+      index: 'getResourceByName',
+      key: { name: 'resourceType', value: 'dataset' },
+      sortKey: 'name',
+      eq: { S: dataSet.name }
+    };
+    const response: QueryCommandOutput = await this._aws.helpers.ddb.query(queryParams).execute();
+
+    if (response && response.Items && response.Items.length > 0) {
       throw new Error(
         `Cannot create the DataSet. A DataSet must have a unique \'name\', and  \'${dataSet.name}\' already exists. `
       );
-    } catch (err) {
-      if (!Boom.isBoom(err, 404)) throw err;
     }
   }
 
   private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
     const endPointKey = {
-      pk: `${this._dataSetKeyType}#${endPoint.dataSetName}`,
+      pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
       sk: `${this._endPointKeyType}#${endPoint.name}`
     };
     const endPointParams: { item: { [key: string]: string | string[] } } = {
@@ -123,6 +126,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         id: endPoint.id as string,
         name: endPoint.name,
         createdAt: endPoint.createdAt as string,
+        dataSetId: endPoint.dataSetId,
         dataSetName: endPoint.dataSetName,
         path: endPoint.path,
         endPointUrl: endPoint.endPointUrl,
@@ -137,8 +141,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
     const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSet.name}`,
-      sk: `${this._dataSetKeyType}#${dataSet.name}`
+      pk: `${this._dataSetKeyType}#${dataSet.Id}`,
+      sk: `${this._dataSetKeyType}#${dataSet.Id}`
     };
     const dataSetParams: { item: { [key: string]: string | string[] } } = {
       item: {
@@ -148,7 +152,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         storageName: dataSet.storageName,
         path: dataSet.path,
         awsAccountId: dataSet.awsAccountId as string,
-        storageType: dataSet.storageType as string
+        storageType: dataSet.storageType as string,
+        resourceType: 'dataset'
       }
     };
 

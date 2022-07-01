@@ -107,6 +107,7 @@ describe('DataSetService', () => {
       .mockImplementation(async () => {
         return {
           name: mockExistingEndpointName,
+          dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
           path: mockDataSetPath,
           endPointUrl: mockEndPointUrl,

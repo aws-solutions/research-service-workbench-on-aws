@@ -121,11 +121,11 @@ export class DataSetService {
   /**
    * Get details on a particular DataSet.
    *
-   * @param dataSetName - the name of the DataSet for which details are desired.
+   * @param dataSetId - the Id of the DataSet for which details are desired.
    * @returns - the DataSet object associated with that DataSet.
    */
-  public async getDataSet(dataSetName: string): Promise<DataSet> {
-    return await this._dbProvider.getDataSetMetadata(dataSetName);
+  public async getDataSet(dataSetId: string): Promise<DataSet> {
+    return await this._dbProvider.getDataSetMetadata(dataSetId);
   }
 
   /**

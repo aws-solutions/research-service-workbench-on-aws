@@ -12,11 +12,11 @@ export interface DataSetMetadataPlugin {
    * Gets the metadata associated with an overall dataset. This differs from
    * object/file Metadata. For that, use {@link getDataSetObjectMetadata}.
    *
-   * @param name - the name of the DataSet for which to get the metadata.
+   * @param id - the ID of the DataSet for which to get the metadata.
    *
    * @returns the metadata associated with the overall DataSet.
    */
-  getDataSetMetadata(name: string): Promise<DataSet>;
+  getDataSetMetadata(id: string): Promise<DataSet>;
 
   /**
    * Get a list of objects in the DataSet as stored in the backend.
