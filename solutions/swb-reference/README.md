@@ -63,8 +63,7 @@ Example code for GETTING all environment with status "COMPLETED"
 ```ts
 const setup: Setup = new Setup();
 const adminSession = await setup.createAdminSession();
-envId='abc';
-const { data: response } = await adminSession.resources.environments.environment(envId).get();
+const { data: response } = await adminSession.resources.environments.get({status: 'COMPLETED'});
 ```
 
 
