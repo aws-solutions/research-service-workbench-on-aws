@@ -256,7 +256,7 @@ describe('DataSetService', () => {
 
     it('returns the mount string for the DataSet mount point', async () => {
       await expect(
-        service.addDataSetExternalEndpoint(mockDataSetName, mockAccessPointName, mockRoleArn, plugin)
+        service.addDataSetExternalEndpoint(mockDataSetName, mockAccessPointName, plugin, mockRoleArn)
       ).resolves.toEqual(
         JSON.stringify({
           name: mockDataSetName,
@@ -273,8 +273,8 @@ describe('DataSetService', () => {
         response = await service.addDataSetExternalEndpoint(
           mockDataSetWithEndpointId,
           mockExistingEndpointName,
-          mockRoleArn,
-          plugin
+          plugin,
+          mockRoleArn
         );
         expect.hasAssertions();
       } catch (err) {
