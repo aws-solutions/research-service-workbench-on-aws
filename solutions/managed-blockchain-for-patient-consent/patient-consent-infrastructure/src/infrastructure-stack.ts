@@ -1,26 +1,8 @@
 /* eslint-disable no-new */
 import { join } from 'path';
 import { Stack, StackProps, CfnOutput, RemovalPolicy, aws_kms, Duration, Fn } from 'aws-cdk-lib';
-import {
-  AuthorizationType,
-  LambdaIntegration,
-  AccessLogFormat,
-  LogGroupLogDestination,
-  LambdaRestApi,
-  RequestValidator,
-  AccessLogField,
-  MethodLoggingLevel,
-  EndpointType
-} from 'aws-cdk-lib/aws-apigateway';
-
-import {
-  AccountRootPrincipal,
-  Effect,
-  PolicyDocument,
-  PolicyStatement,
-  ServicePrincipal,
-  Role
-} from 'aws-cdk-lib/aws-iam';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as nodejsLambda from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
@@ -40,8 +22,8 @@ export class InfrastructureStack extends Stack {
     const partition = Stack.of(this).partition;
     const region = Stack.of(this).region;
 
-    const lambdaServiceRole = new Role(this, 'LambdaServiceRole', {
-      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+    const lambdaServiceRole = new iam.Role(this, 'LambdaServiceRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
       roleName: 'LambdaServiceRole'
     });
 
@@ -56,15 +38,15 @@ export class InfrastructureStack extends Stack {
       role: lambdaServiceRole
     });
 
-    const kmsKeyPolicyDocument = new PolicyDocument({
+    const kmsKeyPolicyDocument = new iam.PolicyDocument({
       statements: [
-        new PolicyStatement({
+        new iam.PolicyStatement({
           actions: ['kms:*'],
-          effect: Effect.ALLOW,
-          principals: [new AccountRootPrincipal()],
+          effect: iam.Effect.ALLOW,
+          principals: [new iam.AccountRootPrincipal()],
           resources: ['*']
         }),
-        new PolicyStatement({
+        new iam.PolicyStatement({
           actions: [
             'kms:Encrypt*',
             'kms:Decrypt*',
@@ -72,8 +54,8 @@ export class InfrastructureStack extends Stack {
             'kms:GenerateDataKey*',
             'kms:Describe*'
           ],
-          effect: Effect.ALLOW,
-          principals: [new ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))],
+          effect: iam.Effect.ALLOW,
+          principals: [new iam.ServicePrincipal(Fn.sub('logs.${AWS::Region}.amazonaws.com'))],
           resources: [`arn:${partition}:logs:${region}:*:*`]
         })
       ]
@@ -91,37 +73,36 @@ export class InfrastructureStack extends Stack {
       encryptionKey: kmsKey
     });
 
-    const restApi = new LambdaRestApi(this, 'RestApi', {
+    const restApi = new apigateway.LambdaRestApi(this, 'RestApi', {
       handler: lambdaService,
       proxy: false,
       cloudWatchRole: false,
       endpointConfiguration: {
-        types: [EndpointType.EDGE]
+        types: [apigateway.EndpointType.EDGE]
       },
       deployOptions: {
-        stageName: props?.stage,
         tracingEnabled: true,
-        loggingLevel:
-          props?.logLevel === MethodLoggingLevel.ERROR ? MethodLoggingLevel.ERROR : MethodLoggingLevel.INFO,
-        accessLogDestination: new LogGroupLogDestination(logGroup),
-        accessLogFormat: AccessLogFormat.custom(
-          `${AccessLogField.contextRequestId()} ${AccessLogField.contextErrorMessage()} ${AccessLogField.contextErrorMessageString()}`
+        accessLogDestination: new apigateway.LogGroupLogDestination(logGroup),
+        accessLogFormat: apigateway.AccessLogFormat.custom(
+          `${apigateway.AccessLogField.contextRequestId()} ${apigateway.AccessLogField.contextErrorMessage()} ${apigateway.AccessLogField.contextErrorMessageString()}`
         )
       }
     });
 
-    const requestValidator = new RequestValidator(this, 'MyRequestValidator', {
+    const requestValidator = new apigateway.RequestValidator(this, 'MyRequestValidator', {
       restApi: restApi,
       requestValidatorName: 'requestValidatorName',
       validateRequestBody: false,
       validateRequestParameters: false
     });
 
-    restApi.root.addResource('patient-consent').addMethod('POST', new LambdaIntegration(lambdaService), {
-      requestValidator: requestValidator,
-      authorizationType: AuthorizationType.IAM,
-      apiKeyRequired: false
-    });
+    restApi.root
+      .addResource('patient-consent')
+      .addMethod('POST', new apigateway.LambdaIntegration(lambdaService), {
+        requestValidator: requestValidator,
+        authorizationType: apigateway.AuthorizationType.IAM,
+        apiKeyRequired: false
+      });
 
     new CfnOutput(this, 'HttpEndpoint', {
       value: restApi.url,
@@ -141,7 +122,10 @@ export class InfrastructureStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/InfrastructureStack/RestApi/DeploymentStage.prod/Resource',
-      [{ id: 'AwsSolutions-APIG3', reason: 'Access is configured by IAM role and API key' }]
+      [
+        { id: 'AwsSolutions-APIG3', reason: 'Access is configured by IAM role and API key' },
+        { id: 'AwsSolutions-APIG6', reason: 'We will enable CloudWatch logging for all methods when defined' }
+      ]
     );
   }
 }
