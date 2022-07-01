@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin, Writer, AuditEntry } from '@amzn/workbench-core-audit';
-import { AwsService } from '@amzn/workbench-core-base';
+import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
+import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
 import {
   DataSet,
   DataSetService,
@@ -17,24 +17,52 @@ import _ = require('lodash');
 
 export type Operation = 'Launch' | 'Terminate';
 
-const logger: LoggingService = new LoggingService();
-class AuditLogger implements Writer {
-  private _logger: LoggingService;
-  public constructor(logger: LoggingService) {
-    this._logger = logger;
-  }
-
-  public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {
-    this._logger.info('test', {});
-  }
-}
-
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
   public ssmDocSuffix: string;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_NAME_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
+  }
+
+  /**
+   * Get the mount strings for all datasets attached to a given workspace.
+   * @param dataSetIds - the list of datasets attached.
+   * @param envId - the environment on which to mount the dataset(s)
+   *
+   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
+   */
+  public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
+    let datasetsToMount: Array<{ [key: string]: string }> = [];
+    const logger: LoggingService = new LoggingService();
+    const datasetService = new DataSetService(
+      new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+      logger,
+      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
+    );
+
+    datasetsToMount = await Promise.all(
+      _.map(datasetIds, async (datasetId) => {
+        const dataSet: DataSet = await datasetService.getDataSet(datasetId);
+
+        const mountString: string = _.isEmpty(dataSet.externalEndpoints)
+          ? await datasetService.addDataSetExternalEndpoint(
+              datasetId,
+              `${datasetId}-mounted-on-${envId}`,
+              new S3DataSetStoragePlugin(this.aws)
+            )
+          : await datasetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
+
+        return {
+          datasetId,
+          storageName: dataSet.storageName,
+          path: dataSet.path,
+          mountString
+        };
+      })
+    );
+
+    return JSON.stringify(datasetsToMount);
   }
 
   public async launch(payload: {
@@ -44,44 +72,12 @@ export default class EnvironmentLifecycleHelper {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     envMetadata: any;
   }): Promise<void> {
-    let datasetsToMount: Array<{ [key: string]: string }> = [];
-    if (!_.isEmpty(payload.envMetadata.datasets)) {
-      // TODO: Attach logger and auditService instances
-      const datasetService = new DataSetService(
-        new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
-        logger,
-        new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
-      );
-
-      datasetsToMount = await Promise.all(
-        _.map(payload.envMetadata.datasets, async (datasetName) => {
-          const dataSet: DataSet = await datasetService.getDataSet(datasetName);
-
-          const mountString: string = _.isEmpty(dataSet.externalEndpoints)
-            ? await datasetService.addDataSetExternalEndpoint(
-                'dataSetName',
-                'externalEndpointName',
-                new S3DataSetStoragePlugin(this.aws)
-              )
-            : await datasetService.getDataSetMountString(datasetName, dataSet.externalEndpoints![0]);
-
-          return {
-            datasetName,
-            storageName: dataSet.storageName,
-            path: dataSet.path,
-            mountString
-          };
-        })
-      );
-    }
-
     const updatedPayload = {
       envMgmtRoleArn: payload.envMetadata.PROJ.envMgmtRoleArn,
       externalId: payload.envMetadata.PROJ.externalId,
       operation: payload.operation,
       envType: payload.envType,
-      ssmParameters: payload.ssmParameters,
-      datasetsToMount
+      ssmParameters: payload.ssmParameters
     };
 
     const hostAwsSdk = await this.getAwsSdkForEnvMgmtRole({
@@ -105,6 +101,13 @@ export default class EnvironmentLifecycleHelper {
 
   /**
    * Executing SSM Document in hosting account with provided envMetadata
+   * @param ssmParameters - the list of input parameters for SSM doc execution
+   * @param operation - the operation type - eg. 'Launch'
+   * @param envType - the env type name - eg. 'sagemaker'
+   * @param envMgmtRoleArn - ARN of the envMgmtRole on the hosting account for SSM doc to assume
+   * @param externalId - external ID string if declared at the time of onboarding hosting account, for role assumption
+   *
+   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
    */
   public async executeSSMDocument(payload: {
     ssmParameters: { [key: string]: string[] };
