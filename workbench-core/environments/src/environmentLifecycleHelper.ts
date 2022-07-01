@@ -20,51 +20,28 @@ export type Operation = 'Launch' | 'Terminate';
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
   public ssmDocSuffix: string;
+  public dataSetService: DataSetService;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_NAME_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
-  }
-
-  /**
-   * Get the mount strings for all datasets attached to a given workspace.
-   * @param dataSetIds - the list of datasets attached.
-   * @param envId - the environment on which to mount the dataset(s)
-   *
-   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
-   */
-  public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
-    let datasetsToMount: Array<{ [key: string]: string }> = [];
     const logger: LoggingService = new LoggingService();
-    const datasetService = new DataSetService(
+    this.dataSetService = new DataSetService(
       new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
     );
-
-    datasetsToMount = await Promise.all(
-      _.map(datasetIds, async (datasetId) => {
-        const dataSet: DataSet = await datasetService.getDataSet(datasetId);
-
-        const mountString: string = _.isEmpty(dataSet.externalEndpoints)
-          ? await datasetService.addDataSetExternalEndpoint(
-              datasetId,
-              `${datasetId}-mounted-on-${envId}`,
-              new S3DataSetStoragePlugin(this.aws)
-            )
-          : await datasetService.getDataSetMountString(datasetId, `${datasetId}-mounted-on-${envId}`);
-
-        return {
-          datasetId,
-          storageName: dataSet.storageName,
-          path: dataSet.path,
-          mountString
-        };
-      })
-    );
-
-    return JSON.stringify(datasetsToMount);
   }
 
+  /**
+   * Get the mount strings for all datasets attached to a given workspace.
+   * @param payload - contains the following:
+   * * @param ssmParameters - the list of input parameters for SSM doc execution
+   * * @param operation - the operation type - eg. 'Launch'
+   * * @param envType - the env type name - eg. 'sagemaker'
+   * * @param envMetadata - the environment to launch
+   *
+   * @returns null
+   */
   public async launch(payload: {
     ssmParameters: { [key: string]: string[] };
     operation: Operation;
@@ -107,7 +84,7 @@ export default class EnvironmentLifecycleHelper {
    * @param envMgmtRoleArn - ARN of the envMgmtRole on the hosting account for SSM doc to assume
    * @param externalId - external ID string if declared at the time of onboarding hosting account, for role assumption
    *
-   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
+   * @returns null
    */
   public async executeSSMDocument(payload: {
     ssmParameters: { [key: string]: string[] };
@@ -134,6 +111,40 @@ export default class EnvironmentLifecycleHelper {
         Parameters: payload.ssmParameters
       });
     }
+  }
+
+  /**
+   * Get the mount strings for all datasets attached to a given workspace.
+   * @param dataSetIds - the list of datasets attached.
+   * @param envId - the environment on which to mount the dataset(s)
+   *
+   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
+   */
+  public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
+    let datasetsToMount: Array<{ [key: string]: string }> = [];
+
+    datasetsToMount = await Promise.all(
+      _.map(datasetIds, async (datasetId) => {
+        const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
+
+        const mountString: string = _.isEmpty(dataSet.externalEndpoints)
+          ? await this.dataSetService.addDataSetExternalEndpoint(
+              datasetId,
+              `${datasetId}-mounted-on-${envId}`,
+              new S3DataSetStoragePlugin(this.aws)
+            )
+          : await this.dataSetService.getDataSetMountString(datasetId, `${datasetId}-mounted-on-${envId}`);
+
+        return {
+          datasetId,
+          storageName: dataSet.storageName,
+          path: dataSet.path,
+          mountString
+        };
+      })
+    );
+
+    return JSON.stringify(datasetsToMount);
   }
 
   public async getSSMDocArn(ssmDocOutputName: string): Promise<string> {
