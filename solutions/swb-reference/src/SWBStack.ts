@@ -406,12 +406,12 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
-          }),
-          new PolicyStatement({
-            sid: 'datasetS3Bucket',
-            actions: ['*'],
-            resources: ['arn:aws:s3:::dataset-test-acl-off', 'arn:aws:s3:::dataset-test-acl-off/*']
           })
+          // new PolicyStatement({
+          //   sid: 'datasetS3Bucket',
+          //   actions: ['*'],
+          //   resources: ['arn:aws:s3:::exampleBucketName', 'arn:aws:s3:::exampleBucketName/*']
+          // })
         ]
       })
     );
