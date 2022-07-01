@@ -15,6 +15,7 @@ function getConstants(): {
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
+  ALLOWED_ORIGINS: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -51,7 +52,8 @@ function getConstants(): {
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    STATUS_HANDLER_ARN_NAME
+    STATUS_HANDLER_ARN_NAME,
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
   };
 }
 
