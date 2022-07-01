@@ -52,7 +52,7 @@ rushx start
 
 If needed, run the development server with:
 ```
-yarn dev
+rushx dev
 ```
 
 ## App
