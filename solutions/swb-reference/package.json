@@ -20,7 +20,7 @@
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "compile": "scripts/buildLambda.js",
     "depcheck": "depcheck",
-    "integration-tests": "jest integration-tests",
+    "integration-tests": "rushx build && jest lib/integration-tests",
     "jest": "jest",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
@@ -29,16 +29,6 @@
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testRegex": ".test.ts",
-    "transform": {
-      "\\.(ts)$": "ts-jest"
-    }
   },
   "dependencies": {
     "@amzn/environments": "workspace:*",
@@ -59,6 +49,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "axios": "^0.27.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-s3": "^3.118.1",
@@ -91,6 +82,7 @@
     "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
+    "jest-circus": "^26.6.3",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",
