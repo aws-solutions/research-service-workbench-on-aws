@@ -407,7 +407,7 @@ export class SWBStack extends Stack {
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
           }),
-          // TODO: Narrow down permissions for dataset bucket (if possible)
+          // TODO: Narrow down permissions (dmmadse working on it)
           new PolicyStatement({
             sid: 'datasetS3Bucket',
             actions: ['*'],
