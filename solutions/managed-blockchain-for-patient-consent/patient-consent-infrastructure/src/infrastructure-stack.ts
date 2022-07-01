@@ -8,7 +8,9 @@ import {
   LogGroupLogDestination,
   LambdaRestApi,
   RequestValidator,
-  AccessLogField
+  AccessLogField,
+  MethodLoggingLevel,
+  EndpointType
 } from 'aws-cdk-lib/aws-apigateway';
 
 import {
@@ -16,20 +18,32 @@ import {
   Effect,
   PolicyDocument,
   PolicyStatement,
-  ServicePrincipal
+  ServicePrincipal,
+  Role
 } from 'aws-cdk-lib/aws-iam';
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
 import * as nodejsLambda from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 
+export interface PatientConsentStackProps extends StackProps {
+  stage: string;
+  region: string;
+  logLevel: string;
+}
+
 export class InfrastructureStack extends Stack {
-  public constructor(scope: Construct, id: string, props?: StackProps) {
+  public constructor(scope: Construct, id: string, props?: PatientConsentStackProps) {
     super(scope, id, props);
 
     const partition = Stack.of(this).partition;
     const region = Stack.of(this).region;
+
+    const lambdaServiceRole = new Role(this, 'LambdaServiceRole', {
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+      roleName: 'LambdaServiceRole'
+    });
 
     const lambdaService = new nodejsLambda.NodejsFunction(this, 'LambdaService', {
       runtime: Runtime.NODEJS_16_X,
@@ -38,7 +52,8 @@ export class InfrastructureStack extends Stack {
       entry: join(__dirname, '/../src/lambdas/client-app.ts'),
       bundling: {
         externalModules: ['aws-sdk']
-      }
+      },
+      role: lambdaServiceRole
     });
 
     const kmsKeyPolicyDocument = new PolicyDocument({
@@ -80,8 +95,14 @@ export class InfrastructureStack extends Stack {
       handler: lambdaService,
       proxy: false,
       cloudWatchRole: false,
+      endpointConfiguration: {
+        types: [EndpointType.EDGE]
+      },
       deployOptions: {
+        stageName: props?.stage,
         tracingEnabled: true,
+        loggingLevel:
+          props?.logLevel === MethodLoggingLevel.ERROR ? MethodLoggingLevel.ERROR : MethodLoggingLevel.INFO,
         accessLogDestination: new LogGroupLogDestination(logGroup),
         accessLogFormat: AccessLogFormat.custom(
           `${AccessLogField.contextRequestId()} ${AccessLogField.contextErrorMessage()} ${AccessLogField.contextErrorMessageString()}`
@@ -110,11 +131,7 @@ export class InfrastructureStack extends Stack {
     /**
      * cdk-nag suppressions
      */
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/InfrastructureStack/LambdaService/ServiceRole/Resource',
-      [{ id: 'AwsSolutions-IAM4', reason: "I'm ok using managed policies for this example" }]
-    );
+
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/InfrastructureStack/RestApi/Default/patient-consent/POST/Resource',
@@ -124,22 +141,7 @@ export class InfrastructureStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/InfrastructureStack/RestApi/DeploymentStage.prod/Resource',
-      [
-        {
-          id: 'AwsSolutions-APIG3',
-          reason: 'Access is configured by IAM role and API key'
-        },
-        {
-          id: 'AwsSolutions-APIG6',
-          reason: 'We will not be using CloudWatch not needed at this time'
-        }
-      ]
+      [{ id: 'AwsSolutions-APIG3', reason: 'Access is configured by IAM role and API key' }]
     );
-    // NagSuppressions.addResourceSuppressionsByPath(this, '/InfrastructureStack/LambdaService/Resource', [
-    //   {
-    //     id: 'AwsSolutions-L1',
-    //     reason: 'We are using Node14 for Lambda functions'
-    //   }
-    // ]);
   }
 }

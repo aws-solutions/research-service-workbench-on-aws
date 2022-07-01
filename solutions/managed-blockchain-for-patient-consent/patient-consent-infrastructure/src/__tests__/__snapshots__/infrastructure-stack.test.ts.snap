@@ -59,6 +59,13 @@ Object {
       },
     },
   },
+  "Parameters": Object {
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
   "Resources": Object {
     "KMSKeyBD866E3F": Object {
       "DeletionPolicy": "Delete",
@@ -103,7 +110,22 @@ Object {
                   "Fn::Sub": "logs.\${AWS::Region}.amazonaws.com",
                 },
               },
-              "Resource": "*",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":logs:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":*:*",
+                  ],
+                ],
+              },
             },
           ],
           "Version": "2012-10-17",
@@ -115,48 +137,32 @@ Object {
     },
     "LambdaService68B9B9DF": Object {
       "DependsOn": Array [
-        "LambdaServiceServiceRole71319041",
+        "LambdaServiceRoleA527BFC4",
       ],
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-L1",
-              "reason": "We are using Node14 for Lambda functions",
-            },
-          ],
-        },
-      },
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "6a9069c1b98845612a0b01f00e36dcfd948d0d23cef4df7c67b0065a7018bbfa.zip",
+          "S3Key": "6c7f86668a58977a705946ef4d3fa377c91140d9bb8cfba8cbd2a5d94580cbfd.zip",
         },
-        "FunctionName": "LambdaService",
-        "Handler": "buildLambda.handler",
+        "Environment": Object {
+          "Variables": Object {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.clientAppHandler",
         "Role": Object {
           "Fn::GetAtt": Array [
-            "LambdaServiceServiceRole71319041",
+            "LambdaServiceRoleA527BFC4",
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs16.x",
       },
       "Type": "AWS::Lambda::Function",
     },
-    "LambdaServiceServiceRole71319041": Object {
-      "Metadata": Object {
-        "cdk_nag": Object {
-          "rules_to_suppress": Array [
-            Object {
-              "id": "AwsSolutions-IAM4",
-              "reason": "I'm ok using managed policies for this example",
-            },
-          ],
-        },
-      },
+    "LambdaServiceRoleA527BFC4": Object {
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -170,20 +176,7 @@ Object {
           ],
           "Version": "2012-10-17",
         },
-        "ManagedPolicyArns": Array [
-          Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                "arn:",
-                Object {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
+        "RoleName": "LambdaServiceRole",
       },
       "Type": "AWS::IAM::Role",
     },
@@ -200,11 +193,16 @@ Object {
     },
     "RestApi0C43BF4B": Object {
       "Properties": Object {
+        "EndpointConfiguration": Object {
+          "Types": Array [
+            "EDGE",
+          ],
+        },
         "Name": "RestApi",
       },
       "Type": "AWS::ApiGateway::RestApi",
     },
-    "RestApiDeployment180EC503284b8274541a60e4da0ef0aab2849569": Object {
+    "RestApiDeployment180EC5037241046c4d78b424a3e2c8836cb1f737": Object {
       "DependsOn": Array [
         "MyRequestValidator838D6595",
         "RestApipatientconsentPOST37CC2902",
@@ -226,10 +224,6 @@ Object {
               "id": "AwsSolutions-APIG3",
               "reason": "Access is configured by IAM role and API key",
             },
-            Object {
-              "id": "AwsSolutions-APIG6",
-              "reason": "We will not be using CloudWatch not needed at this time",
-            },
           ],
         },
       },
@@ -244,12 +238,21 @@ Object {
           "Format": "$context.requestId $context.error.message $context.error.messageString",
         },
         "DeploymentId": Object {
-          "Ref": "RestApiDeployment180EC503284b8274541a60e4da0ef0aab2849569",
+          "Ref": "RestApiDeployment180EC5037241046c4d78b424a3e2c8836cb1f737",
         },
+        "MethodSettings": Array [
+          Object {
+            "DataTraceEnabled": false,
+            "HttpMethod": "*",
+            "LoggingLevel": "INFO",
+            "ResourcePath": "/*",
+          },
+        ],
         "RestApiId": Object {
           "Ref": "RestApi0C43BF4B",
         },
         "StageName": "prod",
+        "TracingEnabled": true,
       },
       "Type": "AWS::ApiGateway::Stage",
     },
@@ -413,6 +416,33 @@ Object {
       },
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
     },
   },
 }

@@ -239,6 +239,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "aws-event-mocks",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "aws-jwt-verify",
       "allowedCategories": [ "production" ]
     },
