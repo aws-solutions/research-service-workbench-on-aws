@@ -41,7 +41,7 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      PCLUSTER_API_URL
+      PCLUSTER_API_URL,
       ALLOWED_ORIGINS
     } = getConstants();
 
@@ -62,7 +62,7 @@ export class SWBStack extends Stack {
       S3_ARTIFACT_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      PCLUSTER_API_URL
+      PCLUSTER_API_URL,
       ALLOWED_ORIGINS
     };
 

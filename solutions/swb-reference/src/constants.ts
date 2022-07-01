@@ -9,7 +9,6 @@ function getConstants(): {
   AWS_REGION: string;
   SSM_DOC_NAME_SUFFIX: string;
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
-
   S3_ARTIFACT_BUCKET_SC_PREFIX: string;
   LAUNCH_CONSTRAINT_ROLE_NAME: string;
   AMI_IDS_TO_SHARE: string;
@@ -51,14 +50,13 @@ function getConstants(): {
     AWS_REGION,
     SSM_DOC_NAME_SUFFIX,
     S3_ARTIFACT_BUCKET_ARN_NAME,
-
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
-    PCLUSTER_API_URL
+    PCLUSTER_API_URL,
     ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
   };
 }
