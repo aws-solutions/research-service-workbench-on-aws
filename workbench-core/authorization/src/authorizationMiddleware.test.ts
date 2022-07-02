@@ -23,7 +23,6 @@ jest.mock('./authorizationService', () => {
 jest.mock('');
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-jest.mock('@amzn/workbench-core-logging');
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
@@ -58,7 +57,7 @@ describe('authorization middleware', () => {
       roles: ['guest']
     };
     logger = new LoggingService();
-    jest.spyOn(logger, 'error');
+    jest.spyOn(logger, 'error').mockImplementation(() => {});
     mockPermissionsPlugin = new MockPermissionsPlugin();
     mockAuthorizationPlugin = new MockAuthorizationPlugin();
     authorizationService = new AuthorizationService(mockAuthorizationPlugin, mockPermissionsPlugin);

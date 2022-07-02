@@ -77,7 +77,7 @@ describe('StaticPermissionsPlugin', () => {
     };
 
     logger = new LoggingService();
-    jest.spyOn(logger, 'warn');
+    jest.spyOn(logger, 'warn').mockImplementation(() => {});
     staticPermissionsPlugin = new StaticPermissionsPlugin(
       mockPermissionsMap,
       routesMap,
