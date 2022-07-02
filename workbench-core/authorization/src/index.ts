@@ -9,3 +9,10 @@ export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } f
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
 export { AuthenticatedUser } from './authenticatedUser';
+export { ForbiddenError, isForbiddenError } from './errors/forbiddenError';
+export {
+  AuthenticatedUserNotFoundError,
+  isAuthenticatedUserNotFoundError
+} from './errors/authenticatedUserNotFoundError';
+export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors/permissionNotGrantedError';
+export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';

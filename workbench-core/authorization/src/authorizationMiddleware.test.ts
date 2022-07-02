@@ -20,8 +20,11 @@ jest.mock('./authorizationService', () => {
       };
     });
 });
+jest.mock('');
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
+jest.mock('@amzn/workbench-core-logging');
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';
@@ -44,6 +47,7 @@ describe('authorization middleware', () => {
   let mockAuthorizationPlugin: AuthorizationPlugin;
   let mockAdmin: AuthenticatedUser;
   let mockGuest: AuthenticatedUser;
+  let logger: LoggingService;
   beforeEach(() => {
     mockAdmin = {
       id: 'sampleUID',
@@ -53,6 +57,8 @@ describe('authorization middleware', () => {
       id: 'sampleUID',
       roles: ['guest']
     };
+    logger = new LoggingService();
+    jest.spyOn(logger, 'error');
     mockPermissionsPlugin = new MockPermissionsPlugin();
     mockAuthorizationPlugin = new MockAuthorizationPlugin();
     authorizationService = new AuthorizationService(mockAuthorizationPlugin, mockPermissionsPlugin);
@@ -225,6 +231,31 @@ describe('authorization middleware', () => {
     const response: Response = {} as Response;
     await authorizationMiddleware(request, response, next);
     expect(next).toBeCalledTimes(1);
+  });
+
+  test('logging errors', async () => {
+    const next = jest.fn();
+    const response: Response = {
+      locals: {
+        user: {
+          id: 'sampleId'
+        }
+      },
+      status: jest.fn().mockImplementation((statusCode: number) => {
+        return response;
+      }),
+      json: jest.fn()
+    } as unknown as Response;
+    const request: Request = {
+      method: 'PUT',
+      path: '/sample'
+    } as Request;
+    authorizationMiddleware = withAuth(authorizationService, { logger });
+    await authorizationMiddleware(request, response, next);
+    expect(next).toBeCalledTimes(0);
+    expect(logger.error).toBeCalledTimes(1);
+    expect(response.status).toBeCalledWith(403);
+    expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
   });
 
   describe('retrieveUser', () => {
