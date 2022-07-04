@@ -13,8 +13,8 @@ import { isEmpty } from 'lodash';
 import * as client from './client';
 import * as invites from './invites';
 import * as node from './node';
-import * as utilities from './utilities';
 import * as s3 from './s3';
+import * as utilities from './utilities';
 
 /*
  * Define which Hyperledger Fabric framework to use
@@ -191,7 +191,7 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
   public readonly certS3BucketName: string;
   public readonly adminCidr: string;
 
-  constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
+  public constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
     super(scope, id);
 
     // Collect metadata on the stack

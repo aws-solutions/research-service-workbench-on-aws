@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as constructs from 'constructs';
 
 import * as network from './network';
@@ -18,7 +18,7 @@ export class HyperledgerFabricS3 extends constructs.Construct {
    */
   public readonly s3: s3.Bucket;
 
-  constructor(scope: network.HyperledgerFabricNetwork, id: string) {
+  public constructor(scope: network.HyperledgerFabricNetwork, id: string) {
     super(scope, id);
 
     // Collect metadata on the stack

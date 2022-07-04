@@ -6,9 +6,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { KeyPair } from 'cdk-ec2-key-pair';
 import * as constructs from 'constructs';
 import * as network from './network';
-import { KeyPair } from 'cdk-ec2-key-pair';
 
 /**
  * Construct properties for `HyperledgerFabricVpc`
@@ -49,7 +49,11 @@ export class HyperledgerFabricClient extends constructs.Construct {
    */
   public readonly vpcEndpoint: ec2.InterfaceVpcEndpoint;
 
-  constructor(scope: network.HyperledgerFabricNetwork, id: string, props?: HyperledgerFabricClientProps) {
+  public constructor(
+    scope: network.HyperledgerFabricNetwork,
+    id: string,
+    props?: HyperledgerFabricClientProps
+  ) {
     super(scope, id);
 
     // Collect metadata on the stack
