@@ -66,11 +66,11 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   /**
    * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
-   * to the dataset prefix for a given external role.
+   * to the dataset prefix for a given external role if provided.
    * @param name - the name of the S3 bucket where the storage resides.
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
    * @param externalEndpointName - the name of the access pont to create.
-   * @param externalRoleName - the role which will be given access to the files under the prefix.
+   * @param externalRoleName - an optional role which will be given access to the files under the prefix.
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
    * @returns a string representing the URI to the dataset root prefix.
    */
@@ -78,19 +78,22 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string,
+    externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<string> {
     const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName);
     await this._configureBucketPolicy(name, accessPointArn);
-    await this._configureAccessPointPolicy(
-      name,
-      path,
-      externalEndpointName,
-      accessPointArn,
-      externalRoleName
-    );
-    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+
+    if (externalRoleName) {
+      await this._configureAccessPointPolicy(
+        name,
+        path,
+        externalEndpointName,
+        accessPointArn,
+        externalRoleName
+      );
+      if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+    }
     return `s3://${accessPointArn}/`;
   }
 
