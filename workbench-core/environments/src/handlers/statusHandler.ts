@@ -1,10 +1,10 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import Boom from '@hapi/boom';
-import _ = require('lodash');
-import { EnvironmentService } from '../apiSupport/environmentService';
+import _ from 'lodash';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { isEnvironmentStatus } from '../constants/environmentStatus';
-import EventBridgeEventToDDB from '../interface/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import { EnvironmentService } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 
 export default class StatusHandler {

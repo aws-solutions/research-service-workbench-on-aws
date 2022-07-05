@@ -6,7 +6,7 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
-import _ = require('lodash');
+import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';

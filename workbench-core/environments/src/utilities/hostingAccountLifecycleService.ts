@@ -7,9 +7,9 @@ import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import _ = require('lodash');
-import AccountService from '../apiSupport/accountService';
+import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import AccountService from '../services/accountService';
 import IamRoleCloneService from './iamRoleCloneService';
 
 export default class HostingAccountLifecycleService {

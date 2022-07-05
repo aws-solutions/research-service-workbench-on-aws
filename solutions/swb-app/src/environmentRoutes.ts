@@ -2,7 +2,7 @@
 import { EnvironmentService, isEnvironmentStatus, isSortAttribute } from '@amzn/environments';
 import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
-import _ = require('lodash');
+import _ from 'lodash';
 import { Environment } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
 

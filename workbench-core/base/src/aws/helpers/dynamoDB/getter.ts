@@ -11,7 +11,7 @@ import {
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import _ = require('lodash');
+import _ from 'lodash';
 
 class Getter {
   private _ddb: DynamoDB;

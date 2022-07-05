@@ -1,5 +1,5 @@
 import { AwsService } from '@amzn/workbench-core-base';
-import AccountService from '../apiSupport/accountService';
+import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
 
 export default class AccountHandler {

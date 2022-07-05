@@ -1,8 +1,8 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { mockClient } from 'aws-sdk-client-mock';
-import { EnvironmentService, Environment } from '../apiSupport/environmentService';
-import EventBridgeEventToDDB from '../interface/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import { EnvironmentService, Environment } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
 

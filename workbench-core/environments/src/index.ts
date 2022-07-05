@@ -1,10 +1,3 @@
-import AccountService from './apiSupport/accountService';
-import { EnvironmentService, Environment } from './apiSupport/environmentService';
-import EnvironmentTypeConfigService from './apiSupport/environmentTypeConfigService';
-import EnvironmentTypeService from './apiSupport/environmentTypeService';
-import HostingAccountService from './apiSupport/hostingAccountService';
-import AccountHandler from './compute/accountHandler';
-import StatusHandler from './compute/statusHandler';
 import { EnvironmentStatus, isEnvironmentStatus } from './constants/environmentStatus';
 import {
   EnvironmentTypeStatus,
@@ -12,11 +5,18 @@ import {
   ENVIRONMENT_TYPE_STATUS
 } from './constants/environmentTypeStatus';
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
-import EnvironmentConnectionService from './interface/environmentConnectionService';
-import EnvironmentLifecycleService from './interface/environmentLifecycleService';
-import EventBridgeEventToDDB from './interface/eventBridgeEventToDDB';
+import AccountHandler from './handlers/accountHandler';
+import StatusHandler from './handlers/statusHandler';
+import EnvironmentConnectionService from './interfaces/environmentConnectionService';
+import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
+import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
+import AccountService from './services/accountService';
+import { EnvironmentService, Environment } from './services/environmentService';
+import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
+import EnvironmentTypeService from './services/environmentTypeService';
+import HostingAccountService from './services/hostingAccountService';
 import EnvironmentLifecycleHelper from './utilities/environmentLifecycleHelper';
 import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
 
