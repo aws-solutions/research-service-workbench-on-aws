@@ -15,7 +15,8 @@ import {
   SpaceBetween,
   SplitPanel,
   Table,
-  StatusIndicator
+  StatusIndicator,
+  Flashbar
 } from '@awsui/components-react';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
@@ -39,16 +40,18 @@ import {
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
 import styles from '../styles/BaseLayout.module.scss';
-
+import { useRouter } from 'next/router';
 export interface EnvironmentProps {
   locale: string;
 }
 
-export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => ({
-  props: {
-    ...(await serverSideTranslations(locale, ['common']))
-  }
-});
+export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common']))
+    }
+  };
+};
 
 const Environment: NextPage = () => {
   // For functions to return content specific to the table
@@ -61,7 +64,8 @@ const Environment: NextPage = () => {
   const { environments, mutate } = useEnvironments();
 
   const [error, setError] = useState('');
-
+  const router = useRouter();
+  const { message, notificationType } = router.query;
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -88,6 +92,22 @@ const Environment: NextPage = () => {
     amount: 1,
     unit: 'week'
   });
+
+  const initialNotifications =
+    !!message && !!notificationType
+      ? [
+          {
+            type: notificationType,
+            dismissible: true,
+            dismissLabel: 'Dismiss message',
+            onDismiss: () => setNotifications([]),
+            content: message,
+            id: `message_0`
+          }
+        ]
+      : [];
+  const [notifications, setNotifications] = useState(initialNotifications);
+
   useEffect(() => {
     setDateFilter(dateFilter);
   }, [dateFilter]);
@@ -254,6 +274,7 @@ const Environment: NextPage = () => {
       }
       content={
         <Box margin={{ bottom: 'l' }}>
+          <Flashbar items={notifications}></Flashbar>
           <Head>
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />

@@ -1,6 +1,7 @@
 import { useCollection } from '@awsui/collection-hooks';
 import { Cards, Box, CardsProps } from '@awsui/components-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { EnvTypeConfigItem } from '../models/EnvironmentTypeConfig';
 
 interface OnSelectEnvTypeConfigFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeConfigItem>): void;
@@ -8,21 +9,16 @@ interface OnSelectEnvTypeConfigFunction {
 export interface EnvTypeConfigsProps {
   OnSelect: OnSelectEnvTypeConfigFunction;
   allItems: EnvTypeConfigItem[];
-  selectedItem?: string;
-}
-
-export interface EnvTypeConfigItem {
-  id: string;
-  name: string;
-  estimatedCost: string;
-  instanceType: string;
+  isLoading?: boolean;
 }
 
 export default function EnvTypeConfigCards(props: EnvTypeConfigsProps): JSX.Element {
-  const itemType: string = 'Environment Type Configuration';
+  const itemType: string = 'Configurations';
   const { items } = useCollection(props.allItems, {});
-  const selected = props.allItems.filter((i) => i.id === props.selectedItem);
-  const [selectedItems, setSelectedItems] = useState<EnvTypeConfigItem[]>(selected);
+  const [selectedItems, setSelectedItems] = useState<EnvTypeConfigItem[]>([]);
+  useEffect(() => {
+    setSelectedItems([]); //clean selection on reload items
+  }, [items]);
   return (
     <Cards
       onSelectionChange={({ detail }) => {
@@ -40,14 +36,15 @@ export default function EnvTypeConfigCards(props: EnvTypeConfigsProps): JSX.Elem
           },
           {
             id: 'instanceType',
-            content: (e) => e.instanceType,
+            content: (e) => e.type,
             header: 'Instance Type'
           }
         ]
       }}
       cardsPerRow={[{ cards: 1 }, { minWidth: 300, cards: 3 }]}
       items={items}
-      loadingText="Loading Environment Type Configurations"
+      loading={props.isLoading}
+      loadingText="Loading Configurations"
       selectionType="single"
       trackBy="id"
       visibleSections={['estimatedCost', 'instanceType']}

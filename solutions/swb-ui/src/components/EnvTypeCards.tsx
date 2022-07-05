@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../common/tableNoMatchState';
+import { EnvTypeItem } from '../models/EnvironmentType';
 
 interface OnSelectEnvTypeFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeItem>): void;
@@ -19,12 +20,7 @@ export interface EnvTypesProps {
   OnSelect: OnSelectEnvTypeFunction;
   allItems: EnvTypeItem[];
   selectedItem?: string;
-}
-
-export interface EnvTypeItem {
-  id: string;
-  name: string;
-  description: string;
+  isLoading?: boolean;
 }
 
 export const searchableColumns: string[] = ['name', 'description'];
@@ -32,7 +28,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
   const [preferences, setPreferences] = useState({
     pageSize: 10
   });
-  const itemType: string = 'Compute Platform';
+  const itemType: string = 'Compute Platforms';
   const { items, filterProps, paginationProps } = useCollection(props.allItems, {
     filtering: {
       empty: TableEmptyDisplay(itemType),
@@ -58,6 +54,8 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
 
   return (
     <Cards
+      loading={props.isLoading}
+      loadingText="Loading Compute Platforms"
       onSelectionChange={({ detail }) => {
         setSelectedItems((prevState) => detail.selectedItems);
         props.OnSelect(detail);
@@ -75,7 +73,6 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
         ]
       }}
       items={items}
-      loadingText="Loading Compute Platforms"
       selectionType="single"
       trackBy="id"
       visibleSections={['description']}
