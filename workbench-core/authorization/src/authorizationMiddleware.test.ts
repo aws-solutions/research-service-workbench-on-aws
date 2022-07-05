@@ -20,7 +20,6 @@ jest.mock('./authorizationService', () => {
       };
     });
 });
-jest.mock('');
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
 import { LoggingService } from '@amzn/workbench-core-logging';

@@ -43,7 +43,7 @@ function checkMethod(method: string): method is HTTPMethod {
 export default function withAuth(
   authorizationService: AuthorizationService,
   options?: {
-    logger: LoggingService;
+    logger?: LoggingService;
   }
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   /**
@@ -64,7 +64,7 @@ export default function withAuth(
       } else throw new Error('Method is not valid');
     } catch (err) {
       // log if a logger is provided
-      options?.logger.error(err);
+      options?.logger?.error(err);
       res.status(403).json({ error: 'User is not authorized' });
     }
   };
