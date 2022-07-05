@@ -3,6 +3,7 @@
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
+import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_API_PAGE_SIZE } from './constants';
 import envResourceTypeToKey from './environmentResourceTypeToKey';
@@ -332,7 +333,7 @@ export class EnvironmentService {
       // PROJ
       this._buildPkSk(params.projectId, envResourceTypeToKey.project),
       // DS
-      ...params.datasetIds.map((dsId) => {
+      ..._.map(params.datasetIds, (dsId) => {
         return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
     ];
