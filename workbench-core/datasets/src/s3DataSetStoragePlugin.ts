@@ -18,7 +18,6 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
-import _ from 'lodash';
 import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
