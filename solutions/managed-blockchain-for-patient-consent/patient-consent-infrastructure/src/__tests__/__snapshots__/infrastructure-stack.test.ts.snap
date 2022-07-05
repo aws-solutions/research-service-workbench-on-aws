@@ -224,6 +224,10 @@ Object {
               "id": "AwsSolutions-APIG3",
               "reason": "Access is configured by IAM role and API key",
             },
+            Object {
+              "id": "AwsSolutions-APIG6",
+              "reason": "We will enable CloudWatch logging for all methods when defined",
+            },
           ],
         },
       },
@@ -240,14 +244,6 @@ Object {
         "DeploymentId": Object {
           "Ref": "RestApiDeployment180EC5037241046c4d78b424a3e2c8836cb1f737",
         },
-        "MethodSettings": Array [
-          Object {
-            "DataTraceEnabled": false,
-            "HttpMethod": "*",
-            "LoggingLevel": "ERROR",
-            "ResourcePath": "/*",
-          },
-        ],
         "RestApiId": Object {
           "Ref": "RestApi0C43BF4B",
         },

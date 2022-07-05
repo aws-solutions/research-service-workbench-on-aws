@@ -29,8 +29,7 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "test:integration": "heft test -u --clean --no-build",
-    "test:only": "heft test -u --clean --no-build --test-path-pattern infrastructure-stack"
+    "test:only": "heft test -u --clean --no-build 2>&1"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.118.1",
