@@ -13,7 +13,7 @@ import {
 } from '@amzn/workbench-core-datasets';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Output } from '@aws-sdk/client-cloudformation';
-import _ = require('lodash');
+import _ from 'lodash';
 
 export type Operation = 'Launch' | 'Terminate';
 
