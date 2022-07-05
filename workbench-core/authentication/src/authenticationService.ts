@@ -95,7 +95,7 @@ export class AuthenticationService {
   }
 
   /**
-   * Takes temporary state and codeChallenge values and returns the URL of the endpoint used to retreive the authorization code.
+   * Takes temporary state and codeChallenge values and returns the URL of the endpoint used to retrieve the authorization code.
    *
    * The state and codeChallenge parameters should be temporary strings, such as TEMP_STATE and TEMP_CODE_CHALLENGE.
    * These values will be replaced on the frontend with the real values to keep them secret.
@@ -120,5 +120,14 @@ export class AuthenticationService {
    */
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
     return await this._authenticationPlugin.refreshAccessToken(refreshToken);
+  }
+
+  /**
+   * Gets the URL of the endpoint used to logout the user.
+   *
+   * @returns the endpoint URL string
+   */
+  public getLogoutUrl(): string {
+    return this._authenticationPlugin.getLogoutUrl();
   }
 }

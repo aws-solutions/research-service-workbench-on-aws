@@ -39,6 +39,7 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
+  allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!
   }),

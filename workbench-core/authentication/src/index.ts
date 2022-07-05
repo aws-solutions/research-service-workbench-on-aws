@@ -27,6 +27,7 @@ export { getTimeInSeconds } from './utils';
 export {
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
+  isUserLoggedIn,
   logoutUser,
   refreshAccessToken,
   verifyToken
