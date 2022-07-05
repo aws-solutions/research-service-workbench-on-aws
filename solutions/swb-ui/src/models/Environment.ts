@@ -30,6 +30,7 @@ export interface CreateEnvironmentForm {
   envTypeConfigId?: string;
   description?: string;
   envType?: string;
+  datasetIds?: [];
 }
 
 export interface CreateEnvironmentFormValidation {

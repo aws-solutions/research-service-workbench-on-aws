@@ -16,7 +16,8 @@ import {
   SplitPanel,
   Table,
   StatusIndicator,
-  Flashbar
+  Flashbar,
+  FlashbarProps
 } from '@awsui/components-react';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
@@ -93,21 +94,21 @@ const Environment: NextPage = () => {
     amount: 1,
     unit: 'week'
   });
-
-  // const initialNotifications =
-  //   !!message && !!notificationType
-  //     ? [
-  //         {
-  //           type: notificationType,
-  //           dismissible: true,
-  //           dismissLabel: 'Dismiss message',
-  //           onDismiss: () => setNotifications([]),
-  //           content: message,
-  //           id: `message_0`
-  //         }
-  //       ]
-  //     : [];
-  // const [notifications, setNotifications] = useState(initialNotifications);
+  const initialNotifications =
+    !!message && !!notificationType
+      ? [
+          {
+            type: notificationType as FlashbarProps.Type,
+            dismissible: true,
+            dismissLabel: 'Dismiss message',
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            onDismiss: () => setNotifications([]),
+            content: message,
+            id: 'message_0'
+          }
+        ]
+      : [];
+  const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>(initialNotifications);
 
   useEffect(() => {
     setDateFilter(dateFilter);
@@ -275,7 +276,7 @@ const Environment: NextPage = () => {
       }
       content={
         <Box margin={{ bottom: 'l' }}>
-          {/* <Flashbar items={notifications} /> */}
+          <Flashbar items={notifications} />
           <Head>
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />
@@ -354,7 +355,9 @@ const Environment: NextPage = () => {
                         >
                           Terminate
                         </Button>
-                        <Button variant="primary">Create Workspace</Button>
+                        <Button variant="primary" href="/environment">
+                          Create Workspace
+                        </Button>
                       </SpaceBetween>
                     </Box>
                   }

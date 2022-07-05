@@ -58,7 +58,12 @@ const Environment: NextPage = () => {
   const [formData, setFormData] = useState<CreateEnvironmentForm>({});
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
   const { envTypes, envTypesLoading } = useEnvironmentType();
-  const { envTypeConfigs, envTypeConfigsLoading } = useEnvTypeConfigs(formData.envTypeId || '');
+  const { envTypeConfigs, envTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
+  const nameRegex = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-]*$');
+  /* eslint-disable security/detect-unsafe-regex */
+  const cidrRegex = new RegExp(
+    '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[.]){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/(3[0-2]|[1-2][0-9]|[0-9]))$'
+  );
   const OnSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
     setselectedEnvType(selected);
@@ -66,7 +71,8 @@ const Environment: NextPage = () => {
       ...formData,
       envTypeId: selected?.id,
       envTypeConfigId: undefined,
-      envType: selected?.type
+      envType: selected?.type,
+      datasetIds: []
     });
   };
   const OnSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
@@ -98,6 +104,13 @@ const Environment: NextPage = () => {
     {
       field: 'name',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      condition: (a: any) => !!a && nameRegex.test(a),
+      message:
+        'Workspace Name must start with an alphabetic character and can only contain alphanumeric characters (case sensitive) and hyphens.'
+    },
+    {
+      field: 'name',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Workspace Name cannot be longer than 128 characters'
     },
@@ -106,6 +119,12 @@ const Environment: NextPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
       message: 'restrictedCIDR is Required'
+    },
+    {
+      field: 'restrictedCIDR',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      condition: (a: any) => !!a && cidrRegex.test(a),
+      message: 'Restricted CIDR must be in the format range:  [1.0.0.0/0 - 255.255.255.255/32].'
     },
     {
       field: 'restrictedCIDR',
@@ -134,8 +153,8 @@ const Environment: NextPage = () => {
     {
       field: 'description',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !a || a.length <= 128,
-      message: 'Description cannot be longer than 128 characters'
+      condition: (a: any) => !a || a.length <= 500,
+      message: 'Description cannot be longer than 500 characters'
     }
   ];
   const validateField = (field: keyof CreateEnvironmentForm): boolean => {
@@ -171,13 +190,13 @@ const Environment: NextPage = () => {
         return;
       }
       await createEnvironment(formData);
-      // await router.push({
-      //   pathname: '/environments',
-      //   query: {
-      //     message: 'Workspace Created Successfully',
-      //     notificationType: 'success'
-      //   }
-      // });
+      await router.push({
+        pathname: '/environments',
+        query: {
+          message: 'Workspace Created Successfully',
+          notificationType: 'success'
+        }
+      });
     } catch {
       setError('There was a problem trying to create workspace.');
     } finally {
@@ -218,7 +237,7 @@ const Environment: NextPage = () => {
                 errorText={error}
                 actions={
                   <SpaceBetween direction="horizontal" size="xs">
-                    <Button formAction="none" variant="link">
+                    <Button formAction="none" variant="link" href="/environments">
                       Cancel
                     </Button>
                     <Button
@@ -317,7 +336,7 @@ const Environment: NextPage = () => {
                       </FormField>
                       <FormField
                         label="Description - optional"
-                        constraintText="Requirements."
+                        constraintText="Description cannot be longer than 500 characters."
                         errorText={formErrors?.descriptionError}
                       >
                         <Textarea
@@ -325,7 +344,7 @@ const Environment: NextPage = () => {
                             setFormData({ ...formData, description: value })
                           }
                           value={formData?.description || ''}
-                          placeholder="This is a placeholder"
+                          placeholder="Description"
                         />
                       </FormField>
                     </SpaceBetween>
