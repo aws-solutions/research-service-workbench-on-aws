@@ -18,6 +18,7 @@ import {
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { createEnvironment } from '../api/environments';
 import { useEnvTypeConfigs } from '../api/environmentTypeConfigs';
@@ -27,10 +28,9 @@ import EnvTypeCards from '../components/EnvTypeCards';
 import EnvTypeConfigCards from '../components/EnvTypeConfigCards';
 import Navigation from '../components/Navigation';
 import { useSettings } from '../context/SettingsContext';
+import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../models/Environment';
 import { EnvTypeItem } from '../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../models/EnvironmentTypeConfig';
-import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../models/Environment';
-import { useRouter } from 'next/router';
 
 export interface EnvironmentProps {
   locale: string;
@@ -164,7 +164,6 @@ const Environment: NextPage = () => {
     return false;
   };
   const submitForm = async (): Promise<void> => {
-    console.log(formData);
     setIsSubmitLoading(true);
     try {
       if (!validateForm()) {
@@ -172,13 +171,13 @@ const Environment: NextPage = () => {
         return;
       }
       await createEnvironment(formData);
-      router.push({
-        pathname: '/environments',
-        query: {
-          message: 'Workspace Created Successfully',
-          notificationType: 'success'
-        }
-      });
+      // await router.push({
+      //   pathname: '/environments',
+      //   query: {
+      //     message: 'Workspace Created Successfully',
+      //     notificationType: 'success'
+      //   }
+      // });
     } catch {
       setError('There was a problem trying to create workspace.');
     } finally {
@@ -189,7 +188,7 @@ const Environment: NextPage = () => {
   const projects = [{ label: 'Project 123', value: 'proj-123' }];
   useEffect(() => {
     validateForm();
-    if (formData && Object.keys(formData).length != 0) {
+    if (formData && Object.keys(formData).length !== 0) {
       //show validations only when there is an interaction with user
       validateField('envTypeConfigId');
       validateField('envTypeId');

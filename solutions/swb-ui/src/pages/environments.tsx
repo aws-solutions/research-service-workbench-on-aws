@@ -22,6 +22,7 @@ import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { useEnvironments, terminate, start, stop, connect } from '../api/environments';
 import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
@@ -40,7 +41,7 @@ import {
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
 import styles from '../styles/BaseLayout.module.scss';
-import { useRouter } from 'next/router';
+
 export interface EnvironmentProps {
   locale: string;
 }
@@ -93,20 +94,20 @@ const Environment: NextPage = () => {
     unit: 'week'
   });
 
-  const initialNotifications =
-    !!message && !!notificationType
-      ? [
-          {
-            type: notificationType,
-            dismissible: true,
-            dismissLabel: 'Dismiss message',
-            onDismiss: () => setNotifications([]),
-            content: message,
-            id: `message_0`
-          }
-        ]
-      : [];
-  const [notifications, setNotifications] = useState(initialNotifications);
+  // const initialNotifications =
+  //   !!message && !!notificationType
+  //     ? [
+  //         {
+  //           type: notificationType,
+  //           dismissible: true,
+  //           dismissLabel: 'Dismiss message',
+  //           onDismiss: () => setNotifications([]),
+  //           content: message,
+  //           id: `message_0`
+  //         }
+  //       ]
+  //     : [];
+  // const [notifications, setNotifications] = useState(initialNotifications);
 
   useEffect(() => {
     setDateFilter(dateFilter);
@@ -274,7 +275,7 @@ const Environment: NextPage = () => {
       }
       content={
         <Box margin={{ bottom: 'l' }}>
-          <Flashbar items={notifications}></Flashbar>
+          {/* <Flashbar items={notifications} /> */}
           <Head>
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />
