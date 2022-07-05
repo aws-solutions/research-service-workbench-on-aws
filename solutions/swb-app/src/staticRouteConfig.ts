@@ -1,27 +1,37 @@
 import { RoutesIgnored, RoutesMap } from '@amzn/workbench-core-authorization';
 
 export const routesMap: RoutesMap = {
-  '/guest': {
+  '/environments': {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Environment'
+      }
+    ],
     GET: [
       {
         action: 'READ',
-        subject: 'Guest'
+        subject: 'Environment'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Environment'
+      }
+    ],
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'Environment'
       }
     ]
   },
-  '/pro': {
-    GET: [
+  '/user': {
+    POST: [
       {
-        action: 'READ',
-        subject: 'Guest'
-      }
-    ]
-  },
-  '/admin': {
-    GET: [
-      {
-        action: 'READ',
-        subject: 'Admin'
+        action: 'CREATE',
+        subject: 'User'
       }
     ]
   }
@@ -47,5 +57,8 @@ export const routesIgnored: RoutesIgnored = {
   // TODO: Ignoring these routes right now, but eventually will need to send token in Authorization header and validate
   '/environments': {
     GET: true
+  },
+  '/user': {
+    POST: true
   }
 };

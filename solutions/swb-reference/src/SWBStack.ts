@@ -429,6 +429,23 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
+          }),
+          new PolicyStatement({
+            actions: [
+              'cognito-idp:AdminAddUserToGroup',
+              'cognito-idp:AdminCreateUser',
+              'cognito-idp:AdminDeleteUser',
+              'cognito-idp:AdminGetUser',
+              'cognito-idp:AdminListGroupsForUser',
+              'cognito-idp:AdminRemoveUserFromGroup',
+              'cognito-idp:AdminUpdateUserAttributes',
+              'cognito-idp:CreateGroup',
+              'cognito-idp:DeleteGroup',
+              'cognito-idp:ListGroups',
+              'cognito-idp:ListUsers',
+              'cognito-idp:ListUsersInGroup'
+            ],
+            resources: ['*']
           })
         ]
       })
