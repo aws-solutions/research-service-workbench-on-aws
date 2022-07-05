@@ -26,7 +26,7 @@ export interface DataSet {
   path: string;
 
   /**
-   * the endpoints through which the dataset is accessible.
+   * the Ids endpoints through which the dataset is accessible.
    */
   externalEndpoints?: string[];
 
