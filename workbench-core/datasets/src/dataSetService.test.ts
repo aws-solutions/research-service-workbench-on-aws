@@ -170,7 +170,14 @@ describe('DataSetService', () => {
           mockAwsAccountId,
           plugin
         )
-      ).resolves.toBeUndefined();
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(plugin.createStorage).toBeCalledTimes(1);
     });
@@ -188,7 +195,14 @@ describe('DataSetService', () => {
     it('calls importStorage and addDataSet ', async () => {
       await expect(
         service.importDataSet('name', 'storageName', 'path', 'accountId', plugin)
-      ).resolves.toBeUndefined();
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(plugin.importStorage).toBeCalledTimes(1);
     });
