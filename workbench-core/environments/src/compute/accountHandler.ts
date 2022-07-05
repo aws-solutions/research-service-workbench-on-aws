@@ -1,6 +1,6 @@
 import { AwsService } from '@amzn/workbench-core-base';
-import AccountService from './accountService';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+import AccountService from '../apiSupport/accountService';
+import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
 
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;

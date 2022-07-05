@@ -1,24 +1,24 @@
-import AccountHandler from './accountHandler';
-import AccountService from './accountService';
-import CognitoSetup from './cognitoSetup';
-import EnvironmentConnectionService from './environmentConnectionService';
-import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import EnvironmentLifecycleService from './environmentLifecycleService';
-import { EnvironmentService, Environment } from './environmentService';
-import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
-import EnvironmentTypeConfigService from './environmentTypeConfigService';
-import EnvironmentTypeService from './environmentTypeService';
+import AccountService from './apiSupport/accountService';
+import { EnvironmentService, Environment } from './apiSupport/environmentService';
+import EnvironmentTypeConfigService from './apiSupport/environmentTypeConfigService';
+import EnvironmentTypeService from './apiSupport/environmentTypeService';
+import HostingAccountService from './apiSupport/hostingAccountService';
+import AccountHandler from './compute/accountHandler';
+import StatusHandler from './compute/statusHandler';
+import { EnvironmentStatus, isEnvironmentStatus } from './constants/environmentStatus';
 import {
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS
-} from './environmentTypeStatus';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import HostingAccountService from './hostingAccountService';
-import ServiceCatalogSetup from './serviceCatalogSetup';
-import { SortAttribute, isSortAttribute } from './sortAttributes';
-import StatusHandler from './statusHandler';
+} from './constants/environmentTypeStatus';
+import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
+import EnvironmentConnectionService from './interface/environmentConnectionService';
+import EnvironmentLifecycleService from './interface/environmentLifecycleService';
+import EventBridgeEventToDDB from './interface/eventBridgeEventToDDB';
+import CognitoSetup from './postDeployment/cognitoSetup';
+import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
+import EnvironmentLifecycleHelper from './utilities/environmentLifecycleHelper';
+import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
 
 export {
   HostingAccountService,

@@ -4,10 +4,9 @@ import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_API_PAGE_SIZE } from './constants';
-import envResourceTypeToKey from './environmentResourceTypeToKey';
-import { EnvironmentStatus } from './environmentStatus';
-import { addPaginationToken, getPaginationToken } from './paginationHelper';
+import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import { EnvironmentStatus } from '../constants/environmentStatus';
+import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export interface Environment {
   id: string | undefined;
