@@ -1,20 +1,39 @@
 /* eslint-disable security/detect-object-injection */
 
-import { AwsService } from '@amzn/workbench-core-base';
-import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
+import environmentResourceTypeToKey from './environmentResourceTypeToKey';
 
-interface ProjectItemType {
+interface Project {
   pk: string;
   sk: string;
   id: string;
   resourceType: string;
   envMgmtRoleArn: string;
   externalId: string;
+  accountHandlerRoleArn: string;
+  accountId: string;
+  awsAccountId: string;
+  createdAt: string;
+  createdBy: string;
+  dependency: string;
+  description: string;
+  encryptionKeyArn: string;
+  environmentInstanceFiles: string;
+  indexId: string;
+  name: string;
+  owner: string;
+  projectAdmins: string[];
+  subnetId: string;
+  updatedAt: string;
+  updatedBy: string;
+  vpcId: string;
 }
 
 export default class ProjectService {
   private _aws: AwsService;
+  private _resourceType: string = 'project';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
@@ -25,36 +44,29 @@ export default class ProjectService {
    * Get project
    * projectID - Project Id of project to retrieve
    */
-  public async getProject(projectID: string): Promise<ProjectItemType> {
-    const getParams = {
-      pk: 'PROJ#' + projectID,
-      sk: 'PROJ#' + projectID
-    };
+  public async getProject(projectId: string): Promise<Project> {
+    const response = await this._aws.helpers.ddb
+      .get(buildDynamoDBPkSk(projectId, environmentResourceTypeToKey.project))
+      .execute();
 
-    const project = await this._aws.helpers.ddb.get(getParams).execute();
-
-    const item = (project as GetItemCommandOutput).Item;
+    const item = (response as GetItemCommandOutput).Item;
 
     if (item === undefined) {
-      throw Boom.notFound(`Could not find project ${getParams.pk}`);
+      throw Boom.notFound(`Could not find project ${projectId}`);
     } else {
-      const projectItem = item as unknown as ProjectItemType;
-      return Promise.resolve(projectItem);
+      const project = item as unknown as Project;
+      return Promise.resolve(project);
     }
   }
 
-  public async getProjects(): Promise<QueryCommandOutput> {
+  public async getProjects(): Promise<{ data: Project[] }> {
     const queryParams = {
-      key: { name: 'resourceType', value: 'project' },
+      key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByUpdatedAt'
     };
 
-    const allProjects = await this._aws.helpers.ddb.query(queryParams).execute();
+    const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
 
-    if (allProjects === undefined) {
-      throw Boom.notFound(`Could not find projects`);
-    } else {
-      return Promise.resolve(allProjects);
-    }
+    return Promise.resolve({ data: projectsResponse.Items as unknown as Project[] });
   }
 }

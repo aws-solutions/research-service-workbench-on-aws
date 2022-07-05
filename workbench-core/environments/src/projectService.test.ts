@@ -75,7 +75,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.getProjects();
 
       // CHECK
-      expect(actualResponse.Items).toEqual(items);
+      expect(actualResponse.data).toEqual(items);
     });
   });
 
