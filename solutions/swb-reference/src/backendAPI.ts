@@ -10,8 +10,8 @@ import {
   EnvironmentTypeConfigService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
-import { AuditService, BaseAuditPlugin, Writer, AuditEntry } from '@amzn/workbench-core-audit';
-import { AwsService } from '@amzn/workbench-core-base';
+import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
+import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
@@ -24,17 +24,6 @@ import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagema
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({ region: 'us-east-1', ddbTableName: process.env.STACK_NAME! });
-
-class AuditLogger implements Writer {
-  private _logger: LoggingService;
-  public constructor(logger: LoggingService) {
-    this._logger = logger;
-  }
-
-  public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {
-    this._logger.info('test', {});
-  }
-}
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [

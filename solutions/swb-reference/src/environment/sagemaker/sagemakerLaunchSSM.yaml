@@ -43,6 +43,9 @@ parameters:
   InstanceType:
     type: String
     description: 'The size of the notebook instance coming from environment type config'
+  DatasetMounts:
+    type: String
+    description: Stringified array of dataset objects containing their mountString
 mainSteps:
   - name: LaunchSagemaker
     action: 'aws:executeAwsApi'
@@ -76,6 +79,8 @@ mainSteps:
           Value: '{{ EnvironmentInstanceFiles }}'
         - Key: AutoStopIdleTimeInMinutes
           Value: '{{ AutoStopIdleTimeInMinutes }}'
+        - Key: DatasetMounts
+          Value: '{{ DatasetMounts }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'

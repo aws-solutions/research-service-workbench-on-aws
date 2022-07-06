@@ -43,6 +43,42 @@ describe('EnvironmentLifecycleHelper', () => {
     });
   }
 
+  test('getDatasetsToMount returns empty list stringified when no datasets are to be created', async () => {
+    // BUILD
+    const helper = new EnvironmentLifecycleHelper();
+    const datasetIds: string[] = [];
+    const envId = 'sampleEnvId';
+    helper.dataSetService.addDataSetExternalEndpoint = jest.fn();
+    helper.dataSetService.getDataSetMountString = jest.fn();
+    helper.dataSetService.getDataSet = jest.fn();
+
+    // OPERATE
+    const response = await helper.getDatasetsToMount(datasetIds, envId);
+
+    // CHECK
+    await expect(response).toEqual('[]');
+  });
+
+  test('getDatasetsToMount does not throw error', async () => {
+    // BUILD
+    const helper = new EnvironmentLifecycleHelper();
+    const datasetIds = ['exampleDatasetId'];
+    const envId = 'sampleEnvId';
+    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => 'sampleMountString');
+    helper.dataSetService.getDataSetMountString = jest.fn(async () => 'sampleMountString');
+    helper.dataSetService.getDataSet = jest.fn(async () => {
+      return {
+        storageName: 'sampleStorageName',
+        path: 'sampleBucketPath',
+        name: 'sampleDataset',
+        externalEndpoints: []
+      };
+    });
+
+    // OPERATE & CHECK
+    await expect(helper.getDatasetsToMount(datasetIds, envId)).resolves.not.toThrowError();
+  });
+
   test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
     // BUILD
     const helper = new EnvironmentLifecycleHelper();

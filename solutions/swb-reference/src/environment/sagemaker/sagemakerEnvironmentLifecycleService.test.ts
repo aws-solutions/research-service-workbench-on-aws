@@ -108,6 +108,20 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     expect(response).toEqual({ ...environment, status: 'PENDING' });
   });
 
+  test('Launch should return mocked id when mounting datasets', async () => {
+    const envHelper = new EnvironmentLifecycleHelper();
+    environment.datasetIds = ['exampleDS'];
+    envHelper.launch = jest.fn();
+    envHelper.getDatasetsToMount = jest.fn(async () => 'exampleDS');
+    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
+
+    const sm = new SagemakerEnvironmentLifecycleService();
+    sm.helper = envHelper;
+    const response = await sm.launch(environment);
+    expect(response).toEqual({ ...environment, status: 'PENDING' });
+  });
+
   test('Terminate should operate as expected', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.executeSSMDocument = jest.fn();

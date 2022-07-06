@@ -40,7 +40,10 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       InstanceType: [instanceSize],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
-      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes]
+      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
+      DatasetMounts: !_.isEmpty(envMetadata.datasetIds)
+        ? [await this.helper.getDatasetsToMount(envMetadata.datasetIds, envMetadata.id)]
+        : ['[]']
     };
 
     await this.helper.launch({

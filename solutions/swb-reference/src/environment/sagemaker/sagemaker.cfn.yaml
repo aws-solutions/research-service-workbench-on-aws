@@ -37,6 +37,9 @@ Parameters:
   AutoStopIdleTimeInMinutes:
     Type: Number
     Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
+  DatasetMounts:
+    Type: String
+    Description: Stringified array of dataset objects containing their mountString
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
