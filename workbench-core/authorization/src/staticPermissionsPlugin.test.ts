@@ -1,5 +1,6 @@
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
+import { RouteNotSecuredError } from './errors/routeNotSecuredError';
 import {
   AuthenticatedUser,
   PermissionsMap,
@@ -76,7 +77,7 @@ describe('StaticPermissionsPlugin', () => {
     };
 
     logger = new LoggingService();
-    jest.spyOn(logger, 'warn');
+    jest.spyOn(logger, 'warn').mockImplementation(() => {});
     staticPermissionsPlugin = new StaticPermissionsPlugin(
       mockPermissionsMap,
       routesMap,
@@ -101,6 +102,7 @@ describe('StaticPermissionsPlugin', () => {
         await staticPermissionsPlugin.getOperationsByRoute('/user', 'POST');
         expect.hasAssertions();
       } catch (err) {
+        expect(err).toBeInstanceOf(RouteNotSecuredError);
         expect(err.message).toBe('Route has not been secured');
       }
     });

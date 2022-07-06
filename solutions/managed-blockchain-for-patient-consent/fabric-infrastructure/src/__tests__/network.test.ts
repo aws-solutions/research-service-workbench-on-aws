@@ -22,7 +22,8 @@ describe('HyperledgerFabricNetwork', () => {
     const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
-      memberName: 'TestMember'
+      memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.resourceCountIs('AWS::ManagedBlockchain::Member', 1);
@@ -79,7 +80,8 @@ describe('HyperledgerFabricNetwork', () => {
       networkName: 'TestNetwork',
       networkDescription: 'This is a test network',
       memberName: 'TestMember',
-      memberDescription: 'This is a test member'
+      memberDescription: 'This is a test member',
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.hasResource('AWS::ManagedBlockchain::Member', {
@@ -104,7 +106,8 @@ describe('HyperledgerFabricNetwork', () => {
       memberName: 'TestMember',
       proposalDurationInHours: 12,
       thresholdPercentage: 75,
-      thresholdComparator: hyperledger.ThresholdComparator.GREATER_THAN_OR_EQUAL_TO
+      thresholdComparator: hyperledger.ThresholdComparator.GREATER_THAN_OR_EQUAL_TO,
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.hasResource('AWS::ManagedBlockchain::Member', {
@@ -131,7 +134,8 @@ describe('HyperledgerFabricNetwork', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkEdition: hyperledger.NetworkEdition.STARTER,
       networkName: 'TestNetwork',
-      memberName: 'TestMember'
+      memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.hasResource('AWS::ManagedBlockchain::Member', {
@@ -154,7 +158,8 @@ describe('HyperledgerFabricNetwork', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      frameworkVersion: hyperledger.FrameworkVersion.VERSION_1_2
+      frameworkVersion: hyperledger.FrameworkVersion.VERSION_1_2,
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.hasResource('AWS::ManagedBlockchain::Member', {
@@ -173,7 +178,8 @@ describe('HyperledgerFabricNetwork', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      frameworkVersion: hyperledger.FrameworkVersion.VERSION_2_2
+      frameworkVersion: hyperledger.FrameworkVersion.VERSION_2_2,
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.hasResource('AWS::ManagedBlockchain::Member', {
@@ -192,7 +198,8 @@ describe('HyperledgerFabricNetwork', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      enableCaLogging: false
+      enableCaLogging: false,
+      adminCidr: '192.168.1.1/32'
     });
 
     expect(network.enableCaLogging).toBe(false);
@@ -204,7 +211,8 @@ describe('HyperledgerFabricNetwork', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      enableCaLogging: true
+      enableCaLogging: true,
+      adminCidr: '192.168.1.1/32'
     });
 
     expect(network.enableCaLogging).toBe(true);
@@ -217,7 +225,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', { env: { region: 'us-west-1' } });
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: 'TestMember'
+        memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(unsupportedRegion).toThrow(Error);
@@ -229,7 +238,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: '',
-        memberName: 'TestMember'
+        memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32'
       });
     };
     const nameTooLong = (): void => {
@@ -237,7 +247,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'ThisNetworkNameIsSixtyFiveCharactersLongAndThatIsTooLongToWork123',
-        memberName: 'TestMember'
+        memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(nameTooShort).toThrow(Error);
@@ -252,7 +263,8 @@ describe('HyperledgerFabricNetwork', () => {
         networkName: 'TestNetwork',
         networkDescription:
           'ThisNetworkDescriptionIsOneHundredTwentyNineCharactersLongAndThatIsTooLongToWork1234567890123456789012345678901234567890123456789',
-        memberName: 'TestMember'
+        memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(descriptionTooLong).toThrow(Error);
@@ -264,7 +276,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: ''
+        memberName: '',
+        adminCidr: '192.168.1.1/32'
       });
     };
     const nameTooLong = (): void => {
@@ -272,7 +285,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: 'ThisMemberNameIsSixtyFiveCharactersLongAndThatIsTooLongToWork1234'
+        memberName: 'ThisMemberNameIsSixtyFiveCharactersLongAndThatIsTooLongToWork1234',
+        adminCidr: '192.168.1.1/32'
       });
     };
     const nameStartsWithNumber = (): void => {
@@ -280,7 +294,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: '0TestMember'
+        memberName: '0TestMember',
+        adminCidr: '192.168.1.1/32'
       });
     };
     const nameStartsAndEndsWithHyphen = (): void => {
@@ -288,7 +303,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: '-TestMember-'
+        memberName: '-TestMember-',
+        adminCidr: '192.168.1.1/32'
       });
     };
     const nameHasConsecutiveHyphens = (): void => {
@@ -296,7 +312,8 @@ describe('HyperledgerFabricNetwork', () => {
       const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
-        memberName: 'Test--Member'
+        memberName: 'Test--Member',
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(nameTooShort).toThrow(Error);
@@ -314,7 +331,8 @@ describe('HyperledgerFabricNetwork', () => {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
         memberDescription:
-          'ThisMemberDescriptionIsOneHundredTwentyNineCharactersLongAndThatIsTooLongToWork12345678901234567890123456789012345678901234567890'
+          'ThisMemberDescriptionIsOneHundredTwentyNineCharactersLongAndThatIsTooLongToWork12345678901234567890123456789012345678901234567890',
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(descriptionTooLong).toThrow(Error);
@@ -327,7 +345,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        proposalDurationInHours: 0
+        proposalDurationInHours: 0,
+        adminCidr: '192.168.1.1/32'
       });
     };
     const durationTooLong = (): void => {
@@ -336,7 +355,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        proposalDurationInHours: 169
+        proposalDurationInHours: 169,
+        adminCidr: '192.168.1.1/32'
       });
     };
     const durationNotInteger = (): void => {
@@ -345,7 +365,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        proposalDurationInHours: 3.14159
+        proposalDurationInHours: 3.14159,
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(durationTooShort).toThrow(Error);
@@ -360,7 +381,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        thresholdPercentage: -1
+        thresholdPercentage: -1,
+        adminCidr: '192.168.1.1/32'
       });
     };
     const thresholdTooLarge = (): void => {
@@ -369,7 +391,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        thresholdPercentage: 101
+        thresholdPercentage: 101,
+        adminCidr: '192.168.1.1/32'
       });
     };
     const thresholdNotInteger = (): void => {
@@ -378,7 +401,8 @@ describe('HyperledgerFabricNetwork', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
-        thresholdPercentage: 1.61803
+        thresholdPercentage: 1.61803,
+        adminCidr: '192.168.1.1/32'
       });
     };
     expect(thresholdTooSmall).toThrow(Error);
@@ -391,7 +415,8 @@ describe('HyperledgerFabricNetwork', () => {
     const stack = new cdk.Stack(app, 'HyperledgerTestStack', DEFAULT_ENV);
     new hyperledger.HyperledgerFabricNetwork(stack, 'V2TestNetwork', {
       networkName: 'TestNetwork',
-      memberName: 'TestMember'
+      memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32'
     });
 
     cdknag.NagSuppressions.addStackSuppressions(stack, [
@@ -441,6 +466,18 @@ describe('HyperledgerFabricNetwork', () => {
         {
           id: 'AwsSolutions-SMG4',
           reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      stack,
+      '/HyperledgerTestStack/V2TestNetwork/NetworkClient/ec2-instance/Resource',
+      [
+        {
+          id: 'AwsSolutions-EC29',
+          reason:
+            'This instance is used by network Admin to set up the Fabric, Admin can choose to terminate it once the setup is completed.'
         }
       ]
     );

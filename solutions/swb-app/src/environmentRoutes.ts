@@ -46,7 +46,7 @@ export function setUpEnvRoutes(
         }
         res.status(201).send(env);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -65,7 +65,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.terminate(req.params.id);
         res.send(response);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -84,7 +84,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.start(req.params.id);
         res.send(response);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -103,7 +103,7 @@ export function setUpEnvRoutes(
         const response = await environments[envType].lifecycle.stop(req.params.id);
         res.send(response);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -141,7 +141,7 @@ export function setUpEnvRoutes(
         };
         res.send(response);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }

@@ -117,6 +117,7 @@ importers:
       aws-cdk-lib: ^2.29.1
       aws-sdk-client-mock: ^0.6.2
       axios: ^0.27.1
+      cdk-ec2-key-pair: ^3.3.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
       esbuild: ^0.14.21
@@ -140,6 +141,7 @@ importers:
       '@aws-sdk/client-s3': 3.118.1
       '@aws-sdk/types': 3.110.0
       aws-cdk-lib: 2.29.1_constructs@10.1.42
+      cdk-ec2-key-pair: 3.3.1_b58070d5c904f2e35eeee41952391c50
       constructs: 10.1.42
       fabric-ca-client: 2.2.12
       fabric-common: 2.2.12
@@ -7379,6 +7381,16 @@ packages:
   /case/1.6.3:
     resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
     engines: {node: '>= 0.8.0'}
+
+  /cdk-ec2-key-pair/3.3.1_b58070d5c904f2e35eeee41952391c50:
+    resolution: {integrity: sha512-CmGy2ebHK+sZYJmylERt5QnsmFm/4Kjuqc0A3DdWTu28j+foAAPF5KjzgwRcNerqnwys56MI4zjWgNBiyXUPpA==}
+    peerDependencies:
+      aws-cdk-lib: ^2.0.0
+      constructs: ^10.0.0
+    dependencies:
+      aws-cdk-lib: 2.29.1_constructs@10.1.42
+      constructs: 10.1.42
+    dev: false
 
   /cdk-nag/2.14.47_b58070d5c904f2e35eeee41952391c50:
     resolution: {integrity: sha512-AmXLZal9EHfAMr+8nsLTTDRYfkG7LoCqfgaOfVQ9Urr7sirgXghfU8BfZvUhM7fFHd4a+LDuzDVe3Xu7OOK4yQ==}

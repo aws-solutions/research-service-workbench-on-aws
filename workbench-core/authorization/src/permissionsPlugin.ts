@@ -19,6 +19,10 @@ export default interface PermissionsPlugin {
    * Returns a set of {@link Operation} given a Route and {@link HTTPMethod}.
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
+   *
+   * @returns A set of {@link Operation}s associated to the route.
+   *
+   * @throws - {@link RouteNotSecuredError} when route is not secured
    */
   getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]>;
 

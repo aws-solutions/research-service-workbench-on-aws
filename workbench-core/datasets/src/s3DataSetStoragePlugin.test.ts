@@ -23,6 +23,8 @@ describe('S3DataSetStoragePlugin', () => {
     secretAccessKey: 'fakeSecret'
   } as const;
 
+  const mockAwsAccountId = '123456789012';
+
   let aws: AwsService;
   beforeEach(() => {
     aws = new AwsService({
@@ -319,7 +321,7 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleName)
       ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
@@ -380,7 +382,7 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(0);
@@ -436,7 +438,7 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -502,7 +504,7 @@ describe('S3DataSetStoragePlugin', () => {
         .resolves({});
 
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual(`s3://${accessPointArn}/`);
 
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -541,7 +543,7 @@ describe('S3DataSetStoragePlugin', () => {
       const kmsMock = mockClient(KMSClient);
       kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn)
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(0);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
@@ -571,7 +573,14 @@ describe('S3DataSetStoragePlugin', () => {
       const kmsMock = mockClient(KMSClient);
       kmsMock.on(GetKeyPolicyCommand).resolves({}).on(PutKeyPolicyCommand).resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+        plugin.addExternalEndpoint(
+          name,
+          path,
+          externalEndpointName,
+          mockAwsAccountId,
+          externalRoleArn,
+          kmsKeyArn
+        )
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
@@ -629,7 +638,14 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+        plugin.addExternalEndpoint(
+          name,
+          path,
+          externalEndpointName,
+          mockAwsAccountId,
+          externalRoleArn,
+          kmsKeyArn
+        )
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
@@ -704,7 +720,14 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+        plugin.addExternalEndpoint(
+          name,
+          path,
+          externalEndpointName,
+          mockAwsAccountId,
+          externalRoleArn,
+          kmsKeyArn
+        )
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(0);
@@ -759,7 +782,14 @@ describe('S3DataSetStoragePlugin', () => {
         .on(PutKeyPolicyCommand)
         .resolves({});
       await expect(
-        plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleArn, kmsKeyArn)
+        plugin.addExternalEndpoint(
+          name,
+          path,
+          externalEndpointName,
+          mockAwsAccountId,
+          externalRoleArn,
+          kmsKeyArn
+        )
       ).resolves.toEqual(`s3://${accessPointArn}/`);
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
       expect(kmsMock.commandCalls(PutKeyPolicyCommand)).toHaveLength(1);
