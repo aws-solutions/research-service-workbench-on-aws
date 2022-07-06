@@ -58,7 +58,7 @@ describe('ProjectService', () => {
       ddbMock
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByUpdatedAt',
+          IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
             '#resourceType': 'resourceType'
