@@ -157,12 +157,12 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
     const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSet.Id}`,
-      sk: `${this._dataSetKeyType}#${dataSet.Id}`
+      pk: `${this._dataSetKeyType}#${dataSet.id}`,
+      sk: `${this._dataSetKeyType}#${dataSet.id}`
     };
     const dataSetParams: { item: { [key: string]: string | string[] } } = {
       item: {
-        id: dataSet.Id as string,
+        id: dataSet.id as string,
         name: dataSet.name,
         createdAt: dataSet.createdAt as string,
         storageName: dataSet.storageName,
@@ -178,6 +178,6 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 
-    return dataSet.Id as string;
+    return dataSet.id as string;
   }
 }
