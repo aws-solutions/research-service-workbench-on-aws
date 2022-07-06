@@ -15,7 +15,8 @@ describe('HyperledgerFabricClient', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      prefix: 'patient-consent'
+      prefix: 'patient-consent',
+      adminCidr: '192.168.1.1/32'
     });
 
     const template = assertions.Template.fromStack(stack);
@@ -40,7 +41,10 @@ describe('HyperledgerFabricClient', () => {
     const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
     const vpc = new ec2.Vpc(stack, 'ClientVpc', {
       cidr: '40.0.0.0/16',
-      subnetConfiguration: [{ name: 'Private', subnetType: ec2.SubnetType.PRIVATE_ISOLATED }]
+      subnetConfiguration: [
+        { name: 'Private', subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+        { name: 'Public', subnetType: ec2.SubnetType.PUBLIC }
+      ]
     });
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
@@ -48,7 +52,8 @@ describe('HyperledgerFabricClient', () => {
       prefix: 'patient-consent',
       client: {
         vpc: vpc
-      }
+      },
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.resourceCountIs('AWS::EC2::VPC', 1);

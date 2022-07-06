@@ -16,6 +16,8 @@ export class InfrastructureStack extends Stack {
     const networkId = this.node.tryGetContext('networkId');
     const invitationId = this.node.tryGetContext('invitationId');
     const additionalMembers = this.node.tryGetContext('additionalMembers');
+    const certS3BucketName = this.node.tryGetContext('certS3BucketName');
+    const adminCidr = this.node.tryGetContext('adminCidr');
     const availabilityZone = isEmpty(this.node.tryGetContext('availabilityZone'))
       ? Stack.of(this).availabilityZones[0]
       : this.node.tryGetContext('availabilityZone');
@@ -31,6 +33,8 @@ export class InfrastructureStack extends Stack {
       networkId,
       invitationId,
       additionalMembers,
+      certS3BucketName,
+      adminCidr,
       nodes: [
         {
           availabilityZone,
@@ -95,6 +99,23 @@ export class InfrastructureStack extends Stack {
       value: network.nodes.map((n) => n.eventEndpoint).join(',')
     });
 
+    new cdk.CfnOutput(this, 'AdminEC2PrivateKey', {
+      description: 'Secret ARN for SSH connection to EC2 client node',
+      value: network.client.keyPair.privateKeyArn
+    });
+
+    new cdk.CfnOutput(this, 'EC2Endpoint', {
+      description: 'Endpoint for EC2 client node',
+      value: network.client.clienNode.instancePublicDnsName
+    });
+
+    if (network.createNewNetwork) {
+      new cdk.CfnOutput(this, 'CertS3Bucket', {
+        description: 'S3 bucket for sharing certificates between members',
+        value: network.certS3BucketName
+      });
+    }
+
     /**
      * cdk-nag suppression
      */
@@ -145,6 +166,18 @@ export class InfrastructureStack extends Stack {
         {
           id: 'AwsSolutions-SMG4',
           reason: 'Secrets created for Managed Blockchain users do not support auto-rotation'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/HyperledgerTestStack/V2TestNetwork/NetworkClient/ec2-instance/Resource',
+      [
+        {
+          id: 'AwsSolutions-EC29',
+          reason:
+            'This instance is used by network Admin to set up the Fabric, Admin can choose to terminate it once the setup is completed.'
         }
       ]
     );
