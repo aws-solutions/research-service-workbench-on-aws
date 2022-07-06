@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
+import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
+
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
@@ -28,9 +30,9 @@ export class SWBStack extends Stack {
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
-    USER_POOL_ID: string;
     CLIENT_ID: string;
     CLIENT_SECRET: string;
+    USER_POOL_ID: string;
     WEBSITE_URL: string;
   };
   public constructor(app: App) {
@@ -46,9 +48,8 @@ export class SWBStack extends Stack {
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN,
-      USER_POOL_ID,
-      CLIENT_ID,
-      CLIENT_SECRET,
+      USER_POOL_CLIENT_NAME,
+      USER_POOL_NAME,
       WEBSITE_URL
     } = getConstants();
 
@@ -58,6 +59,12 @@ export class SWBStack extends Stack {
       }
     });
 
+    const workbenchCognito = this._createCognitoResources(
+      COGNITO_DOMAIN,
+      WEBSITE_URL,
+      USER_POOL_NAME,
+      USER_POOL_CLIENT_NAME
+    );
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
     this.lambdaEnvVars = {
@@ -70,10 +77,10 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
-      COGNITO_DOMAIN,
-      USER_POOL_ID,
-      CLIENT_ID,
-      CLIENT_SECRET,
+      COGNITO_DOMAIN: workbenchCognito.cognitoDomain,
+      CLIENT_ID: workbenchCognito.userPoolClientId,
+      CLIENT_SECRET: workbenchCognito.userPoolClientSecret.toString(),
+      USER_POOL_ID: workbenchCognito.userPoolId,
       WEBSITE_URL
     };
 
@@ -546,5 +553,36 @@ export class SWBStack extends Stack {
     table.grantReadWriteData(apiLambda);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
     return table;
+  }
+
+  private _createCognitoResources(
+    domainPrefix: string,
+    websiteUrl: string,
+    userPoolName: string,
+    userPoolClientName: string
+  ): WorkbenchCognito {
+    const props: WorkbenchCognitoProps = {
+      domainPrefix: domainPrefix,
+      websiteUrl: websiteUrl,
+      userPoolName: userPoolName,
+      userPoolClientName: userPoolClientName,
+      oidcIdentityProviders: []
+    };
+
+    const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);
+
+    new CfnOutput(this, 'cognitoUserPoolId', {
+      value: workbenchCognito.userPoolId
+    });
+
+    new CfnOutput(this, 'cognitoUserPoolClientId', {
+      value: workbenchCognito.userPoolClientId
+    });
+
+    new CfnOutput(this, 'cognitoDomainName', {
+      value: workbenchCognito.cognitoDomain
+    });
+
+    return workbenchCognito;
   }
 }

@@ -1,7 +1,6 @@
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
-  AdminCreateUserCommandOutput,
   AdminDeleteUserCommand,
   AdminGetUserCommand,
   AdminListGroupsForUserCommand,

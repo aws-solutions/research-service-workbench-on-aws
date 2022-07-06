@@ -35,6 +35,10 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
+      "name": "@amzn/workbench-core-infrastructure",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-logging",
       "allowedCategories": [ "production", "prototypes" ]
     },

@@ -39,7 +39,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(cookieParser());
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-    region: process.env.AWS_REGION!,
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     clientId: process.env.CLIENT_ID!,

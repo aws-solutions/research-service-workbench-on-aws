@@ -22,7 +22,6 @@ import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagem
 import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: process.env.AWS_REGION!,
   cognitoDomain: process.env.COGNITO_DOMAIN!,
   userPoolId: process.env.USER_POOL_ID!,
   clientId: process.env.CLIENT_ID!,

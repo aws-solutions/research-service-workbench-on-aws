@@ -170,6 +170,7 @@ importers:
       '@amzn/swb-app': workspace:*
       '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-infrastructure': workspace:*
       '@aws-sdk/client-cloudformation': ^3.58.0
       '@aws-sdk/client-dynamodb': ^3.67.0
       '@aws-sdk/client-s3': ^3.58.0
@@ -218,6 +219,7 @@ importers:
       '@amzn/swb-app': link:../swb-app
       '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
       '@amzn/workbench-core-base': link:../../workbench-core/base
+      '@amzn/workbench-core-infrastructure': link:../../workbench-core/infrastructure
       '@aws-sdk/client-cloudformation': 3.100.0
       '@aws-sdk/client-dynamodb': 3.100.0
       '@aws-sdk/client-s3': 3.100.0
@@ -4401,7 +4403,6 @@ packages:
 
   /@balena/dockerignore/1.0.2:
     resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
-    dev: false
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -6584,7 +6585,16 @@ packages:
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.25
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.7
+      yaml: 1.10.2
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -6959,6 +6969,10 @@ packages:
   /caniuse-lite/1.0.30001346:
     resolution: {integrity: sha512-q6ibZUO2t88QCIPayP/euuDREq+aMAxFE5S70PkrLh0iTDj/zEhgvJRKC2+CvXY6EWc6oQwUR48lL5vCW6jiXQ==}
 
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
+
   /cdk-nag/2.14.26_8d994d7bf27edab84c843ce1928354a1:
     resolution: {integrity: sha512-emOwacq+6kHgVcCqQWRGdznBYt+GlfYU0Bqh4q9XvvxCSXxRL0K5UKrTFDqXpcquvncryegh4Pa2UoFBVdOWgA==}
     peerDependencies:
@@ -7200,7 +7214,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /concurrently/7.2.1:
     resolution: {integrity: sha512-7cab/QyqipqghrVr9qZmoWbidu0nHsmxrpNqQ7r/67vfl1DWJElexehQnTH1p+87tDkihaAjM79xTZyBQh7HLw==}
@@ -10273,7 +10287,6 @@ packages:
 
   /jsonschema/1.4.1:
     resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
-    dev: false
 
   /jsx-ast-utils/3.3.0:
     resolution: {integrity: sha512-XzO9luP6L0xkxwhIJMTJQpZo/eeN60K08jHdexfD569AGxeNug6UketeHXEhROoM8aR7EcUoOQmIhcJQjcuq8Q==}
@@ -13125,7 +13138,6 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
-    dev: true
 
   /yargs-parser/20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
