@@ -3,7 +3,7 @@
 import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
-import environmentResourceTypeToKey from './environmentResourceTypeToKey';
+import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 
 interface Project {
   pk: string;
