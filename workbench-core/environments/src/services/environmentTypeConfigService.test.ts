@@ -1,6 +1,5 @@
-/* eslint-disable */
-import EnvironmentTypeConfigService from './environmentTypeConfigService';
-import { mockClient } from 'aws-sdk-client-mock';
+const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
+jest.mock('uuid', () => ({ v4: () => envTypeConfigId }));
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -9,12 +8,12 @@ import {
   QueryCommandOutput,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import environmentResourceTypeToKey from './environmentResourceTypeToKey';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
+import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import EnvironmentTypeConfigService from './environmentTypeConfigService';
 
 describe('environmentTypeConfigService', () => {
-  const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
-  jest.mock('uuid', () => ({ v4: () => envTypeConfigId }));
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
   });
