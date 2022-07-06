@@ -155,6 +155,14 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/plugin-syntax-flow",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/plugin-transform-react-jsx",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@babel/preset-env",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -379,6 +387,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "react-scripts",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "sass",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -416,6 +428,10 @@
     },
     {
       "name": "uuid",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "web-vitals",
       "allowedCategories": [ "production" ]
     },
     {
