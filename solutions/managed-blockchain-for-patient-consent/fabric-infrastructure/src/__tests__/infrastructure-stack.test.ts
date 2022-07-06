@@ -15,7 +15,13 @@ const DEFAULT_ENV = {
 
 describe('InfrastructureStack', () => {
   test('InfrastructureStack is created with expected configuration when creating network', () => {
-    const app = new cdk.App({ context: { availabilityZone: 'us-east-1a' } });
+    const app = new cdk.App({
+      context: {
+        availabilityZone: 'us-east-1a',
+        additionalMembers: ['123456789', '0987654321'],
+        adminCidr: '192.168.1.1/32'
+      }
+    });
     const stack = new InfrastructureStack(app, 'HyperledgerTestStack', DEFAULT_ENV);
     cdk.Aspects.of(stack).add(new cdknag.AwsSolutionsChecks({ verbose: true }));
     const template = assertions.Template.fromStack(stack);
@@ -54,7 +60,13 @@ describe('InfrastructureStack', () => {
 
   test('InfrastructureStack is created without sending invitation when joining existing network', () => {
     const app = new cdk.App({
-      context: { availabilityZone: 'us-east-1a', networkId: 'n-1234567890', invitationId: 'in-1234567890' }
+      context: {
+        availabilityZone: 'us-east-1a',
+        networkId: 'n-1234567890',
+        invitationId: 'in-1234567890',
+        certS3BucketName: 'fake-s3-bucket-name',
+        adminCidr: '192.168.1.1/32'
+      }
     });
     const stack = new InfrastructureStack(app, 'HyperledgerTestStack', DEFAULT_ENV);
     cdk.Aspects.of(stack).add(new cdknag.AwsSolutionsChecks({ verbose: true }));
