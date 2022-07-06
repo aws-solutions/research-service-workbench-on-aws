@@ -1,5 +1,6 @@
-import { Ability, AbilityBuilder, ForbiddenError } from '@casl/ability';
+import { Ability, AbilityBuilder, ForbiddenError as CASLForbiddenError } from '@casl/ability';
 import AuthorizationPlugin from './authorizationPlugin';
+import { ForbiddenError } from './errors/forbiddenError';
 import Operation from './operation';
 import Permission from './permission';
 /**
@@ -9,10 +10,13 @@ import Permission from './permission';
 export default class CASLAuthorizationPlugin implements AuthorizationPlugin {
   public async isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<void> {
     const ability: Ability = this._defineAbilitiesFor(userPermissions);
-
-    operations.forEach((operation: Operation) => {
-      ForbiddenError.from(ability).throwUnlessCan(operation.action, operation.subject, operation.field);
-    });
+    try {
+      operations.forEach((operation: Operation) => {
+        CASLForbiddenError.from(ability).throwUnlessCan(operation.action, operation.subject, operation.field);
+      });
+    } catch (err) {
+      throw new ForbiddenError(err.message);
+    }
   }
   /**
    * Given a set of a user's {@link  Permission}s, an CASL {@link Ability} is created.
