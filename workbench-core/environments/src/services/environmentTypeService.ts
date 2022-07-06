@@ -3,10 +3,9 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_API_PAGE_SIZE } from './constants';
-import envKeyNameToKey from './environmentKeyNameToKey';
-import { EnvironmentTypeStatus } from './environmentTypeStatus';
-import { addPaginationToken, getPaginationToken } from './paginationHelper';
+import envKeyNameToKey from '../constants/environmentKeyNameToKey';
+import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
+import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 interface EnvironmentType {
   pk: string;

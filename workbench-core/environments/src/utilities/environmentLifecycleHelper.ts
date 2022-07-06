@@ -33,7 +33,7 @@ export default class EnvironmentLifecycleHelper {
   }
 
   /**
-   * Get the mount strings for all datasets attached to a given workspace.
+   * Launch an environment by executing SSM document
    * @param payload - contains the following:
    * * @param ssmParameters - the list of input parameters for SSM doc execution
    * * @param operation - the operation type - eg. 'Launch'
