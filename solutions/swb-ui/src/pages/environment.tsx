@@ -315,12 +315,7 @@ const Environment: NextPage = () => {
                       </FormField>
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                         <Select
-                          selectedOption={
-                            projects
-                              .map((p) => ({ label: p.name, value: p.id }))
-                              .filter((p) => p.value === formData?.projectId)
-                              .at(0) || null
-                          }
+                          selectedOption={null}
                           loadingText="Loading Projects"
                           options={projects.map((p) => ({ label: p.name, value: p.id }))}
                           selectedAriaLabel={formData?.projectId}
