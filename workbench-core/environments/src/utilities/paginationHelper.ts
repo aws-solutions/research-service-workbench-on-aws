@@ -25,3 +25,5 @@ export function getPaginationToken(ddbQueryResponse: QueryCommandOutput): string
     ? Buffer.from(JSON.stringify(ddbQueryResponse.LastEvaluatedKey)).toString('base64')
     : undefined;
 }
+
+export const DEFAULT_API_PAGE_SIZE: number = 50;
