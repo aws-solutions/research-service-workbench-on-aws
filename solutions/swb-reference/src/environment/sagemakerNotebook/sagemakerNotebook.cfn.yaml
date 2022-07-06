@@ -11,14 +11,14 @@ Parameters:
     Description: EC2 instance type to launch
     Default: ml.t3.xlarge
   VPC:
-    Description: VPC for EMR nodes.
+    Description: VPC for Sagemaker Notebook
     Type: AWS::EC2::VPC::Id
   Subnet:
-    Description: Subnet for EMR nodes, from the VPC selected above
+    Description: Subnet for Sagemaker Notebook, from the VPC selected above
     Type: AWS::EC2::Subnet::Id
   AccessFromCIDRBlock:
     Type: String
-    Description: The CIDR used to access sagemaker. This parameter is only required when AppStream is disabled
+    Description: The CIDR used to access sagemaker
     Default: 10.0.0.0/19
   S3Mounts:
     Type: String

@@ -152,7 +152,7 @@ export class SWBStack extends Stack {
         })
       ]
     });
-    const sagemakerPolicy = new PolicyDocument({
+    const sagemakerNotebookPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
           actions: [
@@ -211,7 +211,7 @@ export class SWBStack extends Stack {
       roleName: `${this.stackName}-LaunchConstraint`,
       description: 'Launch constraint role for Service Catalog products',
       inlinePolicies: {
-        sagemakerLaunchPermissions: sagemakerPolicy,
+        sagemakerNotebookLaunchPermissions: sagemakerNotebookPolicy,
         commonScManagement
       }
     });

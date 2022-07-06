@@ -12,10 +12,12 @@ import { AwsService } from '@amzn/workbench-core-base';
 import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 
-export default class SagemakerEnvironmentLifecycleService implements EnvironmentLifecycleService {
+export default class SagemakerNotebookEnvironmentLifecycleService implements EnvironmentLifecycleService {
   public helper: EnvironmentLifecycleHelper;
   public aws: AwsService;
   public envService: EnvironmentService;
+  private _envType: string = 'sagemakerNotebook';
+
   public constructor() {
     this.helper = new EnvironmentLifecycleHelper();
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
@@ -34,7 +36,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       Subnet: [envMetadata.PROJ.subnetId],
       ProvisioningArtifactId: [envMetadata.ETC.provisioningArtifactId],
       ProductId: [envMetadata.ETC.productId],
-      Namespace: [`sagemaker-${Date.now()}`],
+      Namespace: [`${this._envType}-${Date.now()}`],
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
       CIDR: [cidr],
       InstanceType: [instanceSize],
@@ -46,7 +48,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     await this.helper.launch({
       ssmParameters,
       operation: 'Launch',
-      envType: 'sagemaker',
+      envType: this._envType,
       envMetadata
     });
 
@@ -68,7 +70,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
     await this.helper.executeSSMDocument({
       ssmParameters,
       operation: 'Terminate',
-      envType: 'sagemaker',
+      envType: this._envType,
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId
     });
@@ -89,7 +91,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId,
       operation: 'Start',
-      envType: 'sagemaker'
+      envType: this._envType
     });
 
     await hostAwsSdk.clients.sagemaker.startNotebookInstance({ NotebookInstanceName: instanceName });
@@ -110,7 +112,7 @@ export default class SagemakerEnvironmentLifecycleService implements Environment
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId,
       operation: 'Stop',
-      envType: 'sagemaker'
+      envType: this._envType
     });
 
     await hostAwsSdk.clients.sagemaker.stopNotebookInstance({ NotebookInstanceName: instanceName });
