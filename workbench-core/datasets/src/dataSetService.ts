@@ -34,6 +34,8 @@ export class DataSetService {
    * @param awsAccountId - the AWS account where the DataSet resides.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
    * for a particular platform, account, etc.
+   *
+   * @returns the DataSet object which is stored in the backing datastore.
    */
   public async provisionDataSet(
     datasetName: string,
@@ -41,7 +43,7 @@ export class DataSetService {
     path: string,
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const locator: string = await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
@@ -52,7 +54,7 @@ export class DataSetService {
       location: locator
     };
 
-    await this._dbProvider.addDataSet(provisioned);
+    return await this._dbProvider.addDataSet(provisioned);
   }
 
   /**
@@ -63,6 +65,8 @@ export class DataSetService {
    * @param awsAccountId - the 12 digit Id of the AWS account where the dataSet resides.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
    * for a particular platform, account, etc.
+   *
+   * @returns the DataSet object which is stored in teh backing datastore.
    */
   public async importDataSet(
     datasetName: string,
@@ -70,7 +74,7 @@ export class DataSetService {
     path: string,
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const locator: string = await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
@@ -81,7 +85,7 @@ export class DataSetService {
       location: locator
     };
 
-    await this._dbProvider.addDataSet(imported);
+    return await this._dbProvider.addDataSet(imported);
   }
 
   /**
@@ -153,6 +157,7 @@ export class DataSetService {
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
+      targetDS.awsAccountId as string,
       externalRoleName
     );
 

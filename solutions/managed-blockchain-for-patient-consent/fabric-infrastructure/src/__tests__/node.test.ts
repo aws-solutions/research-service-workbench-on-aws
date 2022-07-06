@@ -18,7 +18,8 @@ describe('HyperledgerFabricNode', () => {
     const stack = new cdk.Stack(app, 'TestStack', DEFAULT_ENV);
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
-      memberName: 'TestMember'
+      memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.resourceCountIs('AWS::ManagedBlockchain::Node', 1);
@@ -46,6 +47,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: []
     });
     const template = assertions.Template.fromStack(stack);
@@ -59,6 +61,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: []
     });
     const node = new hyperledger.HyperledgerFabricNode(network, 'TestHyperledgerFabricNode');
@@ -75,6 +78,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           availabilityZone: 'us-east-1b',
@@ -131,7 +135,8 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
-      networkEdition: hyperledger.NetworkEdition.STARTER
+      networkEdition: hyperledger.NetworkEdition.STARTER,
+      adminCidr: '192.168.1.1/32'
     });
     const template = assertions.Template.fromStack(stack);
     template.resourceCountIs('AWS::ManagedBlockchain::Node', 1);
@@ -158,6 +163,7 @@ describe('HyperledgerFabricNode', () => {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
       networkEdition: hyperledger.NetworkEdition.STARTER,
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           availabilityZone: 'us-east-1b',
@@ -202,6 +208,7 @@ describe('HyperledgerFabricNode', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32',
         nodes: [
           {
             availabilityZone: 'us-west-1a'
@@ -216,6 +223,7 @@ describe('HyperledgerFabricNode', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32',
         nodes: [
           {
             availabilityZone: 'us-east-1z'
@@ -234,6 +242,7 @@ describe('HyperledgerFabricNode', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32',
         nodes: [{}, {}, {}, {}]
       });
     };
@@ -247,6 +256,7 @@ describe('HyperledgerFabricNode', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32',
         networkEdition: hyperledger.NetworkEdition.STARTER,
         nodes: [{}, {}, {}]
       });
@@ -262,6 +272,7 @@ describe('HyperledgerFabricNode', () => {
       new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
         networkName: 'TestNetwork',
         memberName: 'TestMember',
+        adminCidr: '192.168.1.1/32',
         networkEdition: hyperledger.NetworkEdition.STARTER,
         nodes: [
           {
@@ -279,6 +290,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           enableNodeLogging: false
@@ -294,6 +306,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           enableNodeLogging: true
@@ -310,6 +323,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           enableChaincodeLogging: false
@@ -326,6 +340,7 @@ describe('HyperledgerFabricNode', () => {
     const network = new hyperledger.HyperledgerFabricNetwork(stack, 'TestHyperledgerFabricNetwork', {
       networkName: 'TestNetwork',
       memberName: 'TestMember',
+      adminCidr: '192.168.1.1/32',
       nodes: [
         {
           enableChaincodeLogging: true
