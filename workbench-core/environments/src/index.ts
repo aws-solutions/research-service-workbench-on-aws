@@ -16,6 +16,7 @@ import {
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import HostingAccountService from './hostingAccountService';
+import ProjectService from './projectService';
 import ServiceCatalogSetup from './serviceCatalogSetup';
 import { SortAttribute, isSortAttribute } from './sortAttributes';
 import StatusHandler from './statusHandler';
@@ -38,6 +39,7 @@ export {
   CognitoSetup,
   EnvironmentService,
   EnvironmentTypeService,
+  ProjectService,
   Environment,
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,

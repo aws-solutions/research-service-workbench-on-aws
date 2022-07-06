@@ -7,7 +7,8 @@ import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { Express } from 'express';
@@ -44,6 +45,9 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   })
 };

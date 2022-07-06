@@ -23,6 +23,7 @@ import React, { useEffect, useState } from 'react';
 import { createEnvironment } from '../api/environments';
 import { useEnvTypeConfigs } from '../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../api/environmentTypes';
+import { useProjects } from '../api/projects';
 import { layoutLabels } from '../common/labels';
 import EnvTypeCards from '../components/EnvTypeCards';
 import EnvTypeConfigCards from '../components/EnvTypeConfigCards';
@@ -59,6 +60,7 @@ const Environment: NextPage = () => {
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
   const { envTypes, envTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, envTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
+  const { projects, projectsLoading } = useProjects();
   const nameRegex = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-]*$');
   /* eslint-disable security/detect-unsafe-regex */
   const cidrRegex = new RegExp(
@@ -204,7 +206,6 @@ const Environment: NextPage = () => {
     }
   };
 
-  const projects = [{ label: 'Project 123', value: 'proj-123' }];
   useEffect(() => {
     validateForm();
     if (formData && Object.keys(formData).length !== 0) {
@@ -315,9 +316,13 @@ const Environment: NextPage = () => {
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                         <Select
                           selectedOption={
-                            projects.filter((p) => p.value === formData?.projectId).at(0) || null
+                            projects
+                              .map((p) => ({ label: p.name, value: p.id }))
+                              .filter((p) => p.value === formData?.projectId)
+                              .at(0) || null
                           }
-                          options={projects}
+                          loadingText="Loading Projects"
+                          options={projects.map((p) => ({ label: p.name, value: p.id }))}
                           selectedAriaLabel={formData?.projectId}
                           onChange={({ detail: { selectedOption } }) => {
                             setFormData({ ...formData, projectId: selectedOption.value });

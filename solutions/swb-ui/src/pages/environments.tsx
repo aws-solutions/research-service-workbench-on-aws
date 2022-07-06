@@ -41,7 +41,6 @@ import {
 } from '../environments-table-config/workspacesColumnDefinitions';
 import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import styles from '../styles/BaseLayout.module.scss';
 
 export interface EnvironmentProps {
   locale: string;
@@ -249,7 +248,6 @@ const Environment: NextPage = () => {
   return (
     <AppLayout
       id="environments-layout"
-      className={styles.baseLayout}
       headerSelector="#header"
       stickyNotifications
       toolsHide
