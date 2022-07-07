@@ -130,10 +130,10 @@ export default class EnvironmentLifecycleHelper {
         const mountString: string = _.isEmpty(dataSet.externalEndpoints)
           ? await this.dataSetService.addDataSetExternalEndpoint(
               datasetId,
-              `${datasetId}-mounted-on-${envId}`,
+              `mount-on-${envId}`,
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await this.dataSetService.getDataSetMountString(datasetId, `${datasetId}-mounted-on-${envId}`);
+          : await this.dataSetService.getDataSetMountString(datasetId, `mount-on-${envId}`);
 
         return {
           datasetId,

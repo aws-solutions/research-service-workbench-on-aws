@@ -225,6 +225,8 @@ export class SWBStack extends Stack {
   private _createS3Buckets(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-artifacts', {});
 
+    // TODO: Try uploading bootstrap scripts via CDK
+
     new CfnOutput(this, s3ArtifactName, {
       value: s3Bucket.bucketArn
     });
@@ -414,7 +416,7 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             sid: 'datasetS3Bucket',
             actions: ['*'],
-            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*']
+            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*', 'arn:aws:s3:*:*:accesspoint/*']
           })
         ]
       })

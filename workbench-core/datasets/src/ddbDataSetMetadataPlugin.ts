@@ -102,7 +102,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
-    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetName);
+    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
     const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id as string);
 
     if (_.find(endPoints, (ep) => ep.name === endPoint.name))

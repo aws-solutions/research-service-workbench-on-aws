@@ -168,28 +168,28 @@ Resources:
       #      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
 
-# TODO: Add script for mounting studies and autostop
-#  BasicNotebookInstanceLifecycleConfig:
-#    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
-#    Properties:
-#      OnStart:
-#        - Content:
-#            Fn::Base64: !Sub |
-#              #!/usr/bin/env bash
-#              # Download and execute bootstrap script
-#              aws s3 cp "${EnvironmentInstanceFiles}/get_bootstrap.sh" "/tmp"
-#              chmod 500 "/tmp/get_bootstrap.sh"
-#              /tmp/get_bootstrap.sh "${EnvironmentInstanceFiles}" '${S3Mounts}'
-#
-#              # Stop Idle Script
-#              if [ "${AutoStopIdleTimeInMinutes}" != "0" ]; then
-#                echo "Fetching the autostop script"
-#                aws s3 cp "${EnvironmentInstanceFiles}/offline-packages/sagemaker/autostop.py" "/usr/local/bin"
-#                chmod a+x /usr/local/bin/autostop.py
-#                IDLE_TIME=`expr ${AutoStopIdleTimeInMinutes} \* 60`
-#                echo "Starting the SageMaker autostop script in cron"
-#                (crontab -l 2>/dev/null; echo "*/1 * * * * /usr/bin/python /usr/local/bin/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/autostop.log") | crontab -
-#              fi
+  # TODO: Add script for mounting studies and autostop
+  BasicNotebookInstanceLifecycleConfig:
+    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
+    Properties:
+      OnStart:
+        - Content:
+            Fn::Base64: !Sub |
+              #!/usr/bin/env bash
+              # Download and execute bootstrap script
+              aws s3 cp "${EnvironmentInstanceFiles}/get_bootstrap.sh" "/tmp"
+              chmod 500 "/tmp/get_bootstrap.sh"
+              /tmp/get_bootstrap.sh "${EnvironmentInstanceFiles}" '${S3Mounts}'
+
+              # Stop Idle Script
+              if [ "${AutoStopIdleTimeInMinutes}" != "0" ]; then
+                echo "Fetching the autostop script"
+                aws s3 cp "${EnvironmentInstanceFiles}/offline-packages/sagemaker/autostop.py" "/usr/local/bin"
+                chmod a+x /usr/local/bin/autostop.py
+                IDLE_TIME=`expr ${AutoStopIdleTimeInMinutes} \* 60`
+                echo "Starting the SageMaker autostop script in cron"
+                (crontab -l 2>/dev/null; echo "*/1 * * * * /usr/bin/python /usr/local/bin/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/autostop.log") | crontab -
+              fi
 
 Outputs:
   NotebookInstanceName:

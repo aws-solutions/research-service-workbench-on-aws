@@ -151,9 +151,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {
-    const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
-      Bucket: name
-    };
     const s3BucketArn: string = `arn:aws:s3:::${name}`;
     const accountId: string = this._awsAccountIdFromArn(accessPointArn);
 
@@ -174,13 +171,23 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       }`)
     );
 
-    const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
-      getBucketPolicyConfig
-    );
+    let bucketPolicyResponse: GetBucketPolicyCommandOutput;
     let bucketPolicy: PolicyDocument;
-    if (bucketPolicyResponse.Policy) {
-      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
-    } else {
+
+    try {
+      const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
+        Bucket: name
+      };
+
+      bucketPolicyResponse = await this._aws.clients.s3.getBucketPolicy(getBucketPolicyConfig);
+
+      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
+    } catch (err) {
+      if (err.name !== 'NoSuchBucketPolicy')
+        throw new Error(
+          `Encountered an error while getting bucket policy for bucket ${name}. Error: ${err.name}`
+        );
+
       bucketPolicy = new PolicyDocument();
     }
 
