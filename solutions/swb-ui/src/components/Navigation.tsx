@@ -23,11 +23,13 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
     },
     { type: 'link', text: t('Users'), href: '/users' },
     { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' }
+    { type: 'link', text: t('Datasets'), href: '/datasets' },
+    { type: 'link', text: t('Workspace Types'), href: '/environmentstype' }
   ];
   const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     { type: 'link', text: t('Workspaces'), href: '/environments' },
     { type: 'link', text: t('Datasets'), href: '/datasets' },
+    { type: 'link', text: t('Workspace Types'), href: '/environmentstype' },
     {
       type: 'section',
       text: t('Dashboards'),
