@@ -58,14 +58,10 @@ export async function handler(event: any) {
   status = _.get(event.detail, statusLocation[source]);
 
   if (source === 'automation') {
-    console.log('ZZZ: Inside automation');
     // For when events arise from launch/terminate operations (SSM docs)
     const envType = event.detail.EnvType;
-    console.log('ZZZ: envTypeRecordOutputKeys', envTypeRecordOutputKeys);
-    console.log('ZZZ: envType', envType);
     recordOutputKeys.instanceName = envTypeRecordOutputKeys[envType].instanceNameRecordKey;
     recordOutputKeys.instanceArn = envTypeRecordOutputKeys[envType].instanceArnRecordKey;
-    console.log('recordOutputKeys', recordOutputKeys);
   } else {
     // For when events arise from start/stop operations (not from SSM docs)
     if (_.includes(Object.keys(alternateStatuses[source]), status))
