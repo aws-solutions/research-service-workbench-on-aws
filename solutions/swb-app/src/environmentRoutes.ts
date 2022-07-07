@@ -11,9 +11,7 @@ export function setUpEnvRoutes(
   environments: { [key: string]: Environment },
   environmentService: EnvironmentService
 ): void {
-  const supportedEnvs = Object.keys(environments).map((env) => {
-    return env.toLocaleLowerCase();
-  });
+  const supportedEnvs = Object.keys(environments);
 
   async function getEnvironmentType(envId: string): Promise<string> {
     const env = await environmentService.getEnvironment(envId, true);

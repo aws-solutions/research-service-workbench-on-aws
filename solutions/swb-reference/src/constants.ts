@@ -33,11 +33,8 @@ function getConstants(): {
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const PCLUSTER_API_URL = config.parallelClusterApiURL;
-
   const AMI_IDS: string[] = [];
-
   // These are the OutputKey for the SWB Main Account CFN stack
-
   const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';

@@ -23,7 +23,6 @@ describe('EnvironmentService', () => {
     jest.clearAllMocks();
     ddbMock.reset();
   });
-
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
   const TABLE_NAME = 'exampleDDBTable';
   const envService = new EnvironmentService({ TABLE_NAME });

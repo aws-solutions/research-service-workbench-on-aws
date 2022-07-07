@@ -21,7 +21,6 @@ export class SWBStack extends Stack {
     STAGE: string;
     STACK_NAME: string;
     SSM_DOC_NAME_SUFFIX: string;
-
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;

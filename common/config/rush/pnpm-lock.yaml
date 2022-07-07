@@ -273,8 +273,6 @@ importers:
       aws-lambda: ^1.0.7
       aws-sdk-client-mock: ^0.6.2
       aws4: ^1.11.0
-      aws4-axios: ^2.4.9
-      axios: ^0.27.1
       cdk-ssm-document: ^3.1.1
       constructs: ^10.0.0
       depcheck: ^1.4.3
@@ -308,8 +306,6 @@ importers:
       '@vendia/serverless-express': 4.8.2
       aws-sdk-client-mock: 0.6.2_186c47bf154802e3879e62ee3def12b3
       aws4: 1.11.0
-      aws4-axios: 2.4.9_axios@0.27.2
-      axios: 0.27.2
       express: 4.18.1
       https: 1.0.0
       js-yaml: 4.1.0
@@ -5860,6 +5856,7 @@ packages:
     resolution: {integrity: sha512-x0f96eBPrCCJzJxdPbUvDFRva4yPpINJzTuXXpmS2j9qLUpF2nyGzvXPlRziuGbCsPukwY4JfuO+8xwsoZLzGw==}
     dependencies:
       '@types/node': 14.18.21
+    dev: true
 
   /@types/babel__core/7.1.19:
     resolution: {integrity: sha512-WEOTgRsbYkvA/KCsDwVEGkd7WAr1e3g31VHQ8zy5gul/V1qKullU/BU5I68X5v7V3GnB9eotmom4v5a5gjxorw==}
@@ -6787,20 +6784,6 @@ packages:
       uuid: 8.0.0
       xml2js: 0.4.19
     dev: true
-
-  /aws4-axios/2.4.9_axios@0.27.2:
-    resolution: {integrity: sha512-egAUTk8oLdsb5OGa+BI30PBa4lZh3tOO0q2YL99Gq8lyY8s08bt81jF8ekOuY+ZP98bfB5wHJhKStVhvRRjT7Q==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      axios: '>=0.25.0'
-    dependencies:
-      '@aws-sdk/client-sts': 3.118.1
-      '@types/aws4': 1.11.2
-      aws4: 1.11.0
-      axios: 0.27.2
-    transitivePeerDependencies:
-      - aws-crt
-    dev: false
 
   /aws4/1.11.0:
     resolution: {integrity: sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==}

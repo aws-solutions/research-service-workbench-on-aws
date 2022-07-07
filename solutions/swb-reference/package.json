@@ -54,8 +54,6 @@
     "@vendia/serverless-express": "^4.5.4",
     "aws-sdk-client-mock": "^0.6.2",
     "aws4": "^1.11.0",
-    "aws4-axios": "^2.4.9",
-    "axios": "^0.27.1",
     "express": "^4.17.3",
     "https": "^1.0.0",
     "js-yaml": "^4.1.0",

@@ -3,7 +3,6 @@ import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-ser
 import { mockClient } from 'aws-sdk-client-mock';
 import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
 import { EnvironmentService, Environment } from './environmentService';
-
 import EventBridgeEventToDDB from './eventBridgeEventToDDB';
 import StatusHandler from './statusHandler';
 
@@ -104,7 +103,6 @@ describe('StatusHandler', () => {
 
   test('execute does not return an error on Launch operation even when event older than last update', async () => {
     // BUILD
-
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });

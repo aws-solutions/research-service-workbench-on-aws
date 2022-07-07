@@ -59,6 +59,9 @@ export default class ProjectService {
     }
   }
 
+  /**
+   * Get all projects
+   */
   public async getProjects(): Promise<{ data: Project[] }> {
     const queryParams = {
       key: { name: 'resourceType', value: this._resourceType },
