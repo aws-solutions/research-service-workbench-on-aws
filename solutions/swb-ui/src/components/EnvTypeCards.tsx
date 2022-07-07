@@ -17,7 +17,7 @@ interface OnSelectEnvTypeFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeItem>): void;
 }
 export interface EnvTypesProps {
-  OnSelect: OnSelectEnvTypeFunction;
+  onSelect: OnSelectEnvTypeFunction;
   allItems: EnvTypeItem[];
   selectedItem?: string;
   isLoading?: boolean;
@@ -36,13 +36,9 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       filteringFunction: (item: any, filteringText: string): any => {
         const filteringTextLowerCase = filteringText.toLowerCase();
-        return (
-          searchableColumns
-            // eslint-disable-next-line security/detect-object-injection
-            .map((key) => item[key])
-            .some(
-              (value) => typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
-            )
+        return searchableColumns.some(
+          (key) =>
+            typeof item[key] === 'string' && item[key].toLowerCase().indexOf(filteringTextLowerCase) > -1
         );
       }
     },
@@ -58,7 +54,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
       loadingText="Loading Compute Platforms"
       onSelectionChange={({ detail }) => {
         setSelectedItems((prevState) => detail.selectedItems);
-        props.OnSelect(detail);
+        props.onSelect(detail);
       }}
       selectedItems={selectedItems}
       cardDefinition={{

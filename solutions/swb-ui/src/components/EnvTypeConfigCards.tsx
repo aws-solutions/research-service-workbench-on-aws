@@ -7,7 +7,7 @@ interface OnSelectEnvTypeConfigFunction {
   (selection: CardsProps.SelectionChangeDetail<EnvTypeConfigItem>): void;
 }
 export interface EnvTypeConfigsProps {
-  OnSelect: OnSelectEnvTypeConfigFunction;
+  onSelect: OnSelectEnvTypeConfigFunction;
   allItems: EnvTypeConfigItem[];
   isLoading?: boolean;
 }
@@ -23,7 +23,7 @@ export default function EnvTypeConfigCards(props: EnvTypeConfigsProps): JSX.Elem
     <Cards
       onSelectionChange={({ detail }) => {
         setSelectedItems(detail.selectedItems);
-        props.OnSelect(detail);
+        props.onSelect(detail);
       }}
       selectedItems={selectedItems}
       cardDefinition={{

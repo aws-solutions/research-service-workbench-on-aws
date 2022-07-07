@@ -25,7 +25,7 @@ export type EnvironmentStatus = 'STOPPED' | 'STOPPING' | 'FAILED' | 'COMPLETED' 
 export interface CreateEnvironmentForm {
   envTypeId?: string;
   name?: string;
-  restrictedCIDR?: string;
+  cidr?: string;
   projectId?: string;
   envTypeConfigId?: string;
   description?: string;
@@ -36,7 +36,7 @@ export interface CreateEnvironmentForm {
 export interface CreateEnvironmentFormValidation {
   envTypeIdError?: string;
   nameError?: string;
-  restrictedCIDRError?: string;
+  cidrError?: string;
   projectIdError?: string;
   envTypeConfigIdError?: string;
   descriptionError?: string;

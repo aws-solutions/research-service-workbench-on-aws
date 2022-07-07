@@ -55,7 +55,7 @@ const Environment: NextPage = () => {
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
-  const OnSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
+  const onSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
     setselectedEnvType(selected);
     setFormData({
@@ -65,10 +65,13 @@ const Environment: NextPage = () => {
       envType: selected?.type,
       datasetIds: []
     });
+    validateField('envType', selected?.id);
+    validateField('envTypeConfigId', undefined);
   };
-  const OnSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
+  const onSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
     const selected = (selection && selection.at(0)) || undefined;
     setFormData({ ...formData, envTypeConfigId: selected?.id });
+    validateField('envTypeConfigId', selected?.id);
   };
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
@@ -106,19 +109,19 @@ const Environment: NextPage = () => {
       message: 'Workspace Name cannot be longer than 128 characters'
     },
     {
-      field: 'restrictedCIDR',
+      field: 'cidr',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a,
-      message: 'restrictedCIDR is Required'
+      message: 'Restricted CIDR is Required'
     },
     {
-      field: 'restrictedCIDR',
+      field: 'cidr',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && cidrRegex.test(a),
       message: 'Restricted CIDR must be in the format range:  [1.0.0.0/0 - 255.255.255.255/32].'
     },
     {
-      field: 'restrictedCIDR',
+      field: 'cidr',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Restricted CIDR cannot be longer than 128 characters'
@@ -148,10 +151,10 @@ const Environment: NextPage = () => {
       message: 'Description cannot be longer than 500 characters'
     }
   ];
-  const validateField = (field: keyof CreateEnvironmentForm): boolean => {
+  const validateField = (field: keyof CreateEnvironmentForm, value: any): boolean => {
     for (const rule of validationRules.filter((f) => f.field === field)) {
       // eslint-disable-next-line security/detect-object-injection
-      if (!rule.condition(formData[field])) {
+      if (!rule.condition(value)) {
         setFormErrors((prevState: CreateEnvironmentFormValidation) => ({
           ...prevState,
           [`${field}Error`]: rule.message
@@ -185,15 +188,6 @@ const Environment: NextPage = () => {
     setDisableSubmit(
       !validationRules.every((rule) => rule.condition(formData[rule.field as keyof CreateEnvironmentForm]))
     );
-    if (formData && Object.keys(formData).length !== 0) {
-      //show validations only when there is an interaction with user
-      validateField('envTypeConfigId');
-      validateField('envTypeId');
-      validateField('name');
-      validateField('description');
-      validateField('projectId');
-      validateField('restrictedCIDR');
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
   return (
@@ -256,7 +250,7 @@ const Environment: NextPage = () => {
                       <EnvTypeCards
                         isLoading={areEnvTypesLoading}
                         allItems={envTypes}
-                        OnSelect={async (selected) => await OnSelectEnvType(selected.selectedItems)}
+                        onSelect={async (selected) => await onSelectEnvType(selected.selectedItems)}
                       />
                     </FormField>
                   </ExpandableSection>
@@ -281,20 +275,24 @@ const Environment: NextPage = () => {
                       >
                         <Input
                           value={formData?.name || ''}
-                          onChange={({ detail: { value } }) => setFormData({ ...formData, name: value })}
+                          onChange={({ detail: { value } }) => {
+                            setFormData({ ...formData, name: value });
+                            validateField('name', value);
+                          }}
                         />
                       </FormField>
                       <FormField
                         label="Restricted CIDR"
                         description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
                         constraintText="Note: an environment config with a hardcoded CIDR will override this value."
-                        errorText={formErrors?.restrictedCIDRError}
+                        errorText={formErrors?.cidrError}
                       >
                         <Input
-                          value={formData?.restrictedCIDR || ''}
-                          onChange={({ detail: { value } }) =>
-                            setFormData({ ...formData, restrictedCIDR: value })
-                          }
+                          value={formData?.cidr || ''}
+                          onChange={({ detail: { value } }) => {
+                            setFormData({ ...formData, cidr: value });
+                            validateField('cidr', value);
+                          }}
                         />
                       </FormField>
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
@@ -312,6 +310,7 @@ const Environment: NextPage = () => {
                           selectedAriaLabel={formData?.projectId}
                           onChange={({ detail: { selectedOption } }) => {
                             setFormData({ ...formData, projectId: selectedOption.value });
+                            validateField('projectId', selectedOption.value);
                           }}
                           statusType={areProjectsLoading ? 'loading' : 'finished'}
                         />
@@ -323,7 +322,9 @@ const Environment: NextPage = () => {
                         <EnvTypeConfigCards
                           isLoading={areEnvTypeConfigsLoading}
                           allItems={envTypeConfigs}
-                          OnSelect={(selected) => OnSelectEnvTypeConfig(selected.selectedItems)}
+                          onSelect={(selected) => {
+                            onSelectEnvTypeConfig(selected.selectedItems);
+                          }}
                         />
                       </FormField>
                       <FormField
@@ -332,9 +333,10 @@ const Environment: NextPage = () => {
                         errorText={formErrors?.descriptionError}
                       >
                         <Textarea
-                          onChange={({ detail: { value } }) =>
-                            setFormData({ ...formData, description: value })
-                          }
+                          onChange={({ detail: { value } }) => {
+                            setFormData({ ...formData, description: value });
+                            validateField('description', value);
+                          }}
                           value={formData?.description || ''}
                           placeholder="Description"
                         />
