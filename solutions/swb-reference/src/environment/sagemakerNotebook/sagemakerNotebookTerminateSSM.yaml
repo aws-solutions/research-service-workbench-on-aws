@@ -1,4 +1,4 @@
-description: SSM document to terminate a Sagemaker instance
+description: SSM document to terminate a Sagemaker Notebook instance
 schemaVersion: '0.3'
 parameters:
   ProvisionedProductId:
@@ -11,7 +11,7 @@ parameters:
     type: String
     description: 'The ID of the environment resource stored in DDB'
 mainSteps:
-  - name: TerminateSagemaker
+  - name: Terminate
     action: 'aws:executeAwsApi'
     maxAttempts: 3
     timeoutSeconds: 30
@@ -31,7 +31,7 @@ mainSteps:
     inputs:
       Service: servicecatalog
       Api: DescribeRecord
-      Id: '{{ TerminateSagemaker.RecordId }}'
+      Id: '{{ Terminate.RecordId }}'
       DesiredValues:
         - SUCCEEDED
         - FAILED
@@ -43,7 +43,7 @@ mainSteps:
     inputs:
       Service: servicecatalog
       Api: DescribeRecord
-      Id: '{{ TerminateSagemaker.RecordId }}'
+      Id: '{{ Terminate.RecordId }}'
     outputs:
       - Name: ProductStatus
         Type: String
@@ -69,7 +69,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATED" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ Terminate.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Terminate", "Status": "TERMINATED" }'
           DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
@@ -80,7 +80,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ TerminateSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "ErrorMessage": {{ GetRecordDetail.ErrorMessage }} }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ Terminate.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "ErrorMessage": {{ GetRecordDetail.ErrorMessage }} }'
           DetailType: 'Terminate'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

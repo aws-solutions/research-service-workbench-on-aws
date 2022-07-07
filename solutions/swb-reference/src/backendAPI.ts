@@ -19,8 +19,8 @@ import {
 } from '@amzn/workbench-core-datasets';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Express } from 'express';
-import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
-import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
+import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
+import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({ region: 'us-east-1', ddbTableName: process.env.STACK_NAME! });
@@ -31,13 +31,13 @@ const apiRouteConfig: ApiRouteConfig = {
       path: '/foo',
       serviceAction: 'launch',
       httpMethod: 'post',
-      service: new SagemakerEnvironmentLifecycleService()
+      service: new SagemakerNotebookEnvironmentLifecycleService()
     }
   ],
   environments: {
-    sagemaker: {
-      lifecycle: new SagemakerEnvironmentLifecycleService(),
-      connection: new SagemakerEnvironmentConnectionService()
+    sagemakerNotebook: {
+      lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
+      connection: new SagemakerNotebookEnvironmentConnectionService()
     }
 
     // Add your environment types here as follows:

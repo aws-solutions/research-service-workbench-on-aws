@@ -27,7 +27,8 @@ export async function handler(event: any) {
   // Various environment types indicate instance names and ARNs differently in ServiceCatalog record outputs
   // This is to standardize each of them
   const envTypeRecordOutputKeys: { [id: string]: { [id: string]: string } } = {
-    sagemaker: {
+    // This is the `envType` defined in the "LaunchSSM.yaml" SSM document
+    sagemakerNotebook: {
       instanceNameRecordKey: 'NotebookInstanceName',
       instanceArnRecordKey: 'NotebookArn'
     }
@@ -58,7 +59,7 @@ export async function handler(event: any) {
 
   if (source === 'automation') {
     // For when events arise from launch/terminate operations (SSM docs)
-    const envType = event.detail.EnvType.toLowerCase();
+    const envType = event.detail.EnvType;
     recordOutputKeys.instanceName = envTypeRecordOutputKeys[envType].instanceNameRecordKey;
     recordOutputKeys.instanceArn = envTypeRecordOutputKeys[envType].instanceArnRecordKey;
   } else {

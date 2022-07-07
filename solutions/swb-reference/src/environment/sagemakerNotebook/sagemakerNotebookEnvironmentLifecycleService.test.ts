@@ -5,9 +5,9 @@ const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
 import { EnvironmentLifecycleHelper, EnvironmentService, Environment } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
-import SagemakerEnvironmentLifecycleService from './sagemakerEnvironmentLifecycleService';
+import SagemakerNotebookEnvironmentLifecycleService from './sagemakerNotebookEnvironmentLifecycleService';
 
-describe('SagemakerEnvironmentLifecycleService', () => {
+describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   let environment: Environment;
   beforeEach(() => {
@@ -102,7 +102,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 
-    const sm = new SagemakerEnvironmentLifecycleService();
+    const sm = new SagemakerNotebookEnvironmentLifecycleService();
     sm.helper = envHelper;
     const response = await sm.launch(environment);
     expect(response).toEqual({ ...environment, status: 'PENDING' });
@@ -129,7 +129,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
 
-    const sm = new SagemakerEnvironmentLifecycleService();
+    const sm = new SagemakerNotebookEnvironmentLifecycleService();
     sm.helper = envHelper;
     sm.envService = envService;
     const response = await sm.terminate(environment.id!);
@@ -137,7 +137,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
   });
 
   test('Start should operate as expected', async () => {
-    const sm = new SagemakerEnvironmentLifecycleService();
+    const sm = new SagemakerNotebookEnvironmentLifecycleService();
     const hostSdk = new AwsService({ region: process.env.AWS_REGION! });
     hostSdk.clients.sagemaker.startNotebookInstance = jest.fn();
     const envHelper = new EnvironmentLifecycleHelper();
@@ -151,7 +151,7 @@ describe('SagemakerEnvironmentLifecycleService', () => {
     await expect(sm.start('6e185c8c-caeb-4305-8f08-d408b316dca7')).resolves.not.toThrowError();
   });
   test('Stop should operate as expected', async () => {
-    const sm = new SagemakerEnvironmentLifecycleService();
+    const sm = new SagemakerNotebookEnvironmentLifecycleService();
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     const hostSdk = new AwsService({ region: process.env.AWS_REGION! });
     hostSdk.clients.sagemaker.stopNotebookInstance = jest.fn();

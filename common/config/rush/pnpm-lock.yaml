@@ -181,6 +181,126 @@ importers:
       ts-node: 10.8.1_01f4831a90327c4fa15ca04ce3a26ce1
       typescript: 4.7.4
 
+  ../../solutions/managed-blockchain-for-patient-consent/patient-consent-express:
+    specifiers:
+      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
+      '@rushstack/eslint-config': ^2.5.1
+      '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
+      '@rushstack/heft-node-rig': ^1.7.1
+      '@types/express': ^4.17.13
+      '@types/heft-jest': 1.0.2
+      '@types/node': ^14
+      depcheck: ^1.4.3
+      eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
+      eslint-plugin-security: ^1.4.0
+      express: ^4.17.3
+      npm-package-json-lint: ^6.3.0
+      npm-package-json-lint-config-default: ^5.0.0
+      sort-package-json: ^1.57.0
+      typescript: ^4.5.2
+    dependencies:
+      '@amzn/workbench-core-audit': link:../../../workbench-core/audit
+      '@amzn/workbench-core-logging': link:../../../workbench-core/logging
+    devDependencies:
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../../workbench-core/eslint-custom
+      '@rushstack/eslint-config': 2.6.2_eslint@8.18.0+typescript@4.7.4
+      '@rushstack/heft': 0.45.14
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.14
+      '@rushstack/heft-node-rig': 1.9.15_@rushstack+heft@0.45.14
+      '@types/express': 4.17.13
+      '@types/heft-jest': 1.0.2
+      '@types/node': 14.18.21
+      depcheck: 1.4.3
+      eslint: 8.18.0
+      eslint-plugin-import: 2.26.0_eslint@8.18.0
+      eslint-plugin-security: 1.5.0
+      express: 4.18.1
+      npm-package-json-lint: 6.3.0
+      npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
+      sort-package-json: 1.57.0
+      typescript: 4.7.4
+
+  ../../solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure:
+    specifiers:
+      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/patient-consent-express': workspace:*
+      '@aws-cdk/assert': ^2.0.0
+      '@aws-sdk/client-s3': ^3.118.1
+      '@aws-sdk/types': ^3.110.0
+      '@rushstack/eslint-config': ^2.5.1
+      '@rushstack/heft': ^0.45.0
+      '@rushstack/heft-jest-plugin': ^0.2.3
+      '@rushstack/heft-node-rig': ^1.7.1
+      '@types/aws-lambda': ^8.10.92
+      '@types/express': ^4.17.13
+      '@types/heft-jest': 1.0.2
+      '@types/lodash': ^4.14.181
+      '@types/node': ^14
+      '@vendia/serverless-express': ^4.5.4
+      aws-cdk: ^2.12.0
+      aws-cdk-lib: ^2.29.1
+      aws-sdk-client-mock: ^0.6.2
+      axios: ^0.27.1
+      cdk-nag: ^2.12.25
+      constructs: ^10.0.0
+      depcheck: ^1.4.3
+      esbuild: ^0.14.21
+      eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
+      eslint-plugin-security: ^1.4.0
+      express: ^4.17.3
+      istanbul-badges-readme: 1.8.1
+      jest: ^27.5.1
+      lodash: ^4.17.21
+      npm-package-json-lint: ^6.3.0
+      npm-package-json-lint-config-default: ^5.0.0
+      pnpm: ^7.4.0
+      sort-package-json: ^1.57.0
+      source-map-support: ^0.5.16
+      typescript: ^4.5.2
+    dependencies:
+      '@aws-sdk/client-s3': 3.118.1
+      '@aws-sdk/types': 3.110.0
+      aws-cdk-lib: 2.29.1_constructs@10.1.42
+      constructs: 10.1.42
+      lodash: 4.17.21
+      pnpm: 7.4.0
+      source-map-support: 0.5.21
+    devDependencies:
+      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../../workbench-core/eslint-custom
+      '@amzn/patient-consent-express': link:../patient-consent-express
+      '@aws-cdk/assert': 2.29.1_eec81a5d0d39660f74aa9ce6545ce701
+      '@rushstack/eslint-config': 2.6.2_eslint@8.18.0+typescript@4.7.4
+      '@rushstack/heft': 0.45.14
+      '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.14
+      '@rushstack/heft-node-rig': 1.9.15_@rushstack+heft@0.45.14
+      '@types/aws-lambda': 8.10.101
+      '@types/express': 4.17.13
+      '@types/heft-jest': 1.0.2
+      '@types/lodash': 4.14.182
+      '@types/node': 14.18.21
+      '@vendia/serverless-express': 4.8.2
+      aws-cdk: 2.29.1
+      aws-sdk-client-mock: 0.6.2_186c47bf154802e3879e62ee3def12b3
+      axios: 0.27.2
+      cdk-nag: 2.14.47_b58070d5c904f2e35eeee41952391c50
+      depcheck: 1.4.3
+      esbuild: 0.14.47
+      eslint: 8.18.0
+      eslint-plugin-import: 2.26.0_eslint@8.18.0
+      eslint-plugin-security: 1.5.0
+      express: 4.18.1
+      istanbul-badges-readme: 1.8.1
+      jest: 27.5.1
+      npm-package-json-lint: 6.3.0
+      npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
+      sort-package-json: 1.57.0
+      typescript: 4.7.4
+
   ../../solutions/swb-app:
     specifiers:
       '@amzn/environments': workspace:*
@@ -12549,6 +12669,11 @@ packages:
       irregular-plurals: 3.3.0
     dev: true
 
+  /pnpm/7.4.0:
+    resolution: {integrity: sha512-mlV8dw6b9Ta+u+zhJeBDvf4Io+g9Vg8esCxdfUcVhai00wzrLaAJ7TNE67dzHHukkQZ3nuHmdWqQxvtkrBa5Ig==}
+    engines: {node: '>=14.6'}
+    hasBin: true
+    dev: false
   /posix-character-classes/0.1.1:
     resolution: {integrity: sha512-xTgYBc3fuo7Yt7JbiuFxSYGToMoz8fLoE6TC9Wx1P/u+LfeThMOAqmuyECnlBaaJb+u1m9hHiXUEtwW4OzfUJg==}
     engines: {node: '>=0.10.0'}

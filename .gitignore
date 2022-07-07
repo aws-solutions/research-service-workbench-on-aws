@@ -104,3 +104,6 @@ solutions/managed-blockchain-for-patient-consent/*/build
 
 # example package
 workbench-core/example/infrastructure/build
+
+#patient consent app cdk-outputs
+solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/cdk-outputs.json
