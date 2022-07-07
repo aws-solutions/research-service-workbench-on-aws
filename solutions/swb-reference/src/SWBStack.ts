@@ -152,7 +152,7 @@ export class SWBStack extends Stack {
         })
       ]
     });
-    const sagemakerPolicy = new PolicyDocument({
+    const sagemakerNotebookPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
           actions: [
@@ -211,7 +211,7 @@ export class SWBStack extends Stack {
       roleName: `${this.stackName}-LaunchConstraint`,
       description: 'Launch constraint role for Service Catalog products',
       inlinePolicies: {
-        sagemakerLaunchPermissions: sagemakerPolicy,
+        sagemakerNotebookLaunchPermissions: sagemakerNotebookPolicy,
         commonScManagement
       }
     });
@@ -239,7 +239,8 @@ export class SWBStack extends Stack {
       handler: 'statusHandlerLambda.handler',
       runtime: Runtime.NODEJS_14_X,
       environment: this.lambdaEnvVars,
-      timeout: Duration.seconds(60)
+      timeout: Duration.seconds(60),
+      memorySize: 256
     });
 
     statusHandlerLambda.addPermission('RouteHostEvents', {

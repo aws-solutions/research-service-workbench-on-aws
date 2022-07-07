@@ -1,4 +1,4 @@
-description: SSM document to provision a Sagemaker instance
+description: SSM document to provision a Sagemaker Notebook instance
 assumeRole: ''
 schemaVersion: '0.3'
 parameters:
@@ -47,7 +47,7 @@ parameters:
     type: String
     description: Stringified array of dataset objects containing their mountString
 mainSteps:
-  - name: LaunchSagemaker
+  - name: Launch
     action: 'aws:executeAwsApi'
     maxAttempts: 3
     timeoutSeconds: 30
@@ -99,7 +99,7 @@ mainSteps:
     inputs:
       Service: servicecatalog
       Api: DescribeProvisionedProduct
-      Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
+      Id: '{{ Launch.ProvisionedProductId }}'
       DesiredValues:
         - AVAILABLE
         - ERROR
@@ -111,7 +111,7 @@ mainSteps:
     inputs:
       Service: servicecatalog
       Api: DescribeProvisionedProduct
-      Id: '{{ LaunchSagemaker.ProvisionedProductId }}'
+      Id: '{{ Launch.ProvisionedProductId }}'
     outputs:
       - Name: ProductStatus
         Type: String
@@ -137,7 +137,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "COMPLETED" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ Launch.ProvisionedProductId }}", "RecordId": "{{ Launch.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Launch", "Status": "COMPLETED" }'
           DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda
@@ -148,7 +148,7 @@ mainSteps:
       Service: events
       Api: PutEvents
       Entries:
-        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ LaunchSagemaker.ProvisionedProductId }}", "RecordId": "{{ LaunchSagemaker.RecordId }}", "EnvType": "Sagemaker", "Operation": "Launch", "Status": "FAILED", "ErrorMessage": "{{ GetProvisionedProductDetail.ErrorMessage }}" }'
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ Launch.ProvisionedProductId }}", "RecordId": "{{ Launch.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Launch", "Status": "FAILED", "ErrorMessage": "{{ GetProvisionedProductDetail.ErrorMessage }}" }'
           DetailType: 'Launch'
           EventBusName: 'default'
           Source: 'automation' # This is being used for updating env in statusHandler lambda

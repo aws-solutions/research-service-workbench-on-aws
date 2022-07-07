@@ -66,7 +66,7 @@ describe('ServiceCatalogSetup', () => {
       sc['_createSCPortfolio'] = jest.fn().mockResolvedValue('port-abc');
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
-        .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
+        .mockResolvedValue({ sagemakerNotebook: 'environments/sagemaker.cfn.yaml' });
       sc['_uploadTemplateToS3'] = jest.fn().mockResolvedValue({});
       sc['_getProductId'] = jest.fn().mockResolvedValue(undefined);
       sc['_addProductsToPortfolio'] = jest.fn().mockResolvedValue('prod-123');
@@ -88,7 +88,7 @@ describe('ServiceCatalogSetup', () => {
       });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
-        .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
+        .mockResolvedValue({ sagemakerNotebook: 'environments/sagemaker.cfn.yaml' });
       sc['_uploadTemplateToS3'] = jest.fn().mockResolvedValue({});
       sc['_getProductId'] = jest.fn().mockResolvedValue(undefined);
       sc['_addProductsToPortfolio'] = jest.fn().mockResolvedValue('prod-123');
@@ -110,7 +110,7 @@ describe('ServiceCatalogSetup', () => {
       });
       sc['_getEnvTypeToUpdate'] = jest
         .fn()
-        .mockResolvedValue({ sagemaker: 'environments/sagemaker.cfn.yaml' });
+        .mockResolvedValue({ sagemakerNotebook: 'environments/sagemaker.cfn.yaml' });
       sc['_uploadTemplateToS3'] = jest.fn().mockResolvedValue({});
       sc['_getProductId'] = jest.fn().mockResolvedValue('prod-123');
       sc['_updateProduct'] = jest.fn().mockResolvedValue(undefined);
