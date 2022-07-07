@@ -116,7 +116,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 
-    const sm = new SagemakerEnvironmentLifecycleService();
+    const sm = new SagemakerNotebookEnvironmentLifecycleService();
     sm.helper = envHelper;
     const response = await sm.launch(environment);
     expect(response).toEqual({ ...environment, status: 'PENDING' });
