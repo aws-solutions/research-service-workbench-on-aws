@@ -18,7 +18,7 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   AccessFromCIDRBlock:
     Type: String
-    Description: The CIDR used to access sagemaker
+    Description: The CIDR used to access sagemaker notebook
     Default: 10.0.0.0/19
   S3Mounts:
     Type: String
