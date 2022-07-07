@@ -8,7 +8,7 @@ const useEnvTypeConfigs = (id: string) => {
     httpApiGet
   );
   const envTypeConfigs: EnvTypeConfigItem[] = (data && data.data) || [];
-  return { envTypeConfigs, envTypeConfigsLoading: isValidating };
+  return { envTypeConfigs, areEnvTypeConfigsLoading: isValidating };
 };
 
 export { useEnvTypeConfigs };

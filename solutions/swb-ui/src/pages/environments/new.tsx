@@ -53,7 +53,7 @@ const Environment: NextPage = () => {
   const [formData, setFormData] = useState<CreateEnvironmentForm>({});
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
-  const { envTypeConfigs, envTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
+  const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
   const OnSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
@@ -321,7 +321,7 @@ const Environment: NextPage = () => {
                           Configuration ({envTypeConfigs.length}) <Link href="#">Info</Link>
                         </Header>
                         <EnvTypeConfigCards
-                          isLoading={envTypeConfigsLoading}
+                          isLoading={areEnvTypeConfigsLoading}
                           allItems={envTypeConfigs}
                           OnSelect={(selected) => OnSelectEnvTypeConfig(selected.selectedItems)}
                         />
