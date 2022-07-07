@@ -223,6 +223,7 @@ const Environment: NextPage = () => {
     <AppLayout
       id="environment"
       stickyNotifications
+      maxContentWidth={Number.MAX_VALUE}
       toolsHide
       ariaLabels={layoutLabels}
       navigation={<Navigation activeHref="#/" />}
@@ -316,10 +317,12 @@ const Environment: NextPage = () => {
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                         <Select
                           selectedOption={
-                            projects
-                              ?.map((p) => ({ label: p.name, value: p.id }))
-                              ?.filter((p) => p.value === formData?.projectId)
-                              ?.at(0) || null
+                            projectsLoading
+                              ? null
+                              : projects
+                                  .map((p) => ({ label: p.name, value: p.id }))
+                                  .filter((p) => p.value === formData?.projectId)
+                                  .at(0) || null
                           }
                           loadingText="Loading Projects"
                           options={projects.map((p) => ({ label: p.name, value: p.id }))}
@@ -361,7 +364,6 @@ const Environment: NextPage = () => {
         </Container>
       }
       contentType="form"
-      minContentWidth={1300}
     />
   );
 };
