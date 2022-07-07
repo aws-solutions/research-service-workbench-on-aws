@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   AppLayout,
   Box,
@@ -25,10 +24,10 @@ import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
 import { layoutLabels } from '../../common/labels';
+import { nameRegex, cidrRegex } from '../../common/utils';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
 import Navigation from '../../components/Navigation';
-import { useSettings } from '../../context/SettingsContext';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
 import { EnvTypeItem } from '../../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
@@ -46,11 +45,6 @@ export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<
 const Environment: NextPage = () => {
   // App settings constant
 
-  const { settings } = useSettings();
-  const [preferences] = useState({
-    pageSize: 20
-  });
-
   const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
@@ -58,14 +52,9 @@ const Environment: NextPage = () => {
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<CreateEnvironmentForm>({});
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
-  const { envTypes, envTypesLoading } = useEnvironmentType();
+  const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, envTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
-  const { projects, projectsLoading } = useProjects();
-  const nameRegex = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-]*$');
-  /* eslint-disable security/detect-unsafe-regex */
-  const cidrRegex = new RegExp(
-    '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[.]){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/(3[0-2]|[1-2][0-9]|[0-9]))$'
-  );
+  const { projects, areProjectsLoading } = useProjects();
   const OnSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
     setselectedEnvType(selected);
@@ -173,24 +162,9 @@ const Environment: NextPage = () => {
     setFormErrors((prevState: CreateEnvironmentFormValidation) => ({ ...prevState, [`${field}Error`]: '' }));
     return true;
   };
-
-  const validateForm = (): boolean => {
-    if (
-      validationRules.every((rule) => rule.condition(formData[rule.field as keyof CreateEnvironmentForm]))
-    ) {
-      setDisableSubmit(false);
-      return true;
-    }
-    setDisableSubmit(true);
-    return false;
-  };
   const submitForm = async (): Promise<void> => {
     setIsSubmitLoading(true);
     try {
-      if (!validateForm()) {
-        setError('Not all fields met the required specifications');
-        return;
-      }
       await createEnvironment(formData);
       await router.push({
         pathname: '/environments',
@@ -200,7 +174,7 @@ const Environment: NextPage = () => {
         }
       });
     } catch {
-      setError('There was a problem trying to create workspace.');
+      setError('There was a problem creating a workspace.');
     } finally {
       setIsSubmitLoading(false);
     }
@@ -208,7 +182,9 @@ const Environment: NextPage = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
 
   useEffect(() => {
-    validateForm();
+    setDisableSubmit(
+      !validationRules.every((rule) => rule.condition(formData[rule.field as keyof CreateEnvironmentForm]))
+    );
     if (formData && Object.keys(formData).length !== 0) {
       //show validations only when there is an interaction with user
       validateField('envTypeConfigId');
@@ -255,7 +231,7 @@ const Environment: NextPage = () => {
                       loading={isSubmitLoading}
                       onClick={async () => await submitForm()}
                     >
-                      Save Workspace
+                      Create Workspace
                     </Button>
                   </SpaceBetween>
                 }
@@ -278,7 +254,7 @@ const Environment: NextPage = () => {
                   >
                     <FormField errorText={formErrors?.envTypeIdError}>
                       <EnvTypeCards
-                        isLoading={envTypesLoading}
+                        isLoading={areEnvTypesLoading}
                         allItems={envTypes}
                         OnSelect={async (selected) => await OnSelectEnvType(selected.selectedItems)}
                       />
@@ -324,7 +300,7 @@ const Environment: NextPage = () => {
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                         <Select
                           selectedOption={
-                            projectsLoading
+                            areProjectsLoading
                               ? null
                               : projects
                                   .map((p) => ({ label: p.name, value: p.id }))
@@ -337,6 +313,7 @@ const Environment: NextPage = () => {
                           onChange={({ detail: { selectedOption } }) => {
                             setFormData({ ...formData, projectId: selectedOption.value });
                           }}
+                          statusType={areProjectsLoading ? 'loading' : 'finished'}
                         />
                       </FormField>
                       <FormField errorText={formErrors?.envTypeConfigIdError}>

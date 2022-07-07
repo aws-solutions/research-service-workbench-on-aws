@@ -7,7 +7,7 @@ const useEnvironmentType = () => {
   const envTypes: EnvTypeItem[] = ((data && data.data) || []).filter(
     (t: EnvTypeItem) => t.status === 'APPROVED'
   );
-  return { envTypes, envTypesLoading: isValidating };
+  return { envTypes, areEnvTypesLoading: isValidating };
 };
 
 export { useEnvironmentType };
