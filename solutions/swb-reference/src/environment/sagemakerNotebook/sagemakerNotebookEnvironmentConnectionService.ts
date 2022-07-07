@@ -1,7 +1,7 @@
 import { EnvironmentConnectionService } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 
-export default class SagemakerEnvironmentConnectionService implements EnvironmentConnectionService {
+export default class SagemakerNotebookEnvironmentConnectionService implements EnvironmentConnectionService {
   /**
    * Get credentials for connecting to the environment
    */

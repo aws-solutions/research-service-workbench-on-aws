@@ -1,7 +1,7 @@
 # Setup Instructions for SWBv2p1
 
-Follow the instructions below to deploy SWBv2 with Sagemaker lifecycle support. You'll be able to 
-launch/start/stop/terminate/connect to a Sagemaker instance.
+Follow the instructions below to deploy SWBv2 with Sagemaker Notebook lifecycle support. You'll be able to 
+launch/start/stop/terminate/connect to a Sagemaker Notebook instance.
 
 The following instructions are for setting up SWBv2 Part 1. In this version of the code, we have not finished 
 building all of the configuration APIs required for setting up SWBv2. Therefore, some of the steps will require manual edits to DDB. 
@@ -144,9 +144,9 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
 Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of
 the following values
-* productId: `Product ID` of `sagemaker` product
-* provisioningArtifactId: This value can be found by clicking on the `sagemaker` product. There should be one version of the 
-`sagemaker` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
+* productId: `Product ID` of `sagemakerNotebook` product
+* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the 
+`sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
 
 ```json
 {
@@ -156,7 +156,7 @@ the following values
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
     "allowRoleIds": [],
-    "type": "sagemaker",
+    "type": "sagemakerNotebook",
     "desc": "Description for config 1",
     "name": "Config 1",
     "owner": "abc",
@@ -186,7 +186,7 @@ the following values
 }
 ```
 
-If you would like to launch a sagemaker instance with a different instance type than `ml.t3.medium`, you can replace that value
+If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value
 in the JSON above.
 
 ### Setup API URL in client Application
@@ -229,7 +229,7 @@ is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account hand
 
 # Test the API
 
-**Launch Sagemaker Instance**
+**Launch Sagemaker Notebook Instance**
 
 In POSTMAN this is the `Launch Environment` API
 
@@ -243,7 +243,7 @@ POST `{{API_URL}}/environments`
     "envTypeConfigId": "envTypeConfig-123",
     "projectId": "proj-123",
     "datasetIds": [],
-    "envType": "sagemaker"
+    "envType": "sagemakerNotebook"
 }
 ```
 
@@ -265,7 +265,7 @@ In POSTMAN this is the `Get Connection` API. Under the `Path Variable` section, 
 
 GET `{{API_URL}}/environments/:id/connections`
 Replace `:id` with the `id` value from launching the environment. In the response you'll find a `url`. Copy and paste that `url`
-into the browser to view your Sagemaker instance.
+into the browser to view your Sagemaker Notebook instance.
 
 **Stop an Environment**
 

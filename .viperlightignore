@@ -15,10 +15,10 @@ cdk.out
 123456789012
 
 #Fake access key id used
-solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.js
-solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentLifecycleService.test.ts
-solutions/swb-reference/lib/environment/sagemaker/sagemakerEnvironmentConnectionService.test.js
-solutions/swb-reference/src/environment/sagemaker/sagemakerEnvironmentConnectionService.test.ts
+solutions/swb-reference/lib/environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService.test.js
+solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService.test.ts
+solutions/swb-reference/lib/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.js
+solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts
 workbench-core/environments/lib/utilities/environmentLifecycleHelper.test.js
 workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts
 
