@@ -1,12 +1,12 @@
 import { CreatePresignedNotebookInstanceUrlCommand, SageMakerClient } from '@aws-sdk/client-sagemaker';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
 import { mockClient } from 'aws-sdk-client-mock';
-import SagemakerEnvironmentConnectionService from './sagemakerEnvironmentConnectionService';
+import SagemakerNotebookEnvironmentConnectionService from './sagemakerNotebookEnvironmentConnectionService';
 
-describe('SagemakerEnvironmentConnectionService', () => {
+describe('SagemakerNotebookEnvironmentConnectionService', () => {
   test('getAuthCreds should return mocked value', async () => {
     // BUILD
-    const sm = new SagemakerEnvironmentConnectionService();
+    const sm = new SagemakerNotebookEnvironmentConnectionService();
     const instanceName = 'instance-abc123';
     const sagemakerMock = mockClient(SageMakerClient);
     const url = 'authorized-url-123';
@@ -36,7 +36,7 @@ describe('SagemakerEnvironmentConnectionService', () => {
   });
 
   test('getConnectionInstruction should return mocked value', async () => {
-    const sm = new SagemakerEnvironmentConnectionService();
+    const sm = new SagemakerNotebookEnvironmentConnectionService();
     await expect(sm.getConnectionInstruction()).resolves.toEqual(
       'Open the provided sagemaker url to access the Jupyter Notebook'
     );
