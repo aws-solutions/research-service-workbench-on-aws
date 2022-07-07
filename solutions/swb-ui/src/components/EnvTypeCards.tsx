@@ -38,6 +38,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
         const filteringTextLowerCase = filteringText.toLowerCase();
         return searchableColumns.some(
           (key) =>
+            // eslint-disable-next-line security/detect-object-injection
             typeof item[key] === 'string' && item[key].toLowerCase().indexOf(filteringTextLowerCase) > -1
         );
       }

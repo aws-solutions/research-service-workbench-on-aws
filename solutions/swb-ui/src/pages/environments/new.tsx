@@ -55,24 +55,6 @@ const Environment: NextPage = () => {
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
-  const onSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
-    const selected = (selection && selection.at(0)) || undefined;
-    setselectedEnvType(selected);
-    setFormData({
-      ...formData,
-      envTypeId: selected?.id,
-      envTypeConfigId: undefined,
-      envType: selected?.type,
-      datasetIds: []
-    });
-    validateField('envType', selected?.id);
-    validateField('envTypeConfigId', undefined);
-  };
-  const onSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
-    const selected = (selection && selection.at(0)) || undefined;
-    setFormData({ ...formData, envTypeConfigId: selected?.id });
-    validateField('envTypeConfigId', selected?.id);
-  };
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -151,6 +133,7 @@ const Environment: NextPage = () => {
       message: 'Description cannot be longer than 500 characters'
     }
   ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const validateField = (field: keyof CreateEnvironmentForm, value: any): boolean => {
     for (const rule of validationRules.filter((f) => f.field === field)) {
       // eslint-disable-next-line security/detect-object-injection
@@ -164,6 +147,24 @@ const Environment: NextPage = () => {
     }
     setFormErrors((prevState: CreateEnvironmentFormValidation) => ({ ...prevState, [`${field}Error`]: '' }));
     return true;
+  };
+  const onSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
+    const selected = (selection && selection.at(0)) || undefined;
+    setselectedEnvType(selected);
+    setFormData({
+      ...formData,
+      envTypeId: selected?.id,
+      envTypeConfigId: undefined,
+      envType: selected?.type,
+      datasetIds: []
+    });
+    validateField('envType', selected?.id);
+    validateField('envTypeConfigId', undefined);
+  };
+  const onSelectEnvTypeConfig = (selection: EnvTypeConfigItem[]): void => {
+    const selected = (selection && selection.at(0)) || undefined;
+    setFormData({ ...formData, envTypeConfigId: selected?.id });
+    validateField('envTypeConfigId', selected?.id);
   };
   const submitForm = async (): Promise<void> => {
     setIsSubmitLoading(true);
