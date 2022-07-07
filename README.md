@@ -12,7 +12,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-90.73%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.76%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.62%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-91.13%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-90.82%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.76%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.65%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-91.21%25-brightgreen.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -32,6 +32,8 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
+| [solutions/managed-blockchain-for-patient-consent/patient-consent-express](./solutions/managed-blockchain-for-patient-consent/patient-consent-express/) | [@amzn/patient-consent-express] | [README](./solutions/managed-blockchain-for-patient-consent/patient-consent-express/README.md)
+| [solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure](./solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/) | [@amzn/patient-consent-infrastructure] | [README](./solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/README.md)
 | [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
 | [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
 | [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
