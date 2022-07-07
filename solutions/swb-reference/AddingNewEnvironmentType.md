@@ -37,7 +37,7 @@ In this step we set up the workflow for managing environment launch and terminat
             type: String
             description: 'The size of the notebook instance coming from environment type config'
         mainSteps:
-          - name: Lsunvh
+          - name: Launch
             action: 'aws:executeAwsApi'
             inputs:
               Service: servicecatalog
