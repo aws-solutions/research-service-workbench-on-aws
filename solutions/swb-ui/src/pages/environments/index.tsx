@@ -25,22 +25,22 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
-import { useEnvironments, terminate, start, stop, connect } from '../api/environments';
-import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
-import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
-import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
-import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../common/splitPanel';
-import { getFilterCounterText } from '../common/tableCounterStrings';
-import { TableEmptyDisplay } from '../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../common/tableNoMatchState';
-import Navigation from '../components/Navigation';
-import { useSettings } from '../context/SettingsContext';
+import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
+import { datei18nStrings, relativeOptions } from '../../common/dateRelativeOptions';
+import { convertToAbsoluteRange, isValidRangeFunction } from '../../common/dateRelativeProperties';
+import { i18nStrings, paginationLables, layoutLabels } from '../../common/labels';
+import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../../common/splitPanel';
+import { getFilterCounterText } from '../../common/tableCounterStrings';
+import { TableEmptyDisplay } from '../../common/tableEmptyState';
+import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
+import Navigation from '../../components/Navigation';
+import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
   searchableColumns
-} from '../environments-table-config/workspacesColumnDefinitions';
-import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
-import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
+} from '../../environments-table-config/workspacesColumnDefinitions';
+import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
+import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
 
 export interface EnvironmentProps {
   locale: string;
@@ -71,11 +71,11 @@ const Environment: NextPage = () => {
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
       text: 'Service Workbench',
-      href: '#'
+      href: '/'
     },
     {
-      text: 'Login',
-      href: '#'
+      text: 'Workspaces',
+      href: '/environments'
     }
   ];
   // eslint-disable-next-line prefer-const
@@ -353,7 +353,7 @@ const Environment: NextPage = () => {
                         >
                           Terminate
                         </Button>
-                        <Button variant="primary" href="/environment">
+                        <Button variant="primary" href="/environments/new">
                           Create Workspace
                         </Button>
                       </SpaceBetween>

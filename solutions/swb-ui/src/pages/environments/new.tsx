@@ -20,18 +20,18 @@ import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { createEnvironment } from '../api/environments';
-import { useEnvTypeConfigs } from '../api/environmentTypeConfigs';
-import { useEnvironmentType } from '../api/environmentTypes';
-import { useProjects } from '../api/projects';
-import { layoutLabels } from '../common/labels';
-import EnvTypeCards from '../components/EnvTypeCards';
-import EnvTypeConfigCards from '../components/EnvTypeConfigCards';
-import Navigation from '../components/Navigation';
-import { useSettings } from '../context/SettingsContext';
-import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../models/Environment';
-import { EnvTypeItem } from '../models/EnvironmentType';
-import { EnvTypeConfigItem } from '../models/EnvironmentTypeConfig';
+import { createEnvironment } from '../../api/environments';
+import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
+import { useEnvironmentType } from '../../api/environmentTypes';
+import { useProjects } from '../../api/projects';
+import { layoutLabels } from '../../common/labels';
+import EnvTypeCards from '../../components/EnvTypeCards';
+import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
+import Navigation from '../../components/Navigation';
+import { useSettings } from '../../context/SettingsContext';
+import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
+import { EnvTypeItem } from '../../models/EnvironmentType';
+import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
 
 export interface EnvironmentProps {
   locale: string;
@@ -93,7 +93,7 @@ const Environment: NextPage = () => {
     },
     {
       text: 'Create Workspace',
-      href: '/environment'
+      href: '/environments/new'
     }
   ];
   const validationRules = [
@@ -205,6 +205,7 @@ const Environment: NextPage = () => {
       setIsSubmitLoading(false);
     }
   };
+  const [navigationOpen, setNavigationOpen] = useState(false);
 
   useEffect(() => {
     validateForm();
@@ -222,11 +223,17 @@ const Environment: NextPage = () => {
   return (
     <AppLayout
       id="environment"
+      headerSelector="#header"
       stickyNotifications
       maxContentWidth={Number.MAX_VALUE}
       toolsHide
       ariaLabels={layoutLabels}
+      navigationOpen={navigationOpen}
       navigation={<Navigation activeHref="#/" />}
+      onNavigationChange={({ detail }) => {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        setNavigationOpen(detail.open);
+      }}
       breadcrumbs={
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
       }
