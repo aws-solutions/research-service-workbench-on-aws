@@ -48,7 +48,7 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -259,8 +259,12 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cdk-ec2-key-pair",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -420,7 +424,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "swr",

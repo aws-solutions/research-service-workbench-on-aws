@@ -1,6 +1,5 @@
-import { ForbiddenError } from '@casl/ability';
 import { fc, itProp } from 'jest-fast-check';
-import { Operation, Permission, CASLAuthorizationPlugin } from '.';
+import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError } from '.';
 
 describe('CASL Authorization Plugin', () => {
   let caslAuthorizationPlugin: CASLAuthorizationPlugin;

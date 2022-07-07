@@ -66,11 +66,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   /**
    * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
-   * to the dataset prefix for a given external role.
+   * to the dataset prefix for a given external role if provided.
    * @param name - the name of the S3 bucket where the storage resides.
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
    * @param externalEndpointName - the name of the access pont to create.
-   * @param externalRoleName - the role which will be given access to the files under the prefix.
+   * @param ownerAccountId - the owning AWS account for the bucket.
+   * @param externalRoleName - an optional role which will be given access to the files under the prefix.
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
    * @returns a string representing the URI to the dataset root prefix.
    */
@@ -78,19 +79,23 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string,
+    ownerAccountId: string,
+    externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<string> {
-    const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName);
+    const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
     await this._configureBucketPolicy(name, accessPointArn);
-    await this._configureAccessPointPolicy(
-      name,
-      path,
-      externalEndpointName,
-      accessPointArn,
-      externalRoleName
-    );
-    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+
+    if (externalRoleName) {
+      await this._configureAccessPointPolicy(
+        name,
+        path,
+        externalEndpointName,
+        accessPointArn,
+        externalRoleName
+      );
+      if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+    }
     return `s3://${accessPointArn}/`;
   }
 
@@ -129,10 +134,15 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  private async _createAccessPoint(name: string, externalEndpointName: string): Promise<string> {
+  private async _createAccessPoint(
+    name: string,
+    externalEndpointName: string,
+    bucketAccount: string
+  ): Promise<string> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
-      Bucket: name
+      Bucket: name,
+      AccountId: bucketAccount
     };
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig

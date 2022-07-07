@@ -10,7 +10,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
-import environmentResourceTypeToKey from './environmentResourceTypeToKey';
+import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 

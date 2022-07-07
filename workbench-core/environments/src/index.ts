@@ -1,24 +1,24 @@
-import AccountHandler from './accountHandler';
-import AccountService from './accountService';
-import CognitoSetup from './cognitoSetup';
-import EnvironmentConnectionService from './environmentConnectionService';
-import EnvironmentLifecycleHelper from './environmentLifecycleHelper';
-import EnvironmentLifecycleService from './environmentLifecycleService';
-import { EnvironmentService, Environment } from './environmentService';
-import { EnvironmentStatus, isEnvironmentStatus } from './environmentStatus';
-import EnvironmentTypeConfigService from './environmentTypeConfigService';
-import EnvironmentTypeService from './environmentTypeService';
+import { EnvironmentStatus, isEnvironmentStatus } from './constants/environmentStatus';
 import {
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS
-} from './environmentTypeStatus';
-import EventBridgeEventToDDB from './eventBridgeEventToDDB';
-import HostingAccountLifecycleService from './hostingAccountLifecycleService';
-import HostingAccountService from './hostingAccountService';
-import ServiceCatalogSetup from './serviceCatalogSetup';
-import { SortAttribute, isSortAttribute } from './sortAttributes';
-import StatusHandler from './statusHandler';
+} from './constants/environmentTypeStatus';
+import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
+import AccountHandler from './handlers/accountHandler';
+import StatusHandler from './handlers/statusHandler';
+import EnvironmentConnectionService from './interfaces/environmentConnectionService';
+import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
+import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
+import CognitoSetup from './postDeployment/cognitoSetup';
+import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
+import AccountService from './services/accountService';
+import { EnvironmentService, Environment } from './services/environmentService';
+import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
+import EnvironmentTypeService from './services/environmentTypeService';
+import HostingAccountService from './services/hostingAccountService';
+import EnvironmentLifecycleHelper from './utilities/environmentLifecycleHelper';
+import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
 
 export {
   HostingAccountService,
