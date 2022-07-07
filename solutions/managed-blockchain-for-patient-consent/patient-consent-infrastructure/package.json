@@ -16,7 +16,7 @@
     "infrastructure": "lib/index.js"
   },
   "scripts": {
-    "build": "rushx compile && heft build --clean && rushx pkg-json-lint",
+    "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "rushx compile && heft test -u --clean --test-path-pattern infrastructure-stack && rushx pkg-json-lint && rushx make-badges",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
