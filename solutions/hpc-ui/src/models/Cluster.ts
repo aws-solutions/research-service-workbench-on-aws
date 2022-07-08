@@ -33,4 +33,12 @@ export type SSMCommandStatus = {
   StatusDetails: string;
 };
 
+export type JobParameters = {
+  command: string;
+  job_name: string;
+  nodes: number;
+  ntasks: number;
+  partition: string;
+};
+
 export type JobStatus = 'CONFIGURING' | 'STOPPING' | 'FAILED' | 'COMPLETED' | 'PENDING' | 'CANCELLED';

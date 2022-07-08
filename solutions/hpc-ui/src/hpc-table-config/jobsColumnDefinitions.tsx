@@ -5,7 +5,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     id: 'job_id',
     header: 'ID',
     cell: (e: { job_id: string }) => e.job_id,
-    sortingField: 'jobId'
+    sortingField: 'job_id'
   },
   {
     id: 'name',
@@ -33,7 +33,6 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     cell: (e: { job_state: string; start_time: number }) => {
       if (
         e.job_state === 'COMPLETED' ||
-        e.job_state === 'PENDING' ||
         e.job_state === 'RUNNING' ||
         e.job_state === 'FAILED' ||
         e.job_state === 'CANCELLED'
@@ -58,7 +57,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
 ];
 
 export const searchableColumns: string[] = [
-  'jobId',
+  'job_id',
   'name',
   'partition',
   'nodes',

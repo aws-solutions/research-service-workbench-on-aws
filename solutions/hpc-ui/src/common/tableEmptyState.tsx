@@ -8,9 +8,8 @@ import { Box } from '@awsui/components-react';
  * <Table empty={ TableEmptyDisplay("cluster") } />
  * // Displays "No clusters" title
  * // "No clusters to display."
- * // <Button> with "Create cluster" text
  * ```
- * @returns empty table information and call to action
+ * @returns empty table information
  */
 export function TableEmptyDisplay(itemType: string): JSX.Element {
   return (

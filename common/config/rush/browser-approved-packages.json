@@ -187,6 +187,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@reduxjs/toolkit",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -387,7 +391,15 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "react-redux",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react-scripts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "redux",
       "allowedCategories": [ "production" ]
     },
     {
