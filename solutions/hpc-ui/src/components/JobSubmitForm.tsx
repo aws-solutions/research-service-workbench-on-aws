@@ -1,7 +1,7 @@
-import { Box, Button, FormField, Header, Input, Modal, SpaceBetween } from '@awsui/components-react';
+import { useState } from 'react';
 import { submitJob } from '../api/hpc-clusters';
-import React from 'react';
-import { JobParameters } from '../models/Cluster';
+import { JobParameters } from '../models/HPC-UI-Types';
+import { Box, Button, FormField, Header, Input, Modal, SpaceBetween } from '@awsui/components-react';
 
 interface JobSubmitFormProps {
   projectId: string;
@@ -11,7 +11,7 @@ interface JobSubmitFormProps {
 }
 
 export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
-  const [jobForm, setJobForm] = React.useState({
+  const [jobForm, setJobForm] = useState({
     command: '',
     job_name: '',
     nodes: 0,

@@ -1,13 +1,13 @@
+import { Cluster } from '../models/HPC-UI-Types';
 import { getClusters } from '../api/hpc-clusters';
-import { Cluster } from '../models/Cluster';
-import { AppLayout, Box, Header, Select, SplitPanel, SpaceBetween, Table } from '@awsui/components-react';
+import { useCollection } from '@awsui/collection-hooks';
+import { useState, useEffect } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { columnDefinitions } from '../hpc-table-config/clustersColumnDefinitions';
-import { useCollection } from '@awsui/collection-hooks';
 import { filteringProperties } from '../hpc-table-config/clustersFilteringProperties';
-import JobsTable from './JobsTable';
-import React from 'react';
 import { OptionDefinition } from '@awsui/components-react/internal/components/option/interfaces';
+import { AppLayout, Box, Header, Select, SplitPanel, SpaceBetween, Table } from '@awsui/components-react';
+import JobsTable from './JobsTable';
 
 export default function ClustersTable(): JSX.Element {
   const options = [
@@ -15,17 +15,17 @@ export default function ClustersTable(): JSX.Element {
     { label: 'example-project', value: 'example-project' }
   ];
 
-  const [clusters, setClusters] = React.useState([] as Cluster[]);
+  const [clusters, setClusters] = useState([] as Cluster[]);
 
-  const [selectedOption, setSelectedOption] = React.useState(options?.at(0) as OptionDefinition);
+  const [selectedOption, setSelectedOption] = useState(options?.at(0) as OptionDefinition);
 
-  const [splitOpen, setSplitOpen] = React.useState(true);
+  const [splitOpen, setSplitOpen] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getClusters(selectedOption.value!)
       .then((items) => setClusters(items))
       .catch(() => setClusters([]));
-  }, [selectedOption.value!]);
+  }, [selectedOption.value]);
 
   const itemType: string = 'cluster';
 

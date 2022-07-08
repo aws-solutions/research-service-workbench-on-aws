@@ -1,5 +1,5 @@
-import ClustersTable from './ClustersTable';
 import { TopNavigation } from '@awsui/components-react';
+import ClustersTable from './ClustersTable';
 
 export default function Main(): JSX.Element {
   return (

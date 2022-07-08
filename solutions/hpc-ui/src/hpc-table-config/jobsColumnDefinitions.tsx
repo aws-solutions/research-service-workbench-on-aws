@@ -31,12 +31,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     id: 'start_time',
     header: 'Started',
     cell: (e: { job_state: string; start_time: number }) => {
-      if (
-        e.job_state === 'COMPLETED' ||
-        e.job_state === 'RUNNING' ||
-        e.job_state === 'FAILED' ||
-        e.job_state === 'CANCELLED'
-      ) {
+      if (['COMPLETED', 'RUNNING', 'FAILED', 'CANCELLED'].includes(e.job_state)) {
         return new Date(e.start_time * 1000).toLocaleString();
       } else {
         return 'N/A';
@@ -47,7 +42,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     id: 'end_time',
     header: 'Completed',
     cell: (e: { job_state: string; end_time: number }) => {
-      if (e.job_state === 'COMPLETED' || e.job_state === 'FAILED' || e.job_state === 'CANCELLED') {
+      if (['COMPLETED', 'FAILED', 'CANCELLED'].includes(e.job_state)) {
         return new Date(e.end_time * 1000).toLocaleString();
       } else {
         return 'N/A';

@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { httpApiGet, httpApiPost, httpApiPut } from './apiHelper';
-import { Cluster, Job, JobParameters } from '../models/Cluster';
+import { Cluster, Job, JobParameters } from '../models/HPC-UI-Types';
 
 const getClusters = async (projectId: string): Promise<Cluster[]> => {
   return await httpApiGet(`projects/${projectId}/clusters`, {});
@@ -14,7 +14,6 @@ const useCluster = (projectId: string, clusterName: string) => {
       refreshInterval: 15000
     }
   );
-
   return cluster as Cluster;
 };
 
@@ -26,9 +25,7 @@ const useJobQueue = (projectId: string, clusterName: string, instanceId: string)
     httpApiGet,
     { refreshInterval: 5000 }
   );
-
   let jobs = ((data && data.StandardOutputContent) || []) as unknown as Job[];
-
   return { jobs, jobMutate };
 };
 

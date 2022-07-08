@@ -1,11 +1,11 @@
-import { Box, Header, SpaceBetween, Table, Button } from '@awsui/components-react';
+import { useState } from 'react';
+import { useCollection } from '@awsui/collection-hooks';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { columnDefinitions } from '../hpc-table-config/jobsColumnDefinitions';
-import { useCollection } from '@awsui/collection-hooks';
 import { filteringProperties } from '../hpc-table-config/jobsFilteringProperties';
 import { useCluster, useJobQueue, stopJob } from '../api/hpc-clusters';
+import { Box, Header, SpaceBetween, Table, Button } from '@awsui/components-react';
 import JobSubmitForm from './JobSubmitForm';
-import React from 'react';
 
 interface JobsTableProps {
   projectId: string;
@@ -21,7 +21,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
     cluster !== undefined ? cluster.headNode?.instanceId! : cluster
   );
 
-  const [viewJobForm, setViewJobForm] = React.useState(false);
+  const [viewJobForm, setViewJobForm] = useState(false);
 
   const itemType: string = 'job';
 
@@ -35,21 +35,12 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
   });
 
   const noStop = (): boolean => {
-    let flag = false;
-    if (collectionProps.selectedItems?.length === 0) {
-      flag = true;
+    if (collectionProps.selectedItems?.length !== 0) {
+      return collectionProps.selectedItems!.some((job) =>
+        ['STOPPING', 'FAILED', 'COMPLETED', 'CANCELLED'].includes(job?.job_state)
+      );
     }
-    collectionProps.selectedItems?.forEach((job) => {
-      if (
-        job?.job_state === 'STOPPING' ||
-        job?.job_state === 'FAILED' ||
-        job?.job_state === 'COMPLETED' ||
-        job?.job_state === 'CANCELLED'
-      ) {
-        flag = true;
-      }
-    });
-    return flag;
+    return true;
   };
 
   const executeStop = async (): Promise<void> => {

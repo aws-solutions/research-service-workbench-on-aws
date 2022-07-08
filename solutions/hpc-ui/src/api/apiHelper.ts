@@ -38,11 +38,7 @@ const httpApiDelete = async (urlPath: string, params: any): Promise<any> => {
 };
 
 const fetchData = async (options: any): Promise<any> => {
-  //TODO add auth token and error handling
-  const { data } = await axios(options).catch(function (error) {
-    //TODO: call logger to capture exception
-    throw 'there was an error while trying to retrieve data';
-  });
+  const { data } = await axios(options);
   return data;
 };
 
