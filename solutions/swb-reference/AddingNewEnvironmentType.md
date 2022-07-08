@@ -194,7 +194,7 @@ STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 * If the [onboard-account.cfn.yaml](../swb-reference/src/templates/onboard-account.cfn.yaml) template was updated, the hosting account CloudFormation stack will need to be updated.
 
 ## Step 7 (Optional): Test Launch new Environment
-Do the following steps if you would like to launch your new environment type
+Do the following steps if you would like to launch your new environment type, and assuming your new envType is named `sagemakerExample`
 
 1. Create a new `envTypeConfig` for your environment, by adding the following JSON to DDB. Example below
     ```json
