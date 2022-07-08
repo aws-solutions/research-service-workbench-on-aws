@@ -17,6 +17,7 @@ import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
 import HostingAccountService from './services/hostingAccountService';
+import ProjectService from './services/projectService';
 import EnvironmentLifecycleHelper from './utilities/environmentLifecycleHelper';
 import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
 
@@ -38,6 +39,7 @@ export {
   CognitoSetup,
   EnvironmentService,
   EnvironmentTypeService,
+  ProjectService,
   Environment,
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,

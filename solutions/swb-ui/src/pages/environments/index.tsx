@@ -15,40 +15,44 @@ import {
   SpaceBetween,
   SplitPanel,
   Table,
-  StatusIndicator
+  StatusIndicator,
+  Flashbar,
+  FlashbarProps
 } from '@awsui/components-react';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
-import { useEnvironments, terminate, start, stop, connect } from '../api/environments';
-import { datei18nStrings, relativeOptions } from '../common/dateRelativeOptions';
-import { convertToAbsoluteRange, isValidRangeFunction } from '../common/dateRelativeProperties';
-import { i18nStrings, paginationLables, layoutLabels } from '../common/labels';
-import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../common/splitPanel';
-import { getFilterCounterText } from '../common/tableCounterStrings';
-import { TableEmptyDisplay } from '../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../common/tableNoMatchState';
-import Navigation from '../components/Navigation';
-import { useSettings } from '../context/SettingsContext';
+import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
+import { datei18nStrings, relativeOptions } from '../../common/dateRelativeOptions';
+import { convertToAbsoluteRange, isValidRangeFunction } from '../../common/dateRelativeProperties';
+import { i18nStrings, paginationLables, layoutLabels } from '../../common/labels';
+import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../../common/splitPanel';
+import { getFilterCounterText } from '../../common/tableCounterStrings';
+import { TableEmptyDisplay } from '../../common/tableEmptyState';
+import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
+import Navigation from '../../components/Navigation';
+import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
   searchableColumns
-} from '../environments-table-config/workspacesColumnDefinitions';
-import { filteringOptions } from '../environments-table-config/workspacesFilteringOptions';
-import { filteringProperties } from '../environments-table-config/workspacesFilteringProperties';
-import styles from '../styles/BaseLayout.module.scss';
+} from '../../environments-table-config/workspacesColumnDefinitions';
+import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
+import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
 
 export interface EnvironmentProps {
   locale: string;
 }
 
-export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => ({
-  props: {
-    ...(await serverSideTranslations(locale, ['common']))
-  }
-});
+export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common']))
+    }
+  };
+};
 
 const Environment: NextPage = () => {
   // For functions to return content specific to the table
@@ -61,16 +65,17 @@ const Environment: NextPage = () => {
   const { environments, mutate } = useEnvironments();
 
   const [error, setError] = useState('');
-
+  const router = useRouter();
+  const { message, notificationType } = router.query;
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
       text: 'Service Workbench',
-      href: '#'
+      href: '/'
     },
     {
-      text: 'Login',
-      href: '#'
+      text: 'Workspaces',
+      href: '/environments'
     }
   ];
   // eslint-disable-next-line prefer-const
@@ -88,6 +93,22 @@ const Environment: NextPage = () => {
     amount: 1,
     unit: 'week'
   });
+  const initialNotifications =
+    !!message && !!notificationType
+      ? [
+          {
+            type: notificationType as FlashbarProps.Type,
+            dismissible: true,
+            dismissLabel: 'Dismiss message',
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            onDismiss: () => setNotifications([]),
+            content: message,
+            id: 'message_0'
+          }
+        ]
+      : [];
+  const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>(initialNotifications);
+
   useEffect(() => {
     setDateFilter(dateFilter);
   }, [dateFilter]);
@@ -227,7 +248,6 @@ const Environment: NextPage = () => {
   return (
     <AppLayout
       id="environments-layout"
-      className={styles.baseLayout}
       headerSelector="#header"
       stickyNotifications
       toolsHide
@@ -254,6 +274,7 @@ const Environment: NextPage = () => {
       }
       content={
         <Box margin={{ bottom: 'l' }}>
+          <Flashbar items={notifications} />
           <Head>
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />
@@ -332,7 +353,9 @@ const Environment: NextPage = () => {
                         >
                           Terminate
                         </Button>
-                        <Button variant="primary">Create Workspace</Button>
+                        <Button variant="primary" href="/environments/new">
+                          Create Workspace
+                        </Button>
                       </SpaceBetween>
                     </Box>
                   }

@@ -7,7 +7,8 @@ import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
@@ -61,6 +62,9 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   })
 };
