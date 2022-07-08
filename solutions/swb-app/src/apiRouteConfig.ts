@@ -4,7 +4,8 @@ import {
   EnvironmentLifecycleService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 
 export interface ApiRouteConfig {
@@ -15,6 +16,7 @@ export interface ApiRouteConfig {
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;
+  projectService: ProjectService;
 }
 
 export interface ApiRoute {
