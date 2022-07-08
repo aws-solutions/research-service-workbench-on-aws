@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { EnvironmentItem, EnvironmentConnectResponse } from '../models/Environment';
-import { httpApiGet, httpApiPut, httpApiDelete } from './apiHelper';
+import { httpApiGet, httpApiPut, httpApiDelete, httpApiPost } from './apiHelper';
+import { EnvironmentItem, EnvironmentConnectResponse, CreateEnvironmentForm } from '../models/Environment';
 
 const useEnvironments = () => {
   const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
@@ -13,8 +13,13 @@ const useEnvironments = () => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;
     item.project = item.projectId;
+    item.workspaceCost = 0;
   });
   return { environments, mutate };
+};
+
+const createEnvironment = async (environment: CreateEnvironmentForm): Promise<void> => {
+  await httpApiPost('environments', { ...environment });
 };
 
 const start = async (id: string): Promise<void> => {
@@ -32,5 +37,4 @@ const terminate = async (id: string): Promise<void> => {
 const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
   return await httpApiGet(`environments/${id}/connections`, {});
 };
-
-export { useEnvironments, start, stop, terminate, connect };
+export { useEnvironments, start, stop, terminate, connect, createEnvironment };
