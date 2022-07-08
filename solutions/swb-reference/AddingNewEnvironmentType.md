@@ -229,7 +229,7 @@ Do the following steps if you would like to launch your new environment type
        "productId": "prod-a6vului72ggkk",                 // Grab new product id from Service Catalog Portfolio 
        "provisioningArtifactId": "pa-n23bxsl22zkju",      // Grab new provisionArtifact id from Service Catalog Portfolio 
        "resourceType": "envTypeConfig",
-       "type": "sagemakerNotebook",
+       "type": "sagemakerExample",
        "updatedAt": "2022-02-03T20:07:50.573Z",
        "updatedBy": "abc"
     }
@@ -238,13 +238,13 @@ Do the following steps if you would like to launch your new environment type
 POST `{{API_URL}}/environments`
     ```json
     {
-        "description": "test-sagemakerNotebook AWS",
+        "description": "test-sagemakerExample AWS",
         "name": "test",
         "envTypeId": "envType-2",
         "envTypeConfigId": "envTypeConfig-2",
         "projectId": "proj-123",
         "datasetIds": [],
-        "envType": "sagemakerNotebook"
+        "envType": "sagemakerExample"
     }
     ```
 The `envTypeId` and `envTypeConfigId` value are references to the `envTypeConfig` that you created in step 1.
