@@ -31,6 +31,10 @@ export async function handler(event: any) {
     sagemakerNotebook: {
       instanceNameRecordKey: 'NotebookInstanceName',
       instanceArnRecordKey: 'NotebookArn'
+    },
+    sagemakerExample: {
+      instanceNameRecordKey: 'NotebookInstanceName',
+      instanceArnRecordKey: 'NotebookArn'
     }
 
     // Add your new env types here

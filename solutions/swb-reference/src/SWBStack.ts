@@ -206,12 +206,67 @@ export class SWBStack extends Stack {
       ]
     });
 
+    const sagemakerExamplePolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: [
+            'sagemaker:DescribeNotebookInstanceLifecycleConfig',
+            'sagemaker:CreateNotebookInstanceLifecycleConfig',
+            'sagemaker:DeleteNotebookInstanceLifecycleConfig'
+          ],
+          resources: [
+            'arn:aws:sagemaker:*:*:notebook-instance-lifecycle-config/basicnotebookinstancelifecycleconfig-*'
+          ]
+        }),
+        new PolicyStatement({
+          actions: [
+            'sagemaker:DescribeNotebookInstance',
+            'sagemaker:CreateNotebookInstance',
+            'sagemaker:StopNotebookInstance',
+            'sagemaker:StopNotebookInstance',
+            'sagemaker:DeleteNotebookInstance'
+          ],
+          resources: ['arn:aws:sagemaker:*:*:notebook-instance/basicnotebookinstance-*']
+        }),
+        new PolicyStatement({
+          actions: ['s3:GetObject'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: ['servicecatalog:*'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          actions: [
+            'cloudformation:CreateStack',
+            'cloudformation:DeleteStack',
+            'cloudformation:DescribeStackEvents',
+            'cloudformation:DescribeStacks',
+            'cloudformation:GetTemplateSummary',
+            'cloudformation:SetStackPolicy',
+            'cloudformation:ValidateTemplate',
+            'cloudformation:UpdateStack'
+          ],
+          resources: ['arn:aws:cloudformation:*:*:stack/SC-*']
+        }),
+        new PolicyStatement({
+          actions: [
+            'ec2:DescribeNetworkInterfaces',
+            'ec2:CreateNetworkInterface',
+            'ec2:DeleteNetworkInterface'
+          ],
+          resources: ['*']
+        })
+      ]
+    });
+
     const iamRole = new Role(this, 'LaunchConstraint', {
       assumedBy: new ServicePrincipal('servicecatalog.amazonaws.com'),
       roleName: `${this.stackName}-LaunchConstraint`,
       description: 'Launch constraint role for Service Catalog products',
       inlinePolicies: {
         sagemakerNotebookLaunchPermissions: sagemakerNotebookPolicy,
+        sagemakerExampleLaunchPermissions: sagemakerExamplePolicy,
         commonScManagement
       }
     });
