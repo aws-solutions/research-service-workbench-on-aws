@@ -13,6 +13,4 @@ NOTICE: The user management service does not include authorization in any form. 
 ## Usage
 [Authentication Service](./docs/authenticationService.md)
 
-[Authentication Middleware](./docs/authenticationMiddleware.md)
-
 [User Management Service](./docs/userManagementService.md)
