@@ -143,7 +143,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     name: string,
     externalEndpointName: string,
     bucketAccount: string
-  ): Promise<{ endPointArn: string; endPointAlias: string? }> {
+  ): Promise<{ endPointArn: string; endPointAlias?: string }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
       Bucket: name,
