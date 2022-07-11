@@ -24,6 +24,7 @@ export class SWBStack extends Stack {
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    S3_DATASETS_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
@@ -33,6 +34,7 @@ export class SWBStack extends Stack {
       STAGE,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
@@ -57,17 +59,19 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_DATASETS_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS
     };
 
+    this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const statusHandler = this._createStatusHandlerLambda();
     const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
     const table = this._createDDBTable(apiLambda);
     this._createRestApi(apiLambda);
 
-    const artifactS3Bucket = this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     this._createAccountHandlerLambda(lcRole, artifactS3Bucket, table.tableArn);
 
@@ -222,10 +226,19 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3Buckets(s3ArtifactName: string): Bucket {
+  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-artifacts', {});
 
     new CfnOutput(this, s3ArtifactName, {
+      value: s3Bucket.bucketArn
+    });
+    return s3Bucket;
+  }
+
+  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
+    const s3Bucket = new Bucket(this, 's3-datasets', {});
+
+    new CfnOutput(this, s3DatasetsName, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
