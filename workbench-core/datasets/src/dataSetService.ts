@@ -139,7 +139,7 @@ export class DataSetService {
    * @param externalRoleName - a role which will interact with the endpoint.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
    * to modify the target DataSet's underlying storage.
-   * @returns a string representation of a JSON object which contains a URL to the storage, the DataSet's name and the storage path.
+   * @returns a string representation of a JSON object which contains an alias to mount the storage, the DataSet's name and the storage path.
    */
   public async addDataSetExternalEndpoint(
     dataSetId: string,
