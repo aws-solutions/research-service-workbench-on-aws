@@ -15,7 +15,7 @@ export default class Workflow {
 
   public createSSMDocuments(): void {
     // Add your new environment type here. The name should exactly match the folder name of the new environment type in the environment folder
-    const envTypes = ['sagemaker'];
+    const envTypes = ['sagemakerNotebook'];
 
     envTypes.forEach((envType) => {
       const docTypes = ['Launch', 'Terminate'];

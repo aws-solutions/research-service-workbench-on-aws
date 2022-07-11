@@ -412,6 +412,24 @@
       ]
     },
     {
+      "name": "projects",
+      "item": [
+        {
+          "name": "Get All projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{API_URL}}/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Create Hosting Account",
       "request": {
         "method": "POST",

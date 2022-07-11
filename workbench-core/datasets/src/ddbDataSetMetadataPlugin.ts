@@ -81,7 +81,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
-    endPointParam.Id = uuidv4();
+    endPointParam.id = uuidv4();
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
@@ -102,7 +102,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
-    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetName);
+    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
     const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id as string);
 
     if (_.find(endPoints, (ep) => ep.name === endPoint.name))
@@ -134,7 +134,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
     const endPointKey = {
       pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
-      sk: `${this._endPointKeyType}#${endPoint.Id}`
+      sk: `${this._endPointKeyType}#${endPoint.id}`
     };
     const endPointParams: { item: { [key: string]: string | string[] } } = {
       item: {
@@ -157,12 +157,12 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
     const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSet.Id}`,
-      sk: `${this._dataSetKeyType}#${dataSet.Id}`
+      pk: `${this._dataSetKeyType}#${dataSet.id}`,
+      sk: `${this._dataSetKeyType}#${dataSet.id}`
     };
     const dataSetParams: { item: { [key: string]: string | string[] } } = {
       item: {
-        id: dataSet.Id as string,
+        id: dataSet.id as string,
         name: dataSet.name,
         createdAt: dataSet.createdAt as string,
         storageName: dataSet.storageName,
@@ -178,6 +178,6 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 
-    return dataSet.Id as string;
+    return dataSet.id as string;
   }
 }

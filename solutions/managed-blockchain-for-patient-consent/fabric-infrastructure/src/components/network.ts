@@ -13,6 +13,7 @@ import { isEmpty } from 'lodash';
 import * as client from './client';
 import * as invites from './invites';
 import * as node from './node';
+import * as s3 from './s3';
 import * as utilities from './utilities';
 
 /*
@@ -143,6 +144,16 @@ export interface HyperledgerFabricNetworkProps {
    * Additional members to be invited to join the network
    */
   readonly additionalMembers?: string[];
+
+  /**
+   * Create new bucket when creating new network
+   */
+  readonly certS3BucketName?: string;
+
+  /**
+   * Cidr used for allow list in admin EC2 instance
+   */
+  readonly adminCidr: string;
 }
 
 /**
@@ -177,6 +188,8 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
   public readonly createNewNetwork: boolean;
   public readonly additionalMembers: string[];
   public readonly prefix: string;
+  public readonly certS3BucketName: string;
+  public readonly adminCidr: string;
 
   public constructor(scope: constructs.Construct, id: string, props: HyperledgerFabricNetworkProps) {
     super(scope, id);
@@ -200,7 +213,9 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
     this.enableCaLogging = props.enableCaLogging ?? true;
     this.networkId = props.networkId ?? '';
     this.invitationId = props.invitationId ?? '';
+    this.certS3BucketName = props.certS3BucketName ?? '';
     this.additionalMembers = props.additionalMembers ?? [];
+    this.adminCidr = props.adminCidr;
 
     // Ensure the parameters captured above are valid, so we don't
     // need to wait until deployment time to discover an error
@@ -226,14 +241,18 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
       throw new Error('Voting policy threshold percentage must be between 0 and 100.');
     }
 
-    if (isEmpty(this.networkId) && isEmpty(this.invitationId)) {
+    if (isEmpty(this.networkId) && isEmpty(this.invitationId) && isEmpty(this.certS3BucketName)) {
       this.createNewNetwork = true;
-    } else if (!isEmpty(this.networkId) && !isEmpty(this.invitationId)) {
+    } else if (!isEmpty(this.networkId) && !isEmpty(this.invitationId) && !isEmpty(this.certS3BucketName)) {
       this.createNewNetwork = false;
     } else {
       throw new Error(
-        'Context value networkId and invitationId must be provided together to join existing network.'
+        'Context value networkId, invitationId and certS3BucketName must be provided together to join existing network.'
       );
+    }
+
+    if (isEmpty(this.adminCidr)) {
+      throw new Error('adminCidr is required.');
     }
     // Per the Managed Blockchain documentation, the admin password must be at least eight
     // characters long and no more than 32 characters. It must contain at least one uppercase
@@ -384,14 +403,16 @@ export class HyperledgerFabricNetwork extends constructs.Construct {
     // Build out the client VPC construct
     this.client = new client.HyperledgerFabricClient(this, 'NetworkClient', props.client);
 
-    // Invite new members
-    if (this.createNewNetwork) {
+    // Invite new members and create certs bucket
+    if (this.createNewNetwork && !isEmpty(this.additionalMembers)) {
       const inviteResources = new invites.HyperledgerFabricInvite(this, 'Invite');
 
       // eslint-disable-next-line no-new
       new cdk.CustomResource(this, 'InviteCustomResource', {
         serviceToken: inviteResources.inviteProvider.serviceToken
       });
+
+      this.certS3BucketName = new s3.HyperledgerFabricS3(this, 'CertsBucket').s3.bucketName;
     }
   }
 }
