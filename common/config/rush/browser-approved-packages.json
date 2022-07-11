@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@amzn/patient-consent-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/swb-app",
       "allowedCategories": [ "production" ]
     },
@@ -44,7 +48,7 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -260,7 +264,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -395,6 +399,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "pnpm",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -416,7 +424,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "swr",

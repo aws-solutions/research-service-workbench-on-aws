@@ -1,3 +1,15 @@
+export interface EndpointConnectionStrings {
+  /**
+   * a URL which can be used to access the storage endpoint.
+   */
+  endPointUrl: string;
+
+  /**
+   * An optional alias which also can be used to access the storage endpoint.
+   */
+  endPointAlias?: string;
+}
+
 /**
  * This interface represents a contract consumed by the DataSets service to interact
  * with an underlying stroage provider. This interface should be implemented for each
@@ -39,17 +51,19 @@ export interface DataSetsStoragePlugin {
    * @param path - a string which locates to root of the dataset within the storage medium
    * such as a prefix in an S3 bucket.
    * @param externalEndpointName - a name to uniquely identify the endpoint.
+   * @param ownerAccountId - the AWS Account Id where the storage resides.
    * @param externalRoleName - an optional role name which the external environment will assume to
    * access the DataSet
    *
-   * @returns a string which can be used to mount the DataSet to an external environment.
+   * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
    */
   addExternalEndpoint(
     name: string,
     path: string,
     externalEndpointName: string,
+    ownerAccountId: string,
     externalRoleName?: string
-  ): Promise<string>;
+  ): Promise<EndpointConnectionStrings>;
 
   /**
    * Add a role used to access an external endpoint.

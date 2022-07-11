@@ -275,7 +275,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       };
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
-        Id: mockDataSetId,
+        id: mockDataSetId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         endPointUrl: mockEndPointUrl,
