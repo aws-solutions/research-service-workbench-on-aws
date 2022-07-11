@@ -102,7 +102,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
-    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetName);
+    console.log('endpoint.dataSetName', endPoint.dataSetId);
+    const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
     const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id as string);
 
     if (_.find(endPoints, (ep) => ep.name === endPoint.name))
@@ -132,6 +133,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   }
 
   private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
+    console.log('_storeEndPointToDdb', endPoint);
     const endPointKey = {
       pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
       sk: `${this._endPointKeyType}#${endPoint.Id}`

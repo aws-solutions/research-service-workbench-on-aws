@@ -127,13 +127,15 @@ export default class EnvironmentLifecycleHelper {
       _.map(datasetIds, async (datasetId) => {
         const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
 
+        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
         const mountString: string = _.isEmpty(dataSet.externalEndpoints)
           ? await this.dataSetService.addDataSetExternalEndpoint(
               datasetId,
-              `${datasetId}-mounted-on-${envId}`,
+              datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
+              // `${datasetId}-mounted-on-${envId}`,   This value is too long and will throw an error
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await this.dataSetService.getDataSetMountString(datasetId, `${datasetId}-mounted-on-${envId}`);
+          : await this.dataSetService.getDataSetMountString(datasetId, datasetEndPointName);
 
         return {
           datasetId,

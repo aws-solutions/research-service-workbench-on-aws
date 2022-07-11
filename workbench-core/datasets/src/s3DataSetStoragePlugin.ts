@@ -144,6 +144,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Bucket: name,
       AccountId: bucketAccount
     };
+    console.log('accessPOintConfig', accessPointConfig);
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig
     );
@@ -174,16 +175,32 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       }`)
     );
 
-    const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
-      getBucketPolicyConfig
-    );
-    let bucketPolicy: PolicyDocument;
-    if (bucketPolicyResponse.Policy) {
-      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
-    } else {
-      bucketPolicy = new PolicyDocument();
+    console.log('delegationStatement', delegationStatement);
+    let bucketPolicy: PolicyDocument = new PolicyDocument();
+    try {
+      const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
+        getBucketPolicyConfig
+      );
+      if (bucketPolicyResponse.Policy) {
+        bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
+      }
+    } catch (e) {
+      console.log('e', e);
+      console.log('eCode', e.Code);
+      // All errors are thrown except NoSuchBucket error. For that error we assign new bucket policy for bucket
+      if (e.Code !== 'NoSuchBucketPolicy') {
+        throw e;
+      }
     }
 
+    // console.log('bucketPolicyResponse', bucketPolicyResponse);
+    // if (bucketPolicyResponse.Policy) {
+    //   bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
+    // } else {
+    //   bucketPolicy = new PolicyDocument();
+    // }
+
+    // console.log('bucketPolicy', bucketPolicy);
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
 
     bucketPolicy.addStatements(delegationStatement);
