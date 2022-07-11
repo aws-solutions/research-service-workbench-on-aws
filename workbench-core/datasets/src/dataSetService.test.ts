@@ -24,6 +24,7 @@ describe('DataSetService', () => {
   const mockDataSetStorageType = 'S3';
   const mockDataSetStorageName = 'S3-Bucket';
   const mockAccessPointName = 'Sample-Access-Point';
+  const mockAccessPointAlias = `${mockAccessPointName}-s3alias`;
   const mockRoleArn = 'Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
@@ -112,6 +113,7 @@ describe('DataSetService', () => {
           dataSetName: mockDataSetName,
           path: mockDataSetPath,
           endPointUrl: mockEndPointUrl,
+          endPointAlias: mockAccessPointAlias,
           allowedRoles: [mockRoleArn]
         };
       });
@@ -124,6 +126,7 @@ describe('DataSetService', () => {
         dataSetName: mockDataSetName,
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
+        endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn]
       };
     });
@@ -132,11 +135,10 @@ describe('DataSetService', () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
     });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'addExternalEndpoint').mockImplementation(async () => {
-      return JSON.stringify({
-        name: mockDataSetName,
-        bucket: mockEndPointUrl,
-        prefix: mockDataSetPath
-      });
+      return {
+        endPointUrl: mockEndPointUrl,
+        endPointAlias: mockAccessPointAlias
+      };
     });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'importStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
@@ -289,7 +291,7 @@ describe('DataSetService', () => {
       ).resolves.toEqual(
         JSON.stringify({
           name: mockDataSetName,
-          bucket: mockEndPointUrl,
+          bucket: mockAccessPointAlias,
           prefix: mockDataSetPath
         })
       );

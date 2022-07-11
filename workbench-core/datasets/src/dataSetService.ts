@@ -2,6 +2,7 @@ import { AuditService } from '@amzn/workbench-core-audit';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
+import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
@@ -44,14 +45,13 @@ export class DataSetService {
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
-    const locator: string = await storageProvider.createStorage(storageName, path);
+    await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
       storageName: storageName,
       path: path,
       awsAccountId: awsAccountId,
-      storageType: storageProvider.getStorageType(),
-      location: locator
+      storageType: storageProvider.getStorageType()
     };
 
     return await this._dbProvider.addDataSet(provisioned);
@@ -75,14 +75,13 @@ export class DataSetService {
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
-    const locator: string = await storageProvider.importStorage(storageName, path);
+    await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
       storageName: storageName,
       path: path,
       awsAccountId: awsAccountId,
-      storageType: storageProvider.getStorageType(),
-      location: locator
+      storageType: storageProvider.getStorageType()
     };
 
     return await this._dbProvider.addDataSet(imported);
@@ -153,7 +152,7 @@ export class DataSetService {
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
-    const storageUrl = await storageProvider.addExternalEndpoint(
+    const connections: EndpointConnectionStrings = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
@@ -166,7 +165,8 @@ export class DataSetService {
       dataSetId: targetDS.id as string,
       dataSetName: targetDS.name,
       path: targetDS.path,
-      endPointUrl: storageUrl
+      endPointUrl: connections.endPointUrl,
+      endPointAlias: connections.endPointAlias
     };
 
     if (externalRoleName) {
@@ -178,8 +178,9 @@ export class DataSetService {
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
     targetDS.externalEndpoints.push(endPoint.id as string);
+
     await this._dbProvider.updateDataSet(targetDS);
-    return this._generateMountString(endPoint.dataSetName, endPoint.endPointUrl, endPoint.path);
+    return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias as string, endPoint.path);
   }
 
   /**

@@ -18,6 +18,7 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
+import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
@@ -73,7 +74,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
    * @param ownerAccountId - the owning AWS account for the bucket.
    * @param externalRoleName - an optional role which will be given access to the files under the prefix.
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
-   * @returns a string representing the URI to the dataset root prefix.
+   * @returns the S3 URL and the alias which can be used to access the endpoint.
    */
   public async addExternalEndpoint(
     name: string,
@@ -82,21 +83,25 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     ownerAccountId: string,
     externalRoleName?: string,
     kmsKeyArn?: string
-  ): Promise<string> {
-    const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
-    await this._configureBucketPolicy(name, accessPointArn);
+  ): Promise<EndpointConnectionStrings> {
+    const response: { endPointArn: string; endPointAlias: string | undefined } =
+      await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
+    await this._configureBucketPolicy(name, response.endPointArn);
 
     if (externalRoleName) {
       await this._configureAccessPointPolicy(
         name,
         path,
         externalEndpointName,
-        accessPointArn,
+        response.endPointArn,
         externalRoleName
       );
       if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
     }
-    return `s3://${accessPointArn}/`;
+    return {
+      endPointUrl: `s3://${response.endPointArn}/`,
+      endPointAlias: response.endPointAlias
+    };
   }
 
   public async addRoleToExternalEndpoint(
@@ -138,7 +143,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     name: string,
     externalEndpointName: string,
     bucketAccount: string
-  ): Promise<string> {
+  ): Promise<{ endPointArn: string; endPointAlias: string | undefined }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
       Bucket: name,
@@ -147,7 +152,10 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig
     );
-    return `${response.AccessPointArn}`;
+    return {
+      endPointArn: response.AccessPointArn as string,
+      endPointAlias: response.Alias
+    };
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {

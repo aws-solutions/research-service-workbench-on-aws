@@ -145,10 +145,17 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         dataSetName: endPoint.dataSetName,
         path: endPoint.path,
         endPointUrl: endPoint.endPointUrl,
-        allowedRoles: endPoint.allowedRoles as string[],
         resourceType: 'endpoint'
       }
     };
+
+    if (endPoint.allowedRoles) {
+      endPointParams.item.allowedRoles = endPoint.allowedRoles;
+    }
+
+    if (endPoint.endPointAlias) {
+      endPointParams.item.endPointAlias = endPoint.endPointAlias;
+    }
 
     await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
 

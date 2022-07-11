@@ -50,8 +50,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@rushstack/eslint-config": "^2.5.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",

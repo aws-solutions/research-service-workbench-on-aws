@@ -1,3 +1,15 @@
+export interface EndpointConnectionStrings {
+  /**
+   * a URL which can be used to access the storage endpoint.
+   */
+  endPointUrl: string;
+
+  /**
+   * An optional alias which also can be used to access the storage endpoint.
+   */
+  endPointAlias?: string;
+}
+
 /**
  * This interface represents a contract consumed by the DataSets service to interact
  * with an underlying stroage provider. This interface should be implemented for each
@@ -51,7 +63,7 @@ export interface DataSetsStoragePlugin {
     externalEndpointName: string,
     ownerAccountId: string,
     externalRoleName?: string
-  ): Promise<string>;
+  ): Promise<EndpointConnectionStrings>;
 
   /**
    * Add a role used to access an external endpoint.
