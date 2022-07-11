@@ -6,7 +6,6 @@ import {
   Header,
   Pagination,
   Table,
-  TextFilter,
   SpaceBetween
 } from '@awsui/components-react';
 import * as React from 'react';
@@ -14,10 +13,6 @@ import { columnDefinitions } from '../environments-table-config/workspacetypesCo
 import { allItems } from '../environments-table-config/workspacetypesData';
 
 function WorkspaceTypesTable(): JSX.Element {
-  /*const [
-      selectedItems,
-      setSelectedItems
-    ] = React.useState([{ name: "Item 2" }]);*/
   const { collectionProps } = useCollection(allItems, {
     sorting: {},
     selection: {}
@@ -28,19 +23,19 @@ function WorkspaceTypesTable(): JSX.Element {
   const revokeButtonStatuses: string[] = ['Approved'];
   const approveButtonStatuses: string[] = ['Not Approved'];
 
-  //button loading status
-  //const buttonLoadingStatuses: string[]= ['Approved','Not Approved'];
-
   const isOneItemSelected = (): boolean | undefined => {
-    return collectionProps.selectedItems && collectionProps.selectedItems.length >= 1;
+    return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
   };
+
   const getWorkspaceStatus = (): string => {
     const selectedItems = collectionProps.selectedItems;
-    if (selectedItems !== undefined && isOneItemSelected()) {
-      if (collectionProps.selectedItems?.at(0)?.approval) {
-        const status = collectionProps.selectedItems!.at(0)!.approval;
-        return status;
-      }
+    if (
+      selectedItems !== undefined &&
+      isOneItemSelected() &&
+      collectionProps.selectedItems?.at(0)?.approval
+    ) {
+      const status = collectionProps.selectedItems!.at(0)!.approval;
+      return status;
     }
     return '';
   };
@@ -63,19 +58,8 @@ function WorkspaceTypesTable(): JSX.Element {
         columnDefinitions={columnDefinitions}
         items={allItems}
         loadingText="Loading resources"
-        //selectionType="multi"
         trackBy="name"
         visibleColumns={['name', 'approval', 'description']}
-        empty={
-          <Box textAlign="center" color="inherit">
-            <b>No resources</b>
-            <Box padding={{ bottom: 's' }} variant="p" color="inherit">
-              No resources to display.
-            </Box>
-            <Button>Create resource</Button>
-          </Box>
-        }
-        filter={<TextFilter filteringPlaceholder="Find resources" filteringText="" />}
         header={
           <Header
             counter={
@@ -86,18 +70,8 @@ function WorkspaceTypesTable(): JSX.Element {
             actions={
               <Box float="right">
                 <SpaceBetween direction="horizontal" size="xs">
-                  <Button
-                    disabled={!approveButtonStatuses.includes(getWorkspaceStatus())}
-                    //loading={revokeButtonStatuses.includes(getWorkspaceStatus())}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    disabled={!revokeButtonStatuses.includes(getWorkspaceStatus())}
-                    //loading={approveButtonStatuses.includes(getWorkspaceStatus())}
-                  >
-                    Revoke
-                  </Button>
+                  <Button disabled={!approveButtonStatuses.includes(getWorkspaceStatus())}>Approve</Button>
+                  <Button disabled={!revokeButtonStatuses.includes(getWorkspaceStatus())}>Revoke</Button>
                   <Button>Edit</Button>
                   <Button>Delete</Button>
                 </SpaceBetween>

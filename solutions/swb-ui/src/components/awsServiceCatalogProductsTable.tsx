@@ -96,16 +96,12 @@ function AwsServiceCatalogProductsTable(): JSX.Element {
                 label: 'Main distribution properties',
                 options: [
                   {
-                    id: 'name',
-                    label: 'Workspace Name',
+                    id: 'Product Name',
+                    label: 'Product Name',
                     editable: false
                   },
-                  { id: 'approval', label: 'Approval' },
-                  { id: 'description', label: 'Description' },
-                  {
-                    id: 'actions',
-                    label: 'Actions'
-                  }
+
+                  { id: 'description', label: 'Description' }
                 ]
               }
             ]
