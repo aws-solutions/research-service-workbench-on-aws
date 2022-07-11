@@ -175,19 +175,18 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       }`)
     );
 
-    console.log('delegationStatement', delegationStatement);
     let bucketPolicy: PolicyDocument = new PolicyDocument();
+    try {
     try {
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
         getBucketPolicyConfig
       );
+
       if (bucketPolicyResponse.Policy) {
         bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
       }
     } catch (e) {
-      console.log('e', e);
-      console.log('eCode', e.Code);
-      // All errors are thrown except NoSuchBucket error. For that error we assign new bucket policy for bucket
+      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
       if (e.Code !== 'NoSuchBucketPolicy') {
         throw e;
       }
