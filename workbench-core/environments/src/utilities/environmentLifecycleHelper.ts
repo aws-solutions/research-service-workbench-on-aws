@@ -132,7 +132,6 @@ export default class EnvironmentLifecycleHelper {
           ? await this.dataSetService.addDataSetExternalEndpoint(
               datasetId,
               datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
-              // `${datasetId}-mounted-on-${envId}`,   This value is too long and will throw an error
               new S3DataSetStoragePlugin(this.aws)
             )
           : await this.dataSetService.getDataSetMountString(datasetId, datasetEndPointName);

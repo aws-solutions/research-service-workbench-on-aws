@@ -144,7 +144,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Bucket: name,
       AccountId: bucketAccount
     };
-    console.log('accessPOintConfig', accessPointConfig);
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig
     );
@@ -180,7 +179,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
         getBucketPolicyConfig
       );
-
       if (bucketPolicyResponse.Policy) {
         bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
       }
