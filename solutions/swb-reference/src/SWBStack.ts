@@ -415,7 +415,7 @@ export class SWBStack extends Stack {
           new PolicyStatement({
             sid: 'datasetS3Bucket',
             actions: ['*'],
-            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*']
+            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*', 'arn:aws:s3:*:*:accesspoint/*']
           })
         ]
       })
