@@ -156,13 +156,13 @@ export class DataSetService {
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
-      targetDS.awsAccountId as string,
+      targetDS.awsAccountId!,
       externalRoleName
     );
 
     const endPointParam: ExternalEndpoint = {
       name: externalEndpointName,
-      dataSetId: targetDS.id as string,
+      dataSetId: targetDS.id!,
       dataSetName: targetDS.name,
       path: targetDS.path,
       endPointUrl: connections.endPointUrl,
@@ -177,7 +177,7 @@ export class DataSetService {
 
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
-    targetDS.externalEndpoints.push(endPoint.id as string);
+    targetDS.externalEndpoints.push(endPoint.id!);
 
     await this._dbProvider.updateDataSet(targetDS);
     return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias!, endPoint.path);

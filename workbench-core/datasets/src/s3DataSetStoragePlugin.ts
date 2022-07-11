@@ -153,7 +153,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       accessPointConfig
     );
     return {
-      endPointArn: response.AccessPointArn as string,
+      endPointArn: response.AccessPointArn!,
       endPointAlias: response.Alias
     };
   }

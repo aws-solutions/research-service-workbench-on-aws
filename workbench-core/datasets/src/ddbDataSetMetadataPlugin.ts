@@ -103,7 +103,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
     const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
-    const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id as string);
+    const endPoints: ExternalEndpoint[] = await this.listEndpointsForDataSet(targetDS.id!);
 
     if (_.find(endPoints, (ep) => ep.name === endPoint.name))
       throw new Error(
@@ -138,9 +138,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
     const endPointParams: { item: { [key: string]: string | string[] } } = {
       item: {
-        id: endPoint.id as string,
+        id: endPoint.id!,
         name: endPoint.name,
-        createdAt: endPoint.createdAt as string,
+        createdAt: endPoint.createdAt!,
         dataSetId: endPoint.dataSetId,
         dataSetName: endPoint.dataSetName,
         path: endPoint.path,
@@ -159,7 +159,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
 
-    return endPoint.id as string;
+    return endPoint.id!;
   }
 
   private async _storeDataSetToDdb(dataSet: DataSet): Promise<string> {
@@ -169,22 +169,21 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
     const dataSetParams: { item: { [key: string]: string | string[] } } = {
       item: {
-        id: dataSet.id as string,
+        id: dataSet.id!,
         name: dataSet.name,
-        createdAt: dataSet.createdAt as string,
+        createdAt: dataSet.createdAt!,
         storageName: dataSet.storageName,
         path: dataSet.path,
-        awsAccountId: dataSet.awsAccountId as string,
-        storageType: dataSet.storageType as string,
+        awsAccountId: dataSet.awsAccountId!,
+        storageType: dataSet.storageType!,
         resourceType: 'dataset'
       }
     };
 
-    if (dataSet.externalEndpoints)
-      dataSetParams.item.externalEndpoints = dataSet.externalEndpoints as string[];
+    if (dataSet.externalEndpoints) dataSetParams.item.externalEndpoints = dataSet.externalEndpoints!;
 
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 
-    return dataSet.id as string;
+    return dataSet.id!;
   }
 }
