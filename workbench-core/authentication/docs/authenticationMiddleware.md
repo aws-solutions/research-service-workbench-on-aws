@@ -22,14 +22,10 @@ app.use(express.json())
 ```
 
 ## Functions
-[getAuthorizationCodeUrl](#getauthorizationcodeurl)
-
-[getTokensFromAuthorizationCode](#gettokensfromauthorizationcode)
-
-[verifyToken](#verifytoken)
-
-[refreshAccessToken](#refreshaccesstoken)
-
+[getAuthorizationCodeUrl](#getauthorizationcodeurl)  
+[getTokensFromAuthorizationCode](#gettokensfromauthorizationcode)  
+[verifyToken](#verifytoken)  
+[refreshAccessToken](#refreshaccesstoken)  
 [logoutUser](#logoutuser)
 
 ### getAuthorizationCodeUrl
@@ -58,51 +54,51 @@ This route places the access token and refresh token, if it exists, into http on
 app.get('tokens', getTokensFromAuthorizationCode(authenticationService));
 ```
 
-## verifyToken
+### verifyToken
 This middleware is used to authenticate a user from its access token.
 If authenticated, the user's id and roles will be stored in `res.locals.user`
 
-### Assumptions
+#### Assumptions
 
 - the access token is stored in a cookie named `access_token`
 
-### Example
+#### Example
 ```ts
 app.use(verifyToken(authenticationService))
 app.get('protectedRoute', (req, res) => res.sendStatus(200));
 ```
 
-## refreshAccessToken
+### refreshAccessToken
 This route handler used to refresh an expired access code.
 
-### Assumptions
+#### Assumptions
 - the access token is stored in a cookie named `access_token`
 
-### Example
+#### Example
 ```ts
 app.get('refresh', refreshAccessToken(authenticationService));
 ```
 
-## logoutUser
+### logoutUser
 This route handler is used to logout a user.
 
-### Assumptions
+#### Assumptions
 - the access token is stored in a cookie named `access_token`
 - if there is a refresh token, it is stored in a cookie named `refresh_token`
 
-### Example
+#### Example
 ```ts
 app.get('logout', logoutUser(authenticationService));
 ```
 
-## isUserLoggedIn
+### isUserLoggedIn
 This route handler is used to check if the user making the request is logged in.
 
-### Assumptions
+#### Assumptions
 - if there is a access token, it is stored in a cookie named `access_token`
 - if there is a refresh token, it is stored in a cookie named `refresh_token`
 
-### Example
+#### Example
 ```ts
 app.get('loggedIn', isUserLoggedIn(authenticationService));
 ```
