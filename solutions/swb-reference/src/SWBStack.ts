@@ -24,6 +24,7 @@ export class SWBStack extends Stack {
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    S3_DATASETS_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
@@ -33,6 +34,7 @@ export class SWBStack extends Stack {
       STAGE,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
