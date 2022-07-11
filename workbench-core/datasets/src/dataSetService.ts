@@ -185,7 +185,7 @@ export class DataSetService {
   /**
    * Get the details of an external endpoint.
    * @param dataSetId - the name of the DataSet.
-   * @param endPointId - the name of the EndPoint.
+   * @param endPointId - the id of the EndPoint.
    * @returns - the details of the endpoint.
    */
   public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
