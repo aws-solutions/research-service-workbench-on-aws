@@ -138,6 +138,7 @@ export class SWBStack extends Stack {
         new PolicyStatement({
           actions: [
             'ec2:AuthorizeSecurityGroupIngress',
+            'ec2:AuthorizeSecurityGroupEgress',
             'ec2:RevokeSecurityGroupEgress',
             'ec2:CreateSecurityGroup',
             'ec2:DeleteSecurityGroup',
