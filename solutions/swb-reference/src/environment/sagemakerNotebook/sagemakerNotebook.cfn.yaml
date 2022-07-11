@@ -48,6 +48,11 @@ Resources:
       GroupDescription: SageMaker Notebook Instance
       VpcId:
         Ref: VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -64,12 +69,50 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - 's3:*'
-              - 'logs:*'
-            Resource: '*'
+              - 's3:ListBucket'
+            Resource: '*' # TODO: add dataset bucket
           - Effect: Allow
             Action:
-              - 'kms:*'
+              - 's3:GetObject'
+              - 's3:PutObject'
+            Resource: '*' # TODO: add dataset bucket
+          - Effect: Allow
+            Action:
+              - 's3:ListBucket'
+            Resource: !Sub
+              - 'arn:aws:s3:::${S3Bucket}'
+              - S3Bucket: !Select [2, !Split ['/', !Ref EnvironmentInstanceFiles]]
+            Condition:
+              StringLike:
+                s3:prefix: !Sub
+                  - '${S3Prefix}/*'
+                  - S3Prefix: !Select [3, !Split ['/', !Ref EnvironmentInstanceFiles]]
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+            Resource: !Sub
+              - 'arn:aws:s3:::${S3Location}/*'
+              # Remove "s3://" prefix from EnvironmentInstanceFiles
+              - S3Location: !Select [1, !Split ['s3://', !Ref EnvironmentInstanceFiles]]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:CreateLogGroup
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
+          - Effect: Allow
+            Action:
+              - 'kms:CreateGrant'
+              - 'kms:CreateKey'
+              - 'kms:DescribeKey'
+              - 'kms:EnableKeyRotation'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKeyWithoutPlaintext'
+              - 'kms:Get*'
+              - 'kms:List*'
             Resource: '*'
           - Effect: Allow
             Action:
