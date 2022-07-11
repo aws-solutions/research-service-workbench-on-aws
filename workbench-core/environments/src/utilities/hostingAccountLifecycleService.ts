@@ -35,6 +35,8 @@ export default class HostingAccountLifecycleService {
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
 
+    // TODO: Add account to artifactBucket's bucket policy
+
     // Finally store the new/updated account details in DDB
     return this._accountService.createOrUpdate(accountMetadata);
   }

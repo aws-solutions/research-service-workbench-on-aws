@@ -172,7 +172,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     );
 
     let bucketPolicyResponse: GetBucketPolicyCommandOutput;
-    let bucketPolicy: PolicyDocument;
+    let bucketPolicy: PolicyDocument = new PolicyDocument();
 
     try {
       const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
@@ -188,7 +188,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
           `Encountered an error while getting bucket policy for bucket ${name}. Error: ${err.name}`
         );
 
-      bucketPolicy = new PolicyDocument();
+      bucketPolicy;
     }
 
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;

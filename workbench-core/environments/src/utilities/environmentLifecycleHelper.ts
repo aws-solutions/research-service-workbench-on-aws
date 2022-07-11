@@ -121,7 +121,7 @@ export default class EnvironmentLifecycleHelper {
    * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
    */
   public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
-    let datasetsToMount: Array<{ [key: string]: string }> = [];
+    let datasetsToMount: Array<string> = [];
 
     datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
@@ -135,12 +135,7 @@ export default class EnvironmentLifecycleHelper {
             )
           : await this.dataSetService.getDataSetMountString(datasetId, `mount-on-${envId}`);
 
-        return {
-          datasetId,
-          storageName: dataSet.storageName,
-          path: dataSet.path,
-          mountString
-        };
+        return mountString;
       })
     );
 

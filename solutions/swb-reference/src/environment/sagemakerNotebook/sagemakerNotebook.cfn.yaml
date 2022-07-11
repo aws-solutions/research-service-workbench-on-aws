@@ -37,9 +37,6 @@ Parameters:
   AutoStopIdleTimeInMinutes:
     Type: Number
     Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
-  DatasetMounts:
-    Type: String
-    Description: Stringified array of dataset objects containing their mountString
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
@@ -139,21 +136,21 @@ Resources:
 
   # This policy is attached to the role after the instance is created
   # so that the instance can be referenced in the resource section
-  #  NotebookStopPolicy:
-  #    Type: AWS::IAM::Policy
-  #    Properties:
-  #      PolicyName: NotebookStop
-  #      PolicyDocument:
-  #        Version: '2012-10-17'
-  #        Statement:
-  #          - Effect: Allow
-  #            Action:
-  #              - sagemaker:DescribeNotebookInstance
-  #              - sagemaker:StopNotebookInstance
-  #            Resource:
-  #              - !Ref BasicNotebookInstance
-  #      Roles:
-  #        - !Ref IAMRole
+  NotebookStopPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: NotebookStop
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstance
+              - sagemaker:StopNotebookInstance
+            Resource:
+              - !Ref BasicNotebookInstance
+      Roles:
+        - !Ref IAMRole
 
   # TODO: Consider also passing DefaultCodeRepository to allow persisting notebook data
   BasicNotebookInstance:
@@ -165,7 +162,7 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup
       DirectInternetAccess: Enabled
-      #      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
+      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
 
   # TODO: Add script for mounting studies and autostop

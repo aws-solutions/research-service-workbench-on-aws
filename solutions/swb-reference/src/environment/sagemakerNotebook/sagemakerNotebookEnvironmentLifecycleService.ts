@@ -43,7 +43,7 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
-      DatasetMounts: !_.isEmpty(envMetadata.datasetIds)
+      S3Mounts: !_.isEmpty(envMetadata.datasetIds)
         ? [await this.helper.getDatasetsToMount(envMetadata.datasetIds, envMetadata.id)]
         : ['[]']
     };
