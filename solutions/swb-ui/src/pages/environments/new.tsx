@@ -154,7 +154,6 @@ const Environment: NextPage = () => {
   const submitForm = async (): Promise<void> => {
     setIsSubmitLoading(true);
     try {
-      console.log('formData', formData);
       await createEnvironment(formData);
       await router.push({
         pathname: '/environments',
@@ -177,7 +176,6 @@ const Environment: NextPage = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
-
   return (
     <AppLayout
       id="environment"

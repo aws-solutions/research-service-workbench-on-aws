@@ -149,7 +149,6 @@ export class DataSetService {
     externalRoleName?: string
   ): Promise<string> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
-    console.log('ZZZ: targetDS', targetDS);
 
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
@@ -176,7 +175,6 @@ export class DataSetService {
 
     const endPoint: ExternalEndpoint = await this._dbProvider.addExternalEndpoint(endPointParam);
 
-    console.log('endpoint', endPoint);
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
     targetDS.externalEndpoints.push(endPoint.id as string);
