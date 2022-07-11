@@ -2,6 +2,7 @@ import { AuditService } from '@amzn/workbench-core-audit';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
+import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
@@ -44,14 +45,13 @@ export class DataSetService {
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
-    const locator: string = await storageProvider.createStorage(storageName, path);
+    await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
       storageName: storageName,
       path: path,
       awsAccountId: awsAccountId,
-      storageType: storageProvider.getStorageType(),
-      location: locator
+      storageType: storageProvider.getStorageType()
     };
 
     return await this._dbProvider.addDataSet(provisioned);
@@ -75,14 +75,13 @@ export class DataSetService {
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
-    const locator: string = await storageProvider.importStorage(storageName, path);
+    await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
       storageName: storageName,
       path: path,
       awsAccountId: awsAccountId,
-      storageType: storageProvider.getStorageType(),
-      location: locator
+      storageType: storageProvider.getStorageType()
     };
 
     return await this._dbProvider.addDataSet(imported);
@@ -140,7 +139,7 @@ export class DataSetService {
    * @param externalRoleName - a role which will interact with the endpoint.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
    * to modify the target DataSet's underlying storage.
-   * @returns a string representation of a JSON object which contains a URL to the storage, the DataSet's name and the storage path.
+   * @returns a string representation of a JSON object which contains an alias to mount the storage, the DataSet's name and the storage path.
    */
   public async addDataSetExternalEndpoint(
     dataSetId: string,
@@ -153,20 +152,21 @@ export class DataSetService {
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
-    const storageUrl = await storageProvider.addExternalEndpoint(
+    const connections: EndpointConnectionStrings = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
-      targetDS.awsAccountId as string,
+      targetDS.awsAccountId!,
       externalRoleName
     );
 
     const endPointParam: ExternalEndpoint = {
       name: externalEndpointName,
-      dataSetId: targetDS.id as string,
+      dataSetId: targetDS.id!,
       dataSetName: targetDS.name,
       path: targetDS.path,
-      endPointUrl: storageUrl
+      endPointUrl: connections.endPointUrl,
+      endPointAlias: connections.endPointAlias
     };
 
     if (externalRoleName) {
@@ -177,9 +177,10 @@ export class DataSetService {
 
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
-    targetDS.externalEndpoints.push(endPoint.id as string);
+    targetDS.externalEndpoints.push(endPoint.id!);
+
     await this._dbProvider.updateDataSet(targetDS);
-    return this._generateMountString(endPoint.dataSetName, endPoint.endPointUrl, endPoint.path);
+    return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias!, endPoint.path);
   }
 
   /**
