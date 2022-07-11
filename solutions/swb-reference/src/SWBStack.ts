@@ -66,14 +66,13 @@ export class SWBStack extends Stack {
     };
 
     this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
-    const statusHandler = this._createStatusHandlerLambda();
-    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
-    const table = this._createDDBTable(apiLambda);
-    this._createRestApi(apiLambda);
-
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    this._createAccountHandlerLambda(lcRole, artifactS3Bucket, table.tableArn);
+    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
+    const statusHandler = this._createStatusHandlerLambda();
+    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
+    this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
+    this._createRestApi(apiLambda);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
@@ -183,10 +182,10 @@ export class SWBStack extends Stack {
           actions: ['s3:GetObject'],
           resources: ['*']
         }),
-        new PolicyStatement({
-          actions: ['servicecatalog:*'],
-          resources: ['*']
-        }),
+        // new PolicyStatement({
+        //   actions: ['servicecatalog:*'],
+        //   resources: ['*']
+        // }),
         new PolicyStatement({
           actions: [
             'cloudformation:CreateStack',
@@ -263,12 +262,11 @@ export class SWBStack extends Stack {
     statusHandlerLambda.role?.attachInlinePolicy(
       new Policy(this, 'statusHandlerLambdaPolicy', {
         statements: [
-          // TODO: Restrict policy permissions
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: ['*'],
-            sid: 'DynamoDBAccess'
-          }),
+          // new PolicyStatement({
+          //   actions: ['dynamodb:UpdateItem', 'dynamodb:Query', 'dynamodb:GetItem'],
+          //   resources: ['*'],
+          //   sid: 'DynamoDBAccess'
+          // }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
@@ -289,11 +287,7 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(
-    launchConstraintRole: Role,
-    artifactS3Bucket: Bucket,
-    ddbTableArn: string
-  ): void {
+  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): Function {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -355,12 +349,12 @@ export class SWBStack extends Stack {
             sid: 'S3Bucket',
             actions: ['s3:GetObject'],
             resources: [`${artifactS3Bucket.bucketArn}/*`]
-          }),
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: [ddbTableArn, `${ddbTableArn}/index/*`],
-            sid: 'DynamoDBAccess'
           })
+          // new PolicyStatement({
+          //   actions: ['dynamodb:*'],
+          //   resources: [ddbTableArn, `${ddbTableArn}/index/*`],
+          //   sid: 'DynamoDBAccess'
+          // })
         ]
       })
     );
@@ -374,6 +368,8 @@ export class SWBStack extends Stack {
       schedule: Schedule.cron({ minute: '0/5' })
     });
     eventRule.addTarget(new targets.LambdaFunction(lambda));
+
+    return lambda;
   }
 
   private _createAPILambda(statusHandlerLambdaArn: string): Function {
@@ -391,11 +387,11 @@ export class SWBStack extends Stack {
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
           // TODO: Restrict policy permissions
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: ['*'],
-            sid: 'DynamoDBAccess'
-          }),
+          // new PolicyStatement({
+          //   actions: ['dynamodb:*'],
+          //   resources: ['*'],
+          //   sid: 'DynamoDBAccess'
+          // }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
@@ -475,7 +471,11 @@ export class SWBStack extends Stack {
   }
 
   // DynamoDB Table
-  private _createDDBTable(apiLambda: Function): Table {
+  private _createDDBTable(
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
     const tableName: string = `${this.stackName}`;
     const table = new Table(this, tableName, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
@@ -522,6 +522,8 @@ export class SWBStack extends Stack {
     });
     // Grant the Lambda Function read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
+    table.grantReadWriteData(statusHandler);
+    table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
     return table;
   }
