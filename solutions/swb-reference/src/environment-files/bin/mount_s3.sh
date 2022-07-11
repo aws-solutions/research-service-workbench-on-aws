@@ -61,11 +61,11 @@ num_mounts=$(printf "%s" "$mounts" | jq ". | length" -)
 for ((study_idx=0; study_idx<$num_mounts; study_idx++))
 do
     # Parse bucket/key info
-    study_id="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .name -)" # path instead of name ?
-    s3_bucket="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .bucket -)"
-    s3_prefix="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .prefix -)"
-    s3_role_arn="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .roleArn -)"
-    kms_arn="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq ".kmsArn" -)"
+    study_id="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .name | tr -d '"')" # Name of the DS
+    s3_bucket="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .bucket | tr -d '"')" # Access point alias
+    s3_prefix="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .prefix | tr -d '"')" # path of the DS inside bucket
+    s3_role_arn="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq .roleArn | tr -d '"')"
+    kms_arn="$(printf "%s" "$mounts" | jq -r ".[$study_idx]" | jq ".kmsArn" | tr -d '"')"
 
     # Mount S3 location if not already mounted
     study_dir="${MOUNT_DIR}/${study_id}"

@@ -187,8 +187,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
         throw new Error(
           `Encountered an error while getting bucket policy for bucket ${name}. Error: ${err.name}`
         );
-
-      bucketPolicy;
     }
 
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
