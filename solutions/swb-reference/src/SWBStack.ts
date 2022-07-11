@@ -262,11 +262,6 @@ export class SWBStack extends Stack {
     statusHandlerLambda.role?.attachInlinePolicy(
       new Policy(this, 'statusHandlerLambdaPolicy', {
         statements: [
-          // new PolicyStatement({
-          //   actions: ['dynamodb:UpdateItem', 'dynamodb:Query', 'dynamodb:GetItem'],
-          //   resources: ['*'],
-          //   sid: 'DynamoDBAccess'
-          // }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
@@ -350,11 +345,6 @@ export class SWBStack extends Stack {
             actions: ['s3:GetObject'],
             resources: [`${artifactS3Bucket.bucketArn}/*`]
           })
-          // new PolicyStatement({
-          //   actions: ['dynamodb:*'],
-          //   resources: [ddbTableArn, `${ddbTableArn}/index/*`],
-          //   sid: 'DynamoDBAccess'
-          // })
         ]
       })
     );
@@ -386,12 +376,6 @@ export class SWBStack extends Stack {
     apiLambda.role?.attachInlinePolicy(
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
-          // TODO: Restrict policy permissions
-          // new PolicyStatement({
-          //   actions: ['dynamodb:*'],
-          //   resources: ['*'],
-          //   sid: 'DynamoDBAccess'
-          // }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
@@ -520,7 +504,7 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'type', type: AttributeType.STRING }
     });
-    // Grant the Lambda Function read access to the DynamoDB table
+    // Grant the Lambda Functions read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
     table.grantReadWriteData(statusHandler);
     table.grantReadWriteData(createAccountHandler);
