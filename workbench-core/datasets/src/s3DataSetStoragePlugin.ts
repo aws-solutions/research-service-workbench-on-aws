@@ -84,7 +84,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<EndpointConnectionStrings> {
-    const response: { endPointArn: string; endPointAlias: string | undefined } =
+    const response: { endPointArn: string; endPointAlias?: string } =
       await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
     await this._configureBucketPolicy(name, response.endPointArn);
 
