@@ -177,7 +177,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
     let bucketPolicy: PolicyDocument = new PolicyDocument();
     try {
-    try {
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
         getBucketPolicyConfig
       );
@@ -192,14 +191,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       }
     }
 
-    // console.log('bucketPolicyResponse', bucketPolicyResponse);
-    // if (bucketPolicyResponse.Policy) {
-    //   bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
-    // } else {
-    //   bucketPolicy = new PolicyDocument();
-    // }
-
-    // console.log('bucketPolicy', bucketPolicy);
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
 
     bucketPolicy.addStatements(delegationStatement);

@@ -96,19 +96,13 @@ const Environment: NextPage = () => {
     {
       field: 'cidr',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a,
-      message: 'Restricted CIDR is Required'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && cidrRegex.test(a),
+      condition: (a: any) => (a ? cidrRegex.test(a) : true),
       message: 'Restricted CIDR must be in the format range:  [1.0.0.0/0 - 255.255.255.255/32].'
     },
     {
       field: 'cidr',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && a.length <= 128,
+      condition: (a: any) => (a ? a.length <= 128 : true),
       message: 'Restricted CIDR cannot be longer than 128 characters'
     },
     {
@@ -288,7 +282,7 @@ const Environment: NextPage = () => {
                         />
                       </FormField>
                       <FormField
-                        label="Restricted CIDR"
+                        label="Restricted CIDR (Optional)"
                         description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
                         constraintText="Note: an environment config with a hardcoded CIDR will override this value."
                         errorText={formErrors?.cidrError}
