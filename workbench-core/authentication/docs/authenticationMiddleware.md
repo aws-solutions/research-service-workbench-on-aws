@@ -1,7 +1,7 @@
 # Authentication Middleware
 
 ## Description
-Express middleware and route handlers for basic authentication flow.
+Express middleware and route handlers for basic authentication flow. Read the [Authentication Service](./authenticationService.md) documentation before exploring middleware.
 
 ## Usage
 
@@ -13,7 +13,7 @@ The provided middleware and route handlers assume that the Express application i
   - [built in express](https://expressjs.com/en/4x/api.html) via `express.json()` for express versions >= 4.16.0
   - [body-parser](https://www.npmjs.com/package/body-parser) for express versions < 4.16.0
 
-### Example
+#### Example
 ```ts
 const app = express();
 
@@ -32,28 +32,28 @@ app.use(express.json())
 
 [logoutUser](#logoutuser)
 
-## getAuthorizationCodeUrl
+### getAuthorizationCodeUrl
 This route handler is used to get the url to the authentication hosted UI.
 The `stateVerifier` and `codeChallenge` request query parameters are temporary values passed in by the client. The client will replace these values later in order to keep them a client secret.
 
-### Assumptions
-- a request query parameter named `stateVerifier` that holds a temporary state value
-- a request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
+#### Assumptions
+- a url request query parameter named `stateVerifier` that holds a temporary state value
+- a url request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
 
-### Example
+#### Example
 ```ts
 app.get('codeUrl', getAuthorizationCodeUrl(authenticationService));
 ```
 
-## getTokensFromAuthorizationCode
+### getTokensFromAuthorizationCode
 This route handler is used to exchange the authorization code received from the authentication server for authentication tokens.
 This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token in the response body.
 
-### Assumptions
-- a request body parameter named `code` that holds the authorization code
-- a request body parameter named `codeVerifier` that holds a pkce code verifier value
+#### Assumptions
+- a url request body parameter named `code` that holds the authorization code
+- a url request body parameter named `codeVerifier` that holds a pkce code verifier value
 
-### Example
+#### Example
 ```ts
 app.get('tokens', getTokensFromAuthorizationCode(authenticationService));
 ```
