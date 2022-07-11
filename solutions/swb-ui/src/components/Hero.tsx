@@ -2,13 +2,10 @@ import Box from '@awsui/components-react/box';
 import Button from '@awsui/components-react/button';
 import Container from '@awsui/components-react/container';
 import Grid from '@awsui/components-react/grid';
-import { useTranslation } from 'next-i18next';
-import Image from 'next/image';
 import { useSettings } from '../context/SettingsContext';
 import styles from '../styles/Hero.module.scss';
 
 function Hero(): JSX.Element {
-  const { t } = useTranslation();
   const { settings } = useSettings();
 
   return (
@@ -38,17 +35,7 @@ function Hero(): JSX.Element {
               Login
             </Button>
           </div>
-          <div className="custom-home__header-cta">
-            <Container>
-              <Image
-                src="/login-image.gif"
-                layout="responsive"
-                width="10px"
-                height="10px"
-                alt={t('Hero.SWBImageAlt')}
-              />
-            </Container>
-          </div>
+          <div className="custom-home__header-cta"></div>
         </Grid>
       </Box>
     </div>

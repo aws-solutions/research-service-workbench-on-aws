@@ -1,5 +1,4 @@
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
-import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { User, researcherUser } from '../models/User';
 
@@ -10,30 +9,29 @@ export interface NavigationProps {
 }
 
 export default function Navigation({ items }: NavigationProps): JSX.Element {
-  const { t } = useTranslation();
   const [activeHref, setActiveHref] = React.useState('');
   const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     {
       type: 'section',
-      text: t('Dashboards'),
+      text: 'Dashboards',
       items: [
-        { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
-        { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
+        { type: 'link', text: 'All Dashboards', href: '/dashboards' },
+        { type: 'link', text: 'Project Dashboards', href: '/dashboards#projects' }
       ]
     },
-    { type: 'link', text: t('Users'), href: '/users' },
-    { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' }
+    { type: 'link', text: 'Users', href: '/users' },
+    { type: 'link', text: 'Workspaces', href: '/environments' },
+    { type: 'link', text: 'Datasets', href: '/datasets' }
   ];
   const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
-    { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' },
+    { type: 'link', text: 'Workspaces', href: '/environments' },
+    { type: 'link', text: 'Datasets', href: '/datasets' },
     {
       type: 'section',
-      text: t('Dashboards'),
+      text: 'Dashboards',
       items: [
-        { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
-        { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
+        { type: 'link', text: 'All Dashboards', href: '/dashboards' },
+        { type: 'link', text: 'Project Dashboards', href: '/dashboards#projects' }
       ]
     }
   ];
