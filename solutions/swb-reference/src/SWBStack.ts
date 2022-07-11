@@ -182,10 +182,6 @@ export class SWBStack extends Stack {
           actions: ['s3:GetObject'],
           resources: ['*']
         }),
-        // new PolicyStatement({
-        //   actions: ['servicecatalog:*'],
-        //   resources: ['*']
-        // }),
         new PolicyStatement({
           actions: [
             'cloudformation:CreateStack',
