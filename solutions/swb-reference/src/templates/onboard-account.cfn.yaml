@@ -163,7 +163,7 @@ Resources:
                 - servicecatalog:DescribeRecord
               Resource:
                 - '*'
-        - PolicyName: sagemaker-access
+        - PolicyName: sagemakerNotebook-access
           PolicyDocument:
             Statement:
               Effect: Allow

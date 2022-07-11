@@ -26,6 +26,7 @@ describe('DataSetService', () => {
   const mockAccessPointName = 'Sample-Access-Point';
   const mockRoleArn = 'Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
+  const mockExistingEndpointId = 'Sample-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
 
@@ -80,8 +81,8 @@ describe('DataSetService', () => {
     });
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetMetadata')
-      .mockImplementation(async (name: string): Promise<DataSet> => {
-        if (name === mockDataSetWithEndpointId) {
+      .mockImplementation(async (id: string): Promise<DataSet> => {
+        if (id === mockDataSetWithEndpointId) {
           return {
             id: mockDataSetWithEndpointId,
             name: mockDataSetName,
@@ -92,7 +93,6 @@ describe('DataSetService', () => {
             externalEndpoints: [mockExistingEndpointName]
           };
         }
-
         return {
           id: mockDataSetId,
           name: mockDataSetName,
@@ -106,13 +106,28 @@ describe('DataSetService', () => {
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
       .mockImplementation(async () => {
         return {
+          id: mockExistingEndpointId,
           name: mockExistingEndpointName,
+          dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
           path: mockDataSetPath,
           endPointUrl: mockEndPointUrl,
           allowedRoles: [mockRoleArn]
         };
       });
+
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'addExternalEndpoint').mockImplementation(async () => {
+      return {
+        id: mockExistingEndpointId,
+        name: mockExistingEndpointName,
+        dataSetId: mockDataSetId,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        allowedRoles: [mockRoleArn]
+      };
+    });
+
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
     });
@@ -155,7 +170,14 @@ describe('DataSetService', () => {
           mockAwsAccountId,
           plugin
         )
-      ).resolves.toBeUndefined();
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(plugin.createStorage).toBeCalledTimes(1);
     });
@@ -173,7 +195,14 @@ describe('DataSetService', () => {
     it('calls importStorage and addDataSet ', async () => {
       await expect(
         service.importDataSet('name', 'storageName', 'path', 'accountId', plugin)
-      ).resolves.toBeUndefined();
+      ).resolves.toEqual({
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        storageName: mockDataSetStorageName,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType
+      });
       expect(metaPlugin.addDataSet).toBeCalledTimes(1);
       expect(plugin.importStorage).toBeCalledTimes(1);
     });
@@ -256,7 +285,7 @@ describe('DataSetService', () => {
 
     it('returns the mount string for the DataSet mount point', async () => {
       await expect(
-        service.addDataSetExternalEndpoint(mockDataSetName, mockAccessPointName, mockRoleArn, plugin)
+        service.addDataSetExternalEndpoint(mockDataSetId, mockAccessPointName, plugin, mockRoleArn)
       ).resolves.toEqual(
         JSON.stringify({
           name: mockDataSetName,
@@ -273,9 +302,10 @@ describe('DataSetService', () => {
         response = await service.addDataSetExternalEndpoint(
           mockDataSetWithEndpointId,
           mockExistingEndpointName,
-          mockRoleArn,
-          plugin
+          plugin,
+          mockRoleArn
         );
+        expect.hasAssertions();
       } catch (err) {
         response = err;
       }

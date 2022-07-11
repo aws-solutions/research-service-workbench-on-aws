@@ -34,6 +34,8 @@ export class DataSetService {
    * @param awsAccountId - the AWS account where the DataSet resides.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
    * for a particular platform, account, etc.
+   *
+   * @returns the DataSet object which is stored in the backing datastore.
    */
   public async provisionDataSet(
     datasetName: string,
@@ -41,7 +43,7 @@ export class DataSetService {
     path: string,
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const locator: string = await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
@@ -52,7 +54,7 @@ export class DataSetService {
       location: locator
     };
 
-    await this._dbProvider.addDataSet(provisioned);
+    return await this._dbProvider.addDataSet(provisioned);
   }
 
   /**
@@ -63,6 +65,8 @@ export class DataSetService {
    * @param awsAccountId - the 12 digit Id of the AWS account where the dataSet resides.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
    * for a particular platform, account, etc.
+   *
+   * @returns the DataSet object which is stored in teh backing datastore.
    */
   public async importDataSet(
     datasetName: string,
@@ -70,7 +74,7 @@ export class DataSetService {
     path: string,
     awsAccountId: string,
     storageProvider: DataSetsStoragePlugin
-  ): Promise<void> {
+  ): Promise<DataSet> {
     const locator: string = await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
@@ -81,74 +85,116 @@ export class DataSetService {
       location: locator
     };
 
-    await this._dbProvider.addDataSet(imported);
+    return await this._dbProvider.addDataSet(imported);
   }
 
   /**
    * Removes a DataSet from the solution however it does not delete the storage.
-   * @param dataSetName - the name of the DataSet to remove.
+   * @param dataSetId - the ID of the DataSet to remove.
    */
-  public async removeDataSet(dataSetName: string): Promise<void> {
+  public async removeDataSet(dataSetId: string): Promise<void> {
     throw new Error(notImplementedText);
   }
 
   /**
    * Get the mount configuration string for a DataSet.
-   * @param dataSetName - the name of the DataSet.
-   * @param endPointName - an arn with which the DataSet will be accessed from the external environment.
+   * @param dataSetId - the ID of the DataSet.
+   * @param endPointId - the ID of the endpoint to remove.
    *
    * @returns the string needed to mount the Dataset in an external environment.
    */
-  public async getDataSetMountString(dataSetName: string, endPointName: string): Promise<string> {
-    const targetDS: DataSet = await this.getDataSet(dataSetName);
+  public async getDataSetMountString(dataSetId: string, endPointId: string): Promise<string> {
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
 
-    if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointName))
-      throw Boom.notFound(`'${endPointName}' not found on DataSet '${dataSetName}'.`);
+    if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
+      throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
 
-    const endPoint = await this.getExternalEndPoint(dataSetName, endPointName);
-    return this._generateMountString(dataSetName, endPoint.endPointUrl, targetDS.path);
+    const endPoint = await this.getExternalEndPoint(dataSetId, endPointId);
+    return this._generateMountString(dataSetId, endPoint.endPointUrl, targetDS.path);
   }
 
+  /**
+   * List the currently known DataSets.
+   *
+   * @returns an array of DataSet objects.
+   */
   public async listDataSets(): Promise<DataSet[]> {
     return await this._dbProvider.listDataSets();
   }
 
-  public async getDataSet(dataSetName: string): Promise<DataSet> {
-    return await this._dbProvider.getDataSetMetadata(dataSetName);
+  /**
+   * Get details on a particular DataSet.
+   *
+   * @param dataSetId - the Id of the DataSet for which details are desired.
+   * @returns - the DataSet object associated with that DataSet.
+   */
+  public async getDataSet(dataSetId: string): Promise<DataSet> {
+    return await this._dbProvider.getDataSetMetadata(dataSetId);
   }
 
+  /**
+   * Add an external endpoint to a DataSet.
+   *
+   * @param dataSetId - the name of the DataSet to which the endpoint will be added.
+   * @param externalEndpointName - the name of the endpoint to add.
+   * @param externalRoleName - a role which will interact with the endpoint.
+   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
+   * to modify the target DataSet's underlying storage.
+   * @returns a string representation of a JSON object which contains a URL to the storage, the DataSet's name and the storage path.
+   */
   public async addDataSetExternalEndpoint(
-    dataSetName: string,
+    dataSetId: string,
     externalEndpointName: string,
-    externalRoleName: string,
-    storageProvider: DataSetsStoragePlugin
+    storageProvider: DataSetsStoragePlugin,
+    externalRoleName?: string
   ): Promise<string> {
-    const targetDS: DataSet = await this.getDataSet(dataSetName);
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
 
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
-      throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetName}'.`);
+      throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
-    const mountString = await storageProvider.addExternalEndpoint(
+    const storageUrl = await storageProvider.addExternalEndpoint(
       targetDS.storageName,
       targetDS.path,
       externalEndpointName,
+      targetDS.awsAccountId as string,
       externalRoleName
     );
 
+    const endPointParam: ExternalEndpoint = {
+      name: externalEndpointName,
+      dataSetId: targetDS.id as string,
+      dataSetName: targetDS.name,
+      path: targetDS.path,
+      endPointUrl: storageUrl
+    };
+
+    if (externalRoleName) {
+      endPointParam.allowedRoles = [externalRoleName];
+    }
+
+    const endPoint: ExternalEndpoint = await this._dbProvider.addExternalEndpoint(endPointParam);
+
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
-    targetDS.externalEndpoints.push(externalEndpointName);
+    targetDS.externalEndpoints.push(endPoint.id as string);
     await this._dbProvider.updateDataSet(targetDS);
-    return mountString;
+    return this._generateMountString(endPoint.dataSetName, endPoint.endPointUrl, endPoint.path);
   }
 
-  public async getExternalEndPoint(dataSetName: string, endPointName: string): Promise<ExternalEndpoint> {
-    return await this._dbProvider.getDataSetEndPointDetails(dataSetName, endPointName);
+  /**
+   * Get the details of an external endpoint.
+   * @param dataSetId - the name of the DataSet.
+   * @param endPointId - the id of the EndPoint.
+   * @returns - the details of the endpoint.
+   */
+  public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
+    return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
-  private _generateMountString(dataSetName: string, endPointURL: string, path: string): string {
+  private _generateMountString(dataSetId: string, endPointURL: string, path: string): string {
     return JSON.stringify({
-      name: dataSetName,
+      name: dataSetId,
       bucket: endPointURL,
       prefix: path
     });

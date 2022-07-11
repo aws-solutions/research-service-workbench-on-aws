@@ -9,12 +9,14 @@ function getConstants(): {
   AWS_REGION: string;
   SSM_DOC_NAME_SUFFIX: string;
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
+  S3_DATASETS_BUCKET_ARN_NAME: string;
   S3_ARTIFACT_BUCKET_SC_PREFIX: string;
   LAUNCH_CONSTRAINT_ROLE_NAME: string;
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
+  ALLOWED_ORIGINS: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -36,6 +38,7 @@ function getConstants(): {
   // These are the OutputKey for the SWB Main Account CFN stack
   const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
+  const S3_DATASETS_BUCKET_ARN_NAME = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
   const STATUS_HANDLER_ARN_NAME = 'StatusHandlerLambdaArnOutput';
 
@@ -46,12 +49,14 @@ function getConstants(): {
     AWS_REGION,
     SSM_DOC_NAME_SUFFIX,
     S3_ARTIFACT_BUCKET_ARN_NAME,
+    S3_DATASETS_BUCKET_ARN_NAME,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
-    STATUS_HANDLER_ARN_NAME
+    STATUS_HANDLER_ARN_NAME,
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
   };
 }
 
