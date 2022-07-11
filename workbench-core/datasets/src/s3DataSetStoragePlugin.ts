@@ -183,7 +183,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
         bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
       }
     } catch (e) {
-      // All errors are thrown except NoSuchBucket error. For that error we assign new bucket policy for bucket
+      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
       if (e.Code !== 'NoSuchBucketPolicy') {
         throw e;
       }
