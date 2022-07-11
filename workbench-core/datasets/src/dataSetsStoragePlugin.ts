@@ -55,7 +55,7 @@ export interface DataSetsStoragePlugin {
    * @param externalRoleName - an optional role name which the external environment will assume to
    * access the DataSet
    *
-   * @returns a string which can be used to mount the DataSet to an external environment.
+   * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
    */
   addExternalEndpoint(
     name: string,
