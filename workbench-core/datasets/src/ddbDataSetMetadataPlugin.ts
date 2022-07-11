@@ -81,7 +81,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
-    endPointParam.Id = uuidv4();
+    endPointParam.id = uuidv4();
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
@@ -134,7 +134,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
     const endPointKey = {
       pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
-      sk: `${this._endPointKeyType}#${endPoint.Id}`
+      sk: `${this._endPointKeyType}#${endPoint.id}`
     };
     const endPointParams: { item: { [key: string]: string | string[] } } = {
       item: {

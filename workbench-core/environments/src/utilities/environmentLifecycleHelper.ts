@@ -127,13 +127,14 @@ export default class EnvironmentLifecycleHelper {
       _.map(datasetIds, async (datasetId) => {
         const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
 
+        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
         const mountString: string = _.isEmpty(dataSet.externalEndpoints)
           ? await this.dataSetService.addDataSetExternalEndpoint(
               datasetId,
-              `mount-on-${envId}`,
+              datasetEndPointName,
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await this.dataSetService.getDataSetMountString(datasetId, `mount-on-${envId}`);
+          : await this.dataSetService.getDataSetMountString(datasetId, datasetEndPointName);
 
         return mountString;
       })
