@@ -21,3 +21,23 @@ export type EnvironmentConnectResponse = {
 };
 
 export type EnvironmentStatus = 'STOPPED' | 'STOPPING' | 'FAILED' | 'COMPLETED' | 'PENDING' | 'TERMINATING';
+
+export interface CreateEnvironmentForm {
+  envTypeId?: string;
+  name?: string;
+  cidr?: string;
+  projectId?: string;
+  envTypeConfigId?: string;
+  description?: string;
+  envType?: string;
+  datasetIds?: [];
+}
+
+export interface CreateEnvironmentFormValidation {
+  envTypeIdError?: string;
+  nameError?: string;
+  cidrError?: string;
+  projectIdError?: string;
+  envTypeConfigIdError?: string;
+  descriptionError?: string;
+}

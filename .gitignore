@@ -92,6 +92,8 @@ build/
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
+solutions/swb-reference/integration-tests/config/*.yaml
+!solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 solutions/swb-reference/.aws-sam/
@@ -102,3 +104,6 @@ solutions/managed-blockchain-for-patient-consent/*/build
 
 # example package
 workbench-core/example/infrastructure/build
+
+#patient consent app cdk-outputs
+solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/cdk-outputs.json

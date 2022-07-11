@@ -7,12 +7,13 @@ import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import { Express } from 'express';
-import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
-import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
+import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
+import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import HPCService from './HPC/HPCService';
 
 const apiRouteConfig: ApiRouteConfig = {
@@ -49,9 +50,9 @@ const apiRouteConfig: ApiRouteConfig = {
     }
   ],
   environments: {
-    sagemaker: {
-      lifecycle: new SagemakerEnvironmentLifecycleService(),
-      connection: new SagemakerEnvironmentConnectionService()
+    sagemakerNotebook: {
+      lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
+      connection: new SagemakerNotebookEnvironmentConnectionService()
     }
 
     // Add your environment types here as follows:
@@ -69,6 +70,9 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   })
 };

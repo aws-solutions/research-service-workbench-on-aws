@@ -7,6 +7,7 @@ import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { setUpProjectRoutes } from './projectRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
@@ -32,6 +33,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
+  setUpProjectRoutes(router, apiRouteConfig.projectService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

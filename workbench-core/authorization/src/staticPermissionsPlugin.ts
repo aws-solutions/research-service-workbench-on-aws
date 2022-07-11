@@ -1,6 +1,7 @@
 import { LoggingService } from '@amzn/workbench-core-logging';
 import _ from 'lodash';
 import { AuthenticatedUser } from './authenticatedUser';
+import { RouteNotSecuredError } from './errors/routeNotSecuredError';
 import Operation from './operation';
 import Permission, { PermissionsMap } from './permission';
 import PermissionsPlugin from './permissionsPlugin';
@@ -50,7 +51,7 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
       const methodToOperations = _.get(_.get(this._routesMap, route), method);
       if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
     }
-    throw new Error('Route has not been secured');
+    throw new RouteNotSecuredError('Route has not been secured');
   }
   /**
    * Checks if a route is being ignored for Authorization.
