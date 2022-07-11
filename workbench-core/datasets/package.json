@@ -25,6 +25,16 @@
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
   },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
+  },
   "dependencies": {
     "@amzn/workbench-core-audit": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
@@ -40,6 +50,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@rushstack/eslint-config": "^2.5.1",
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
@@ -60,6 +71,7 @@
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",
+    "ts-jest": "^27.1.3",
     "typescript": "^4.5.2"
   }
 }
