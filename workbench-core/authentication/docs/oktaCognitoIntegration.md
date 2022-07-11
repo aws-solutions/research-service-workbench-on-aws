@@ -1,6 +1,16 @@
-Prerequesites:
-- The user pool has been configured with a domain and an app client
-- app client is configured for Authorization code grant
+# Okta Integration into Cognito
+
+## Description
+
+Set-by-step instructions for integrating Okta into Cognito
+
+## Usage
+
+### Requirements:
+- The user pool to integrate with has been preconfigured, including a domain and an app client
+- The app client is configured to use the **Authorization code grant** OAuth 2.0 grant type
+
+### Steps
 
 1. Navigate to [Okta](https://www.okta.com/), register if necessary, and sign in
 2. Create an Okta app
