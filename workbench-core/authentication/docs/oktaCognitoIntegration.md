@@ -20,14 +20,14 @@ Prerequesites:
   7. Change **Issuer** from **Dynamic** to **Okta URL** and note the Issuer URL. You need this URL for configuring Okta in your Amazon Cognito user pool
 4. Add an OIDC IdP in your user pool
   1.  In the Amazon Cognito console, navigate to your user pool
-  2.  In the left navigation pane, under Federation, click **Sign-in experience**
-  3.  Click **Federated identity provider sign-in** and select **OpenID Connect (OIDC)**
+  2.  In the user pool console, click the **Sign-in experience** tab
+  3.  Under **Federated identity provider sign-in**, click **Add identity provider** and select **OpenID Connect (OIDC)**
   4.  Do the following:
-    1. For Provider name, enter a name for the IdP. This name appears in the Amazon Cognito hosted web UI.
-       Note: You can't change this field after creating the provider. If you plan to include this field in your app or use the Amazon Cognito hosted web UI, use a name that you're comfortable with your app's users seeing.
+    1. For Provider name, enter a name for the IdP. This name appears in the Amazon Cognito hosted web UI
+       Note: You can't change this field after creating the provider, so use a name that you're comfortable with your app's users seeing
     2. For Client ID, input the Client ID that you noted earlier from Okta
     3. For Client secret, input the Client secret that you noted earlier from Okta
-    4. For Authorize scope, input these scopes `openid email profile`. These are the scopes required for the default authentication services
+    4. For Authorize scope, input these scopes: `openid email profile`. These are the scopes required for the default authentication services
     5. For Attribute request method, leave the setting as GET
     6. For Issuer, leave **Auto fill through issuer URL** selected and input the Issuer URL that you copied earlier from Okta
     7. For Map attributes, add the following mappings:
@@ -38,10 +38,10 @@ Prerequesites:
       | given_name          | given_name               |
       | username            | username                 |
       These are the mappings required for the default authentication services
-  5.  Click Add identity provider
+  5.  Click **Add identity provider**
 5. Add the created Okta IdP to your app client
   1. In the Amazon Cognito console, navigate to your user pool app client
-  2. On the app client page, under Hosted UI, click Edit
+  2. On the app client page, under Hosted UI, click **Edit**
   3. Under Identity Providers, select your newly created Okta IdP
-  4. Click Save changes
-  5. Under Hosted UI, click View Hosted UI to view your newly created Okta IdP in the hosted UI
+  4. Click **Save changes**
+  5. Under Hosted UI, click **View Hosted UI** to view your newly created Okta IdP in the hosted UI
