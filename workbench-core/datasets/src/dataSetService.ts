@@ -161,7 +161,6 @@ export class DataSetService {
       targetDS.awsAccountId as string,
       externalRoleName
     );
-    console.log('storageURL', storageUrl);
 
     const endPointParam: ExternalEndpoint = {
       name: externalEndpointName,
@@ -175,7 +174,6 @@ export class DataSetService {
       endPointParam.allowedRoles = [externalRoleName];
     }
 
-    console.log('endPointParam', endPointParam);
     const endPoint: ExternalEndpoint = await this._dbProvider.addExternalEndpoint(endPointParam);
 
     console.log('endpoint', endPoint);

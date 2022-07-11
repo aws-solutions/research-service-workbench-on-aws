@@ -136,7 +136,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     console.log('_storeEndPointToDdb', endPoint);
     const endPointKey = {
       pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
-      sk: `${this._endPointKeyType}#${endPoint.Id}`
+      sk: `${this._endPointKeyType}#${endPoint.id}`
     };
     const endPointParams: { item: { [key: string]: string | string[] } } = {
       item: {
