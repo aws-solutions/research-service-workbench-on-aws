@@ -180,7 +180,7 @@ export class DataSetService {
     targetDS.externalEndpoints.push(endPoint.id as string);
 
     await this._dbProvider.updateDataSet(targetDS);
-    return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias as string, endPoint.path);
+    return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias!, endPoint.path);
   }
 
   /**
