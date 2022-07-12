@@ -289,7 +289,6 @@ const Environment: NextPage = () => {
                       </FormField>
                       <FormField
                         label="Dataset"
-                        errorText={formErrors?.datasetError}
                         description="Studies that you would like to mount to your workspace"
                       >
                         <Multiselect

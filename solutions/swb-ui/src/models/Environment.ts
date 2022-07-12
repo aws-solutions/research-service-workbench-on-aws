@@ -40,5 +40,4 @@ export interface CreateEnvironmentFormValidation {
   projectIdError?: string;
   envTypeConfigIdError?: string;
   descriptionError?: string;
-  datasetError?: string;
 }
