@@ -67,8 +67,8 @@ export interface DataSetsStoragePlugin {
 
   /**
    * Add a role used to access an external endpoint.
-   * If provided, update the policy on the KMS key to all
-   * access for the given role.
+   * If provided, update the policy on the KMS key to grant
+   * encrypt/decrypt access for the given role.
    *
    * @param name - the name of the storage destination accessed by the external endpoint.
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
