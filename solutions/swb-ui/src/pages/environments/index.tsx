@@ -88,11 +88,7 @@ const Environment: NextPage = () => {
   });
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue>({
-    type: 'relative',
-    amount: 1,
-    unit: 'week'
-  });
+  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
   const initialNotifications =
     !!message && !!notificationType
       ? [
@@ -117,7 +113,7 @@ const Environment: NextPage = () => {
   const { items, filteredItemsCount, collectionProps, filterProps, paginationProps, propertyFilterProps } =
     useCollection(environments, {
       filtering: {
-        empty: TableEmptyDisplay(itemType),
+        empty: TableEmptyDisplay(itemType, '/environments/new'),
         noMatch: TableNoMatchDisplay(itemType),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filteringFunction: (item: any, filteringText): any => {
@@ -143,7 +139,7 @@ const Environment: NextPage = () => {
       },
       propertyFiltering: {
         filteringProperties: filteringProperties,
-        empty: TableEmptyDisplay(itemType),
+        empty: TableEmptyDisplay(itemType, '/environments/new'),
         noMatch: TableNoMatchDisplay(itemType)
       },
       pagination: { pageSize: preferences.pageSize },
@@ -159,7 +155,7 @@ const Environment: NextPage = () => {
   const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
   const startButtonEnableStatuses: string[] = ['PENDING', 'STOPPED'];
   const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
-  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
+  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED', 'COMPLETED'];
   // Constant buttons should show loading based on statuses in the array
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];

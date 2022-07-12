@@ -24,7 +24,10 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 
 const logger: LoggingService = new LoggingService();
-const aws: AwsService = new AwsService({ region: 'us-east-1', ddbTableName: process.env.STACK_NAME! });
+const aws: AwsService = new AwsService({
+  region: process.env.AWS_REGION!,
+  ddbTableName: process.env.STACK_NAME!
+});
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
