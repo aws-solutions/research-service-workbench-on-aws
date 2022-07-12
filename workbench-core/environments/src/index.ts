@@ -1,5 +1,4 @@
 import { EnvironmentStatus, isEnvironmentStatus } from './constants/environmentStatus';
-
 import {
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,

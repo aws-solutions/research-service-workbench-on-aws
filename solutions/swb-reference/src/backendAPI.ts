@@ -19,14 +19,14 @@ import HPCService from './HPC/HPCService';
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
     {
-      path: '/projects/:projectId/clusters',
+      path: '/projects/:projectId/clusters/:clusterName',
       serviceAction: 'getAwsCluster',
       httpMethod: 'get',
       service: new HPCService()
     },
     {
-      path: '/projects/:projectId/clusters/:clusterName',
-      serviceAction: 'getAwsCluster',
+      path: '/projects/:projectId/clusters',
+      serviceAction: 'listAwsClusters',
       httpMethod: 'get',
       service: new HPCService()
     },

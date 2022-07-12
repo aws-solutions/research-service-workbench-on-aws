@@ -32,6 +32,7 @@ describe('HPCService', () => {
       version: '3.1.4'
     }
   ];
+
   const cluster: Cluster = {
     cloudformationStackArn: 'arn:aws:cloudformation:us-east-1:1234556789:stack/hosting-cluster/0987654321',
     clusterName: 'hosting-cluster',
@@ -114,18 +115,18 @@ describe('HPCService', () => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
 
-  test('getAwsCluster for Cluster List', async () => {
+  test('listAwsClusters for Listing AWS Clusters', async () => {
     const mainHPC = new HPCService();
 
     mainHPC.helper.awsAssumeEnvMgt = jest.fn().mockResolvedValue(awsServiceCredentials);
     mainHPC.helper.sendSignedClusterRequest = jest.fn().mockResolvedValue(clusters);
 
-    const response = await mainHPC.getAwsCluster(exReq);
+    const response = await mainHPC.listAwsClusters(exReq);
 
     expect(response).toEqual(clusters);
   });
 
-  test('getAwsCluster for Single Cluster', async () => {
+  test('getAwsCluster for Single AWS Cluster', async () => {
     const mainHPC = new HPCService();
 
     mainHPC.helper.awsAssumeEnvMgt = jest.fn().mockResolvedValue(awsServiceCredentials);
@@ -135,6 +136,15 @@ describe('HPCService', () => {
     const response = await mainHPC.getAwsCluster(exReq);
 
     expect(response).toEqual(cluster);
+  });
+
+  test('getAwsCluster no cluster name provided', async () => {
+    const mainHPC = new HPCService();
+
+    mainHPC.helper.awsAssumeEnvMgt = jest.fn().mockResolvedValue(awsServiceCredentials);
+    exReq.params.clusterName = undefined!;
+
+    await expect(mainHPC.getAwsCluster(exReq)).rejects.toThrow('No cluster name provided.');
   });
 
   test('jobQueue for Seeing Job Queue', async () => {

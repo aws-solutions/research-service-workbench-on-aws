@@ -11,6 +11,14 @@ import { Request } from 'express';
 import { AwsServiceWithCredentials, SSMCommandStatus, Cluster } from './HPCTypes';
 
 export default class HPCServiceHelper {
+  public aws: AwsService;
+  public projService: ProjectService;
+
+  public constructor() {
+    this.aws = new AwsService({ region: process.env.AWS_REGION! });
+    this.projService = new ProjectService({ TABLE_NAME: process.env.STACK_NAME! });
+  }
+
   public async assumeRoleWithCredentials(params: {
     aws: AwsService;
     roleArn: string;
@@ -42,16 +50,12 @@ export default class HPCServiceHelper {
   }
 
   public async awsAssumeEnvMgt(projectId: string): Promise<AwsServiceWithCredentials> {
-    const aws = new AwsService({ region: process.env.AWS_REGION! });
-
     const timestamp = new Date().getTime();
 
-    const projService = new ProjectService({ TABLE_NAME: process.env.STACK_NAME! });
-
-    const projItem = await projService.getProject(projectId);
+    const projItem = await this.projService.getProject(projectId);
 
     const assumeRoleParams = {
-      aws: aws,
+      aws: this.aws,
       roleArn: projItem.envMgmtRoleArn,
       roleSessionName: `hpc-service-${timestamp}`,
       region: process.env.AWS_REGION!,

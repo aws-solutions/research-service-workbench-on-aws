@@ -343,6 +343,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "http-request-mock",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "https",
       "allowedCategories": [ "production" ]
     },
@@ -393,6 +397,10 @@
     {
       "name": "next-transpile-modules",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "nock",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "nodemon",

@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import Boom from '@hapi/boom';
 import aws4 from 'aws4';
 import { Request } from 'express';
 import HPCServiceHelper from './HPCServiceHelper';
@@ -14,7 +15,7 @@ export default class HPCService {
     this.helper = new HPCServiceHelper();
   }
 
-  public async getAwsCluster(req: Request): Promise<Cluster | Cluster[]> {
+  public async getAwsCluster(req: Request): Promise<Cluster> {
     const awsEnvMgt = await this.helper.awsAssumeEnvMgt(req.params.projectId);
 
     const opts = {
@@ -27,6 +28,8 @@ export default class HPCService {
 
     if (req.params.clusterName) {
       opts.path = `/prod/v3/clusters/${req.params.clusterName}`;
+    } else {
+      throw Boom.notFound(`No cluster name provided.`);
     }
 
     const creds = {
@@ -37,7 +40,29 @@ export default class HPCService {
 
     const signed: aws4.Request = aws4.sign(opts, creds);
 
-    return this.helper.sendSignedClusterRequest(req, signed);
+    return this.helper.sendSignedClusterRequest(req, signed) as Promise<Cluster>;
+  }
+
+  public async listAwsClusters(req: Request): Promise<Cluster[]> {
+    const awsEnvMgt = await this.helper.awsAssumeEnvMgt(req.params.projectId);
+
+    const opts = {
+      host: process.env.PCLUSTER_API_URL!,
+      service: 'execute-api',
+      region: process.env.AWS_REGION!,
+      method: 'GET',
+      path: '/prod/v3/clusters'
+    };
+
+    const creds = {
+      accessKeyId: awsEnvMgt.credentials.AccessKeyId,
+      secretAccessKey: awsEnvMgt.credentials.SecretAccessKey,
+      sessionToken: awsEnvMgt.credentials.SessionToken
+    };
+
+    const signed: aws4.Request = aws4.sign(opts, creds);
+
+    return this.helper.sendSignedClusterRequest(req, signed) as Promise<Cluster[]>;
   }
 
   public async getJobQueue(req: Request): Promise<SSMCommandStatus> {
