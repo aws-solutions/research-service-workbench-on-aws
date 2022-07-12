@@ -13,18 +13,20 @@ import {
   Container,
   Link,
   Textarea,
-  Select
+  Select,
+  Multiselect
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { useDatasets } from '../../api/datasets';
 import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
 import { layoutLabels } from '../../common/labels';
-import { nameRegex, cidrRegex } from '../../common/utils';
+import { nameRegex } from '../../common/utils';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
 import Navigation from '../../components/Navigation';
@@ -48,13 +50,14 @@ const Environment: NextPage = () => {
   const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
-  const [selectedEnvType, setselectedEnvType] = useState<EnvTypeItem>();
+  const [selectedEnvType, setSelectedEnvType] = useState<EnvTypeItem>();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<CreateEnvironmentForm>({});
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
+  const { datasets, areDatasetsLoading } = useDatasets();
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -89,24 +92,6 @@ const Environment: NextPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Workspace Name cannot be longer than 128 characters'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a,
-      message: 'Restricted CIDR is Required'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && cidrRegex.test(a),
-      message: 'Restricted CIDR must be in the format range:  [1.0.0.0/0 - 255.255.255.255/32].'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && a.length <= 128,
-      message: 'Restricted CIDR cannot be longer than 128 characters'
     },
     {
       field: 'projectId',
@@ -150,7 +135,7 @@ const Environment: NextPage = () => {
   };
   const onSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
-    setselectedEnvType(selected);
+    setSelectedEnvType(selected);
     setFormData({
       ...formData,
       envTypeId: selected?.id,
@@ -282,20 +267,6 @@ const Environment: NextPage = () => {
                           }}
                         />
                       </FormField>
-                      <FormField
-                        label="Restricted CIDR"
-                        description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
-                        constraintText="Note: an environment config with a hardcoded CIDR will override this value."
-                        errorText={formErrors?.cidrError}
-                      >
-                        <Input
-                          value={formData?.cidr || ''}
-                          onChange={({ detail: { value } }) => {
-                            setFormData({ ...formData, cidr: value });
-                            validateField('cidr', value);
-                          }}
-                        />
-                      </FormField>
                       <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                         <Select
                           selectedOption={
@@ -314,6 +285,32 @@ const Environment: NextPage = () => {
                             validateField('projectId', selectedOption.value);
                           }}
                           statusType={areProjectsLoading ? 'loading' : 'finished'}
+                        />
+                      </FormField>
+                      <FormField
+                        label="Dataset"
+                        description="Studies that you would like to mount to your workspace"
+                      >
+                        <Multiselect
+                          selectedOptions={
+                            areDatasetsLoading
+                              ? []
+                              : datasets
+                                  .map((ds) => ({ label: ds.name, value: ds.id }))
+                                  .filter((ds) => formData.datasetIds?.includes(ds.value))
+                          }
+                          options={datasets.map((ds) => ({ label: ds.name, value: ds.id }))}
+                          onChange={(changeDetails) => {
+                            const datasetIds = changeDetails.detail.selectedOptions.map((selectOption) => {
+                              return selectOption.value;
+                            }) as string[];
+                            setFormData({
+                              ...formData,
+                              datasetIds
+                            });
+                          }}
+                          placeholder="Choose options"
+                          selectedAriaLabel="Selected"
                         />
                       </FormField>
                       <FormField errorText={formErrors?.envTypeConfigIdError}>
