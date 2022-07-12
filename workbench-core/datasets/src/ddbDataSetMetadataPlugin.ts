@@ -100,6 +100,12 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return dataSetEndPoints.Items as unknown as ExternalEndpoint[];
   }
 
+  public async updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
+    const endPointParam: ExternalEndpoint = endPoint;
+    await this._storeEndPointToDdb(endPointParam);
+    return endPointParam;
+  }
+
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
     const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);

@@ -79,4 +79,13 @@ export interface DataSetMetadataPlugin {
    * @returns an array of ExternalEndpoint objects.
    */
   listEndpointsForDataSet(dataSetId: string): Promise<ExternalEndpoint[]>;
+
+  /**
+   * Update an external endpoint with the given data.
+   *
+   * @param endPoint - the details of the endpoint to update.
+   *
+   * @returns the updated details of the Endpoint.
+   */
+  updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
 }

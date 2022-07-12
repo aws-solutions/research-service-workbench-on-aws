@@ -84,8 +84,11 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<EndpointConnectionStrings> {
-    const response: { endPointArn: string; endPointAlias?: string } =
-      await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
+    const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
+      name,
+      externalEndpointName,
+      ownerAccountId
+    );
     await this._configureBucketPolicy(name, response.endPointArn);
 
     if (externalRoleName) {
@@ -106,10 +109,16 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   public async addRoleToExternalEndpoint(
     name: string,
+    path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string> {
-    throw new Error('Method not implemented.');
+    externalRoleName: string,
+    endPointUrl: string,
+    kmsKeyArn?: string
+  ): Promise<void> {
+    const endPointArn: string = endPointUrl.replace('s3://', '');
+    await this._configureAccessPointPolicy(name, path, externalEndpointName, endPointArn, externalRoleName);
+
+    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
   }
 
   public async removeRoleFromExternalEndpoint(

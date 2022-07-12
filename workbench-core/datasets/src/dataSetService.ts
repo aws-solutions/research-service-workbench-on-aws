@@ -3,7 +3,13 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
+import {
+  DataSet,
+  DataSetMetadataPlugin,
+  DataSetsStoragePlugin,
+  ExternalEndpoint,
+  S3DataSetStoragePlugin
+} from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -181,6 +187,32 @@ export class DataSetService {
 
     await this._dbProvider.updateDataSet(targetDS);
     return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias!, endPoint.path);
+  }
+
+  public async addRoleToExternalEndpoint(
+    dataSetId: string,
+    endPointId: string,
+    externalRoleArn: string,
+    storageProvider: S3DataSetStoragePlugin,
+    kmsKeyArn?: string
+  ): Promise<void> {
+    const endPointDetails: ExternalEndpoint = await this._dbProvider.getDataSetEndPointDetails(
+      dataSetId,
+      endPointId
+    );
+    if (!endPointDetails.allowedRoles) endPointDetails.allowedRoles = [];
+    if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn))
+      throw new Error(`${externalRoleArn} has already been added to ${endPointDetails.name}`);
+    await storageProvider.addRoleToExternalEndpoint(
+      endPointDetails.dataSetName,
+      endPointDetails.path,
+      endPointDetails.name,
+      externalRoleArn,
+      endPointDetails.endPointUrl,
+      kmsKeyArn
+    );
+    endPointDetails.allowedRoles.push(externalRoleArn);
+    await this._dbProvider.updateExternalEndpoint(endPointDetails);
   }
 
   /**
