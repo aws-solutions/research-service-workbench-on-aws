@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { EnvironmentItem, EnvironmentConnectResponse, CreateEnvironmentForm } from '../models/Environment';
-import { httpApiGet, httpApiPut, httpApiDelete, httpApiPost } from './apiHelper';
+import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
 
 const useEnvironments = () => {
   const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
