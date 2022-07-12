@@ -3,13 +3,7 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import {
-  DataSet,
-  DataSetMetadataPlugin,
-  DataSetsStoragePlugin,
-  ExternalEndpoint,
-  S3DataSetStoragePlugin
-} from '.';
+import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
