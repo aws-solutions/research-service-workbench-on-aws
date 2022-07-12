@@ -42,9 +42,13 @@ export default class StatusHandler {
       return;
     }
 
-    const updateRequest: { status: string; error?: { type: string; value: string } } = {
-      status: event.status
-    };
+    const updateRequest: { status: string; error?: { type: string; value: string }; resourceType?: string } =
+      {
+        status: event.status
+      };
+    if (event.status === 'TERMINATED') {
+      updateRequest.resourceType = 'terminated_environment';
+    }
     if (event.errorMsg) {
       updateRequest.error = {
         // We use event.operation for Launch/Terminate SSM doc events
