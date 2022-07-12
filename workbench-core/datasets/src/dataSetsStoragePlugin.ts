@@ -74,7 +74,7 @@ export interface DataSetsStoragePlugin {
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
    * @param externalRoleName - the name of the role which will replace the current role accessing the endpoint.
    * @param endPointUrl - a URL which can be used to reach the endpoint.
-   * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt data in the storage location.
+   * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
   addRoleToExternalEndpoint(
