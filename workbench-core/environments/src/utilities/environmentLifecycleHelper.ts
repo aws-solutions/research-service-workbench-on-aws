@@ -118,7 +118,8 @@ export default class EnvironmentLifecycleHelper {
    * @param dataSetIds - the list of datasets attached.
    * @param envId - the environment on which to mount the dataset(s)
    *
-   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
+   * @returns datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
+   * '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\"\}"]'
    */
   public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
     let datasetsToMount: Array<string> = [];

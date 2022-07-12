@@ -6,7 +6,7 @@
 #
 # /usr/local/s3-mounts.json should contain S3 study data metadata of the form
 #  [{
-#   "id": "STUDY_ID",
+#   "name": "STUDY_NAME",
 #   "bucket": "BUCKET_NAME",
 #   "prefix": "BUCKET_PREFIX"
 # }, ...]

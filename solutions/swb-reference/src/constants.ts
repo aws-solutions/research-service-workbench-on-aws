@@ -31,7 +31,7 @@ function getConstants(): {
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
   const AWS_REGION = config.awsRegion;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
-  const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/';
+  const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
 

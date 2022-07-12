@@ -1,3 +1,5 @@
+import fs from 'fs';
+import { join } from 'path';
 import { S3 } from '@aws-sdk/client-s3';
 
 export default class S3Service {
@@ -27,5 +29,37 @@ export default class S3Service {
       };
       await this._s3.putObject(putObjectParam);
     }
+  }
+
+  /**
+   * Upload an entire folder with contained files as-is to S3
+   * @param s3BucketName - The name of the S3 bucket to place the folder in
+   * @param prefix - The key name to create in S3 for this folder
+   * @param path - The full local directory path in local system of the folder
+   */
+  public async uploadFolder(s3BucketName: string, prefix: string, path: string): Promise<void> {
+    const recursiveUpload = async (path: string, dirName: string): Promise<void> => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fileAndDirInCurrFolder = fs.readdirSync(path);
+      for (const name of fileAndDirInCurrFolder) {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const isDirectory = fs.lstatSync(join(path, name)).isDirectory();
+        if (isDirectory) {
+          await recursiveUpload(join(path, name), `${dirName}${name}/`);
+        } else {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          const fileContent = fs.readFileSync(`${path}/${name}`);
+          const putObjectParam = {
+            Bucket: s3BucketName,
+            Key: `${prefix}${dirName}${name}`,
+            Body: fileContent
+          };
+
+          await this._s3.putObject(putObjectParam);
+        }
+      }
+    };
+
+    await recursiveUpload(path, '');
   }
 }
