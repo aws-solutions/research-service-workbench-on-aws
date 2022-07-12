@@ -189,18 +189,27 @@ export class DataSetService {
     return this._generateMountString(endPoint.dataSetName, endPoint.endPointAlias!, endPoint.path);
   }
 
+  /**
+   * Adds a role to an existing endpoint.
+   *
+   * @param dataSetId - the ID of the DataSet.
+   * @param endPointId - the ID of the endpoint.
+   * @param externalRoleArn  - the ARN of the role to add to the endpoint.
+   * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
+   * @param kmsKeyArn - an optional ARN to a KMS key used to encrypt data in the DataSet.
+   */
   public async addRoleToExternalEndpoint(
     dataSetId: string,
     endPointId: string,
     externalRoleArn: string,
-    storageProvider: S3DataSetStoragePlugin,
+    storageProvider: DataSetsStoragePlugin,
     kmsKeyArn?: string
   ): Promise<void> {
     const endPointDetails: ExternalEndpoint = await this._dbProvider.getDataSetEndPointDetails(
       dataSetId,
       endPointId
     );
-    if (!endPointDetails.allowedRoles) endPointDetails.allowedRoles = [];
+    endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
     if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn))
       throw new Error(`${externalRoleArn} has already been added to ${endPointDetails.name}`);
     await storageProvider.addRoleToExternalEndpoint(
