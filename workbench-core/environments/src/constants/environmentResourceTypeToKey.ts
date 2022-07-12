@@ -1,4 +1,3 @@
-// Environment Item's metadata key
 const envResourceTypeToKey: {
   environment: string;
   project: string;
