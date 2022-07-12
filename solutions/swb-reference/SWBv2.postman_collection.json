@@ -12,10 +12,10 @@
         {
           "name": "Terminate Environment",
           "request": {
-            "method": "DELETE",
+            "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{API_URL}}/environments/:id",
+              "raw": "{{API_URL}}/environments/:id/terminate",
               "host": ["{{API_URL}}"],
               "path": ["environments", ":id"],
               "variable": [
