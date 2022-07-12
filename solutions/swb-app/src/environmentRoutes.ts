@@ -54,8 +54,8 @@ export function setUpEnvRoutes(
   );
 
   // Terminate
-  router.delete(
-    '/environments/:id',
+  router.put(
+    '/environments/:id/terminate',
     wrapAsync(async (req: Request, res: Response) => {
       const envType = await getEnvironmentType(req.params.id);
 
