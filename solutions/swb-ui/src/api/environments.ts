@@ -13,7 +13,6 @@ const useEnvironments = () => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;
     item.project = item.projectId;
-    item.workspaceCost = 0;
   });
   return { environments, mutate };
 };
