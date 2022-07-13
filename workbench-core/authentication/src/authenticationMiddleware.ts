@@ -6,11 +6,6 @@ import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
-// TODO add to doc
-// requires use of cookieParser and bodyParser middlewares
-// app.use(cookieParser());
-// app.use(express.json());
-
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
