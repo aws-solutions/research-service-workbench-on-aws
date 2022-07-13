@@ -4,7 +4,7 @@ import pkceChallenge from 'pkce-challenge';
 import React, { useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { login, token } from '../api/auth';
-import { User } from '../models/User';
+import { UserItem } from '../models/User';
 import styles from '../styles/Hero.module.scss';
 
 function getFragmentParam(location: Location, key: string): string {
@@ -56,9 +56,10 @@ function Login(): JSX.Element {
           // Assuming only one group is assigned for the user, if any
           const userGroup =
             decodedToken['cognito:groups']?.length > 0 ? decodedToken['cognito:groups'][0] : 'N/A';
-          const user: User = {
+          const user: UserItem = {
             id: decodedToken.sub as string,
-            name: decodedToken.name as string,
+            givenName: decodedToken.givenName as string,
+            familyName: decodedToken.familyName as string,
             email: decodedToken.email as string,
             avatar: { name: 'user-profile' },
             claims: [],
@@ -71,12 +72,13 @@ function Login(): JSX.Element {
 
           // Temporary log statement, remove when AuthZ consumes this
           console.log(user);
+          localStorage.setItem('userEmail', user.email);
 
           localStorage.removeItem('stateVerifier');
           localStorage.removeItem('pkceVerifier');
 
           window.history.replaceState({}, '', window.location.origin + window.location.pathname);
-          window.location.assign(window.location.origin + window.location.pathname + 'environments');
+          // window.location.assign(window.location.origin + window.location.pathname + 'environments');
         } catch (e) {
           console.log(e);
         }

@@ -59,6 +59,7 @@ const Environment: NextPage = () => {
     pageSize: 20
   });
   const { environments, mutate } = useEnvironments();
+  console.log(environments);
 
   const [error, setError] = useState('');
 

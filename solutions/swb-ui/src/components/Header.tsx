@@ -44,12 +44,12 @@ export default function Header(): JSX.Element {
       utilities={[
         {
           type: 'menu-dropdown',
-          text: user.name,
+          text: `${user.givenName} ${user.familyName}`,
           description: user.email,
-          iconName: user.avatar.name,
-          iconAlt: user.avatar.alt,
-          iconSvg: user.avatar.svg,
-          iconUrl: user.avatar.url,
+          // iconName: user.avatar.name,
+          // iconAlt: user.avatar.alt,
+          // iconSvg: user.avatar.svg,
+          // iconUrl: user.avatar.url,
           items: profileActions,
           onItemClick: async () => await logoutEvent()
         }

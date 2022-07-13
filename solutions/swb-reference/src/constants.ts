@@ -34,7 +34,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
-  const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
 
