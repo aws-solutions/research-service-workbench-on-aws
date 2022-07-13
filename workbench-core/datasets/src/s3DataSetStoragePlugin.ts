@@ -115,6 +115,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     endPointUrl: string,
     kmsKeyArn?: string
   ): Promise<void> {
+    // TODO: either throw error if not formatted correctly or support all S3 URL types https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
     const endPointArn: string = endPointUrl.replace('s3://', '');
     await this._configureAccessPointPolicy(name, path, externalEndpointName, endPointArn, externalRoleName);
 
