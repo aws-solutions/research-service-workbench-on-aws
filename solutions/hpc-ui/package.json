@@ -8,7 +8,7 @@
     "sort-package-json": "sort-package-json package.json",
     "start": "react-scripts start",
     "test": "react-scripts test",
-    "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
+    "test:only": ""
   },
   "browserslist": {
     "production": [
