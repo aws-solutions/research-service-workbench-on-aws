@@ -7,7 +7,8 @@
     "eject": "react-scripts eject",
     "sort-package-json": "sort-package-json package.json",
     "start": "react-scripts start",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "browserslist": {
     "production": [
@@ -28,9 +29,6 @@
     ]
   },
   "dependencies": {
-    "@testing-library/jest-dom": "5.16.1",
-    "@testing-library/react": "12.1.2",
-    "@testing-library/user-event": "13.5.0",
     "axios": "^0.27.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",

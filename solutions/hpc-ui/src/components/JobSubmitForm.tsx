@@ -19,7 +19,7 @@ export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
     partition: ''
   } as JobParameters);
 
-  const noSubmit = (): boolean => {
+  const shouldDisableSubmitButton = (): boolean => {
     let flag = true;
     if (
       jobForm.command !== '' &&
@@ -33,7 +33,7 @@ export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
     return flag;
   };
 
-  const submitProcess = (): void => {
+  const executeSubmitJobProcess = (): void => {
     submitJob(props.projectId, props.clusterName, props.instanceId, jobForm);
     props.handleViewJobFormCallBack();
   };
@@ -48,7 +48,7 @@ export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
         <Box float="right">
           <SpaceBetween direction="horizontal" size="xs">
             <Button onClick={() => props.handleViewJobFormCallBack()}>Cancel</Button>
-            <Button disabled={noSubmit()} onClick={() => submitProcess()}>
+            <Button disabled={shouldDisableSubmitButton()} onClick={() => executeSubmitJobProcess()}>
               Submit
             </Button>
           </SpaceBetween>

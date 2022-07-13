@@ -1,5 +1,5 @@
-import { Cluster } from '../models/HPC-UI-Types';
-import { getClusters } from '../api/hpc-clusters';
+import { Cluster, Project } from '../models/HPC-UI-Types';
+import { getProjects, getClusters } from '../api/hpc-clusters';
 import { useCollection } from '@awsui/collection-hooks';
 import { useState, useEffect } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
@@ -10,16 +10,23 @@ import { AppLayout, Box, Header, Select, SplitPanel, SpaceBetween, Table } from 
 import JobsTable from './JobsTable';
 
 export default function ClustersTable(): JSX.Element {
-  const options = [
-    { label: 'proj-123', value: 'proj-123' },
-    { label: 'example-project', value: 'example-project' }
-  ];
+  const [projects, setProjects] = useState([] as Project[]);
+
+  const options = projects.map((project) => {
+    return { label: project.id, value: project.id };
+  });
 
   const [clusters, setClusters] = useState([] as Cluster[]);
 
-  const [selectedOption, setSelectedOption] = useState(options?.at(0) as OptionDefinition);
+  const [selectedOption, setSelectedOption] = useState([] as OptionDefinition);
 
-  const [splitOpen, setSplitOpen] = useState(true);
+  const [isSplitOpen, setSplitOpen] = useState(true);
+
+  useEffect(() => {
+    getProjects()
+      .then((items) => setProjects(items.data))
+      .catch(() => setProjects([]));
+  }, []);
 
   useEffect(() => {
     getClusters(selectedOption.value!)
@@ -43,7 +50,7 @@ export default function ClustersTable(): JSX.Element {
       disableContentHeaderOverlap
       navigationHide
       toolsHide
-      splitPanelOpen={splitOpen}
+      splitPanelOpen={isSplitOpen}
       onSplitPanelToggle={(e) => {
         setSplitOpen(e.detail.open);
       }}
@@ -86,9 +93,11 @@ export default function ClustersTable(): JSX.Element {
                   <SpaceBetween direction="horizontal" size="xs">
                     <Header variant="h3">Select Project:</Header>
                     <Select
+                      expandToViewport
                       selectedOption={selectedOption}
                       onChange={({ detail }) => setSelectedOption(detail.selectedOption!)}
                       options={options}
+                      loadingText="Loading projects..."
                       placeholder="Choose a project"
                       selectedAriaLabel="Selected"
                       empty="No projects"

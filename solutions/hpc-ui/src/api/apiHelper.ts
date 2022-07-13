@@ -12,6 +12,7 @@ const httpApiGet = async (urlPath: string, params: any): Promise<any> => {
   };
   return await fetchData(options);
 };
+
 const httpApiPost = async (urlPath: string, params: any): Promise<any> => {
   const options = {
     method: 'POST',
@@ -20,6 +21,7 @@ const httpApiPost = async (urlPath: string, params: any): Promise<any> => {
   };
   return await fetchData(options);
 };
+
 const httpApiPut = async (urlPath: string, params: any): Promise<any> => {
   const options = {
     method: 'PUT',
@@ -28,6 +30,7 @@ const httpApiPut = async (urlPath: string, params: any): Promise<any> => {
   };
   return await fetchData(options);
 };
+
 const httpApiDelete = async (urlPath: string, params: any): Promise<any> => {
   const options = {
     method: 'DELETE',

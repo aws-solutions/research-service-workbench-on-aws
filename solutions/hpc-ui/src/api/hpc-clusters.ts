@@ -1,6 +1,10 @@
 import useSWR from 'swr';
 import { httpApiGet, httpApiPost, httpApiPut } from './apiHelper';
-import { Cluster, Job, JobParameters } from '../models/HPC-UI-Types';
+import { Cluster, Job, JobParameters, Project } from '../models/HPC-UI-Types';
+
+const getProjects = async (): Promise<{ data: Project[] }> => {
+  return await httpApiGet(`projects`, {});
+};
 
 const getClusters = async (projectId: string): Promise<Cluster[]> => {
   return await httpApiGet(`projects/${projectId}/clusters`, {});
@@ -50,4 +54,4 @@ const submitJob = async (
   await httpApiPost(`projects/${projectId}/clusters/${clusterName}/headNode/${instanceId}/jobs/`, jobBody);
 };
 
-export { getClusters, useCluster, useJobQueue, stopJob, submitJob };
+export { getProjects, getClusters, useCluster, useJobQueue, stopJob, submitJob };

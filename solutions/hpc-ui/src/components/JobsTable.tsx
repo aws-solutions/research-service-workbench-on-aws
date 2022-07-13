@@ -34,7 +34,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
     selection: {}
   });
 
-  const noStop = (): boolean => {
+  const shouldDisableStopJobButton = (): boolean => {
     if (collectionProps.selectedItems?.length !== 0) {
       return collectionProps.selectedItems!.some((job) =>
         ['STOPPING', 'FAILED', 'COMPLETED', 'CANCELLED'].includes(job?.job_state)
@@ -43,7 +43,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
     return true;
   };
 
-  const executeStop = async (): Promise<void> => {
+  const executeStopJob = async (): Promise<void> => {
     collectionProps.selectedItems?.forEach(async (job) => {
       await stopJob(props.projectId, props.clusterName, cluster.headNode?.instanceId!, job.job_id);
       await jobMutate();
@@ -83,18 +83,12 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
                 actions={
                   <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
-                      <Button disabled={noStop()} onClick={() => executeStop()}>
+                      <Button disabled={shouldDisableStopJobButton()} onClick={() => executeStopJob()}>
                         Stop Job
                       </Button>
                       <Button
                         variant="primary"
-                        disabled={
-                          cluster !== undefined
-                            ? cluster.headNode?.state! !== 'running'
-                              ? true
-                              : false
-                            : true
-                        }
+                        disabled={cluster !== undefined ? cluster.headNode?.state! !== 'running' : true}
                         onClick={() => setViewJobForm(!viewJobForm)}
                       >
                         Submit Job
