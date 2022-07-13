@@ -19,7 +19,7 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import IamHelper from './iamHelper';
+import { IamHelper } from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
 /**

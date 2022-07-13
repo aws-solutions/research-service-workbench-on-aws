@@ -83,7 +83,7 @@ async function uploadBootstrapScriptsToS3(): Promise<void> {
   if (!fs.existsSync(sagemakerPath)) fs.mkdirSync(sagemakerPath);
   if (!fs.existsSync(fusePath)) fs.mkdirSync(fusePath);
 
-  console.log('Downloading file-system binary packages');
+  console.log('Downloading offline file-system binary packages');
 
   await Promise.all([
     downloadFile(
@@ -173,10 +173,10 @@ async function uploadBootstrapScriptsToS3(): Promise<void> {
 
   const s3Service = awsService.helpers.s3;
   console.log(
-    `Uploading environment bootstrap scripts to S3 bucket ${s3BucketName}, path: ${S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX}`
+    `Uploading offline environment bootstrap scripts to S3 bucket ${s3BucketName}, path: ${S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX}`
   );
   await s3Service.uploadFolder(s3BucketName, S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX, scriptsPath);
-  console.log('Finished uploading environment bootstrap scripts to S3');
+  console.log('Finished uploading offline environment bootstrap scripts to S3');
 }
 
 async function getS3BucketArn(awsService: AwsService): Promise<string> {

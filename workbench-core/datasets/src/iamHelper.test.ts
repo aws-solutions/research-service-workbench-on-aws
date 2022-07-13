@@ -1,5 +1,5 @@
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
-import IamHelper from './iamHelper';
+import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {
   describe('compareStatementPrincipal', () => {

@@ -21,7 +21,8 @@ env_type() {
     then
         printf "sagemaker"
     else
-        printf "ec2-linux"
+        echo "Error! Unknown env type" > '/var/log/messages'
+        exit 1
     fi
 }
 

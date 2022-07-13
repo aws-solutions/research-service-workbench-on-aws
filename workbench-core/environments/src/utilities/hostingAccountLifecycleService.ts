@@ -5,8 +5,11 @@
 
 import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
+import { IamHelper } from '@amzn/workbench-core-datasets';
+import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
@@ -27,18 +30,97 @@ export default class HostingAccountLifecycleService {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
     const cfService = this._aws.helpers.cloudformation;
-    const { [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn } = await cfService.getCfnOutput(
-      this._stackName,
-      [process.env.STATUS_HANDLER_ARN_NAME!]
-    );
+    const {
+      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
+      [process.env.S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX!]: artifactBucketArn
+    } = await cfService.getCfnOutput(this._stackName, [
+      process.env.STATUS_HANDLER_ARN_NAME!,
+      process.env.S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX!
+    ]);
 
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
 
-    // TODO: Add account to artifactBucket's bucket policy
+    // Add account to artifactBucket's bucket policy
+    await this.updateArtifactsBucketPolicy(artifactBucketArn, accountMetadata.awsAccountId);
 
     // Finally store the new/updated account details in DDB
     return this._accountService.createOrUpdate(accountMetadata);
+  }
+
+  /**
+   * Update artifacts bucket policy to include new hosting account ID for environment bootstrap file access
+   * @param artifactBucketArn - ARN of the artifacts bucket in main account
+   * @param awsAccountId - Hosting account ID to add as principal for list/get access
+   */
+  public async updateArtifactsBucketPolicy(artifactBucketArn: string, awsAccountId: string): Promise<void> {
+    const bucketName = artifactBucketArn.split(':').pop() as string;
+
+    let bucketPolicy: PolicyDocument = new PolicyDocument();
+    try {
+      const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
+        Bucket: bucketName
+      });
+      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
+    } catch (e) {
+      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
+      if (e.Code !== 'NoSuchBucketPolicy') {
+        throw e;
+      }
+    }
+
+    // If List statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, 'List:environment-files')) {
+      const listStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "List:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:ListBucket",
+        "Resource": ["${artifactBucketArn}"],
+        "Condition": {
+          "StringLike": {
+            "s3:prefix": "environment-files*"
+            }
+          }
+        }`)
+      );
+      bucketPolicy.addStatements(listStatement);
+    } else {
+      // If List statement doesn't contain this accountId, add it
+      bucketPolicy = IamHelper.addPrincipalToStatement(bucketPolicy, 'List:environment-files', awsAccountId);
+    }
+
+    // If Get statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
+      const getStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "Get:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:GettBucket",
+        "Resource": ["${artifactBucketArn}/environment-files*"]
+        }`)
+      );
+      bucketPolicy.addStatements(getStatement);
+    } else {
+      // If Get statement doesn't contain this accountId, add it
+      bucketPolicy = IamHelper.addPrincipalToStatement(bucketPolicy, 'List:environment-files', awsAccountId);
+    }
+
+    const putPolicyParams: PutBucketPolicyCommandInput = {
+      Bucket: bucketName,
+      Policy: JSON.stringify(bucketPolicy.toJSON())
+    };
+
+    // Update bucket policy
+    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
   /**
