@@ -146,9 +146,6 @@ export default class HPCServiceHelper {
       StatusDetails: commandStatusResponse.StatusDetails!
     };
 
-    return new Promise((resolve, reject) => {
-      resolve(ssmCommandStatus);
-      reject('Error has occured');
-    });
+    return ssmCommandStatus;
   }
 }
