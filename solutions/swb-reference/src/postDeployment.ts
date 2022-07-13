@@ -85,92 +85,91 @@ async function uploadBootstrapScriptsToS3(): Promise<void> {
 
   console.log('Downloading file-system binary packages');
 
-  await downloadFile(
-    'https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py',
-    `${sagemakerPath}/autostop.py`
-  );
+  await Promise.all([
+    downloadFile(
+      'https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-notebook-instance-lifecycle-config-samples/master/scripts/auto-stop-idle/autostop.py',
+      `${sagemakerPath}/autostop.py`
+    ),
 
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/basesystem-10.0-4.9.amzn1.noarch.rpm',
-    `${fusePath}/basesystem-10.0-4.9.amzn1.noarch.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/bash-4.2.46-34.43.amzn1.x86_64.rpm',
-    `${fusePath}/bash-4.2.46-34.43.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/filesystem-2.4.30-3.8.amzn1.x86_64.rpm',
-    `${fusePath}/filesystem-2.4.30-3.8.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/fuse-2.9.4-1.18.amzn1.x86_64.rpm',
-    `${fusePath}/fuse-2.9.4-1.18.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/glibc-2.17-292.180.amzn1.x86_64.rpm',
-    `${fusePath}/glibc-2.17-292.180.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/glibc-common-2.17-292.180.amzn1.x86_64.rpm',
-    `${fusePath}/glibc-common-2.17-292.180.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/info-5.1-4.10.amzn1.x86_64.rpm',
-    `${fusePath}/info-5.1-4.10.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libgcc72-7.2.1-2.59.amzn1.x86_64.rpm',
-    `${fusePath}/libgcc72-7.2.1-2.59.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libselinux-2.1.10-3.22.amzn1.x86_64.rpm',
-    `${fusePath}/libselinux-2.1.10-3.22.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libsepol-2.1.7-3.12.amzn1.x86_64.rpm',
-    `${fusePath}/libsepol-2.1.7-3.12.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/ncurses-base-5.7-4.20090207.14.amzn1.x86_64.rpm',
-    `${fusePath}/ncurses-base-5.7-4.20090207.14.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/ncurses-libs-5.7-4.20090207.14.amzn1.x86_64.rpm',
-    `${fusePath}/ncurses-libs-5.7-4.20090207.14.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nspr-4.21.0-1.43.amzn1.x86_64.rpm',
-    `${fusePath}/nspr-4.21.0-1.43.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nss-softokn-freebl-3.44.0-8.44.amzn1.x86_64.rpm',
-    `${fusePath}/nss-softokn-freebl-3.44.0-8.44.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nss-util-3.44.0-4.56.amzn1.x86_64.rpm',
-    `${fusePath}/nss-util-3.44.0-4.56.amzn1.x86_64.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/setup-2.8.14-20.12.amzn1.noarch.rpm',
-    `${fusePath}/setup-2.8.14-20.12.amzn1.noarch.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/tzdata-2020d-2.76.amzn1.noarch.rpm',
-    `${fusePath}/tzdata-2020d-2.76.amzn1.noarch.rpm`
-  );
-  await downloadFile(
-    'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/which-2.19-6.10.amzn1.x86_64.rpm',
-    `${fusePath}/which-2.19-6.10.amzn1.x86_64.rpm`
-  );
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/basesystem-10.0-4.9.amzn1.noarch.rpm',
+      `${fusePath}/basesystem-10.0-4.9.amzn1.noarch.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/bash-4.2.46-34.43.amzn1.x86_64.rpm',
+      `${fusePath}/bash-4.2.46-34.43.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/filesystem-2.4.30-3.8.amzn1.x86_64.rpm',
+      `${fusePath}/filesystem-2.4.30-3.8.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/fuse-2.9.4-1.18.amzn1.x86_64.rpm',
+      `${fusePath}/fuse-2.9.4-1.18.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/glibc-2.17-292.180.amzn1.x86_64.rpm',
+      `${fusePath}/glibc-2.17-292.180.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/glibc-common-2.17-292.180.amzn1.x86_64.rpm',
+      `${fusePath}/glibc-common-2.17-292.180.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/info-5.1-4.10.amzn1.x86_64.rpm',
+      `${fusePath}/info-5.1-4.10.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libgcc72-7.2.1-2.59.amzn1.x86_64.rpm',
+      `${fusePath}/libgcc72-7.2.1-2.59.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libselinux-2.1.10-3.22.amzn1.x86_64.rpm',
+      `${fusePath}/libselinux-2.1.10-3.22.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/libsepol-2.1.7-3.12.amzn1.x86_64.rpm',
+      `${fusePath}/libsepol-2.1.7-3.12.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/ncurses-base-5.7-4.20090207.14.amzn1.x86_64.rpm',
+      `${fusePath}/ncurses-base-5.7-4.20090207.14.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/ncurses-libs-5.7-4.20090207.14.amzn1.x86_64.rpm',
+      `${fusePath}/ncurses-libs-5.7-4.20090207.14.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nspr-4.21.0-1.43.amzn1.x86_64.rpm',
+      `${fusePath}/nspr-4.21.0-1.43.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nss-softokn-freebl-3.44.0-8.44.amzn1.x86_64.rpm',
+      `${fusePath}/nss-softokn-freebl-3.44.0-8.44.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/nss-util-3.44.0-4.56.amzn1.x86_64.rpm',
+      `${fusePath}/nss-util-3.44.0-4.56.amzn1.x86_64.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/setup-2.8.14-20.12.amzn1.noarch.rpm',
+      `${fusePath}/setup-2.8.14-20.12.amzn1.noarch.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/updates/adeeb554baf5/x86_64/Packages/tzdata-2020d-2.76.amzn1.noarch.rpm',
+      `${fusePath}/tzdata-2020d-2.76.amzn1.noarch.rpm`
+    ),
+    downloadFile(
+      'http://packages.eu-central-1.amazonaws.com/2018.03/main/c31535f74c6e/x86_64/Packages/which-2.19-6.10.amzn1.x86_64.rpm',
+      `${fusePath}/which-2.19-6.10.amzn1.x86_64.rpm`
+    ),
 
-  await downloadFile(
-    'https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64',
-    `${binaryPath}/jq-1.5-linux64`
-  );
-  await downloadFile(
-    'https://github.com/kahing/goofys/releases/download/v0.24.0/goofys',
-    `${binaryPath}/goofys`
-  ); // TODO: Regression testing since checksum didn't match with prev
+    downloadFile(
+      'https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64',
+      `${binaryPath}/jq-1.5-linux64`
+    ),
+    downloadFile('https://github.com/kahing/goofys/releases/download/v0.24.0/goofys', `${binaryPath}/goofys`) // TODO: Regression testing since checksum didn't match with prev
+  ]);
 
   const s3Service = awsService.helpers.s3;
   console.log(

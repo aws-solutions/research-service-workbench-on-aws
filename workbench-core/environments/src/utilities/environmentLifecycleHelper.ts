@@ -135,7 +135,7 @@ export default class EnvironmentLifecycleHelper {
               datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await this.dataSetService.getDataSetMountString(datasetId, datasetEndPointName);
+          : await this.dataSetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
 
         return mountString;
       })
