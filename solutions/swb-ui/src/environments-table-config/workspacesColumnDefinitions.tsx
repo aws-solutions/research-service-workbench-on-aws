@@ -30,12 +30,6 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     header: 'Owner',
     cell: (e: { owner: string }) => e.owner,
     sortingField: 'owner'
-  },
-  {
-    id: 'workspaceCost',
-    header: 'Workspace cost (last 7 days)',
-    cell: (e: { workspaceCost: number }) => `$ ${e.workspaceCost}`,
-    sortingField: 'workspaceCost'
   }
 ];
 
@@ -44,6 +38,5 @@ export const searchableColumns: string[] = [
   'workspaceStatus',
   'createdAt',
   'project',
-  'owner',
-  'workspaceCost'
+  'owner'
 ];
