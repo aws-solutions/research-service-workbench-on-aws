@@ -27,7 +27,7 @@ const authenticationService = new AuthenticationService(cognitoAuthenticationPlu
 
 ## Integration with Express
 
-Documentation on integrating AuthenticationService can be found [here](./authenticationMiddleware.md).
+Documentation on integrating AuthenticationService with Express can be found [here](./authenticationMiddleware.md).
 
 ## Extending AuthenticationService
 

@@ -78,11 +78,11 @@ app.listen(3001);
 ```
 
 ## Functions
-[getAuthorizationCodeUrl](#getauthorizationcodeurl)  
-[getTokensFromAuthorizationCode](#gettokensfromauthorizationcode)  
-[verifyToken](#verifytoken)  
-[refreshAccessToken](#refreshaccesstoken)  
-[logoutUser](#logoutuser)
+- [getAuthorizationCodeUrl](#getauthorizationcodeurl)  
+- [getTokensFromAuthorizationCode](#gettokensfromauthorizationcode)  
+- [verifyToken](#verifytoken)  
+- [refreshAccessToken](#refreshaccesstoken)  
+- [logoutUser](#logoutuser)
 
 ### getAuthorizationCodeUrl
 This route handler is used to get the url to the authentication hosted UI.
