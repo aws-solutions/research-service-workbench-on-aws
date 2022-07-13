@@ -27,6 +27,7 @@ export class SWBStack extends Stack {
     S3_DATASETS_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
+    PCLUSTER_API_URL: string;
     ALLOWED_ORIGINS: string;
   };
   public constructor(app: App) {
@@ -41,6 +42,7 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
+      PCLUSTER_API_URL,
       ALLOWED_ORIGINS
     } = getConstants();
 
@@ -62,6 +64,7 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
+      PCLUSTER_API_URL,
       ALLOWED_ORIGINS
     };
 

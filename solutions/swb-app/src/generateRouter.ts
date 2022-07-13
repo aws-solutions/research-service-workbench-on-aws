@@ -24,7 +24,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     router[apiRoute.httpMethod](apiRoute.path, async (req: Request, res: Response) => {
       // Config setting is provided by developer, and not external user request
       // nosemgrep
-      const response = await apiRoute.service[apiRoute.serviceAction]();
+      const response = await apiRoute.service[apiRoute.serviceAction](req);
       res.send(response);
     });
   });
@@ -38,8 +38,8 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);
   router.use(unknownErrorHandler);
-
+  router.use(boomErrorHandler);
+  router.use(unknownErrorHandler);
   app.use('/', router);
-
   return app;
 }
