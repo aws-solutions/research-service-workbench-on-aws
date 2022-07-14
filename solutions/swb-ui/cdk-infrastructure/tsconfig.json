@@ -6,6 +6,6 @@
     "lib": ["dom"],
     "rootDir": "src"
   },
-  "include": ["src/*", "src/tests/*"],
+  "include": ["src/*", "src/test/*"],
   "exclude": ["./node_modules", "./lib", "./cdk.out", "./bin"]
 }
