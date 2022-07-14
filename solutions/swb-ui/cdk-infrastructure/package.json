@@ -16,14 +16,21 @@
     "cdk-infrastructure": "bin/cdk-infrastructure.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "heft build --clean",
     "cdk": "cdk",
     "sort-package-json": "sort-package-json package.json",
     "test": "jest",
     "watch": "tsc -w"
   },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
   "devDependencies": {
+    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
     "@types/jest": "^27.4.1",
+    "@types/js-yaml": "^4.0.5",
     "@types/node": "^14",
     "@types/prettier": "2.6.3",
     "aws-cdk": "^2.12.0",
