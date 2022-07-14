@@ -3,10 +3,22 @@ import { getProjects, getClusters } from '../api/hpc-clusters';
 import { useCollection } from '@awsui/collection-hooks';
 import { useState, useEffect } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
+import { TableSelectDisplay } from '../common/tableSelectState';
 import { columnDefinitions } from '../hpc-table-config/clustersColumnDefinitions';
 import { filteringProperties } from '../hpc-table-config/clustersFilteringProperties';
 import { OptionDefinition } from '@awsui/components-react/internal/components/option/interfaces';
-import { AppLayout, Box, Header, Select, SplitPanel, SpaceBetween, Table } from '@awsui/components-react';
+import {
+  AppLayout,
+  Box,
+  BreadcrumbGroup,
+  Header,
+  Link,
+  Pagination,
+  Select,
+  SplitPanel,
+  SpaceBetween,
+  Table
+} from '@awsui/components-react';
 import JobsTable from './JobsTable';
 
 export default function ClustersTable(): JSX.Element {
@@ -20,33 +32,90 @@ export default function ClustersTable(): JSX.Element {
 
   const [selectedOption, setSelectedOption] = useState([] as OptionDefinition);
 
-  const [isSplitOpen, setSplitOpen] = useState(true);
+  const [isSplitOpen, setSplitOpen] = useState(false);
+
+  const [isClustersLoading, setClustersLoading] = useState(false);
+
+  const [clusterTablePreferences] = useState({ pageSize: 5 });
 
   useEffect(() => {
     getProjects()
-      .then((items) => setProjects(items.data))
-      .catch(() => setProjects([]));
+      .then((items) => {
+        setProjects(items.data);
+      })
+      .catch(() => {
+        setProjects([]);
+        setClustersLoading(false);
+      });
   }, []);
 
   useEffect(() => {
-    getClusters(selectedOption.value!)
-      .then((items) => setClusters(items))
-      .catch(() => setClusters([]));
+    if (selectedOption.value! !== undefined) {
+      setClustersLoading(true);
+      getClusters(selectedOption.value!)
+        .then((items) => {
+          setClusters(items);
+          setClustersLoading(false);
+        })
+        .catch(() => {
+          setClusters([]);
+          setClustersLoading(false);
+        });
+    }
   }, [selectedOption.value]);
 
-  const itemType: string = 'cluster';
+  const emptyItemType: string = 'cluster';
+  const selectItemType: string = 'project';
 
-  const { items, collectionProps } = useCollection(clusters, {
+  const { items, collectionProps, paginationProps } = useCollection(clusters, {
     propertyFiltering: {
       filteringProperties: filteringProperties,
-      empty: TableEmptyDisplay(itemType)
+      empty:
+        selectedOption.value! === undefined
+          ? TableSelectDisplay(selectItemType)
+          : TableEmptyDisplay(emptyItemType)
     },
-    sorting: {},
-    selection: {}
+    selection: {
+      trackBy: 'clusterName'
+    },
+    pagination: { pageSize: clusterTablePreferences.pageSize },
+    sorting: {}
   });
+
+  useEffect(() => {
+    if (collectionProps.selectedItems?.at(0)?.clusterName! !== undefined) {
+      setSplitOpen(true);
+    } else {
+      setSplitOpen(false);
+    }
+  }, [collectionProps.selectedItems]);
 
   return (
     <AppLayout
+      breadcrumbs={
+        <BreadcrumbGroup
+          items={[
+            { text: 'Service Workbench', href: '/' },
+            {
+              text: 'AWS ParallelClusters',
+              href: '#components/breadcrumb-group'
+            }
+          ]}
+        />
+      }
+      contentHeader={
+        <Header
+          description="View and manage AWS ParallelClusters for batch jobs all within Service Workbench."
+          variant="h1"
+          info={
+            <Link href="https://aws.amazon.com/hpc/parallelcluster/" variant="info">
+              Info
+            </Link>
+          }
+        >
+          AWS ParallelClusters
+        </Header>
+      }
       disableContentHeaderOverlap
       navigationHide
       toolsHide
@@ -69,12 +138,20 @@ export default function ClustersTable(): JSX.Element {
             openButtonAriaLabel: 'Open panel',
             resizeHandleAriaLabel: 'Resize split panel'
           }}
-          header="Job Management Panel"
+          header={
+            collectionProps.selectedItems?.at(0)?.clusterName! !== undefined
+              ? collectionProps.selectedItems?.at(0)?.clusterName!
+              : '0 clusters selected'
+          }
         >
-          <JobsTable
-            projectId={selectedOption.value!}
-            clusterName={collectionProps.selectedItems?.at(0)?.clusterName!}
-          />
+          {collectionProps.selectedItems?.at(0)?.clusterName! !== undefined ? (
+            <JobsTable
+              projectId={isSplitOpen ? selectedOption.value! : undefined!}
+              clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}
+            />
+          ) : (
+            <Box>Select a cluster to see its details.</Box>
+          )}
         </SplitPanel>
       }
       content={
@@ -83,15 +160,19 @@ export default function ClustersTable(): JSX.Element {
           selectionType="single"
           selectedItems={collectionProps.selectedItems}
           columnDefinitions={columnDefinitions}
-          loadingText="Loading clusters"
+          loading={isClustersLoading}
+          loadingText="Loading clusters..."
           items={items}
+          pagination={<Pagination {...paginationProps} />}
           header={
             <Header
               counter={`(${clusters.length})`}
               actions={
                 <Box float="right">
                   <SpaceBetween direction="horizontal" size="xs">
-                    <Header variant="h3">Select Project:</Header>
+                    <Box variant="h3" color="text-label">
+                      Select Project:
+                    </Box>
                     <Select
                       expandToViewport
                       selectedOption={selectedOption}

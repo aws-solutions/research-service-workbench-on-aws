@@ -22,7 +22,11 @@ const useCluster = (projectId: string, clusterName: string) => {
 };
 
 const useJobQueue = (projectId: string, clusterName: string, instanceId: string) => {
-  const { data, mutate: jobMutate } = useSWR(
+  const {
+    data,
+    isValidating: jobisValidating,
+    mutate: jobMutate
+  } = useSWR(
     instanceId !== undefined
       ? `projects/${projectId}/clusters/${clusterName}/headNode/${instanceId}/jobs`
       : null,
@@ -30,7 +34,7 @@ const useJobQueue = (projectId: string, clusterName: string, instanceId: string)
     { refreshInterval: 5000 }
   );
   let jobs = ((data && data.StandardOutputContent) || []) as unknown as Job[];
-  return { jobs, jobMutate };
+  return { jobs, jobisValidating, jobMutate };
 };
 
 const stopJob = async (

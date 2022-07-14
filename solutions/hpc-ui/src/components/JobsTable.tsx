@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCollection } from '@awsui/collection-hooks';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
+import { TableSelectDisplay } from '../common/tableSelectState';
 import { columnDefinitions } from '../hpc-table-config/jobsColumnDefinitions';
 import { filteringProperties } from '../hpc-table-config/jobsFilteringProperties';
 import { useCluster, useJobQueue, stopJob } from '../api/hpc-clusters';
-import { Box, Header, SpaceBetween, Table, Button } from '@awsui/components-react';
+import { Box, Button, Header, Pagination, SpaceBetween, Table } from '@awsui/components-react';
 import JobSubmitForm from './JobSubmitForm';
 
 interface JobsTableProps {
@@ -15,23 +16,48 @@ interface JobsTableProps {
 export default function JobsTable(props: JobsTableProps): JSX.Element {
   const cluster = useCluster(props.projectId, props.clusterName);
 
-  const { jobs, jobMutate } = useJobQueue(
+  const [isJobsLoading, setJobsLoading] = useState(false);
+
+  const { jobs, jobisValidating, jobMutate } = useJobQueue(
     props.projectId,
     props.clusterName,
-    cluster !== undefined ? cluster.headNode?.instanceId! : cluster
+    cluster !== undefined
+      ? cluster.headNode?.state === 'running'
+        ? cluster.headNode?.instanceId!
+        : undefined!
+      : undefined!
   );
+
+  useEffect(() => {
+    if (props.clusterName === undefined) {
+      setJobsLoading(false);
+    } else if (cluster === undefined || (jobs.length === 0 && jobisValidating)) {
+      setJobsLoading(true);
+    } else {
+      setJobsLoading(false);
+    }
+  }, [props.clusterName, cluster, jobs, jobisValidating]);
 
   const [viewJobForm, setViewJobForm] = useState(false);
 
-  const itemType: string = 'job';
+  const [jobsTablePreferences] = useState({ pageSize: 4 });
 
-  const { items, collectionProps } = useCollection(jobs, {
+  const emptyItemType: string = 'job';
+  const selectItemType: string = 'cluster';
+
+  const { items, collectionProps, paginationProps } = useCollection(jobs, {
     propertyFiltering: {
       filteringProperties: filteringProperties,
-      empty: TableEmptyDisplay(itemType)
+      empty:
+        props.clusterName === undefined
+          ? TableSelectDisplay(selectItemType)
+          : TableEmptyDisplay(emptyItemType)
     },
-    sorting: {},
-    selection: {}
+    selection: {
+      trackBy: 'job_id'
+    },
+    pagination: { pageSize: jobsTablePreferences.pageSize },
+    sorting: {}
   });
 
   const shouldDisableStopJobButton = (): boolean => {
@@ -60,7 +86,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
         <JobSubmitForm
           projectId={props.projectId}
           clusterName={props.clusterName}
-          instanceId={cluster !== undefined ? cluster.headNode?.instanceId! : cluster}
+          instanceId={cluster !== undefined ? cluster.headNode?.instanceId! : undefined!}
           handleViewJobFormCallBack={handleViewJobFormCallBack}
         />
       )}
@@ -69,50 +95,59 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
         selectionType="multi"
         selectedItems={collectionProps.selectedItems}
         columnDefinitions={columnDefinitions}
-        loadingText="Loading jobs"
+        loading={isJobsLoading}
+        loadingText="Loading jobs..."
         items={items}
+        pagination={<Pagination {...paginationProps} />}
         header={
-          <>
-            <SpaceBetween direction="vertical" size="xs">
-              <Header
-                counter={
-                  collectionProps.selectedItems?.length
-                    ? `(${collectionProps.selectedItems.length}/${jobs.length})`
-                    : `(${jobs.length})`
-                }
-                actions={
-                  <Box float="right">
-                    <SpaceBetween direction="horizontal" size="xs">
-                      <Button disabled={shouldDisableStopJobButton()} onClick={() => executeStopJob()}>
-                        Stop Job
-                      </Button>
-                      <Button
-                        variant="primary"
-                        disabled={cluster !== undefined ? cluster.headNode?.state! !== 'running' : true}
-                        onClick={() => setViewJobForm(!viewJobForm)}
-                      >
-                        Submit Job
-                      </Button>
-                    </SpaceBetween>
-                  </Box>
-                }
-                variant="h2"
-              >
-                {props.clusterName !== undefined ? `Cluster: ${props.clusterName}` : 'No cluster selected'}
-              </Header>
-              <Box float="left">
-                <SpaceBetween direction="horizontal" size="xs">
-                  <Box variant="h3" color="text-label">
-                    Head Node Instance ID:{' '}
-                    {cluster !== undefined ? cluster.headNode?.instanceId! : 'Loading...'}
-                  </Box>
-                  <Box variant="h3" color="text-label">
-                    State: {cluster !== undefined ? cluster.headNode?.state! : 'Loading...'}
-                  </Box>
-                </SpaceBetween>
-              </Box>
-            </SpaceBetween>
-          </>
+          <SpaceBetween direction="vertical" size="xs">
+            <Header
+              counter={
+                collectionProps.selectedItems?.length !== 0
+                  ? `(${collectionProps.selectedItems?.length}/${jobs.length})`
+                  : `(${jobs.length})`
+              }
+              actions={
+                <Box float="right">
+                  <SpaceBetween direction="horizontal" size="xs">
+                    <Button disabled={shouldDisableStopJobButton()} onClick={() => executeStopJob()}>
+                      Stop Job
+                    </Button>
+                    <Button
+                      variant="primary"
+                      disabled={cluster !== undefined ? cluster.headNode?.state! !== 'running' : true}
+                      onClick={() => setViewJobForm(!viewJobForm)}
+                    >
+                      Submit Job
+                    </Button>
+                  </SpaceBetween>
+                </Box>
+              }
+              variant="h2"
+            >
+              Job Management
+            </Header>
+            <Box float="left">
+              <SpaceBetween direction="horizontal" size="xs">
+                <Box variant="h3" color="text-label">
+                  Head Node Instance ID:{' '}
+                  {props.clusterName !== undefined
+                    ? cluster !== undefined
+                      ? cluster.headNode?.instanceId!
+                      : 'Loading...'
+                    : 'N/A'}
+                </Box>
+                <Box variant="h3" color="text-label">
+                  State:{' '}
+                  {props.clusterName !== undefined
+                    ? cluster !== undefined
+                      ? cluster.headNode?.state!
+                      : 'Loading...'
+                    : 'N/A'}
+                </Box>
+              </SpaceBetween>
+            </Box>
+          </SpaceBetween>
         }
       />
     </>
