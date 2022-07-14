@@ -17,45 +17,90 @@ import * as path from 'path';
 import { getConstants } from '../src/constants';
 
 export class CdkInfrastructureStack extends Stack {
+  public distributionEnvVars: {
+    STAGE: string;
+    STACK_NAME: string;
+    API_BASE_URL: string;
+    AWS_REGION: string;
+    S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    S3_ARTIFACT_BUCKET_NAME: string;
+    S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
+    ACCESS_IDENTITY_ARTIFACT_NAME: string;
+    DISTRIBUTION_ARTIFACT_NAME: string;
+    DISTRIBUTION_ARTIFACT_DOMAIN: string;
+    DISTRIBUTION_FUNCTION_ARTIFACT_NAME: string;
+    DISTRIBUTION_FUNCTION_NAME: string;
+    RESPONSE_HEADERS_ARTIFACT_NAME: string;
+    RESPONSE_HEADERS_NAME: string;
+  };
   constructor(scope: Construct, id: string, props?: StackProps) {
-    const { STAGE, API_BASE_URL, AWS_REGION } = getConstants();
-    super(scope, id, {
+    const {
+      STAGE,
+      STACK_NAME,
+      API_BASE_URL,
+      AWS_REGION,
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_ARTIFACT_BUCKET_NAME,
+      S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
+      ACCESS_IDENTITY_ARTIFACT_NAME,
+      DISTRIBUTION_ARTIFACT_NAME,
+      DISTRIBUTION_ARTIFACT_DOMAIN,
+      DISTRIBUTION_FUNCTION_ARTIFACT_NAME,
+      DISTRIBUTION_FUNCTION_NAME,
+      RESPONSE_HEADERS_ARTIFACT_NAME,
+      RESPONSE_HEADERS_NAME
+    } = getConstants();
+    super(scope, STACK_NAME, {
       env: {
         region: AWS_REGION
       }
     });
 
-    const bucket = this._createS3Bucket('S3BucketArtifactsArnOutput');
+    this.distributionEnvVars = {
+      STAGE,
+      STACK_NAME,
+      API_BASE_URL,
+      AWS_REGION,
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_ARTIFACT_BUCKET_NAME,
+      S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
+      ACCESS_IDENTITY_ARTIFACT_NAME,
+      DISTRIBUTION_ARTIFACT_NAME,
+      DISTRIBUTION_ARTIFACT_DOMAIN,
+      DISTRIBUTION_FUNCTION_ARTIFACT_NAME,
+      DISTRIBUTION_FUNCTION_NAME,
+      RESPONSE_HEADERS_ARTIFACT_NAME,
+      RESPONSE_HEADERS_NAME
+    };
+    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_ARN_NAME);
     this._deployS3Bucket(bucket);
     const originAccessIdentity = this._createIdentity(bucket);
     const redirectFunction = this._createRedirectFunction();
     const securityHeaders = this._createSecurityPolicy(API_BASE_URL);
-    const distribution = this._createDistribution(
-      originAccessIdentity,
-      bucket,
-      redirectFunction,
-      securityHeaders
-    );
+    this._createDistribution(originAccessIdentity, bucket, redirectFunction, securityHeaders);
   }
   private _createS3Bucket(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, 'swb-ui-bucket', {
+    const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
       accessControl: BucketAccessControl.PRIVATE
     });
 
-    new CfnOutput(this, s3ArtifactName, {
+    new CfnOutput(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_ARN_NAME, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
   }
   private _deployS3Bucket(bucket: Bucket): void {
-    new BucketDeployment(this, 'swb-ui-bucket-deployment', {
+    new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
       sources: [Source.asset(path.resolve(__dirname, '../../out'))]
     });
   }
 
   private _createIdentity(bucket: Bucket): OriginAccessIdentity {
-    const originAccessIdentity = new OriginAccessIdentity(this, 'swb-ui-origin-access-identity');
+    const originAccessIdentity = new OriginAccessIdentity(
+      this,
+      this.distributionEnvVars.ACCESS_IDENTITY_ARTIFACT_NAME
+    );
     bucket.grantRead(originAccessIdentity);
     return originAccessIdentity;
   }
@@ -66,7 +111,7 @@ export class CdkInfrastructureStack extends Stack {
     redirectFunction: Function,
     securityPolicy: ResponseHeadersPolicy
   ): Distribution {
-    const distribution = new Distribution(this, 'swb-ui-distribution', {
+    const distribution = new Distribution(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_NAME, {
       defaultRootObject: 'index.html',
 
       defaultBehavior: {
@@ -81,24 +126,24 @@ export class CdkInfrastructureStack extends Stack {
       },
       additionalBehaviors: {}
     });
-    new CfnOutput(this, 'S3DistributionArtifactsDomain', {
+    new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
       value: distribution.distributionDomainName
     });
     return distribution;
   }
 
   private _createRedirectFunction(): Function {
-    return new Function(this, 'swb-ui-redirect-distribution-function', {
+    return new Function(this, this.distributionEnvVars.DISTRIBUTION_FUNCTION_ARTIFACT_NAME, {
       code: FunctionCode.fromFile({
         filePath: path.join(__dirname, '../src/redirectFunction.js')
       }),
-      functionName: 'RedirectRoutingFunction'
+      functionName: this.distributionEnvVars.DISTRIBUTION_FUNCTION_NAME
     });
   }
 
   private _createSecurityPolicy(apiBaseUrl: string): ResponseHeadersPolicy {
-    return new ResponseHeadersPolicy(this, 'ResponseHeadersPolicy', {
-      responseHeadersPolicyName: 'swb-ui-policy',
+    return new ResponseHeadersPolicy(this, this.distributionEnvVars.RESPONSE_HEADERS_ARTIFACT_NAME, {
+      responseHeadersPolicyName: this.distributionEnvVars.RESPONSE_HEADERS_NAME,
       comment: 'Security policy',
       securityHeadersBehavior: {
         contentSecurityPolicy: {
