@@ -4,7 +4,8 @@ import {
   mockAdminPermissions,
   mockGetOperations,
   mockGuestPermissions,
-  mockPutOperations
+  mockPutOperations,
+  mockGetRoleOperations
 } from './mockPermissions';
 
 export class MockPermissionsPlugin implements PermissionsPlugin {
@@ -21,6 +22,8 @@ export class MockPermissionsPlugin implements PermissionsPlugin {
     if (route === '/sample') {
       if (method === 'GET') return mockGetOperations;
       else if (method === 'PUT') return mockPutOperations;
+    } else if (route === '/user/*/role/*') {
+      if (method === 'GET') return mockGetRoleOperations;
     }
     throw new Error('Route not secured');
   }

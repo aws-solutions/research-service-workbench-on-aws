@@ -2,6 +2,7 @@ import { Operation, Permission, AuthorizationPlugin } from '..';
 import {
   mockAdminPermissions,
   mockGetOperations,
+  mockGetRoleOperations,
   mockGuestPermissions,
   mockPutOperations
 } from './mockPermissions';
@@ -14,6 +15,8 @@ export class MockAuthorizationPlugin implements AuthorizationPlugin {
       operations === mockGetOperations &&
       (userPermissions === mockAdminPermissions || userPermissions === mockGuestPermissions)
     ) {
+      return;
+    } else if (operations === mockGetRoleOperations && mockAdminPermissions === userPermissions) {
       return;
     }
     throw new Error('Permission is not granted');
