@@ -24,6 +24,7 @@ export class SWBStack extends Stack {
     AMI_IDS_TO_SHARE: string;
     LAUNCH_CONSTRAINT_ROLE_NAME: string;
     S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    S3_DATASETS_BUCKET_ARN_NAME: string;
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
@@ -33,6 +34,7 @@ export class SWBStack extends Stack {
       STAGE,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       STACK_NAME,
       SSM_DOC_NAME_SUFFIX,
@@ -57,19 +59,20 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       LAUNCH_CONSTRAINT_ROLE_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_DATASETS_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS
     };
 
+    this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
+    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
     const statusHandler = this._createStatusHandlerLambda();
     const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
-    const table = this._createDDBTable(apiLambda);
+    this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
-
-    const artifactS3Bucket = this._createS3Buckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    this._createAccountHandlerLambda(lcRole, artifactS3Bucket, table.tableArn);
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
@@ -134,6 +137,7 @@ export class SWBStack extends Stack {
         new PolicyStatement({
           actions: [
             'ec2:AuthorizeSecurityGroupIngress',
+            'ec2:AuthorizeSecurityGroupEgress',
             'ec2:RevokeSecurityGroupEgress',
             'ec2:CreateSecurityGroup',
             'ec2:DeleteSecurityGroup',
@@ -179,10 +183,6 @@ export class SWBStack extends Stack {
           resources: ['*']
         }),
         new PolicyStatement({
-          actions: ['servicecatalog:*'],
-          resources: ['*']
-        }),
-        new PolicyStatement({
           actions: [
             'cloudformation:CreateStack',
             'cloudformation:DeleteStack',
@@ -222,10 +222,19 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3Buckets(s3ArtifactName: string): Bucket {
+  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-artifacts', {});
 
     new CfnOutput(this, s3ArtifactName, {
+      value: s3Bucket.bucketArn
+    });
+    return s3Bucket;
+  }
+
+  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
+    const s3Bucket = new Bucket(this, 's3-datasets', {});
+
+    new CfnOutput(this, s3DatasetsName, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
@@ -249,12 +258,6 @@ export class SWBStack extends Stack {
     statusHandlerLambda.role?.attachInlinePolicy(
       new Policy(this, 'statusHandlerLambdaPolicy', {
         statements: [
-          // TODO: Restrict policy permissions
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: ['*'],
-            sid: 'DynamoDBAccess'
-          }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
@@ -275,11 +278,7 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(
-    launchConstraintRole: Role,
-    artifactS3Bucket: Bucket,
-    ddbTableArn: string
-  ): void {
+  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): Function {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -341,11 +340,6 @@ export class SWBStack extends Stack {
             sid: 'S3Bucket',
             actions: ['s3:GetObject'],
             resources: [`${artifactS3Bucket.bucketArn}/*`]
-          }),
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: [ddbTableArn, `${ddbTableArn}/index/*`],
-            sid: 'DynamoDBAccess'
           })
         ]
       })
@@ -360,6 +354,8 @@ export class SWBStack extends Stack {
       schedule: Schedule.cron({ minute: '0/5' })
     });
     eventRule.addTarget(new targets.LambdaFunction(lambda));
+
+    return lambda;
   }
 
   private _createAPILambda(statusHandlerLambdaArn: string): Function {
@@ -376,12 +372,6 @@ export class SWBStack extends Stack {
     apiLambda.role?.attachInlinePolicy(
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
-          // TODO: Restrict policy permissions
-          new PolicyStatement({
-            actions: ['dynamodb:*'],
-            resources: ['*'],
-            sid: 'DynamoDBAccess'
-          }),
           new PolicyStatement({
             actions: ['events:PutPermission'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
@@ -461,7 +451,11 @@ export class SWBStack extends Stack {
   }
 
   // DynamoDB Table
-  private _createDDBTable(apiLambda: Function): Table {
+  private _createDDBTable(
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
     const tableName: string = `${this.stackName}`;
     const table = new Table(this, tableName, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
@@ -506,8 +500,10 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'resourceType', type: AttributeType.STRING },
       sortKey: { name: 'type', type: AttributeType.STRING }
     });
-    // Grant the Lambda Function read access to the DynamoDB table
+    // Grant the Lambda Functions read access to the DynamoDB table
     table.grantReadWriteData(apiLambda);
+    table.grantReadWriteData(statusHandler);
+    table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
     return table;
   }

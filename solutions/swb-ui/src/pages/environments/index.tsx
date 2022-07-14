@@ -150,7 +150,7 @@ const Environment: NextPage = () => {
   const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
   const startButtonEnableStatuses: string[] = ['PENDING', 'STOPPED'];
   const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'PENDING', 'STARTED', 'COMPLETED'];
-  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED'];
+  const terminateButtonEnableStatuses: string[] = ['FAILED', 'PENDING', 'STOPPED', 'COMPLETED'];
   // Constant buttons should show loading based on statuses in the array
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];
@@ -230,11 +230,6 @@ const Environment: NextPage = () => {
       }
     }
   };
-  // Split panel constants
-  const { header: panelHeader, body: panelBody } = getPanelContent(collectionProps.selectedItems, itemType);
-  const { splitPanelOpen, onSplitPanelToggle, splitPanelSize, onSplitPanelResize } = useSplitPanel(
-    collectionProps.selectedItems
-  );
 
   return (
     <AppLayout
@@ -254,15 +249,6 @@ const Environment: NextPage = () => {
         setNavigationOpen(detail.open);
         navigationOpen = true;
       }}
-      splitPanelOpen={splitPanelOpen}
-      onSplitPanelToggle={onSplitPanelToggle}
-      splitPanelSize={splitPanelSize}
-      onSplitPanelResize={onSplitPanelResize}
-      splitPanel={
-        <SplitPanel header={panelHeader} i18nStrings={splitPaneli18nstrings}>
-          {panelBody}
-        </SplitPanel>
-      }
       content={
         <Box margin={{ bottom: 'l' }}>
           <Flashbar items={notifications} />

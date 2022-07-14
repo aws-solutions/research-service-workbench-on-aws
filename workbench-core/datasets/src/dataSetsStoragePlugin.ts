@@ -1,3 +1,15 @@
+export interface EndpointConnectionStrings {
+  /**
+   * a URL which can be used to access the storage endpoint.
+   */
+  endPointUrl: string;
+
+  /**
+   * An optional alias which also can be used to access the storage endpoint.
+   */
+  endPointAlias?: string;
+}
+
 /**
  * This interface represents a contract consumed by the DataSets service to interact
  * with an underlying stroage provider. This interface should be implemented for each
@@ -43,7 +55,7 @@ export interface DataSetsStoragePlugin {
    * @param externalRoleName - an optional role name which the external environment will assume to
    * access the DataSet
    *
-   * @returns a string which can be used to mount the DataSet to an external environment.
+   * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
    */
   addExternalEndpoint(
     name: string,
@@ -51,23 +63,28 @@ export interface DataSetsStoragePlugin {
     externalEndpointName: string,
     ownerAccountId: string,
     externalRoleName?: string
-  ): Promise<string>;
+  ): Promise<EndpointConnectionStrings>;
 
   /**
    * Add a role used to access an external endpoint.
+   * If provided, update the policy on the KMS key to grant
+   * encrypt/decrypt access for the given role.
    *
    * @param name - the name of the storage destination accessed by the external endpoint.
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
    * @param externalRoleName - the name of the role which will replace the current role accessing the endpoint.
-
+   * @param endPointUrl - a URL which can be used to reach the endpoint.
+   * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
   addRoleToExternalEndpoint(
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string>;
+    externalRoleName: string,
+    endPointUrl: string,
+    kmsKeyArn?: string
+  ): Promise<void>;
 
   /**
    * Remove a role from an external endpoint.
