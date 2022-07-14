@@ -107,3 +107,10 @@ workbench-core/example/infrastructure/build
 
 #patient consent app cdk-outputs
 solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/cdk-outputs.json
+
+#next static export
+solutions/swb-ui/out
+
+#swb-ui cdk-infrastructure
+!solutions/swb-ui/cdk-infrastructure/lib/
+!solutions/swb-ui/cdk-infrastructure/bin/

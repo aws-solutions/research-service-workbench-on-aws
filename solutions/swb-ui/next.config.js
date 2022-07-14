@@ -7,4 +7,8 @@ const nextConfig = {
   i18n
 };
 
-module.exports = withTM(nextConfig);
+//module.exports =
+module.exports = {
+  ...withTM(nextConfig),
+  trailingSlash: true
+};

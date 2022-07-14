@@ -594,6 +594,34 @@ importers:
       ts-jest: 27.1.5_7f5c30a72d82a681fbc0438998364388
       typescript: 4.7.2
 
+  ../../solutions/swb-ui/cdk-infrastructure:
+    specifiers:
+      '@types/jest': ^27.4.1
+      '@types/node': ^14
+      '@types/prettier': 2.6.3
+      aws-cdk: ^2.12.0
+      aws-cdk-lib: ^2.29.1
+      constructs: ^10.0.0
+      jest: ^27.5.1
+      sort-package-json: ^1.57.0
+      source-map-support: ^0.5.16
+      ts-jest: ^27.1.3
+      ts-node: ^10.4.0
+      typescript: ^4.5.2
+    devDependencies:
+      '@types/jest': 27.5.2
+      '@types/node': 14.18.21
+      '@types/prettier': 2.6.3
+      aws-cdk: 2.29.1
+      aws-cdk-lib: 2.29.1_constructs@10.1.42
+      constructs: 10.1.42
+      jest: 27.5.1_ts-node@10.8.1
+      sort-package-json: 1.57.0
+      source-map-support: 0.5.21
+      ts-jest: 27.1.5_6400e448c8ce26641831d9829b55a941
+      ts-node: 10.8.1_01f4831a90327c4fa15ca04ce3a26ce1
+      typescript: 4.7.4
+
   ../../workbench-core/audit:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
@@ -8335,7 +8363,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concurrently/7.2.1:
     resolution: {integrity: sha512-7cab/QyqipqghrVr9qZmoWbidu0nHsmxrpNqQ7r/67vfl1DWJElexehQnTH1p+87tDkihaAjM79xTZyBQh7HLw==}
@@ -14827,7 +14855,7 @@ packages:
       '@types/jest': 27.5.2
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1
+      jest: 27.5.1_ts-node@10.8.1
       jest-util: 27.5.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
