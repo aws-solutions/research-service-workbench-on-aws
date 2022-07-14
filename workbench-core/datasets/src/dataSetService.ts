@@ -3,13 +3,7 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import {
-  DataSet,
-  DataSetMetadataPlugin,
-  DataSetsStoragePlugin,
-  ExternalEndpoint,
-  RoleExistsOnEndpointError
-} from '.';
+import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -197,8 +191,6 @@ export class DataSetService {
    * @param externalRoleArn  - the ARN of the role to add to the endpoint.
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
    * @param kmsKeyArn - an optional ARN to a KMS key used to encrypt data in the DataSet.
-   *
-   * @throws RoleExistsOnEndpointError when the supplied role has already been added to the endpoint.
    */
   public async addRoleToExternalEndpoint(
     dataSetId: string,
@@ -212,10 +204,8 @@ export class DataSetService {
       endPointId
     );
     endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
-    if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn))
-      throw new RoleExistsOnEndpointError(
-        `${externalRoleArn} has already been added to ${endPointDetails.name}`
-      );
+    if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) return;
+
     await storageProvider.addRoleToExternalEndpoint(
       endPointDetails.dataSetName,
       endPointDetails.path,

@@ -1,4 +1,4 @@
-import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {
@@ -303,9 +303,9 @@ describe('IamHelper', () => {
     it('returns empty doc if source doc is empty', () => {
       const source = new PolicyDocument();
       const targetSid = 'StatementToCheck';
-      const newPrincipal = 'newAwsAccountId';
+      const newPrincipal = `arn:aws:iam::newAccountId:root`;
       try {
-        IamHelper.addPrincipalToStatement(source, targetSid, new AccountPrincipal(newPrincipal));
+        IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
       } catch (err) {
         expect(err.message).toBe('Cannot add principal. Policy document is invalid');
       }

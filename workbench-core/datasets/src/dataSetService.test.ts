@@ -7,7 +7,7 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, RoleExistsOnEndpointError, S3DataSetStoragePlugin } from '.';
+import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -343,12 +343,10 @@ describe('DataSetService', () => {
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
-    it('throws if the role has already been added to the endpoint.', async () => {
+    it('no-op if the role has already been added to the endpoint.', async () => {
       await expect(
         service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockRoleArn, plugin)
-      ).rejects.toEqual(
-        new RoleExistsOnEndpointError(`${mockRoleArn} has already been added to ${mockExistingEndpointName}`)
-      );
+      ).not.toThrow();
     });
 
     it('completes if given an unknown role arn.', async () => {

@@ -73,12 +73,12 @@ export class SWBStack extends Stack {
       ALLOWED_ORIGINS
     };
 
-    this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
-    const statusHandler = this._createStatusHandlerLambda();
-    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
+    const statusHandler = this._createStatusHandlerLambda(datasetBucket);
+    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
@@ -274,7 +274,7 @@ export class SWBStack extends Stack {
     return s3Bucket;
   }
 
-  private _createStatusHandlerLambda(): Function {
+  private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
@@ -296,6 +296,27 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
           })
         ]
       })
@@ -392,7 +413,7 @@ export class SWBStack extends Stack {
     return lambda;
   }
 
-  private _createAPILambda(statusHandlerLambdaArn: string): Function {
+  private _createAPILambda(datasetBucket: Bucket, artifactS3Bucket: Bucket): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
@@ -435,11 +456,33 @@ export class SWBStack extends Stack {
             actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
             resources: ['*']
           }),
-          // TODO: Narrow down permissions (dmmadse working on it)
           new PolicyStatement({
-            sid: 'datasetS3Bucket',
-            actions: ['*'],
-            resources: ['arn:aws:s3:::*', 'arn:aws:s3:::*/*', 'arn:aws:s3:*:*:accesspoint/*']
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:GetBucketPolicy',
+              's3:PutBucketPolicy',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
+          }),
+          new PolicyStatement({
+            sid: 'environmentBootstrapS3Access',
+            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+            resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
           })
         ]
       })

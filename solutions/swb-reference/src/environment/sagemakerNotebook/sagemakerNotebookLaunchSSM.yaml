@@ -46,6 +46,9 @@ parameters:
   S3Mounts:
     type: String
     description: Stringified array of dataset objects containing their mountString
+  IamPolicyDocument:
+    type: String
+    description: The IAM policy to be associated with the launched workstation
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
@@ -70,7 +73,7 @@ mainSteps:
         - Key: Namespace
           Value: '{{ Namespace }}'
         - Key: IamPolicyDocument
-          Value: '{}'
+          Value: '{{ IamPolicyDocument }}'
         - Key: InstanceType
           Value: '{{ InstanceType }}'
         - Key: Subnet

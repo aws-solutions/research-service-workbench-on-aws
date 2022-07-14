@@ -6,7 +6,7 @@
 import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { IamHelper } from '@amzn/workbench-core-datasets';
-import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3';
@@ -94,7 +94,7 @@ export default class HostingAccountLifecycleService {
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
         'List:environment-files',
-        new AccountPrincipal(awsAccountId)
+        `arn:aws:iam::${awsAccountId}:root`
       );
     }
 
@@ -118,7 +118,7 @@ export default class HostingAccountLifecycleService {
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
         'Get:environment-files',
-        new AccountPrincipal(awsAccountId)
+        `arn:aws:iam::${awsAccountId}:root`
       );
     }
 
