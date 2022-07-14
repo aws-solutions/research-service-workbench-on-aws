@@ -77,12 +77,18 @@ export function setUpEnvRoutes(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
       const envType = await getEnvironmentType(req.params.id);
-
+      const environment = await environmentService.getEnvironment(req.params.id);
+      if (environment.status === 'STOPPING') {
+        throw Boom.conflict('Cannot start environment while environment is currently being stopped');
+      }
+      if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
+        res.status(204).send();
+      }
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.start(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.start(req.params.id);
+        res.status(204).send();
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
@@ -96,12 +102,19 @@ export function setUpEnvRoutes(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
       const envType = await getEnvironmentType(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id);
+      if (['PENDING', 'STARTING'].includes(environment.status)) {
+        throw Boom.conflict('Cannot stop environment while environment is currently being started');
+      }
+      if (['STOPPING', 'STOPPED'].includes(environment.status)) {
+        res.status(204).send();
+      }
 
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.stop(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.stop(req.params.id);
+        res.status(204).send();
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
