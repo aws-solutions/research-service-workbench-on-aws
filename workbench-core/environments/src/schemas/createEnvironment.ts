@@ -1,4 +1,4 @@
-// Schema for creating an Environment
+// Schema for createEnvironment API
 import { Schema } from 'jsonschema';
 
 const CreateEnvironmentSchema: Schema = {
