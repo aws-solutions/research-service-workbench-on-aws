@@ -19,17 +19,12 @@ AWS_CONFIG_DIR="${HOME}/.aws"
 
 # Define a function to determine what type of environment this is (EMR, SageMaker, RStudio, or EC2 Linux)
 env_type() {
-    if [ -d "/usr/share/aws/emr" ]
-    then
-        printf "emr"
-    elif [ -d "/home/ec2-user/SageMaker" ]
+    if [ -d "/home/ec2-user/SageMaker" ]
     then
         printf "sagemaker"
-    elif [ -d "/var/log/rstudio-server" ]
-    then
-        printf "rstudio"
     else
-        printf "ec2-linux"
+        echo "Error! Unknown env type" > '/var/log/messages'
+        exit 1
     fi
 }
 
@@ -107,9 +102,6 @@ done
 # Define where the Jupyter notebook (if any) should be running
 notebook_dir=""
 case "$(env_type)" in
-    "emr")
-        notebook_dir="/opt/hail-on-AWS-spot-instances/notebook"
-        ;;
     "sagemaker")
         notebook_dir="/home/ec2-user/SageMaker"
         ;;

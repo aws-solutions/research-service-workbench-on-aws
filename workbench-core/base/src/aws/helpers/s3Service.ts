@@ -33,6 +33,14 @@ export default class S3Service {
 
   /**
    * Upload an entire folder with contained files as-is to S3
+   *
+   * Warnings for developers:
+   * 1. This is not a solution to offer customers for remote file upload.
+   *     This is only to be used from the application deployer's local machine (eg. during post deployment)
+   * 2. When using, account for this method's limitations for scenarios where:
+   *  - network/lambda timeouts might occur for larger folder/long operations
+   *  - maximum single file size is limited to 5GB even if your connection can handle the time needed.
+   *
    * @param s3BucketName - The name of the S3 bucket to place the folder in
    * @param prefix - The key name to create in S3 for this folder
    * @param path - The full local directory path in local system of the folder

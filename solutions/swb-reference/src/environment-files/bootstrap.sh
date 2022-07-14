@@ -75,7 +75,7 @@ case "$(env_type)" in
 esac
 
 echo "Copying Goofys from bootstrap.sh"
-cp "${FILES_DIR}/offline-packages/goofys" /usr/local/bin/goofys
+cp "${FILES_DIR}/offline-packages/goofys-0.24.0" /usr/local/bin/goofys
 chmod +x "/usr/local/bin/goofys"
 
 # Create S3 mount script and config file

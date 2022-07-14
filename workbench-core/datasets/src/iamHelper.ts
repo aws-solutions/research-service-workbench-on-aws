@@ -1,4 +1,4 @@
-import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { IPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import _ from 'lodash';
 
 export class IamHelper {
@@ -17,18 +17,20 @@ export class IamHelper {
   public static addPrincipalToStatement(
     source: PolicyDocument,
     targetSid: string,
-    principal: string
+    principal: IPrincipal
   ): PolicyDocument {
     const policyObj = source.toJSON();
-    if (policyObj && policyObj.Statement) {
-      _.forEach(policyObj.Statement, (s) => {
-        const statement: PolicyStatement = PolicyStatement.fromJson(s);
-        if (statement.sid === targetSid) {
-          statement.addPrincipals(new AccountPrincipal(principal));
-        }
-      });
-    }
-    return PolicyDocument.fromJson(policyObj);
+    if (!policyObj || !policyObj.Statement)
+      throw new Error('Cannot add principal. Policy document is invalid');
+    const returnDoc = new PolicyDocument();
+    _.forEach(policyObj.Statement, (s) => {
+      const statement: PolicyStatement = PolicyStatement.fromJson(s);
+      if (s.sid === targetSid) {
+        statement.addPrincipals(principal);
+      }
+      returnDoc.addStatements(statement);
+    });
+    return returnDoc;
   }
 
   public static compareStatementPrincipal(source: PolicyStatement, target: PolicyStatement): boolean {

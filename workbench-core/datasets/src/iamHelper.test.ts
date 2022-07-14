@@ -1,4 +1,4 @@
-import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {
@@ -250,6 +250,65 @@ describe('IamHelper', () => {
       `)
       );
       expect(IamHelper.compareStatementAction(source, target)).toBe(true);
+    });
+  });
+
+  describe('containsStatementId', () => {
+    it('returns false when the source and target SIDs do not match.', () => {
+      const source = PolicyDocument.fromJson({
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Sid: 'StatementToCheck',
+            Principal: {
+              AWS: '*'
+            },
+            Action: '*',
+            Effect: 'Allow',
+            Resource: '*'
+          }
+        ]
+      });
+      const targetSid = 'StatementDifferentThanExpected';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeFalsy();
+    });
+
+    it('returns true when the a statement SID in source doc and target SID match.', () => {
+      const source = PolicyDocument.fromJson({
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Sid: 'StatementToCheck',
+            Principal: {
+              AWS: '*'
+            },
+            Action: '*',
+            Effect: 'Allow',
+            Resource: '*'
+          }
+        ]
+      });
+      const targetSid = 'StatementToCheck';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeTruthy();
+    });
+
+    it('returns false when statements do not exist in source doc', () => {
+      const source = new PolicyDocument();
+      const targetSid = 'StatementToCheck';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeFalsy();
+    });
+  });
+
+  describe('addPrincipalToStatement', () => {
+    it('returns empty doc if source doc is empty', () => {
+      const source = new PolicyDocument();
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = 'newAwsAccountId';
+      try {
+        IamHelper.addPrincipalToStatement(source, targetSid, new AccountPrincipal(newPrincipal));
+      } catch (err) {
+        expect(err.message).toBe('Cannot add principal. Policy document is invalid');
+      }
     });
   });
 
