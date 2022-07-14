@@ -109,10 +109,17 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   public async addRoleToExternalEndpoint(
     name: string,
+    path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string> {
-    throw new Error('Method not implemented.');
+    externalRoleName: string,
+    endPointUrl: string,
+    kmsKeyArn?: string
+  ): Promise<void> {
+    // TODO: either throw error if not formatted correctly or support all S3 URL types https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
+    const endPointArn: string = endPointUrl.replace('s3://', '');
+    await this._configureAccessPointPolicy(name, path, externalEndpointName, endPointArn, externalRoleName);
+
+    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
   }
 
   public async removeRoleFromExternalEndpoint(

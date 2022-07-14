@@ -35,7 +35,7 @@ export interface ExternalEndpoint {
   allowedRoles?: string[];
 
   /**
-   * The S3 URL to reach this endpoint.
+   * A URL to reach this endpoint.
    */
   endPointUrl: string;
 

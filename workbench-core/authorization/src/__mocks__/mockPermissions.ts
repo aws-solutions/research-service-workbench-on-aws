@@ -10,6 +10,11 @@ export const mockAdminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Sample'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Role'
   }
 ];
 
@@ -35,5 +40,12 @@ export const mockGetOperations: Operation[] = [
   {
     action: 'READ',
     subject: 'Sample'
+  }
+];
+
+export const mockGetRoleOperations: Operation[] = [
+  {
+    action: 'READ',
+    subject: 'Role'
   }
 ];

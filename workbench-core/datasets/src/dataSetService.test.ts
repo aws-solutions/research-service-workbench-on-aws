@@ -7,7 +7,7 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
+import { DataSet, DataSetService, RoleExistsOnEndpointError, S3DataSetStoragePlugin } from '.';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -26,6 +26,7 @@ describe('DataSetService', () => {
   const mockAccessPointName = 'Sample-Access-Point';
   const mockAccessPointAlias = `${mockAccessPointName}-s3alias`;
   const mockRoleArn = 'Sample-Role-Arn';
+  const mockAlternateRoleArn = 'Another-Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
@@ -130,6 +131,18 @@ describe('DataSetService', () => {
         allowedRoles: [mockRoleArn]
       };
     });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateExternalEndpoint').mockImplementation(async () => {
+      return {
+        id: mockExistingEndpointId,
+        name: mockExistingEndpointName,
+        dataSetId: mockDataSetId,
+        dataSetName: mockDataSetName,
+        path: mockDataSetPath,
+        endPointUrl: mockEndPointUrl,
+        endPointAlias: mockAccessPointAlias,
+        allowedRoles: [mockRoleArn, mockAlternateRoleArn]
+      };
+    });
 
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
@@ -143,6 +156,9 @@ describe('DataSetService', () => {
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'importStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
     });
+    jest
+      .spyOn(S3DataSetStoragePlugin.prototype, 'addRoleToExternalEndpoint')
+      .mockImplementation(async () => {});
   });
 
   describe('constructor', () => {
@@ -315,6 +331,30 @@ describe('DataSetService', () => {
       expect(response.message).toEqual(
         `'${mockExistingEndpointName}' already exists in '${mockDataSetWithEndpointId}'.`
       );
+    });
+  });
+
+  describe('addRoleToExternalEndpoint', () => {
+    let service: DataSetService;
+    let plugin: S3DataSetStoragePlugin;
+
+    beforeEach(() => {
+      service = new DataSetService(audit, log, metaPlugin);
+      plugin = new S3DataSetStoragePlugin(aws);
+    });
+
+    it('throws if the role has already been added to the endpoint.', async () => {
+      await expect(
+        service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockRoleArn, plugin)
+      ).rejects.toEqual(
+        new RoleExistsOnEndpointError(`${mockRoleArn} has already been added to ${mockExistingEndpointName}`)
+      );
+    });
+
+    it('completes if given an unknown role arn.', async () => {
+      await expect(
+        service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockAlternateRoleArn, plugin)
+      ).resolves.toBeUndefined();
     });
   });
 });

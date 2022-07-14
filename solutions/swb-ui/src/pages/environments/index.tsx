@@ -235,11 +235,6 @@ const Environment: NextPage = () => {
       }
     }
   };
-  // Split panel constants
-  const { header: panelHeader, body: panelBody } = getPanelContent(collectionProps.selectedItems, itemType);
-  const { splitPanelOpen, onSplitPanelToggle, splitPanelSize, onSplitPanelResize } = useSplitPanel(
-    collectionProps.selectedItems
-  );
 
   return (
     <AppLayout
@@ -259,15 +254,6 @@ const Environment: NextPage = () => {
         setNavigationOpen(detail.open);
         navigationOpen = true;
       }}
-      splitPanelOpen={splitPanelOpen}
-      onSplitPanelToggle={onSplitPanelToggle}
-      splitPanelSize={splitPanelSize}
-      onSplitPanelResize={onSplitPanelResize}
-      splitPanel={
-        <SplitPanel header={panelHeader} i18nStrings={splitPaneli18nstrings}>
-          {panelBody}
-        </SplitPanel>
-      }
       content={
         <Box margin={{ bottom: 'l' }}>
           <Flashbar items={notifications} />
