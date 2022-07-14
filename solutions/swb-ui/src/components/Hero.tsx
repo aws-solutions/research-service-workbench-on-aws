@@ -1,6 +1,5 @@
 import Box from '@awsui/components-react/box';
 import Button from '@awsui/components-react/button';
-import Container from '@awsui/components-react/container';
 import Grid from '@awsui/components-react/grid';
 import { useSettings } from '../context/SettingsContext';
 import styles from '../styles/Hero.module.scss';

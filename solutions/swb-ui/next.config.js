@@ -8,6 +8,5 @@ const nextConfig = {
 //module.exports =
 module.exports = {
   ...withTM(nextConfig),
-  // assetPrefix: './',
   trailingSlash: true
 };
