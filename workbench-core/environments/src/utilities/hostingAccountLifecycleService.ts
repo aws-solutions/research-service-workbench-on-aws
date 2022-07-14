@@ -6,7 +6,7 @@
 import { Readable } from 'stream';
 import { AwsService } from '@amzn/workbench-core-base';
 import { IamHelper } from '@amzn/workbench-core-datasets';
-import { AccountPrincipal, PolicyDocument, PolicyStatement, Effect } from '@aws-cdk/aws-iam';
+import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3';
@@ -71,18 +71,23 @@ export default class HostingAccountLifecycleService {
 
     // If List statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'List:environment-files')) {
-      const listStatement = new PolicyStatement({
-        sid: 'List:environment-files',
-        actions: ['s3:ListBucket'],
-        resources: [`${artifactBucketArn}*`],
-        principals: [new AccountPrincipal(awsAccountId)],
-        effect: Effect.ALLOW,
-        conditions: {
-          StringLike: {
-            's3:prefix': 'environment-files*'
+      const listStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "List:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:ListBucket",
+        "Resource": ["${artifactBucketArn}"],
+        "Condition": {
+          "StringLike": {
+            "s3:prefix": "environment-files*"
+            }
           }
-        }
-      });
+        }`)
+      );
       bucketPolicy.addStatements(listStatement);
     } else {
       // If List statement doesn't contain this accountId, add it
@@ -95,13 +100,18 @@ export default class HostingAccountLifecycleService {
 
     // If Get statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
-      const getStatement = new PolicyStatement({
-        sid: 'Get:environment-files',
-        actions: ['s3:GetBucket'],
-        resources: [`${artifactBucketArn}/environment-files*`],
-        principals: [new AccountPrincipal(awsAccountId)],
-        effect: Effect.ALLOW
-      });
+      const getStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "Get:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": ["${artifactBucketArn}/environment-files*"]
+        }`)
+      );
       bucketPolicy.addStatements(getStatement);
     } else {
       // If Get statement doesn't contain this accountId, add it
