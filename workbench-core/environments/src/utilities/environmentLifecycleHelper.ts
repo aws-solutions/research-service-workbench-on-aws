@@ -118,10 +118,11 @@ export default class EnvironmentLifecycleHelper {
    * @param dataSetIds - the list of datasets attached.
    * @param envId - the environment on which to mount the dataset(s)
    *
-   * @returns a stringified list of objects containing dataset's name, storageName, path and mountString
+   * @returns datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
+   * '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\"\}"]'
    */
   public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
-    let datasetsToMount: Array<{ [key: string]: string }> = [];
+    let datasetsToMount: Array<string> = [];
 
     datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
@@ -134,14 +135,9 @@ export default class EnvironmentLifecycleHelper {
               datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
               new S3DataSetStoragePlugin(this.aws)
             )
-          : await this.dataSetService.getDataSetMountString(datasetId, datasetEndPointName);
+          : await this.dataSetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
 
-        return {
-          datasetId,
-          storageName: dataSet.storageName,
-          path: dataSet.path,
-          mountString
-        };
+        return mountString;
       })
     );
 

@@ -11,6 +11,7 @@ function getConstants(): {
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
   S3_DATASETS_BUCKET_ARN_NAME: string;
   S3_ARTIFACT_BUCKET_SC_PREFIX: string;
+  S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX: string;
   LAUNCH_CONSTRAINT_ROLE_NAME: string;
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
@@ -30,6 +31,7 @@ function getConstants(): {
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
   const AWS_REGION = config.awsRegion;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
+  const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
 
@@ -51,6 +53,7 @@ function getConstants(): {
     S3_ARTIFACT_BUCKET_ARN_NAME,
     S3_DATASETS_BUCKET_ARN_NAME,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
+    S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX,
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,

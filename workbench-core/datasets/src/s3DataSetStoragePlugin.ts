@@ -19,7 +19,7 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import IamHelper from './iamHelper';
+import { IamHelper } from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
 /**
@@ -84,8 +84,11 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalRoleName?: string,
     kmsKeyArn?: string
   ): Promise<EndpointConnectionStrings> {
-    const response: { endPointArn: string; endPointAlias?: string } =
-      await this._createAccessPoint(name, externalEndpointName, ownerAccountId);
+    const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
+      name,
+      externalEndpointName,
+      ownerAccountId
+    );
     await this._configureBucketPolicy(name, response.endPointArn);
 
     if (externalRoleName) {
@@ -159,9 +162,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {
-    const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
-      Bucket: name
-    };
     const s3BucketArn: string = `arn:aws:s3:::${name}`;
     const accountId: string = this._awsAccountIdFromArn(accessPointArn);
 
@@ -184,6 +184,9 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
     let bucketPolicy: PolicyDocument = new PolicyDocument();
     try {
+      const getBucketPolicyConfig: GetBucketPolicyCommandInput = {
+        Bucket: name
+      };
       const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
         getBucketPolicyConfig
       );

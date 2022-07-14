@@ -8,9 +8,17 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
-import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import {
+  Policy,
+  PolicyDocument,
+  PolicyStatement,
+  Role,
+  ServicePrincipal,
+  Effect,
+  AnyPrincipal
+} from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -228,7 +236,31 @@ export class SWBStack extends Stack {
   }
 
   private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-artifacts', {});
+    const s3Bucket = new Bucket(this, 's3-artifacts', {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
+
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        resources: [s3Bucket.bucketArn, `${s3Bucket.bucketArn}/*`],
+        actions: ['s3:*'],
+        principals: [new AnyPrincipal()],
+        conditions: { Bool: { 'aws:SecureTransport': 'false' } }
+      })
+    );
+
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use SigV4',
+        effect: Effect.DENY,
+        resources: [`${s3Bucket.bucketArn}/*`],
+        actions: ['s3:*'],
+        principals: [new AnyPrincipal()],
+        conditions: { StringNotEquals: { 's3:signatureversion': 'AWS4-HMAC-SHA256' } }
+      })
+    );
 
     new CfnOutput(this, s3ArtifactName, {
       value: s3Bucket.bucketArn
@@ -237,7 +269,9 @@ export class SWBStack extends Stack {
   }
 
   private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-datasets', {});
+    const s3Bucket = new Bucket(this, 's3-datasets', {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
 
     new CfnOutput(this, s3DatasetsName, {
       value: s3Bucket.bucketArn
