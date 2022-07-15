@@ -36,7 +36,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemaker\"\n}",
+              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemakerNotebook\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -208,7 +208,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemaker\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
+              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemakerNotebook\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -296,7 +296,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-77ncg2cb3bx4g\",\n    \"provisioningArtifactId\": \"pa-hs4ex4okpbl7e\",\n    \"allowRoleIds\": [],\n    \"type\": \"sagemaker\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"productId\": \"prod-77ncg2cb3bx4g\",\n    \"provisioningArtifactId\": \"pa-hs4ex4okpbl7e\",\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
