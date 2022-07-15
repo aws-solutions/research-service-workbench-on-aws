@@ -570,7 +570,7 @@ importers:
       ts-jest: 27.1.5_9aad12bf37a51c380d7fd766c0633ba1
       typescript: 4.7.4
 
-  ../../solutions/swb-ui/cdk-infrastructure:
+  ../../solutions/swb-ui/infrastructure:
     specifiers:
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
