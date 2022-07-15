@@ -40,6 +40,7 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
       CIDR: [cidr],
       InstanceType: [instanceSize],
+      DatasetsBucketName: [await this.helper.getDatasetsBucketName()],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],

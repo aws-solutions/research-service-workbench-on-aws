@@ -76,6 +76,16 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
+  public async getDatasetsBucketName(): Promise<string> {
+    const cfService = this.aws.helpers.cloudformation;
+    const { [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn } = await cfService.getCfnOutput(
+      process.env.STACK_NAME!,
+      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]
+    );
+
+    return datasetsBucketArn.split(':').pop();
+  }
+
   /**
    * Executing SSM Document in hosting account with provided envMetadata
    * @param ssmParameters - the list of input parameters for SSM doc execution
