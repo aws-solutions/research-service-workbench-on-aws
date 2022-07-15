@@ -84,7 +84,7 @@ Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assi
 
 1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide a value for `apiBaseUrl` with the next steps: 
     1. Follow instructions from step [Retrieve API URL](##retrieve-api-url) and copy the value with format `https://{api}.{region}.amazonaws.com/dev/`
-    1. Remove the last par of the URL `/dev/`.
+    1. Remove the last part of the URL `/dev/`.
     1. Assign value to `apiBaseUrl`,  `apiBaseUrl` must have the next format  `https://{api}.{region}.amazonaws.com`.
 
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
@@ -105,7 +105,6 @@ In order to deploy application we need to export the application as a static web
 
 ```
 rush install
-rush build
 STAGE=<STAGE> rushx cdk bootstrap
 STAGE=<STAGE> rushx cdk-deploy
 
@@ -122,8 +121,7 @@ arn:aws:cloudformation:region:account:stack/swb-ui-dev-va/id
 
 ✨  Total time: 250.4s
 ```
-
-In order to navigate to the deployed application copy Cloudformation output `swb-ui-dev-va.WebsiteURL` with format `<id>.cloudfront.net` into your browser
+To navigate to the website, follow the link provided by `swb-ui-dev-va.WebsiteURL`.
 
 
 ## Design system
