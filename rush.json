@@ -115,7 +115,7 @@
     },
     {
       "packageName": "@amzn/hpc-ui",
-      "projectFolder": "solutions/hpc-ui",
+      "projectFolder": "solutions/swb-plugins/hpc-ui",
       "reviewCategory": "production",
       "shouldPublish": true
     },
