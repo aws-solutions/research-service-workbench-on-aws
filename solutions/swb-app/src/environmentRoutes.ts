@@ -76,15 +76,13 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
       const environment = await environmentService.getEnvironment(req.params.id);
+      const envType = environment.ETC.type;
       if (environment.status === 'STOPPING') {
         throw Boom.conflict('Cannot start environment while environment is currently being stopped');
-      }
-      if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
+      } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
         res.status(204).send();
-      }
-      if (supportedEnvs.includes(envType)) {
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
         await environments[envType].lifecycle.start(req.params.id);
@@ -101,16 +99,14 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
       const environment = await environmentService.getEnvironment(req.params.id);
+      const envType = environment.ETC.type;
+
       if (['PENDING', 'STARTING'].includes(environment.status)) {
         throw Boom.conflict('Cannot stop environment while environment is currently being started');
-      }
-      if (['STOPPING', 'STOPPED'].includes(environment.status)) {
+      } else if (['STOPPING', 'STOPPED'].includes(environment.status)) {
         res.status(204).send();
-      }
-
-      if (supportedEnvs.includes(envType)) {
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
         await environments[envType].lifecycle.stop(req.params.id);
