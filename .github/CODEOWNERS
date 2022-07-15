@@ -2,6 +2,10 @@
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
 common/config/rush/pnpm-lock.yaml
+.gitallowed
+.gitattributes
+.gitignore
+.viperlightignore
 common/changes/
 solutions/example-ui-app                              @mabreuortega
 solutions/swb-ui                                      @awslabs/aws-ma-swb

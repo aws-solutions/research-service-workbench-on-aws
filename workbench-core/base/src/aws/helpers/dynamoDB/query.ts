@@ -5,7 +5,7 @@
 
 import { AttributeValue, QueryCommandInput, QueryCommandOutput, DynamoDB } from '@aws-sdk/client-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
-import _ = require('lodash');
+import _ from 'lodash';
 
 /**
  * This class helps with building queries to a DDB table

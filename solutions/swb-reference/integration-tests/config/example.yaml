@@ -1,1 +1,7 @@
-apiBaseUrl: ''
+#apiBaseUrl: ''
+
+# Default Env Config for launching a new environment
+#envTypeId: ''
+#envTypeConfigId: ''
+#projectId: ''
+#envType: ''

@@ -7,7 +7,8 @@ import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
 import {
@@ -18,8 +19,8 @@ import {
   CognitoUserManagementPlugin
 } from '@amzn/workbench-core-authentication';
 import { Express } from 'express';
-import SagemakerEnvironmentConnectionService from './environment/sagemaker/sagemakerEnvironmentConnectionService';
-import SagemakerEnvironmentLifecycleService from './environment/sagemaker/sagemakerEnvironmentLifecycleService';
+import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
+import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: process.env.COGNITO_DOMAIN!,
@@ -35,13 +36,13 @@ const apiRouteConfig: ApiRouteConfig = {
       path: '/foo',
       serviceAction: 'launch',
       httpMethod: 'post',
-      service: new SagemakerEnvironmentLifecycleService()
+      service: new SagemakerNotebookEnvironmentLifecycleService()
     }
   ],
   environments: {
-    sagemaker: {
-      lifecycle: new SagemakerEnvironmentLifecycleService(),
-      connection: new SagemakerEnvironmentConnectionService()
+    sagemakerNotebook: {
+      lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
+      connection: new SagemakerNotebookEnvironmentConnectionService()
     }
 
     // Add your environment types here as follows:
@@ -61,6 +62,9 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   })
 };

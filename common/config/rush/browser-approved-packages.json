@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@amzn/patient-consent-express",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/swb-app",
       "allowedCategories": [ "production" ]
     },
@@ -44,7 +48,7 @@
     },
     {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -91,12 +95,20 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-kms",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/client-lambda",
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/client-managedblockchain",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
@@ -120,7 +132,7 @@
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -236,7 +248,7 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "axios",
@@ -247,8 +259,12 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "cdk-nag",
+      "name": "cdk-ec2-key-pair",
       "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "cdk-nag",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -311,6 +327,14 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "fabric-ca-client",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "fabric-common",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "fast-check",
       "allowedCategories": [ "production" ]
     },
@@ -325,6 +349,10 @@
     {
       "name": "jest",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "jest-circus",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "jest-fast-check",
@@ -345,6 +373,10 @@
     {
       "name": "md5-file",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "nconf",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next",
@@ -379,6 +411,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "pnpm",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -404,7 +440,7 @@
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "swr",
@@ -420,7 +456,7 @@
     },
     {
       "name": "ts-node",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "typescript",

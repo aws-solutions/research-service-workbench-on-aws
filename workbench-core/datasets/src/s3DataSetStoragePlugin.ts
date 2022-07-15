@@ -1,6 +1,11 @@
 import { AwsService } from '@amzn/workbench-core-base';
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import {
+  GetKeyPolicyCommandInput,
+  GetKeyPolicyCommandOutput,
+  PutKeyPolicyCommandInput
+} from '@aws-sdk/client-kms';
+import {
   GetBucketPolicyCommandInput,
   GetBucketPolicyCommandOutput,
   PutBucketPolicyCommandInput,
@@ -13,7 +18,7 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
-import { Credentials } from '@aws-sdk/types';
+import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import IamHelper from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
@@ -22,19 +27,21 @@ import { DataSetsStoragePlugin } from '.';
  */
 export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _aws: AwsService;
-  private _kmsKeyArn: string;
 
   /**
    *
-   * @param s3Options - options needed to create and maintain the S3 bucket associated with this provider.
+   * @param aws - {@link AwsService}
    */
-  public constructor(s3Options: { region: string; credentials: Credentials; kmsKeyArn: string }) {
-    this._aws = new AwsService({ region: s3Options.region, credentials: s3Options.credentials });
-    this._kmsKeyArn = s3Options.kmsKeyArn;
+  public constructor(aws: AwsService) {
+    this._aws = aws;
+  }
+
+  public getStorageType(): string {
+    return 'S3';
   }
 
   /**
-   * Create a new DataSet storage location. For S3, this is a prefix within a bucket.
+   * Create a new DataSet storage location. For S3, this is a prefix within an existing S3 bucket.
    * @param name - the name of the S3 bucket where the storage should reside.
    * @param path - the prefix to create for the dataset.
    *
@@ -45,8 +52,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     const params: PutObjectCommandInput = {
       Bucket: name,
       ContentLength: 0,
-      Key: objectKey,
-      ServerSideEncryption: this._kmsKeyArn
+      Key: objectKey
     };
 
     await this._aws.clients.s3.putObject(params);
@@ -54,39 +60,66 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     return `s3://${name}/${objectKey}`;
   }
 
+  public async importStorage(name: string, path: string): Promise<string> {
+    const objectKey: string = path.endsWith('/') ? path : `${path}/`;
+    return `s3://${name}/${objectKey}`;
+  }
+
   /**
    * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
-   * to the dataset prefix for a given external role.
+   * to the dataset prefix for a given external role if provided.
    * @param name - the name of the S3 bucket where the storage resides.
    * @param path - the S3 bucket prefix which identifies the root of the DataSet.
    * @param externalEndpointName - the name of the access pont to create.
-   * @param externalRoleName - the role which will be given access to the files under the prefix.
-   * @returns a string representing the URI to the dataset root prefix.
+   * @param ownerAccountId - the owning AWS account for the bucket.
+   * @param externalRoleName - an optional role which will be given access to the files under the prefix.
+   * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
+   * @returns the S3 URL and the alias which can be used to access the endpoint.
    */
   public async addExternalEndpoint(
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string> {
-    const accessPointArn: string = await this._createAccessPoint(name, externalEndpointName);
-    await this._configureBucketPolicy(name, accessPointArn);
-    await this._configureAccessPointPolicy(
+    ownerAccountId: string,
+    externalRoleName?: string,
+    kmsKeyArn?: string
+  ): Promise<EndpointConnectionStrings> {
+    const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
       name,
-      path,
       externalEndpointName,
-      accessPointArn,
-      externalRoleName
+      ownerAccountId
     );
-    return `s3://${accessPointArn}/${path}/`;
+    await this._configureBucketPolicy(name, response.endPointArn);
+
+    if (externalRoleName) {
+      await this._configureAccessPointPolicy(
+        name,
+        path,
+        externalEndpointName,
+        response.endPointArn,
+        externalRoleName
+      );
+      if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
+    }
+    return {
+      endPointUrl: `s3://${response.endPointArn}/`,
+      endPointAlias: response.endPointAlias
+    };
   }
 
   public async addRoleToExternalEndpoint(
     name: string,
+    path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string> {
-    throw new Error('Method not implemented.');
+    externalRoleName: string,
+    endPointUrl: string,
+    kmsKeyArn?: string
+  ): Promise<void> {
+    // TODO: either throw error if not formatted correctly or support all S3 URL types https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html
+    const endPointArn: string = endPointUrl.replace('s3://', '');
+    await this._configureAccessPointPolicy(name, path, externalEndpointName, endPointArn, externalRoleName);
+
+    if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
   }
 
   public async removeRoleFromExternalEndpoint(
@@ -116,15 +149,23 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  private async _createAccessPoint(name: string, externalEndpointName: string): Promise<string> {
+  private async _createAccessPoint(
+    name: string,
+    externalEndpointName: string,
+    bucketAccount: string
+  ): Promise<{ endPointArn: string; endPointAlias?: string }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
-      Bucket: name
+      Bucket: name,
+      AccountId: bucketAccount
     };
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig
     );
-    return `${response.AccessPointArn}`;
+    return {
+      endPointArn: response.AccessPointArn!,
+      endPointAlias: response.Alias
+    };
   }
 
   private async _configureBucketPolicy(name: string, accessPointArn: string): Promise<void> {
@@ -151,14 +192,19 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       }`)
     );
 
-    const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
-      getBucketPolicyConfig
-    );
-    let bucketPolicy: PolicyDocument;
-    if (bucketPolicyResponse.Policy) {
-      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
-    } else {
-      bucketPolicy = new PolicyDocument();
+    let bucketPolicy: PolicyDocument = new PolicyDocument();
+    try {
+      const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy(
+        getBucketPolicyConfig
+      );
+      if (bucketPolicyResponse.Policy) {
+        bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy));
+      }
+    } catch (e) {
+      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
+      if (e.Code !== 'NoSuchBucketPolicy') {
+        throw e;
+      }
     }
 
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
@@ -241,6 +287,83 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     };
 
     await this._aws.clients.s3Control.putAccessPointPolicy(putPolicyParams);
+  }
+
+  private async _configureKmsKey(kmsKeyArn: string, externalRoleName: string): Promise<void> {
+    const accountId = this._awsAccountIdFromArn(externalRoleName);
+
+    // key usage statement
+    const usageStatement: PolicyStatement = PolicyStatement.fromJson(
+      JSON.parse(`
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${accountId}:root"
+      },
+      "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "*"
+    }`)
+    );
+
+    // allow attachment statement
+    const attachStatement: PolicyStatement = PolicyStatement.fromJson(
+      JSON.parse(`
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"arn:aws:iam::${accountId}:root"
+      },
+      "Action": [
+        "kms:CreateGrant",
+        "kms:ListGrant",
+        "kms:RevokeGrant"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "kms:GrantIsForAWSResource": "true"
+        }
+      }
+    }`)
+    );
+
+    const params: GetKeyPolicyCommandInput = {
+      KeyId: kmsKeyArn,
+      PolicyName: 'default'
+    };
+    const kmsPolicyResponse: GetKeyPolicyCommandOutput = await this._aws.clients.kms.getKeyPolicy(params);
+    let kmsPolicy: PolicyDocument;
+    if (kmsPolicyResponse.Policy) {
+      kmsPolicy = PolicyDocument.fromJson(JSON.parse(kmsPolicyResponse.Policy));
+    } else {
+      kmsPolicy = new PolicyDocument();
+    }
+
+    let isDirty: boolean = false;
+    if (!IamHelper.policyDocumentContainsStatement(kmsPolicy, usageStatement)) {
+      isDirty = true;
+      kmsPolicy.addStatements(usageStatement);
+    }
+
+    if (IamHelper.policyDocumentContainsStatement(kmsPolicy, attachStatement)) {
+      if (!isDirty) return;
+    } else {
+      kmsPolicy.addStatements(attachStatement);
+    }
+
+    const putPolicyParams: PutKeyPolicyCommandInput = {
+      KeyId: kmsKeyArn,
+      PolicyName: 'default',
+      Policy: JSON.stringify(kmsPolicy.toJSON())
+    };
+
+    await this._aws.clients.kms.putKeyPolicy(putPolicyParams);
   }
 
   private _awsAccountIdFromArn(arn: string): string {
