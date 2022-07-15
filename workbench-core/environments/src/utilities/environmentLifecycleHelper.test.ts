@@ -49,7 +49,6 @@ describe('EnvironmentLifecycleHelper', () => {
     const datasetIds: string[] = [];
     const envId = 'sampleEnvId';
     helper.dataSetService.addDataSetExternalEndpoint = jest.fn();
-    helper.dataSetService.getDataSetMountString = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
 
     // OPERATE
@@ -64,8 +63,14 @@ describe('EnvironmentLifecycleHelper', () => {
     const helper = new EnvironmentLifecycleHelper();
     const datasetIds = ['exampleDatasetId'];
     const envId = 'sampleEnvId';
-    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => 'sampleMountString');
-    helper.dataSetService.getDataSetMountString = jest.fn(async () => 'sampleMountString');
+    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => {
+      return {
+        name: 'dataSetName',
+        bucket: 'endPointURL',
+        prefix: 'path',
+        endpointId: 'endpointId'
+      };
+    });
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
         storageName: 'sampleStorageName',

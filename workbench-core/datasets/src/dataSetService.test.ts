@@ -246,7 +246,7 @@ describe('DataSetService', () => {
     });
 
     it("throws when called with a name that doesn't exists.", async () => {
-      await expect(service.getDataSetMountString('name', 'endPointName')).rejects.toThrow(
+      await expect(service.getDataSetMountObject('name', 'endPointName')).rejects.toThrow(
         new Error(`'endPointName' not found on DataSet 'name'.`)
       );
     });

@@ -287,8 +287,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Policy: JSON.stringify(apPolicy.toJSON())
     };
 
-    console.log(putPolicyParams.Policy);
-
     await this._aws.clients.s3Control.putAccessPointPolicy(putPolicyParams);
   }
 

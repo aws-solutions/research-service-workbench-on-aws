@@ -6,7 +6,6 @@
 import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
 import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
 import {
-  DataSet,
   DataSetService,
   DdbDataSetMetadataPlugin,
   S3DataSetStoragePlugin
@@ -14,7 +13,8 @@ import {
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Output } from '@aws-sdk/client-cloudformation';
 import _ from 'lodash';
-import { Environment } from '../services/environmentService';
+import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import { Environment, EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
 
@@ -120,28 +120,45 @@ export default class EnvironmentLifecycleHelper {
    * @param envId - the environment on which to mount the dataset(s)
    *
    * @returns datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
-   * '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\"\}"]'
+   * '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\",\"endpointId\":\"sampleEndpointId\"\}"]'
    */
   public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
-    let datasetsToMount: Array<string> = [];
+    if (_.isEmpty(datasetIds)) return '[]';
 
-    datasetsToMount = await Promise.all(
+    // TODO: Allow multiple datasets to be mounted per workspace post-preview
+    if (datasetIds.length > 1) throw new Error('Cannot mount more than one dataset per workspace');
+
+    const environmentService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+
+    const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
-        const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
-
         const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
-        const mountString: string = _.isEmpty(dataSet.externalEndpoints)
-          ? await this.dataSetService.addDataSetExternalEndpoint(
-              datasetId,
-              datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
-              new S3DataSetStoragePlugin(this.aws)
-            )
-          : await this.dataSetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
+        const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
+          datasetId,
+          datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
+          new S3DataSetStoragePlugin(this.aws)
+        );
 
-        return mountString;
+        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        await environmentService.addMetadata(
+          envId,
+          envResourceTypeToKey.environment,
+          mountObject.endpointId,
+          envResourceTypeToKey.endpoint,
+          {
+            id: endpoint.id!,
+            dataSetId: endpoint.dataSetId,
+            endPointUrl: endpoint.endPointUrl,
+            path: endpoint.path
+          }
+        );
+        return JSON.stringify({
+          name: mountObject.name,
+          bucket: mountObject.bucket,
+          prefix: mountObject.path
+        });
       })
     );
-
     return JSON.stringify(datasetsToMount);
   }
 
@@ -166,12 +183,11 @@ export default class EnvironmentLifecycleHelper {
 
     await Promise.all(
       // for each dataset linked to env
-      _.map(envDetails.datasetIds, async (datasetId) => {
-        const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
+      _.map(envDetails.ENDPOINTS, async (endpoint) => {
         // link instance role to dataset endpoint
         await this.dataSetService.addRoleToExternalEndpoint(
-          datasetId,
-          dataSet.externalEndpoints![0],
+          endpoint.dataSetId,
+          endpoint.id,
           instanceRoleArn,
           s3DataSetStoragePlugin
         );
@@ -181,103 +197,66 @@ export default class EnvironmentLifecycleHelper {
 
   /**
    * Get the workspace IAM policy for accessing all datasets attached.
-   * @param dataSetIds - the list of datasets attached.
-   * @param envId - the environment on which to mount the dataset(s)
+   * @param envMetadata - the environment with list of dataset IDs
+   * @param encryptionKeyArn - the encryption key ARN for env data traffic
    *
    * @returns iamPolicy - A stringified IAM policy
    */
-  public async generateIamPolicy(datasetIds: Array<string>, envId: string): Promise<string> {
-    const policyDoc = {};
-    // // Build policy statements for object-level permissions
-    // const statements = [];
+  public async generateIamPolicy(envMetadata: Environment, encryptionKeyArn: string): Promise<string> {
+    if (_.isEmpty(envMetadata.datasetIds)) return '{}';
 
-    // // TODO: Manage AuthZ with user UIDs (DS and environment creators) for assigning R/W privileges to the environment
-    // // For now, giving R/W access to all environments
+    // TODO: Allow multiple datasets to be mounted per workspace post-preview
+    if (envMetadata.datasetIds.length > 1)
+      throw new Error('Cannot mount more than one dataset per workspace');
 
-    // if (datasetIds.length) {
-    //   const writeableStudies = _.filter(datasetIds, dataset => dataset.writeable);
-    //   const readonlyStudies = _.filter(datasetIds, dataset => !dataset.writeable);
+    // Build policy statements for object-level permissions
+    const statements = [];
 
-    //   if (writeableStudies.length && writeableStudies.length > 0) {
-    //     const objectLevelWriteActions = [
-    //       's3:GetObject',
-    //       's3:AbortMultipartUpload',
-    //       's3:ListMultipartUploadParts',
-    //       's3:PutObject',
-    //       's3:PutObjectAcl',
-    //       's3:DeleteObject',
-    //     ];
-    //     statements.push({
-    //       Sid: readWriteStatementId,
-    //       Effect: 'Allow',
-    //       Action: objectLevelWriteActions,
-    //       Resource: this._getObjectPathArns(writeableStudies),
-    //     });
-    //   }
+    // TODO: Manage AuthZ with user UIDs (DS and environment creators) for assigning R/W privileges to the environment
+    // For now, giving R/W access to all users
 
-    //   if (readonlyStudies.length && readonlyStudies.length > 0) {
-    //     const objectLevelReadActions = ['s3:GetObject'];
-    //     statements.push({
-    //       Sid: readOnlyStatementId,
-    //       Effect: 'Allow',
-    //       Action: objectLevelReadActions,
-    //       Resource: this._getObjectPathArns(readonlyStudies),
-    //     });
-    //   }
+    const objectLevelWriteActions = [
+      's3:GetObject',
+      's3:AbortMultipartUpload',
+      's3:ListMultipartUploadParts',
+      's3:PutObject',
+      's3:PutObjectAcl',
+      's3:DeleteObject'
+    ];
 
-    //   // Create map of buckets whose paths need list access
-    //   const bucketPaths = {};
-    //   this._getObjectPathArns(studyInfo).forEach(arn => {
-    //     const { bucket, prefix } = parseS3Arn(arn);
-    //     if (!(bucket in bucketPaths)) {
-    //       bucketPaths[bucket] = [];
-    //     }
-    //     bucketPaths[bucket].push(prefix);
-    //   });
+    statements.push({
+      Sid: 'DataSetReadWriteAccess',
+      Effect: 'Allow',
+      Action: objectLevelWriteActions,
+      Resource: _.map(envMetadata.ENDPOINTS, (endpoint) => {
+        const endPointArn: string = endpoint.endPointUrl.replace('s3://', '');
+        const path: string = endpoint.path;
+        return `${endPointArn}/object/${path}/*`;
+      })
+    });
 
-    //   // Add bucket list permissions to statements
-    //   let bucketCtr = 1;
-    //   Object.keys(bucketPaths).forEach(bucketName => {
-    //     statements.push({
-    //       Sid: `studyListS3Access${bucketCtr}`,
-    //       Effect: 'Allow',
-    //       Action: 's3:ListBucket',
-    //       Resource: `arn:aws:s3:::${bucketName}`,
-    //       Condition: {
-    //         StringLike: {
-    //           's3:prefix': bucketPaths[bucketName],
-    //         },
-    //       },
-    //     });
-    //     bucketCtr += 1;
-    //   });
+    statements.push({
+      Sid: 'DataSetListBucket',
+      Effect: 'Allow',
+      Action: 's3:ListBucket',
+      Resource: _.map(envMetadata.ENDPOINTS, (endpoint) => {
+        const endPointArn: string = endpoint.endPointUrl.replace('s3://', '');
+        return endPointArn;
+      })
+    });
 
-    //   // // Add KMS Permissions
-    //   const studyDataKmsAliasArn = this.settings.get(settingKeys.studyDataKmsKeyArn);
+    statements.push({
+      Sid: 'studyKMSAccess',
+      Action: ['kms:Decrypt', 'kms:DescribeKey', 'kms:Encrypt', 'kms:GenerateDataKey', 'kms:ReEncrypt*'],
+      Effect: 'Allow',
+      Resource: encryptionKeyArn
+    });
 
-    //   // Get KMS Key ARN from KMS Alias ARN
-    //   // The "Decrypt","DescribeKey","GenerateDataKey" etc require KMS KEY ARN and not ALIAS ARN
-    //   const [aws] = await this.service(['aws']);
-    //   const kmsClient = new this.aws.clients.kms;
-    //   const data = await kmsClient
-    //     .describeKey({
-    //       KeyId: studyDataKmsAliasArn,
-    //     })
-    //     .promise();
-    //   const studyDataKmsKeyArn = data.KeyMetadata.Arn;
-    //   statements.push({
-    //     Sid: 'studyKMSAccess',
-    //     Action: ['kms:Decrypt', 'kms:DescribeKey', 'kms:Encrypt', 'kms:GenerateDataKey', 'kms:ReEncrypt*'],
-    //     Effect: 'Allow',
-    //     Resource: studyDataKmsKeyArn,
-    //   });
-
-    //   // Build final policyDoc
-    //   policyDoc = {
-    //     Version: '2012-10-17',
-    //     Statement: statements,
-    //   };
-    // }
+    // Build final policyDoc
+    const policyDoc = {
+      Version: '2012-10-17',
+      Statement: statements
+    };
 
     return JSON.stringify(policyDoc);
   }
