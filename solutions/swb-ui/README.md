@@ -84,7 +84,10 @@ For the design system we are using @awsui project. More information can be found
 
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
 
-1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide `apiBaseUrl` value from step [Retrieve API URL](##retrieve-api-url).
+1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide a value for `apiBaseUrl` with the next steps: 
+    1. Follow instructions from step [Retrieve API URL](##retrieve-api-url) and copy the value with format `https://{api}.{region}.amazonaws.com/dev/`
+    1. Remove the last par of the URL `/dev/`.
+    1. Assign value to `apiBaseUrl`,  `apiBaseUrl` must have the next format  `https://{api}.{region}.amazonaws.com`.
 
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
@@ -99,7 +102,9 @@ In order to deploy application we need to export the application as a static web
 
 
 ### Deploy static website
+
 1. In `solutions/swb-ui/cdk/infrastructure` root directory run commands
+
 ```
 rush install
 rush build
