@@ -21,7 +21,7 @@ describe('environment terminate negative tests', () => {
 
   test('environment does not exist', async () => {
     try {
-      await adminSession.resources.environments.environment('fakeEnv').delete();
+      await adminSession.resources.environments.environment('fakeEnv').terminate();
     } catch (e) {
       checkHttpError(
         e,
@@ -32,5 +32,14 @@ describe('environment terminate negative tests', () => {
         })
       );
     }
+  });
+
+  test('terminate an environment that is already terminated should return a 204 and not change the environment status', async () => {
+    const envId = setup.getSettings().get('alreadyTerminateEnvId');
+    const terminateResponse = await adminSession.resources.environments.environment(envId).terminate();
+    expect(terminateResponse.status).toEqual(204);
+
+    const envDetailResponse = await adminSession.resources.environments.environment(envId).get();
+    expect(envDetailResponse.data.status).toEqual('TERMINATED');
   });
 });
