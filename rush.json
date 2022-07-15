@@ -142,6 +142,12 @@
       "projectFolder": "solutions/managed-blockchain-for-patient-consent/patient-consent-express",
       "reviewCategory": "production",
       "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
