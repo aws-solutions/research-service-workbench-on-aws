@@ -19,7 +19,8 @@
     "build": "heft build --clean",
     "cdk": "cdk",
     "sort-package-json": "sort-package-json package.json",
-    "test": "jest",
+    "test": "rushx test:only",
+    "test:only": "heft test --clean --no-build",
     "watch": "tsc -w"
   },
   "dependencies": {
