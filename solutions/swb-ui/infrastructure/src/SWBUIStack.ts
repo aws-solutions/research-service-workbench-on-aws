@@ -14,9 +14,9 @@ import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import * as path from 'path';
-import { getConstants } from '../src/constants';
+import { getConstants } from './constants';
 
-export class CdkInfrastructureStack extends Stack {
+export class SWBUIStack extends Stack {
   public distributionEnvVars: {
     STAGE: string;
     STACK_NAME: string;
@@ -74,10 +74,7 @@ export class CdkInfrastructureStack extends Stack {
     };
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_ARN_NAME);
     this._deployS3Bucket(bucket);
-    const originAccessIdentity = this._createIdentity(bucket);
-    const redirectFunction = this._createRedirectFunction();
-    const securityHeaders = this._createSecurityPolicy(API_BASE_URL);
-    this._createDistribution(originAccessIdentity, bucket, redirectFunction, securityHeaders);
+    this._createDistribution(bucket);
   }
   private _createS3Bucket(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
@@ -96,7 +93,7 @@ export class CdkInfrastructureStack extends Stack {
     });
   }
 
-  private _createIdentity(bucket: Bucket): OriginAccessIdentity {
+  private _createOriginAccessIdentity(bucket: Bucket): OriginAccessIdentity {
     const originAccessIdentity = new OriginAccessIdentity(
       this,
       this.distributionEnvVars.ACCESS_IDENTITY_ARTIFACT_NAME
@@ -105,12 +102,10 @@ export class CdkInfrastructureStack extends Stack {
     return originAccessIdentity;
   }
 
-  private _createDistribution(
-    originAccessIdentity: OriginAccessIdentity,
-    bucket: Bucket,
-    redirectFunction: Function,
-    securityPolicy: ResponseHeadersPolicy
-  ): Distribution {
+  private _createDistribution(bucket: Bucket): Distribution {
+    const originAccessIdentity = this._createOriginAccessIdentity(bucket);
+    const redirectFunction = this._createRedirectFunction();
+    const securityPolicy = this._createSecurityPolicy(this.distributionEnvVars.API_BASE_URL);
     const distribution = new Distribution(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_NAME, {
       defaultRootObject: 'index.html',
 
@@ -131,7 +126,11 @@ export class CdkInfrastructureStack extends Stack {
     });
     return distribution;
   }
-
+  /*
+  Cloudfront access files from S3 Bucket as file path directory.
+  This function recieves the web routing format URL and transforms it into file path.
+  e.g. /environments => /environments/index.html
+*/
   private _createRedirectFunction(): Function {
     return new Function(this, this.distributionEnvVars.DISTRIBUTION_FUNCTION_ARTIFACT_NAME, {
       code: FunctionCode.fromFile({

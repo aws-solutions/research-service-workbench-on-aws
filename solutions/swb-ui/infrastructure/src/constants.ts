@@ -26,18 +26,19 @@ function getConstants(): {
     fs.readFileSync(join(__dirname, `./config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
   );
 
+  const namePrefix = `swb-ui-${config.stage}-${config.awsRegionShortName}`;
   const API_BASE_URL = config.apiBaseUrl;
   const AWS_REGION = config.awsRegion;
-  const STACK_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}`;
+  const STACK_NAME = namePrefix;
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
-  const S3_ARTIFACT_BUCKET_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-bucket`;
-  const S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-deployment-bucket`;
-  const ACCESS_IDENTITY_ARTIFACT_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-origin-access-identity`;
-  const DISTRIBUTION_ARTIFACT_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-distribution`;
-  const DISTRIBUTION_ARTIFACT_DOMAIN = 'S3DistributionArtifactsDomain';
-  const DISTRIBUTION_FUNCTION_ARTIFACT_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-redirect-distribution-function`;
-  const DISTRIBUTION_FUNCTION_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-RedirectRoutingFunction`;
-  const RESPONSE_HEADERS_ARTIFACT_NAME = `swb-ui-${config.stage}-${config.awsRegionShortName}-response-header-policy`;
+  const S3_ARTIFACT_BUCKET_NAME = `${namePrefix}-bucket`;
+  const S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME = `${namePrefix}-deployment-bucket`;
+  const ACCESS_IDENTITY_ARTIFACT_NAME = `${namePrefix}-origin-access-identity`;
+  const DISTRIBUTION_ARTIFACT_NAME = `${namePrefix}-distribution`;
+  const DISTRIBUTION_ARTIFACT_DOMAIN = 'WebsiteURL';
+  const DISTRIBUTION_FUNCTION_ARTIFACT_NAME = `${namePrefix}-redirect-distribution-function`;
+  const DISTRIBUTION_FUNCTION_NAME = `${namePrefix}-RedirectRoutingFunction`;
+  const RESPONSE_HEADERS_ARTIFACT_NAME = `${namePrefix}-response-header-policy`;
   const RESPONSE_HEADERS_NAME = 'SWBResponseHeadersPolicy';
 
   return {

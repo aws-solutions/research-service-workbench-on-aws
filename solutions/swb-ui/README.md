@@ -68,15 +68,11 @@ The environments page is at [http://localhost:3000/environments](http://localhos
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/environments](http://localhost:3000/api/environments).
 
 
-## Design system
-
-For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).
-
-## Deploy Applcation
+## Deploy UI
 
 Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assign value to `NEXT_PUBLIC_API_BASE_URL` in `.env.local` before starting next steps for deploy process.
 
-### Setuo Config File
+### Setup Config File
 
 1. Navigate to `solutions/swb-ui/cdk/infrastructure/src/config`
 
@@ -111,20 +107,25 @@ In order to deploy application we need to export the application as a static web
 rush install
 rush build
 STAGE=<STAGE> rushx cdk bootstrap
-STAGE=<STAGE> cdk deploy
+STAGE=<STAGE> rushx cdk-deploy
 
 ```
 
-After the script is finished Couldformation outputs will be shown with the next format:
+After the deployment is completed you'll see the following output:
 
 ```
 Outputs:
 swb-ui-dev-va.S3BucketArtifactsArnOutput = arn:aws:s3:::swb-ui-dev-va-arn-id
-swb-ui-dev-va.S3DistributionArtifactsDomain = domainId.cloudfront.net
+swb-ui-dev-va.WebsiteURL = https://domainId.cloudfront.net
 Stack ARN:
 arn:aws:cloudformation:region:account:stack/swb-ui-dev-va/id
 
 ✨  Total time: 250.4s
 ```
 
-In order to navigate to the deployed application copy Cloudformation output `swb-ui-dev-va.S3DistributionArtifactsDomain` with format `<id>.cloudfront.net` into your browser
+In order to navigate to the deployed application copy Cloudformation output `swb-ui-dev-va.WebsiteURL` with format `<id>.cloudfront.net` into your browser
+
+
+## Design system
+
+For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).

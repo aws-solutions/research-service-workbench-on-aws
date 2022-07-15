@@ -144,8 +144,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/swb-ui-cdk-infrastructure",
-      "projectFolder": "solutions/swb-ui/cdk-infrastructure",
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

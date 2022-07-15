@@ -5,7 +5,6 @@ const nextConfig = {
   reactStrictMode: true
 };
 
-//module.exports =
 module.exports = {
   ...withTM(nextConfig),
   trailingSlash: true
