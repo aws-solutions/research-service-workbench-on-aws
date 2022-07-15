@@ -33,6 +33,7 @@ import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../../com
 import { getFilterCounterText } from '../../common/tableCounterStrings';
 import { TableEmptyDisplay } from '../../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
+import ConnectEnvironmentModal from '../../components/ConnectEnvironmentModal';
 import Navigation from '../../components/Navigation';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -41,6 +42,7 @@ import {
 } from '../../environments-table-config/workspacesColumnDefinitions';
 import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
+import { EnvironmentConnectResponse } from '../../models/Environment';
 
 export interface EnvironmentProps {
   locale: string;
@@ -166,8 +168,14 @@ const Environment: NextPage = () => {
   const startButtonLoadingStatuses: string[] = ['STARTING'];
   const [terminatingIds, setTerminatingIds] = useState(new Set<string>());
   const [stoppingIds, setStoppingIds] = useState(new Set<string>());
-  const [connectingIds, setConnectingIds] = useState(new Set<string>());
   const [startingIds, setstartingIds] = useState(new Set<string>());
+  const [showConnectEnvironmentModalVisible, setShowConnectEnvironmentModalVisible] =
+    useState<boolean>(false);
+  const [isLoadingEnvConnection, setIsLoadingEnvConnection] = useState<boolean>(false);
+  const [envConnectResponse, setEnvConnectResponse] = useState<EnvironmentConnectResponse>({
+    instructionResponse: '',
+    authCredResponse: {}
+  });
 
   const isOneItemSelected = (): boolean | undefined => {
     return collectionProps.selectedItems && collectionProps.selectedItems.length === 1;
@@ -211,8 +219,14 @@ const Environment: NextPage = () => {
             await start(id);
             break;
           case 'CONNECT':
-            setConnectingIds((prev) => new Set(prev.add(id)));
+            const connectingEnvId = collectionProps.selectedItems ? collectionProps.selectedItems[0].id : '';
+            console.log('connectingEnvId', connectingEnvId);
+            setIsLoadingEnvConnection(true);
+            const response = await connect(connectingEnvId);
+            setEnvConnectResponse(response);
+            setIsLoadingEnvConnection(false);
             actionLabel = 'Connect to Workspace';
+            setShowConnectEnvironmentModalVisible(true);
             //TODO: implement Connect workflow
             break;
         }
@@ -225,10 +239,6 @@ const Environment: NextPage = () => {
           return new Set(prev);
         });
         setStoppingIds((prev) => {
-          prev.delete(id);
-          return new Set(prev);
-        });
-        setConnectingIds((prev) => {
           prev.delete(id);
           return new Set(prev);
         });
@@ -259,123 +269,135 @@ const Environment: NextPage = () => {
         navigationOpen = true;
       }}
       content={
-        <Box margin={{ bottom: 'l' }}>
-          <Flashbar items={notifications} />
-          <Head>
-            <title>{settings.name}</title>
-            <link rel="icon" href={settings.favicon} />
-          </Head>
-          {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
-          <Table
-            {...collectionProps}
-            selectionType="multi"
-            selectedItems={collectionProps.selectedItems}
-            ariaLabels={{
-              selectionGroupLabel: 'Items selection',
-              allItemsSelectionLabel: ({ selectedItems }) =>
-                `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`,
-              itemSelectionLabel: ({ selectedItems }, item) => {
-                const isItemSelected = selectedItems.filter((i) => i.workspace === item.workspace).length;
-                return `${item.workspace} is ${isItemSelected ? '' : 'not'} selected`;
+        <>
+          {showConnectEnvironmentModalVisible && (
+            <ConnectEnvironmentModal
+              closeModal={() => {
+                setShowConnectEnvironmentModalVisible(false);
+              }}
+              instructions={envConnectResponse.instructionResponse}
+              authCredResponse={envConnectResponse.authCredResponse}
+            />
+          )}
+
+          <Box margin={{ bottom: 'l' }}>
+            <Flashbar items={notifications} />
+            <Head>
+              <title>{settings.name}</title>
+              <link rel="icon" href={settings.favicon} />
+            </Head>
+            {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
+            <Table
+              {...collectionProps}
+              selectionType="multi"
+              selectedItems={collectionProps.selectedItems}
+              ariaLabels={{
+                selectionGroupLabel: 'Items selection',
+                allItemsSelectionLabel: ({ selectedItems }) =>
+                  `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`,
+                itemSelectionLabel: ({ selectedItems }, item) => {
+                  const isItemSelected = selectedItems.filter((i) => i.workspace === item.workspace).length;
+                  return `${item.workspace} is ${isItemSelected ? '' : 'not'} selected`;
+                }
+              }}
+              header={
+                <>
+                  <Header
+                    counter={
+                      collectionProps.selectedItems?.length
+                        ? `(${collectionProps.selectedItems.length}/${environments.length})`
+                        : `(${environments.length})`
+                    }
+                    actions={
+                      <Box float="right">
+                        <SpaceBetween direction="horizontal" size="xs">
+                          <Button
+                            disabled={
+                              !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                              (collectionProps.selectedItems && collectionProps.selectedItems.length > 1)
+                            }
+                            loading={isLoadingEnvConnection}
+                            onClick={() => executeAction('CONNECT')}
+                          >
+                            Connect
+                          </Button>
+                          <Button
+                            disabled={
+                              !startButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                              startingIds.has(getSelectedId())
+                            }
+                            loading={
+                              startButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                              startingIds.has(getSelectedId())
+                            }
+                            onClick={() => executeAction('START')}
+                          >
+                            Start
+                          </Button>
+                          <Button
+                            disabled={
+                              !stopButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                              stoppingIds.has(getSelectedId())
+                            }
+                            loading={
+                              stopButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                              stoppingIds.has(getSelectedId())
+                            }
+                            onClick={() => executeAction('STOP')}
+                          >
+                            Stop
+                          </Button>
+                          <Button
+                            disabled={
+                              !terminateButtonEnableStatuses.includes(getEnvironmentStatus()) ||
+                              terminatingIds.has(getSelectedId())
+                            }
+                            loading={
+                              terminateButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
+                              terminatingIds.has(getSelectedId())
+                            }
+                            onClick={() => executeAction('TERMINATE')}
+                          >
+                            Terminate
+                          </Button>
+                          <Button variant="primary" href="/environments/new">
+                            Create Workspace
+                          </Button>
+                        </SpaceBetween>
+                      </Box>
+                    }
+                  >
+                    Workspaces
+                  </Header>
+                </>
               }
-            }}
-            header={
-              <>
-                <Header
-                  counter={
-                    collectionProps.selectedItems?.length
-                      ? `(${collectionProps.selectedItems.length}/${environments.length})`
-                      : `(${environments.length})`
-                  }
-                  actions={
-                    <Box float="right">
-                      <SpaceBetween direction="horizontal" size="xs">
-                        <Button
-                          disabled={
-                            !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
-                            connectingIds.has(getSelectedId())
-                          }
-                          loading={connectingIds.has(getSelectedId())}
-                          onClick={() => executeAction('CONNECT')}
-                        >
-                          Connect
-                        </Button>
-                        <Button
-                          disabled={
-                            !startButtonEnableStatuses.includes(getEnvironmentStatus()) ||
-                            startingIds.has(getSelectedId())
-                          }
-                          loading={
-                            startButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
-                            startingIds.has(getSelectedId())
-                          }
-                          onClick={() => executeAction('START')}
-                        >
-                          Start
-                        </Button>
-                        <Button
-                          disabled={
-                            !stopButtonEnableStatuses.includes(getEnvironmentStatus()) ||
-                            stoppingIds.has(getSelectedId())
-                          }
-                          loading={
-                            stopButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
-                            stoppingIds.has(getSelectedId())
-                          }
-                          onClick={() => executeAction('STOP')}
-                        >
-                          Stop
-                        </Button>
-                        <Button
-                          disabled={
-                            !terminateButtonEnableStatuses.includes(getEnvironmentStatus()) ||
-                            terminatingIds.has(getSelectedId())
-                          }
-                          loading={
-                            terminateButtonLoadingStatuses.includes(getEnvironmentStatus()) ||
-                            terminatingIds.has(getSelectedId())
-                          }
-                          onClick={() => executeAction('TERMINATE')}
-                        >
-                          Terminate
-                        </Button>
-                        <Button variant="primary" href="/environments/new">
-                          Create Workspace
-                        </Button>
-                      </SpaceBetween>
-                    </Box>
-                  }
-                >
-                  Workspaces
-                </Header>
-              </>
-            }
-            columnDefinitions={columnDefinitions}
-            loadingText="Loading workspaces"
-            filter={
-              <>
-                <PropertyFilter
-                  {...propertyFilterProps}
-                  countText={getFilterCounterText(filteredItemsCount)}
-                  i18nStrings={i18nStrings}
-                  filteringOptions={filteringOptions}
-                  expandToViewport={true}
-                />
-                <DateRangePicker
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
-                  value={dateFilter}
-                  relativeOptions={relativeOptions}
-                  i18nStrings={datei18nStrings}
-                  placeholder="Filter by a date and time range"
-                  isValidRange={isValidRangeFunction}
-                />
-              </>
-            }
-            pagination={<Pagination {...paginationProps} ariaLabels={paginationLables} />}
-            items={items}
-          />
-        </Box>
+              columnDefinitions={columnDefinitions}
+              loadingText="Loading workspaces"
+              filter={
+                <>
+                  <PropertyFilter
+                    {...propertyFilterProps}
+                    countText={getFilterCounterText(filteredItemsCount)}
+                    i18nStrings={i18nStrings}
+                    filteringOptions={filteringOptions}
+                    expandToViewport={true}
+                  />
+                  <DateRangePicker
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
+                    value={dateFilter}
+                    relativeOptions={relativeOptions}
+                    i18nStrings={datei18nStrings}
+                    placeholder="Filter by a date and time range"
+                    isValidRange={isValidRangeFunction}
+                  />
+                </>
+              }
+              pagination={<Pagination {...paginationProps} ariaLabels={paginationLables} />}
+              items={items}
+            />
+          </Box>
+        </>
       }
     ></AppLayout>
   );
