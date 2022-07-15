@@ -33,7 +33,7 @@ API URL can also be found by login to aws with Main Account:
 
 Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL="<API_URL>"`
 
-For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
+For local instances, in `swb-ui` directory create a file with name `.env.local` containing the API URL variable with the format:
 ```
 NEXT_PUBLIC_API_BASE_URL="<API_URL>"
 ```
@@ -73,6 +73,8 @@ The environments page is at [http://localhost:3000/environments](http://localhos
 For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).
 
 ## Deploy Applcation
+
+Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assign value to `NEXT_PUBLIC_API_BASE_URL` in `.env.local` before starting next steps for deploy process.
 
 ### Setuo Config File
 

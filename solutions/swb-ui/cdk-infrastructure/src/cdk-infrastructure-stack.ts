@@ -127,7 +127,7 @@ export class CdkInfrastructureStack extends Stack {
       additionalBehaviors: {}
     });
     new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
-      value: distribution.distributionDomainName
+      value: `https://${distribution.distributionDomainName}`
     });
     return distribution;
   }
@@ -166,6 +166,6 @@ export class CdkInfrastructureStack extends Stack {
     });
   }
   private _getContentSecurityPolicy(apiBaseUrl: string): string {
-    return `default-src 'self'; connect-src ${apiBaseUrl}; font-src 'self' data: ; style-src 'self' 'unsafe-inline';`;
+    return `default-src 'none'; connect-src ${apiBaseUrl}; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inline' 'strict-dynamic' 'self'; font-src 'self' data:`;
   }
 }
