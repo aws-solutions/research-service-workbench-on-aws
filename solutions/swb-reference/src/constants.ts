@@ -19,6 +19,9 @@ function getConstants(): {
   ALLOWED_ORIGINS: string;
   COGNITO_DOMAIN: string;
   WEBSITE_URL: string;
+  USER_POOL_ID: string;
+  CLIENT_ID: string;
+  CLIENT_SECRET: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -37,6 +40,9 @@ function getConstants(): {
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
+  const USER_POOL_ID = config.usePoolId;
+  const CLIENT_ID = config.clientId;
+  const CLIENT_SECRET = config.clientSecret;
 
   const AMI_IDS: string[] = [];
 
@@ -62,7 +68,10 @@ function getConstants(): {
     STATUS_HANDLER_ARN_NAME,
     ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
     COGNITO_DOMAIN,
-    WEBSITE_URL
+    WEBSITE_URL,
+    USER_POOL_ID,
+    CLIENT_ID,
+    CLIENT_SECRET
   };
 }
 

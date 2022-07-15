@@ -3,7 +3,7 @@ import { CreateUserForm } from '../models/User';
 import { httpApiGet, httpApiPost, httpApiPut } from './apiHelper';
 
 const addUserToRole = async (username: string, role: string): Promise<void> => {
-  await httpApiPut(`users/${username}/roles/${role}`, {});
+  await httpApiPut(`/roles/${role}`, { username: username });
 };
 
 const createUser = async (createUserForm: CreateUserForm): Promise<void> => {

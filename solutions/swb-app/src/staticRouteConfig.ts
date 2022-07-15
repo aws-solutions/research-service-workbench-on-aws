@@ -15,33 +15,33 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/sampleEnvironment': {
+  '/environments/*': {
     DELETE: [
       {
         action: 'DELETE',
-        subject: 'sampleEnvironment'
+        subject: 'Environment'
       }
     ],
     GET: [
       {
         action: 'READ',
-        subject: 'sampleEnvironment'
+        subject: 'Environment'
       }
     ]
   },
-  '/environments/sampleEnvironment/start': {
+  '/environments/*/start': {
     PUT: [
       {
         action: 'UPDATE',
-        subject: 'sampleEnvironment'
+        subject: 'Environment'
       }
     ]
   },
-  '/environments/sampleEnvironment/stop': {
+  '/environments/*/stop': {
     PUT: [
       {
         action: 'UPDATE',
-        subject: 'sampleEnvironment'
+        subject: 'Environment'
       }
     ]
   },
@@ -67,11 +67,11 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/users/sampleUser/roles/sampleRole': {
+  '/roles/Researcher': {
     PUT: [
       {
         action: 'UPDATE',
-        subject: 'sampleRole-SampleUser'
+        subject: 'Role'
       }
     ]
   }
@@ -99,18 +99,24 @@ export const routesIgnored: RoutesIgnored = {
     GET: true,
     POST: true
   },
-  '/environments/': {
+  '/environments/*': {
     GET: true,
     DELETE: true
   },
+  '/environments/*/start': {
+    PUT: true
+  },
+  '/environments/*/stop': {
+    PUT: true
+  },
   '/users': {
-    // GET: true,
+    GET: true,
     POST: true
   },
   '/roles': {
     POST: true
   },
-  '/users/*/roles/Researcher': {
+  '/roles/Researcher': {
     PUT: true
   },
   '/aws-accounts': {

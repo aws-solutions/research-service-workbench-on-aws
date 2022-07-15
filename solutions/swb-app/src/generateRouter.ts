@@ -33,11 +33,10 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   const router: Router = express.Router();
 
-  app.use(cors({ origin: apiRouteConfig.allowedOrigins })); //, exposedHeaders: ['Set-Cookie'], credentials: true }));
+  app.use(cors({ origin: apiRouteConfig.allowedOrigins, exposedHeaders: ['Set-Cookie'], credentials: true }));
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
-  app.use();
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,

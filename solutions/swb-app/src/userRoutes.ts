@@ -33,9 +33,9 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
   );
 
   router.put(
-    '/users/:id/roles/:roleName',
+    '/roles/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
-      const response = await user.addUserToRole(req.params.id, req.params.roleName);
+      const response = await user.addUserToRole(req.body.username, req.params.roleName);
       res.send(response);
     })
   );

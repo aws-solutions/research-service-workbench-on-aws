@@ -50,7 +50,10 @@ export class SWBStack extends Stack {
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
-      WEBSITE_URL
+      WEBSITE_URL,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -65,6 +68,23 @@ export class SWBStack extends Stack {
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
     );
+
+    let cognitoDomain: string;
+    let clientId: string;
+    let clientSecret: string;
+    let userPoolId: string;
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      cognitoDomain = `https://${COGNITO_DOMAIN}.auth.${AWS_REGION}.amazoncognito.com`;
+      clientId = CLIENT_ID;
+      clientSecret = CLIENT_SECRET;
+      userPoolId = USER_POOL_ID;
+    } else {
+      cognitoDomain = workbenchCognito.cognitoDomain;
+      clientId = workbenchCognito.userPoolClientId;
+      clientSecret = workbenchCognito.userPoolClientSecret.toString();
+      userPoolId = workbenchCognito.userPoolId;
+    }
+
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
     this.lambdaEnvVars = {
@@ -77,10 +97,10 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
-      COGNITO_DOMAIN: workbenchCognito.cognitoDomain,
-      CLIENT_ID: workbenchCognito.userPoolClientId,
-      CLIENT_SECRET: workbenchCognito.userPoolClientSecret.toString(),
-      USER_POOL_ID: workbenchCognito.userPoolId,
+      COGNITO_DOMAIN: cognitoDomain,
+      CLIENT_ID: clientId,
+      CLIENT_SECRET: clientSecret,
+      USER_POOL_ID: userPoolId,
       WEBSITE_URL
     };
 
