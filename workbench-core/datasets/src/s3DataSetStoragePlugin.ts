@@ -102,7 +102,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
     }
     return {
-      endPointUrl: `s3://${response.endPointArn}/`,
+      endPointUrl: `s3://${response.endPointArn}`,
       endPointAlias: response.endPointAlias
     };
   }
@@ -258,13 +258,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Name: accessPointName
     };
 
-    const apPolicyResponse: GetAccessPointPolicyCommandOutput =
-      await this._aws.clients.s3Control.getAccessPointPolicy(getPolicyParams);
-    let apPolicy: PolicyDocument;
-    if (apPolicyResponse.Policy) {
-      apPolicy = PolicyDocument.fromJson(JSON.parse(apPolicyResponse.Policy));
-    } else {
-      apPolicy = new PolicyDocument();
+    let apPolicy: PolicyDocument = new PolicyDocument();
+    // s3Control GetAccessPointPolicy throws NoSuchAccessPointPolicy error when policy doesn't exist
+    try {
+      const apPolicyResponse: GetAccessPointPolicyCommandOutput =
+        await this._aws.clients.s3Control.getAccessPointPolicy(getPolicyParams);
+      if (apPolicyResponse.Policy) apPolicy = PolicyDocument.fromJson(JSON.parse(apPolicyResponse.Policy));
+    } catch (err) {
+      if (err.Code !== 'NoSuchAccessPointPolicy') throw err;
     }
 
     let isDirty: boolean = false;
@@ -285,6 +286,8 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Name: accessPointName,
       Policy: JSON.stringify(apPolicy.toJSON())
     };
+
+    console.log(putPolicyParams.Policy);
 
     await this._aws.clients.s3Control.putAccessPointPolicy(putPolicyParams);
   }

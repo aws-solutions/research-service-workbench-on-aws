@@ -162,12 +162,13 @@ export default class EnvironmentLifecycleHelper {
   }
 
   public async addRoleToAccessPoint(envDetails: Environment, instanceRoleArn: string): Promise<void> {
-    // for each dataset linked to env
     const s3DataSetStoragePlugin = new S3DataSetStoragePlugin(this.aws);
 
     await Promise.all(
+      // for each dataset linked to env
       _.map(envDetails.datasetIds, async (datasetId) => {
         const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
+        // link instance role to dataset endpoint
         await this.dataSetService.addRoleToExternalEndpoint(
           datasetId,
           dataSet.externalEndpoints![0],
@@ -176,8 +177,6 @@ export default class EnvironmentLifecycleHelper {
         );
       })
     );
-
-    // link instance role to dataset endpoint
   }
 
   /**
