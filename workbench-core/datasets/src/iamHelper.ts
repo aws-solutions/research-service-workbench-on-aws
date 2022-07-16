@@ -169,9 +169,6 @@ export default class IamHelper {
     // if the document already effectively contains the statement, nothing to do.
     if (this.policyDocumentContainsStatement(document, statement)) return result;
 
-    console.log(`add statement: ${JSON.stringify(statement.toJSON())}`);
-    console.log(`to document: ${JSON.stringify(document.toJSON())}`);
-
     const policyObj = document.toJSON();
     const statementObj = _.get(policyObj, 'Statement');
     const statementObjects = _.map(statementObj, (s) => PolicyStatement.fromJson(s));
@@ -191,28 +188,18 @@ export default class IamHelper {
           statement.principals,
           existingStatements[0][0].principals
         ).inSourceNotTarget as IPrincipal[];
-        missingPrincipals.map((s) =>
-          console.log(`adding: ${JSON.stringify(s.policyFragment.principalJson)}`)
-        );
         existingStatements[0][0].addPrincipals(...missingPrincipals);
-        console.log(`found ${JSON.stringify(existingStatements[0][0].toJSON())}`);
         result.documentResult = new PolicyDocument();
-        console.log('add first set of statements');
-        existingStatements[0].map((s) => console.log(JSON.stringify(s.toJSON())));
         result.documentResult.addStatements(...existingStatements[0]);
-        console.log('check 2nd set.');
         if (existingStatements[1] && existingStatements[1].length > 0)
           result.documentResult.addStatements(...existingStatements[1]);
-        console.log('all statements added.');
         result.documentUpdated = true;
-        console.log(`statement is now added: ${JSON.stringify(result.documentResult.toJSON())}`);
       }
     }
 
     if (!result.documentUpdated) {
       result.documentResult.addStatements(statement);
       result.documentUpdated = true;
-      console.log(`new statement added: ${JSON.stringify(result.documentResult.toJSON())}`);
     }
 
     return result;
