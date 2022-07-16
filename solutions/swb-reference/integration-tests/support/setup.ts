@@ -13,8 +13,8 @@ export default class Setup {
     // @ts-ignore
     this._settings = new Settings(global['__settings__']);
 
-    // Retry failed tests up to three times
-    jest.retryTimes(3);
+    // Let's not setup test retries until we find that we actually need it
+    jest.retryTimes(0);
   }
 
   public async createAnonymousSession(): Promise<ClientSession> {

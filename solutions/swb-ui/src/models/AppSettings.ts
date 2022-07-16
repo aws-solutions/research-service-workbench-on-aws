@@ -15,8 +15,8 @@ export interface AppSettings {
 
 export const defaultAppSettings: AppSettings = {
   language: Language.en,
-  logo: 'logo-image.png',
-  favicon: 'favicon.ico',
+  logo: '/logo-image.png',
+  favicon: '/favicon.ico',
   name: 'Service Workbench on AWS',
   slogan: '',
   description: ''
