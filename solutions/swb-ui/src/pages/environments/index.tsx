@@ -6,10 +6,12 @@ import {
   BreadcrumbGroup,
   BreadcrumbGroupProps,
   Button,
+  CollectionPreferences,
   DateRangePicker,
   DateRangePickerProps,
   Header,
   Pagination,
+  PaginationProps,
   PropertyFilter,
   PropertyFilterProps,
   SpaceBetween,
@@ -40,6 +42,7 @@ import {
 } from '../../environments-table-config/workspacesColumnDefinitions';
 import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
+import { EnvironmentsGridFilter } from '../../models/Environment';
 
 export interface EnvironmentProps {
   locale: string;
@@ -50,11 +53,25 @@ const Environment: NextPage = () => {
   const itemType: string = 'workspace';
   // App settings constant
   const { settings } = useSettings();
-  const [preferences] = useState({
-    pageSize: 20
-  });
-  const { environments, mutate } = useEnvironments();
 
+  const pageSizeOptions = [
+    { label: '20', value: 20 },
+    { label: '30', value: 30 },
+    { label: '50', value: 50 }
+  ];
+  const [gridPaginationParams, setGridPaginationParams] = useState({
+    currentPageIndex: 1,
+    paginationTokens: new Map<number, string>().set(1, ''),
+    hasOpenEndPagination: true,
+    pageCount: 1
+  });
+  const [gridFilterParamas, setGridFilterParamas] = useState<EnvironmentsGridFilter>({
+    paginationToken: '',
+    pageSize: pageSizeOptions.at(0)?.value,
+    descending: 'createdAt'
+  });
+  const { environments, mutate, paginationToken, areEnvironmentsLoading } =
+    useEnvironments(gridFilterParamas);
   const [error, setError] = useState('');
   const router = useRouter();
   const { message, notificationType } = router.query;
@@ -100,10 +117,6 @@ const Environment: NextPage = () => {
       : [];
   const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>(initialNotifications);
 
-  useEffect(() => {
-    setDateFilter(dateFilter);
-  }, [dateFilter]);
-
   // Property and date filter collections
   const { items, filteredItemsCount, collectionProps, filterProps, paginationProps, propertyFilterProps } =
     useCollection(environments, {
@@ -137,13 +150,9 @@ const Environment: NextPage = () => {
         empty: TableEmptyDisplay(itemType),
         noMatch: TableNoMatchDisplay(itemType)
       },
-      pagination: { pageSize: preferences.pageSize },
       sorting: {},
       selection: {}
     });
-  useEffect(() => {
-    setWorkspaces(workspaces);
-  }, [workspaces]);
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
@@ -231,6 +240,83 @@ const Environment: NextPage = () => {
     }
   };
 
+  const resetPagination = (): void => {
+    setGridPaginationParams({
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    });
+  };
+
+  const onPaginationChange = (detail: PaginationProps.ChangeDetail): void => {
+    if (!gridPaginationParams.paginationTokens.get(detail.currentPageIndex) && detail.currentPageIndex > 1) {
+      return;
+    }
+    if (detail.currentPageIndex > gridPaginationParams.pageCount)
+      //show discovered pages on pagination
+      setGridPaginationParams({
+        ...gridPaginationParams,
+        pageCount: detail.currentPageIndex,
+        currentPageIndex: detail.currentPageIndex
+      });
+    else setGridPaginationParams({ ...gridPaginationParams, currentPageIndex: detail.currentPageIndex });
+
+    setGridFilterParamas({
+      ...gridFilterParamas,
+      paginationToken: gridPaginationParams.paginationTokens.get(detail.currentPageIndex)
+    });
+  };
+
+  const onNextPageClick = (detail: PaginationProps.PageClickDetail): void => {
+    if (!gridPaginationParams.paginationTokens.get(detail.requestedPageIndex)) {
+      setGridPaginationParams({ ...gridPaginationParams, currentPageIndex: detail.requestedPageIndex - 1 });
+      return;
+    }
+  };
+
+  const onSortingChange = (isDescending: boolean | undefined, sortingField: string | undefined): void => {
+    resetPagination();
+    setGridFilterParamas({
+      ...gridFilterParamas,
+      ascending: isDescending ? undefined : sortingField,
+      descending: isDescending ? sortingField : undefined,
+      paginationToken: undefined
+    });
+  };
+
+  const onConfirmPageSize = (pageSize: number | undefined): void => {
+    resetPagination();
+    setGridFilterParamas({
+      ...gridFilterParamas,
+      pageSize: pageSize || pageSizeOptions.at(0)?.value,
+      paginationToken: undefined
+    });
+  };
+
+  useEffect(() => {
+    setDateFilter(dateFilter);
+  }, [dateFilter]);
+
+  useEffect(() => {
+    //save next page token into dictionary so we can access previous page or directly clicking page number
+    setGridPaginationParams((prevState) => {
+      return {
+        ...prevState,
+        paginationTokens: prevState.paginationTokens.set(
+          gridPaginationParams.currentPageIndex + 1,
+          paginationToken
+        ),
+        hasOpenEndPagination: !!prevState.paginationTokens.get(gridPaginationParams.pageCount + 1)
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginationToken, gridPaginationParams.currentPageIndex]);
+
+  useEffect(() => {
+    setWorkspaces(workspaces);
+  }, [workspaces]);
+
   return (
     <AppLayout
       id="environments-layout"
@@ -259,6 +345,12 @@ const Environment: NextPage = () => {
           {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
           <Table
             {...collectionProps}
+            sortingDescending={!!gridFilterParamas.descending}
+            sortingColumn={{ sortingField: gridFilterParamas.descending || gridFilterParamas.ascending }}
+            onSortingChange={(event) =>
+              onSortingChange(event.detail.isDescending, event.detail.sortingColumn.sortingField)
+            }
+            loading={areEnvironmentsLoading}
             selectionType="multi"
             selectedItems={collectionProps.selectedItems}
             ariaLabels={{
@@ -273,11 +365,6 @@ const Environment: NextPage = () => {
             header={
               <>
                 <Header
-                  counter={
-                    collectionProps.selectedItems?.length
-                      ? `(${collectionProps.selectedItems.length}/${environments.length})`
-                      : `(${environments.length})`
-                  }
                   actions={
                     <Box float="right">
                       <SpaceBetween direction="horizontal" size="xs">
@@ -344,7 +431,7 @@ const Environment: NextPage = () => {
             columnDefinitions={columnDefinitions}
             loadingText="Loading workspaces"
             filter={
-              <>
+              <SpaceBetween direction="vertical" size="xs">
                 <PropertyFilter
                   {...propertyFilterProps}
                   countText={getFilterCounterText(filteredItemsCount)}
@@ -361,9 +448,32 @@ const Environment: NextPage = () => {
                   placeholder="Filter by a date and time range"
                   isValidRange={isValidRangeFunction}
                 />
-              </>
+              </SpaceBetween>
             }
-            pagination={<Pagination {...paginationProps} ariaLabels={paginationLables} />}
+            pagination={
+              <Pagination
+                disabled={areEnvironmentsLoading}
+                pagesCount={gridPaginationParams.pageCount}
+                currentPageIndex={gridPaginationParams.currentPageIndex}
+                onChange={({ detail }) => onPaginationChange(detail)}
+                onNextPageClick={({ detail }) => onNextPageClick(detail)}
+                openEnd={gridPaginationParams.hasOpenEndPagination}
+                ariaLabels={paginationLables}
+              />
+            }
+            preferences={
+              <CollectionPreferences
+                title="Preferences"
+                confirmLabel="Confirm"
+                cancelLabel="Cancel"
+                preferences={{ pageSize: gridFilterParamas.pageSize }}
+                onConfirm={({ detail: { pageSize } }) => onConfirmPageSize(pageSize)}
+                pageSizePreference={{
+                  title: 'Page size',
+                  options: pageSizeOptions
+                }}
+              />
+            }
             items={items}
           />
         </Box>

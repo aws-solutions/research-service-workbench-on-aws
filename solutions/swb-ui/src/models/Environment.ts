@@ -41,3 +41,10 @@ export interface CreateEnvironmentFormValidation {
   envTypeConfigIdError?: string;
   descriptionError?: string;
 }
+
+export interface EnvironmentsGridFilter {
+  ascending?: string;
+  descending?: string;
+  paginationToken?: string;
+  pageSize?: number;
+}
