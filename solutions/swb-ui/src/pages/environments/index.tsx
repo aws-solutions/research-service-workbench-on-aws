@@ -67,7 +67,7 @@ const Environment: NextPage = () => {
   });
   const [gridFilterParamas, setGridFilterParamas] = useState<EnvironmentsGridFilter>({
     paginationToken: '',
-    pageSize: pageSizeOptions.at(0)?.value,
+    pageSize: pageSizeOptions[0]?.value,
     descending: 'createdAt'
   });
   const { environments, mutate, paginationToken, areEnvironmentsLoading } =
@@ -289,7 +289,7 @@ const Environment: NextPage = () => {
     resetPagination();
     setGridFilterParamas({
       ...gridFilterParamas,
-      pageSize: pageSize || pageSizeOptions.at(0)?.value,
+      pageSize: pageSize || pageSizeOptions[0]?.value,
       paginationToken: undefined
     });
   };
