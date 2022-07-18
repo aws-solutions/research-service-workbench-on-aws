@@ -42,7 +42,7 @@ export interface CreateEnvironmentFormValidation {
   descriptionError?: string;
 }
 
-export interface EnvironmentsGridFilter {
+export interface EnvironmentsTableFilter {
   ascending?: string;
   descending?: string;
   paginationToken?: string;

@@ -41,7 +41,7 @@ import {
 } from '../../environments-table-config/workspacesColumnDefinitions';
 import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
-import { EnvironmentsGridFilter } from '../../models/Environment';
+import { EnvironmentsTableFilter } from '../../models/Environment';
 
 export interface EnvironmentProps {
   locale: string;
@@ -58,7 +58,7 @@ const Environment: NextPage = () => {
     { label: '30', value: 30 },
     { label: '50', value: 50 }
   ];
-  const [filterParams, setFilterParams] = useState<EnvironmentsGridFilter>({
+  const [filterParams, setFilterParams] = useState<EnvironmentsTableFilter>({
     paginationToken: '',
     pageSize: pageSizeOptions[0]?.value,
     descending: 'createdAt',
@@ -233,7 +233,7 @@ const Environment: NextPage = () => {
   };
 
   const onPaginationChange = (detail: PaginationProps.ChangeDetail): void => {
-    //when clicking next page, this will cehck if there are more pages to load, if not, disable next button and get back to previous page
+    //when clicking next page, this will check if there are more pages to load, if not, disable next button and go back to previous page
     if (!filterParams.paginationTokens.get(detail.currentPageIndex) && detail.currentPageIndex > 1) {
       setFilterParams((prevState) => ({
         ...prevState,
@@ -306,7 +306,7 @@ const Environment: NextPage = () => {
   };
 
   useEffect(() => {
-    //save next page token into dictionary so we can access previous or next page or directly clicking page number
+    //save next page token into dictionary so we can access previous or next page by directly clicking page number
     setFilterParams((prevState) => ({
       ...prevState,
       paginationTokens: prevState.paginationTokens.set(prevState.currentPageIndex + 1, paginationToken)

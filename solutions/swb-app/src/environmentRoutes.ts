@@ -230,17 +230,19 @@ export function setUpEnvRoutes(
       }
       // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+        throw Boom.badRequest(
+          'Invalid pagination token and/or page size. Please try again with valid inputs'
+        );
       } else if (status && !isEnvironmentStatus(status)) {
-        res.status(400).send('Invalid environment status. Please try again with valid inputs.');
+        throw Boom.badRequest('Invalid environment status. Please try again with valid inputs.');
       } else if ((ascending && !isSortAttribute(ascending)) || (descending && !isSortAttribute(descending))) {
-        res.status(400).send('Invalid sort attribute. Please try again with valid inputs.');
+        throw Boom.badRequest('Invalid sort attribute. Please try again with valid inputs.');
       } else if (ascending && descending) {
-        res.status(400).send('Cannot sort on two attributes. Please try again with valid inputs.');
+        throw Boom.badRequest('Cannot sort on two attributes. Please try again with valid inputs.');
       } else if ((createdAtFrom && !createdAtTo) || (!createdAtFrom && createdAtTo)) {
-        res.status(400).send(`Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`);
+        throw Boom.badRequest(
+          `Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`
+        );
       } else {
         const response = await environmentService.listEnvironments(
           user,
