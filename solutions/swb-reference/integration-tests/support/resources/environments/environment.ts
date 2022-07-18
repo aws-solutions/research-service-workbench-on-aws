@@ -17,6 +17,10 @@ export default class Environment extends Resource {
     return this._axiosInstance.put(`${this._api}/start`);
   }
 
+  public async terminate(): Promise<AxiosResponse> {
+    return this._axiosInstance.put(`${this._api}/terminate`);
+  }
+
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     const maxWaitTimeInSeconds = 600;

@@ -359,6 +359,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jsonschema",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
