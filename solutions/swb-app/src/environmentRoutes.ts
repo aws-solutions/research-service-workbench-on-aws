@@ -18,10 +18,6 @@ export function setUpEnvRoutes(
   environmentService: EnvironmentService
 ): void {
   const supportedEnvs = Object.keys(environments);
-  async function getEnvironmentType(envId: string): Promise<string> {
-    const env = await environmentService.getEnvironment(envId, true);
-    return env.ETC.type;
-  }
 
   // Launch
   router.post(
