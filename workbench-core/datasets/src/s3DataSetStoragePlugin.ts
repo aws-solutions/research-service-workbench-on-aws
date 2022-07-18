@@ -270,14 +270,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       listBucketPolicyStatement,
       apPolicy
     );
-    const isDirty = updateResult.documentUpdated;
+    const isPolicyUpdated = updateResult.documentUpdated;
 
     updateResult = IamHelper.insertStatementIntoDocument(
       getPutBucketPolicyStatement,
       updateResult.documentResult
     );
 
-    if (isDirty || updateResult.documentUpdated) {
+    if (isPolicyUpdated || updateResult.documentUpdated) {
       const putPolicyParams: PutAccessPointPolicyCommandInput = {
         AccountId: accountId,
         Name: accessPointName,
