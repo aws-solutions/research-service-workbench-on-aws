@@ -18,10 +18,6 @@ export function setUpEnvRoutes(
   environmentService: EnvironmentService
 ): void {
   const supportedEnvs = Object.keys(environments);
-  async function getEnvironmentType(envId: string): Promise<string> {
-    const env = await environmentService.getEnvironment(envId, true);
-    return env.ETC.type;
-  }
 
   // Launch
   router.post(
@@ -89,13 +85,17 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
-
-      if (supportedEnvs.includes(envType)) {
+      const environment = await environmentService.getEnvironment(req.params.id);
+      const envType = environment.ETC.type;
+      if (environment.status === 'STOPPING') {
+        throw Boom.conflict('Cannot start environment while environment is currently being stopped');
+      } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
+        res.status(204).send();
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.start(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.start(req.params.id);
+        res.status(204).send();
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
@@ -108,13 +108,18 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id);
+      const envType = environment.ETC.type;
 
-      if (supportedEnvs.includes(envType)) {
+      if (['PENDING', 'STARTING'].includes(environment.status)) {
+        throw Boom.conflict('Cannot stop environment while environment is currently being started');
+      } else if (['STOPPING', 'STOPPED'].includes(environment.status)) {
+        res.status(204).send();
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.stop(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.stop(req.params.id);
+        res.status(204).send();
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
@@ -231,7 +236,7 @@ export function setUpEnvRoutes(
       // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         throw Boom.badRequest(
-          'Invalid pagination token and/or page size. Please try again with valid inputs'
+          'Invalid pagination token and/or page size. Please try again with valid inputs.'
         );
       } else if (status && !isEnvironmentStatus(status)) {
         throw Boom.badRequest('Invalid environment status. Please try again with valid inputs.');
