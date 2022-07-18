@@ -45,7 +45,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
           .status(400)
           .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
       } else {
-        const envType = await environmentTypeService.getEnvironmentTypes(
+        const envType = await environmentTypeService.listEnvironmentTypes(
           pageSize ? Number(pageSize) : undefined,
           paginationToken
         );
