@@ -145,7 +145,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public async validateToken(token: string): Promise<CognitoJwtPayload> {
     try {
-      return this._verifier.verify(token);
+      return await this._verifier.verify(token);
     } catch (error) {
       throw new InvalidJWTError('token is invalid');
     }
