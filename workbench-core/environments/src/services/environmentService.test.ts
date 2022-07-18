@@ -316,7 +316,8 @@ describe('EnvironmentService', () => {
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
           IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType AND #createdAt = :createdAt',
+          KeyConditionExpression:
+            '#resourceType = :resourceType AND #createdAt BETWEEN :createdAt1 AND :createdAt2',
           ExpressionAttributeNames: {
             '#resourceType': 'resourceType',
             '#createdAt': 'createdAt'
@@ -325,10 +326,14 @@ describe('EnvironmentService', () => {
             ':resourceType': {
               S: 'environment'
             },
-            ':createdAt': {
+            ':createdAt1': {
+              S: '2022-05-13T20:03:54.055Z'
+            },
+            ':createdAt2': {
               S: '2022-05-13T20:03:54.055Z'
             }
-          }
+          },
+          Limit: 50
         })
         .resolves(queryItemResponse);
 
