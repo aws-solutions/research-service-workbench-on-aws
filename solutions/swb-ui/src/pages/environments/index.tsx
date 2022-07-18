@@ -81,11 +81,7 @@ const Environment: NextPage = () => {
   });
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue>({
-    type: 'relative',
-    amount: 1,
-    unit: 'week'
-  });
+  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
   const initialNotifications =
     !!message && !!notificationType
       ? [
