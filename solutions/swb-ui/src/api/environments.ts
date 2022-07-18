@@ -3,7 +3,7 @@ import { EnvironmentItem, EnvironmentConnectResponse, CreateEnvironmentForm } fr
 import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
 
 const useEnvironments = () => {
-  const { data, mutate } = useSWR('environments', httpApiGet, {});
+  const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
 
   // `/environments` API returns a JSON in this format
   // { data: [], paginationToken: ''}

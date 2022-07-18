@@ -44,6 +44,7 @@ const httpApiDelete = async (
 };
 
 const fetchData = async (options: any): Promise<any> => {
+  // TODO: remove these headers once accessToken is properly set by cookies
   options.headers = { Authorization: `${localStorage.getItem('accessToken')}` };
   //TODO add auth token and error handling
   const { data } = await axios(options).catch(function (error) {

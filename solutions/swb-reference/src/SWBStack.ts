@@ -83,7 +83,7 @@ export class SWBStack extends Stack {
     } else {
       cognitoDomain = workbenchCognito.cognitoDomain;
       clientId = workbenchCognito.userPoolClientId;
-      clientSecret = workbenchCognito.userPoolClientSecret.toString();
+      clientSecret = workbenchCognito.userPoolClientSecret.unsafeUnwrap();
       userPoolId = workbenchCognito.userPoolId;
     }
 
