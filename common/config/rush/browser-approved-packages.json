@@ -359,7 +359,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "fs.realpath",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "generate-password",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "glob",
       "allowedCategories": [ "production" ]
     },
     {

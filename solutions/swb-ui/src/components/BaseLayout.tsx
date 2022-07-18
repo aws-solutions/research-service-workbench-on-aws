@@ -21,15 +21,21 @@ const breadcrumbs: BreadcrumbGroupProps.Item[] = [
 
 export interface LayoutProps {
   navigationHide?: boolean;
+  appName?: string;
   children: React.ReactNode;
 }
 
-export default function Layout({ navigationHide, children }: LayoutProps): JSX.Element {
+export default function Layout({ navigationHide, appName, children }: LayoutProps): JSX.Element {
   // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
   const { notifications } = useNotifications();
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
+
+  if (appName !== undefined) {
+    breadcrumbs[1].text = appName;
+  }
+
   return (
     <AppLayout
       id="app-layout"

@@ -11,6 +11,11 @@ export interface NavigationProps {
 
 export default function Navigation({ items }: NavigationProps): JSX.Element {
   const { t } = useTranslation();
+
+  const apps = (process.env.apps_menu as unknown as string[]).map((item) => {
+    return { type: 'link', text: t(item.replace(/_/g, ' ')), href: `/apps/${item}` };
+  }) as unknown as SideNavigationProps.Item[];
+
   const [activeHref, setActiveHref] = React.useState('');
   const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     {
@@ -23,7 +28,12 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
     },
     { type: 'link', text: t('Users'), href: '/users' },
     { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' }
+    { type: 'link', text: t('Datasets'), href: '/datasets' },
+    {
+      type: 'section',
+      text: t('Apps'),
+      items: apps
+    }
   ];
   const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     { type: 'link', text: t('Workspaces'), href: '/environments' },
@@ -35,6 +45,11 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
         { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
         { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
       ]
+    },
+    {
+      type: 'section',
+      text: t('Apps'),
+      items: apps
     }
   ];
 
