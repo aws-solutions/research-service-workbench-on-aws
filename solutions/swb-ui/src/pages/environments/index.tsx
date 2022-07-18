@@ -206,7 +206,6 @@ const Environment: NextPage = () => {
             break;
           case 'CONNECT':
             const connectingEnvId = collectionProps.selectedItems ? collectionProps.selectedItems[0].id : '';
-            console.log('connectingEnvId', connectingEnvId);
             setIsLoadingEnvConnection(true);
             const response = await connect(connectingEnvId);
             setEnvConnectResponse(response);
