@@ -311,7 +311,7 @@ const Environment: NextPage = () => {
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationToken, gridPaginationParams.currentPageIndex]);
+  }, [paginationToken, gridPaginationParams.currentPageIndex, gridFilterParamas.pageSize]);
 
   useEffect(() => {
     setWorkspaces(workspaces);
