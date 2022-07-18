@@ -1,8 +1,12 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
   "compilerOptions": {
+    "types": ["heft-jest", "node"],
+    "lib": ["esnext", "dom", "dom.iterable", "ESNext.Array"],
+    "rootDir": "src",
+    "outDir": "lib",
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,11 +16,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "types": ["jest", "node"],
-    "noEmit": true
+    "sourceMap": true,
+    "declaration": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["src"],
   "exclude": ["node_modules", "lib"]
 }

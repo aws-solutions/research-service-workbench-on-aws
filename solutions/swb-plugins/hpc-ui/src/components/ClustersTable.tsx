@@ -10,7 +10,6 @@ import { OptionDefinition } from '@awsui/components-react/internal/components/op
 import {
   AppLayout,
   Box,
-  BreadcrumbGroup,
   Header,
   Link,
   Pagination,
@@ -83,7 +82,7 @@ export default function ClustersTable(): JSX.Element {
   });
 
   useEffect(() => {
-    if (collectionProps.selectedItems?.at(0)?.clusterName! !== undefined) {
+    if (collectionProps.selectedItems?.length !== 0) {
       setSplitOpen(true);
     } else {
       setSplitOpen(false);
@@ -92,17 +91,6 @@ export default function ClustersTable(): JSX.Element {
 
   return (
     <AppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          items={[
-            { text: 'Service Workbench', href: '/' },
-            {
-              text: 'AWS ParallelClusters',
-              href: '#components/breadcrumb-group'
-            }
-          ]}
-        />
-      }
       contentHeader={
         <Header
           description="View and manage AWS ParallelClusters for batch jobs all within Service Workbench."
@@ -139,12 +127,12 @@ export default function ClustersTable(): JSX.Element {
             resizeHandleAriaLabel: 'Resize split panel'
           }}
           header={
-            collectionProps.selectedItems?.at(0)?.clusterName! !== undefined
+            collectionProps.selectedItems?.length !== 0
               ? collectionProps.selectedItems?.at(0)?.clusterName!
               : '0 clusters selected'
           }
         >
-          {collectionProps.selectedItems?.at(0)?.clusterName! !== undefined ? (
+          {collectionProps.selectedItems?.length !== 0 ? (
             <JobsTable
               projectId={isSplitOpen ? selectedOption.value! : undefined!}
               clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}

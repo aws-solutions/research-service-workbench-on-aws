@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@amzn/hpc-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/patient-consent-express",
       "allowedCategories": [ "production" ]
     },
@@ -213,6 +217,14 @@
     {
       "name": "@rushstack/heft-node-rig",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft-webpack4-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-webpack5-plugin",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/node-core-library",
@@ -463,6 +475,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "ts-loader",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "ts-node",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -476,6 +492,14 @@
     },
     {
       "name": "web-vitals",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "webpack",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "webpack-cli",
       "allowedCategories": [ "production" ]
     },
     {

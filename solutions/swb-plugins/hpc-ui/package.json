@@ -1,10 +1,23 @@
 {
   "name": "@amzn/hpc-ui",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.0.1",
+  "description": "React frontend UI for HPC ParallelClusters on Service Workbench v2",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
+  "main": "lib/App.js",
+  "typings": "lib/App.d.ts",
   "scripts": {
-    "build": "react-scripts build",
+    "build": "react-scripts build && tsc && rushx pkg-json-lint",
     "eject": "react-scripts eject",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "start": "react-scripts start",
     "test": "react-scripts test",
