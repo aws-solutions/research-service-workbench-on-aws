@@ -19,7 +19,7 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import IamHelper from './iamHelper';
+import IamHelper, { InsertStatementResult } from './iamHelper';
 import { DataSetsStoragePlugin } from '.';
 
 /**
@@ -130,10 +130,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  // public async getExternalEndpoint(dataSetName: string, externalEndpointName: string): Promise<string> {
-  //   throw new Error('Method not implemented.');
-  // }
-
   public async createPresignedUploadUrl(
     dataSetName: string,
     timeToLiveMilliseconds: number
@@ -208,7 +204,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     }
 
     if (IamHelper.policyDocumentContainsStatement(bucketPolicy, delegationStatement)) return;
-
     bucketPolicy.addStatements(delegationStatement);
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
@@ -267,26 +262,25 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       apPolicy = new PolicyDocument();
     }
 
-    let isDirty: boolean = false;
+    let updateResult: InsertStatementResult = IamHelper.insertStatementIntoDocument(
+      listBucketPolicyStatement,
+      apPolicy
+    );
+    const isPolicyUpdated = updateResult.documentUpdated;
 
-    if (!IamHelper.policyDocumentContainsStatement(apPolicy, listBucketPolicyStatement)) {
-      isDirty = true;
-      apPolicy.addStatements(listBucketPolicyStatement);
+    updateResult = IamHelper.insertStatementIntoDocument(
+      getPutBucketPolicyStatement,
+      updateResult.documentResult
+    );
+
+    if (isPolicyUpdated || updateResult.documentUpdated) {
+      const putPolicyParams: PutAccessPointPolicyCommandInput = {
+        AccountId: accountId,
+        Name: accessPointName,
+        Policy: JSON.stringify(updateResult.documentResult.toJSON())
+      };
+      await this._aws.clients.s3Control.putAccessPointPolicy(putPolicyParams);
     }
-
-    if (IamHelper.policyDocumentContainsStatement(apPolicy, getPutBucketPolicyStatement)) {
-      if (!isDirty) return;
-    } else {
-      apPolicy.addStatements(getPutBucketPolicyStatement);
-    }
-
-    const putPolicyParams: PutAccessPointPolicyCommandInput = {
-      AccountId: accountId,
-      Name: accessPointName,
-      Policy: JSON.stringify(apPolicy.toJSON())
-    };
-
-    await this._aws.clients.s3Control.putAccessPointPolicy(putPolicyParams);
   }
 
   private async _configureKmsKey(kmsKeyArn: string, externalRoleName: string): Promise<void> {
