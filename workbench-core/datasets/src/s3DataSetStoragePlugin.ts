@@ -277,20 +277,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       updateResult.documentResult
     );
 
-    // if (!IamHelper.policyDocumentContainsStatement(apPolicy, listBucketPolicyStatement)) {
-    //   isDirty = true;
-
-    //   const policyObject = apPolicy.toJSON();
-
-    //   apPolicy.addStatements(listBucketPolicyStatement);
-    // }
-
-    // if (IamHelper.policyDocumentContainsStatement(apPolicy, getPutBucketPolicyStatement)) {
-    //   if (!isDirty) return;
-    // } else {
-    //   apPolicy.addStatements(getPutBucketPolicyStatement);
-    // }
-
     if (isDirty || updateResult.documentUpdated) {
       const putPolicyParams: PutAccessPointPolicyCommandInput = {
         AccountId: accountId,

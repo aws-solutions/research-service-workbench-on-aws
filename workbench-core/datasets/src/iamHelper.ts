@@ -28,7 +28,8 @@ export interface InsertStatementResult {
 
   /**
    * The result of merging a statement into the document.
-   * If the merge required no
+   * If the merge required no changes to the existing policy document,
+   * this will be identical to the original.
    */
   documentResult: PolicyDocument;
 }
