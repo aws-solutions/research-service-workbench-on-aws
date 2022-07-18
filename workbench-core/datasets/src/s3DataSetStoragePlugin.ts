@@ -130,10 +130,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  // public async getExternalEndpoint(dataSetName: string, externalEndpointName: string): Promise<string> {
-  //   throw new Error('Method not implemented.');
-  // }
-
   public async createPresignedUploadUrl(
     dataSetName: string,
     timeToLiveMilliseconds: number
