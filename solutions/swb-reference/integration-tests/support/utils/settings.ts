@@ -13,6 +13,7 @@ interface Setting {
   projectId: string;
   envType: string;
   runId: string;
+  alreadyTerminateEnvId: string;
 }
 
 type SettingKey = keyof Setting;
