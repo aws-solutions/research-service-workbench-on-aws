@@ -46,7 +46,7 @@ export function setUpEnvTypeConfigRoutes(
           .status(400)
           .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
       } else {
-        const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfigs(
+        const envTypeConfig = await environmentTypeConfigService.listEnvironmentTypeConfigs(
           req.params.envTypeId,
           pageSize ? Number(pageSize) : undefined,
           paginationToken

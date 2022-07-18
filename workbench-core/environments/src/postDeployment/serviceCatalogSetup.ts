@@ -223,7 +223,9 @@ export default class ServiceCatalogSetup {
         .map((name) => {
           return Number(name.replace('v', ''));
         })
-        .sort()
+        .sort((a, b) => {
+          return a - b;
+        })
         .pop();
 
       if (largestVersionNumber === undefined) {

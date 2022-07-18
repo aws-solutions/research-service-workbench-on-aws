@@ -21,8 +21,9 @@ describe('environment terminate negative tests', () => {
 
   test('environment does not exist', async () => {
     try {
-      await adminSession.resources.environments.environment('fakeEnv').delete();
+      await adminSession.resources.environments.environment('fakeEnv').terminate();
     } catch (e) {
+      console.log('error is', e);
       checkHttpError(
         e,
         new HttpError(404, {
