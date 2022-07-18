@@ -229,7 +229,7 @@ export function setUpEnvRoutes(
       } else if (ascending && descending) {
         res.status(400).send('Cannot sort on two attributes. Please try again with valid inputs.');
       } else {
-        const response = await environmentService.getEnvironments(
+        const response = await environmentService.listEnvironments(
           user,
           filter,
           pageSize ? Number(pageSize) : undefined,
