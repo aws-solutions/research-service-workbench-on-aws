@@ -1,11 +1,5 @@
 lockfileVersion: 5.3
 
-specifiers:
-  next-i18next: ~10.3.0
-
-dependencies:
-  next-i18next: 10.3.0
-
 packages:
 
   /@babel/runtime/7.17.8:
@@ -61,53 +55,6 @@ packages:
     resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
     dependencies:
       void-elements: 3.1.0
-    dev: false
-
-  /i18next-fs-backend/1.1.4:
-    resolution: {integrity: sha512-/MfAGMP0jHonV966uFf9PkWWuDjPYLIcsipnSO3NxpNtAgRUKLTwvm85fEmsF6hGeu0zbZiCQ3W74jwO6K9uXA==}
-    dev: false
-
-  /i18next/21.6.14:
-    resolution: {integrity: sha512-XL6WyD+xlwQwbieXRlXhKWoLb/rkch50/rA+vl6untHnJ+aYnkQ0YDZciTWE78PPhOpbi2gR0LTJCJpiAhA+uQ==}
-    dependencies:
-      '@babel/runtime': 7.17.8
-    dev: false
-
-  /next-i18next/10.3.0:
-    resolution: {integrity: sha512-glVigyij3wivFAqGYxgW0w6rQHETpAAKnN5p2Lc//XiSENCbkDRW9a8ApA/c5msAnThzrYXNVu4XcKRfSCWQzA==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      next: '>= 10.0.0'
-      react: '>= 16.8.0'
-    dependencies:
-      '@babel/runtime': 7.17.8
-      '@types/hoist-non-react-statics': 3.3.1
-      core-js: 3.21.1
-      hoist-non-react-statics: 3.3.2
-      i18next: 21.6.14
-      i18next-fs-backend: 1.1.4
-      react-i18next: 11.16.2_i18next@21.6.14
-    transitivePeerDependencies:
-      - react-native
-    dev: false
-
-  /react-i18next/11.16.2_i18next@21.6.14:
-    resolution: {integrity: sha512-1iuZduvARUelL5ux663FvIoDZExwFO+9QtRAAt4uvs1/aun4cUZt8XBrVg7iiDgNls9cOSORAhE7Ri5KA9RMvg==}
-    peerDependencies:
-      i18next: '>= 19.0.0'
-      react: '>= 16.8.0'
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.17.8
-      html-escaper: 2.0.2
-      html-parse-stringify: 3.0.1
-      i18next: 21.6.14
     dev: false
 
   /react-is/16.13.1:

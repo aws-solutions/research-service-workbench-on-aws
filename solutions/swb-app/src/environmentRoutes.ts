@@ -1,10 +1,16 @@
-// Environment launch
-import { EnvironmentService, isEnvironmentStatus, isSortAttribute } from '@amzn/environments';
+import {
+  EnvironmentService,
+  isEnvironmentStatus,
+  isSortAttribute,
+  CreateEnvironmentSchema
+} from '@amzn/environments';
 import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
+import { validate } from 'jsonschema';
 import _ from 'lodash';
 import { Environment } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
+import { processValidatorResult } from './validatorHelper';
 
 export function setUpEnvRoutes(
   router: Router,
@@ -12,7 +18,6 @@ export function setUpEnvRoutes(
   environmentService: EnvironmentService
 ): void {
   const supportedEnvs = Object.keys(environments);
-
   async function getEnvironmentType(envId: string): Promise<string> {
     const env = await environmentService.getEnvironment(envId, true);
     return env.ETC.type;
@@ -22,6 +27,7 @@ export function setUpEnvRoutes(
   router.post(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
+      processValidatorResult(validate(req.body, CreateEnvironmentSchema));
       const envType = req.body.envType;
       if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
@@ -230,7 +236,7 @@ export function setUpEnvRoutes(
       } else if (ascending && descending) {
         res.status(400).send('Cannot sort on two attributes. Please try again with valid inputs.');
       } else {
-        const response = await environmentService.getEnvironments(
+        const response = await environmentService.listEnvironments(
           user,
           filter,
           pageSize ? Number(pageSize) : undefined,

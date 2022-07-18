@@ -23,6 +23,7 @@ describe('environment terminate negative tests', () => {
     try {
       await adminSession.resources.environments.environment('fakeEnv').terminate();
     } catch (e) {
+      console.log('error is', e);
       checkHttpError(
         e,
         new HttpError(404, {

@@ -12,6 +12,7 @@ import EnvironmentLifecycleService from './interfaces/environmentLifecycleServic
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
+import CreateEnvironmentSchema from './schemas/createEnvironment';
 import AccountService from './services/accountService';
 import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
@@ -44,5 +45,6 @@ export {
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  CreateEnvironmentSchema
 };
