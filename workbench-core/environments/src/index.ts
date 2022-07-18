@@ -7,6 +7,7 @@ import {
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
 import AccountHandler from './handlers/accountHandler';
 import StatusHandler from './handlers/statusHandler';
+import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
@@ -46,5 +47,6 @@ export {
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
-  CreateEnvironmentSchema
+  CreateEnvironmentSchema,
+  EnvironmentConnectionLinkPlaceholder
 };

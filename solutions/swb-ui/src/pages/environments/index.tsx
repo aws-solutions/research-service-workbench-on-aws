@@ -32,7 +32,7 @@ import { getPanelContent, splitPaneli18nstrings, useSplitPanel } from '../../com
 import { getFilterCounterText } from '../../common/tableCounterStrings';
 import { TableEmptyDisplay } from '../../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
-import ConnectEnvironmentModal from '../../components/ConnectEnvironmentModal';
+import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
 import Navigation from '../../components/Navigation';
 import { useSettings } from '../../context/SettingsContext';
 import {
@@ -258,7 +258,7 @@ const Environment: NextPage = () => {
       content={
         <>
           {showConnectEnvironmentModalVisible && (
-            <ConnectEnvironmentModal
+            <EnvironmentConnectModal
               closeModal={() => {
                 setShowConnectEnvironmentModalVisible(false);
               }}
