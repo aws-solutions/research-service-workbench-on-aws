@@ -378,7 +378,7 @@ describe('S3DataSetStoragePlugin', () => {
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)).toHaveLength(0);
     });
 
-    it('updates the list bucket access point policy if the prinicpal is missing', async () => {
+    it('updates the list bucket access point policy if the principal is missing', async () => {
       const plugin = new S3DataSetStoragePlugin(aws);
 
       const s3Mock = mockClient(S3Client);
@@ -438,7 +438,7 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"}],"Version":"2012-10-17"}'
       );
     });
 
@@ -502,7 +502,7 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"}],"Version":"2012-10-17"}'
       );
     });
 

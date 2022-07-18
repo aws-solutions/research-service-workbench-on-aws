@@ -72,7 +72,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProjects();
+      const actualResponse = await projService.listProjects();
 
       // CHECK
       expect(actualResponse.data).toEqual(items);

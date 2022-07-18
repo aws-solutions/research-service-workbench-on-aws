@@ -118,14 +118,14 @@ export class EnvironmentService {
   }
 
   /**
-   * Get all environments with option to filter by status
+   * List all environments with options for filtering, pagination, and sort
    * @param user - User information
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
-  public async getEnvironments(
+  public async listEnvironments(
     user: { role: string; ownerId: string },
     filter?: {
       status?: EnvironmentStatus;

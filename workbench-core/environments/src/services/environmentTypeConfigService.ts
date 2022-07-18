@@ -52,7 +52,7 @@ export default class EnvironmentTypeConfigService {
     }
   }
 
-  public async getEnvironmentTypeConfigs(
+  public async listEnvironmentTypeConfigs(
     envTypeId: string,
     pageSize?: number,
     paginationToken?: string
