@@ -156,8 +156,7 @@ const Environment: NextPage = () => {
   const [terminatingIds, setTerminatingIds] = useState(new Set<string>());
   const [stoppingIds, setStoppingIds] = useState(new Set<string>());
   const [startingIds, setstartingIds] = useState(new Set<string>());
-  const [showConnectEnvironmentModalVisible, setShowConnectEnvironmentModalVisible] =
-    useState<boolean>(false);
+  const [showConnectEnvironmentModal, setShowConnectEnvironmentModal] = useState<boolean>(false);
   const [isLoadingEnvConnection, setIsLoadingEnvConnection] = useState<boolean>(false);
   const [envConnectResponse, setEnvConnectResponse] = useState<EnvironmentConnectResponse>({
     instructionResponse: '',
@@ -213,7 +212,7 @@ const Environment: NextPage = () => {
             setEnvConnectResponse(response);
             setIsLoadingEnvConnection(false);
             actionLabel = 'Connect to Workspace';
-            setShowConnectEnvironmentModalVisible(true);
+            setShowConnectEnvironmentModal(true);
             //TODO: implement Connect workflow
             break;
         }
@@ -257,10 +256,10 @@ const Environment: NextPage = () => {
       }}
       content={
         <Box margin={{ bottom: 'l' }}>
-          {showConnectEnvironmentModalVisible && (
+          {showConnectEnvironmentModal && (
             <EnvironmentConnectModal
               closeModal={() => {
-                setShowConnectEnvironmentModalVisible(false);
+                setShowConnectEnvironmentModal(false);
               }}
               instructions={envConnectResponse.instructionResponse}
               authCredResponse={envConnectResponse.authCredResponse}
