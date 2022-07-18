@@ -63,13 +63,20 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/terminate',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
-
-      if (supportedEnvs.includes(envType)) {
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const envType = environment.ETC.type;
+      const envStatus = environment.status;
+      if (['TERMINATING', 'TERMINATED'].includes(envStatus)) {
+        res.status(204).send();
+      } else if (envStatus === 'TERMINATING_FAILED') {
+        throw Boom.conflict(
+          'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
+        );
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.terminate(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.terminate(req.params.id);
+        res.status(204).send();
       } else {
         throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
