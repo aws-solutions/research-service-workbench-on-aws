@@ -113,7 +113,7 @@ Resources:
               - 'kms:GenerateDataKeyWithoutPlaintext'
               - 'kms:Get*'
               - 'kms:List*'
-            Resource: '*'
+            Resource: !Ref EncryptionKeyArn
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'

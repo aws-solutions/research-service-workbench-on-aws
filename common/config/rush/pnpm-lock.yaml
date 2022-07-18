@@ -329,6 +329,7 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      jsonschema: ^1.4.1
       lodash: ^4.17.21
       nodemon: ^2.0.15
       npm-package-json-lint: ^6.3.0
@@ -345,6 +346,7 @@ importers:
       cookie-parser: 1.4.6
       cors: 2.8.5
       express: 4.18.1
+      jsonschema: 1.4.1
       lodash: 4.17.21
     devDependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
@@ -377,7 +379,6 @@ importers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
-      '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-base': workspace:*
       '@amzn/workbench-core-infrastructure': workspace:*
       '@aws-sdk/client-cloudformation': ^3.118.1
@@ -428,7 +429,6 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
-      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
       '@amzn/workbench-core-base': link:../../workbench-core/base
       '@amzn/workbench-core-infrastructure': link:../../workbench-core/infrastructure
       '@aws-sdk/client-cloudformation': 3.130.0
@@ -592,7 +592,7 @@ importers:
       ts-jest: 27.1.5_7f5c30a72d82a681fbc0438998364388
       typescript: 4.7.2
 
-  ../../solutions/swb-ui/cdk-infrastructure:
+  ../../solutions/swb-ui/infrastructure:
     specifiers:
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -972,6 +972,7 @@ importers:
       generate-password: ^1.7.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      jsonschema: ^1.4.1
       lodash: ^4.17.21
       md5-file: ^5.0.0
       npm-package-json-lint: ^6.3.0
@@ -996,6 +997,7 @@ importers:
       '@aws-sdk/util-dynamodb': 3.105.0
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
+      jsonschema: 1.4.1
       lodash: 4.17.21
       md5-file: 5.0.0
       uuid: 8.3.2
@@ -5327,9 +5329,9 @@ packages:
         optional: true
     dependencies:
       '@jest/console': 27.5.1
-      '@jest/reporters': 27.4.6
+      '@jest/reporters': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.20
       ansi-escapes: 4.3.2
@@ -5338,15 +5340,15 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 27.5.1
-      jest-config: 27.4.7
+      jest-config: 27.5.1
       jest-haste-map: 27.5.1
       jest-message-util: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-resolve-dependencies: 27.5.1
       jest-runner: 27.5.1
       jest-runtime: 27.5.1
-      jest-snapshot: 27.4.6
+      jest-snapshot: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
       jest-watcher: 27.5.1
@@ -5372,9 +5374,9 @@ packages:
         optional: true
     dependencies:
       '@jest/console': 27.5.1
-      '@jest/reporters': 27.4.6
+      '@jest/reporters': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.20
       ansi-escapes: 4.3.2
@@ -5383,15 +5385,15 @@ packages:
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 27.5.1
-      jest-config: 27.4.7_ts-node@10.8.0
+      jest-config: 27.5.1_ts-node@10.8.0
       jest-haste-map: 27.5.1
       jest-message-util: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-resolve-dependencies: 27.5.1
       jest-runner: 27.5.1
       jest-runtime: 27.5.1
-      jest-snapshot: 27.4.6
+      jest-snapshot: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
       jest-watcher: 27.5.1
@@ -5571,7 +5573,7 @@ packages:
       '@bcoe/v8-coverage': 0.2.3
       '@jest/console': 27.5.1
       '@jest/test-result': 27.5.1
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/node': 14.18.20
       chalk: 4.1.2
@@ -5585,7 +5587,7 @@ packages:
       istanbul-lib-source-maps: 4.0.1
       istanbul-reports: 3.1.4
       jest-haste-map: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-util: 27.5.1
       jest-worker: 27.5.1
       slash: 3.0.0
@@ -8372,7 +8374,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   /concurrently/7.2.1:
     resolution: {integrity: sha512-7cab/QyqipqghrVr9qZmoWbidu0nHsmxrpNqQ7r/67vfl1DWJElexehQnTH1p+87tDkihaAjM79xTZyBQh7HLw==}
@@ -11124,7 +11126,7 @@ packages:
       jest-get-type: 27.5.1
       jest-jasmine2: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-runner: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
@@ -11162,7 +11164,7 @@ packages:
       jest-get-type: 27.5.1
       jest-jasmine2: 27.5.1
       jest-regex-util: 27.5.1
-      jest-resolve: 27.4.6
+      jest-resolve: 27.5.1
       jest-runner: 27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
@@ -11868,7 +11870,7 @@ packages:
       '@babel/plugin-syntax-typescript': 7.17.12_@babel+core@7.18.2
       '@babel/traverse': 7.18.2
       '@babel/types': 7.18.4
-      '@jest/transform': 27.4.6
+      '@jest/transform': 27.5.1
       '@jest/types': 27.5.1
       '@types/babel__traverse': 7.17.1
       '@types/prettier': 2.6.3
@@ -14704,7 +14706,7 @@ packages:
     dev: false
 
   /timsort/0.3.0:
-    resolution: {integrity: sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=}
+    resolution: {integrity: sha512-qsdtZH+vMoCARQtyod4imc2nIJwg9Cc7lPRrw9CzF8ZKR0khdr8+2nX80PBhET3tcyTtJDxAffGh2rXH4tyU8A==}
 
   /tmp/0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}

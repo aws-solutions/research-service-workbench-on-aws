@@ -68,32 +68,62 @@ The environments page is at [http://localhost:3000/environments](http://localhos
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/environments](http://localhost:3000/api/environments).
 
 
-## Design system
-
-For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).
-
-## Deploy Applcation
+## Deploy UI
 
 Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assign value to `NEXT_PUBLIC_API_BASE_URL` in `.env.local` before starting next steps for deploy process.
 
-### Setuo Config File
+### Setup Config File
+
 1. Navigate to `solutions/swb-ui/cdk/infrastructure/src/config`
+
 1. Copy `solutions/swb-ui/cdk/infrastructure/src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.`
+
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
+
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
-1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide `apiBaseUrl` value from step [Retrieve API URL](##retrieve-api-url).
+
+1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide a value for `apiBaseUrl` with the next steps: 
+    1. Follow instructions from step [Retrieve API URL](##retrieve-api-url) and copy the value with format `https://{api}.{region}.amazonaws.com/dev/`
+    1. Remove the last part of the URL `/dev/`.
+    1. Assign value to `apiBaseUrl`,  `apiBaseUrl` must have the next format  `https://{api}.{region}.amazonaws.com`.
+
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
+
 ### Export Site
+
 In order to deploy application we need to export the application as a static website
+
 1. Navigate to `solutions/swb-ui/`
+
 1. Run command `rushx export`
 
+
 ### Deploy static website
-1. Navigate to `solutions/swb-ui/cdk/infrastructure`
-1. Run commands
-```
-rushx build
-STAGE=<STAGE> cdk deploy
+
+1. In `solutions/swb-ui/cdk/infrastructure` root directory run commands
 
 ```
+rush install
+STAGE=<STAGE> rushx cdk bootstrap
+STAGE=<STAGE> rushx cdk-deploy
+
+```
+
+After the deployment is completed you'll see the following output:
+
+```
+Outputs:
+swb-ui-dev-va.S3BucketArtifactsArnOutput = arn:aws:s3:::swb-ui-dev-va-arn-id
+swb-ui-dev-va.WebsiteURL = https://domainId.cloudfront.net
+Stack ARN:
+arn:aws:cloudformation:region:account:stack/swb-ui-dev-va/id
+
+✨  Total time: 250.4s
+```
+To navigate to the website, follow the link provided by `swb-ui-dev-va.WebsiteURL`.
+
+
+## Design system
+
+For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).

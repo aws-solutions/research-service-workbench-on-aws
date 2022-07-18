@@ -363,6 +363,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jsonschema",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "jwt-decode",
       "allowedCategories": [ "production" ]
     },

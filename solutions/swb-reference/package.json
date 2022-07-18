@@ -33,7 +33,6 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@amzn/swb-app": "workspace:*",
-    "@amzn/workbench-core-authentication": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
     "@amzn/workbench-core-infrastructure": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",
