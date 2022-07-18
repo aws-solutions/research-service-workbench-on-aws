@@ -41,7 +41,7 @@ function getConstants(): {
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
-  const USER_POOL_ID = config.usePoolId;
+  const USER_POOL_ID = config.userPoolId;
   const CLIENT_ID = config.clientId;
   const CLIENT_SECRET = config.clientSecret;
 

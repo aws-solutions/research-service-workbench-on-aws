@@ -1,7 +1,7 @@
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
-import { useTranslation } from 'next-i18next';
 import React from 'react';
-// import { User, researcherUser } from '../models/User';
+import { useAuthentication } from '../context/AuthenticationContext';
+import RouteGuard from './RouteGuard';
 
 export interface NavigationProps {
   activeHref?: string;
@@ -16,46 +16,36 @@ export default function Navigation({
   items,
   onFollowHandler
 }: NavigationProps): JSX.Element {
-  const { t } = useTranslation();
   const defaultNavHeader: SideNavigationProps.Header = {
     text: 'Service Workbench',
     href: '#/'
   };
   const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
-    { type: 'link', text: t('Users'), href: '/users' },
-    { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' }
+    { type: 'link', text: 'Users', href: '/users' },
+    { type: 'link', text: 'Workspaces', href: '/environments' }
   ];
   const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
-    { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' }
+    { type: 'link', text: 'Workspaces', href: '/environments' }
   ];
 
   // Role-based navigation display
-  // const user: User = researcherUser;
-  // const userRole: string = user.role;
-  const navDisplay: typeof adminNavItems | typeof userNavItems = adminNavItems;
-  // if (userRole === 'admin') {
-  //   navDisplay = adminNavItems;
-  // } else {
-  //   navDisplay = userNavItems;
-  // }
-  // navDisplay = userNavItems;
-  // Role-based navigation state
-  // const activeNav: typeof activeHref = '/environments';
-  // if (userRole === 'admin') {
-  //   activeNav = '/dashboards';
-  // } else {
-  //   activeNav = '/environments';
-  // }
-  // activeNav = '/environments';
+  const { user } = useAuthentication();
+  const userRole = user ? user.role : 'researcher';
+  let navDisplay: typeof adminNavItems | typeof userNavItems = adminNavItems;
+  if (userRole === 'Admin') {
+    navDisplay = adminNavItems;
+  } else {
+    navDisplay = userNavItems;
+  }
 
   return (
-    <SideNavigation
-      activeHref={activeHref}
-      header={header ? header : defaultNavHeader}
-      items={items ? items : navDisplay}
-      onFollow={onFollowHandler}
-    />
+    <RouteGuard>
+      <SideNavigation
+        activeHref={activeHref}
+        header={header ? header : defaultNavHeader}
+        items={items ? items : navDisplay}
+        onFollow={onFollowHandler}
+      />
+    </RouteGuard>
   );
 }

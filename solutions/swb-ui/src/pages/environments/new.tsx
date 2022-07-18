@@ -16,7 +16,6 @@ import {
   Select
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { createEnvironment } from '../../api/environments';
@@ -35,12 +34,6 @@ import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
 export interface EnvironmentProps {
   locale: string;
 }
-
-export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => ({
-  props: {
-    ...(await serverSideTranslations(locale, ['common']))
-  }
-});
 
 const Environment: NextPage = () => {
   // App settings constant
@@ -200,7 +193,7 @@ const Environment: NextPage = () => {
       toolsHide
       ariaLabels={layoutLabels}
       navigationOpen={navigationOpen}
-      navigation={<Navigation activeHref="#/" />}
+      navigation={<Navigation activeHref="/environments" />}
       onNavigationChange={({ detail }) => {
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         setNavigationOpen(detail.open);

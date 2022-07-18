@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const urlBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
   const options = {
@@ -44,6 +44,7 @@ const httpApiDelete = async (
 };
 
 const fetchData = async (options: any): Promise<any> => {
+  options.headers = { Authorization: `${localStorage.getItem('accessToken')}` };
   //TODO add auth token and error handling
   const { data } = await axios(options).catch(function (error) {
     //TODO: call logger to capture exception

@@ -11,24 +11,9 @@ import {
   ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
-import {
-  AuthenticationService,
-  CognitoAuthenticationPlugin,
-  CognitoAuthenticationPluginOptions,
-  UserManagementService,
-  CognitoUserManagementPlugin
-} from '@amzn/workbench-core-authentication';
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
-
-const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  cognitoDomain: process.env.COGNITO_DOMAIN!,
-  userPoolId: process.env.USER_POOL_ID!,
-  clientId: process.env.CLIENT_ID!,
-  clientSecret: process.env.CLIENT_SECRET!,
-  websiteUrl: process.env.WEBSITE_URL!
-};
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -52,8 +37,6 @@ const apiRouteConfig: ApiRouteConfig = {
     // }
   },
   account: new HostingAccountService(),
-  auth: new AuthenticationService(new CognitoAuthenticationPlugin(cognitoPluginOptions)),
-  user: new UserManagementService(new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)),
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   }),

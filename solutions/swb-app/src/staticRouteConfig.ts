@@ -1,6 +1,14 @@
 import { RoutesIgnored, RoutesMap } from '@amzn/workbench-core-authorization';
 
 export const routesMap: RoutesMap = {
+  '/aws-accounts': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Account'
+      }
+    ]
+  },
   '/environments': {
     GET: [
       {
@@ -15,13 +23,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/*': {
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: 'Environment'
-      }
-    ],
+  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
     GET: [
       {
         action: 'READ',
@@ -29,7 +31,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/*/start': {
+  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/start': {
     PUT: [
       {
         action: 'UPDATE',
@@ -37,7 +39,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/*/stop': {
+  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/stop': {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'Environment'
+      }
+    ]
+  },
+  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/terminate': {
     PUT: [
       {
         action: 'UPDATE',
@@ -92,34 +102,5 @@ export const routesIgnored: RoutesIgnored = {
   },
   '/loggedIn': {
     GET: true
-  },
-
-  // TODO: Ignoring these routes right now, but eventually will need to send token in Authorization header and validate
-  '/environments': {
-    GET: true,
-    POST: true
-  },
-  '/environments/*': {
-    GET: true,
-    DELETE: true
-  },
-  '/environments/*/start': {
-    PUT: true
-  },
-  '/environments/*/stop': {
-    PUT: true
-  },
-  '/users': {
-    GET: true,
-    POST: true
-  },
-  '/roles': {
-    POST: true
-  },
-  '/roles/Researcher': {
-    PUT: true
-  },
-  '/aws-accounts': {
-    POST: true
   }
 };

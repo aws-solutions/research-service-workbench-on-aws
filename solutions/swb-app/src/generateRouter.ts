@@ -2,7 +2,9 @@ import {
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
-  CognitoAuthenticationPlugin
+  CognitoAuthenticationPlugin,
+  UserManagementService,
+  CognitoUserManagementPlugin
 } from '@amzn/workbench-core-authentication';
 import {
   withAuth,
@@ -34,7 +36,13 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   const router: Router = express.Router();
 
-  app.use(cors({ origin: apiRouteConfig.allowedOrigins, exposedHeaders: ['Set-Cookie'], credentials: true }));
+  app.use(
+    cors({
+      origin: apiRouteConfig.allowedOrigins,
+      allowedHeaders: ['Set-Cookie', 'Content-Type'],
+      credentials: true
+    })
+  );
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
@@ -50,12 +58,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const authenticationService = new AuthenticationService(
     new CognitoAuthenticationPlugin(cognitoPluginOptions)
   );
-  const logger: LoggingService = new LoggingService();
 
   // Create Authorization Service
   const staticPermissionsMap: PermissionsMap = StaticPermissionsConfig.permissionsMap;
   const staticRoutesMap: RoutesMap = StaticRoutesConfig.routesMap;
   const staticRoutesIgnored: RoutesIgnored = StaticRoutesConfig.routesIgnored;
+  const logger: LoggingService = new LoggingService();
   const staticPermissionsPlugin: StaticPermissionsPlugin = new StaticPermissionsPlugin(
     staticPermissionsMap,
     staticRoutesMap,
@@ -69,7 +77,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   );
 
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
-  app.use(withAuth(authorizationService));
+  app.use(withAuth(authorizationService, { logger: logger }));
 
   // Dynamic routes
   apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
@@ -83,10 +91,14 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     });
   });
 
+  const userManagementService: UserManagementService = new UserManagementService(
+    new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)
+  );
+
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpAccountRoutes(router, apiRouteConfig.account);
-  setUpAuthRoutes(router, apiRouteConfig.auth, logger);
-  setUpUserRoutes(router, apiRouteConfig.user);
+  setUpAuthRoutes(router, authenticationService, logger);
+  setUpUserRoutes(router, userManagementService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(router, apiRouteConfig.projectService);

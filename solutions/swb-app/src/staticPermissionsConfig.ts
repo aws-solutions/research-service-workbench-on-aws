@@ -1,33 +1,5 @@
 import { Permission, PermissionsMap } from '@amzn/workbench-core-authorization';
 
-const researcherPermissions: Permission[] = [
-  {
-    effect: 'ALLOW',
-    action: 'READ',
-    subject: 'Environment'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'CREATE',
-    subject: 'Environment'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'UPDATE',
-    subject: 'Environment'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'DELETE',
-    subject: 'Environment'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'READ',
-    subject: 'User'
-  }
-];
-
 const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
@@ -51,11 +23,6 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
-    action: 'DELETE',
-    subject: 'Environment'
-  },
-  {
-    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
@@ -76,7 +43,25 @@ const adminPermissions: Permission[] = [
   }
 ];
 
+const researcherPermissions: Permission[] = [
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Environment'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Environment'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Environment'
+  }
+];
+
 export const permissionsMap: PermissionsMap = {
-  Researcher: researcherPermissions,
-  Admin: adminPermissions
+  Admin: adminPermissions,
+  Researcher: researcherPermissions
 };

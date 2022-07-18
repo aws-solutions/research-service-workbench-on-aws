@@ -21,7 +21,6 @@ import {
 } from '@awsui/components-react';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
@@ -46,14 +45,6 @@ export interface EnvironmentProps {
   locale: string;
 }
 
-export const getServerSideProps = async ({ locale }: EnvironmentProps): Promise<unknown> => {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common']))
-    }
-  };
-};
-
 const Environment: NextPage = () => {
   // For functions to return content specific to the table
   const itemType: string = 'workspace';
@@ -63,7 +54,6 @@ const Environment: NextPage = () => {
     pageSize: 20
   });
   const { environments, mutate } = useEnvironments();
-  console.log(environments);
 
   const [error, setError] = useState('');
   const router = useRouter();
@@ -249,7 +239,7 @@ const Environment: NextPage = () => {
       toolsHide
       ariaLabels={layoutLabels}
       navigationOpen={navigationOpen}
-      navigation={<Navigation activeHref="#/" />}
+      navigation={<Navigation activeHref="/environments" />}
       breadcrumbs={
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
       }

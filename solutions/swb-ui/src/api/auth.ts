@@ -1,11 +1,15 @@
 import { httpApiGet, httpApiPost } from './apiHelper';
 
 const token = async (body: { code: string; codeVerifier: string | null }): Promise<any> => {
-  return await httpApiPost('token', body);
+  return await httpApiPost('token', body, true);
 };
 
 const login = async (): Promise<any> => {
-  return await httpApiGet('login/?stateVerifier=TEMP_STATE_VERIFIER&codeChallenge=TEMP_CODE_CHALLENGE', {});
+  return await httpApiGet(
+    'login/?stateVerifier=TEMP_STATE_VERIFIER&codeChallenge=TEMP_CODE_CHALLENGE',
+    {},
+    true
+  );
 };
 
 const logout = async (): Promise<any> => {
