@@ -16,7 +16,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
   {
     id: 'createdAt',
     header: 'Created at',
-    cell: (e: { createdAt: string }) => new Date(e.createdAt).toString(),
+    cell: (e: { createdAt: string }) => new Date(e.createdAt).toLocaleString(),
     sortingField: 'createdAt'
   },
   {

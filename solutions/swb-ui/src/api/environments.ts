@@ -3,13 +3,14 @@ import {
   EnvironmentItem,
   EnvironmentConnectResponse,
   CreateEnvironmentForm,
-  EnvironmentsGridFilter
+  EnvironmentsQueryParams
 } from '../models/Environment';
 import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
-import { buildQueryString } from '../common/utils';
+import { convertToRecord } from '../common/utils';
 
-const useEnvironments = (params?: EnvironmentsGridFilter) => {
-  var queryString = buildQueryString(params);
+const useEnvironments = (params?: EnvironmentsQueryParams) => {
+  let queryString = new URLSearchParams(convertToRecord(params)).toString();
+  queryString = queryString ? `?${queryString}` : '';
   const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);
 
   // `/environments` API returns a JSON in this format

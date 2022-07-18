@@ -21,7 +21,6 @@ import {
   Flashbar,
   FlashbarProps
 } from '@awsui/components-react';
-import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -59,19 +58,23 @@ const Environment: NextPage = () => {
     { label: '30', value: 30 },
     { label: '50', value: 50 }
   ];
-  const [gridPaginationParams, setGridPaginationParams] = useState({
+  const [filterParams, setFilterParams] = useState<EnvironmentsGridFilter>({
+    paginationToken: '',
+    pageSize: pageSizeOptions[0]?.value,
+    descending: 'createdAt',
     currentPageIndex: 1,
     paginationTokens: new Map<number, string>().set(1, ''),
     hasOpenEndPagination: true,
     pageCount: 1
   });
-  const [gridFilterParamas, setGridFilterParamas] = useState<EnvironmentsGridFilter>({
-    paginationToken: '',
-    pageSize: pageSizeOptions[0]?.value,
-    descending: 'createdAt'
+  const { environments, mutate, paginationToken, areEnvironmentsLoading } = useEnvironments({
+    ascending: filterParams.ascending,
+    createdAtFrom: filterParams.createdAtFrom,
+    createdAtTo: filterParams.createdAtTo,
+    descending: filterParams.descending,
+    pageSize: filterParams.pageSize,
+    paginationToken: filterParams.paginationToken
   });
-  const { environments, mutate, paginationToken, areEnvironmentsLoading } =
-    useEnvironments(gridFilterParamas);
   const [error, setError] = useState('');
   const router = useRouter();
   const { message, notificationType } = router.query;
@@ -96,11 +99,7 @@ const Environment: NextPage = () => {
   });
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue>({
-    type: 'relative',
-    amount: 1,
-    unit: 'week'
-  });
+  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
   const initialNotifications =
     !!message && !!notificationType
       ? [
@@ -125,13 +124,6 @@ const Environment: NextPage = () => {
         noMatch: TableNoMatchDisplay(itemType),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filteringFunction: (item: any, filteringText): any => {
-          if (dateFilter !== null) {
-            const range = convertToAbsoluteRange(dateFilter);
-            if (!isWithinInterval(new Date(item.createdAt), range)) {
-              return false;
-            }
-          }
-
           const filteringTextLowerCase = filteringText.toLowerCase();
 
           return (
@@ -240,82 +232,87 @@ const Environment: NextPage = () => {
     }
   };
 
-  const resetPagination = (): void => {
-    setGridPaginationParams({
+  const onPaginationChange = (detail: PaginationProps.ChangeDetail): void => {
+    //when clicking next page, this will cehck if there are more pages to load, if not, disable next button and get back to previous page
+    if (!filterParams.paginationTokens.get(detail.currentPageIndex) && detail.currentPageIndex > 1) {
+      setFilterParams((prevState) => ({
+        ...prevState,
+        currentPageIndex: detail.currentPageIndex - 1,
+        hasOpenEndPagination: false
+      }));
+      return;
+    }
+    //get previously saved token of page clicked
+    const paginationToken = filterParams.paginationTokens.get(detail.currentPageIndex) || '';
+
+    //update pages shown in pagination if we discover a new page and set current page
+    setFilterParams((prevState) => ({
+      ...prevState,
+      pageCount:
+        detail.currentPageIndex > prevState.pageCount ? detail.currentPageIndex : prevState.pageCount,
+      currentPageIndex: detail.currentPageIndex,
+      paginationToken: paginationToken
+    }));
+  };
+  const onSortingChange = (isDescending: boolean | undefined, sortingField: string | undefined): void => {
+    setDateFilter(null);
+    setFilterParams((prevState) => ({
+      ...prevState,
+      ascending: isDescending ? undefined : sortingField,
+      descending: isDescending ? sortingField : undefined,
+      paginationToken: undefined,
+      createdAtFrom: undefined,
+      createdAtTo: undefined,
       currentPageIndex: 1,
       paginationTokens: new Map<number, string>().set(1, ''),
       hasOpenEndPagination: true,
       pageCount: 1
-    });
+    }));
   };
 
-  const onPaginationChange = (detail: PaginationProps.ChangeDetail): void => {
-    if (!gridPaginationParams.paginationTokens.get(detail.currentPageIndex) && detail.currentPageIndex > 1) {
-      return;
+  const onDateFilterChange = (dateFilterValue: DateRangePickerProps.RelativeValue): void => {
+    let start: Date | undefined = undefined;
+    let end: Date | undefined = undefined;
+    setDateFilter(dateFilterValue);
+    if (dateFilterValue) {
+      const range = convertToAbsoluteRange(dateFilterValue);
+      start = range.start;
+      end = range.end;
     }
-    if (detail.currentPageIndex > gridPaginationParams.pageCount)
-      //show discovered pages on pagination
-      setGridPaginationParams({
-        ...gridPaginationParams,
-        pageCount: detail.currentPageIndex,
-        currentPageIndex: detail.currentPageIndex
-      });
-    else setGridPaginationParams({ ...gridPaginationParams, currentPageIndex: detail.currentPageIndex });
-
-    setGridFilterParamas({
-      ...gridFilterParamas,
-      paginationToken: gridPaginationParams.paginationTokens.get(detail.currentPageIndex)
-    });
-  };
-
-  const onNextPageClick = (detail: PaginationProps.PageClickDetail): void => {
-    if (!gridPaginationParams.paginationTokens.get(detail.requestedPageIndex)) {
-      setGridPaginationParams({ ...gridPaginationParams, currentPageIndex: detail.requestedPageIndex - 1 });
-      return;
-    }
-  };
-
-  const onSortingChange = (isDescending: boolean | undefined, sortingField: string | undefined): void => {
-    resetPagination();
-    setGridFilterParamas({
-      ...gridFilterParamas,
-      ascending: isDescending ? undefined : sortingField,
-      descending: isDescending ? sortingField : undefined,
-      paginationToken: undefined
-    });
+    setFilterParams((prevState) => ({
+      ...prevState,
+      ascending: undefined,
+      descending: undefined,
+      paginationToken: undefined,
+      createdAtFrom: start?.toISOString(),
+      createdAtTo: end?.toISOString(),
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    }));
   };
 
   const onConfirmPageSize = (pageSize: number | undefined): void => {
-    resetPagination();
-    setGridFilterParamas({
-      ...gridFilterParamas,
+    setFilterParams((prevState) => ({
+      ...prevState,
       pageSize: pageSize || pageSizeOptions[0]?.value,
-      paginationToken: undefined
-    });
+      paginationToken: undefined,
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    }));
   };
 
   useEffect(() => {
-    setDateFilter(dateFilter);
-  }, [dateFilter]);
-
-  useEffect(() => {
-    //save next page token into dictionary so we can access previous page or directly clicking page number
-    setGridPaginationParams((prevState) => {
-      return {
-        ...prevState,
-        paginationTokens: prevState.paginationTokens.set(
-          gridPaginationParams.currentPageIndex + 1,
-          paginationToken
-        ),
-        hasOpenEndPagination: !!prevState.paginationTokens.get(gridPaginationParams.pageCount + 1)
-      };
-    });
+    //save next page token into dictionary so we can access previous or next page or directly clicking page number
+    setFilterParams((prevState) => ({
+      ...prevState,
+      paginationTokens: prevState.paginationTokens.set(prevState.currentPageIndex + 1, paginationToken)
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationToken, gridPaginationParams.currentPageIndex, gridFilterParamas.pageSize]);
-
-  useEffect(() => {
-    setWorkspaces(workspaces);
-  }, [workspaces]);
+  }, [paginationToken]);
 
   return (
     <AppLayout
@@ -345,8 +342,8 @@ const Environment: NextPage = () => {
           {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
           <Table
             {...collectionProps}
-            sortingDescending={!!gridFilterParamas.descending}
-            sortingColumn={{ sortingField: gridFilterParamas.descending || gridFilterParamas.ascending }}
+            sortingDescending={!!filterParams.descending}
+            sortingColumn={{ sortingField: filterParams.descending || filterParams.ascending }}
             onSortingChange={(event) =>
               onSortingChange(event.detail.isDescending, event.detail.sortingColumn.sortingField)
             }
@@ -441,7 +438,7 @@ const Environment: NextPage = () => {
                 />
                 <DateRangePicker
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
+                  onChange={({ detail }: SetStateAction<any>) => onDateFilterChange(detail.value)}
                   value={dateFilter}
                   relativeOptions={relativeOptions}
                   i18nStrings={datei18nStrings}
@@ -453,11 +450,10 @@ const Environment: NextPage = () => {
             pagination={
               <Pagination
                 disabled={areEnvironmentsLoading}
-                pagesCount={gridPaginationParams.pageCount}
-                currentPageIndex={gridPaginationParams.currentPageIndex}
+                pagesCount={filterParams.pageCount}
+                currentPageIndex={filterParams.currentPageIndex}
                 onChange={({ detail }) => onPaginationChange(detail)}
-                onNextPageClick={({ detail }) => onNextPageClick(detail)}
-                openEnd={gridPaginationParams.hasOpenEndPagination}
+                openEnd={filterParams.hasOpenEndPagination}
                 ariaLabels={paginationLables}
               />
             }
@@ -466,7 +462,7 @@ const Environment: NextPage = () => {
                 title="Preferences"
                 confirmLabel="Confirm"
                 cancelLabel="Cancel"
-                preferences={{ pageSize: gridFilterParamas.pageSize }}
+                preferences={{ pageSize: filterParams.pageSize }}
                 onConfirm={({ detail: { pageSize } }) => onConfirmPageSize(pageSize)}
                 pageSizePreference={{
                   title: 'Page size',

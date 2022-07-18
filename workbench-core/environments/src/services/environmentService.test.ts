@@ -335,7 +335,7 @@ describe('EnvironmentService', () => {
       // OPERATE
       const actualResponse = await envService.getEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
-        { createdAt: '2022-05-13T20:03:54.055Z' }
+        { createdAtFrom: '2022-05-13T20:03:54.055Z', createdAtTo: '2022-05-13T20:03:54.055Z' }
       );
 
       // CHECK
