@@ -57,7 +57,7 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async getEnvironmentTypes(
+  public async listEnvironmentTypes(
     pageSize?: number,
     paginationToken?: string
   ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {

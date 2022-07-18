@@ -99,14 +99,14 @@ describe('environmentTypeService', () => {
         'eyJzayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInJlc291cmNlVHlwZSI6ImVudlR5cGUiLCJwayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMTZUMjI6NDE6MDUuOTYyWiJ9';
 
       // OPERATE
-      const actualResponse = await envTypeService.getEnvironmentTypes(1, validPaginationToken);
+      const actualResponse = await envTypeService.listEnvironmentTypes(1, validPaginationToken);
 
       // CHECK
       expect(actualResponse).toEqual({ data: [envType] });
     });
     test('invalidPaginationToken', async () => {
       // BUILD & OPERATE & CHECK
-      await expect(envTypeService.getEnvironmentTypes(1, 'invalidPaginationToken')).rejects.toThrow(
+      await expect(envTypeService.listEnvironmentTypes(1, 'invalidPaginationToken')).rejects.toThrow(
         'Invalid paginationToken'
       );
     });
