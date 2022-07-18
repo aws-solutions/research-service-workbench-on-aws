@@ -140,6 +140,36 @@ export class DataSetService {
   }
 
   /**
+   * Removes an external endpoint to a DataSet.
+   *
+   * @param dataSetId - the name of the DataSet from which the endpoint will be removed.
+   * @param externalEndpointId - the ID of the endpoint to remove.
+   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
+   * to modify the target DataSet's underlying storage.
+   */
+  public async removeDataSetExternalEndpoint(
+    dataSetId: string,
+    externalEndpointId: string,
+    storageProvider: DataSetsStoragePlugin
+  ): Promise<void> {
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
+    const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
+
+    if (!_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
+      throw Boom.badRequest(`'${externalEndpointId}' does not exist in '${dataSetId}'.`);
+
+    await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
+
+    if (!targetDS.externalEndpoints) return;
+
+    targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
+      return endpoint === externalEndpointId;
+    });
+
+    await this._dbProvider.updateDataSet(targetDS);
+  }
+
+  /**
    * Add an external endpoint to a DataSet.
    *
    * @param dataSetId - the name of the DataSet to which the endpoint will be added.

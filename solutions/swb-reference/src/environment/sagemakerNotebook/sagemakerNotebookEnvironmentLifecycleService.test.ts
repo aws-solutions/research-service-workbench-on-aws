@@ -112,7 +112,9 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const envHelper = new EnvironmentLifecycleHelper();
     environment.datasetIds = ['exampleDS'];
     envHelper.launch = jest.fn();
-    envHelper.getDatasetsToMount = jest.fn(async () => 'exampleDS');
+    envHelper.getDatasetsToMount = jest.fn(async () => {
+      return { S3Mounts: 'exampleDs', IamPolicyDocument: '{exampleDs}' };
+    });
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 

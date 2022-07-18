@@ -43,11 +43,16 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
-      IamPolicyDocument: [
-        await this.helper.generateIamPolicy(envMetadata.datasetIds, envMetadata.PROJ.encryptionKeyArn)
-      ],
-      S3Mounts: [await this.helper.getDatasetsToMount(envMetadata.datasetIds, envMetadata.id)]
+      IamPolicyDocument: [''],
+      S3Mounts: ['']
     };
+
+    const { S3Mounts, IamPolicyDocument } = await this.helper.getDatasetsToMount(
+      envMetadata.datasetIds,
+      envMetadata
+    );
+    ssmParameters.S3Mounts = [S3Mounts];
+    ssmParameters.IamPolicyDocument = [IamPolicyDocument];
 
     await this.helper.launch({
       ssmParameters,
@@ -79,7 +84,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       externalId: envDetails.PROJ.externalId
     });
 
-    // TODO: Delete access point for this workspace
+    // Delete access point(s) for this workspace
+    await this.helper.removeAccessPoints(envDetails);
 
     // Store env row in DDB
     await this.envService.updateEnvironment(envId, { status: 'TERMINATING' });

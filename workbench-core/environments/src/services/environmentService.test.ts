@@ -62,10 +62,20 @@ describe('EnvironmentService', () => {
     ],
     updatedAt: '2022-05-18T20:33:42.608Z',
     createdAt: '2022-05-18T20:33:42.608Z',
-    sk: 'DS#dataset-123',
+    sk: 'DATASET#dataset-123',
     pk: `ENV#${envId}`,
     id: 'dataset-123',
     name: 'Study 1'
+  };
+  const endpointItem = {
+    updatedAt: '2022-05-18T20:33:42.608Z',
+    createdAt: '2022-05-18T20:33:42.608Z',
+    sk: 'ENDPOINT#endpoint-123',
+    pk: `ENV#${envId}`,
+    id: 'endpoint-123',
+    dataSetId: datasetItem.id,
+    endPointUrl: `s3://arn:aws:s3:someRegion:123456789012:accesspoint/${envId}`,
+    path: 'samplePath'
   };
   const envTypeConfigItem = {
     provisioningArtifactId: 'pa-3cwcuxmksf2xy',
@@ -133,7 +143,7 @@ describe('EnvironmentService', () => {
 
     test('includeMetadata = true', async () => {
       // BUILD
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const metaData = [datasetItem, envTypeConfigItem, projItem, endpointItem];
       const envWithMetadata = [env, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
@@ -161,7 +171,8 @@ describe('EnvironmentService', () => {
 
       // CHECK
       expect(actualResponse).toEqual({
-        DS: [datasetItem],
+        DATASETS: [datasetItem],
+        ENDPOINTS: [endpointItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,
@@ -1008,7 +1019,8 @@ describe('EnvironmentService', () => {
 
       // CHECK
       expect(actualResponse).toEqual({
-        DS: [datasetItem],
+        DATASETS: [datasetItem],
+        ENDPOINTS: [],
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,

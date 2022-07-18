@@ -14,6 +14,7 @@ import {
 import {
   CreateAccessPointCommandInput,
   CreateAccessPointCommandOutput,
+  DeleteAccessPointCommandInput,
   GetAccessPointPolicyCommandInput,
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
@@ -63,6 +64,17 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   public async importStorage(name: string, path: string): Promise<string> {
     const objectKey: string = path.endsWith('/') ? path : `${path}/`;
     return `s3://${name}/${objectKey}`;
+  }
+
+  /**
+   * Deletes an external endpoint (accesspoint) to the S3 Bucket
+   * @param name - the name of the S3 bucket where the storage resides.
+   * @param path - the S3 bucket prefix which identifies the root of the DataSet.
+   * @param externalEndpointName - the name of the access pont to create.
+   * @param ownerAccountId - the owning AWS account for the bucket.
+   */
+  public async removeExternalEndpoint(externalEndpointName: string, ownerAccountId: string): Promise<void> {
+    await this._deleteAccessPoint(externalEndpointName, ownerAccountId);
   }
 
   /**
@@ -147,6 +159,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     timeToLiveMilliseconds: number
   ): Promise<string[]> {
     throw new Error('Method not implemented.');
+  }
+
+  private async _deleteAccessPoint(externalEndpointName: string, bucketAccount: string): Promise<void> {
+    const accessPointConfig: DeleteAccessPointCommandInput = {
+      Name: externalEndpointName,
+      AccountId: bucketAccount
+    };
+    await this._aws.clients.s3Control.deleteAccessPoint(accessPointConfig);
   }
 
   private async _createAccessPoint(

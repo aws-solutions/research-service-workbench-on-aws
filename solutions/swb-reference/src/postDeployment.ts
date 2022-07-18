@@ -171,7 +171,7 @@ async function uploadBootstrapScriptsToS3(): Promise<void> {
     downloadFile(
       'https://github.com/kahing/goofys/releases/download/v0.24.0/goofys',
       `${binaryPath}/goofys-0.24.0`
-    ) // TODO: Regression testing since checksum didn't match with prev
+    )
   ]);
 
   const s3Service = awsService.helpers.s3;

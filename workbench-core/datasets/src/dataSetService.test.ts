@@ -304,13 +304,12 @@ describe('DataSetService', () => {
     it('returns the mount string for the DataSet mount point', async () => {
       await expect(
         service.addDataSetExternalEndpoint(mockDataSetId, mockAccessPointName, plugin, mockRoleArn)
-      ).resolves.toEqual(
-        JSON.stringify({
-          name: mockDataSetName,
-          bucket: mockAccessPointAlias,
-          prefix: mockDataSetPath
-        })
-      );
+      ).resolves.toEqual({
+        name: mockDataSetName,
+        bucket: mockAccessPointAlias,
+        prefix: mockDataSetPath,
+        endpointId: mockExistingEndpointId
+      });
     });
 
     it('throws if the external endpoint already exists.', async () => {
@@ -346,7 +345,7 @@ describe('DataSetService', () => {
     it('no-op if the role has already been added to the endpoint.', async () => {
       await expect(
         service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockRoleArn, plugin)
-      ).not.toThrow();
+      ).resolves.toBeUndefined();
     });
 
     it('completes if given an unknown role arn.', async () => {

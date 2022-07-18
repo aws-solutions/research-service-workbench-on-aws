@@ -472,7 +472,8 @@ export class SWBStack extends Stack {
               's3:ListBucket',
               's3:PutAccessPointPolicy',
               's3:GetAccessPointPolicy',
-              's3:CreateAccessPoint'
+              's3:CreateAccessPoint',
+              's3:DeleteAccessPoint'
             ],
             resources: [
               datasetBucket.bucketArn,
