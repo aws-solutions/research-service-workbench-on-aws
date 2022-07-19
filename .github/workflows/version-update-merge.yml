@@ -16,7 +16,7 @@ jobs:
     outputs:
         version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
         version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
-
+        version_second_commit_hash: "${{ steps.rush-version.outputs.second_commit_hash }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
@@ -47,12 +47,14 @@ jobs:
         id: rush-version
         run: |
           node common/scripts/install-run-rush.js version --bump --target-branch test-main --ignore-git-hooks
-          commit_hash=`git log -1 --format='%H'`
+          commit_hash=`git rev-parse @`
+          second_commit_hash=`git rev-parse @~`
           echo $commit_hash
           echo "::set-output name=changes_detected::false"
           if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
             echo "::set-output name=changes_detected::true"
             echo "::set-output name=commit_hash::$commit_hash"
+            echo "::set-output name=second_commit_hash::$second_commit_hash"
           fi
   rush-publish:  
     runs-on: ubuntu-20.04
@@ -118,12 +120,13 @@ jobs:
   rebase-merge-to-develop:
     runs-on: ubuntu-20.04
     needs: [rush-version, rush-publish]
-    env: 
-      COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
-      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
     permissions:
       id-token: write
       contents: read
+    env: 
+      COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
+      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
+      SECOND_COMMIT_HASH: " ${{ needs.rush-version.outputs.version_second_commit_hash }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
