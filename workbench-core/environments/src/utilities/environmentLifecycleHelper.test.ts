@@ -77,6 +77,7 @@ describe('EnvironmentLifecycleHelper', () => {
     };
     helper.dataSetService.addDataSetExternalEndpoint = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
+    helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE
     const response = await helper.getDatasetsToMount(datasetIds, envMetadata);
@@ -144,6 +145,7 @@ describe('EnvironmentLifecycleHelper', () => {
         endPointUrl: 's3://sampleBucket'
       };
     });
+    helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE & CHECK
     await expect(helper.getDatasetsToMount(datasetIds, envMetadata)).resolves.not.toThrowError();
