@@ -75,6 +75,7 @@ Run the post deployment step
 STAGE=<STAGE> rushx run-postDeployment      # Setup Service Catalog portfolio and products
 ```
 
+## Deploy to the Hosting Account
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. Upload [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml)
@@ -209,6 +210,8 @@ Your environment should have one variable. Name it `API_URL` and the value shoul
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 #### Onboard hosting account
+Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`.
+
 Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
 
 In POSTMAN this is the `Create Hosting Account` API
@@ -289,3 +292,11 @@ In POSTMAN this is the `Terminate Environment` API. Under the `Path Variable` se
 DELETE `{{API_URL}}/environments/:id`
 
 Replace `:id` with the `id` value from launching the environment. You should receive a response with an HTTP status code of `200` for success.
+
+# User Management
+Going to the SWB UI `http:localhost:3000/users` (or your CloudFront distribution if you deployed swb-ui) allows you to see and create additional Researchers.
+In order to create new Admins: 
+  1. You must go to the Cognito console in your AWS Console.
+  2. Under "User pools", look for and click on `swb-userpool-<stage>-<abbreviation>`.
+  3. Under the Users tab, click the "Create user" button to create a new user.
+  4. Once the user is created, click on the username and under "Group memberships", click on "Add user to group" to add the user to the Admin group.
