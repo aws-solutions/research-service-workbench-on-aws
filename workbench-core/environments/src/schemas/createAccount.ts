@@ -29,12 +29,8 @@ const CreateAccountSchema: Schema = {
     'awsAccountId',
     'envMgmtRoleArn',
     'hostingAccountHandlerRoleArn',
-    'vpcId',
-    'subnetId',
-    'cidr',
     'environmentInstanceFiles',
-    'encryptionKeyArn',
-    'status'
+    'encryptionKeyArn'
   ]
 };
 
