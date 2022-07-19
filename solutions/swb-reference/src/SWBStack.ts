@@ -11,6 +11,7 @@ import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
+import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -67,8 +68,8 @@ export class SWBStack extends Stack {
 
     this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
+    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda();
     const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
@@ -78,7 +79,10 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
   }
 
-  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
+  private _createLaunchConstraintIAMRole(
+    launchConstraintRoleNameOutput: string,
+    artifactS3Bucket: Bucket
+  ): Role {
     const commonScManagement = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -128,7 +132,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*']
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
@@ -148,11 +152,11 @@ export class SWBStack extends Stack {
             'ec2:DescribeSubnets',
             'ec2:DescribeVpcs'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeTags, DescrbeKeyPairs, DescribeSecurityGroups, DescribeSubnets, DescribeVpcs do not allow for resource-based permissions
         }),
         new PolicyStatement({
           actions: ['kms:CreateGrant'],
-          resources: ['*']
+          resources: ['*'] // Must be wildcard because we do not know the keys at the time of creation of this policy
         })
       ]
     });
@@ -180,7 +184,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
-          resources: ['*']
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
           actions: [
@@ -201,7 +205,7 @@ export class SWBStack extends Stack {
             'ec2:CreateNetworkInterface',
             'ec2:DeleteNetworkInterface'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeNetworkInterfaces does not allow resource-level permissions
         })
       ]
     });
@@ -278,7 +282,11 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): Function {
+  private _createAccountHandlerLambda(
+    launchConstraintRole: Role,
+    artifactS3Bucket: Bucket,
+    amiIdsToShare: string
+  ): Function {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -288,62 +296,69 @@ export class SWBStack extends Stack {
       timeout: Duration.minutes(4)
     });
 
-    lambda.role?.attachInlinePolicy(
-      new Policy(this, 'accountHandlerPolicy', {
-        statements: [
-          new PolicyStatement({
-            sid: 'CreatePortfolioShare',
-            actions: ['servicecatalog:CreatePortfolioShare'],
-            resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
-          }),
-          // Allows accountHandler to get portfolioId based on portfolioName
-          // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
-          new PolicyStatement({
-            sid: 'ListPortfolios',
-            actions: ['servicecatalog:ListPortfolios'],
-            resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
-          }),
-          new PolicyStatement({
-            sid: 'AssumeRole',
-            actions: ['sts:AssumeRole'],
-            // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-            resources: ['arn:aws:iam::*:role/*hosting-account-role']
-          }),
-          new PolicyStatement({
-            sid: 'GetLaunchConstraint',
-            actions: [
-              'iam:GetRole',
-              'iam:GetRolePolicy',
-              'iam:ListRolePolicies',
-              'iam:ListAttachedRolePolicies'
-            ],
-            resources: [launchConstraintRole.roleArn]
-          }),
-          new PolicyStatement({
-            sid: 'ShareAmi',
-            actions: ['ec2:ModifyImageAttribute'],
-            resources: ['*']
-          }),
-          new PolicyStatement({
-            sid: 'ShareSSM',
-            actions: ['ssm:ModifyDocumentPermission'],
-            resources: [
-              this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
-            ]
-          }),
-          new PolicyStatement({
-            sid: 'Cloudformation',
-            actions: ['cloudformation:DescribeStacks'],
-            resources: [this.stackId]
-          }),
-          new PolicyStatement({
-            sid: 'S3Bucket',
-            actions: ['s3:GetObject'],
-            resources: [`${artifactS3Bucket.bucketArn}/*`]
-          })
-        ]
-      })
-    );
+    const amiIdsList: string[] = JSON.parse(amiIdsToShare);
+
+    const lambdaPolicy = new Policy(this, 'accountHandlerPolicy', {
+      statements: [
+        new PolicyStatement({
+          sid: 'CreatePortfolioShare',
+          actions: ['servicecatalog:CreatePortfolioShare'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+        }),
+        // Allows accountHandler to get portfolioId based on portfolioName
+        // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
+        new PolicyStatement({
+          sid: 'ListPortfolios',
+          actions: ['servicecatalog:ListPortfolios'],
+          resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
+        }),
+        new PolicyStatement({
+          sid: 'AssumeRole',
+          actions: ['sts:AssumeRole'],
+          // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+          resources: ['arn:aws:iam::*:role/*hosting-account-role']
+        }),
+        new PolicyStatement({
+          sid: 'GetLaunchConstraint',
+          actions: [
+            'iam:GetRole',
+            'iam:GetRolePolicy',
+            'iam:ListRolePolicies',
+            'iam:ListAttachedRolePolicies'
+          ],
+          resources: [launchConstraintRole.roleArn]
+        }),
+        new PolicyStatement({
+          sid: 'ShareSSM',
+          actions: ['ssm:ModifyDocumentPermission'],
+          resources: [
+            this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+          ]
+        }),
+        new PolicyStatement({
+          sid: 'Cloudformation',
+          actions: ['cloudformation:DescribeStacks'],
+          resources: [this.stackId]
+        }),
+        new PolicyStatement({
+          sid: 'S3Bucket',
+          actions: ['s3:GetObject'],
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
+        })
+      ]
+    });
+
+    if (!_.isEmpty(amiIdsList)) {
+      lambdaPolicy.addStatements(
+        new PolicyStatement({
+          sid: 'ShareAmi',
+          actions: ['ec2:ModifyImageAttribute'],
+          resources: amiIdsList
+        })
+      );
+    }
+
+    lambda.role?.attachInlinePolicy(lambdaPolicy);
 
     new CfnOutput(this, 'AccountHandlerLambdaRoleOutput', {
       value: lambda.role!.roleArn
@@ -373,7 +388,7 @@ export class SWBStack extends Stack {
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
           new PolicyStatement({
-            actions: ['events:PutPermission'],
+            actions: ['events:DescribeRule', 'events:Put*'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
@@ -391,15 +406,6 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
-          }),
-          new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*'],
-            resources: ['*'],
-            sid: 'EventbridgeAccess'
-          }),
-          new PolicyStatement({
-            actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-            resources: ['*']
           })
         ]
       })
