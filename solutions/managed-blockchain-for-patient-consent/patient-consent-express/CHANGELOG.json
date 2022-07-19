@@ -1,0 +1,17 @@
+{
+  "name": "@amzn/patient-consent-express",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@amzn/patient-consent-express_v0.0.2",
+      "date": "Tue, 19 Jul 2022 02:20:05 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@amzn/workbench-core-audit\" to `0.0.2`"
+          }
+        ]
+      }
+    }
+  ]
+}
