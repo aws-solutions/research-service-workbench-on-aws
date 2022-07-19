@@ -81,8 +81,8 @@ jobs:
           ref: ${{ steps.set-ref.outputs.ref }}
           fetch-depth: 0
 
-#       - name: Base Action
-#         uses: ./.github/actions/baseAction
+      - name: Base Action
+        uses: ./.github/actions/baseAction
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

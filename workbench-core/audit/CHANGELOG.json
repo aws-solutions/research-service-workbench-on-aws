@@ -2,6 +2,18 @@
   "name": "@amzn/workbench-core-audit",
   "entries": [
     {
+      "version": "0.0.7",
+      "tag": "@amzn/workbench-core-audit_v0.0.7",
+      "date": "Tue, 19 Jul 2022 12:13:07 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@amzn/workbench-core-authorization\" to `0.0.7`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.6",
       "tag": "@amzn/workbench-core-audit_v0.0.6",
       "date": "Tue, 19 Jul 2022 11:58:48 GMT",
