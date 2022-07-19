@@ -130,12 +130,6 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: Set git config
-        run: |
-          git config user.email ${{ secrets.BOT-USER-EMAIL }}
-          git config user.name ${{ secrets.BOT-USER }}
-          git config commit.gpgsign true
-          git config pull.rebase true   # rebase
       - name: Merge to test-develop
         run: |
           echo "Set the COMMIT_ID to merge to test-develop, to current workflow commit id, if no version change commit was made"
@@ -147,6 +141,7 @@ jobs:
           else
             COMMIT_ID=$GITHUB_SHA
           fi
+          git config pull.rebase true   # rebase
           git checkout test-develop
           echo
           echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
