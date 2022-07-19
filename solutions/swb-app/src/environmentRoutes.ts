@@ -187,7 +187,8 @@ export function setUpEnvRoutes(
       const {
         status,
         name,
-        createdAt,
+        createdAtFrom,
+        createdAtTo,
         owner,
         type,
         project,
@@ -204,8 +205,11 @@ export function setUpEnvRoutes(
       if (name && typeof name === 'string') {
         filter = { ...filter, name };
       }
-      if (createdAt && typeof createdAt === 'string') {
-        filter = { ...filter, createdAt };
+      if (createdAtFrom && typeof createdAtFrom === 'string') {
+        filter = { ...filter, createdAtFrom };
+      }
+      if (createdAtTo && typeof createdAtTo === 'string') {
+        filter = { ...filter, createdAtTo };
       }
       if (owner && typeof owner === 'string') {
         filter = { ...filter, owner };
@@ -240,6 +244,10 @@ export function setUpEnvRoutes(
         throw Boom.badRequest('Invalid sort attribute. Please try again with valid inputs.');
       } else if (ascending && descending) {
         throw Boom.badRequest('Cannot sort on two attributes. Please try again with valid inputs.');
+      } else if ((createdAtFrom && !createdAtTo) || (!createdAtFrom && createdAtTo)) {
+        throw Boom.badRequest(
+          `Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`
+        );
       } else {
         const response = await environmentService.listEnvironments(
           user,
