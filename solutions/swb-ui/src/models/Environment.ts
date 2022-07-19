@@ -1,4 +1,4 @@
-export type EnvironmentItem = {
+export interface EnvironmentItem {
   workspaceName: string;
   workspaceStatus: EnvironmentStatus;
   createdAt: string;
@@ -8,17 +8,17 @@ export type EnvironmentItem = {
   name: string;
   status: EnvironmentStatus;
   projectId: string;
-};
+}
 
-export type EnvironmentActionResponse = {
+export interface EnvironmentActionResponse {
   envId: string;
   status: EnvironmentStatus;
-};
+}
 
-export type EnvironmentConnectResponse = {
-  authCredResponse: any;
+export interface EnvironmentConnectResponse {
+  authCredResponse: { [key: string]: string };
   instructionResponse: string;
-};
+}
 
 export type EnvironmentStatus = 'STOPPED' | 'STOPPING' | 'FAILED' | 'COMPLETED' | 'PENDING' | 'TERMINATING';
 
