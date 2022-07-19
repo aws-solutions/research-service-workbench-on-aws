@@ -41,3 +41,25 @@ export interface CreateEnvironmentFormValidation {
   envTypeConfigIdError?: string;
   descriptionError?: string;
 }
+
+export interface EnvironmentsTableFilter {
+  ascending?: string;
+  descending?: string;
+  paginationToken?: string;
+  pageSize?: number;
+  createdAtFrom?: string;
+  createdAtTo?: string;
+  currentPageIndex: number;
+  paginationTokens: Map<number, string>;
+  hasOpenEndPagination: boolean;
+  pageCount: number;
+}
+
+export interface EnvironmentsQueryParams {
+  ascending?: string;
+  descending?: string;
+  paginationToken?: string;
+  pageSize?: number;
+  createdAtFrom?: string;
+  createdAtTo?: string;
+}

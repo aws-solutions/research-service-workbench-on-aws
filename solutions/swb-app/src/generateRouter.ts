@@ -34,6 +34,7 @@ import { setUpUserRoutes } from './userRoutes';
 
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
+  app.disable('x-powered-by');
   const router: Router = express.Router();
 
   app.use(

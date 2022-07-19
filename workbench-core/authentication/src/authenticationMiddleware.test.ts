@@ -406,22 +406,20 @@ describe('authenticationMiddleware integration tests', () => {
       expect(next).toHaveBeenCalledTimes(0);
     });
 
-    // TODO: this test currently does not work because authorization header does not allow non-strings. Uncomment test once cookie set is fixed.
-    // it('should return 401 when access_token cookie is not a string', async () => {
+    it('should return 401 when access_token cookie is not a string', async () => {
+      const req: Request = {
+        cookies: {
+          access_token: 123
+        }
+      } as Request;
 
-    //   const req: Request = {
-    //     cookies: {
-    //       access_token: 123
-    //     }
-    //   } as Request;
+      const next = jest.fn();
 
-    //   const next = jest.fn();
+      await verifyTokenMiddleware(req, res, next);
 
-    //   await verifyTokenMiddleware(req, res, next);
-
-    //   expect(res.sendStatus).toHaveBeenCalledWith(401);
-    //   expect(next).toHaveBeenCalledTimes(0);
-    // });
+      expect(res.sendStatus).toHaveBeenCalledWith(401);
+      expect(next).toHaveBeenCalledTimes(0);
+    });
 
     it('should return 401 when access_token cookie is invalid', async () => {
       const req: Request = {

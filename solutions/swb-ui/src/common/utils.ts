@@ -8,3 +8,13 @@ export const cidrRegex: RegExp = new RegExp(
 export const emailRegex: RegExp = new RegExp(
   /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,4}))$/
 );
+
+export const convertToRecord = (queryObject: any): Record<string, string> => {
+  let result: Record<string, string> = {};
+  if (!queryObject) return result;
+  Object.entries(queryObject).forEach(([key, value]) => {
+    if (value) result[key] = value as string;
+  });
+
+  return result;
+};

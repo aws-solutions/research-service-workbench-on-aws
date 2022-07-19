@@ -139,7 +139,7 @@ export function verifyToken(
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.headers.authorization;
+      const accessToken = req.headers ? req.headers.authorization : undefined;
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
