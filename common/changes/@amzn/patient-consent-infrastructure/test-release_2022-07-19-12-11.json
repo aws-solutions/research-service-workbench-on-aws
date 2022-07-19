@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/patient-consent-infrastructure",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@amzn/patient-consent-infrastructure"
+}
