@@ -37,9 +37,15 @@ Parameters:
   AutoStopIdleTimeInMinutes:
     Type: Number
     Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
-  DatasetsBucketName:
+  DatasetsBucketArn:
     Type: String
     Description: Name of the datasets bucket in the main account
+  MainAccountId:
+    Type: String
+    Description: The Main Account ID where application is deployed
+  MainAccountRegion:
+    Type: String
+    Description: The region of application deployment in main account
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
@@ -72,12 +78,27 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - 's3:ListBucket'
               - 's3:GetObject'
+              - 's3:AbortMultipartUpload'
+              - 's3:ListMultipartUploadParts'
               - 's3:PutObject'
+              - 's3:GetObjectAcl'
+              - 's3:PutObjectAcl'
             Resource: !Sub
-              - 'arn:aws:s3:::${DatasetsBucketName}*'
-              - 'arn:aws:s3:::${DatasetsBucketName}/*'
+              - '${DatasetsBucketArn}/*'
+              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*'
+              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*/object/*'
+          - Effect: Allow
+            Action:
+              - 's3:GetAccessPoint'
+              - 's3:ListAccessPoints'
+            Resource: '*' # These actions require wildcard resources
+          - Effect: Allow
+            Action:
+              - 's3:ListBucket'
+            Resource: !Sub
+              - ${DatasetsBucketArn}
+              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*'
           - Effect: Allow
             Action:
               - 's3:ListBucket'
@@ -115,7 +136,8 @@ Resources:
               - 'kms:GenerateDataKeyWithoutPlaintext'
               - 'kms:Get*'
               - 'kms:List*'
-            Resource: '*'
+            Resource: !Sub
+              - EncryptionKeyArn
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'

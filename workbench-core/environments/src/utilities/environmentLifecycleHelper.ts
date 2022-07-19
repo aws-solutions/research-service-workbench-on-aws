@@ -79,15 +79,21 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
-  public async getDatasetsBucketName(): Promise<string> {
+  public async getCfnOutputs(): Promise<{ [id: string]: string }> {
     const cfService = this.aws.helpers.cloudformation;
-    const { [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn } = await cfService.getCfnOutput(
-      process.env.STACK_NAME!,
-      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]
-    );
+    const {
+      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
+      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn
+    } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
+      process.env.STATUS_HANDLER_ARN_NAME!,
+      process.env.S3_DATASETS_BUCKET_ARN_NAME!
+    ]);
 
-    // We create this at deploy time so this will be present in the stack
-    return datasetsBucketArn.split(':').pop()!;
+    const mainAccountRegion = statusHandlerArn.split(':')[3];
+    const mainAccountId = statusHandlerArn.split(':')[4];
+
+    // We create these at deploy time so this will be present in the stack
+    return { datasetsBucketArn, mainAccountRegion, mainAccountId };
   }
 
   /**
@@ -169,10 +175,10 @@ export default class EnvironmentLifecycleHelper {
 
     const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
+        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
         const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
           datasetId,
-          // Using envId to name endpoint for better mapping (each env has its own endpoint)
-          envId,
+          datasetEndPointName,
           new S3DataSetStoragePlugin(this.aws)
         );
 
