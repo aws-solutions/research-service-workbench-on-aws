@@ -1,5 +1,5 @@
 import { EnvironmentConnectionLinkPlaceholder } from '@amzn/environments';
-import { Modal, SpaceBetween, Link, FlashbarProps } from '@awsui/components-react';
+import { Modal, SpaceBetween, Link } from '@awsui/components-react';
 import Box from '@awsui/components-react/box';
 import Button from '@awsui/components-react/button';
 import { useNotifications } from '../context/NotificationContext';
