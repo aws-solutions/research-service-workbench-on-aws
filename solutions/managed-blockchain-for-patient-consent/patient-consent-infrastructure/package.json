@@ -1,6 +1,6 @@
 {
   "name": "@amzn/patient-consent-infrastructure",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Example infrastructure to deploy express app",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
