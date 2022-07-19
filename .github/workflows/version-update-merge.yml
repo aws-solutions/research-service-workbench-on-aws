@@ -46,7 +46,7 @@ jobs:
       - name: Rush Version
         id: rush-version
         run: |
-          node common/scripts/install-run-rush.js version --bump --target-branch ${{github.ref_name}} --ignore-git-hooks
+          node common/scripts/install-run-rush.js version --bump --target-branch test-main --ignore-git-hooks
           commit_hash=`git log -1 --format='%H'`
           echo $commit_hash
           echo "::set-output name=changes_detected::false"
@@ -111,7 +111,7 @@ jobs:
           
       - name: Rush Publish
         run: |
-          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --ignore-git-hooks --include-all --target-branch ${{ github.ref_name }} --publish"
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --ignore-git-hooks --include-all --target-branch test-main --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
