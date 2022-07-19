@@ -5,44 +5,57 @@ parameters:
   ProductId:
     type: String
     description: 'The ProductId to be used from Service Catalog'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   EncryptionKeyArn:
     type: String
     description: 'The encryption key ARN to be used'
+    allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
   CIDR:
     type: String
     description: 'The initial CIDR block to be granted access'
+    allowedPattern: ^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$
   ProvisioningArtifactId:
     type: String
     description: 'The ProvisioningArtifactId to be used from Service Catalog'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   VPC:
     type: String
     description: 'The VPC to be used where the environment will reside'
+    allowedPattern: ^vpc-[a-zA-Z0-9]+$
   Subnet:
     type: String
     description: 'The Subnet to be used where the environment will reside'
+    allowedPattern: ^subnet-[a-zA-Z0-9]+$
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
+    allowedPattern: [0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}
   Namespace:
     type: String
     description: 'The namespace to be used for creating the CfN stack resources'
     default: 'swbv2-Sagemaker'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   InstanceName:
     type: String
     description: '(Required) The name of the Sagemaker instance being provisioned.'
+    allowedPattern: ^[a-zA-Z0-9][a-zA-Z0-9._-]{1,128}$
   PathId:
     type: String
     description: 'The Path ID for the Service Catalog product.'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   EnvironmentInstanceFiles:
     type: String
     description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
   AutoStopIdleTimeInMinutes:
     type: String
     description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
     default: '0'
+    allowedPattern: \d+
   InstanceType:
     type: String
     description: 'The size of the notebook instance coming from environment type config'
+    allowedPattern: ^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+$
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
