@@ -14,6 +14,7 @@ import {
 import {
   CreateAccessPointCommandInput,
   CreateAccessPointCommandOutput,
+  DeleteAccessPointCommandInput,
   GetAccessPointPolicyCommandInput,
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
@@ -66,6 +67,17 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   /**
+   * Deletes an external endpoint (accesspoint) to the S3 Bucket
+   * @param name - the name of the S3 bucket where the storage resides.
+   * @param path - the S3 bucket prefix which identifies the root of the DataSet.
+   * @param externalEndpointName - the name of the access pont to create.
+   * @param ownerAccountId - the owning AWS account for the bucket.
+   */
+  public async removeExternalEndpoint(externalEndpointName: string, ownerAccountId: string): Promise<void> {
+    await this._deleteAccessPoint(externalEndpointName, ownerAccountId);
+  }
+
+  /**
    * Add an external endpoint (accesspoint) to the S3 Bucket and grant access
    * to the dataset prefix for a given external role if provided.
    * @param name - the name of the S3 bucket where the storage resides.
@@ -102,7 +114,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
     }
     return {
-      endPointUrl: `s3://${response.endPointArn}/`,
+      endPointUrl: `s3://${response.endPointArn}`,
       endPointAlias: response.endPointAlias
     };
   }
@@ -147,6 +159,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     timeToLiveMilliseconds: number
   ): Promise<string[]> {
     throw new Error('Method not implemented.');
+  }
+
+  private async _deleteAccessPoint(externalEndpointName: string, bucketAccount: string): Promise<void> {
+    const accessPointConfig: DeleteAccessPointCommandInput = {
+      Name: externalEndpointName,
+      AccountId: bucketAccount
+    };
+    await this._aws.clients.s3Control.deleteAccessPoint(accessPointConfig);
   }
 
   private async _createAccessPoint(
@@ -258,13 +278,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       Name: accessPointName
     };
 
-    const apPolicyResponse: GetAccessPointPolicyCommandOutput =
-      await this._aws.clients.s3Control.getAccessPointPolicy(getPolicyParams);
-    let apPolicy: PolicyDocument;
-    if (apPolicyResponse.Policy) {
-      apPolicy = PolicyDocument.fromJson(JSON.parse(apPolicyResponse.Policy));
-    } else {
-      apPolicy = new PolicyDocument();
+    let apPolicy: PolicyDocument = new PolicyDocument();
+    // s3Control GetAccessPointPolicy throws NoSuchAccessPointPolicy error when policy doesn't exist
+    try {
+      const apPolicyResponse: GetAccessPointPolicyCommandOutput =
+        await this._aws.clients.s3Control.getAccessPointPolicy(getPolicyParams);
+      if (apPolicyResponse.Policy) apPolicy = PolicyDocument.fromJson(JSON.parse(apPolicyResponse.Policy));
+    } catch (err) {
+      if (err.Code !== 'NoSuchAccessPointPolicy') throw err;
     }
 
     let isDirty: boolean = false;

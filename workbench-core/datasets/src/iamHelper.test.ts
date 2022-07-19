@@ -1,4 +1,4 @@
-import { AccountPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {
@@ -303,12 +303,78 @@ describe('IamHelper', () => {
     it('returns empty doc if source doc is empty', () => {
       const source = new PolicyDocument();
       const targetSid = 'StatementToCheck';
-      const newPrincipal = 'newAwsAccountId';
+      const newPrincipal = `arn:aws:iam::newAccountId:root`;
       try {
-        IamHelper.addPrincipalToStatement(source, targetSid, new AccountPrincipal(newPrincipal));
+        IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
       } catch (err) {
         expect(err.message).toBe('Cannot add principal. Policy document is invalid');
       }
+    });
+
+    it('adds principal in new array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: 'arn:aws:iam::oldAccountId:root'
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::newAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
+    });
+
+    it('adds principal in existing array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::oldAccountId2:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: [
+            'arn:aws:iam::oldAccountId:root',
+            'arn:aws:iam::oldAccountId2:root',
+            'arn:aws:iam::newAccountId:root'
+          ]
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
     });
   });
 

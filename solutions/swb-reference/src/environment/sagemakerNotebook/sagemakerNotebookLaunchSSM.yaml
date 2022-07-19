@@ -46,6 +46,9 @@ parameters:
   S3Mounts:
     type: String
     description: Stringified array of dataset objects containing their mountString
+  IamPolicyDocument:
+    type: String
+    description: The IAM policy to be associated with the launched workstation
   DatasetsBucketName:
     type: String
     description: The IAM policy to be associated with the launched workstation

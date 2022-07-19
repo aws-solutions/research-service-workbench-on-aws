@@ -6,7 +6,6 @@
 import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
 import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
 import {
-  DataSet,
   DataSetService,
   DdbDataSetMetadataPlugin,
   S3DataSetStoragePlugin
@@ -14,6 +13,8 @@ import {
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Output } from '@aws-sdk/client-cloudformation';
 import _ from 'lodash';
+import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import { Environment, EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
 
@@ -21,6 +22,7 @@ export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
   public ssmDocSuffix: string;
   public dataSetService: DataSetService;
+  public environmentService: EnvironmentService;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_NAME_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
@@ -30,6 +32,7 @@ export default class EnvironmentLifecycleHelper {
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
     );
+    this.environmentService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
   }
 
   /**
@@ -83,7 +86,8 @@ export default class EnvironmentLifecycleHelper {
       [process.env.S3_DATASETS_BUCKET_ARN_NAME!]
     );
 
-    return datasetsBucketArn.split(':').pop();
+    // We create this at deploy time so this will be present in the stack
+    return datasetsBucketArn.split(':').pop()!;
   }
 
   /**
@@ -124,34 +128,87 @@ export default class EnvironmentLifecycleHelper {
   }
 
   /**
-   * Get the mount strings for all datasets attached to a given workspace.
-   * @param dataSetIds - the list of datasets attached.
-   * @param envId - the environment on which to mount the dataset(s)
-   *
-   * @returns datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
-   * '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\"\}"]'
+   * Delete the access points for all datasets attached to a given workspace.
+   * @param envMetadata - the environment for which access point(s) were created
    */
-  public async getDatasetsToMount(datasetIds: Array<string>, envId: string): Promise<string> {
-    let datasetsToMount: Array<string> = [];
+  public async removeAccessPoints(envMetadata: Environment): Promise<void> {
+    if (_.isEmpty(envMetadata.datasetIds)) return;
 
-    datasetsToMount = await Promise.all(
+    await Promise.all(
+      _.map(envMetadata.ENDPOINTS, async (endpoint) => {
+        await this.dataSetService.removeDataSetExternalEndpoint(
+          endpoint.dataSetId,
+          endpoint.id,
+          new S3DataSetStoragePlugin(this.aws)
+        );
+      })
+    );
+  }
+
+  /**
+   * Get the mount strings for all datasets attached to a given workspace.
+   * @param dataSetIds - the list of dataset IDs attached.
+   * @param envMetadata - the environment on which to mount the dataset(s)
+   *
+   * @returns an object containing:
+   *  1. datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
+   *     '["\{\"name\":\"testDs\",\"bucket\":\"s3://arn:aws:s3:us-east-1:<AcctID>:accesspoint/<randomStr>/\",\"prefix\":\"samplePath\",\"endpointId\":\"sampleEndpointId\"\}"]'
+   *  2. Stringified IAM policy to be assigned to the workspace role
+   */
+  public async getDatasetsToMount(
+    datasetIds: Array<string>,
+    envMetadata: Environment
+  ): Promise<{ [id: string]: string }> {
+    if (_.isEmpty(datasetIds)) return { s3Mounts: '[]', iamPolicyDocument: '{}' };
+
+    // TODO: Allow multiple datasets to be mounted per workspace post-preview
+    if (datasetIds.length > 1) throw new Error('Cannot mount more than one dataset per workspace');
+
+    const envId = envMetadata.id!;
+    const endpointsCreated: { [key: string]: string }[] = [];
+
+    const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
-        const dataSet: DataSet = await this.dataSetService.getDataSet(datasetId);
+        const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
+          datasetId,
+          // Using envId to name endpoint for better mapping (each env has its own endpoint)
+          envId,
+          new S3DataSetStoragePlugin(this.aws)
+        );
 
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
-        const mountString: string = _.isEmpty(dataSet.externalEndpoints)
-          ? await this.dataSetService.addDataSetExternalEndpoint(
-              datasetId,
-              datasetEndPointName, // Need to take a subset of the uuid, because full uuid is too long
-              new S3DataSetStoragePlugin(this.aws)
-            )
-          : await this.dataSetService.getDataSetMountString(datasetId, dataSet.externalEndpoints![0]);
+        const dataSet = await this.dataSetService.getDataSet(datasetId);
+        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        const endpointObj = {
+          id: endpoint.id!,
+          dataSetId: endpoint.dataSetId,
+          endPointUrl: endpoint.endPointUrl,
+          path: endpoint.path,
+          storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
+        };
 
-        return mountString;
+        await this.environmentService.addMetadata(
+          envId,
+          envResourceTypeToKey.environment,
+          mountObject.endpointId,
+          envResourceTypeToKey.endpoint,
+          endpointObj
+        );
+
+        endpointsCreated.push(endpointObj);
+
+        return JSON.stringify({
+          name: mountObject.name,
+          bucket: mountObject.bucket,
+          prefix: mountObject.prefix
+        });
       })
     );
 
-    return JSON.stringify(datasetsToMount);
+    // Call IAM policy generator here, and return both strings
+    const iamPolicyDocument = this.generateIamPolicy(endpointsCreated, envMetadata.PROJ.encryptionKeyArn);
+    const s3Mounts = JSON.stringify(datasetsToMount);
+
+    return { s3Mounts, iamPolicyDocument };
   }
 
   public async getSSMDocArn(ssmDocOutputName: string): Promise<string> {
@@ -168,6 +225,99 @@ export default class EnvironmentLifecycleHelper {
     } else {
       throw new Error(`Cannot find output name: ${ssmDocOutputName}`);
     }
+  }
+
+  public async addRoleToAccessPoint(envDetails: Environment, instanceRoleArn: string): Promise<void> {
+    const s3DataSetStoragePlugin = new S3DataSetStoragePlugin(this.aws);
+
+    await Promise.all(
+      // for each dataset linked to env
+      _.map(envDetails.ENDPOINTS, async (endpoint) => {
+        // link instance role to dataset endpoint
+        await this.dataSetService.addRoleToExternalEndpoint(
+          endpoint.dataSetId,
+          endpoint.id,
+          instanceRoleArn,
+          s3DataSetStoragePlugin
+        );
+      })
+    );
+  }
+
+  /**
+   * Get the workspace IAM policy for accessing all datasets attached.
+   * @param endpointsCreated - the external endpoints created for this environment
+   * @param encryptionKeyArn - the encryption key ARN for env data traffic
+   *
+   * @returns iamPolicy - A stringified IAM policy
+   */
+  public generateIamPolicy(endpointsCreated: { [id: string]: string }[], encryptionKeyArn: string): string {
+    // Build policy statements for object-level permissions
+    const statements = [];
+
+    // TODO: Manage AuthZ with user UIDs (DS and environment creators) for assigning R/W privileges to the environment
+    // For now, giving R/W access to all users
+
+    const storageArnsWithPath = _.map(endpointsCreated, (endpoint) => {
+      const storageArn: string = endpoint.storageArn;
+      const path: string = endpoint.path;
+      return `${storageArn}/${path}/*`;
+    });
+
+    const endpointArnsWithPath = _.map(endpointsCreated, (endpoint) => {
+      const endpointArn = endpoint.endPointUrl.replace('s3://', '');
+      return `${endpointArn}/object/${endpoint.path}/*`;
+    });
+
+    const endpointArns = _.map(endpointsCreated, (endpoint) => {
+      return endpoint.endPointUrl.replace('s3://', '');
+    });
+    const storageArns = _.map(endpointsCreated, (endpoint) => {
+      return endpoint.storageArn;
+    });
+
+    statements.push({
+      Sid: 'DataSetReadWriteAccess',
+      Effect: 'Allow',
+      Action: [
+        's3:GetObject',
+        's3:AbortMultipartUpload',
+        's3:ListMultipartUploadParts',
+        's3:PutObject',
+        's3:GetObjectAcl',
+        's3:PutObjectAcl'
+      ],
+      Resource: _.union(storageArnsWithPath, endpointArnsWithPath)
+    });
+
+    statements.push({
+      Sid: 'DataSetAccessPointAccess',
+      Effect: 'Allow',
+      Action: ['s3:GetAccessPoint', 's3:ListAccessPoints'],
+      Resource: '*'
+    });
+
+    statements.push({
+      Sid: 'DataSetListBucket',
+      Effect: 'Allow',
+      Action: 's3:ListBucket',
+      Resource: _.union(storageArns, endpointArns)
+    });
+
+    statements.push({
+      Sid: 'studyKMSAccess',
+      Action: ['kms:Decrypt', 'kms:DescribeKey', 'kms:Encrypt', 'kms:GenerateDataKey', 'kms:ReEncrypt*'],
+      Effect: 'Allow',
+      Resource: encryptionKeyArn
+    });
+
+    // Build final policyDoc
+    const policyDoc = {
+      Version: '2012-10-17',
+      Statement: statements
+    };
+
+    return JSON.stringify(policyDoc);
   }
 
   public async getAwsSdkForEnvMgmtRole(payload: {

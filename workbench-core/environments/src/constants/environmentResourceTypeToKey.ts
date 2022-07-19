@@ -4,6 +4,7 @@ const envResourceTypeToKey: {
   envType: string;
   envTypeConfig: string;
   dataset: string;
+  endpoint: string;
   instance: string;
   awsAccount: string;
   account: string;
@@ -13,6 +14,7 @@ const envResourceTypeToKey: {
   envType: 'ET',
   envTypeConfig: 'ETC',
   dataset: 'DATASET',
+  endpoint: 'ENDPOINT',
   instance: 'INID',
   awsAccount: 'AWSACC',
   account: 'ACC'

@@ -15,6 +15,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.AWS_REGION = 'us-east-1';
     process.env.STACK_NAME = 'swb-swbv2-va';
+    process.env.S3_DATASETS_BUCKET_ARN_NAME = 'arn:aws:s3:::sampleDatasetsBucketName';
     mockUuid.v4.mockImplementationOnce(() => 'sampleEnvId');
     environment = {
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -99,6 +100,12 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   test('Launch should return mocked id', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.launch = jest.fn();
+    envHelper.getDatasetsBucketName = jest.fn(async () => {
+      return 'sampleDatasetBucket';
+    });
+    envHelper.getDatasetsToMount = jest.fn(async () => {
+      return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
+    });
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 
@@ -112,7 +119,12 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const envHelper = new EnvironmentLifecycleHelper();
     environment.datasetIds = ['exampleDS'];
     envHelper.launch = jest.fn();
-    envHelper.getDatasetsToMount = jest.fn(async () => 'exampleDS');
+    envHelper.getDatasetsBucketName = jest.fn(async () => {
+      return 'sampleDatasetBucket';
+    });
+    envHelper.getDatasetsToMount = jest.fn(async () => {
+      return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
+    });
     const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
 

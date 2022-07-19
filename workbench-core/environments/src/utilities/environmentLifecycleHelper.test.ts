@@ -47,25 +47,85 @@ describe('EnvironmentLifecycleHelper', () => {
     // BUILD
     const helper = new EnvironmentLifecycleHelper();
     const datasetIds: string[] = [];
-    const envId = 'sampleEnvId';
+    const envMetadata = {
+      id: 'sampleEnvId',
+      PROJ: {
+        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+        externalId: 'workbench'
+      },
+      ETC: {
+        productId: 'sampleProductId'
+      },
+      instanceId: '',
+      cidr: '',
+      description: '',
+      error: undefined,
+      name: '',
+      outputs: [],
+      projectId: '',
+      status: 'PENDING',
+      datasetIds: [],
+      envTypeConfigId: '',
+      updatedAt: '',
+      updatedBy: '',
+      createdAt: '',
+      createdBy: '',
+      provisionedProductId: '',
+      owner: '',
+      type: '',
+      dependency: ''
+    };
     helper.dataSetService.addDataSetExternalEndpoint = jest.fn();
-    helper.dataSetService.getDataSetMountString = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
+    helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE
-    const response = await helper.getDatasetsToMount(datasetIds, envId);
+    const response = await helper.getDatasetsToMount(datasetIds, envMetadata);
 
     // CHECK
-    await expect(response).toEqual('[]');
+    await expect(response).toEqual({ iamPolicyDocument: '{}', s3Mounts: '[]' });
   });
 
   test('getDatasetsToMount does not throw error', async () => {
     // BUILD
     const helper = new EnvironmentLifecycleHelper();
     const datasetIds = ['exampleDatasetId'];
-    const envId = 'sampleEnvId';
-    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => 'sampleMountString');
-    helper.dataSetService.getDataSetMountString = jest.fn(async () => 'sampleMountString');
+    const envMetadata = {
+      id: 'sampleEnvId',
+      PROJ: {
+        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+        externalId: 'workbench'
+      },
+      ETC: {
+        productId: 'sampleProductId'
+      },
+      instanceId: '',
+      cidr: '',
+      description: '',
+      error: undefined,
+      name: '',
+      outputs: [],
+      projectId: '',
+      status: 'PENDING',
+      datasetIds: [],
+      envTypeConfigId: '',
+      updatedAt: '',
+      updatedBy: '',
+      createdAt: '',
+      createdBy: '',
+      provisionedProductId: '',
+      owner: '',
+      type: '',
+      dependency: ''
+    };
+    helper.dataSetService.addDataSetExternalEndpoint = jest.fn(async () => {
+      return {
+        name: 'dataSetName',
+        bucket: 'endPointURL',
+        prefix: 'path',
+        endpointId: 'endpointId'
+      };
+    });
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
         storageName: 'sampleStorageName',
@@ -74,9 +134,21 @@ describe('EnvironmentLifecycleHelper', () => {
         externalEndpoints: []
       };
     });
+    helper.dataSetService.getExternalEndPoint = jest.fn(async () => {
+      return {
+        id: 'endpointId',
+        endPointAlias: 'sampleAlias',
+        name: 'mockExistingEndpointName',
+        path: 'mockDataSetPath',
+        dataSetId: 'mockDataSetId',
+        dataSetName: 'mockDataSetName',
+        endPointUrl: 's3://sampleBucket'
+      };
+    });
+    helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE & CHECK
-    await expect(helper.getDatasetsToMount(datasetIds, envId)).resolves.not.toThrowError();
+    await expect(helper.getDatasetsToMount(datasetIds, envMetadata)).resolves.not.toThrowError();
   });
 
   test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
