@@ -29,7 +29,7 @@ parameters:
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    allowedPattern: [0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}
+    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
   Namespace:
     type: String
     description: 'The namespace to be used for creating the CfN stack resources'
@@ -46,7 +46,7 @@ parameters:
   EnvironmentInstanceFiles:
     type: String
     description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
-    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
+    allowedPattern: ^s3:\/\/[a-zA-Z0-9_\-\/]+$
   AutoStopIdleTimeInMinutes:
     type: String
     description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
