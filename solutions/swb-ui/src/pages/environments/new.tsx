@@ -27,6 +27,7 @@ import { nameRegex, cidrRegex } from '../../common/utils';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
 import Navigation from '../../components/Navigation';
+import { useNotifications } from '../../context/NotificationContext';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
 import { EnvTypeItem } from '../../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
@@ -124,6 +125,12 @@ const Environment: NextPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !a || a.length <= 500,
       message: 'Description cannot be longer than 500 characters'
+    },
+    {
+      field: 'description',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      condition: (a: any) => !!a,
+      message: 'Description is Required'
     }
   ];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,16 +166,26 @@ const Environment: NextPage = () => {
     setFormData({ ...formData, envTypeConfigId: selected?.id });
     validateField('envTypeConfigId', selected?.id);
   };
+  const { displayNotification, closeNotification } = useNotifications();
+
   const submitForm = async (): Promise<void> => {
     setIsSubmitLoading(true);
     try {
       await createEnvironment(formData);
       await router.push({
-        pathname: '/environments',
-        query: {
-          message: 'Workspace Created Successfully',
-          notificationType: 'success'
-        }
+        pathname: '/environments'
+        // query: {
+        //   message: 'Workspace Created Successfully',
+        //   notificationType: 'success'
+        // }
+      });
+      const id = 'EnvironmentNewMessage';
+      displayNotification(id, {
+        type: 'success',
+        dismissible: true,
+        dismissLabel: 'Dismiss message',
+        onDismiss: () => closeNotification(id),
+        content: 'Workspace Created Successfully'
       });
     } catch {
       setError('There was a problem creating a workspace.');
@@ -322,7 +339,7 @@ const Environment: NextPage = () => {
                         />
                       </FormField>
                       <FormField
-                        label="Description - optional"
+                        label="Description"
                         constraintText="Description cannot be longer than 500 characters."
                         errorText={formErrors?.descriptionError}
                       >

@@ -1,5 +1,5 @@
-import { createContext, useContext, Context, useState } from 'react';
 import { FlashbarProps } from '@awsui/components-react/flashbar';
+import { createContext, useContext, Context, useState } from 'react';
 
 export interface Notifications {
   [key: string]: FlashbarProps.MessageDefinition;
@@ -8,11 +8,13 @@ export interface Notifications {
 export interface NotificationProps {
   notifications: Notifications;
   displayNotification: (id: string, notification: FlashbarProps.MessageDefinition) => void;
+  closeNotification: (id: string) => void;
 }
 
 const NotificationsContext: Context<NotificationProps> = createContext({
   notifications: {} as Notifications,
-  displayNotification: (id: string, notification: FlashbarProps.MessageDefinition) => {}
+  displayNotification: (id: string, notification: FlashbarProps.MessageDefinition) => {},
+  closeNotification: (id: string) => {}
 });
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }): JSX.Element {
@@ -26,8 +28,14 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     others[id] = notification;
     setNotifications(others);
   };
+  const closeNotification = (id: string): void => {
+    const others = { ...notifications };
+    // eslint-disable-next-line security/detect-object-injection
+    delete others[id];
+    setNotifications(others);
+  };
   return (
-    <NotificationsContext.Provider value={{ notifications, displayNotification }}>
+    <NotificationsContext.Provider value={{ notifications, displayNotification, closeNotification }}>
       {children}
     </NotificationsContext.Provider>
   );

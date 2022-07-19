@@ -34,6 +34,7 @@ import { TableEmptyDisplay } from '../../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
 import Navigation from '../../components/Navigation';
+import { useNotifications } from '../../context/NotificationContext';
 import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
@@ -59,7 +60,6 @@ const Environment: NextPage = () => {
 
   const [error, setError] = useState('');
   const router = useRouter();
-  const { message, notificationType } = router.query;
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -82,21 +82,7 @@ const Environment: NextPage = () => {
 
   // Date filter constants
   const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
-  const initialNotifications =
-    !!message && !!notificationType
-      ? [
-          {
-            type: notificationType as FlashbarProps.Type,
-            dismissible: true,
-            dismissLabel: 'Dismiss message',
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            onDismiss: () => setNotifications([]),
-            content: message,
-            id: 'message_0'
-          }
-        ]
-      : [];
-  const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>(initialNotifications);
+  const { notifications } = useNotifications();
 
   useEffect(() => {
     setDateFilter(dateFilter);
@@ -212,7 +198,6 @@ const Environment: NextPage = () => {
             setIsLoadingEnvConnection(false);
             actionLabel = 'Connect to Workspace';
             setShowConnectEnvironmentModal(true);
-            //TODO: implement Connect workflow
             break;
         }
         await mutate();
@@ -264,7 +249,7 @@ const Environment: NextPage = () => {
               authCredResponse={envConnectResponse.authCredResponse}
             />
           )}
-          <Flashbar items={notifications} />
+          <Flashbar items={Object.values(notifications)} />
           <Head>
             <title>{settings.name}</title>
             <link rel="icon" href={settings.favicon} />

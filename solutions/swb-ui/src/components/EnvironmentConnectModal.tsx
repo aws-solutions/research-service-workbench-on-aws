@@ -1,7 +1,8 @@
 import { EnvironmentConnectionLinkPlaceholder } from '@amzn/environments';
-import { Modal, SpaceBetween, Link } from '@awsui/components-react';
+import { Modal, SpaceBetween, Link, FlashbarProps } from '@awsui/components-react';
 import Box from '@awsui/components-react/box';
 import Button from '@awsui/components-react/button';
+import { useNotifications } from '../context/NotificationContext';
 
 interface EnvironmentConnectModalProps {
   closeModal: () => void;
@@ -18,10 +19,20 @@ export default function EnvironmentConnectModal(props: EnvironmentConnectModalPr
     );
   };
 
+  const { displayNotification, closeNotification } = useNotifications();
+
   const getPlaceholderUIElement = (placeholder: { [key: string]: string }): JSX.Element => {
     if (placeholder.type && placeholder.type === 'link') {
       return getLink(placeholder as unknown as EnvironmentConnectionLinkPlaceholder);
     }
+    const id = 'EnvironmentConnectModalError';
+    displayNotification(id, {
+      type: 'error',
+      dismissible: true,
+      dismissLabel: 'Dismiss message',
+      onDismiss: () => closeNotification(id),
+      content: 'Failed to get connection information'
+    });
     console.error('Could not find UI Element for placeholder', placeholder);
     return <></>;
   };
