@@ -2,6 +2,18 @@
   "name": "@amzn/patient-consent-infrastructure",
   "entries": [
     {
+      "version": "0.0.7",
+      "tag": "@amzn/patient-consent-infrastructure_v0.0.7",
+      "date": "Tue, 19 Jul 2022 12:13:07 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@amzn/patient-consent-express\" to `0.0.7`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.6",
       "tag": "@amzn/patient-consent-infrastructure_v0.0.6",
       "date": "Tue, 19 Jul 2022 11:58:48 GMT",
