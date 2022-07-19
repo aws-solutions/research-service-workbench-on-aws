@@ -55,6 +55,63 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/environmentTypes': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'EnvironmentType'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'EnvironmentType'
+      }
+    ]
+  },
+  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'EnvironmentType'
+      }
+    ],
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'EnvironmentType'
+      }
+    ]
+  },
+  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'EnvironmentTypeConfig'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'EnvironmentTypeConfig'
+      }
+    ]
+  },
+  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'EnvironmentTypeConfig'
+        }
+      ],
+      PUT: [
+        {
+          action: 'UPDATE',
+          subject: 'EnvironmentTypeConfig'
+        }
+      ]
+    },
   '/roles': {
     POST: [
       {

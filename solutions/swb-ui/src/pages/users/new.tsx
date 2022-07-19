@@ -1,7 +1,5 @@
 import {
-  AppLayout,
   Box,
-  BreadcrumbGroup,
   BreadcrumbGroupProps,
   SpaceBetween,
   Form,
@@ -15,9 +13,8 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { addUserToRole, createUser } from '../../api/users';
-import { layoutLabels } from '../../common/labels';
 import { emailRegex, nameRegex } from '../../common/utils';
-import Navigation from '../../components/Navigation';
+import BaseLayout from '../../components/BaseLayout';
 import { CreateUserForm, CreateUserFormValidation } from '../../models/User';
 
 export interface UserProps {
@@ -142,129 +139,112 @@ const User: NextPage = () => {
     }
   };
 
-  const [navigationOpen, setNavigationOpen] = useState(false);
-
   useEffect(() => {
     setDisableSubmit(
       !validationRules.every((rule) => rule.condition(formData[rule.field as keyof CreateUserForm]))
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
-  return (
-    <AppLayout
-      id="user"
-      headerSelector="#header"
-      stickyNotifications
-      maxContentWidth={Number.MAX_VALUE}
-      toolsHide
-      ariaLabels={layoutLabels}
-      navigationOpen={navigationOpen}
-      navigation={<Navigation activeHref="/users" />}
-      onNavigationChange={({ detail }) => {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        setNavigationOpen(detail.open);
-      }}
-      breadcrumbs={
-        <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
-      }
-      content={
-        <Container id="userContainer">
-          <Box>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <Form
-                id="createUser"
-                errorText={error}
-                actions={
-                  <SpaceBetween direction="horizontal" size="xs">
-                    <Button formAction="none" variant="link" href="/users">
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="primary"
-                      disabled={disableSubmit || isSubmitLoading}
-                      loading={isSubmitLoading}
-                      onClick={async () => await submitForm()}
-                    >
-                      Create Researcher
-                    </Button>
-                  </SpaceBetween>
-                }
-                header={
-                  <Header variant="h1" description="Create a user assigned to the Researcher role">
+
+  const getContent = (): JSX.Element => {
+    return (
+      <Container id="userContainer">
+        <Box>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <Form
+              id="createUser"
+              errorText={error}
+              actions={
+                <SpaceBetween direction="horizontal" size="xs">
+                  <Button formAction="none" variant="link" href="/users">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled={disableSubmit || isSubmitLoading}
+                    loading={isSubmitLoading}
+                    onClick={async () => await submitForm()}
+                  >
                     Create Researcher
-                  </Header>
-                }
-              >
-                <SpaceBetween direction="vertical" size="l">
-                  <FormField
-                    label="Email"
-                    constraintText={
-                      <>
-                        <li>Must be a valid email address.</li>
-                        <li>Cannot be longer than 128 characters.</li>
-                      </>
-                    }
-                    errorText={formErrors?.emailError}
-                  >
-                    <Input
-                      value={formData?.email || ''}
-                      onChange={({ detail: { value } }) => {
-                        setFormData({ ...formData, email: value });
-                        validateField('email', value);
-                      }}
-                    />
-                  </FormField>
-                  <FormField
-                    label="Given Name"
-                    constraintText={
-                      <>
-                        <li>
-                          Given Name can only contain alphanumeric characters (case sensitive) and hyphens.
-                        </li>
-                        <li>It must start with an alphabetic character.</li>
-                        <li>Cannot be longer than 128 characters.</li>
-                      </>
-                    }
-                    errorText={formErrors?.givenNameError}
-                  >
-                    <Input
-                      value={formData?.firstName || ''}
-                      onChange={({ detail: { value } }) => {
-                        setFormData({ ...formData, firstName: value });
-                        validateField('firstName', value);
-                      }}
-                    />
-                  </FormField>
-                  <FormField
-                    label="Family Name"
-                    constraintText={
-                      <>
-                        <li>
-                          Family Name can only contain alphanumeric characters (case sensitive) and hyphens.
-                        </li>
-                        <li>It must start with an alphabetic character.</li>
-                        <li>Cannot be longer than 128 characters.</li>
-                      </>
-                    }
-                    errorText={formErrors?.givenNameError}
-                  >
-                    <Input
-                      value={formData?.lastName || ''}
-                      onChange={({ detail: { value } }) => {
-                        setFormData({ ...formData, lastName: value });
-                        validateField('lastName', value);
-                      }}
-                    />
-                  </FormField>
+                  </Button>
                 </SpaceBetween>
-              </Form>
-            </form>
-          </Box>
-        </Container>
-      }
-      contentType="form"
-    />
-  );
+              }
+              header={
+                <Header variant="h1" description="Create a user assigned to the Researcher role">
+                  Create Researcher
+                </Header>
+              }
+            >
+              <SpaceBetween direction="vertical" size="l">
+                <FormField
+                  label="Email"
+                  constraintText={
+                    <>
+                      <li>Must be a valid email address.</li>
+                      <li>Cannot be longer than 128 characters.</li>
+                    </>
+                  }
+                  errorText={formErrors?.emailError}
+                >
+                  <Input
+                    value={formData?.email || ''}
+                    onChange={({ detail: { value } }) => {
+                      setFormData({ ...formData, email: value });
+                      validateField('email', value);
+                    }}
+                  />
+                </FormField>
+                <FormField
+                  label="Given Name"
+                  constraintText={
+                    <>
+                      <li>
+                        Given Name can only contain alphanumeric characters (case sensitive) and hyphens.
+                      </li>
+                      <li>It must start with an alphabetic character.</li>
+                      <li>Cannot be longer than 128 characters.</li>
+                    </>
+                  }
+                  errorText={formErrors?.givenNameError}
+                >
+                  <Input
+                    value={formData?.firstName || ''}
+                    onChange={({ detail: { value } }) => {
+                      setFormData({ ...formData, firstName: value });
+                      validateField('firstName', value);
+                    }}
+                  />
+                </FormField>
+                <FormField
+                  label="Family Name"
+                  constraintText={
+                    <>
+                      <li>
+                        Family Name can only contain alphanumeric characters (case sensitive) and hyphens.
+                      </li>
+                      <li>It must start with an alphabetic character.</li>
+                      <li>Cannot be longer than 128 characters.</li>
+                    </>
+                  }
+                  errorText={formErrors?.givenNameError}
+                >
+                  <Input
+                    value={formData?.lastName || ''}
+                    onChange={({ detail: { value } }) => {
+                      setFormData({ ...formData, lastName: value });
+                      validateField('lastName', value);
+                    }}
+                  />
+                </FormField>
+              </SpaceBetween>
+            </Form>
+          </form>
+        </Box>
+      </Container>
+    );
+  };
+
+  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
 };
 
 export default User;

@@ -23,6 +23,36 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'EnvironmentType'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentType'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'EnvironmentType'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'EnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'EnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
@@ -46,18 +76,28 @@ const adminPermissions: Permission[] = [
 const researcherPermissions: Permission[] = [
   {
     effect: 'ALLOW',
-    action: 'READ',
+    action: 'CREATE',
     subject: 'Environment'
   },
   {
     effect: 'ALLOW',
-    action: 'CREATE',
+    action: 'READ',
     subject: 'Environment'
   },
   {
     effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'Environment'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentType'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'EnvironmentTypeConfig'
   }
 ];
 

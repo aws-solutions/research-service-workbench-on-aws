@@ -48,6 +48,7 @@ const fetchData = async (options: any): Promise<any> => {
   options.headers = { Authorization: `${localStorage.getItem('accessToken')}` };
   //TODO add auth token and error handling
   const { data } = await axios(options).catch(function (error) {
+    console.log(error);
     //TODO: call logger to capture exception
     throw 'there was an error while trying to retrieve data';
   });
