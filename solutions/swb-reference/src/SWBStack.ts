@@ -8,7 +8,15 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
-import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import {
+  Effect,
+  Policy,
+  PolicyDocument,
+  PolicyStatement,
+  Role,
+  ServicePrincipal,
+  StarPrincipal
+} from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { getConstants } from './constants';
@@ -222,19 +230,50 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-artifacts', {});
+  private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        principals: [new StarPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          Bool: {
+            'aws:SecureTransport': 'false'
+          }
+        }
+      })
+    );
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use SigV4',
+        effect: Effect.DENY,
+        principals: [new StarPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.arnForObjects('*')],
+        conditions: {
+          StringNotEquals: {
+            's3:signatureversion': 'AWS4-HMAC-SHA256'
+          }
+        }
+      })
+    );
+  }
 
-    new CfnOutput(this, s3ArtifactName, {
-      value: s3Bucket.bucketArn
-    });
-    return s3Bucket;
+  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName);
   }
 
   private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-datasets', {});
+    return this._createSecureS3Bucket('s3-datasets', s3DatasetsName);
+  }
 
-    new CfnOutput(this, s3DatasetsName, {
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
+    const s3Bucket = new Bucket(this, s3BucketId, {});
+    this._addS3TLSSigV4BucketPolicy(s3Bucket);
+
+    new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
