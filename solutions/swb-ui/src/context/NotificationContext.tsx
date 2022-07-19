@@ -18,24 +18,26 @@ const NotificationsContext: Context<NotificationProps> = createContext({
 });
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [notifications, setNotifications] = useState<Notifications>({});
+  const [allNotifications, setAllNotifications] = useState<Notifications>({});
   const displayNotification = (id: string, notification: FlashbarProps.MessageDefinition): void => {
-    if (id in notifications) {
+    if (id in allNotifications) {
       return;
     }
-    const others = { ...notifications };
+    const currentNotifications = { ...allNotifications };
     // eslint-disable-next-line security/detect-object-injection
-    others[id] = notification;
-    setNotifications(others);
+    currentNotifications[id] = notification;
+    setAllNotifications(currentNotifications);
   };
   const closeNotification = (id: string): void => {
-    const others = { ...notifications };
+    const currentNotifications = { ...allNotifications };
     // eslint-disable-next-line security/detect-object-injection
-    delete others[id];
-    setNotifications(others);
+    delete currentNotifications[id];
+    setAllNotifications(currentNotifications);
   };
   return (
-    <NotificationsContext.Provider value={{ notifications, displayNotification, closeNotification }}>
+    <NotificationsContext.Provider
+      value={{ notifications: allNotifications, displayNotification, closeNotification }}
+    >
       {children}
     </NotificationsContext.Provider>
   );

@@ -22,6 +22,10 @@ export default function EnvironmentConnectModal(props: EnvironmentConnectModalPr
   const { displayNotification, closeNotification } = useNotifications();
 
   const getPlaceholderUIElement = (placeholder: { [key: string]: string }): JSX.Element => {
+    if (placeholder.type && placeholder.type === 'link') {
+      return getLink(placeholder as unknown as EnvironmentConnectionLinkPlaceholder);
+    }
+    console.error('Could not find UI Element for placeholder', placeholder);
     const id = 'EnvironmentConnectModalError';
     displayNotification(id, {
       type: 'error',
@@ -30,10 +34,6 @@ export default function EnvironmentConnectModal(props: EnvironmentConnectModalPr
       onDismiss: () => closeNotification(id),
       content: 'Failed to get connection information'
     });
-    if (placeholder.type && placeholder.type === 'link') {
-      return getLink(placeholder as unknown as EnvironmentConnectionLinkPlaceholder);
-    }
-    console.error('Could not find UI Element for placeholder', placeholder);
     return <></>;
   };
 
