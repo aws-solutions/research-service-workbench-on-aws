@@ -1,6 +1,15 @@
 # Change Log - @amzn/workbench-core-authorization
 
-This log was last generated on Tue, 19 Jul 2022 10:15:47 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Jul 2022 10:31:43 GMT and should not be manually modified.
+
+## 0.0.5
+Tue, 19 Jul 2022 10:31:43 GMT
+
+### Patches
+
+- testing change
+- testing change
+- adding changes
 
 ## 0.0.4
 Tue, 19 Jul 2022 10:15:47 GMT
