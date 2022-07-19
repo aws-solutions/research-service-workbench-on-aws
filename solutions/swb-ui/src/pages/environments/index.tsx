@@ -103,47 +103,37 @@ const Environment: NextPage = () => {
     }
   ];
 
-  // Property filter constants
-  const [workspaces, setWorkspaces] = useState<PropertyFilterProps.Query>({
-    tokens: [],
-    operation: 'and'
-  });
-
   // Date filter constants
   const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
 
   // Property and date filter collections
-  const { items, filteredItemsCount, collectionProps, paginationProps, propertyFilterProps } = useCollection(
-    environments,
-    {
-      filtering: {
-        empty: TableEmptyDisplay(itemType),
-        noMatch: TableNoMatchDisplay(itemType),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        filteringFunction: (item: any, filteringText): any => {
-          const filteringTextLowerCase = filteringText.toLowerCase();
+  const { items, filteredItemsCount, collectionProps, propertyFilterProps } = useCollection(environments, {
+    filtering: {
+      empty: TableEmptyDisplay(itemType),
+      noMatch: TableNoMatchDisplay(itemType),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filteringFunction: (item: any, filteringText): any => {
+        const filteringTextLowerCase = filteringText.toLowerCase();
 
-          return (
-            searchableColumns
-              // eslint-disable-next-line security/detect-object-injection
-              .map((key) => item[key])
-              .some(
-                (value) =>
-                  typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
-              )
-          );
-        }
-      },
-      propertyFiltering: {
-        filteringProperties: filteringProperties,
-        empty: TableEmptyDisplay(itemType),
-        noMatch: TableNoMatchDisplay(itemType)
-      },
+        return (
+          searchableColumns
+            // eslint-disable-next-line security/detect-object-injection
+            .map((key) => item[key])
+            .some(
+              (value) => typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
+            )
+        );
+      }
+    },
+    propertyFiltering: {
+      filteringProperties: filteringProperties,
+      empty: TableEmptyDisplay(itemType),
+      noMatch: TableNoMatchDisplay(itemType)
+    },
 
-      sorting: {},
-      selection: {}
-    }
-  );
+    sorting: {},
+    selection: {}
+  });
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
