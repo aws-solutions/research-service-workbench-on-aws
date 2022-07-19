@@ -33,6 +33,7 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
+      AWS_REGION_SHORT_NAME,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
@@ -41,7 +42,8 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      UI_CLIENT_URL
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -65,6 +67,7 @@ export class SWBStack extends Stack {
       ALLOWED_ORIGINS
     };
 
+    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
@@ -76,6 +79,18 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+  }
+
+  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+    new CfnOutput(this, 'awsRegion', {
+      value: awsRegion
+    });
+    new CfnOutput(this, 'awsRegionShortName', {
+      value: awsRegionName
+    });
+    new CfnOutput(this, 'uiClientURL', {
+      value: uiClientURL
+    });
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {

@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { join } from 'path';
-import * as yaml from 'js-yaml';
 
 function getConstants(): {
   STAGE: string;
@@ -18,17 +17,11 @@ function getConstants(): {
   RESPONSE_HEADERS_ARTIFACT_NAME: string;
   RESPONSE_HEADERS_NAME: string;
 } {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const config: any = yaml.load(
-    // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-    // correct file
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(join(__dirname, `./config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-  );
-
-  const namePrefix = `swb-ui-${config.stage}-${config.awsRegionShortName}`;
-  const API_BASE_URL = config.apiBaseUrl;
-  const AWS_REGION = config.awsRegion;
+  const config = getAPIOutputs();
+  const STAGE = process.env.STAGE || '';
+  const namePrefix = `swb-ui-${process.env.STAGE}-${config.awsRegionShortName}`;
+  const API_BASE_URL = config.apiUrlOutput?.replace('/dev/', '') || '';
+  const AWS_REGION = config.awsRegion || '';
   const STACK_NAME = namePrefix;
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
   const S3_ARTIFACT_BUCKET_NAME = `${namePrefix}-bucket`;
@@ -42,7 +35,7 @@ function getConstants(): {
   const RESPONSE_HEADERS_NAME = 'SWBResponseHeadersPolicy';
 
   return {
-    STAGE: config.stage,
+    STAGE,
     API_BASE_URL,
     AWS_REGION,
     STACK_NAME,
@@ -57,6 +50,26 @@ function getConstants(): {
     RESPONSE_HEADERS_ARTIFACT_NAME,
     RESPONSE_HEADERS_NAME
   };
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getAPIOutputs(): any {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const apiStackOutputs: any = JSON.parse(
+      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+      // correct file
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.readFileSync(join(__dirname, `../../../swb-reference/src/config/${process.env.STAGE}.js`), 'utf8') // nosemgrep
+    );
+    const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+    // eslint-disable-next-line security/detect-object-injection
+    return apiStackOutputs[apiStackName];
+  } catch {
+    console.error(
+      `No API Stack deployed found for ${process.env.STAGE}.Please deploy application swb-reference and try again.`
+    );
+    throw `No API Stack deployed found for ${process.env.STAGE}.`;
+  }
 }
 
 export { getConstants };

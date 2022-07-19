@@ -17,6 +17,8 @@ function getConstants(): {
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
   ALLOWED_ORIGINS: string;
+  AWS_REGION_SHORT_NAME: string;
+  UI_CLIENT_URL: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -29,10 +31,13 @@ function getConstants(): {
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
   const AWS_REGION = config.awsRegion;
+  const AWS_REGION_SHORT_NAME = config.awsRegionShortName;
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
-
+  const allowedOrigins: string[] = config.allowedOrigins || [];
+  const uiClientURL = getClientURL();
+  if (uiClientURL) allowedOrigins.push(uiClientURL);
   const AMI_IDS: string[] = [];
 
   // These are the OutputKey for the SWB Main Account CFN stack
@@ -56,8 +61,32 @@ function getConstants(): {
     ROOT_USER_EMAIL,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
-    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
+    ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
+    AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
+    UI_CLIENT_URL: uiClientURL
   };
+}
+
+function getClientURL(): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const uiClientOutput: any = JSON.parse(
+      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+      // correct file
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.readFileSync(
+        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.js`),
+        'utf8'
+      ) // nosemgrep
+    );
+    console.log('2');
+    const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+    // eslint-disable-next-line security/detect-object-injection
+    return uiClientOutput[uiClientStackName].WebsiteURL;
+  } catch {
+    console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
+    return '';
+  }
 }
 
 export { getConstants };
