@@ -5,18 +5,18 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     id: 'workspaceName',
     header: 'Workspace name',
     cell: (e: { workspaceName: string }) => e.workspaceName,
-    sortingField: 'workspaceName'
+    sortingField: 'name'
   },
   {
     id: 'workspaceStatus',
     header: 'Workspace status',
     cell: (e: { workspaceStatus: string }) => e.workspaceStatus,
-    sortingField: 'workspaceStatus'
+    sortingField: 'status'
   },
   {
     id: 'createdAt',
     header: 'Created at',
-    cell: (e: { createdAt: string }) => e.createdAt,
+    cell: (e: { createdAt: string }) => new Date(e.createdAt).toLocaleString(),
     sortingField: 'createdAt'
   },
   {
