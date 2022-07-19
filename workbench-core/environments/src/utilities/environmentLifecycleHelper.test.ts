@@ -82,7 +82,7 @@ describe('EnvironmentLifecycleHelper', () => {
     const response = await helper.getDatasetsToMount(datasetIds, envMetadata);
 
     // CHECK
-    await expect(response).toEqual('[]');
+    await expect(response).toEqual({ iamPolicyDocument: '{}', s3Mounts: '[]' });
   });
 
   test('getDatasetsToMount does not throw error', async () => {
@@ -131,6 +131,17 @@ describe('EnvironmentLifecycleHelper', () => {
         path: 'sampleBucketPath',
         name: 'sampleDataset',
         externalEndpoints: []
+      };
+    });
+    helper.dataSetService.getExternalEndPoint = jest.fn(async () => {
+      return {
+        id: 'endpointId',
+        endPointAlias: 'sampleAlias',
+        name: 'mockExistingEndpointName',
+        path: 'mockDataSetPath',
+        dataSetId: 'mockDataSetId',
+        dataSetName: 'mockDataSetName',
+        endPointUrl: 's3://sampleBucket'
       };
     });
 

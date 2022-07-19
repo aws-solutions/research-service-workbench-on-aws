@@ -112,7 +112,6 @@ export class DataSetService {
       throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
 
     const endPoint = await this.getExternalEndPoint(dataSetId, endPointId);
-
     if (!endPoint.endPointAlias || !endPoint.id) throw Boom.notFound('Endpoint has missing information');
 
     return this._generateMountObject(

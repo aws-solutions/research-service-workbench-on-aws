@@ -238,7 +238,7 @@ describe('DataSetService', () => {
     });
   });
 
-  describe('getDataSetMountString', () => {
+  describe('getDataSetMountObject', () => {
     let service: DataSetService;
 
     beforeEach(() => {
@@ -264,8 +264,80 @@ describe('DataSetService', () => {
         };
       });
 
-      await expect(service.getDataSetMountObject('name', 'endPointName')).rejects.toThrow(
-        new Error(`'endPointName' not found on DataSet 'name'.`)
+      service.getExternalEndPoint = jest.fn(async () => {
+        return {
+          id: mockExistingEndpointId,
+          endPointAlias: 'sampleAlias',
+          name: mockExistingEndpointName,
+          path: mockDataSetPath,
+          dataSetId: mockDataSetId,
+          dataSetName: mockDataSetName,
+          endPointUrl: 's3://sampleBucket'
+        };
+      });
+
+      await expect(service.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)).resolves.toEqual({
+        name: mockDataSetName,
+        prefix: mockDataSetPath,
+        bucket: 'sampleAlias',
+        endpointId: mockExistingEndpointId
+      });
+    });
+
+    it('throws error when called with a name that does not have an alias.', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: [mockExistingEndpointId],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+
+      service.getExternalEndPoint = jest.fn(async () => {
+        return {
+          id: mockExistingEndpointId,
+          name: mockExistingEndpointName,
+          path: mockDataSetPath,
+          dataSetId: mockDataSetId,
+          dataSetName: mockDataSetName,
+          endPointUrl: ''
+        };
+      });
+
+      await expect(service.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)).rejects.toThrow(
+        new Error('Endpoint has missing information')
+      );
+    });
+
+    it('throws error when called with a name that does not have an ID.', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: [mockExistingEndpointId],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+
+      service.getExternalEndPoint = jest.fn(async () => {
+        return {
+          name: mockExistingEndpointName,
+          path: mockDataSetPath,
+          dataSetId: mockDataSetId,
+          dataSetName: mockDataSetName,
+          endPointUrl: ''
+        };
+      });
+
+      await expect(service.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)).rejects.toThrow(
+        new Error('Endpoint has missing information')
       );
     });
   });
