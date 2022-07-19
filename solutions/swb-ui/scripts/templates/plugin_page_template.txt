@@ -1,0 +1,11 @@
+import App from '<--Insert--Plugin--Name-->';
+import BaseLayout from '../../components/BaseLayout';
+
+function <--Insert--Plugin--Name-->APP(): JSX.Element {
+  return (
+    <BaseLayout appName="<--Insert--Plugin--Name-->">
+      <App />
+    </BaseLayout>
+  );
+}
+export default <--Insert--Plugin--Name-->APP;
