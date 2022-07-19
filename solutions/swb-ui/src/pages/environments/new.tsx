@@ -1,7 +1,5 @@
 import {
-  AppLayout,
   Box,
-  BreadcrumbGroup,
   BreadcrumbGroupProps,
   SpaceBetween,
   Form,
@@ -22,19 +20,14 @@ import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
-import { layoutLabels } from '../../common/labels';
 import { nameRegex, cidrRegex } from '../../common/utils';
+import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
-import Navigation from '../../components/Navigation';
 import { useNotifications } from '../../context/NotificationContext';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
 import { EnvTypeItem } from '../../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
-
-export interface EnvironmentProps {
-  locale: string;
-}
 
 const Environment: NextPage = () => {
   // App settings constant
@@ -174,10 +167,6 @@ const Environment: NextPage = () => {
       await createEnvironment(formData);
       await router.push({
         pathname: '/environments'
-        // query: {
-        //   message: 'Workspace Created Successfully',
-        //   notificationType: 'success'
-        // }
       });
       const id = 'EnvironmentNewMessage';
       displayNotification(id, {
@@ -193,7 +182,6 @@ const Environment: NextPage = () => {
       setIsSubmitLoading(false);
     }
   };
-  const [navigationOpen, setNavigationOpen] = useState(false);
 
   useEffect(() => {
     setDisableSubmit(
@@ -201,168 +189,150 @@ const Environment: NextPage = () => {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
-  return (
-    <AppLayout
-      id="environment"
-      headerSelector="#header"
-      stickyNotifications
-      maxContentWidth={Number.MAX_VALUE}
-      toolsHide
-      ariaLabels={layoutLabels}
-      navigationOpen={navigationOpen}
-      navigation={<Navigation activeHref="#/" />}
-      onNavigationChange={({ detail }) => {
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        setNavigationOpen(detail.open);
-      }}
-      breadcrumbs={
-        <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />
-      }
-      content={
-        <Container id="environmentContainer">
-          <Box>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <Form
-                id="createEnvironment"
-                errorText={error}
-                actions={
-                  <SpaceBetween direction="horizontal" size="xs">
-                    <Button formAction="none" variant="link" href="/environments">
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="primary"
-                      disabled={disableSubmit || isSubmitLoading}
-                      loading={isSubmitLoading}
-                      onClick={async () => await submitForm()}
-                    >
-                      Create Workspace
-                    </Button>
-                  </SpaceBetween>
-                }
-                header={
-                  <Header variant="h1" description="Short Description of create workspaces">
-                    Create Research Workspace
-                  </Header>
-                }
-              >
-                <SpaceBetween direction="vertical" size="l">
-                  <ExpandableSection
-                    variant="container"
-                    header={
-                      <Header variant="h2">
-                        Select Compute Platform ({envTypes.length})
-                        <Box>Selected: {selectedEnvType?.name || 'None'} </Box>
-                      </Header>
-                    }
-                    defaultExpanded
+
+  const getContent = (): JSX.Element => {
+    return (
+      <Container>
+        <Box>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <Form
+              errorText={error}
+              actions={
+                <SpaceBetween direction="horizontal" size="xs">
+                  <Button formAction="none" variant="link" href="/environments">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled={disableSubmit || isSubmitLoading}
+                    loading={isSubmitLoading}
+                    onClick={async () => await submitForm()}
                   >
-                    <FormField errorText={formErrors?.envTypeIdError}>
-                      <EnvTypeCards
-                        isLoading={areEnvTypesLoading}
-                        allItems={envTypes}
-                        onSelect={async (selected) => await onSelectEnvType(selected.selectedItems)}
+                    Create Workspace
+                  </Button>
+                </SpaceBetween>
+              }
+              header={
+                <Header variant="h1" description="Short Description of create workspaces">
+                  Create Research Workspace
+                </Header>
+              }
+            >
+              <SpaceBetween direction="vertical" size="l">
+                <ExpandableSection
+                  variant="container"
+                  header={
+                    <Header variant="h2">
+                      Select Compute Platform ({envTypes.length})
+                      <Box>Selected: {selectedEnvType?.name || 'None'} </Box>
+                    </Header>
+                  }
+                  defaultExpanded
+                >
+                  <FormField errorText={formErrors?.envTypeIdError}>
+                    <EnvTypeCards
+                      isLoading={areEnvTypesLoading}
+                      allItems={envTypes}
+                      onSelect={async (selected) => await onSelectEnvType(selected.selectedItems)}
+                    />
+                  </FormField>
+                </ExpandableSection>
+                <ExpandableSection
+                  defaultExpanded
+                  variant="container"
+                  header={<Header variant="h2">Select Configurations</Header>}
+                >
+                  <SpaceBetween direction="vertical" size="l">
+                    <FormField
+                      label="Workspace Name"
+                      constraintText={
+                        <>
+                          <li>Name can only contain alphanumeric characters (case sensitive) and hyphens.</li>
+                          <li>It must start with an alphabetic character.</li>
+                          <li>Cannot be longer than 128 characters.</li>
+                        </>
+                      }
+                      errorText={formErrors?.nameError}
+                    >
+                      <Input
+                        value={formData?.name || ''}
+                        onChange={({ detail: { value } }) => {
+                          setFormData({ ...formData, name: value });
+                          validateField('name', value);
+                        }}
                       />
                     </FormField>
-                  </ExpandableSection>
-                  <ExpandableSection
-                    defaultExpanded
-                    variant="container"
-                    header={<Header variant="h2">Select Configurations</Header>}
-                  >
-                    <SpaceBetween direction="vertical" size="l">
-                      <FormField
-                        label="Workspace Name"
-                        constraintText={
-                          <>
-                            <li>
-                              Name can only contain alphanumeric characters (case sensitive) and hyphens.
-                            </li>
-                            <li>It must start with an alphabetic character.</li>
-                            <li>Cannot be longer than 128 characters.</li>
-                          </>
+                    <FormField
+                      label="Restricted CIDR"
+                      description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
+                      constraintText="Note: an environment config with a hardcoded CIDR will override this value."
+                      errorText={formErrors?.cidrError}
+                    >
+                      <Input
+                        value={formData?.cidr || ''}
+                        onChange={({ detail: { value } }) => {
+                          setFormData({ ...formData, cidr: value });
+                          validateField('cidr', value);
+                        }}
+                      />
+                    </FormField>
+                    <FormField label="Project ID" errorText={formErrors?.projectIdError}>
+                      <Select
+                        selectedOption={
+                          areProjectsLoading
+                            ? null
+                            : projects
+                                .map((p) => ({ label: p.name, value: p.id }))
+                                .filter((p) => p.value === formData?.projectId)
+                                .at(0) || null
                         }
-                        errorText={formErrors?.nameError}
-                      >
-                        <Input
-                          value={formData?.name || ''}
-                          onChange={({ detail: { value } }) => {
-                            setFormData({ ...formData, name: value });
-                            validateField('name', value);
-                          }}
-                        />
-                      </FormField>
-                      <FormField
-                        label="Restricted CIDR"
-                        description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
-                        constraintText="Note: an environment config with a hardcoded CIDR will override this value."
-                        errorText={formErrors?.cidrError}
-                      >
-                        <Input
-                          value={formData?.cidr || ''}
-                          onChange={({ detail: { value } }) => {
-                            setFormData({ ...formData, cidr: value });
-                            validateField('cidr', value);
-                          }}
-                        />
-                      </FormField>
-                      <FormField label="Project ID" errorText={formErrors?.projectIdError}>
-                        <Select
-                          selectedOption={
-                            areProjectsLoading
-                              ? null
-                              : projects
-                                  .map((p) => ({ label: p.name, value: p.id }))
-                                  .filter((p) => p.value === formData?.projectId)
-                                  .at(0) || null
-                          }
-                          loadingText="Loading Projects"
-                          options={projects.map((p) => ({ label: p.name, value: p.id }))}
-                          selectedAriaLabel={formData?.projectId}
-                          onChange={({ detail: { selectedOption } }) => {
-                            setFormData({ ...formData, projectId: selectedOption.value });
-                            validateField('projectId', selectedOption.value);
-                          }}
-                          statusType={areProjectsLoading ? 'loading' : 'finished'}
-                        />
-                      </FormField>
-                      <FormField errorText={formErrors?.envTypeConfigIdError}>
-                        <Header>
-                          Configuration ({envTypeConfigs.length}) <Link href="#">Info</Link>
-                        </Header>
-                        <EnvTypeConfigCards
-                          isLoading={areEnvTypeConfigsLoading}
-                          allItems={envTypeConfigs}
-                          onSelect={(selected) => {
-                            onSelectEnvTypeConfig(selected.selectedItems);
-                          }}
-                        />
-                      </FormField>
-                      <FormField
-                        label="Description"
-                        constraintText="Description cannot be longer than 500 characters."
-                        errorText={formErrors?.descriptionError}
-                      >
-                        <Textarea
-                          onChange={({ detail: { value } }) => {
-                            setFormData({ ...formData, description: value });
-                            validateField('description', value);
-                          }}
-                          value={formData?.description || ''}
-                          placeholder="Description"
-                        />
-                      </FormField>
-                    </SpaceBetween>
-                  </ExpandableSection>
-                </SpaceBetween>
-              </Form>
-            </form>
-          </Box>
-        </Container>
-      }
-      contentType="form"
-    />
-  );
+                        loadingText="Loading Projects"
+                        options={projects.map((p) => ({ label: p.name, value: p.id }))}
+                        selectedAriaLabel={formData?.projectId}
+                        onChange={({ detail: { selectedOption } }) => {
+                          setFormData({ ...formData, projectId: selectedOption.value });
+                          validateField('projectId', selectedOption.value);
+                        }}
+                        statusType={areProjectsLoading ? 'loading' : 'finished'}
+                      />
+                    </FormField>
+                    <FormField errorText={formErrors?.envTypeConfigIdError}>
+                      <Header>
+                        Configuration ({envTypeConfigs.length}) <Link href="#">Info</Link>
+                      </Header>
+                      <EnvTypeConfigCards
+                        isLoading={areEnvTypeConfigsLoading}
+                        allItems={envTypeConfigs}
+                        onSelect={(selected) => {
+                          onSelectEnvTypeConfig(selected.selectedItems);
+                        }}
+                      />
+                    </FormField>
+                    <FormField
+                      label="Description"
+                      constraintText="Description cannot be longer than 500 characters."
+                      errorText={formErrors?.descriptionError}
+                    >
+                      <Textarea
+                        onChange={({ detail: { value } }) => {
+                          setFormData({ ...formData, description: value });
+                          validateField('description', value);
+                        }}
+                        value={formData?.description || ''}
+                        placeholder="Description"
+                      />
+                    </FormField>
+                  </SpaceBetween>
+                </ExpandableSection>
+              </SpaceBetween>
+            </Form>
+          </form>
+        </Box>
+      </Container>
+    );
+  };
+
+  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
 };
 
 export default Environment;
