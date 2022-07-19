@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Distribution,
@@ -13,7 +14,6 @@ import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-import * as path from 'path';
 import { getConstants } from './constants';
 
 export class SWBUIStack extends Stack {
