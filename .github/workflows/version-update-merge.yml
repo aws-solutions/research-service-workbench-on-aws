@@ -141,11 +141,10 @@ jobs:
           else
             COMMIT_ID=$GITHUB_SHA
           fi
-          git config pull.rebase true   # rebase
           git checkout test-develop
           echo
           echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
           echo "  into the 'test-develop' branch ($(git log -1 --pretty=%H test-develop))"
           echo
-          git pull origin test-main --no-edit
+          git merge $COMMIT_ID --no-edit
           git push origin test-develop
