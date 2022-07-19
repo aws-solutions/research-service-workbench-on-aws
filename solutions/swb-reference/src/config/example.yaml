@@ -7,6 +7,7 @@
 #websiteUrl: 'http://localhost:3000'
 
 # Used for local Lambda development; grab them from Cognito console after cdk-deploy completes.
+# Once values are entered, re-run cdk-deploy.
 #userPoolId: ''
 #clientId: ''
 #clientSecret: ''
