@@ -6,10 +6,12 @@ import {
   BreadcrumbGroup,
   BreadcrumbGroupProps,
   Button,
+  CollectionPreferences,
   DateRangePicker,
   DateRangePickerProps,
   Header,
   Pagination,
+  PaginationProps,
   PropertyFilter,
   PropertyFilterProps,
   SpaceBetween,
@@ -19,7 +21,6 @@ import {
   Flashbar,
   FlashbarProps
 } from '@awsui/components-react';
-import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -40,6 +41,7 @@ import {
 } from '../../environments-table-config/workspacesColumnDefinitions';
 import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
 import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
+import { EnvironmentsTableFilter } from '../../models/Environment';
 
 export interface EnvironmentProps {
   locale: string;
@@ -50,11 +52,29 @@ const Environment: NextPage = () => {
   const itemType: string = 'workspace';
   // App settings constant
   const { settings } = useSettings();
-  const [preferences] = useState({
-    pageSize: 20
-  });
-  const { environments, mutate } = useEnvironments();
 
+  const pageSizeOptions = [
+    { label: '20', value: 20 },
+    { label: '30', value: 30 },
+    { label: '50', value: 50 }
+  ];
+  const [filterParams, setFilterParams] = useState<EnvironmentsTableFilter>({
+    paginationToken: '',
+    pageSize: pageSizeOptions[0]?.value,
+    descending: 'createdAt',
+    currentPageIndex: 1,
+    paginationTokens: new Map<number, string>().set(1, ''),
+    hasOpenEndPagination: true,
+    pageCount: 1
+  });
+  const { environments, mutate, paginationToken, areEnvironmentsLoading } = useEnvironments({
+    ascending: filterParams.ascending,
+    createdAtFrom: filterParams.createdAtFrom,
+    createdAtTo: filterParams.createdAtTo,
+    descending: filterParams.descending,
+    pageSize: filterParams.pageSize,
+    paginationToken: filterParams.paginationToken
+  });
   const [error, setError] = useState('');
   const router = useRouter();
   const { message, notificationType } = router.query;
@@ -79,11 +99,7 @@ const Environment: NextPage = () => {
   });
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue>({
-    type: 'relative',
-    amount: 1,
-    unit: 'week'
-  });
+  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
   const initialNotifications =
     !!message && !!notificationType
       ? [
@@ -100,10 +116,6 @@ const Environment: NextPage = () => {
       : [];
   const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>(initialNotifications);
 
-  useEffect(() => {
-    setDateFilter(dateFilter);
-  }, [dateFilter]);
-
   // Property and date filter collections
   const { items, filteredItemsCount, collectionProps, filterProps, paginationProps, propertyFilterProps } =
     useCollection(environments, {
@@ -112,13 +124,6 @@ const Environment: NextPage = () => {
         noMatch: TableNoMatchDisplay(itemType),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         filteringFunction: (item: any, filteringText): any => {
-          if (dateFilter !== null) {
-            const range = convertToAbsoluteRange(dateFilter);
-            if (!isWithinInterval(new Date(item.createdAt), range)) {
-              return false;
-            }
-          }
-
           const filteringTextLowerCase = filteringText.toLowerCase();
 
           return (
@@ -137,13 +142,9 @@ const Environment: NextPage = () => {
         empty: TableEmptyDisplay(itemType),
         noMatch: TableNoMatchDisplay(itemType)
       },
-      pagination: { pageSize: preferences.pageSize },
       sorting: {},
       selection: {}
     });
-  useEffect(() => {
-    setWorkspaces(workspaces);
-  }, [workspaces]);
 
   // Action button constants
   // Constant buttons should be enabled based on statuses in the array
@@ -231,6 +232,88 @@ const Environment: NextPage = () => {
     }
   };
 
+  const onPaginationChange = (detail: PaginationProps.ChangeDetail): void => {
+    //when clicking next page, this will check if there are more pages to load, if not, disable next button and go back to previous page
+    if (!filterParams.paginationTokens.get(detail.currentPageIndex) && detail.currentPageIndex > 1) {
+      setFilterParams((prevState) => ({
+        ...prevState,
+        currentPageIndex: detail.currentPageIndex - 1,
+        hasOpenEndPagination: false
+      }));
+      return;
+    }
+    //get previously saved token of page clicked
+    const paginationToken = filterParams.paginationTokens.get(detail.currentPageIndex) || '';
+
+    //update pages shown in pagination if we discover a new page and set current page
+    setFilterParams((prevState) => ({
+      ...prevState,
+      pageCount:
+        detail.currentPageIndex > prevState.pageCount ? detail.currentPageIndex : prevState.pageCount,
+      currentPageIndex: detail.currentPageIndex,
+      paginationToken: paginationToken
+    }));
+  };
+  const onSortingChange = (isDescending: boolean | undefined, sortingField: string | undefined): void => {
+    setDateFilter(null);
+    setFilterParams((prevState) => ({
+      ...prevState,
+      ascending: isDescending ? undefined : sortingField,
+      descending: isDescending ? sortingField : undefined,
+      paginationToken: undefined,
+      createdAtFrom: undefined,
+      createdAtTo: undefined,
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    }));
+  };
+
+  const onDateFilterChange = (dateFilterValue: DateRangePickerProps.RelativeValue): void => {
+    let start: Date | undefined = undefined;
+    let end: Date | undefined = undefined;
+    setDateFilter(dateFilterValue);
+    if (dateFilterValue) {
+      const range = convertToAbsoluteRange(dateFilterValue);
+      start = range.start;
+      end = range.end;
+    }
+    setFilterParams((prevState) => ({
+      ...prevState,
+      ascending: undefined,
+      descending: undefined,
+      paginationToken: undefined,
+      createdAtFrom: start?.toISOString(),
+      createdAtTo: end?.toISOString(),
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    }));
+  };
+
+  const onConfirmPageSize = (pageSize: number | undefined): void => {
+    setFilterParams((prevState) => ({
+      ...prevState,
+      pageSize: pageSize || pageSizeOptions[0]?.value,
+      paginationToken: undefined,
+      currentPageIndex: 1,
+      paginationTokens: new Map<number, string>().set(1, ''),
+      hasOpenEndPagination: true,
+      pageCount: 1
+    }));
+  };
+
+  useEffect(() => {
+    //save next page token into dictionary so we can access previous or next page by directly clicking page number
+    setFilterParams((prevState) => ({
+      ...prevState,
+      paginationTokens: prevState.paginationTokens.set(prevState.currentPageIndex + 1, paginationToken)
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paginationToken]);
+
   return (
     <AppLayout
       id="environments-layout"
@@ -259,6 +342,12 @@ const Environment: NextPage = () => {
           {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
           <Table
             {...collectionProps}
+            sortingDescending={!!filterParams.descending}
+            sortingColumn={{ sortingField: filterParams.descending || filterParams.ascending }}
+            onSortingChange={(event) =>
+              onSortingChange(event.detail.isDescending, event.detail.sortingColumn.sortingField)
+            }
+            loading={areEnvironmentsLoading}
             selectionType="multi"
             selectedItems={collectionProps.selectedItems}
             ariaLabels={{
@@ -273,11 +362,6 @@ const Environment: NextPage = () => {
             header={
               <>
                 <Header
-                  counter={
-                    collectionProps.selectedItems?.length
-                      ? `(${collectionProps.selectedItems.length}/${environments.length})`
-                      : `(${environments.length})`
-                  }
                   actions={
                     <Box float="right">
                       <SpaceBetween direction="horizontal" size="xs">
@@ -344,7 +428,7 @@ const Environment: NextPage = () => {
             columnDefinitions={columnDefinitions}
             loadingText="Loading workspaces"
             filter={
-              <>
+              <SpaceBetween direction="vertical" size="xs">
                 <PropertyFilter
                   {...propertyFilterProps}
                   countText={getFilterCounterText(filteredItemsCount)}
@@ -354,16 +438,38 @@ const Environment: NextPage = () => {
                 />
                 <DateRangePicker
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onChange={({ detail }: SetStateAction<any>) => setDateFilter(detail.value)}
+                  onChange={({ detail }: SetStateAction<any>) => onDateFilterChange(detail.value)}
                   value={dateFilter}
                   relativeOptions={relativeOptions}
                   i18nStrings={datei18nStrings}
                   placeholder="Filter by a date and time range"
                   isValidRange={isValidRangeFunction}
                 />
-              </>
+              </SpaceBetween>
             }
-            pagination={<Pagination {...paginationProps} ariaLabels={paginationLables} />}
+            pagination={
+              <Pagination
+                disabled={areEnvironmentsLoading}
+                pagesCount={filterParams.pageCount}
+                currentPageIndex={filterParams.currentPageIndex}
+                onChange={({ detail }) => onPaginationChange(detail)}
+                openEnd={filterParams.hasOpenEndPagination}
+                ariaLabels={paginationLables}
+              />
+            }
+            preferences={
+              <CollectionPreferences
+                title="Preferences"
+                confirmLabel="Confirm"
+                cancelLabel="Cancel"
+                preferences={{ pageSize: filterParams.pageSize }}
+                onConfirm={({ detail: { pageSize } }) => onConfirmPageSize(pageSize)}
+                pageSizePreference={{
+                  title: 'Page size',
+                  options: pageSizeOptions
+                }}
+              />
+            }
             items={items}
           />
         </Box>
