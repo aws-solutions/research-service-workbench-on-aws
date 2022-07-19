@@ -135,8 +135,8 @@ jobs:
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
-       - name: Merge to test-develop
-         run: |
+      - name: Merge to test-develop
+        run: |
           echo "Set the COMMIT_ID to merge to test-develop, to current workflow commit id, if no version change commit was made"
           echo "Else"
           echo "Set the COMMIT_ID to VERSION change commit id"
