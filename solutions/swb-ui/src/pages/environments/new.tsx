@@ -20,11 +20,10 @@ import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
-import { nameRegex, cidrRegex } from '../../common/utils';
+import { nameRegex } from '../../common/utils';
 import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
-import { useNotifications } from '../../context/NotificationContext';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
 import { EnvTypeItem } from '../../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
@@ -76,24 +75,6 @@ const Environment: NextPage = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       condition: (a: any) => !!a && a.length <= 128,
       message: 'Workspace Name cannot be longer than 128 characters'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a,
-      message: 'Restricted CIDR is Required'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && cidrRegex.test(a),
-      message: 'Restricted CIDR must be in the format range:  [1.0.0.0/0 - 255.255.255.255/32].'
-    },
-    {
-      field: 'cidr',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !!a && a.length <= 128,
-      message: 'Restricted CIDR cannot be longer than 128 characters'
     },
     {
       field: 'projectId',
@@ -159,22 +140,17 @@ const Environment: NextPage = () => {
     setFormData({ ...formData, envTypeConfigId: selected?.id });
     validateField('envTypeConfigId', selected?.id);
   };
-  const { displayNotification, closeNotification } = useNotifications();
 
   const submitForm = async (): Promise<void> => {
     setIsSubmitLoading(true);
     try {
       await createEnvironment(formData);
       await router.push({
-        pathname: '/environments'
-      });
-      const id = 'EnvironmentNewMessage';
-      displayNotification(id, {
-        type: 'success',
-        dismissible: true,
-        dismissLabel: 'Dismiss message',
-        onDismiss: () => closeNotification(id),
-        content: 'Workspace Created Successfully'
+        pathname: '/environments',
+        query: {
+          message: 'Workspace Created Successfully',
+          notificationType: 'success'
+        }
       });
     } catch {
       setError('There was a problem creating a workspace.');
@@ -259,20 +235,6 @@ const Environment: NextPage = () => {
                         onChange={({ detail: { value } }) => {
                           setFormData({ ...formData, name: value });
                           validateField('name', value);
-                        }}
-                      />
-                    </FormField>
-                    <FormField
-                      label="Restricted CIDR"
-                      description="This research workspace will only be reachable from this CIDR. You can get your CIDR range from your IT Department. The provided default is the CIDR that restricts your IP address."
-                      constraintText="Note: an environment config with a hardcoded CIDR will override this value."
-                      errorText={formErrors?.cidrError}
-                    >
-                      <Input
-                        value={formData?.cidr || ''}
-                        onChange={({ detail: { value } }) => {
-                          setFormData({ ...formData, cidr: value });
-                          validateField('cidr', value);
                         }}
                       />
                     </FormField>

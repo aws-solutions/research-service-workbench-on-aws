@@ -1,4 +1,4 @@
-export const nameRegex = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-]*$');
+export const nameRegex = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-\\s]*$');
 
 /* eslint-disable security/detect-unsafe-regex */
 export const cidrRegex = new RegExp(

@@ -13,9 +13,11 @@ import {
   Table,
   StatusIndicator
 } from '@awsui/components-react';
+import { FlashbarProps } from '@awsui/components-react/flashbar';
 import { isWithinInterval } from 'date-fns';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
 import { datei18nStrings, relativeOptions } from '../../common/dateRelativeOptions';
@@ -26,6 +28,7 @@ import { TableEmptyDisplay } from '../../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
 import BaseLayout from '../../components/BaseLayout';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
+import { useNotifications } from '../../context/NotificationContext';
 import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
@@ -46,6 +49,27 @@ const Environment: NextPage = () => {
   const { environments, mutate } = useEnvironments();
 
   const [error, setError] = useState('');
+  const router = useRouter();
+  const { message, notificationType } = router.query;
+  const { displayNotification, closeNotification } = useNotifications();
+
+  const [hasInitialNotificationBeenShown, setHasInitialNotificationBeenShown] = useState(false);
+  if (!!message && !!notificationType && !hasInitialNotificationBeenShown) {
+    const envMessageId = 'EnvironmentMessage';
+    const notification = {
+      type: notificationType as FlashbarProps.Type,
+      dismissible: true,
+      dismissLabel: 'Dismiss message',
+      onDismiss: () => {
+        closeNotification(envMessageId);
+      },
+      content: message,
+      id: envMessageId
+    };
+    displayNotification(envMessageId, notification);
+    setHasInitialNotificationBeenShown(true);
+  }
+
   // App layout constants
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
