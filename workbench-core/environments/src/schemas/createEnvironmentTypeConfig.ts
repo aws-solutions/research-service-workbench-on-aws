@@ -18,7 +18,7 @@ const CreateEnvironmentTypeConfigSchema: Schema = {
       type: 'array',
       items: {
         type: 'object',
-        additionalProperties: { type: 'string' }
+        additionalProperties: true
       }
     }
   },
