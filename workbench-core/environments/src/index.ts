@@ -14,6 +14,8 @@ import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateAccountSchema from './schemas/createAccount';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
+import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
+import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import AccountService from './services/accountService';
 import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
@@ -48,5 +50,7 @@ export {
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
-  CreateAccountSchema
+  CreateAccountSchema,
+  CreateEnvironmentTypeConfigSchema,
+  UpdateEnvironmentTypeConfigSchema
 };
