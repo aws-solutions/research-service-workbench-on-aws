@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/workbench-core-authorization",
+      "comment": "more authz change",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@amzn/workbench-core-authorization"
+}
