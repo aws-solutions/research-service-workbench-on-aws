@@ -47,7 +47,7 @@ const terminate = async (id: string): Promise<void> => {
 };
 
 const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
-  return await httpApiGet(`environments/${id}/connections`, {});
+  return httpApiGet(`environments/${id}/connections`, {});
 };
 
 export { useEnvironments, start, stop, terminate, connect, createEnvironment };
