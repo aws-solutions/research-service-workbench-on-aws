@@ -2,6 +2,23 @@
   "name": "@amzn/workbench-core-authentication",
   "entries": [
     {
+      "version": "0.0.10",
+      "tag": "@amzn/workbench-core-authentication_v0.0.10",
+      "date": "Tue, 19 Jul 2022 12:58:51 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "added change"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@amzn/workbench-core-authorization\" to `0.0.9`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.9",
       "tag": "@amzn/workbench-core-authentication_v0.0.9",
       "date": "Tue, 19 Jul 2022 12:18:08 GMT",
