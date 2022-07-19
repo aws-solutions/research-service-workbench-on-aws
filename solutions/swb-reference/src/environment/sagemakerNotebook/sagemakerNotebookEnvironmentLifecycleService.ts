@@ -30,6 +30,12 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
       .value!;
 
+    const datasetsBucketName = await this.helper.getDatasetsBucketName();
+    const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
+      envMetadata.datasetIds,
+      envMetadata
+    );
+
     const ssmParameters = {
       InstanceName: [`basicnotebookinstance-${Date.now()}`],
       VPC: [envMetadata.PROJ.vpcId],
@@ -40,19 +46,13 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
       CIDR: [cidr],
       InstanceType: [instanceSize],
+      DatasetsBucketName: [datasetsBucketName],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
-      IamPolicyDocument: [''],
-      S3Mounts: ['']
+      IamPolicyDocument: [s3Mounts],
+      S3Mounts: [iamPolicyDocument]
     };
-
-    const { S3Mounts, IamPolicyDocument } = await this.helper.getDatasetsToMount(
-      envMetadata.datasetIds,
-      envMetadata
-    );
-    ssmParameters.S3Mounts = [S3Mounts];
-    ssmParameters.IamPolicyDocument = [IamPolicyDocument];
 
     await this.helper.launch({
       ssmParameters,

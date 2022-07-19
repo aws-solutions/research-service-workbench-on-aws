@@ -250,6 +250,24 @@ describe('DataSetService', () => {
         new Error(`'endPointName' not found on DataSet 'name'.`)
       );
     });
+
+    it('returns endpoint attributes when called with a name that exists.', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: [mockExistingEndpointId],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+
+      await expect(service.getDataSetMountObject('name', 'endPointName')).rejects.toThrow(
+        new Error(`'endPointName' not found on DataSet 'name'.`)
+      );
+    });
   });
 
   describe('listDataSets', () => {
@@ -330,6 +348,77 @@ describe('DataSetService', () => {
       expect(response.message).toEqual(
         `'${mockExistingEndpointName}' already exists in '${mockDataSetWithEndpointId}'.`
       );
+    });
+  });
+
+  describe('removeDataSetExternalEndpoint', () => {
+    let service: DataSetService;
+    let plugin: S3DataSetStoragePlugin;
+
+    beforeEach(() => {
+      service = new DataSetService(audit, log, metaPlugin);
+      plugin = new S3DataSetStoragePlugin(aws);
+    });
+
+    it('returns nothing after removing DataSet mount point', async () => {
+      await expect(
+        service.removeDataSetExternalEndpoint(mockDataSetId, mockAccessPointName, plugin)
+      ).resolves.not.toThrow();
+    });
+
+    it('returns nothing if endpointId does not exist on dataset', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: ['someOtherEndpoint'],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+
+      await expect(
+        service.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, plugin)
+      ).resolves.not.toThrow();
+    });
+
+    it('returns nothing if no endpointId exists on dataset', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: [],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+
+      await expect(
+        service.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, plugin)
+      ).resolves.not.toThrow();
+    });
+
+    it('finishes successfully if endpointId exists on dataset', async () => {
+      service.getDataSet = jest.fn(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          externalEndpoints: [mockExistingEndpointId],
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+      plugin.removeExternalEndpoint = jest.fn();
+
+      await expect(
+        service.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, plugin)
+      ).resolves.not.toThrow();
     });
   });
 

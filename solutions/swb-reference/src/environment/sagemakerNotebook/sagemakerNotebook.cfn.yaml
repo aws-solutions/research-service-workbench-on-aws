@@ -37,6 +37,9 @@ Parameters:
   AutoStopIdleTimeInMinutes:
     Type: Number
     Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
+  DatasetsBucketName:
+    Type: String
+    Description: Name of the datasets bucket in the main account
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
@@ -70,12 +73,11 @@ Resources:
           - Effect: Allow
             Action:
               - 's3:ListBucket'
-            Resource: '*' # TODO: add dataset bucket
-          - Effect: Allow
-            Action:
               - 's3:GetObject'
               - 's3:PutObject'
-            Resource: '*' # TODO: add dataset bucket
+            Resource: !Sub
+              - 'arn:aws:s3:::${DatasetsBucketName}*'
+              - 'arn:aws:s3:::${DatasetsBucketName}/*'
           - Effect: Allow
             Action:
               - 's3:ListBucket'

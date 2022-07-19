@@ -112,6 +112,9 @@ export class DataSetService {
       throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
 
     const endPoint = await this.getExternalEndPoint(dataSetId, endPointId);
+
+    if (!endPoint.endPointAlias || !endPoint.id) throw Boom.notFound('Endpoint has missing information');
+
     return this._generateMountObject(
       endPoint.dataSetName,
       endPoint.endPointAlias!,
@@ -155,12 +158,10 @@ export class DataSetService {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
     const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
 
-    if (!_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
-      throw Boom.badRequest(`'${externalEndpointId}' does not exist in '${dataSetId}'.`);
+    if (!targetDS.externalEndpoints || !_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
+      return;
 
     await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
-
-    if (!targetDS.externalEndpoints) return;
 
     targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
       return endpoint === externalEndpointId;

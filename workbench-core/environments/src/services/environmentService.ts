@@ -33,6 +33,7 @@ export interface Environment {
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
+  // TODO: Replace any[] with <type>[]
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   DATASETS?: any[];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -49,6 +49,9 @@ parameters:
   IamPolicyDocument:
     type: String
     description: The IAM policy to be associated with the launched workstation
+  DatasetsBucketName:
+    type: String
+    description: The IAM policy to be associated with the launched workstation
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
@@ -82,6 +85,8 @@ mainSteps:
           Value: '{{ EnvironmentInstanceFiles }}'
         - Key: AutoStopIdleTimeInMinutes
           Value: '{{ AutoStopIdleTimeInMinutes }}'
+        - Key: DatasetsBucketName
+          Value: '{{ DatasetsBucketName }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'

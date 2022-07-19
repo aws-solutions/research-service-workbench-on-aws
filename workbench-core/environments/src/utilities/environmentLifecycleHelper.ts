@@ -79,6 +79,17 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
+  public async getDatasetsBucketName(): Promise<string> {
+    const cfService = this.aws.helpers.cloudformation;
+    const { [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn } = await cfService.getCfnOutput(
+      process.env.STACK_NAME!,
+      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]
+    );
+
+    // We create this at deploy time so this will be present in the stack
+    return datasetsBucketArn.split(':').pop()!;
+  }
+
   /**
    * Executing SSM Document in hosting account with provided envMetadata
    * @param ssmParameters - the list of input parameters for SSM doc execution
@@ -116,10 +127,6 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
-  private _generateEndpointName(envId: string, datasetId: string): string {
-    return `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
-  }
-
   /**
    * Delete the access points for all datasets attached to a given workspace.
    * @param envMetadata - the environment for which access point(s) were created
@@ -140,7 +147,7 @@ export default class EnvironmentLifecycleHelper {
 
   /**
    * Get the mount strings for all datasets attached to a given workspace.
-   * @param dataSetIds - the list of datasets attached.
+   * @param dataSetIds - the list of dataset IDs attached.
    * @param envMetadata - the environment on which to mount the dataset(s)
    *
    * @returns an object containing:
@@ -152,12 +159,13 @@ export default class EnvironmentLifecycleHelper {
     datasetIds: Array<string>,
     envMetadata: Environment
   ): Promise<{ [id: string]: string }> {
-    if (_.isEmpty(datasetIds)) return { S3Mounts: '[]', IamPolicyDocument: '{}' };
+    if (_.isEmpty(datasetIds)) return { s3Mounts: '[]', iamPolicyDocument: '{}' };
 
     // TODO: Allow multiple datasets to be mounted per workspace post-preview
     if (datasetIds.length > 1) throw new Error('Cannot mount more than one dataset per workspace');
 
     const envId = envMetadata.id!;
+    const endpointsCreated: { [key: string]: string }[] = [];
 
     const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
@@ -170,19 +178,24 @@ export default class EnvironmentLifecycleHelper {
 
         const dataSet = await this.dataSetService.getDataSet(datasetId);
         const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        const endpointObj = {
+          id: endpoint.id!,
+          dataSetId: endpoint.dataSetId,
+          endPointUrl: endpoint.endPointUrl,
+          path: endpoint.path,
+          storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
+        };
+
         await this.environmentService.addMetadata(
           envId,
           envResourceTypeToKey.environment,
           mountObject.endpointId,
           envResourceTypeToKey.endpoint,
-          {
-            id: endpoint.id!,
-            dataSetId: endpoint.dataSetId,
-            endPointUrl: endpoint.endPointUrl,
-            path: endpoint.path,
-            storageArn: `arn:aws:s3:::${dataSet.storageName}` // TODO: Handle non-S3 storage types in future
-          }
+          endpointObj
         );
+
+        endpointsCreated.push(endpointObj);
+
         return JSON.stringify({
           name: mountObject.name,
           bucket: mountObject.bucket,
@@ -191,13 +204,11 @@ export default class EnvironmentLifecycleHelper {
       })
     );
 
-    const updatedEnv = await this.environmentService.getEnvironment(envId, true);
-
     // Call IAM policy generator here, and return both strings
-    const IamPolicyDocument = this.generateIamPolicy(updatedEnv);
-    const S3Mounts = JSON.stringify(datasetsToMount);
+    const iamPolicyDocument = this.generateIamPolicy(endpointsCreated, envMetadata.PROJ.encryptionKeyArn);
+    const s3Mounts = JSON.stringify(datasetsToMount);
 
-    return { S3Mounts, IamPolicyDocument };
+    return { s3Mounts, iamPolicyDocument };
   }
 
   public async getSSMDocArn(ssmDocOutputName: string): Promise<string> {
@@ -235,33 +246,33 @@ export default class EnvironmentLifecycleHelper {
 
   /**
    * Get the workspace IAM policy for accessing all datasets attached.
-   * @param envMetadata - the environment with list of dataset IDs
+   * @param endpointsCreated - the external endpoints created for this environment
    * @param encryptionKeyArn - the encryption key ARN for env data traffic
    *
    * @returns iamPolicy - A stringified IAM policy
    */
-  public generateIamPolicy(envMetadata: Environment): string {
+  public generateIamPolicy(endpointsCreated: { [id: string]: string }[], encryptionKeyArn: string): string {
     // Build policy statements for object-level permissions
     const statements = [];
 
     // TODO: Manage AuthZ with user UIDs (DS and environment creators) for assigning R/W privileges to the environment
     // For now, giving R/W access to all users
 
-    const storageArnsWithPath = _.map(envMetadata.ENDPOINTS, (endpoint) => {
+    const storageArnsWithPath = _.map(endpointsCreated, (endpoint) => {
       const storageArn: string = endpoint.storageArn;
       const path: string = endpoint.path;
       return `${storageArn}/${path}/*`;
     });
 
-    const endpointArnsWithPath = _.map(envMetadata.ENDPOINTS, (endpoint) => {
+    const endpointArnsWithPath = _.map(endpointsCreated, (endpoint) => {
       const endpointArn = endpoint.endPointUrl.replace('s3://', '');
       return `${endpointArn}/object/${endpoint.path}/*`;
     });
 
-    const endpointArns = _.map(envMetadata.ENDPOINTS, (endpoint) => {
+    const endpointArns = _.map(endpointsCreated, (endpoint) => {
       return endpoint.endPointUrl.replace('s3://', '');
     });
-    const storageArns = _.map(envMetadata.ENDPOINTS, (endpoint) => {
+    const storageArns = _.map(endpointsCreated, (endpoint) => {
       return endpoint.storageArn;
     });
 
@@ -297,7 +308,7 @@ export default class EnvironmentLifecycleHelper {
       Sid: 'studyKMSAccess',
       Action: ['kms:Decrypt', 'kms:DescribeKey', 'kms:Encrypt', 'kms:GenerateDataKey', 'kms:ReEncrypt*'],
       Effect: 'Allow',
-      Resource: envMetadata.PROJ.encryptionKeyArn
+      Resource: encryptionKeyArn
     });
 
     // Build final policyDoc
