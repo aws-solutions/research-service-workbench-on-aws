@@ -10,7 +10,6 @@ import {
   Pagination,
   PaginationProps,
   PropertyFilter,
-  PropertyFilterProps,
   SpaceBetween,
   Table,
   StatusIndicator
