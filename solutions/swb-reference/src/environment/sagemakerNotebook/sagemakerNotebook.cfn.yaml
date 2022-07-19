@@ -84,10 +84,13 @@ Resources:
               - 's3:PutObject'
               - 's3:GetObjectAcl'
               - 's3:PutObjectAcl'
-            Resource: !Sub
-              - '${DatasetsBucketArn}/*'
-              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*'
-              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*/object/*'
+            Resource:
+              - !Join ['/', [Ref: DatasetsBucketArn, '*']]
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
+              - !Join [
+                  ':',
+                  ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*/object/*']
+                ]
           - Effect: Allow
             Action:
               - 's3:GetAccessPoint'
@@ -96,9 +99,9 @@ Resources:
           - Effect: Allow
             Action:
               - 's3:ListBucket'
-            Resource: !Sub
-              - ${DatasetsBucketArn}
-              - 'arn:aws:s3:${MainAccountRegion}:${MainAccountId}:accesspoint/*'
+            Resource:
+              - !Ref DatasetsBucketArn
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
           - Effect: Allow
             Action:
               - 's3:ListBucket'
@@ -136,8 +139,7 @@ Resources:
               - 'kms:GenerateDataKeyWithoutPlaintext'
               - 'kms:Get*'
               - 'kms:List*'
-            Resource: !Sub
-              - EncryptionKeyArn
+            Resource: !Ref EncryptionKeyArn
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'

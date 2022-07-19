@@ -101,7 +101,11 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
-      return process.env.S3_DATASETS_BUCKET_ARN_NAME!;
+      return {
+        datasetsBucketArn: process.env.S3_DATASETS_BUCKET_ARN_NAME!,
+        mainAccountRegion: 'us-east-1',
+        mainAccountId: '123456789012'
+      };
     });
     envHelper.getDatasetsToMount = jest.fn(async () => {
       return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
@@ -120,7 +124,11 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     environment.datasetIds = ['exampleDS'];
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
-      return process.env.S3_DATASETS_BUCKET_ARN_NAME!;
+      return {
+        datasetsBucketArn: process.env.S3_DATASETS_BUCKET_ARN_NAME!,
+        mainAccountRegion: 'us-east-1',
+        mainAccountId: '123456789012'
+      };
     });
     envHelper.getDatasetsToMount = jest.fn(async () => {
       return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
