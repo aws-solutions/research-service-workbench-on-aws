@@ -2,6 +2,24 @@
   "name": "@amzn/workbench-core-authorization",
   "entries": [
     {
+      "version": "0.0.8",
+      "tag": "@amzn/workbench-core-authorization_v0.0.8",
+      "date": "Tue, 19 Jul 2022 12:18:08 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "add authz"
+          },
+          {
+            "comment": "more change"
+          },
+          {
+            "comment": "more change"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.7",
       "tag": "@amzn/workbench-core-authorization_v0.0.7",
       "date": "Tue, 19 Jul 2022 12:13:07 GMT",
