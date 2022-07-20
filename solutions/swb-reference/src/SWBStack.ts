@@ -7,7 +7,6 @@ import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
@@ -19,8 +18,9 @@ import {
   Effect,
   AnyPrincipal
 } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -115,8 +115,12 @@ export class SWBStack extends Stack {
       WEBSITE_URL
     };
 
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const mainAcctEncryptionKey = this._createEncryptionKey();
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      mainAcctEncryptionKey
+    );
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
@@ -126,6 +130,17 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+  }
+
+  private _createEncryptionKey(): Key {
+    const key = new Key(this, 'mainAccountKey', {
+      enableKeyRotation: true
+    });
+
+    new CfnOutput(this, 'mainAccountKey', {
+      value: key.keyArn
+    });
+    return key;
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -272,9 +287,11 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, 's3-artifacts', {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: mainAcctEncryptionKey
     });
 
     s3Bucket.addToResourcePolicy(
@@ -305,9 +322,11 @@ export class SWBStack extends Stack {
     return s3Bucket;
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
+  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, 's3-datasets', {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: mainAcctEncryptionKey
     });
 
     new CfnOutput(this, s3DatasetsName, {
