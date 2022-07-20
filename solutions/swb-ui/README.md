@@ -80,7 +80,6 @@ Project swb-ui can be deployed as a static website using S3 Bucket and CloudFron
 ```
 NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
 ```
-
 1. Navigate to `solutions/swb-ui`
 
 1. Run command `STAGE=<STAGE> rushx deploy`
