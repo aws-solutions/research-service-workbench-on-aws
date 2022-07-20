@@ -3,6 +3,7 @@
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
+import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { EnvironmentStatus } from '../constants/environmentStatus';
@@ -32,8 +33,11 @@ export interface Environment {
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
+  // TODO: Replace any[] with <type>[]
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DS?: any[];
+  DATASETS?: any[];
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ENDPOINTS?: any[];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
 }
@@ -87,7 +91,8 @@ export class EnvironmentService {
         return item;
       });
       let envWithMetadata: Environment = { ...defaultEnv };
-      envWithMetadata.DS = [];
+      envWithMetadata.DATASETS = [];
+      envWithMetadata.ENDPOINTS = [];
       for (const item of items) {
         // parent environment item
         const sk = item.sk as unknown as string;
@@ -95,8 +100,10 @@ export class EnvironmentService {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           const envKey = sk.split('#')[0];
-          if (envKey === 'DS') {
-            envWithMetadata.DS!.push(item);
+          if (envKey === 'DATASET') {
+            envWithMetadata.DATASETS!.push(item);
+          } else if (envKey === 'ENDPOINT') {
+            envWithMetadata.ENDPOINTS!.push(item);
           } else {
             // metadata of environment item
             // @ts-ignore
@@ -349,8 +356,8 @@ export class EnvironmentService {
       },
       // PROJ
       this._buildPkSk(params.projectId, envResourceTypeToKey.project),
-      // DS
-      ...params.datasetIds.map((dsId) => {
+      // DATASETS
+      ..._.map(params.datasetIds, (dsId) => {
         return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
     ];

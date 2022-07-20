@@ -3,7 +3,7 @@ import { UserManagementPlugin } from './userManagementPlugin';
 /**
  *
  */
-export default class UserManagementService {
+export class UserManagementService {
   private _userManagementPlugin: UserManagementPlugin;
 
   public constructor(userManagementPlugin: UserManagementPlugin) {

@@ -42,10 +42,3 @@ export const mockGetOperations: Operation[] = [
     subject: 'Sample'
   }
 ];
-
-export const mockGetRoleOperations: Operation[] = [
-  {
-    action: 'READ',
-    subject: 'Role'
-  }
-];
