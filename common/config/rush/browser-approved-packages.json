@@ -107,10 +107,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws-sdk/client-managedblockchain",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "@aws-sdk/client-s3",
       "allowedCategories": [ "production", "prototypes" ]
     },
