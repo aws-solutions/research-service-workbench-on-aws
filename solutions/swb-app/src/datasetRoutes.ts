@@ -11,14 +11,14 @@ export function setUpDSRoutes(
   router.post(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      await dataSetService.provisionDataSet(
+      const dataSet = await dataSetService.provisionDataSet(
         req.body.datasetName,
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
         dataSetStoragePlugin
       );
-      res.status(201).send();
+      res.status(201).send(dataSet);
     })
   );
 
@@ -26,14 +26,14 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
-      await dataSetService.importDataSet(
+      const dataSet = await dataSetService.importDataSet(
         req.body.datasetName,
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
         dataSetStoragePlugin
       );
-      res.status(201).send();
+      res.status(201).send(dataSet);
     })
   );
 
