@@ -1,11 +1,11 @@
-// Schema for createDataSet API
+// Schema for createExternalEndpoint API
 import { Schema } from 'jsonschema';
 
 const CreateExternalEndpointSchema: Schema = {
   id: '/createExternalEndpoint',
   type: 'object',
   properties: {
-    extenralEndpointName: { type: 'string' },
+    externalEndpointName: { type: 'string' },
     externalRoleName: { type: 'string' },
     kmsKeyArn: { type: 'string' }
   },
