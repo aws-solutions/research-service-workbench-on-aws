@@ -7,12 +7,15 @@ import {
   EnvironmentTypeConfigService,
   ProjectService
 } from '@amzn/environments';
+import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
   account: HostingAccountService;
   environmentService: EnvironmentService;
+  dataSetService: DataSetService;
+  dataSetsStoragePlugin: DataSetsStoragePlugin;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;

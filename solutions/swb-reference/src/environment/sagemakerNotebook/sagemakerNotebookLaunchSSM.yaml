@@ -56,6 +56,21 @@ parameters:
     type: String
     description: 'The size of the notebook instance coming from environment type config'
     allowedPattern: ^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+$
+  S3Mounts:
+    type: String
+    description: Stringified array of dataset objects containing their mountString
+  IamPolicyDocument:
+    type: String
+    description: The IAM policy to be associated with the launched workstation
+  DatasetsBucketArn:
+    type: String
+    description: The ARN of the Datasets bucket in the main account
+  MainAccountId:
+    type: String
+    description: The Main Account ID where application is deployed
+  MainAccountRegion:
+    type: String
+    description: The region of application deployment in main account
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
@@ -76,11 +91,11 @@ mainSteps:
         - Key: AccessFromCIDRBlock
           Value: '{{ CIDR }}'
         - Key: S3Mounts
-          Value: '[]'
+          Value: '{{ S3Mounts }}'
         - Key: Namespace
           Value: '{{ Namespace }}'
         - Key: IamPolicyDocument
-          Value: '{}'
+          Value: '{{ IamPolicyDocument }}'
         - Key: InstanceType
           Value: '{{ InstanceType }}'
         - Key: Subnet
@@ -89,6 +104,12 @@ mainSteps:
           Value: '{{ EnvironmentInstanceFiles }}'
         - Key: AutoStopIdleTimeInMinutes
           Value: '{{ AutoStopIdleTimeInMinutes }}'
+        - Key: DatasetsBucketArn
+          Value: '{{ DatasetsBucketArn }}'
+        - Key: MainAccountId
+          Value: '{{ MainAccountId }}'
+        - Key: MainAccountRegion
+          Value: '{{ MainAccountRegion }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'
