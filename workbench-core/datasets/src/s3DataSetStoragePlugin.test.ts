@@ -169,7 +169,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
@@ -225,7 +225,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, externalRoleName)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(s3Mock.commandCalls(GetBucketPolicyCommand)).toHaveLength(1);
@@ -312,7 +312,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleName)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
 
@@ -371,7 +371,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(s3Mock.commandCalls(PutBucketPolicyCommand)).toHaveLength(1);
@@ -425,7 +425,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
 
@@ -489,7 +489,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
 
@@ -526,7 +526,7 @@ describe('S3DataSetStoragePlugin', () => {
       await expect(
         plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(0);
@@ -568,7 +568,7 @@ describe('S3DataSetStoragePlugin', () => {
           kmsKeyArn
         )
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
@@ -630,7 +630,7 @@ describe('S3DataSetStoragePlugin', () => {
           kmsKeyArn
         )
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
@@ -709,7 +709,7 @@ describe('S3DataSetStoragePlugin', () => {
           kmsKeyArn
         )
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);
@@ -768,7 +768,7 @@ describe('S3DataSetStoragePlugin', () => {
           kmsKeyArn
         )
       ).resolves.toEqual({
-        endPointUrl: `s3://${accessPointArn}/`,
+        endPointUrl: `s3://${accessPointArn}`,
         endPointAlias: mockAccessPointAlias
       });
       expect(kmsMock.commandCalls(GetKeyPolicyCommand)).toHaveLength(1);

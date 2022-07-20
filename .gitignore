@@ -88,6 +88,7 @@ build/
 .idea
 
 # Reference package
+solutions/swb-reference/src/environment-files/offline-packages/*
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml

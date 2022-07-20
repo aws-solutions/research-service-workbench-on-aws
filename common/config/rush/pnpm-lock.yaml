@@ -98,6 +98,7 @@ importers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/workbench-core-authentication': workspace:*
       '@amzn/workbench-core-authorization': workspace:*
+      '@amzn/workbench-core-datasets': workspace:*
       '@amzn/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
@@ -132,6 +133,7 @@ importers:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
       '@amzn/workbench-core-authorization': link:../../workbench-core/authorization
+      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
       '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@hapi/boom': 10.0.0
       cookie-parser: 1.4.6
@@ -170,8 +172,11 @@ importers:
       '@amzn/environments': workspace:*
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@amzn/swb-app': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-datasets': workspace:*
       '@amzn/workbench-core-infrastructure': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-dynamodb': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
@@ -220,8 +225,11 @@ importers:
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
       '@amzn/swb-app': link:../swb-app
+      '@amzn/workbench-core-audit': link:../../workbench-core/audit
       '@amzn/workbench-core-base': link:../../workbench-core/base
+      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
       '@amzn/workbench-core-infrastructure': link:../../workbench-core/infrastructure
+      '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-dynamodb': 3.130.0
       '@aws-sdk/client-s3': 3.130.0
@@ -576,6 +584,8 @@ importers:
   ../../workbench-core/base:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
       '@aws-cdk/aws-dynamodb': ^1.152.0
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-cognito-identity-provider': ^3.118.1
@@ -615,6 +625,8 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@amzn/workbench-core-audit': link:../audit
+      '@amzn/workbench-core-logging': link:../logging
       '@aws-cdk/aws-dynamodb': 1.158.0
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-cognito-identity-provider': 3.130.0
@@ -732,7 +744,11 @@ importers:
   ../../workbench-core/environments:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@amzn/workbench-core-audit': workspace:*
       '@amzn/workbench-core-base': workspace:*
+      '@amzn/workbench-core-datasets': workspace:*
+      '@amzn/workbench-core-logging': workspace:*
+      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-cognito-identity-provider': ^3.118.1
       '@aws-sdk/client-dynamodb': ^3.118.1
@@ -773,7 +789,11 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
+      '@amzn/workbench-core-audit': link:../audit
       '@amzn/workbench-core-base': link:../base
+      '@amzn/workbench-core-datasets': link:../datasets
+      '@amzn/workbench-core-logging': link:../logging
+      '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-cognito-identity-provider': 3.130.0
       '@aws-sdk/client-dynamodb': 3.130.0
