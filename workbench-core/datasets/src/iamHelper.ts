@@ -34,7 +34,41 @@ export interface InsertStatementResult {
   documentResult: PolicyDocument;
 }
 
-export default class IamHelper {
+export class IamHelper {
+  public static containsStatementId(source: PolicyDocument, targetSid: string): boolean {
+    const policyObj = source.toJSON();
+    return (
+      policyObj &&
+      policyObj.Statement &&
+      !!_.find(policyObj.Statement, (s) => {
+        const statement: PolicyStatement = PolicyStatement.fromJson(s);
+        return statement.sid === targetSid;
+      })
+    );
+  }
+
+  public static addPrincipalToStatement(
+    source: PolicyDocument,
+    targetSid: string,
+    awsPrincipal: string
+  ): PolicyDocument {
+    const policyObj = source.toJSON();
+    if (!policyObj || !policyObj.Statement) {
+      throw new Error('Cannot add principal. Policy document is invalid');
+    }
+    const returnDoc = new PolicyDocument();
+    _.forEach(policyObj.Statement, (s) => {
+      if (s.Sid === targetSid) {
+        if (!_.isArray(s.Principal.AWS)) s.Principal.AWS = [s.Principal.AWS];
+        s.Principal.AWS.push(awsPrincipal);
+        s.Principal.AWS = _.uniq(s.Principal.AWS);
+      }
+      const statement: PolicyStatement = PolicyStatement.fromJson(s);
+      returnDoc.addStatements(statement);
+    });
+    return returnDoc;
+  }
+
   /**
    * Verify the prinicpals in the source statement are covered by the list of prinicals in the
    * target statement.

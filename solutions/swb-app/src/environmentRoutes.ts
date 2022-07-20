@@ -85,7 +85,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await environmentService.getEnvironment(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id, true);
       const envType = environment.ETC.type;
       if (environment.status === 'STOPPING') {
         throw Boom.conflict('Cannot start environment while environment is currently being stopped');
@@ -108,7 +108,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await environmentService.getEnvironment(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id, true);
       const envType = environment.ETC.type;
 
       if (['PENDING', 'STARTING'].includes(environment.status)) {
