@@ -13,7 +13,6 @@ import {
   Textarea,
   Select,
   Multiselect
-  // Multiselect
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
