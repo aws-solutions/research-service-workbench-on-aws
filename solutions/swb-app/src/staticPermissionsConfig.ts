@@ -24,6 +24,21 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
     subject: 'EnvironmentType'
   },
   {
@@ -88,6 +103,21 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'UPDATE',
     subject: 'Environment'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
   },
   {
     effect: 'ALLOW',
