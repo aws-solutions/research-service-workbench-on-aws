@@ -11,6 +11,7 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
+  AnyPrincipal
   Effect,
   Policy,
   PolicyDocument,
@@ -20,7 +21,7 @@ import {
   StarPrincipal
 } from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -115,12 +116,12 @@ export class SWBStack extends Stack {
       WEBSITE_URL
     };
 
-    this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
-    const statusHandler = this._createStatusHandlerLambda();
-    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
+    const statusHandler = this._createStatusHandlerLambda(datasetBucket);
+    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
@@ -277,7 +278,7 @@ export class SWBStack extends Stack {
       new PolicyStatement({
         sid: 'Deny requests that do not use TLS/HTTPS',
         effect: Effect.DENY,
-        principals: [new StarPrincipal()],
+        principals: [new AnyPrincipal()],
         actions: ['s3:*'],
         resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
         conditions: {
@@ -291,7 +292,7 @@ export class SWBStack extends Stack {
       new PolicyStatement({
         sid: 'Deny requests that do not use SigV4',
         effect: Effect.DENY,
-        principals: [new StarPrincipal()],
+        principals: [new AnyPrincipal()],
         actions: ['s3:*'],
         resources: [s3Bucket.arnForObjects('*')],
         conditions: {
@@ -312,7 +313,9 @@ export class SWBStack extends Stack {
   }
 
   private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
-    const s3Bucket = new Bucket(this, s3BucketId, {});
+    const s3Bucket = new Bucket(this, s3BucketId, {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
@@ -321,7 +324,7 @@ export class SWBStack extends Stack {
     return s3Bucket;
   }
 
-  private _createStatusHandlerLambda(): Function {
+  private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
@@ -343,6 +346,27 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
           })
         ]
       })
@@ -439,7 +463,7 @@ export class SWBStack extends Stack {
     return lambda;
   }
 
-  private _createAPILambda(statusHandlerLambdaArn: string): Function {
+  private _createAPILambda(datasetBucket: Bucket, artifactS3Bucket: Bucket): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
@@ -488,6 +512,37 @@ export class SWBStack extends Stack {
             resources: ['*']
           }),
           new PolicyStatement({
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:GetBucketPolicy',
+              's3:PutBucketPolicy',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy',
+              's3:CreateAccessPoint',
+              's3:DeleteAccessPoint'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
+          }),
+          new PolicyStatement({
+            sid: 'environmentBootstrapS3Access',
+            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+            resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
+          }),
+          new PolicyStatement({
+            sid: 'cognitoAccess',
             actions: [
               'cognito-idp:AdminAddUserToGroup',
               'cognito-idp:AdminCreateUser',
