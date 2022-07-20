@@ -18,7 +18,6 @@ import {
   PolicyStatement,
   Role,
   ServicePrincipal,
-  StarPrincipal
 } from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
