@@ -234,7 +234,7 @@ Resources:
       LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
 
-  # TODO: Add script for mounting studies and autostop
+  # Add script for mounting studies and autostop
   BasicNotebookInstanceLifecycleConfig:
     Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
     Properties:

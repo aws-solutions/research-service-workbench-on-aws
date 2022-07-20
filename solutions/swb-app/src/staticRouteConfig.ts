@@ -69,6 +69,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/connections': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Environment'
+      }
+    ]
+  },
   '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/start': {
     PUT: [
       {

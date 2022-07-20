@@ -11,7 +11,6 @@ export function setUpDSRoutes(
   router.post(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      //eslint-disable-next-line security/detect-object-injection
       await dataSetService.provisionDataSet(
         req.body.datasetName,
         req.body.storageName,
@@ -27,7 +26,6 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
-      //eslint-disable-next-line security/detect-object-injection
       await dataSetService.importDataSet(
         req.body.datasetName,
         req.body.storageName,
@@ -43,7 +41,6 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/share',
     wrapAsync(async (req: Request, res: Response) => {
-      //eslint-disable-next-line security/detect-object-injection
       await dataSetService.addDataSetExternalEndpoint(
         req.body.datasetName,
         req.body.externalEndpointName,
