@@ -12,6 +12,7 @@ import {
   ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
@@ -77,10 +78,44 @@ export class SWBUIStack extends Stack {
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
   }
+
+  private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, `${s3Bucket.bucketArn}/*`],
+        conditions: {
+          Bool: {
+            'aws:SecureTransport': 'false'
+          }
+        }
+      })
+    );
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use SigV4',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [`${s3Bucket.bucketArn}/*`],
+        conditions: {
+          StringNotEquals: {
+            's3:signatureversion': 'AWS4-HMAC-SHA256'
+          }
+        }
+      })
+    );
+  }
+
   private _createS3Bucket(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
       accessControl: BucketAccessControl.PRIVATE
     });
+
+    this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
     new CfnOutput(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_ARN_NAME, {
       value: s3Bucket.bucketArn

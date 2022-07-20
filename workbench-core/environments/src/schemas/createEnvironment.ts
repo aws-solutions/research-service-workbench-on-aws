@@ -13,7 +13,8 @@ const CreateEnvironmentSchema: Schema = {
     projectId: { type: 'string' },
     datasetIds: { type: 'array', items: { type: 'string' } }
   },
-  required: ['name', 'description', 'envTypeId', 'envTypeConfigId', 'envType', 'projectId', 'datasetIds']
+  required: ['name', 'description', 'envTypeId', 'envTypeConfigId', 'envType', 'projectId', 'datasetIds'],
+  additionalProperties: false
 };
 
 export default CreateEnvironmentSchema;
