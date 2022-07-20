@@ -11,18 +11,17 @@ import {
   Container,
   Link,
   Textarea,
-  Select
-  // Multiselect
+  Select,
+  Multiselect
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-// import { useDatasets } from '../../api/datasets';
+import { useDatasets } from '../../api/datasets';
 import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
-// import { layoutLabels } from '../../common/labels';
 import { nameRegex } from '../../common/utils';
 import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
@@ -44,7 +43,7 @@ const Environment: NextPage = () => {
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
-  // const { datasets, areDatasetsLoading } = useDatasets();
+  const { datasets, areDatasetsLoading } = useDatasets();
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -260,6 +259,32 @@ const Environment: NextPage = () => {
                           validateField('projectId', selectedOption.value);
                         }}
                         statusType={areProjectsLoading ? 'loading' : 'finished'}
+                      />
+                    </FormField>
+                    <FormField
+                      label="Studies"
+                      description="Studies that you would like to mount to your workspace"
+                    >
+                      <Multiselect
+                        selectedOptions={
+                          areDatasetsLoading
+                            ? []
+                            : datasets
+                                .map((ds) => ({ label: ds.name, value: ds.id }))
+                                .filter((ds) => formData.datasetIds?.includes(ds.value))
+                        }
+                        options={datasets.map((ds) => ({ label: ds.name, value: ds.id }))}
+                        onChange={(changeDetails) => {
+                          const datasetIds = changeDetails.detail.selectedOptions.map((selectOption) => {
+                            return selectOption.value;
+                          }) as string[];
+                          setFormData({
+                            ...formData,
+                            datasetIds
+                          });
+                        }}
+                        placeholder="Choose options"
+                        selectedAriaLabel="Selected"
                       />
                     </FormField>
                     <FormField errorText={formErrors?.envTypeConfigIdError}>
