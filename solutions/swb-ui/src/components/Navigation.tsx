@@ -17,7 +17,8 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
   }) as unknown as SideNavigationProps.Item[];
 
   const [activeHref, setActiveHref] = React.useState('');
-  const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
+
+  let adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     {
       type: 'section',
       text: t('Dashboards'),
@@ -28,14 +29,10 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
     },
     { type: 'link', text: t('Users'), href: '/users' },
     { type: 'link', text: t('Workspaces'), href: '/environments' },
-    { type: 'link', text: t('Datasets'), href: '/datasets' },
-    {
-      type: 'section',
-      text: t('Apps'),
-      items: apps
-    }
+    { type: 'link', text: t('Datasets'), href: '/datasets' }
   ];
-  const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
+
+  let userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     { type: 'link', text: t('Workspaces'), href: '/environments' },
     { type: 'link', text: t('Datasets'), href: '/datasets' },
     {
@@ -45,13 +42,20 @@ export default function Navigation({ items }: NavigationProps): JSX.Element {
         { type: 'link', text: t('All Dashboards'), href: '/dashboards' },
         { type: 'link', text: t('Project Dashboards'), href: '/dashboards#projects' }
       ]
-    },
-    {
-      type: 'section',
-      text: t('Apps'),
-      items: apps
     }
   ];
+
+  if (apps.length) {
+    const apps_menu: ReadonlyArray<SideNavigationProps.Item> = [
+      {
+        type: 'section',
+        text: t('Apps'),
+        items: apps
+      }
+    ];
+    adminNavItems = adminNavItems.concat(apps_menu);
+    userNavItems = userNavItems.concat(apps_menu);
+  }
 
   // Role-based navigation display
   const user: User = researcherUser;
