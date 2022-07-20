@@ -5,7 +5,6 @@
     "<rootDir>/src/hostingAccountService.ts",
     "<rootDir>/src/environmentConnectionService.ts",
     "<rootDir>/src/environmentLifecycleService.ts",
-    "<rootDir>/src/environmentLifecycleHelper.ts",
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
     "<rootDir>/src/accountHandler.ts",

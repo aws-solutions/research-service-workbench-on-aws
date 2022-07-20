@@ -12,14 +12,17 @@ import {
   Link,
   Textarea,
   Select
+  // Multiselect
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+// import { useDatasets } from '../../api/datasets';
 import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
+// import { layoutLabels } from '../../common/labels';
 import { nameRegex } from '../../common/utils';
 import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
@@ -34,13 +37,14 @@ const Environment: NextPage = () => {
   const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
-  const [selectedEnvType, setselectedEnvType] = useState<EnvTypeItem>();
+  const [selectedEnvType, setSelectedEnvType] = useState<EnvTypeItem>();
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<CreateEnvironmentForm>({});
   const [formErrors, setFormErrors] = useState<CreateEnvironmentFormValidation>({});
   const { envTypes, areEnvTypesLoading } = useEnvironmentType();
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
+  // const { datasets, areDatasetsLoading } = useDatasets();
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -124,7 +128,7 @@ const Environment: NextPage = () => {
   };
   const onSelectEnvType = async (selection: EnvTypeItem[]): Promise<void> => {
     const selected = (selection && selection.at(0)) || undefined;
-    setselectedEnvType(selected);
+    setSelectedEnvType(selected);
     setFormData({
       ...formData,
       envTypeId: selected?.id,
