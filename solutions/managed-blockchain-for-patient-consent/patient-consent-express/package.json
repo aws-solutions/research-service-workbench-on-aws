@@ -1,6 +1,6 @@
 {
   "name": "@amzn/patient-consent-express",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Example Express App",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
