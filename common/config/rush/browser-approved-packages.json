@@ -43,6 +43,10 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
+      "name": "@amzn/workbench-core-infrastructure",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/workbench-core-logging",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -279,6 +283,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "cookie-parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "cors",
       "allowedCategories": [ "production" ]
     },
@@ -363,6 +371,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "jwt-decode",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -403,6 +415,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "pkce-challenge",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "pnpm",
       "allowedCategories": [ "production" ]
     },
@@ -413,6 +429,10 @@
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "react-router-dom",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",
@@ -460,10 +480,6 @@
     },
     {
       "name": "winston-transport",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "yargs-parser",
       "allowedCategories": [ "production" ]
     }
   ]

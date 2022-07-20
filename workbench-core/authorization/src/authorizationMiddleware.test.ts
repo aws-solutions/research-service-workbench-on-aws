@@ -135,30 +135,6 @@ describe('authorization middleware', () => {
     expect(response.json).toBeCalledWith({ error: 'User is not authorized' });
   });
 
-  test('Request has mockAdmin with correct permissions for GET on /user/:id/role/:role', async () => {
-    const next = jest.fn();
-    const role = 'admin';
-    const response: Response = {
-      locals: {
-        user: mockAdmin
-      },
-      status: jest.fn().mockImplementation((statusCode: number) => {
-        return response;
-      }),
-      json: jest.fn()
-    } as unknown as Response;
-    const request: Request = {
-      method: 'GET',
-      path: `/user/${mockAdmin.id}/role/${role}`,
-      params: {
-        id: mockAdmin.id,
-        role
-      }
-    } as unknown as Request;
-    await authorizationMiddleware(request, response, next);
-    expect(next).toBeCalled();
-  });
-
   test('Request has mockGuest for incorrect Method on /sample', async () => {
     const next = jest.fn();
     const response: Response = {
