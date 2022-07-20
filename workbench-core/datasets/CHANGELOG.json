@@ -2,6 +2,18 @@
   "name": "@amzn/workbench-core-datasets",
   "entries": [
     {
+      "version": "0.0.12",
+      "tag": "@amzn/workbench-core-datasets_v0.0.12",
+      "date": "Wed, 20 Jul 2022 08:33:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@amzn/workbench-core-audit\" to `0.0.12`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.0.11",
       "tag": "@amzn/workbench-core-datasets_v0.0.11",
       "date": "Wed, 20 Jul 2022 08:18:10 GMT",

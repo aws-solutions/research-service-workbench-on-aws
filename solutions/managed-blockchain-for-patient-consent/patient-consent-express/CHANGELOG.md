@@ -1,6 +1,11 @@
 # Change Log - @amzn/patient-consent-express
 
-This log was last generated on Wed, 20 Jul 2022 08:18:10 GMT and should not be manually modified.
+This log was last generated on Wed, 20 Jul 2022 08:33:52 GMT and should not be manually modified.
+
+## 0.0.12
+Wed, 20 Jul 2022 08:33:52 GMT
+
+_Version update only_
 
 ## 0.0.11
 Wed, 20 Jul 2022 08:18:10 GMT
