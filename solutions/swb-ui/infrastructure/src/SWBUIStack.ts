@@ -91,7 +91,7 @@ export class SWBUIStack extends Stack {
       destinationBucket: bucket,
       sources: [Source.asset(path.resolve(__dirname, '../../out'))],
       distribution: distribution,
-      distributionPaths: ['*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
+      distributionPaths: ['/*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });
   }
 
