@@ -1,0 +1,161 @@
+name: version-update-and-publish
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - test-main
+
+jobs:  
+  rush-version:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+        version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
+        version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
+        version_second_commit_hash: "${{ steps.rush-version.outputs.second_commit_hash }}"
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          ref: ${{ steps.set-ref.outputs.ref }}
+          fetch-depth: 0
+      # - name: Base Action
+      #   uses: ./.github/actions/baseAction
+      # - name: Rush test and update the README file in each package with the coverage badge
+      #   run: node common/scripts/install-run-rush.js test --verbose
+      - name: Get Current SHA
+        id: last_sha
+        run: |
+          commit_hash=`git log -1 --format='%H'`
+          echo "::set-output name=commit_hash::$commit_hash"
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.BOT-USER-EMAIL }}
+          git config user.name ${{ secrets.BOT-USER }}
+          git config commit.gpgsign true
+      - name: Rush Version
+        id: rush-version
+        run: |
+          node common/scripts/install-run-rush.js version --bump --target-branch test-main --ignore-git-hooks
+          commit_hash=`git rev-parse @`
+          second_commit_hash=`git rev-parse @~`
+          echo $commit_hash
+          echo "::set-output name=changes_detected::false"
+          if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
+            echo "::set-output name=changes_detected::true"
+            echo "::set-output name=commit_hash::$commit_hash"
+            echo "::set-output name=second_commit_hash::$second_commit_hash"
+          fi
+  rush-publish:  
+    runs-on: ubuntu-20.04
+    needs: [rush-version]
+    permissions:
+      id-token: write
+      contents: read
+    env: 
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.CODEARTIFACT_DOMAIN_NAME }}-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/npm/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
+    steps:
+      - name: Set ref
+        id: set-ref
+        run: |
+          ref=''
+          if ${{ needs.rush-version.outputs.version_changes_detected }}; then
+            ref=${{ needs.rush-version.outputs.version_commit_hash }}
+          fi
+          echo "::set-output name=ref::$ref"
+      
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          ref: ${{ steps.set-ref.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.CODEARTIFACT_REGION }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: OIDCSessionName
+
+      - name: CodeArtifact Auth
+        id: codeartifact
+        run: |
+          TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN_NAME }} --domain-owner ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }} --query authorizationToken --duration-seconds 900 --output text`
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=auth_token::$TOKEN"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.BOT-USER-EMAIL }}
+          git config user.name ${{ secrets.BOT-USER }}
+          git config commit.gpgsign true
+          
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --ignore-git-hooks --include-all --target-branch test-main --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+  rebase-merge-to-develop:
+    runs-on: ubuntu-20.04
+    needs: [rush-version, rush-publish]
+    permissions:
+      id-token: write
+      contents: read
+    env: 
+      COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
+      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
+      SECOND_COMMIT_HASH: " ${{ needs.rush-version.outputs.version_second_commit_hash }}"
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.BOT-USER-EMAIL }}
+          git config user.name ${{ secrets.BOT-USER }}
+          git config commit.gpgsign true
+        
+      - name: Merge to test-develop
+        run: |
+          git checkout test-develop
+          echo
+          echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
+          echo "  into the 'test-develop' branch ($(git log -1 --pretty=%H test-develop))"
+          echo
+          git merge $COMMIT_HASH --ff --no-edit
+          git push origin test-develop
