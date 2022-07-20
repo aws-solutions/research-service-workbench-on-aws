@@ -124,7 +124,6 @@ jobs:
   rebase-merge-to-develop:
     runs-on: ubuntu-20.04
     needs: [rush-version, rush-publish]
-    if: ${{needs.rush-version.outputs.version_changes_detected == true}}
     permissions:
       id-token: write
       contents: read

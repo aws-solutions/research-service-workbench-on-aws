@@ -1,6 +1,6 @@
 {
   "name": "@amzn/workbench-core-datasets",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Access and management of data files for the purpose of connecting to various AWS environments.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
   "repository": {
