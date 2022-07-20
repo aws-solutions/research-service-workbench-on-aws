@@ -2,6 +2,10 @@
 echo "Starting Update of Plugins";
 cd ./solutions/swb-plugins;
 for plugin in *; do
+    if [[ "$(ls -l .)" == "total 0" ]]; then
+        echo "No Plugins Detected";
+        break;
+    fi
     if [ -d "$plugin" ]; then
         pluginPackageName=$(jq -r '.name' ./$plugin/package.json);
         pluginUpper=$(echo "${plugin}" | tr “[a-z]” “[A-Z]”);
@@ -29,6 +33,10 @@ for page in ../swb-ui/src/pages/apps/*; do
     if [[ $page == *.tsx ]]; then
         pluginExists="false";        
         for plugin in *; do
+            if [[ "$(ls -l .)" == "total 0" ]]; then
+                pluginExists="false";
+                break;
+            fi
             if [ -d "$plugin" ]; then
                 if [[ $plugin == $(basename $page .tsx) ]]; then
                     pluginExists="true";
@@ -37,7 +45,7 @@ for page in ../swb-ui/src/pages/apps/*; do
         done
         echo "Plugin for $(basename $page) Exists: $pluginExists";
         if [[ $pluginExists == "false" ]]; then
-            pluginPackageName=$(head -n 1 $page | grep -o '".*"' | tr -d '"');
+            pluginPackageName=$(head -n 1 $page | grep -o "'.*'" | tr -d "'");
             jq --arg pluginName $pluginPackageName 'del(.projects[] | select(.packageName == $pluginName))' ../../rush.json > ../../output_rush.json;
             mv ../../output_rush.json  ../../rush.json;
             jq 'del(.dependencies."'"$pluginPackageName"'")' ../swb-ui/package.json > ../swb-ui/output_package.json;

@@ -1,5 +1,5 @@
-import App from "<--Insert--Plugin--Package--Name-->";
-import BaseLayout from "../../components/BaseLayout";
+import App from '<--Insert--Plugin--Package--Name-->';
+import BaseLayout from '../../components/BaseLayout';
 
 function <--Insert--Plugin--Name-->_APP(): JSX.Element {
   return (
