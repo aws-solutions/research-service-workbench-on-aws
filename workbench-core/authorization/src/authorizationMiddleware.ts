@@ -14,22 +14,6 @@ function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
 }
 
 /**
- * Replaces path params in the path url to '*'
- * @param pathUrl - the path url.
- * @param pathParams - an object containing path params.
- * @returns
- */
-function replacePathParams(pathUrl: string, pathParams: object): string {
-  let modifiedUrl = pathUrl;
-  Object.values(pathParams).forEach((pathParam) => {
-    if (typeof pathParam === 'string') {
-      modifiedUrl = modifiedUrl.replace(pathParam, '*');
-    }
-  });
-  return modifiedUrl;
-}
-
-/**
  * Retrieves the user from the {@link Response}.
  * @param res - {@link Response}
  * @returns - {@link AuthenticatedUser}
@@ -68,7 +52,7 @@ export default function withAuth(
    */
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const route: string = req.params ? replacePathParams(req.path, req.params) : req.path;
+      const route: string = req.path;
       const method: string = req.method;
       if (checkMethod(method)) {
         if (await authorizationService.isRouteIgnored(route, method)) {
