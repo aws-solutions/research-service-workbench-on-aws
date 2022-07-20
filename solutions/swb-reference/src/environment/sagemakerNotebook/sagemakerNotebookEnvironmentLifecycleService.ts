@@ -50,8 +50,8 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
-      IamPolicyDocument: [s3Mounts],
-      S3Mounts: [iamPolicyDocument],
+      IamPolicyDocument: [iamPolicyDocument],
+      S3Mounts: [s3Mounts],
       MainAccountRegion: [mainAccountRegion],
       MainAccountId: [mainAccountId]
     };

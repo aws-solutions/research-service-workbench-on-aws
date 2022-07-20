@@ -9,6 +9,44 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/datasets': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Dataset'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Dataset'
+      }
+    ]
+  },
+  '/datasets/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Dataset'
+      }
+    ]
+  },
+  '/datasets/import': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Dataset'
+      }
+    ]
+  },
+  '/datasets/share': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Dataset'
+      }
+    ]
+  },
   '/environments': {
     GET: [
       {
