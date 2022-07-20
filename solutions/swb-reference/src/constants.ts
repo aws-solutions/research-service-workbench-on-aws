@@ -15,9 +15,15 @@ function getConstants(): {
   LAUNCH_CONSTRAINT_ROLE_NAME: string;
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
+  USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_NAME: string;
   ALLOWED_ORIGINS: string;
+  COGNITO_DOMAIN: string;
+  WEBSITE_URL: string;
+  USER_POOL_ID: string;
+  CLIENT_ID: string;
+  CLIENT_SECRET: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -33,7 +39,13 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
-  const USER_POOL_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
+  const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
+  const COGNITO_DOMAIN = config.cognitoDomain;
+  const WEBSITE_URL = config.websiteUrl;
+  const USER_POOL_ID = config.userPoolId;
+  const CLIENT_ID = config.clientId;
+  const CLIENT_SECRET = config.clientSecret;
 
   const AMI_IDS: string[] = [];
 
@@ -57,9 +69,15 @@ function getConstants(): {
     LAUNCH_CONSTRAINT_ROLE_NAME,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
+    USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_NAME,
-    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins)
+    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
+    COGNITO_DOMAIN,
+    WEBSITE_URL,
+    USER_POOL_ID,
+    CLIENT_ID,
+    CLIENT_SECRET
   };
 }
 

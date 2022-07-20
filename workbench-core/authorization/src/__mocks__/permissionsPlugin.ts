@@ -4,12 +4,11 @@ import {
   mockAdminPermissions,
   mockGetOperations,
   mockGuestPermissions,
-  mockPutOperations,
-  mockGetRoleOperations
+  mockPutOperations
 } from './mockPermissions';
 
 export class MockPermissionsPlugin implements PermissionsPlugin {
-  private _routesIgnored: RoutesIgnored = { '/login': { GET: true } };
+  private _routesIgnored: RoutesIgnored = { '/login': { GET: true }, '/sample/*': { GET: true } };
 
   public async getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]> {
     if (user.roles.includes('admin')) {
@@ -22,8 +21,6 @@ export class MockPermissionsPlugin implements PermissionsPlugin {
     if (route === '/sample') {
       if (method === 'GET') return mockGetOperations;
       else if (method === 'PUT') return mockPutOperations;
-    } else if (route === '/user/*/role/*') {
-      if (method === 'GET') return mockGetRoleOperations;
     }
     throw new Error('Route not secured');
   }

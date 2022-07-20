@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
+import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
+
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
@@ -36,6 +38,11 @@ export class SWBStack extends Stack {
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
+    COGNITO_DOMAIN: string;
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    USER_POOL_ID: string;
+    WEBSITE_URL: string;
   };
   public constructor(app: App) {
     const {
@@ -49,7 +56,14 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_CLIENT_NAME,
+      USER_POOL_NAME,
+      WEBSITE_URL,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -57,6 +71,29 @@ export class SWBStack extends Stack {
         region: AWS_REGION
       }
     });
+
+    const workbenchCognito = this._createCognitoResources(
+      COGNITO_DOMAIN,
+      WEBSITE_URL,
+      USER_POOL_NAME,
+      USER_POOL_CLIENT_NAME
+    );
+
+    let cognitoDomain: string;
+    let clientId: string;
+    let clientSecret: string;
+    let userPoolId: string;
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      cognitoDomain = `https://${COGNITO_DOMAIN}.auth.${AWS_REGION}.amazoncognito.com`;
+      clientId = CLIENT_ID;
+      clientSecret = CLIENT_SECRET;
+      userPoolId = USER_POOL_ID;
+    } else {
+      cognitoDomain = workbenchCognito.cognitoDomain;
+      clientId = workbenchCognito.userPoolClientId;
+      clientSecret = workbenchCognito.userPoolClientSecret.unsafeUnwrap();
+      userPoolId = workbenchCognito.userPoolId;
+    }
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
@@ -70,7 +107,12 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN: cognitoDomain,
+      CLIENT_ID: clientId,
+      CLIENT_SECRET: clientSecret,
+      USER_POOL_ID: userPoolId,
+      WEBSITE_URL
     };
 
     const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
@@ -443,6 +485,11 @@ export class SWBStack extends Stack {
             sid: 'ScAccess'
           }),
           new PolicyStatement({
+            actions: ['cognito-idp:DescribeUserPoolClient'],
+            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            sid: 'CognitoAccess'
+          }),
+          new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
@@ -485,6 +532,24 @@ export class SWBStack extends Stack {
             sid: 'environmentBootstrapS3Access',
             actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
             resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
+          }),
+          new PolicyStatement({
+            sid: 'cognitoAccess',
+            actions: [
+              'cognito-idp:AdminAddUserToGroup',
+              'cognito-idp:AdminCreateUser',
+              'cognito-idp:AdminDeleteUser',
+              'cognito-idp:AdminGetUser',
+              'cognito-idp:AdminListGroupsForUser',
+              'cognito-idp:AdminRemoveUserFromGroup',
+              'cognito-idp:AdminUpdateUserAttributes',
+              'cognito-idp:CreateGroup',
+              'cognito-idp:DeleteGroup',
+              'cognito-idp:ListGroups',
+              'cognito-idp:ListUsers',
+              'cognito-idp:ListUsersInGroup'
+            ],
+            resources: ['*']
           })
         ]
       })
@@ -509,7 +574,7 @@ export class SWBStack extends Stack {
         allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],
         allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         allowCredentials: true,
-        allowOrigins: ['http://localhost:3000']
+        allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
       }
     });
 
@@ -591,5 +656,36 @@ export class SWBStack extends Stack {
     table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
     return table;
+  }
+
+  private _createCognitoResources(
+    domainPrefix: string,
+    websiteUrl: string,
+    userPoolName: string,
+    userPoolClientName: string
+  ): WorkbenchCognito {
+    const props: WorkbenchCognitoProps = {
+      domainPrefix: domainPrefix,
+      websiteUrl: websiteUrl,
+      userPoolName: userPoolName,
+      userPoolClientName: userPoolClientName,
+      oidcIdentityProviders: []
+    };
+
+    const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);
+
+    new CfnOutput(this, 'cognitoUserPoolId', {
+      value: workbenchCognito.userPoolId
+    });
+
+    new CfnOutput(this, 'cognitoUserPoolClientId', {
+      value: workbenchCognito.userPoolClientId
+    });
+
+    new CfnOutput(this, 'cognitoDomainName', {
+      value: workbenchCognito.cognitoDomain
+    });
+
+    return workbenchCognito;
   }
 }

@@ -125,19 +125,20 @@ export class EnvironmentService {
   }
 
   /**
-   * Get all environments with option to filter by status
+   * List all environments with options for filtering, pagination, and sort
    * @param user - User information
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
-  public async getEnvironments(
+  public async listEnvironments(
     user: { role: string; ownerId: string },
     filter?: {
       status?: EnvironmentStatus;
       name?: string;
-      createdAt?: string;
+      createdAtFrom?: string;
+      createdAtTo?: string;
       project?: string;
       owner?: string;
       type?: string;
@@ -157,9 +158,13 @@ export class EnvironmentService {
     if (filter && sort) {
       throw Boom.badRequest('Cannot apply a filter and sort at the same time');
     }
-
+    const filterAttributesLength = filter ? Object.keys(filter).length : 0;
     // Check that at most one filter is defined because we not support more than one filter
-    if (filter && Object.keys(filter).length > 1) {
+    if (
+      filterAttributesLength > 1 &&
+      !(filterAttributesLength === 2 && filter?.createdAtFrom && filter?.createdAtTo)
+    ) {
+      //catch case for range
       throw Boom.badRequest('Cannot apply more than one filter.');
     }
 
@@ -185,9 +190,14 @@ export class EnvironmentService {
           // if admin and name is selected in the filter, use GSI getResourceByName
           const addFilter = this._setFilter('getResourceByName', 'name', filter.name);
           queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.createdAt) {
+        } else if (filter.createdAtFrom && filter.createdAtTo) {
           // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
-          const addFilter = this._setFilter('getResourceByCreatedAt', 'createdAt', filter.createdAt);
+          const addFilter = this._setRangeFilter(
+            'getResourceByCreatedAt',
+            'createdAt',
+            filter.createdAtFrom,
+            filter.createdAtTo
+          );
           queryParams = { ...queryParams, ...addFilter };
         } else if (filter.project) {
           // if admin and project is selected in the filter, use GSI getResourceByProject
@@ -268,6 +278,15 @@ export class EnvironmentService {
       index: gsi,
       sortKey: sortKey,
       eq: { S: eq }
+    };
+    return queryParams;
+  }
+
+  private _setRangeFilter(gsi: string, sortKey: string, from: string, to: string): QueryParams {
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      between: { value1: { S: from }, value2: { S: to } }
     };
     return queryParams;
   }

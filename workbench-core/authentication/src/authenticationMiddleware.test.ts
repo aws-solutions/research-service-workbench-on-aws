@@ -82,7 +82,11 @@ describe('authenticationMiddleware integration tests', () => {
         expires: refreshExpires
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
+      //TODO: Remove accessToken once cookies are properly set
+      expect(res.json).toHaveBeenCalledWith({
+        idToken: tokens.idToken.token,
+        accessToken: tokens.accessToken.token
+      });
     });
 
     it('should set the access and refresh tokens as session cookies when the AuthenticationService IDP sets them as such', async () => {
@@ -114,7 +118,10 @@ describe('authenticationMiddleware integration tests', () => {
         ...cookieOpts
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
+      expect(res.json).toHaveBeenCalledWith({
+        idToken: tokens.idToken.token,
+        accessToken: tokens.accessToken.token
+      });
     });
 
     it('should return 400 when code param is missing', async () => {
@@ -316,6 +323,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
+        },
+        headers: {
+          authorization: 'validToken'
         }
       } as Request;
 
@@ -340,6 +350,9 @@ describe('authenticationMiddleware integration tests', () => {
         method: 'GET',
         cookies: {
           access_token: 'validToken'
+        },
+        headers: {
+          authorization: 'validToken'
         }
       } as Request;
 
@@ -365,6 +378,9 @@ describe('authenticationMiddleware integration tests', () => {
         method: 'POST',
         cookies: {
           access_token: 'validToken'
+        },
+        headers: {
+          authorization: 'validToken'
         }
       } as Request;
 
@@ -378,7 +394,8 @@ describe('authenticationMiddleware integration tests', () => {
 
     it('should return 401 when access_token cookie is missing', async () => {
       const req: Request = {
-        cookies: {}
+        cookies: {},
+        headers: {}
       } as Request;
 
       const next = jest.fn();
@@ -408,6 +425,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
+        },
+        headers: {
+          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -424,6 +444,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
+        },
+        headers: {
+          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -703,6 +726,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
+        },
+        headers: {
+          authorization: 'validToken'
         }
       } as Request;
 
@@ -716,6 +742,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
+        },
+        headers: {
+          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -795,6 +824,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
+        },
+        headers: {
+          authorization: 'validToken'
         }
       } as Request;
       jest.spyOn(authenticationService, 'isUserLoggedIn').mockRejectedValueOnce(new IdpUnavailableError());

@@ -13,8 +13,15 @@ export default class HttpError extends Error {
   }
 
   public isEqual(error: Error): boolean {
-    return (
-      error instanceof HttpError && error.statusCode === this.statusCode && _.isEqual(error.body, this.body)
-    );
+    const isErrorEqual =
+      error instanceof HttpError && error.statusCode === this.statusCode && _.isEqual(error.body, this.body);
+    if (!isErrorEqual) {
+      console.log(
+        `Errors do not match. Expected error is ${JSON.stringify(this)}. Actual error is ${JSON.stringify(
+          error
+        )}`
+      );
+    }
+    return isErrorEqual;
   }
 }

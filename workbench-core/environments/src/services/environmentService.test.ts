@@ -264,7 +264,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         { status: 'PENDING' }
       );
@@ -304,7 +304,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         { name: 'testEnv' }
       );
@@ -327,7 +327,8 @@ describe('EnvironmentService', () => {
         .on(QueryCommand, {
           TableName: 'exampleDDBTable',
           IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType AND #createdAt = :createdAt',
+          KeyConditionExpression:
+            '#resourceType = :resourceType AND #createdAt BETWEEN :createdAt1 AND :createdAt2',
           ExpressionAttributeNames: {
             '#resourceType': 'resourceType',
             '#createdAt': 'createdAt'
@@ -336,17 +337,21 @@ describe('EnvironmentService', () => {
             ':resourceType': {
               S: 'environment'
             },
-            ':createdAt': {
+            ':createdAt1': {
+              S: '2022-05-13T20:03:54.055Z'
+            },
+            ':createdAt2': {
               S: '2022-05-13T20:03:54.055Z'
             }
-          }
+          },
+          Limit: 50
         })
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
-        { createdAt: '2022-05-13T20:03:54.055Z' }
+        { createdAtFrom: '2022-05-13T20:03:54.055Z', createdAtTo: '2022-05-13T20:03:54.055Z' }
       );
 
       // CHECK
@@ -384,7 +389,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         { project: 'proj-123' }
       );
@@ -424,7 +429,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         { owner: 'owner-123' }
       );
@@ -464,7 +469,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         { type: 'envType-123' }
       );
@@ -476,7 +481,7 @@ describe('EnvironmentService', () => {
     test('should fail with too many filters', async () => {
       // OPERATE n CHECK
       await expect(
-        envService.getEnvironments(
+        envService.listEnvironments(
           { role: 'admin', ownerId: 'owner-123' },
           { type: 'envType-123', owner: 'owner-123' }
         )
@@ -511,7 +516,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -551,7 +556,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -591,7 +596,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -631,7 +636,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -671,7 +676,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -711,7 +716,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -751,7 +756,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         undefined,
@@ -766,10 +771,16 @@ describe('EnvironmentService', () => {
     test('should fail with too many sort attributes', async () => {
       // OPERATE n CHECK
       await expect(
-        envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' }, undefined, undefined, undefined, {
-          type: true,
-          owner: true
-        })
+        envService.listEnvironments(
+          { role: 'admin', ownerId: 'owner-123' },
+          undefined,
+          undefined,
+          undefined,
+          {
+            type: true,
+            owner: true
+          }
+        )
       ).rejects.toThrow('Cannot sort by more than one attribute.');
     });
 
@@ -800,7 +811,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' });
+      const actualResponse = await envService.listEnvironments({ role: 'admin', ownerId: 'owner-123' });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -837,7 +848,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments({ role: 'researcher', ownerId: 'owner-123' });
+      const actualResponse = await envService.listEnvironments({ role: 'researcher', ownerId: 'owner-123' });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -885,7 +896,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironments(
+      const actualResponse = await envService.listEnvironments(
         { role: 'admin', ownerId: 'owner-123' },
         undefined,
         limit,
@@ -905,7 +916,12 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(
-        envService.getEnvironments({ role: 'admin', ownerId: 'owner-123' }, undefined, limit, paginationToken)
+        envService.listEnvironments(
+          { role: 'admin', ownerId: 'owner-123' },
+          undefined,
+          limit,
+          paginationToken
+        )
       ).rejects.toThrow('Invalid paginationToken');
     });
   });
