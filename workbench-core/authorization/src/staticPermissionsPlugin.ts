@@ -45,12 +45,26 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
   }
 
   public async getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]> {
+    let methodToOperations;
     if (await this.isRouteIgnored(route, method)) {
       return [];
     } else if (_.has(this._routesMap, route)) {
-      const methodToOperations = _.get(_.get(this._routesMap, route), method);
-      if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
+      methodToOperations = _.get(_.get(this._routesMap, route), method);
+    } else {
+      const BreakException = {};
+      try {
+        _.forEach(Object.entries(this._routesMap), ([routeRegex, operations]) => {
+          const match = route.match(routeRegex);
+          if (match && route === match[0]) {
+            methodToOperations = _.get(operations, method);
+            throw BreakException;
+          }
+        });
+      } catch (e) {
+        if (e !== BreakException) throw e;
+      }
     }
+    if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
     throw new RouteNotSecuredError('Route has not been secured');
   }
   /**
