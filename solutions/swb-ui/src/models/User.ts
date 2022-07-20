@@ -1,28 +1,43 @@
 import { IconProps } from '@awsui/components-react/icon';
 
-export interface User {
+export interface UserItem {
   id: string;
-  name: string;
   email: string;
-  avatar: IconProps;
-  claims: string[];
-  role: string;
+  givenName?: string;
+  familyName?: string;
+  avatar?: IconProps;
+  claims?: string[];
+  role?: string;
 }
 
-export const researcherUser: User = {
+export const researcherUser: UserItem = {
   id: 'sample-researcher-id',
-  name: 'Researcher User',
+  givenName: 'Researcher',
+  familyName: 'User',
   email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
   role: 'researcher'
 };
 
-export const adminUser: User = {
+export const adminUser: UserItem = {
   id: 'sample-admin-id',
-  name: 'Admin User',
+  givenName: 'Admin',
+  familyName: 'User',
   email: 'sample.user@example.com',
   avatar: { name: 'user-profile' },
   claims: [],
   role: 'admin'
 };
+
+export interface CreateUserForm {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface CreateUserFormValidation {
+  emailError?: string;
+  familyNameError?: string;
+  givenNameError?: string;
+}
