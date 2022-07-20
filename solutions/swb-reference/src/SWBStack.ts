@@ -11,7 +11,7 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
-  AnyPrincipal
+  AnyPrincipal,
   Effect,
   Policy,
   PolicyDocument,
