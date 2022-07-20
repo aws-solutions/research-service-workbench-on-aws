@@ -6,7 +6,11 @@ import { AuthenticatedUserNotFoundError } from './errors/authenticatedUserNotFou
 import { HTTPMethod, HTTPMethods } from './routesMap';
 /**
  *
+<<<<<<< HEAD
  * 14th change
+=======
+ * 13th change
+>>>>>>> 1b51f01d4a765af546bbfc9ea39de533d003a6c3
  * Checks to ensure user object is an instance of {@link AuthenticatedUser}.
  * @param user - object that is suppose to represent the user.
  * @returns - boolean stating if user object is an instance of {@link AuthenticatedUser}.
