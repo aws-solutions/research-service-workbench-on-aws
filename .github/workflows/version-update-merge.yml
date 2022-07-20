@@ -124,14 +124,14 @@ jobs:
   rebase-merge-to-develop:
     runs-on: ubuntu-20.04
     needs: [rush-version, rush-publish]
-    if: needs.rush-version.outputs.version_changes_detected == true
     permissions:
       id-token: write
       contents: read
     env: 
       COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
-      # CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
+      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
       SECOND_COMMIT_HASH: " ${{ needs.rush-version.outputs.version_second_commit_hash }}"
+    if: CHANGES_DETECTED == true
     steps:
       - name: git checkout
         uses: actions/checkout@v3
