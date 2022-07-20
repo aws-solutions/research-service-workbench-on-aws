@@ -24,6 +24,10 @@ jobs:
           token: ${{ secrets.MERGE_TOKEN }}
           ref: ${{ steps.set-ref.outputs.ref }}
           fetch-depth: 0
+      # - name: Base Action
+      #   uses: ./.github/actions/baseAction
+      # - name: Rush test and update the README file in each package with the coverage badge
+      #   run: node common/scripts/install-run-rush.js test --verbose
       - name: Get Current SHA
         id: last_sha
         run: |
@@ -120,12 +124,13 @@ jobs:
   rebase-merge-to-develop:
     runs-on: ubuntu-20.04
     needs: [rush-version, rush-publish]
+    if: needs.rush-version.outputs.version_changes_detected == true
     permissions:
       id-token: write
       contents: read
     env: 
       COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
-      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
+      # CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
       SECOND_COMMIT_HASH: " ${{ needs.rush-version.outputs.version_second_commit_hash }}"
     steps:
       - name: git checkout
@@ -148,19 +153,11 @@ jobs:
         
       - name: Merge to test-develop
         run: |
-          echo "Set the COMMIT_ID to merge to test-develop, to current workflow commit id, if no version change commit was made"
-          echo "Else"
-          echo "Set the COMMIT_ID to VERSION change commit id"
-          COMMIT_ID=''
-          if $CHANGES_DETECTED; then
-            COMMIT_ID=$COMMIT_HASH
-          else
-            COMMIT_ID=$GITHUB_SHA
-          fi
           git checkout test-develop
           echo
           echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
           echo "  into the 'test-develop' branch ($(git log -1 --pretty=%H test-develop))"
           echo
-          git merge $COMMIT_ID --no-edit
+          git cherry-pick $SECOND_COMMIT_HASH --ff
+          git cherry-pick $COMMIT_HASH --ff
           git push origin test-develop
