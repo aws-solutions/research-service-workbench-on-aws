@@ -59,18 +59,23 @@ parameters:
   S3Mounts:
     type: String
     description: Stringified array of dataset objects containing their mountString
+    allowedPattern: ^\[.*\]$
   IamPolicyDocument:
     type: String
     description: The IAM policy to be associated with the launched workstation
+    allowedPattern: ^\{.+\}$
   DatasetsBucketArn:
     type: String
     description: The ARN of the Datasets bucket in the main account
+    allowedPattern: ^arn:aws:s3:::[a-zA-Z0-9_\-\/]+$
   MainAccountId:
     type: String
     description: The Main Account ID where application is deployed
+    allowedPattern: \d{12}
   MainAccountRegion:
     type: String
     description: The region of application deployment in main account
+    allowedPattern: ^\w{2,3}-\w+-\d{1}$
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
