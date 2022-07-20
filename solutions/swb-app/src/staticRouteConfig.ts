@@ -73,7 +73,7 @@ export const routesMap: RoutesMap = {
     GET: [
       {
         action: 'READ',
-        subject: 'Environment'
+        subject: 'EnvironmentConnection'
       }
     ]
   },
@@ -158,6 +158,14 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  '/projects': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {
