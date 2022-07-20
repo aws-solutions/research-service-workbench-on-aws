@@ -2,13 +2,19 @@ import TopNavigation from '@awsui/components-react/top-navigation';
 import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
+import { researcherUser } from '../models/User';
 import styles from '../styles/Header.module.scss';
 
 export default function Header(): JSX.Element {
   const { settings } = useSettings();
-  const { user } = useAuthentication();
+  // eslint-disable-next-line prefer-const
+  let { user, signOut } = useAuthentication();
 
-  const profileActions = [{ type: 'button', id: 'signout', text: headerLabels.signout }];
+  if (user === undefined) {
+    user = researcherUser;
+  }
+
+  const profileActions = [{ id: 'signout', text: headerLabels.signout }];
   return (
     <TopNavigation
       id="header"
@@ -22,13 +28,10 @@ export default function Header(): JSX.Element {
       utilities={[
         {
           type: 'menu-dropdown',
-          text: user.name,
+          text: `${user.givenName} ${user.familyName}`,
           description: user.email,
-          iconName: user.avatar.name,
-          iconAlt: user.avatar.alt,
-          iconSvg: user.avatar.svg,
-          iconUrl: user.avatar.url,
-          items: profileActions
+          items: profileActions,
+          onItemClick: async () => await signOut()
         }
       ]}
     />
