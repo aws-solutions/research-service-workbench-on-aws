@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@amzn/workbench-core-audit",
+      "comment": "",
+      "type": "none"
+    }
+  ],
+  "packageName": "@amzn/workbench-core-audit"
+}
