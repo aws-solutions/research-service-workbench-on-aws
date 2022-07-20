@@ -11,7 +11,7 @@ import {
   ResponseHeadersPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { Effect, PolicyStatement, StarPrincipal } from 'aws-cdk-lib/aws-iam';
+import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
@@ -83,7 +83,7 @@ export class SWBUIStack extends Stack {
       new PolicyStatement({
         sid: 'Deny requests that do not use TLS/HTTPS',
         effect: Effect.DENY,
-        principals: [new StarPrincipal()],
+        principals: [new AnyPrincipal()],
         actions: ['s3:*'],
         resources: [s3Bucket.bucketArn, `${s3Bucket.bucketArn}/*`],
         conditions: {
@@ -97,7 +97,7 @@ export class SWBUIStack extends Stack {
       new PolicyStatement({
         sid: 'Deny requests that do not use SigV4',
         effect: Effect.DENY,
-        principals: [new StarPrincipal()],
+        principals: [new AnyPrincipal()],
         actions: ['s3:*'],
         resources: [`${s3Bucket.bucketArn}/*`],
         conditions: {
