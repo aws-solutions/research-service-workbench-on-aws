@@ -1,6 +1,11 @@
 # Change Log - @amzn/patient-consent-infrastructure
 
-This log was last generated on Wed, 20 Jul 2022 08:33:52 GMT and should not be manually modified.
+This log was last generated on Wed, 20 Jul 2022 08:48:38 GMT and should not be manually modified.
+
+## 0.0.13
+Wed, 20 Jul 2022 08:48:38 GMT
+
+_Version update only_
 
 ## 0.0.12
 Wed, 20 Jul 2022 08:33:52 GMT
