@@ -157,5 +157,5 @@ jobs:
           echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
           echo "  into the 'test-develop' branch ($(git log -1 --pretty=%H test-develop))"
           echo
-          git merge $COMMIT_HASH --ff-only --no-edit
+          git merge $COMMIT_HASH --ff --no-edit
           git push origin test-develop
