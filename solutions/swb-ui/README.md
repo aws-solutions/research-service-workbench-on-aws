@@ -72,18 +72,18 @@ Project swb-ui can be deployed as a static website using S3 Bucket and CloudFron
 
 1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
 
-2. Copy value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+1. Copy value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
 
-3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
+1. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
 
-5. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
+1. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
 ```
 NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
 ```
 
-6. Navigate to `solutions/swb-ui`
+1. Navigate to `solutions/swb-ui`
 
-7. Run command `STAGE=<STAGE> rushx deploy`
+1. Run command `STAGE=<STAGE> rushx deploy`
 
 
 After the deployment is completed you'll see the following output:
