@@ -22,15 +22,15 @@ import {
 import JobsTable from './JobsTable';
 
 export default function ClustersTable(): JSX.Element {
-  const [projects, setProjects] = useState([] as Project[]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  const options = projects.map((project) => {
+  const projectOptions = projects.map((project) => {
     return { label: project.id, value: project.id };
   });
 
-  const [clusters, setClusters] = useState([] as Cluster[]);
+  const [clusters, setClusters] = useState<Cluster[]>([]);
 
-  const [selectedOption, setSelectedOption] = useState([] as OptionDefinition);
+  const [selectedProject, setSelectedProject] = useState<OptionDefinition>();
 
   const [isSplitOpen, setSplitOpen] = useState(false);
 
@@ -50,9 +50,9 @@ export default function ClustersTable(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (selectedOption.value! !== undefined) {
+    if (selectedProject !== undefined) {
       setClustersLoading(true);
-      getClusters(selectedOption.value!)
+      getClusters(selectedProject!.value!)
         .then((items) => {
           setClusters(items);
           setClustersLoading(false);
@@ -62,7 +62,7 @@ export default function ClustersTable(): JSX.Element {
           setClustersLoading(false);
         });
     }
-  }, [selectedOption.value]);
+  }, [selectedProject]);
 
   const emptyItemType: string = 'cluster';
   const selectItemType: string = 'project';
@@ -71,9 +71,7 @@ export default function ClustersTable(): JSX.Element {
     propertyFiltering: {
       filteringProperties: filteringProperties,
       empty:
-        selectedOption.value! === undefined
-          ? TableSelectDisplay(selectItemType)
-          : TableEmptyDisplay(emptyItemType)
+        selectedProject === undefined ? TableSelectDisplay(selectItemType) : TableEmptyDisplay(emptyItemType)
     },
     selection: {
       trackBy: 'clusterName'
@@ -146,7 +144,7 @@ export default function ClustersTable(): JSX.Element {
         >
           {collectionProps.selectedItems?.at(0)?.clusterName! !== undefined ? (
             <JobsTable
-              projectId={isSplitOpen ? selectedOption.value! : undefined!}
+              projectId={isSplitOpen ? selectedProject!.value! : undefined!}
               clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}
             />
           ) : (
@@ -175,9 +173,9 @@ export default function ClustersTable(): JSX.Element {
                     </Box>
                     <Select
                       expandToViewport
-                      selectedOption={selectedOption}
-                      onChange={({ detail }) => setSelectedOption(detail.selectedOption!)}
-                      options={options}
+                      selectedOption={selectedProject!}
+                      onChange={({ detail }) => setSelectedProject(detail.selectedOption!)}
+                      options={projectOptions}
                       loadingText="Loading projects..."
                       placeholder="Choose a project"
                       selectedAriaLabel="Selected"
