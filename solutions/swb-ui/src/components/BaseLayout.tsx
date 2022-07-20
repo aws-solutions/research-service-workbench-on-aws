@@ -34,6 +34,7 @@ export default function Layout({ navigationHide, appName, children }: LayoutProp
 
   if (appName !== undefined) {
     breadcrumbs[1].text = appName;
+    breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
   }
 
   return (

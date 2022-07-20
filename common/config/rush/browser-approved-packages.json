@@ -15,6 +15,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@amzn/hpc-ui-test",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/patient-consent-express",
       "allowedCategories": [ "production" ]
     },
@@ -372,6 +376,10 @@
     },
     {
       "name": "hpc_ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "hpc-ui-test",
       "allowedCategories": [ "production" ]
     },
     {

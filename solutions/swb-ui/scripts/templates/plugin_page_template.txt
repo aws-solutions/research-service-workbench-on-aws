@@ -1,11 +1,11 @@
-import App from '<--Insert--Plugin--Name-->';
-import BaseLayout from '../../components/BaseLayout';
+import App from "<--Insert--Plugin--Package--Name-->";
+import BaseLayout from "../../components/BaseLayout";
 
-function <--Insert--Plugin--Name-->APP(): JSX.Element {
+function <--Insert--Plugin--Name-->_APP(): JSX.Element {
   return (
-    <BaseLayout appName="<--Insert--Plugin--Name-->">
+    <BaseLayout appName="<--Insert--Formal--Plugin--Name-->">
       <App />
     </BaseLayout>
   );
 }
-export default <--Insert--Plugin--Name-->APP;
+export default <--Insert--Plugin--Name-->_APP;

@@ -362,7 +362,7 @@ importers:
       ts-jest: 27.1.5_6400e448c8ce26641831d9829b55a941
       typescript: 4.7.4
 
-  ../../solutions/swb-plugins/hpc-ui:
+  ../../solutions/swb-plugins/AWS_ParallelClusters:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@awsui/collection-hooks': ^1.0.0
@@ -624,7 +624,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@amzn/environments': link:../../workbench-core/environments
-      '@amzn/hpc-ui': link:../swb-plugins/hpc-ui
+      '@amzn/hpc-ui': link:../swb-plugins/AWS_ParallelClusters
       axios: 0.27.2
       date-fns: 2.28.0
       express: 4.18.1

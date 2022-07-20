@@ -114,12 +114,6 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/hpc-ui",
-      "projectFolder": "solutions/swb-plugins/hpc-ui",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
@@ -146,6 +140,12 @@
     {
       "packageName": "@amzn/patient-consent-express",
       "projectFolder": "solutions/managed-blockchain-for-patient-consent/patient-consent-express",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/hpc-ui",
+      "projectFolder": "solutions/swb-plugins/AWS_ParallelClusters",
       "reviewCategory": "production",
       "shouldPublish": true
     }

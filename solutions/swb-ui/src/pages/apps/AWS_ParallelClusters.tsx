@@ -1,11 +1,11 @@
 import App from '@amzn/hpc-ui';
 import BaseLayout from '../../components/BaseLayout';
 
-function AWSParallelClustersApp(): JSX.Element {
+function AWS_PARALLELCLUSTERS_APP(): JSX.Element {
   return (
-    <BaseLayout appName="AWS ParallelClusters">
+    <BaseLayout appName="AWS_ParallelClusters">
       <App />
     </BaseLayout>
   );
 }
-export default AWSParallelClustersApp;
+export default AWS_PARALLELCLUSTERS_APP;
