@@ -195,7 +195,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       "Principal": {
         "AWS":"*"
       },
-      "Action": "*",
+      "Action": "s3:*",
       "Resource": ["${s3BucketArn}", "${s3BucketArn}/*"],
       "Condition": {
         "StringEquals": {
