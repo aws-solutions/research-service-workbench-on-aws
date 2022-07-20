@@ -77,9 +77,9 @@ Project swb-ui can be deployed as a static website using S3 Bucket and CloudFron
 3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
 
 4. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
-```
-NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
-```
+    ```
+    NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
+    ```
 
 5. Navigate to `solutions/swb-ui`
 
