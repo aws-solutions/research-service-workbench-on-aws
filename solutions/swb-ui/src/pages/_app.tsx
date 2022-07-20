@@ -7,8 +7,6 @@ import { AuthenticationProvider } from '../context/AuthenticationContext';
 import { NotificationsProvider } from '../context/NotificationContext';
 import { SettingsProvider } from '../context/SettingsContext';
 
-// eslint-disable-next-line @rushstack/typedef-var
-
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
