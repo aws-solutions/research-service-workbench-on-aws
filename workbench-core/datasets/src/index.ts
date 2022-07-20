@@ -6,4 +6,5 @@ export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExistsError';
 export { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
 export { ExternalEndpoint } from './externalEndpoint';
+export { IamHelper } from './iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';

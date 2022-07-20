@@ -31,6 +31,7 @@
     "@amzn/environments": "workspace:*",
     "@amzn/workbench-core-authentication": "workspace:*",
     "@amzn/workbench-core-authorization": "workspace:*",
+    "@amzn/workbench-core-datasets": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "cookie-parser": "^1.4.6",

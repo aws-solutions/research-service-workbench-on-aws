@@ -33,8 +33,11 @@
   "dependencies": {
     "@amzn/environments": "workspace:*",
     "@amzn/swb-app": "workspace:*",
+    "@amzn/workbench-core-audit": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
+    "@amzn/workbench-core-datasets": "workspace:*",
     "@amzn/workbench-core-infrastructure": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-dynamodb": "^3.118.1",
     "@aws-sdk/client-s3": "^3.118.1",
