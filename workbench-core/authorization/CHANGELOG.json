@@ -1,0 +1,17 @@
+{
+  "name": "@amzn/workbench-core-authorization",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "tag": "@amzn/workbench-core-authorization_v0.0.2",
+      "date": "Wed, 20 Jul 2022 10:42:43 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "first change"
+          }
+        ]
+      }
+    }
+  ]
+}
