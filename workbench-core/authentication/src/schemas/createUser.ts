@@ -8,11 +8,7 @@ const CreateUserSchema: Schema = {
     uid: { type: 'string' },
     firstName: { type: 'string' },
     lastName: { type: 'string' },
-    email: { type: 'string' },
-    roles: {
-      type: 'array',
-      items: { type: 'string' }
-    }
+    email: { type: 'string' }
   },
   additionalProperties: false,
   required: ['uid', 'firstname', 'lastName', 'email']
