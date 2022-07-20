@@ -362,7 +362,7 @@ importers:
       ts-jest: 27.1.5_6400e448c8ce26641831d9829b55a941
       typescript: 4.7.4
 
-  ../../solutions/swb-plugins/hpc-ui:
+  ../../solutions/swb-plugins/AWS_ParallelClusters:
     specifiers:
       '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
       '@awsui/collection-hooks': ^1.0.0
@@ -11023,7 +11023,7 @@ packages:
     dev: false
 
   /github-from-package/0.0.0:
-    resolution: {integrity: sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=}
+    resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
     dev: true
 
   /glob-escape/0.0.2:

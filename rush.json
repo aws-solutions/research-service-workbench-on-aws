@@ -115,7 +115,7 @@
     },
     {
       "packageName": "@amzn/hpc-ui",
-      "projectFolder": "solutions/swb-plugins/hpc-ui",
+      "projectFolder": "solutions/swb-plugins/AWS_ParallelClusters",
       "reviewCategory": "production",
       "shouldPublish": true
     },
