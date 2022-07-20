@@ -8,7 +8,8 @@ import {
   HeadersFrameOption,
   HeadersReferrerPolicy,
   OriginAccessIdentity,
-  ResponseHeadersPolicy
+  ResponseHeadersPolicy,
+  ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
@@ -110,7 +111,7 @@ export class SWBUIStack extends Stack {
     const securityPolicy = this._createSecurityPolicy(this.distributionEnvVars.API_BASE_URL);
     const distribution = new Distribution(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_NAME, {
       defaultRootObject: 'index.html',
-
+      enableLogging: true,
       defaultBehavior: {
         origin: new S3Origin(bucket, { originAccessIdentity }),
         responseHeadersPolicy: securityPolicy,
@@ -119,7 +120,8 @@ export class SWBUIStack extends Stack {
             function: redirectFunction,
             eventType: FunctionEventType.VIEWER_REQUEST
           }
-        ]
+        ],
+        viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY
       },
       additionalBehaviors: {}
     });
