@@ -8,7 +8,8 @@ const UpdateEnvironmentTypeSchema: Schema = {
     description: { type: 'string' },
     name: { type: 'string' },
     status: { type: 'string' }
-  }
+  },
+  additionalProperties: false
 };
 
 export default UpdateEnvironmentTypeSchema;

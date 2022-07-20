@@ -15,6 +15,7 @@ const CreateAccountSchema: Schema = {
     encryptionKeyArn: { type: 'string' },
     externalId: { type: 'string' }
   },
+  additionalProperties: false,
   required: [
     'awsAccountId',
     'envMgmtRoleArn',

@@ -23,6 +23,7 @@ const CreateEnvironmentTypeSchema: Schema = {
     },
     status: { type: 'string' }
   },
+  additionalProperties: false,
   required: ['allowedRoleIds', 'type', 'description', 'name', 'params', 'status']
 };
 

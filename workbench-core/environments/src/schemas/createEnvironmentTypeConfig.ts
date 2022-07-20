@@ -22,6 +22,7 @@ const CreateEnvironmentTypeConfigSchema: Schema = {
       }
     }
   },
+  additionalProperties: false,
   required: ['allowedRoleIds', 'type', 'description', 'name', 'params']
 };
 

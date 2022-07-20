@@ -18,7 +18,8 @@ const UpdateEnvironmentTypeConfigSchema: Schema = {
         additionalProperties: true
       }
     }
-  }
+  },
+  additionalProperties: false
 };
 
 export default UpdateEnvironmentTypeConfigSchema;
