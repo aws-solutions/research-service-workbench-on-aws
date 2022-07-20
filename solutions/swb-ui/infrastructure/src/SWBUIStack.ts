@@ -73,8 +73,8 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_NAME
     };
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_ARN_NAME);
-    this._deployS3Bucket(bucket);
-    this._createDistribution(bucket);
+    const distribution = this._createDistribution(bucket);
+    this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
   }
   private _createS3Bucket(s3ArtifactName: string): Bucket {
     const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
@@ -86,10 +86,12 @@ export class SWBUIStack extends Stack {
     });
     return s3Bucket;
   }
-  private _deployS3Bucket(bucket: Bucket): void {
+  private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../out'))]
+      sources: [Source.asset(path.resolve(__dirname, '../../out'))],
+      distribution: distribution,
+      distributionPaths: ['*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });
   }
 

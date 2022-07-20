@@ -79,7 +79,6 @@ function getClientURL(): string {
         'utf8'
       ) // nosemgrep
     );
-    console.log('2');
     const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
     // eslint-disable-next-line security/detect-object-injection
     return uiClientOutput[uiClientStackName].WebsiteURL;

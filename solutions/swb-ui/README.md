@@ -10,36 +10,26 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-### Retrieve API URL
+## Run App
 
-In order to run the application We need to setup the base API URL environment variable first.
+### Prerequisite
 
-Copy API URL from [Installation](../swb-reference/SETUP_v2p1.md##deploy-the-code) step.
-
-Look for the cloud formation output `APIGatewayAPIEndpoint`. The API URL has the format `https://{api}.{region}.amazonaws.com/dev/`
-
-API URL can also be found by login to aws with Main Account:
-
-1. Select Services menu 
-
-1. Select API Gateway option
-
-1. In APis grid select the API created
-
-1. Select Dashboard option on the left panel
-
-1. URL will be displayed at the top of the page with the format `Invoke this API at: <API_URL>`
+1. Follow instructions in [Installation](../swb-reference/SETUP_v2p1.md##deploy-the-code) 
 
 
-Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL="<API_URL>"`
+### Start App
 
-For local instances, in `swb-ui` directory create a file with name `.env.local` containing the API URL variable with the format:
+1. Navigate to `solutions/swb-reference/src/config/<STAGE>.js`
+
+2. Copy value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+
+3. Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"`
+
+
+For local instances, in `swb-ui` directory, create a file with name `.env.local` containing the API URL variable with the format:
 ```
 NEXT_PUBLIC_API_BASE_URL="<API_URL>"
 ```
-
-
-
 
 In the project directory, ensure all dependencies are installed. Run:
 ```
@@ -70,43 +60,18 @@ The environments page is at [http://localhost:3000/environments](http://localhos
 
 ## Deploy UI
 
-Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assign value to `NEXT_PUBLIC_API_BASE_URL` in `.env.local` before starting next steps for deploy process.
+### Prerequisite:
 
-### Setup Config File
-
-1. Navigate to `solutions/swb-ui/cdk/infrastructure/src/config`
-
-1. Copy `solutions/swb-ui/cdk/infrastructure/src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.`
-
-1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
-
-1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
-
-1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide a value for `apiBaseUrl` with the next steps: 
-    1. Follow instructions from step [Retrieve API URL](##retrieve-api-url) and copy the value with format `https://{api}.{region}.amazonaws.com/dev/`
-    1. Remove the last part of the URL `/dev/`.
-    1. Assign value to `apiBaseUrl`,  `apiBaseUrl` must have the next format  `https://{api}.{region}.amazonaws.com`.
-
-1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
-
-
-### Export Site
-
-In order to deploy application we need to export the application as a static website
-
-1. Navigate to `solutions/swb-ui/`
-
-1. Run command `rushx export`
+1. Make sure to Follow instructions in [Installation](../swb-reference/SETUP_v2p1.md##deploy-the-code) 
 
 
 ### Deploy static website
 
-1. In `solutions/swb-ui/cdk/infrastructure` root directory run commands
+Project swb-ui can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
-```
-rush install
-STAGE=<STAGE> rushx cdk bootstrap
-STAGE=<STAGE> rushx cdk-deploy
+1. Navigate to `solutions/swb-ui`
+
+2. Run command `STAGE=<STAGE> rushx deploy`
 
 ```
 
