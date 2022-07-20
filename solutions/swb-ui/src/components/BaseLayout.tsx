@@ -21,10 +21,8 @@ export default function Layout({ navigationHide, children, breadcrumbs }: Layout
   displayNotification(id, {
     type: 'warning',
     dismissible: false,
-    // dismissLabel: 'Dismiss message',
-    // onDismiss: () => closeNotification(id),
     content:
-      'This code is in active development mode. Do not put any critical, production, or otherwise important data in the workspaces or datasets.'
+      'This software is in active development/testing mode. Do not put any critical, production, or otherwise important data in the workspaces or studies.'
   });
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
