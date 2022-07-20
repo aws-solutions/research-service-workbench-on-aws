@@ -11,13 +11,13 @@ import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
-  AnyPrincipal
+  AnyPrincipal,
   Effect,
   Policy,
   PolicyDocument,
   PolicyStatement,
   Role,
-  ServicePrincipal,
+  ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
@@ -303,6 +303,22 @@ export class SWBStack extends Stack {
     );
   }
 
+  private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          StringEquals: {
+            's3:DataAccessPointAccount': this.account
+          }
+        }
+      })
+    );
+  }
+
   private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
     return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName);
   }
@@ -316,6 +332,7 @@ export class SWBStack extends Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
+    if (s3BucketId === 's3-datasets') this._addAccessPointDelegationStatement(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
