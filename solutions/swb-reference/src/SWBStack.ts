@@ -324,7 +324,9 @@ export class SWBStack extends Stack {
   }
 
   private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    return this._createSecureS3Bucket('s3-datasets', s3DatasetsName);
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName);
+    this._addAccessPointDelegationStatement(bucket);
+    return bucket;
   }
 
   private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
@@ -332,7 +334,6 @@ export class SWBStack extends Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
-    if (s3BucketId === 's3-datasets') this._addAccessPointDelegationStatement(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
