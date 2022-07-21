@@ -91,7 +91,7 @@ export default function ClustersTable(): JSX.Element {
     <AppLayout
       contentHeader={
         <Header
-          description="View and manage AWS ParallelClusters for batch jobs all within Service Workbench."
+          description="View and manage your batch jobs within Service Workbench."
           variant="h1"
           info={
             <Link href="https://aws.amazon.com/hpc/parallelcluster/" variant="info">

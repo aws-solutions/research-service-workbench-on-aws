@@ -18,8 +18,8 @@ for plugin in *; do
             jq --arg pluginName $pluginPackageName '.dependencies += {($pluginName): "workspace:*"}' ../swb-ui/package.json > ../swb-ui/output_package.json;
             mv ../swb-ui/output_package.json ../swb-ui/package.json;
             echo "Added $pluginPackageName to package.json of swb-ui";
-            echo "Created new page for $pluginPackageName in swb-ui/src/pages/apps using name $plugin";
-            cp ../swb-ui/scripts/templates/plugin_page_template.txt ../swb-ui/src/pages/apps/$plugin.tsx;
+            echo "Creating new page for $pluginPackageName in swb-ui/src/pages/apps using name $plugin";
+            cp ../swb-ui/scripts/templates/app_page_template.txt ../swb-ui/src/pages/apps/$plugin.tsx;
             sed -i '' "s|<--Insert--Plugin--Package--Name-->|$pluginPackageName|g" ../swb-ui/src/pages/apps/$plugin.tsx;
             sed -i '' "s|<--Insert--Plugin--Name-->|$pluginUpper|g" ../swb-ui/src/pages/apps/$plugin.tsx;
             sed -i '' "s|<--Insert--Formal--Plugin--Name-->|$plugin|g" ../swb-ui/src/pages/apps/$plugin.tsx;
