@@ -17,7 +17,7 @@ parameters:
   ProvisioningArtifactId:
     type: String
     description: 'The ProvisioningArtifactId to be used from Service Catalog'
-    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
+    allowedPattern: ^pa-[a-zA-Z0-9_\-]{1,100}$
   VPC:
     type: String
     description: 'The VPC to be used where the environment will reside'
