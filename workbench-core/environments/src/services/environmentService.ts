@@ -1,5 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 
+import { AuthenticatedUser } from '@amzn/workbench-core-authorization';
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
@@ -133,7 +134,7 @@ export class EnvironmentService {
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
   public async listEnvironments(
-    user: { role: string; ownerId: string },
+    user: AuthenticatedUser,
     filter?: {
       status?: EnvironmentStatus;
       name?: string;
@@ -180,7 +181,7 @@ export class EnvironmentService {
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 
-    if (user.role === 'admin') {
+    if (user.roles.includes('Admin')) {
       if (filter) {
         if (filter.status) {
           // if admin and status is selected in the filter, use GSI getResourceByStatus
@@ -244,7 +245,7 @@ export class EnvironmentService {
       }
     } else {
       // if nonadmin, use GSI getResourceByOwner
-      const addFilter = this._setFilter('getResourceByOwner', 'owner', user?.ownerId);
+      const addFilter = this._setFilter('getResourceByOwner', 'owner', user.id);
       queryParams = { ...queryParams, ...addFilter };
     }
 
@@ -335,19 +336,22 @@ export class EnvironmentService {
     return `${type}#${id}`;
   }
 
-  public async createEnvironment(params: {
-    instanceId?: string;
-    cidr: string;
-    description: string;
-    error?: { type: string; value: string };
-    name: string;
-    outputs: { id: string; value: string; description: string }[];
-    projectId: string;
-    datasetIds: string[];
-    envTypeId: string;
-    envTypeConfigId: string;
-    status?: EnvironmentStatus;
-  }): Promise<Environment> {
+  public async createEnvironment(
+    params: {
+      instanceId?: string;
+      cidr: string;
+      description: string;
+      error?: { type: string; value: string };
+      name: string;
+      outputs: { id: string; value: string; description: string }[];
+      projectId: string;
+      datasetIds: string[];
+      envTypeId: string;
+      envTypeConfigId: string;
+      status?: EnvironmentStatus;
+    },
+    user: AuthenticatedUser
+  ): Promise<Environment> {
     const itemsToGet = [
       // ETC
       {
@@ -377,10 +381,10 @@ export class EnvironmentService {
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
-      updatedBy: 'user-1', // TODO: Get this from request context
+      updatedBy: user.id,
       createdAt: new Date().toISOString(),
-      createdBy: 'user-1', // TODO: Get this from request context
-      owner: 'owner-1', // TODO: Get this from request context
+      createdBy: user.id,
+      owner: user.id,
       status: params.status || 'PENDING',
       type: params.envTypeId,
       dependency: params.projectId
