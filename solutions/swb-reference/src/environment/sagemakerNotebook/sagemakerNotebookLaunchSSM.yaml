@@ -63,7 +63,7 @@ parameters:
   IamPolicyDocument:
     type: String
     description: The IAM policy to be associated with the launched workstation
-    allowedPattern: ^\{.+\}$
+    allowedPattern: ^\{.*\}$
   DatasetsBucketArn:
     type: String
     description: The ARN of the Datasets bucket in the main account
