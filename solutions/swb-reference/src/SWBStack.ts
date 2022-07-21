@@ -3,7 +3,7 @@
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
 
-import { App, aws_iam, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -315,14 +315,14 @@ export class SWBStack extends Stack {
   /**
    * Create bucket for S3 access logs.
    * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
-   * @param bucketName Name of Access Logs Bucket.
+   * @param bucketName - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
   private _createAccessLogsBucket(bucketName: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.KMS,
-      encryptionKey: mainAcctEncryptionKey
+      encryption: BucketEncryption.S3_MANAGED, // https://www.aristotle.a2z.com/implementations/120
+      encryptionKey: undefined
     });
 
     return s3Bucket;
