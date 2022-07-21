@@ -80,7 +80,7 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE
-    const response = await helper.getDatasetsToMount(datasetIds, envMetadata);
+    const response = await helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN');
 
     // CHECK
     await expect(response).toEqual({ iamPolicyDocument: '{}', s3Mounts: '[]' });
@@ -148,7 +148,9 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.environmentService.addMetadata = jest.fn();
 
     // OPERATE & CHECK
-    await expect(helper.getDatasetsToMount(datasetIds, envMetadata)).resolves.not.toThrowError();
+    await expect(
+      helper.getDatasetsToMount(datasetIds, envMetadata, 'sampleKeyARN')
+    ).resolves.not.toThrowError();
   });
 
   test('getAwsSdkForEnvMgmtRole does not throw an error', async () => {
