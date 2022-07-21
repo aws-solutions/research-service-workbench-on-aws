@@ -22,6 +22,7 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -133,8 +134,8 @@ export class SWBStack extends Stack {
       S3_ARTIFACT_BUCKET_ARN_NAME,
       mainAcctEncryptionKey
     );
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
+    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
@@ -168,7 +169,10 @@ export class SWBStack extends Stack {
     return key;
   }
 
-  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
+private _createLaunchConstraintIAMRole(
+    launchConstraintRoleNameOutput: string,
+    artifactS3Bucket: Bucket
+  ): Role {
     const commonScManagement = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -218,7 +222,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*']
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
@@ -238,11 +242,11 @@ export class SWBStack extends Stack {
             'ec2:DescribeSubnets',
             'ec2:DescribeVpcs'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeTags, DescrbeKeyPairs, DescribeSecurityGroups, DescribeSubnets, DescribeVpcs do not allow for resource-based permissions
         }),
         new PolicyStatement({
           actions: ['kms:CreateGrant'],
-          resources: ['*']
+          resources: ['*'] // Must be wildcard because we do not know the keys at the time of creation of this policy
         })
       ]
     });
@@ -270,7 +274,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
-          resources: ['*']
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
           actions: [
@@ -291,7 +295,7 @@ export class SWBStack extends Stack {
             'ec2:CreateNetworkInterface',
             'ec2:DeleteNetworkInterface'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeNetworkInterfaces does not allow resource-level permissions
         })
       ]
     });
@@ -485,7 +489,11 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): Function {
+  private _createAccountHandlerLambda(
+    launchConstraintRole: Role,
+    artifactS3Bucket: Bucket,
+    amiIdsToShare: string
+  ): Function {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -495,8 +503,9 @@ export class SWBStack extends Stack {
       timeout: Duration.minutes(4)
     });
 
-    lambda.role?.attachInlinePolicy(
-      new Policy(this, 'accountHandlerPolicy', {
+    const amiIdsList: string[] = JSON.parse(amiIdsToShare);
+
+    const lambdaPolicy = new Policy(this, 'accountHandlerPolicy', {
         statements: [
           new PolicyStatement({
             sid: 'CreatePortfolioShare',
@@ -532,11 +541,6 @@ export class SWBStack extends Stack {
             resources: [launchConstraintRole.roleArn]
           }),
           new PolicyStatement({
-            sid: 'ShareAmi',
-            actions: ['ec2:ModifyImageAttribute'],
-            resources: ['*']
-          }),
-          new PolicyStatement({
             sid: 'ShareSSM',
             actions: ['ssm:ModifyDocumentPermission'],
             resources: [
@@ -555,7 +559,18 @@ export class SWBStack extends Stack {
           })
         ]
       })
-    );
+
+    if (!_.isEmpty(amiIdsList)) {
+      lambdaPolicy.addStatements(
+        new PolicyStatement({
+          sid: 'ShareAmi',
+          actions: ['ec2:ModifyImageAttribute'],
+          resources: amiIdsList
+        })
+      );
+    }
+
+    lambda.role?.attachInlinePolicy(lambdaPolicy);
 
     new CfnOutput(this, 'AccountHandlerLambdaRoleOutput', {
       value: lambda.role!.roleArn
@@ -585,7 +600,7 @@ export class SWBStack extends Stack {
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
           new PolicyStatement({
-            actions: ['events:PutPermission'],
+            actions: ['events:DescribeRule', 'events:Put*'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
