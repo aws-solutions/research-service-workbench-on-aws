@@ -7,6 +7,102 @@
   },
   "item": [
     {
+      "name": "datasets",
+      "item": [
+        {
+          "name": "Create DataSet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Import DataSet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"existingFolderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/import",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "import"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/id",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get DataSets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "environments",
       "item": [
         {
