@@ -26,6 +26,7 @@ function getConstants(): {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
+  MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -59,6 +60,7 @@ function getConstants(): {
   const S3_DATASETS_BUCKET_ARN_NAME = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
   const STATUS_HANDLER_ARN_NAME = 'StatusHandlerLambdaArnOutput';
+  const MAIN_ACCT_ENCRYPTION_KEY_NAME = 'MainAccountEncryptionKeyOutput';
 
   return {
     STAGE: config.stage,
@@ -83,7 +85,8 @@ function getConstants(): {
     WEBSITE_URL,
     USER_POOL_ID,
     CLIENT_ID,
-    CLIENT_SECRET
+    CLIENT_SECRET,
+    MAIN_ACCT_ENCRYPTION_KEY_NAME
   };
 }
 
