@@ -315,13 +315,14 @@ export class SWBStack extends Stack {
   /**
    * Create bucket for S3 access logs.
    * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
+   * Note this bucket uses S3 Managed encryption as a requirement for access logging.
    * @param bucketName - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
   private _createAccessLogsBucket(bucketName: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED, // https://www.aristotle.a2z.com/implementations/120
+      encryption: BucketEncryption.S3_MANAGED,
       encryptionKey: undefined
     });
 
@@ -690,7 +691,7 @@ export class SWBStack extends Stack {
         stageName: 'dev'
       },
       defaultCorsPreflightOptions: {
-        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'Set-Cookie'],
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],
         allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         allowCredentials: true,
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
