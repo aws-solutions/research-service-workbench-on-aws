@@ -59,7 +59,8 @@
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "md5-file": "^5.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "@amzn/workbench-core-authorization": "workspace:*"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",

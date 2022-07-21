@@ -39,7 +39,7 @@ function getConstants(): {
   const DISTRIBUTION_FUNCTION_ARTIFACT_NAME = `${namePrefix}-redirect-distribution-function`;
   const DISTRIBUTION_FUNCTION_NAME = `${namePrefix}-RedirectRoutingFunction`;
   const RESPONSE_HEADERS_ARTIFACT_NAME = `${namePrefix}-response-header-policy`;
-  const RESPONSE_HEADERS_NAME = 'SWBResponseHeadersPolicy';
+  const RESPONSE_HEADERS_NAME = `${namePrefix}-SWBResponseHeadersPolicy`;
 
   return {
     STAGE: config.stage,
