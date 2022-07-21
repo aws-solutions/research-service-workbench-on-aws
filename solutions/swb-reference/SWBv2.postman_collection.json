@@ -392,7 +392,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-77ncg2cb3bx4g\",\n    \"provisioningArtifactId\": \"pa-hs4ex4okpbl7e\",\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
