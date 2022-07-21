@@ -27,6 +27,9 @@ These manual steps will not be required in the final implementation of SWBv2.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
 1. Uncomment `rootUserEmail` and provide the main account user's email address
+1. Uncomment `cognitoDomain` and provide a unique string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
+1. Uncomment `websiteUrl` and set it to the website url that will be used for the SWB UI.
+1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
 ### Setup CDK
@@ -75,6 +78,7 @@ Run the post deployment step
 STAGE=<STAGE> rushx run-postDeployment      # Setup Service Catalog portfolio and products
 ```
 
+## Deploy to the Hosting Account
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. Upload [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml)
@@ -209,6 +213,8 @@ Your environment should have one variable. Name it `API_URL` and the value shoul
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 #### Onboard hosting account
+Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+
 Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
 
 In POSTMAN this is the `Create Hosting Account` API
@@ -228,6 +234,29 @@ Wait for account handler to run. It runs once every 5 minutes. You'll know that 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
 # Test the API
+
+**Create new DataSet**
+
+In POSTMAN this is the `Create DataSet` API
+
+During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket from the CFN stack output (key named `DataSetsBucketName`) in the main account and construct the following API call
+
+POST `{{API_URL}}/datasets`
+
+```json
+{
+    "datasetName": "<Enter a unique DataSet name>",
+    "storageName": "<Enter the main account DataSets bucket name>",
+    "path": "<Folder name to be created for this in the bucket>",
+    "awsAccountId": "<Main account ID>"
+}
+```
+
+Note: You could also use the above request body for POST `{{API_URL}}/datasets/import` API if the folder already exists in the bucket.
+
+At this point you'll receive a JSON response. That response will have an `id` value. You could use that `id` value in the `datasetIds` array while launching an environment.
+
+Once registered a DataSet using this API, you could also upload files to its bucket folder directly so they're available at environment boot time.
 
 **Launch Sagemaker Notebook Instance**
 
@@ -289,3 +318,11 @@ In POSTMAN this is the `Terminate Environment` API. Under the `Path Variable` se
 DELETE `{{API_URL}}/environments/:id`
 
 Replace `:id` with the `id` value from launching the environment. You should receive a response with an HTTP status code of `200` for success.
+
+# User Management
+Going to the SWB UI `http:localhost:3000/users` (or your CloudFront distribution if you deployed swb-ui) allows you to see and create additional Researchers.
+In order to create new Admins: 
+1. You must go to the Cognito console in your AWS Console.
+1. Under "User pools", look for and click on `swb-userpool-<stage>-<abbreviation>`.
+1. Under the Users tab, click the "Create user" button to create a new user.
+1. Once the user is created, click on the username and under "Group memberships", click on "Add user to group" to add the user to the Admin group.

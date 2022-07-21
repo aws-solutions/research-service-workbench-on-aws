@@ -62,10 +62,20 @@ describe('EnvironmentService', () => {
     ],
     updatedAt: '2022-05-18T20:33:42.608Z',
     createdAt: '2022-05-18T20:33:42.608Z',
-    sk: 'DS#dataset-123',
+    sk: 'DATASET#dataset-123',
     pk: `ENV#${envId}`,
     id: 'dataset-123',
     name: 'Study 1'
+  };
+  const endpointItem = {
+    updatedAt: '2022-05-18T20:33:42.608Z',
+    createdAt: '2022-05-18T20:33:42.608Z',
+    sk: 'ENDPOINT#endpoint-123',
+    pk: `ENV#${envId}`,
+    id: 'endpoint-123',
+    dataSetId: datasetItem.id,
+    endPointUrl: `s3://arn:aws:s3:someRegion:123456789012:accesspoint/${envId}`,
+    path: 'samplePath'
   };
   const envTypeConfigItem = {
     provisioningArtifactId: 'pa-3cwcuxmksf2xy',
@@ -133,7 +143,7 @@ describe('EnvironmentService', () => {
 
     test('includeMetadata = true', async () => {
       // BUILD
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const metaData = [datasetItem, envTypeConfigItem, projItem, endpointItem];
       const envWithMetadata = [env, ...metaData];
       const queryItemResponse: QueryCommandOutput = {
         Items: envWithMetadata.map((item) => {
@@ -161,7 +171,8 @@ describe('EnvironmentService', () => {
 
       // CHECK
       expect(actualResponse).toEqual({
-        DS: [datasetItem],
+        DATASETS: [datasetItem],
+        ENDPOINTS: [endpointItem],
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,
@@ -254,7 +265,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { status: 'PENDING' }
       );
 
@@ -294,7 +305,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { name: 'testEnv' }
       );
 
@@ -339,7 +350,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { createdAtFrom: '2022-05-13T20:03:54.055Z', createdAtTo: '2022-05-13T20:03:54.055Z' }
       );
 
@@ -379,7 +390,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { project: 'proj-123' }
       );
 
@@ -419,7 +430,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { owner: 'owner-123' }
       );
 
@@ -459,7 +470,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         { type: 'envType-123' }
       );
 
@@ -471,7 +482,7 @@ describe('EnvironmentService', () => {
       // OPERATE n CHECK
       await expect(
         envService.listEnvironments(
-          { role: 'admin', ownerId: 'owner-123' },
+          { roles: ['Admin'], id: 'owner-123' },
           { type: 'envType-123', owner: 'owner-123' }
         )
       ).rejects.toThrow('Cannot apply more than one filter.');
@@ -506,7 +517,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -546,7 +557,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -586,7 +597,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -626,7 +637,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -666,7 +677,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -706,7 +717,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -746,7 +757,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         undefined,
         undefined,
@@ -760,16 +771,10 @@ describe('EnvironmentService', () => {
     test('should fail with too many sort attributes', async () => {
       // OPERATE n CHECK
       await expect(
-        envService.listEnvironments(
-          { role: 'admin', ownerId: 'owner-123' },
-          undefined,
-          undefined,
-          undefined,
-          {
-            type: true,
-            owner: true
-          }
-        )
+        envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' }, undefined, undefined, undefined, {
+          type: true,
+          owner: true
+        })
       ).rejects.toThrow('Cannot sort by more than one attribute.');
     });
 
@@ -800,7 +805,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.listEnvironments({ role: 'admin', ownerId: 'owner-123' });
+      const actualResponse = await envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -837,7 +842,7 @@ describe('EnvironmentService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.listEnvironments({ role: 'researcher', ownerId: 'owner-123' });
+      const actualResponse = await envService.listEnvironments({ roles: ['Researcher'], id: 'owner-123' });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -886,7 +891,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE
       const actualResponse = await envService.listEnvironments(
-        { role: 'admin', ownerId: 'owner-123' },
+        { roles: ['Admin'], id: 'owner-123' },
         undefined,
         limit,
         paginationToken
@@ -905,12 +910,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE n CHECK
       await expect(
-        envService.listEnvironments(
-          { role: 'admin', ownerId: 'owner-123' },
-          undefined,
-          limit,
-          paginationToken
-        )
+        envService.listEnvironments({ roles: ['Admin'], id: 'owner-123' }, undefined, limit, paginationToken)
       ).rejects.toThrow('Invalid paginationToken');
     });
   });
@@ -1009,22 +1009,26 @@ describe('EnvironmentService', () => {
       ddbMock.on(QueryCommand).resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.createEnvironment({
-        instanceId: 'instance-123',
-        cidr: '0.0.0.0/0',
-        description: 'test 123',
-        name: 'testEnv',
-        outputs: [],
-        envTypeId: 'envType-123',
-        envTypeConfigId: 'envTypeConfig-123',
-        projectId: 'proj-123',
-        datasetIds: ['dataset-123'],
-        status: 'PENDING'
-      });
+      const actualResponse = await envService.createEnvironment(
+        {
+          instanceId: 'instance-123',
+          cidr: '0.0.0.0/0',
+          description: 'test 123',
+          name: 'testEnv',
+          outputs: [],
+          envTypeId: 'envType-123',
+          envTypeConfigId: 'envTypeConfig-123',
+          projectId: 'proj-123',
+          datasetIds: ['dataset-123'],
+          status: 'PENDING'
+        },
+        { roles: ['Admin'], id: 'owner-123' }
+      );
 
       // CHECK
       expect(actualResponse).toEqual({
-        DS: [datasetItem],
+        DATASETS: [datasetItem],
+        ENDPOINTS: [],
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,

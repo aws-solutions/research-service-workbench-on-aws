@@ -1,8 +1,10 @@
 /* eslint-disable security/detect-object-injection */
 
+import { AuthenticatedUser } from '@amzn/workbench-core-authorization';
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
+import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { EnvironmentStatus } from '../constants/environmentStatus';
@@ -32,8 +34,11 @@ export interface Environment {
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
+  // TODO: Replace any[] with <type>[]
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DS?: any[];
+  DATASETS?: any[];
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ENDPOINTS?: any[];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
 }
@@ -87,7 +92,8 @@ export class EnvironmentService {
         return item;
       });
       let envWithMetadata: Environment = { ...defaultEnv };
-      envWithMetadata.DS = [];
+      envWithMetadata.DATASETS = [];
+      envWithMetadata.ENDPOINTS = [];
       for (const item of items) {
         // parent environment item
         const sk = item.sk as unknown as string;
@@ -95,8 +101,10 @@ export class EnvironmentService {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           const envKey = sk.split('#')[0];
-          if (envKey === 'DS') {
-            envWithMetadata.DS!.push(item);
+          if (envKey === 'DATASET') {
+            envWithMetadata.DATASETS!.push(item);
+          } else if (envKey === 'ENDPOINT') {
+            envWithMetadata.ENDPOINTS!.push(item);
           } else {
             // metadata of environment item
             // @ts-ignore
@@ -126,7 +134,7 @@ export class EnvironmentService {
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
   public async listEnvironments(
-    user: { role: string; ownerId: string },
+    user: AuthenticatedUser,
     filter?: {
       status?: EnvironmentStatus;
       name?: string;
@@ -173,7 +181,7 @@ export class EnvironmentService {
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 
-    if (user.role === 'admin') {
+    if (user.roles.includes('Admin')) {
       if (filter) {
         if (filter.status) {
           // if admin and status is selected in the filter, use GSI getResourceByStatus
@@ -237,7 +245,7 @@ export class EnvironmentService {
       }
     } else {
       // if nonadmin, use GSI getResourceByOwner
-      const addFilter = this._setFilter('getResourceByOwner', 'owner', user?.ownerId);
+      const addFilter = this._setFilter('getResourceByOwner', 'owner', user.id);
       queryParams = { ...queryParams, ...addFilter };
     }
 
@@ -328,19 +336,22 @@ export class EnvironmentService {
     return `${type}#${id}`;
   }
 
-  public async createEnvironment(params: {
-    instanceId?: string;
-    cidr: string;
-    description: string;
-    error?: { type: string; value: string };
-    name: string;
-    outputs: { id: string; value: string; description: string }[];
-    projectId: string;
-    datasetIds: string[];
-    envTypeId: string;
-    envTypeConfigId: string;
-    status?: EnvironmentStatus;
-  }): Promise<Environment> {
+  public async createEnvironment(
+    params: {
+      instanceId?: string;
+      cidr: string;
+      description: string;
+      error?: { type: string; value: string };
+      name: string;
+      outputs: { id: string; value: string; description: string }[];
+      projectId: string;
+      datasetIds: string[];
+      envTypeId: string;
+      envTypeConfigId: string;
+      status?: EnvironmentStatus;
+    },
+    user: AuthenticatedUser
+  ): Promise<Environment> {
     const itemsToGet = [
       // ETC
       {
@@ -349,8 +360,8 @@ export class EnvironmentService {
       },
       // PROJ
       this._buildPkSk(params.projectId, envResourceTypeToKey.project),
-      // DS
-      ...params.datasetIds.map((dsId) => {
+      // DATASETS
+      ..._.map(params.datasetIds, (dsId) => {
         return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
     ];
@@ -370,10 +381,10 @@ export class EnvironmentService {
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
-      updatedBy: 'user-1', // TODO: Get this from request context
+      updatedBy: user.id,
       createdAt: new Date().toISOString(),
-      createdBy: 'user-1', // TODO: Get this from request context
-      owner: 'owner-1', // TODO: Get this from request context
+      createdBy: user.id,
+      owner: user.id,
       status: params.status || 'PENDING',
       type: params.envTypeId,
       dependency: params.projectId

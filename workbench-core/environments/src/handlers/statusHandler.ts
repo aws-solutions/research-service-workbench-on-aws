@@ -86,6 +86,10 @@ export default class StatusHandler {
       .OutputValue!;
     const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceArn })!
       .OutputValue!;
+    const instanceRoleArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceRoleName })!
+      .OutputValue!;
+
+    await envHelper.addRoleToAccessPoint(envDetails, instanceRoleArn);
 
     // We store the provisioned product ID sent in event metadata
     // We only update the provisioned product ID once right after the workspace becomes available

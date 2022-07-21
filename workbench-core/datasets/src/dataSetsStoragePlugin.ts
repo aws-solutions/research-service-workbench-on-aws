@@ -66,6 +66,15 @@ export interface DataSetsStoragePlugin {
   ): Promise<EndpointConnectionStrings>;
 
   /**
+   * Removes an existing dataset connection which was used for access by an external environment
+   *
+   * @param name - the name of the storage destination
+   * @param externalEndpointName - a name to uniquely identify the endpoint.
+   * @param ownerAccountId - the owning AWS account for the storage destination.
+   */
+  removeExternalEndpoint(externalEndpointName: string, ownerAccountId: string): Promise<void>;
+
+  /**
    * Add a role used to access an external endpoint.
    * If provided, update the policy on the KMS key to grant
    * encrypt/decrypt access for the given role.

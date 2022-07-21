@@ -37,6 +37,18 @@ Parameters:
   AutoStopIdleTimeInMinutes:
     Type: Number
     Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
+  DatasetsBucketArn:
+    Type: String
+    Description: Name of the datasets bucket in the main account
+  MainAccountId:
+    Type: String
+    Description: The Main Account ID where application is deployed
+  MainAccountRegion:
+    Type: String
+    Description: The region of application deployment in main account
+  MainAccountKeyArn:
+    Type: String
+    Description: The ARN of main account bucket encryption key
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
@@ -69,13 +81,30 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - 's3:ListBucket'
-            Resource: '*' # TODO: add dataset bucket
+              - 's3:GetObject'
+              - 's3:AbortMultipartUpload'
+              - 's3:ListMultipartUploadParts'
+              - 's3:PutObject'
+              - 's3:GetObjectAcl'
+              - 's3:PutObjectAcl'
+            Resource:
+              - !Join ['/', [Ref: DatasetsBucketArn, '*']]
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
+              - !Join [
+                  ':',
+                  ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*/object/*']
+                ]
           - Effect: Allow
             Action:
-              - 's3:GetObject'
-              - 's3:PutObject'
-            Resource: '*' # TODO: add dataset bucket
+              - 's3:GetAccessPoint'
+              - 's3:ListAccessPoints'
+            Resource: '*' # These actions require wildcard resources
+          - Effect: Allow
+            Action:
+              - 's3:ListBucket'
+            Resource:
+              - !Ref DatasetsBucketArn
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
           - Effect: Allow
             Action:
               - 's3:ListBucket'
@@ -110,10 +139,12 @@ Resources:
               - 'kms:EnableKeyRotation'
               - 'kms:Encrypt'
               - 'kms:Decrypt'
-              - 'kms:GenerateDataKeyWithoutPlaintext'
+              - 'kms:GenerateDataKey'
               - 'kms:Get*'
               - 'kms:List*'
-            Resource: !Ref EncryptionKeyArn
+            Resource:
+              - !Ref EncryptionKeyArn
+              - !Ref MainAccountKeyArn
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'
@@ -123,6 +154,11 @@ Resources:
               - sagemaker:DescribeNotebookInstance
               - sagemaker:StopNotebookInstance
             Resource: '*'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: 'We allow the wildcard resource for sagemaker permissions since we do not know the sagemaker notebook instance identifier at the time of creation of this permisison boundary'
 
   IAMRole:
     Type: 'AWS::IAM::Role'
@@ -164,6 +200,17 @@ Resources:
                     s3:prefix: !Sub
                       - '${S3Prefix}/*'
                       - S3Prefix: !Select [3, !Split ['/', !Ref EnvironmentInstanceFiles]]
+              - Effect: Allow
+                Action:
+                  - 'kms:CreateGrant'
+                  - 'kms:Get*'
+                  - 'kms:List*'
+                  - 'kms:Decrypt'
+                  - 'kms:DescribeKey'
+                  - 'kms:Encrypt'
+                  - 'kms:GenerateDataKey'
+                Resource:
+                  - !Ref MainAccountKeyArn
         - PolicyName: cw-logs
           PolicyDocument:
             Statement:
@@ -179,21 +226,21 @@ Resources:
 
   # This policy is attached to the role after the instance is created
   # so that the instance can be referenced in the resource section
-  #  NotebookStopPolicy:
-  #    Type: AWS::IAM::Policy
-  #    Properties:
-  #      PolicyName: NotebookStop
-  #      PolicyDocument:
-  #        Version: '2012-10-17'
-  #        Statement:
-  #          - Effect: Allow
-  #            Action:
-  #              - sagemaker:DescribeNotebookInstance
-  #              - sagemaker:StopNotebookInstance
-  #            Resource:
-  #              - !Ref BasicNotebookInstance
-  #      Roles:
-  #        - !Ref IAMRole
+  NotebookStopPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: NotebookStop
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstance
+              - sagemaker:StopNotebookInstance
+            Resource:
+              - !Ref BasicNotebookInstance
+      Roles:
+        - !Ref IAMRole
 
   # TODO: Consider also passing DefaultCodeRepository to allow persisting notebook data
   BasicNotebookInstance:
@@ -205,31 +252,31 @@ Resources:
       SecurityGroupIds:
         - !Ref SecurityGroup
       DirectInternetAccess: Enabled
-      #      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
+      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
       KmsKeyId: !Ref EncryptionKeyArn
 
-# TODO: Add script for mounting studies and autostop
-#  BasicNotebookInstanceLifecycleConfig:
-#    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
-#    Properties:
-#      OnStart:
-#        - Content:
-#            Fn::Base64: !Sub |
-#              #!/usr/bin/env bash
-#              # Download and execute bootstrap script
-#              aws s3 cp "${EnvironmentInstanceFiles}/get_bootstrap.sh" "/tmp"
-#              chmod 500 "/tmp/get_bootstrap.sh"
-#              /tmp/get_bootstrap.sh "${EnvironmentInstanceFiles}" '${S3Mounts}'
-#
-#              # Stop Idle Script
-#              if [ "${AutoStopIdleTimeInMinutes}" != "0" ]; then
-#                echo "Fetching the autostop script"
-#                aws s3 cp "${EnvironmentInstanceFiles}/offline-packages/sagemaker/autostop.py" "/usr/local/bin"
-#                chmod a+x /usr/local/bin/autostop.py
-#                IDLE_TIME=`expr ${AutoStopIdleTimeInMinutes} \* 60`
-#                echo "Starting the SageMaker autostop script in cron"
-#                (crontab -l 2>/dev/null; echo "*/1 * * * * /usr/bin/python /usr/local/bin/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/autostop.log") | crontab -
-#              fi
+  # Add script for mounting studies and autostop
+  BasicNotebookInstanceLifecycleConfig:
+    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
+    Properties:
+      OnStart:
+        - Content:
+            Fn::Base64: !Sub |
+              #!/usr/bin/env bash
+              # Download and execute bootstrap script
+              aws s3 cp "${EnvironmentInstanceFiles}/get_bootstrap.sh" "/tmp"
+              chmod 500 "/tmp/get_bootstrap.sh"
+              /tmp/get_bootstrap.sh "${EnvironmentInstanceFiles}" '${S3Mounts}'
+
+              # Stop Idle Script
+              if [ "${AutoStopIdleTimeInMinutes}" != "0" ]; then
+                echo "Fetching the autostop script"
+                aws s3 cp "${EnvironmentInstanceFiles}/offline-packages/sagemaker/autostop.py" "/usr/local/bin"
+                chmod a+x /usr/local/bin/autostop.py
+                IDLE_TIME=`expr ${AutoStopIdleTimeInMinutes} \* 60`
+                echo "Starting the SageMaker autostop script in cron"
+                (crontab -l 2>/dev/null; echo "*/1 * * * * /usr/bin/python /usr/local/bin/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/autostop.log") | crontab -
+              fi
 
 Outputs:
   NotebookInstanceName:

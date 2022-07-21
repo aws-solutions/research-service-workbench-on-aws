@@ -26,13 +26,12 @@ export function setUpEnvRoutes(
       processValidatorResult(validate(req.body, CreateEnvironmentSchema));
       const envType = req.body.envType;
       if (supportedEnvs.includes(envType)) {
-        // We check that envType is in list of supportedEnvs before calling the environments object
         if (req.body.id) {
           throw Boom.badRequest(
             'id cannot be passed in the request body when trying to launch a new environment'
           );
         }
-        const env = await environmentService.createEnvironment(req.body);
+        const env = await environmentService.createEnvironment(req.body, res.locals.user);
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
           //eslint-disable-next-line security/detect-object-injection
@@ -85,7 +84,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await environmentService.getEnvironment(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id, true);
       const envType = environment.ETC.type;
       if (environment.status === 'STOPPING') {
         throw Boom.conflict('Cannot start environment while environment is currently being stopped');
@@ -108,7 +107,7 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const environment = await environmentService.getEnvironment(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id, true);
       const envType = environment.ETC.type;
 
       if (['PENDING', 'STARTING'].includes(environment.status)) {
@@ -179,11 +178,6 @@ export function setUpEnvRoutes(
   router.get(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: ''
-      };
       const {
         status,
         name,
@@ -250,7 +244,7 @@ export function setUpEnvRoutes(
         );
       } else {
         const response = await environmentService.listEnvironments(
-          user,
+          res.locals.user,
           filter,
           pageSize ? Number(pageSize) : undefined,
           paginationToken,

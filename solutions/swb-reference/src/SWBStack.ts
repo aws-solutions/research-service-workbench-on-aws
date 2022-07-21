@@ -1,16 +1,27 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
+import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
+
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
-import { Policy, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import {
+  AccountPrincipal,
+  AnyPrincipal,
+  Effect,
+  Policy,
+  PolicyDocument,
+  PolicyStatement,
+  Role,
+  ServicePrincipal
+} from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
@@ -29,6 +40,12 @@ export class SWBStack extends Stack {
     STATUS_HANDLER_ARN_NAME: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
+    COGNITO_DOMAIN: string;
+    CLIENT_ID: string;
+    CLIENT_SECRET: string;
+    USER_POOL_ID: string;
+    WEBSITE_URL: string;
+    MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
   };
   public constructor(app: App) {
     const {
@@ -42,7 +59,15 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN,
+      USER_POOL_CLIENT_NAME,
+      USER_POOL_NAME,
+      WEBSITE_URL,
+      USER_POOL_ID,
+      CLIENT_ID,
+      CLIENT_SECRET,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -50,6 +75,29 @@ export class SWBStack extends Stack {
         region: AWS_REGION
       }
     });
+
+    const workbenchCognito = this._createCognitoResources(
+      COGNITO_DOMAIN,
+      WEBSITE_URL,
+      USER_POOL_NAME,
+      USER_POOL_CLIENT_NAME
+    );
+
+    let cognitoDomain: string;
+    let clientId: string;
+    let clientSecret: string;
+    let userPoolId: string;
+    if (process.env.LOCAL_DEVELOPMENT === 'true') {
+      cognitoDomain = `https://${COGNITO_DOMAIN}.auth.${AWS_REGION}.amazoncognito.com`;
+      clientId = CLIENT_ID;
+      clientSecret = CLIENT_SECRET;
+      userPoolId = USER_POOL_ID;
+    } else {
+      cognitoDomain = workbenchCognito.cognitoDomain;
+      clientId = workbenchCognito.userPoolClientId;
+      clientSecret = workbenchCognito.userPoolClientSecret.unsafeUnwrap();
+      userPoolId = workbenchCognito.userPoolId;
+    }
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
@@ -63,15 +111,24 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_NAME,
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS
+      ALLOWED_ORIGINS,
+      COGNITO_DOMAIN: cognitoDomain,
+      CLIENT_ID: clientId,
+      CLIENT_SECRET: clientSecret,
+      USER_POOL_ID: userPoolId,
+      WEBSITE_URL,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     };
-
-    this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const mainAcctEncryptionKey = this._createEncryptionKey();
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      mainAcctEncryptionKey
+    );
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
-    const statusHandler = this._createStatusHandlerLambda();
-    const apiLambda: Function = this._createAPILambda(statusHandler.functionArn);
+    const statusHandler = this._createStatusHandlerLambda(datasetBucket);
+    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
@@ -79,7 +136,31 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
   }
 
-  private _createLaunchConstraintIAMRole(
+  private _createEncryptionKey(): Key {
+    const { MAIN_ACCT_ENCRYPTION_KEY_NAME } = getConstants();
+    const mainKeyPolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: ['kms:*'],
+          principals: [new AccountPrincipal(this.account)],
+          resources: ['*'],
+          sid: 'main-key-share-statement'
+        })
+      ]
+    });
+
+    const key = new Key(this, 'mainAccountKey', {
+      enableKeyRotation: true,
+      policy: mainKeyPolicy
+    });
+
+    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_NAME, {
+      value: key.keyArn
+    });
+    return key;
+  }
+
+private _createLaunchConstraintIAMRole(
     launchConstraintRoleNameOutput: string,
     artifactS3Bucket: Bucket
   ): Role {
@@ -226,25 +307,82 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-artifacts', {});
+  private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use TLS/HTTPS',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          Bool: {
+            'aws:SecureTransport': 'false'
+          }
+        }
+      })
+    );
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        sid: 'Deny requests that do not use SigV4',
+        effect: Effect.DENY,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.arnForObjects('*')],
+        conditions: {
+          StringNotEquals: {
+            's3:signatureversion': 'AWS4-HMAC-SHA256'
+          }
+        }
+      })
+    );
+  }
 
-    new CfnOutput(this, s3ArtifactName, {
+  private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new AnyPrincipal()],
+        actions: ['s3:*'],
+        resources: [s3Bucket.bucketArn, s3Bucket.arnForObjects('*')],
+        conditions: {
+          StringEquals: {
+            's3:DataAccessPointAccount': this.account
+          }
+        }
+      })
+    );
+  }
+
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, mainAcctEncryptionKey);
+  }
+
+  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
+    this._addAccessPointDelegationStatement(bucket);
+
+    new CfnOutput(this, 'DataSetsBucketName', {
+      value: bucket.bucketName
+    });
+    return bucket;
+  }
+
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, mainAcctEncryptionKey: Key): Bucket {
+    const s3Bucket = new Bucket(this, s3BucketId, {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: mainAcctEncryptionKey
+    });
+    this._addS3TLSSigV4BucketPolicy(s3Bucket);
+
+    new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-datasets', {});
-
-    new CfnOutput(this, s3DatasetsName, {
-      value: s3Bucket.bucketArn
-    });
-    return s3Bucket;
-  }
-
-  private _createStatusHandlerLambda(): Function {
+  private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
     const statusHandlerLambda = new Function(this, 'statusHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/statusHandler')),
       handler: 'statusHandlerLambda.handler',
@@ -266,6 +404,27 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
           })
         ]
       })
@@ -299,54 +458,59 @@ export class SWBStack extends Stack {
     const amiIdsList: string[] = JSON.parse(amiIdsToShare);
 
     const lambdaPolicy = new Policy(this, 'accountHandlerPolicy', {
-      statements: [
-        new PolicyStatement({
-          sid: 'CreatePortfolioShare',
-          actions: ['servicecatalog:CreatePortfolioShare'],
-          resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
-        }),
-        // Allows accountHandler to get portfolioId based on portfolioName
-        // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
-        new PolicyStatement({
-          sid: 'ListPortfolios',
-          actions: ['servicecatalog:ListPortfolios'],
-          resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
-        }),
-        new PolicyStatement({
-          sid: 'AssumeRole',
-          actions: ['sts:AssumeRole'],
-          // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-          resources: ['arn:aws:iam::*:role/*hosting-account-role']
-        }),
-        new PolicyStatement({
-          sid: 'GetLaunchConstraint',
-          actions: [
-            'iam:GetRole',
-            'iam:GetRolePolicy',
-            'iam:ListRolePolicies',
-            'iam:ListAttachedRolePolicies'
-          ],
-          resources: [launchConstraintRole.roleArn]
-        }),
-        new PolicyStatement({
-          sid: 'ShareSSM',
-          actions: ['ssm:ModifyDocumentPermission'],
-          resources: [
-            this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
-          ]
-        }),
-        new PolicyStatement({
-          sid: 'Cloudformation',
-          actions: ['cloudformation:DescribeStacks'],
-          resources: [this.stackId]
-        }),
-        new PolicyStatement({
-          sid: 'S3Bucket',
-          actions: ['s3:GetObject'],
-          resources: [`${artifactS3Bucket.bucketArn}/*`]
-        })
-      ]
-    });
+        statements: [
+          new PolicyStatement({
+            sid: 'CreatePortfolioShare',
+            actions: ['servicecatalog:CreatePortfolioShare'],
+            resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+          }),
+          // Allows accountHandler to get portfolioId based on portfolioName
+          // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
+          new PolicyStatement({
+            sid: 'ListPortfolios',
+            actions: ['servicecatalog:ListPortfolios'],
+            resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
+          }),
+          new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
+            sid: 'KMSAccess'
+          }),
+          new PolicyStatement({
+            sid: 'AssumeRole',
+            actions: ['sts:AssumeRole'],
+            // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+            resources: ['arn:aws:iam::*:role/*hosting-account-role']
+          }),
+          new PolicyStatement({
+            sid: 'GetLaunchConstraint',
+            actions: [
+              'iam:GetRole',
+              'iam:GetRolePolicy',
+              'iam:ListRolePolicies',
+              'iam:ListAttachedRolePolicies'
+            ],
+            resources: [launchConstraintRole.roleArn]
+          }),
+          new PolicyStatement({
+            sid: 'ShareSSM',
+            actions: ['ssm:ModifyDocumentPermission'],
+            resources: [
+              this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+            ]
+          }),
+          new PolicyStatement({
+            sid: 'Cloudformation',
+            actions: ['cloudformation:DescribeStacks'],
+            resources: [this.stackId]
+          }),
+          new PolicyStatement({
+            sid: 'S3Bucket',
+            actions: ['s3:GetObject'],
+            resources: [`${artifactS3Bucket.bucketArn}/*`]
+          })
+        ]
+      })
 
     if (!_.isEmpty(amiIdsList)) {
       lambdaPolicy.addStatements(
@@ -373,7 +537,7 @@ export class SWBStack extends Stack {
     return lambda;
   }
 
-  private _createAPILambda(statusHandlerLambdaArn: string): Function {
+  private _createAPILambda(datasetBucket: Bucket, artifactS3Bucket: Bucket): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
@@ -403,9 +567,76 @@ export class SWBStack extends Stack {
             sid: 'ScAccess'
           }),
           new PolicyStatement({
+            actions: ['cognito-idp:DescribeUserPoolClient'],
+            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+            sid: 'CognitoAccess'
+          }),
+          new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
+            sid: 'KMSAccess'
+          }),
+          new PolicyStatement({
+            actions: ['events:DescribeRule', 'events:Put*'],
+            resources: ['*'],
+            sid: 'EventbridgeAccess'
+          }),
+          new PolicyStatement({
+            actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+            resources: ['*']
+          }),
+          new PolicyStatement({
+            sid: 'datasetS3Access',
+            actions: [
+              's3:GetObject',
+              's3:GetObjectVersion',
+              's3:GetObjectTagging',
+              's3:AbortMultipartUpload',
+              's3:ListMultipartUploadParts',
+              's3:GetBucketPolicy',
+              's3:PutBucketPolicy',
+              's3:PutObject',
+              's3:PutObjectAcl',
+              's3:PutObjectTagging',
+              's3:ListBucket',
+              's3:PutAccessPointPolicy',
+              's3:GetAccessPointPolicy',
+              's3:CreateAccessPoint',
+              's3:DeleteAccessPoint'
+            ],
+            resources: [
+              datasetBucket.bucketArn,
+              `${datasetBucket.bucketArn}/*`,
+              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+            ]
+          }),
+          new PolicyStatement({
+            sid: 'environmentBootstrapS3Access',
+            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+            resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
+          }),
+          new PolicyStatement({
+            sid: 'cognitoAccess',
+            actions: [
+              'cognito-idp:AdminAddUserToGroup',
+              'cognito-idp:AdminCreateUser',
+              'cognito-idp:AdminDeleteUser',
+              'cognito-idp:AdminGetUser',
+              'cognito-idp:AdminListGroupsForUser',
+              'cognito-idp:AdminRemoveUserFromGroup',
+              'cognito-idp:AdminUpdateUserAttributes',
+              'cognito-idp:CreateGroup',
+              'cognito-idp:DeleteGroup',
+              'cognito-idp:ListGroups',
+              'cognito-idp:ListUsers',
+              'cognito-idp:ListUsersInGroup'
+            ],
+            resources: ['*']
           })
         ]
       })
@@ -512,5 +743,36 @@ export class SWBStack extends Stack {
     table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
     return table;
+  }
+
+  private _createCognitoResources(
+    domainPrefix: string,
+    websiteUrl: string,
+    userPoolName: string,
+    userPoolClientName: string
+  ): WorkbenchCognito {
+    const props: WorkbenchCognitoProps = {
+      domainPrefix: domainPrefix,
+      websiteUrl: websiteUrl,
+      userPoolName: userPoolName,
+      userPoolClientName: userPoolClientName,
+      oidcIdentityProviders: []
+    };
+
+    const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);
+
+    new CfnOutput(this, 'cognitoUserPoolId', {
+      value: workbenchCognito.userPoolId
+    });
+
+    new CfnOutput(this, 'cognitoUserPoolClientId', {
+      value: workbenchCognito.userPoolClientId
+    });
+
+    new CfnOutput(this, 'cognitoDomainName', {
+      value: workbenchCognito.cognitoDomain
+    });
+
+    return workbenchCognito;
   }
 }
