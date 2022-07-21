@@ -219,7 +219,7 @@ In POSTMAN, uses the `envType` => `Create envType` request to make a request wit
 
 In the response make note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
 
-**Create Environment Type**
+**Create Environment Type Config**
 
 In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
 ```json
