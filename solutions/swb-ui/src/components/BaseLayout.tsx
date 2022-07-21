@@ -22,7 +22,7 @@ export default function Layout({ navigationHide, children, breadcrumbs }: Layout
     type: 'warning',
     dismissible: false,
     content:
-      'This software is in active development/testing mode. Do not put any critical, production, or otherwise important data in the workspaces or studies.'
+      'This software is in active development/testing mode. Do not put any critical, production, or otherwise important data in workspaces or studies.'
   });
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
