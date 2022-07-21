@@ -613,7 +613,13 @@
 			"name": "Create Hosting Account",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{ACCESS_TOKEN}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
@@ -630,12 +636,6 @@
 					],
 					"path": [
 						"aws-accounts"
-					],
-					"query": [
-						{
-							"key": "Authorization",
-							"value": "{{ACCESS_TOKEN}}"
-						}
 					]
 				}
 			},
