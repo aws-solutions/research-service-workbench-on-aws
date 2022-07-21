@@ -46,7 +46,6 @@ Set-by-step instructions for integrating Okta into Cognito
           | email               | email                    |
           | family_name         | family_name              |
           | given_name          | given_name               |
-          | username            | username                 |
    5.  Click **Add identity provider**
 5. Add the created Okta IdP to your app client
    1. In the Amazon Cognito console, navigate to your user pool app client
