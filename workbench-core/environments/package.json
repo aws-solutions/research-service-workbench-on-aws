@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-authorization": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
     "@amzn/workbench-core-datasets": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
