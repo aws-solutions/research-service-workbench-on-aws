@@ -106,23 +106,25 @@ EnvMgmtRoleArn
 VPC
 VpcSubnet
 ```
-#### POSTMAN Setup
-In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have one variable. Name it `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`.
 
-Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
-
-### Setup UI and Get access token 
+## Setup UI and Get access token
 Follow the instructions [here](../swb-ui/README.md#getting-started) to run the UI locally.
 
 Go to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+
+## POSTMAN Setup
+In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
+Your environment should have two variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second one `ACCESS_TOKEN` and the value should be the `accessToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
+
+Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+
 
 ### Setup environmentType, environmentTypeConfig, and project configurations
 
 TODO: Reformat this to POSTMAN requests
 
 ### Store account and environment config information in DDB
-Since we have not built the API for account and environment config setup in DDB yet, you'll need to manually add these values to DDB. You can
+Since we have not built the API for Projects setup in DDB yet, you'll need to manually add these values to DDB. You can
 do so, by logging into the DDB page on the AWS console for your `Main account`. There should be a table there with the following
 name `swb-<stage>-<awsRegionShortName>`
 
@@ -135,14 +137,14 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 {
     "pk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
     "sk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
-    "id": "proj-123",
+    "id": "cf3019e3-88d5-4a64-9025-26a177e36f59",
     "accountId": "acc-123",
     "indexId": "index-123",
-    "desc": "Example project",
+    "description": "Example project 1",
     "owner": "abc",
     "projectAdmins": [],
     "resourceType": "project",
-    "name": "Example project",
+    "name": "Project 1",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
     "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
@@ -158,22 +160,18 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 }
 ```
 
-**Store `ETC` resource in DDB**
+**Create Environment Type Config**
 
-Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of
-the following values
+Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
 * productId: `Product ID` of `sagemakerNotebook` product
 * provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
   `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
 
+In POSTMAN, uses the `envType` => `Create envType` request to make a request with the following `body`
 ```json
 {
-    "pk": "ETC",
-    "sk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93ETC#2da0182d-36fc-43e5-9e8b-b9a8a6f81e3b",
-    "id": "2da0182d-36fc-43e5-9e8b-b9a8a6f81e3b",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
-    "allowRoleIds": [],
     "type": "sagemakerNotebook",
     "desc": "Description for config 1",
     "name": "Config 1",
