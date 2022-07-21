@@ -34,7 +34,8 @@ Set-by-step instructions for integrating Okta into Cognito
    3.  Under **Federated identity provider sign-in**, click **Add identity provider** and select **OpenID Connect (OIDC)**
    4.  Do the following:
        1. For Provider name, enter a name for the IdP. This name appears in the Amazon Cognito hosted web UI
-          Note: You can't change this field after creating the provider, so use a name that you're comfortable with your app's users seeing
+          - Note: You can't change this field after creating the provider, so use a name that you're comfortable with your app's users seeing
+          - Note: The name cannot contain spaces or underscores
        2. For Client ID, input the **Client ID** that you noted earlier from Okta
        3. For Client secret, input the **Client secret** that you noted earlier from Okta
        4. For Authorize scope, input these scopes: `openid email profile`. These are the scopes required for the default authentication services
