@@ -106,21 +106,35 @@ EnvMgmtRoleArn
 VPC
 VpcSubnet
 ```
+#### POSTMAN Setup
+In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
+Your environment should have one variable. Name it `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`.
+
+Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+
+### Setup UI and Get access token 
+Follow the instructions [here](../swb-ui/README.md#getting-started) to run the UI locally.
+
+Go to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+
+### Setup environmentType, environmentTypeConfig, and project configurations
+
+TODO: Reformat this to POSTMAN requests
 
 ### Store account and environment config information in DDB
 Since we have not built the API for account and environment config setup in DDB yet, you'll need to manually add these values to DDB. You can
 do so, by logging into the DDB page on the AWS console for your `Main account`. There should be a table there with the following
 name `swb-<stage>-<awsRegionShortName>`
 
-**Store `PROJ` resource in DDB** 
+**Store `PROJ` resource in DDB**
 
-Remember to fill in the correct values for your account. 
+Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
 ```json
 {
-    "pk": "PROJ#proj-123",
-    "sk": "PROJ#proj-123",
+    "pk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
+    "sk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
     "id": "proj-123",
     "accountId": "acc-123",
     "indexId": "index-123",
@@ -149,21 +163,21 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of
 the following values
 * productId: `Product ID` of `sagemakerNotebook` product
-* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the 
-`sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
+* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
+  `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
 
 ```json
 {
     "pk": "ETC",
-    "sk": "ET#envType-123ETC#envTypeConfig-123",
-    "id": "envTypeConfig-123",
+    "sk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93ETC#2da0182d-36fc-43e5-9e8b-b9a8a6f81e3b",
+    "id": "2da0182d-36fc-43e5-9e8b-b9a8a6f81e3b",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
     "allowRoleIds": [],
     "type": "sagemakerNotebook",
     "desc": "Description for config 1",
     "name": "Config 1",
-    "owner": "abc",
+    "owner": "owner-1",
     "params": [
      {
       "key": "IamPolicyDocument",
@@ -190,28 +204,70 @@ the following values
 }
 ```
 
+**Store `ET` resource in DDB**
+```json
+{
+      "status": "APPROVED",
+      "createdAt": "2022-06-21T20:32:04.011Z",
+      "updatedBy": "owner-1",
+      "name": "Sagemaker Jupyter Notebook",
+      "createdBy": "owner-1",
+      "resourceType": "envType",
+      "provisioningArtifactId": "<provisioningArtifactId>",
+      "params": [
+          {
+              "DefaultValue": "ml.t3.xlarge",
+              "IsNoEcho": false,
+              "ParameterConstraints": {
+                  "AllowedValues": []
+              },
+              "ParameterType": "String",
+              "Description": "EC2 instance type to launch",
+              "ParameterKey": "InstanceType"
+          },
+          {
+              "IsNoEcho": false,
+              "ParameterConstraints": {
+                  "AllowedValues": []
+              },
+              "ParameterType": "Number",
+              "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+              "ParameterKey": "AutoStopIdleTimeInMinutes"
+          },
+          {
+              "IsNoEcho": false,
+              "ParameterConstraints": {
+                  "AllowedValues": []
+              },
+              "ParameterType": "String",
+              "Description": "The IAM policy to be associated with the launched workstation",
+              "ParameterKey": "IamPolicyDocument"
+          },
+          {
+              "DefaultValue": "1.1.1.1/1",
+              "IsNoEcho": false,
+              "ParameterConstraints": {
+                  "AllowedValues": []
+              },
+              "ParameterType": "String",
+              "Description": "CIDR to restrict IPs that can access the environment",
+              "ParameterKey": "CIDR"
+          }
+      ],
+      "updatedAt": "2022-06-21T20:32:51.949Z",
+      "sk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
+      "owner": "owner-123",
+      "description": "An Amazon SageMaker Jupyter Notebook 1",
+      "id": "3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
+      "pk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
+      "productId": "<productId>",
+      "type": "sagemakerNotebook"
+  }
+```
 If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value
 in the JSON above.
 
-### Setup API URL in client Application
-
-Setup environment variable `NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"`
-
-For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
-
-```
-NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"
-```
-
-
 ### Setup Account Resources
-
-#### POSTMAN Setup
-In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have one variable. Name it `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. 
-
-Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
-
 #### Onboard hosting account
 Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
 
