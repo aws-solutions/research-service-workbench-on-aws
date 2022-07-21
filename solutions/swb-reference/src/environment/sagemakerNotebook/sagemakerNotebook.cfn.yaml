@@ -154,6 +154,11 @@ Resources:
               - sagemaker:DescribeNotebookInstance
               - sagemaker:StopNotebookInstance
             Resource: '*'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: 'We allow the wildcard resource for sagemaker permissions since we do not know the sagemaker notebook instance identifier at the time of creation of this permisison boundary'
 
   IAMRole:
     Type: 'AWS::IAM::Role'
