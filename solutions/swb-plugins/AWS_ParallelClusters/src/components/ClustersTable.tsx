@@ -10,26 +10,26 @@ import { OptionDefinition } from '@awsui/components-react/internal/components/op
 import {
   AppLayout,
   Box,
+  FormField,
   Header,
   Link,
   Pagination,
   Select,
   SplitPanel,
-  SpaceBetween,
   Table
 } from '@awsui/components-react';
 import JobsTable from './JobsTable';
 
 export default function ClustersTable(): JSX.Element {
-  const [projects, setProjects] = useState([] as Project[]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  const options = projects.map((project) => {
+  const projectOptions = projects.map((project) => {
     return { label: project.id, value: project.id };
   });
 
-  const [clusters, setClusters] = useState([] as Cluster[]);
+  const [clusters, setClusters] = useState<Cluster[]>([]);
 
-  const [selectedOption, setSelectedOption] = useState([] as OptionDefinition);
+  const [selectedProject, setSelectedProject] = useState<OptionDefinition>();
 
   const [isSplitOpen, setSplitOpen] = useState(false);
 
@@ -49,9 +49,9 @@ export default function ClustersTable(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (selectedOption.value! !== undefined) {
+    if (selectedProject !== undefined) {
       setClustersLoading(true);
-      getClusters(selectedOption.value!)
+      getClusters(selectedProject!.value!)
         .then((items) => {
           setClusters(items);
           setClustersLoading(false);
@@ -61,7 +61,7 @@ export default function ClustersTable(): JSX.Element {
           setClustersLoading(false);
         });
     }
-  }, [selectedOption.value]);
+  }, [selectedProject]);
 
   const emptyItemType: string = 'cluster';
   const selectItemType: string = 'project';
@@ -70,9 +70,7 @@ export default function ClustersTable(): JSX.Element {
     propertyFiltering: {
       filteringProperties: filteringProperties,
       empty:
-        selectedOption.value! === undefined
-          ? TableSelectDisplay(selectItemType)
-          : TableEmptyDisplay(emptyItemType)
+        selectedProject === undefined ? TableSelectDisplay(selectItemType) : TableEmptyDisplay(emptyItemType)
     },
     selection: {
       trackBy: 'clusterName'
@@ -134,7 +132,7 @@ export default function ClustersTable(): JSX.Element {
         >
           {collectionProps.selectedItems?.length !== 0 ? (
             <JobsTable
-              projectId={isSplitOpen ? selectedOption.value! : undefined!}
+              projectId={isSplitOpen ? selectedProject!.value! : undefined!}
               clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}
             />
           ) : (
@@ -151,31 +149,23 @@ export default function ClustersTable(): JSX.Element {
           loading={isClustersLoading}
           loadingText="Loading clusters..."
           items={items}
+          filter={
+            <FormField label="Project">
+              <Select
+                expandToViewport
+                selectedOption={selectedProject!}
+                onChange={({ detail }) => setSelectedProject(detail.selectedOption!)}
+                options={projectOptions}
+                loadingText="Loading projects..."
+                placeholder="Choose a project"
+                selectedAriaLabel="Selected"
+                empty="No projects"
+              />
+            </FormField>
+          }
           pagination={<Pagination {...paginationProps} />}
           header={
-            <Header
-              counter={`(${clusters.length})`}
-              actions={
-                <Box float="right">
-                  <SpaceBetween direction="horizontal" size="xs">
-                    <Box variant="h3" color="text-label">
-                      Select Project:
-                    </Box>
-                    <Select
-                      expandToViewport
-                      selectedOption={selectedOption}
-                      onChange={({ detail }) => setSelectedOption(detail.selectedOption!)}
-                      options={options}
-                      loadingText="Loading projects..."
-                      placeholder="Choose a project"
-                      selectedAriaLabel="Selected"
-                      empty="No projects"
-                    />
-                  </SpaceBetween>
-                </Box>
-              }
-              variant="h2"
-            >
+            <Header counter={`(${clusters.length})`} variant="h2">
               Clusters
             </Header>
           }

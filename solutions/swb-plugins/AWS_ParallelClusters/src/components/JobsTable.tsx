@@ -6,7 +6,7 @@ import { columnDefinitions } from '../hpc-table-config/jobsColumnDefinitions';
 import { filteringProperties } from '../hpc-table-config/jobsFilteringProperties';
 import { useCluster, useJobQueue, stopJob } from '../api/hpc-clusters';
 import { Box, Button, Header, Pagination, SpaceBetween, Table } from '@awsui/components-react';
-import JobSubmitForm from './JobSubmitForm';
+import JobSubmitModal from './JobSubmitModal';
 
 interface JobsTableProps {
   projectId: string;
@@ -38,7 +38,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
     }
   }, [props.clusterName, cluster, jobs, jobisValidating]);
 
-  const [viewJobForm, setViewJobForm] = useState(false);
+  const [showJobModal, setShowJobModal] = useState(false);
 
   const [jobsTablePreferences] = useState({ pageSize: 4 });
 
@@ -76,18 +76,18 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
     });
   };
 
-  const handleViewJobFormCallBack = () => {
-    setViewJobForm(!viewJobForm);
+  const closeModal = () => {
+    setShowJobModal(false);
   };
 
   return (
     <>
-      {viewJobForm && (
-        <JobSubmitForm
+      {showJobModal && (
+        <JobSubmitModal
           projectId={props.projectId}
           clusterName={props.clusterName}
           instanceId={cluster !== undefined ? cluster.headNode?.instanceId! : undefined!}
-          handleViewJobFormCallBack={handleViewJobFormCallBack}
+          closeModal={closeModal}
         />
       )}
       <Table
@@ -116,7 +116,7 @@ export default function JobsTable(props: JobsTableProps): JSX.Element {
                     <Button
                       variant="primary"
                       disabled={cluster !== undefined ? cluster.headNode?.state! !== 'running' : true}
-                      onClick={() => setViewJobForm(!viewJobForm)}
+                      onClick={() => setShowJobModal(true)}
                     >
                       Submit Job
                     </Button>

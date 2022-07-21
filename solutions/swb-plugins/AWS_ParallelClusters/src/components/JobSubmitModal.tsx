@@ -3,21 +3,21 @@ import { submitJob } from '../api/hpc-clusters';
 import { JobParameters } from '../models/HPC-UI-Types';
 import { Box, Button, FormField, Input, Modal, SpaceBetween } from '@awsui/components-react';
 
-interface JobSubmitFormProps {
+interface JobSubmitModalProps {
   projectId: string;
   clusterName: string;
   instanceId: string;
-  handleViewJobFormCallBack: () => void;
+  closeModal: () => void;
 }
 
-export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
-  const [jobForm, setJobForm] = useState({
+export default function JobSubmitModal(props: JobSubmitModalProps): JSX.Element {
+  const [jobForm, setJobForm] = useState<JobParameters>({
     command: '',
     job_name: '',
     nodes: 0,
     ntasks: 0,
     partition: ''
-  } as JobParameters);
+  });
 
   const shouldDisableSubmitButton = (): boolean => {
     return !(
@@ -31,19 +31,19 @@ export default function JobSubmitForm(props: JobSubmitFormProps): JSX.Element {
 
   const executeSubmitJobProcess = (): void => {
     submitJob(props.projectId, props.clusterName, props.instanceId, jobForm);
-    props.handleViewJobFormCallBack();
+    props.closeModal();
   };
 
   return (
     <Modal
-      onDismiss={() => props.handleViewJobFormCallBack()}
+      onDismiss={() => props.closeModal()}
       visible
       closeAriaLabel="Close modal"
       size="medium"
       footer={
         <Box float="right">
           <SpaceBetween direction="horizontal" size="xs">
-            <Button onClick={() => props.handleViewJobFormCallBack()}>Cancel</Button>
+            <Button onClick={() => props.closeModal()}>Cancel</Button>
             <Button disabled={shouldDisableSubmitButton()} onClick={() => executeSubmitJobProcess()}>
               Submit
             </Button>
