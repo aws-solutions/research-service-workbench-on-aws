@@ -7,7 +7,7 @@ const UpdateEnvironmentTypeSchema: Schema = {
   properties: {
     description: { type: 'string' },
     name: { type: 'string' },
-    status: { type: 'string' }
+    status: { enum: ['APPROVED', 'NOT_APPROVED'] }
   },
   additionalProperties: false
 };

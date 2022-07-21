@@ -21,7 +21,7 @@ const CreateEnvironmentTypeSchema: Schema = {
         additionalProperties: true
       }
     },
-    status: { type: 'string' }
+    status: { enum: ['APPROVED', 'NOT_APPROVED'] }
   },
   additionalProperties: false,
   required: ['allowedRoleIds', 'type', 'description', 'name', 'params', 'status']
