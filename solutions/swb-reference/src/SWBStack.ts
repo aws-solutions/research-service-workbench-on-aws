@@ -7,10 +7,10 @@ import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
+  AccountPrincipal,
   AnyPrincipal,
   Effect,
   Policy,
@@ -19,8 +19,9 @@ import {
   Role,
   ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -43,6 +44,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     WEBSITE_URL: string;
+    MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
   };
   public constructor(app: App) {
     const {
@@ -63,7 +65,8 @@ export class SWBStack extends Stack {
       WEBSITE_URL,
       USER_POOL_ID,
       CLIENT_ID,
-      CLIENT_SECRET
+      CLIENT_SECRET,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -112,11 +115,16 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      WEBSITE_URL
+      WEBSITE_URL,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     };
 
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const mainAcctEncryptionKey = this._createEncryptionKey();
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      mainAcctEncryptionKey
+    );
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
@@ -126,6 +134,30 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+  }
+
+  private _createEncryptionKey(): Key {
+    const { MAIN_ACCT_ENCRYPTION_KEY_NAME } = getConstants();
+    const mainKeyPolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: ['kms:*'],
+          principals: [new AccountPrincipal(this.account)],
+          resources: ['*'],
+          sid: 'main-key-share-statement'
+        })
+      ]
+    });
+
+    const key = new Key(this, 'mainAccountKey', {
+      enableKeyRotation: true,
+      policy: mainKeyPolicy
+    });
+
+    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_NAME, {
+      value: key.keyArn
+    });
+    return key;
   }
 
   private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
@@ -319,19 +351,25 @@ export class SWBStack extends Stack {
     );
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
-    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName);
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, mainAcctEncryptionKey);
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName);
+  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
+
+    new CfnOutput(this, 'DataSetsBucketName', {
+      value: bucket.bucketName
+    });
     return bucket;
   }
 
-  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, s3BucketId, {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: mainAcctEncryptionKey
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
@@ -426,6 +464,11 @@ export class SWBStack extends Stack {
             resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
           }),
           new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
+            sid: 'KMSAccess'
+          }),
+          new PolicyStatement({
             sid: 'AssumeRole',
             actions: ['sts:AssumeRole'],
             // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
@@ -518,6 +561,11 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
+            sid: 'KMSAccess'
           }),
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
