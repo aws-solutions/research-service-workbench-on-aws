@@ -239,7 +239,7 @@ is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account hand
 
 In POSTMAN this is the `Create DataSet` API
 
-During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket and construct the following API call
+During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket from the CFN stack output (key named `DataSetsBucketName`) in the main account and construct the following API call
 
 POST `{{API_URL}}/datasets`
 

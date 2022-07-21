@@ -358,6 +358,10 @@ export class SWBStack extends Stack {
   private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
     const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
+
+    new CfnOutput(this, 'DataSetsBucketName', {
+      value: bucket.bucketName
+    });
     return bucket;
   }
 
