@@ -46,6 +46,9 @@ Parameters:
   MainAccountRegion:
     Type: String
     Description: The region of application deployment in main account
+  MainAccountKeyArn:
+    Type: String
+    Description: The ARN of main account bucket encryption key
 
 Conditions:
   IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
@@ -136,10 +139,12 @@ Resources:
               - 'kms:EnableKeyRotation'
               - 'kms:Encrypt'
               - 'kms:Decrypt'
-              - 'kms:GenerateDataKeyWithoutPlaintext'
+              - 'kms:GenerateDataKey'
               - 'kms:Get*'
               - 'kms:List*'
-            Resource: !Ref EncryptionKeyArn
+            Resource:
+              - !Ref EncryptionKeyArn
+              - !Ref MainAccountKeyArn
           - Effect: Allow
             Action:
               - 'sts:AssumeRole'
@@ -190,6 +195,17 @@ Resources:
                     s3:prefix: !Sub
                       - '${S3Prefix}/*'
                       - S3Prefix: !Select [3, !Split ['/', !Ref EnvironmentInstanceFiles]]
+              - Effect: Allow
+                Action:
+                  - 'kms:CreateGrant'
+                  - 'kms:Get*'
+                  - 'kms:List*'
+                  - 'kms:Decrypt'
+                  - 'kms:DescribeKey'
+                  - 'kms:Encrypt'
+                  - 'kms:GenerateDataKey'
+                Resource:
+                  - !Ref MainAccountKeyArn
         - PolicyName: cw-logs
           PolicyDocument:
             Statement:

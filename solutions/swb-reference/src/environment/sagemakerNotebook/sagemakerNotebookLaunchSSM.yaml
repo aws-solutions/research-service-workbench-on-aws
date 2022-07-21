@@ -58,6 +58,9 @@ parameters:
   MainAccountRegion:
     type: String
     description: The region of application deployment in main account
+  MainAccountKeyArn:
+    type: String
+    description: The ARN of main account bucket encryption key
 mainSteps:
   - name: Launch
     action: 'aws:executeAwsApi'
@@ -97,6 +100,8 @@ mainSteps:
           Value: '{{ MainAccountId }}'
         - Key: MainAccountRegion
           Value: '{{ MainAccountRegion }}'
+        - Key: MainAccountKeyArn
+          Value: '{{ MainAccountKeyArn }}'
       Tags:
         - Key: Env
           Value: '{{ EnvId }}'
