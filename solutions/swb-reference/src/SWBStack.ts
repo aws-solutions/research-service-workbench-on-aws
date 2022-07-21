@@ -3,7 +3,7 @@
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
 
-import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { App, aws_iam, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -44,10 +44,16 @@ export class SWBStack extends Stack {
     USER_POOL_ID: string;
     WEBSITE_URL: string;
   };
+
+  private _accessLogsBucket: Bucket;
+  private _s3AccessLogsPrefix: string;
+
   public constructor(app: App) {
     const {
       STAGE,
       AWS_REGION,
+      S3_ACCESS_BUCKET_ARN_NAME,
+      S3_ACCESS_BUCKET_PREFIX,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
@@ -114,13 +120,14 @@ export class SWBStack extends Stack {
       USER_POOL_ID: userPoolId,
       WEBSITE_URL
     };
-
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
+    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_BUCKET_ARN_NAME);
+    const datasetsBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
-    const statusHandler = this._createStatusHandlerLambda(datasetBucket);
-    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
+    const statusHandler = this._createStatusHandlerLambda(datasetsBucket);
+    const apiLambda: Function = this._createAPILambda(datasetsBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
@@ -272,6 +279,20 @@ export class SWBStack extends Stack {
     return iamRole;
   }
 
+  /**
+   * Create bucket for S3 access logs.
+   * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
+   * @param bucketName Name of Access Logs Bucket.
+   * @returns S3Bucket
+   */
+  private _createAccessLogsBucket(bucketName: string): Bucket {
+    const s3Bucket = new Bucket(this, 's3-access-logs', {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
+
+    return s3Bucket;
+  }
+
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
     s3Bucket.addToResourcePolicy(
       new PolicyStatement({
@@ -331,14 +352,36 @@ export class SWBStack extends Stack {
 
   private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
     const s3Bucket = new Bucket(this, s3BucketId, {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: this._accessLogsBucket,
+      serverAccessLogsPrefix: this._s3AccessLogsPrefix
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
+    this._setupAccessLogsBucketPolicy(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
+  }
+
+  private _setupAccessLogsBucketPolicy(sourceBucket: Bucket): void {
+    this._accessLogsBucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
+        actions: ['s3:PutObject'],
+        resources: [`${this._accessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        conditions: {
+          ArnLike: {
+            'aws:SourceArn': sourceBucket.bucketArn
+          },
+          StringEquals: {
+            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+          }
+        }
+      })
+    );
   }
 
   private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
@@ -596,7 +639,7 @@ export class SWBStack extends Stack {
         stageName: 'dev'
       },
       defaultCorsPreflightOptions: {
-        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'Set-Cookie'],
         allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         allowCredentials: true,
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
