@@ -7,10 +7,10 @@ import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
+  AccountPrincipal,
   AnyPrincipal,
   Effect,
   Policy,
@@ -19,8 +19,10 @@ import {
   Role,
   ServicePrincipal
 } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { BlockPublicAccess, Bucket } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
 
@@ -43,11 +45,18 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     WEBSITE_URL: string;
+    MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
   };
+
+  private _accessLogsBucket: Bucket;
+  private _s3AccessLogsPrefix: string;
+
   public constructor(app: App) {
     const {
       STAGE,
       AWS_REGION,
+      S3_ACCESS_BUCKET_ARN_NAME,
+      S3_ACCESS_BUCKET_PREFIX,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       S3_DATASETS_BUCKET_ARN_NAME,
       LAUNCH_CONSTRAINT_ROLE_NAME,
@@ -63,7 +72,8 @@ export class SWBStack extends Stack {
       WEBSITE_URL,
       USER_POOL_ID,
       CLIENT_ID,
-      CLIENT_SECRET
+      CLIENT_SECRET,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -112,13 +122,20 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      WEBSITE_URL
+      WEBSITE_URL,
+      MAIN_ACCT_ENCRYPTION_KEY_NAME
     };
 
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(S3_ARTIFACT_BUCKET_ARN_NAME);
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME);
-    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket);
+    this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    const mainAcctEncryptionKey = this._createEncryptionKey();
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_NAME,
+      mainAcctEncryptionKey
+    );
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
+    const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
@@ -128,7 +145,34 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
   }
 
-  private _createLaunchConstraintIAMRole(launchConstraintRoleNameOutput: string): Role {
+  private _createEncryptionKey(): Key {
+    const { MAIN_ACCT_ENCRYPTION_KEY_NAME } = getConstants();
+    const mainKeyPolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: ['kms:*'],
+          principals: [new AccountPrincipal(this.account)],
+          resources: ['*'],
+          sid: 'main-key-share-statement'
+        })
+      ]
+    });
+
+    const key = new Key(this, 'mainAccountKey', {
+      enableKeyRotation: true,
+      policy: mainKeyPolicy
+    });
+
+    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_NAME, {
+      value: key.keyArn
+    });
+    return key;
+  }
+
+private _createLaunchConstraintIAMRole(
+    launchConstraintRoleNameOutput: string,
+    artifactS3Bucket: Bucket
+  ): Role {
     const commonScManagement = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -178,7 +222,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*']
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
@@ -198,11 +242,11 @@ export class SWBStack extends Stack {
             'ec2:DescribeSubnets',
             'ec2:DescribeVpcs'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeTags, DescrbeKeyPairs, DescribeSecurityGroups, DescribeSubnets, DescribeVpcs do not allow for resource-based permissions
         }),
         new PolicyStatement({
           actions: ['kms:CreateGrant'],
-          resources: ['*']
+          resources: ['*'] // Must be wildcard because we do not know the keys at the time of creation of this policy
         })
       ]
     });
@@ -230,7 +274,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
-          resources: ['*']
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
           actions: [
@@ -251,7 +295,7 @@ export class SWBStack extends Stack {
             'ec2:CreateNetworkInterface',
             'ec2:DeleteNetworkInterface'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeNetworkInterfaces does not allow resource-level permissions
         })
       ]
     });
@@ -270,6 +314,23 @@ export class SWBStack extends Stack {
       value: iamRole.roleName
     });
     return iamRole;
+  }
+
+  /**
+   * Create bucket for S3 access logs.
+   * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
+   * Note this bucket uses S3 Managed encryption as a requirement for access logging.
+   * @param bucketName - Name of Access Logs Bucket.
+   * @returns S3Bucket
+   */
+  private _createAccessLogsBucket(bucketName: string, mainAcctEncryptionKey: Key): Bucket {
+    const s3Bucket = new Bucket(this, 's3-access-logs', {
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      encryption: BucketEncryption.S3_MANAGED,
+      encryptionKey: undefined
+    });
+
+    return s3Bucket;
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -319,26 +380,54 @@ export class SWBStack extends Stack {
     );
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string): Bucket {
-    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName);
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, mainAcctEncryptionKey);
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string): Bucket {
-    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName);
+  private _createS3DatasetsBuckets(s3DatasetsName: string, mainAcctEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
+
+    new CfnOutput(this, 'DataSetsBucketName', {
+      value: bucket.bucketName
+    });
     return bucket;
   }
 
-  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string): Bucket {
+  private _createSecureS3Bucket(s3BucketId: string, s3OutputId: string, mainAcctEncryptionKey: Key): Bucket {
     const s3Bucket = new Bucket(this, s3BucketId, {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: this._accessLogsBucket,
+      serverAccessLogsPrefix: this._s3AccessLogsPrefix,
+      encryption: BucketEncryption.KMS,
+      encryptionKey: mainAcctEncryptionKey
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
+    this._setupAccessLogsBucketPolicy(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
+  }
+
+  private _setupAccessLogsBucketPolicy(sourceBucket: Bucket): void {
+    this._accessLogsBucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
+        actions: ['s3:PutObject'],
+        resources: [`${this._accessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        conditions: {
+          ArnLike: {
+            'aws:SourceArn': sourceBucket.bucketArn
+          },
+          StringEquals: {
+            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+          }
+        }
+      })
+    );
   }
 
   private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
@@ -400,7 +489,11 @@ export class SWBStack extends Stack {
     return statusHandlerLambda;
   }
 
-  private _createAccountHandlerLambda(launchConstraintRole: Role, artifactS3Bucket: Bucket): Function {
+  private _createAccountHandlerLambda(
+    launchConstraintRole: Role,
+    artifactS3Bucket: Bucket,
+    amiIdsToShare: string
+  ): Function {
     const lambda = new Function(this, 'accountHandlerLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/accountHandler')),
       handler: 'accountHandlerLambda.handler',
@@ -410,8 +503,9 @@ export class SWBStack extends Stack {
       timeout: Duration.minutes(4)
     });
 
-    lambda.role?.attachInlinePolicy(
-      new Policy(this, 'accountHandlerPolicy', {
+    const amiIdsList: string[] = JSON.parse(amiIdsToShare);
+
+    const lambdaPolicy = new Policy(this, 'accountHandlerPolicy', {
         statements: [
           new PolicyStatement({
             sid: 'CreatePortfolioShare',
@@ -424,6 +518,11 @@ export class SWBStack extends Stack {
             sid: 'ListPortfolios',
             actions: ['servicecatalog:ListPortfolios'],
             resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
+          }),
+          new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
+            sid: 'KMSAccess'
           }),
           new PolicyStatement({
             sid: 'AssumeRole',
@@ -440,11 +539,6 @@ export class SWBStack extends Stack {
               'iam:ListAttachedRolePolicies'
             ],
             resources: [launchConstraintRole.roleArn]
-          }),
-          new PolicyStatement({
-            sid: 'ShareAmi',
-            actions: ['ec2:ModifyImageAttribute'],
-            resources: ['*']
           }),
           new PolicyStatement({
             sid: 'ShareSSM',
@@ -465,7 +559,18 @@ export class SWBStack extends Stack {
           })
         ]
       })
-    );
+
+    if (!_.isEmpty(amiIdsList)) {
+      lambdaPolicy.addStatements(
+        new PolicyStatement({
+          sid: 'ShareAmi',
+          actions: ['ec2:ModifyImageAttribute'],
+          resources: amiIdsList
+        })
+      );
+    }
+
+    lambda.role?.attachInlinePolicy(lambdaPolicy);
 
     new CfnOutput(this, 'AccountHandlerLambdaRoleOutput', {
       value: lambda.role!.roleArn
@@ -495,7 +600,7 @@ export class SWBStack extends Stack {
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
           new PolicyStatement({
-            actions: ['events:PutPermission'],
+            actions: ['events:DescribeRule', 'events:Put*'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
             sid: 'EventBridgeAccess'
           }),
@@ -518,6 +623,11 @@ export class SWBStack extends Stack {
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
+          }),
+          new PolicyStatement({
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
+            sid: 'KMSAccess'
           }),
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],

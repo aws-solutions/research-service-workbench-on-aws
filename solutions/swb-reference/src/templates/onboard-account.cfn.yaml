@@ -220,6 +220,11 @@ Resources:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -299,6 +304,8 @@ Resources:
             reason: "There is a condition so that this role can only be passed to Service Catalog per these instructions: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_iam-passrole-service.html"
           - id: F5
             reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+          - id: W13
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
 
   PolicyHostingAccountHandler:
     Type: AWS::IAM::ManagedPolicy
@@ -370,6 +377,12 @@ Resources:
               - servicecatalog:AcceptPortfolioShare
               - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: "For the cost explorer and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+
 
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'

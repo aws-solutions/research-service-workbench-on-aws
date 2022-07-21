@@ -1,6 +1,15 @@
-import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
+import {
+  CreateDataSetSchema,
+  CreateExternalEndpointSchema,
+  DataSetService,
+  DataSetsStoragePlugin
+} from '@amzn/workbench-core-datasets';
+import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import { validate } from 'jsonschema';
+import { validate as uuidValidate } from 'uuid';
 import { wrapAsync } from './errorHandlers';
+import { processValidatorResult } from './validatorHelper';
 
 export function setUpDSRoutes(
   router: Router,
@@ -11,14 +20,15 @@ export function setUpDSRoutes(
   router.post(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      await dataSetService.provisionDataSet(
+      processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const dataSet = await dataSetService.provisionDataSet(
         req.body.datasetName,
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
         dataSetStoragePlugin
       );
-      res.status(201).send();
+      res.status(201).send(dataSet);
     })
   );
 
@@ -26,23 +36,28 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
-      await dataSetService.importDataSet(
+      processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const dataSet = await dataSetService.importDataSet(
         req.body.datasetName,
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
         dataSetStoragePlugin
       );
-      res.status(201).send();
+      res.status(201).send(dataSet);
     })
   );
 
   // share dataset
   router.post(
-    '/datasets/share',
+    '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
+      if (!uuidValidate(req.params.id)) {
+        throw Boom.badRequest('id request parameter must be a valid uuid.');
+      }
+      processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
       await dataSetService.addDataSetExternalEndpoint(
-        req.body.datasetName,
+        req.params.id,
         req.body.externalEndpointName,
         dataSetStoragePlugin,
         req.body.externalRoleName
@@ -55,12 +70,15 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
+      if (!uuidValidate(req.params.id)) {
+        throw Boom.badRequest('id request parameter must be a valid uuid.');
+      }
       const ds = await dataSetService.getDataSet(req.params.id);
       res.send(ds);
     })
   );
 
-  // Get datasets
+  // List datasets
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
