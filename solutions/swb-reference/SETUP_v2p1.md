@@ -119,11 +119,8 @@ Your environment should have two variables. Name the first one `API_URL` and the
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
 
-### Setup environmentType, environmentTypeConfig, and project configurations
+### Setup project configurations, environmentType, and environmentTypeConfig
 
-TODO: Reformat this to POSTMAN requests
-
-### Store account and environment config information in DDB
 Since we have not built the API for Projects setup in DDB yet, you'll need to manually add these values to DDB. You can
 do so, by logging into the DDB page on the AWS console for your `Main account`. There should be a table there with the following
 name `swb-<stage>-<awsRegionShortName>`
@@ -160,7 +157,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 }
 ```
 
-**Create Environment Type Config**
+**Create Environment Type**
 
 Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
 * productId: `Product ID` of `sagemakerNotebook` product
@@ -170,12 +167,67 @@ Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfol
 In POSTMAN, uses the `envType` => `Create envType` request to make a request with the following `body`
 ```json
 {
+    "status": "APPROVED",
+    "name": "Sagemaker Jupyter Notebook",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
+    "allowedRoleIds": [],
+    "params": [
+        {
+            "DefaultValue": "ml.t3.xlarge",
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "EC2 instance type to launch",
+            "ParameterKey": "InstanceType"
+        },
+        {
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "Number",
+            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+            "ParameterKey": "AutoStopIdleTimeInMinutes"
+        },
+        {
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "The IAM policy to be associated with the launched workstation",
+            "ParameterKey": "IamPolicyDocument"
+        },
+        {
+            "DefaultValue": "1.1.1.1/1",
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "CIDR to restrict IPs that can access the environment",
+            "ParameterKey": "CIDR"
+        }
+    ],
+    "description": "An Amazon SageMaker Jupyter Notebook",
+    "type": "sagemakerNotebook"
+}
+```
+
+In the response make note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
+
+**Create Environment Type**
+
+In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+```json
+{
     "type": "sagemakerNotebook",
-    "desc": "Description for config 1",
+    "description": "Description for config 1",
     "name": "Config 1",
-    "owner": "owner-1",
+    "allowedRoleIds": [], 
     "params": [
      {
       "key": "IamPolicyDocument",
@@ -193,77 +245,11 @@ In POSTMAN, uses the `envType` => `Create envType` request to make a request wit
        "key": "CIDR",
        "value": "0.0.0.0/0"
      }
-    ],
-    "createdAt": "2022-02-03T20:07:50.573Z",
-    "createdBy": "abc",
-    "updatedAt": "2022-02-03T20:07:50.573Z",
-    "updatedBy": "abc",
-    "resourceType": "envTypeConfig"
+    ]
 }
 ```
 
-**Store `ET` resource in DDB**
-```json
-{
-      "status": "APPROVED",
-      "createdAt": "2022-06-21T20:32:04.011Z",
-      "updatedBy": "owner-1",
-      "name": "Sagemaker Jupyter Notebook",
-      "createdBy": "owner-1",
-      "resourceType": "envType",
-      "provisioningArtifactId": "<provisioningArtifactId>",
-      "params": [
-          {
-              "DefaultValue": "ml.t3.xlarge",
-              "IsNoEcho": false,
-              "ParameterConstraints": {
-                  "AllowedValues": []
-              },
-              "ParameterType": "String",
-              "Description": "EC2 instance type to launch",
-              "ParameterKey": "InstanceType"
-          },
-          {
-              "IsNoEcho": false,
-              "ParameterConstraints": {
-                  "AllowedValues": []
-              },
-              "ParameterType": "Number",
-              "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-              "ParameterKey": "AutoStopIdleTimeInMinutes"
-          },
-          {
-              "IsNoEcho": false,
-              "ParameterConstraints": {
-                  "AllowedValues": []
-              },
-              "ParameterType": "String",
-              "Description": "The IAM policy to be associated with the launched workstation",
-              "ParameterKey": "IamPolicyDocument"
-          },
-          {
-              "DefaultValue": "1.1.1.1/1",
-              "IsNoEcho": false,
-              "ParameterConstraints": {
-                  "AllowedValues": []
-              },
-              "ParameterType": "String",
-              "Description": "CIDR to restrict IPs that can access the environment",
-              "ParameterKey": "CIDR"
-          }
-      ],
-      "updatedAt": "2022-06-21T20:32:51.949Z",
-      "sk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
-      "owner": "owner-123",
-      "description": "An Amazon SageMaker Jupyter Notebook 1",
-      "id": "3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
-      "pk": "ET#3523d235-6cec-41d2-ab2d-ea8ad34a4df93",
-      "productId": "<productId>",
-      "type": "sagemakerNotebook"
-  }
-```
-If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value
-in the JSON above.
+If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
 
 ### Setup Account Resources
 #### Onboard hosting account

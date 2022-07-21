@@ -6,7 +6,7 @@ const CreateEnvironmentTypeSchema: Schema = {
   type: 'object',
   properties: {
     productId: { type: 'string' },
-    provisioningArtifact: { type: 'string' },
+    provisioningArtifactId: { type: 'string' },
     allowedRoleIds: {
       type: 'array',
       items: { type: 'string' }
