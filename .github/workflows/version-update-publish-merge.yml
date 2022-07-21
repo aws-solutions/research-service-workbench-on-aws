@@ -24,10 +24,6 @@ jobs:
           token: ${{ secrets.MERGE_TOKEN }}
           ref: ${{ steps.set-ref.outputs.ref }}
           fetch-depth: 0
-      # - name: Base Action
-      #   uses: ./.github/actions/baseAction
-      # - name: Rush test and update the README file in each package with the coverage badge
-      #   run: node common/scripts/install-run-rush.js test --verbose
       - name: Get Current SHA
         id: last_sha
         run: |
@@ -152,10 +148,19 @@ jobs:
         
       - name: Merge to test-develop
         run: |
+          echo "Set the COMMIT_ID to merge to test-develop, to current workflow commit id, if no readme commit was made"
+          echo "Else"
+          echo "Set the COMMIT_ID to README commit id"
+          COMMIT_ID=''
+          if $CHANGES_DETECTED; then
+            COMMIT_ID=$COMMIT_HASH
+          else
+            COMMIT_ID=$GITHUB_SHA
+          fi
           git checkout test-develop
           echo
-          echo "  Attempting to merge the 'test-main' branch ($COMMIT_ID)"
-          echo "  into the 'test-develop' branch ($(git log -1 --pretty=%H test-develop))"
+          echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
+          echo "  into the 'stage' branch ($(git log -1 --pretty=%H stage))"
           echo
-          git merge $COMMIT_HASH --ff --no-edit
+          git merge $COMMIT_ID --ff --no-edit
           git push origin test-develop
