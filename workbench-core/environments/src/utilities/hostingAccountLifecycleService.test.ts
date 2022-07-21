@@ -36,6 +36,7 @@ describe('HostingAccountLifecycleService', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
     process.env.S3_ARTIFACT_BUCKET_ARN_NAME = 'SampleArtifactBucketArnOutput';
+    process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
   });
@@ -65,6 +66,10 @@ describe('HostingAccountLifecycleService', () => {
               OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_NAME!,
               OutputValue: 'arn:aws:s3:::sampleArtifactsBucketName'
             },
+            {
+              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!,
+              OutputValue: 'arn:aws:kms:::key/123-123-123'
+            },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
             { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
             { OutputKey: 'EncryptionKeyArn', OutputValue: 'FakeEncryptionKeyArn' }
@@ -78,6 +83,7 @@ describe('HostingAccountLifecycleService', () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
 
