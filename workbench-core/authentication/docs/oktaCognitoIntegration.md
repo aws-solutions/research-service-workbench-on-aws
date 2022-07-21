@@ -25,9 +25,9 @@ Set-by-step instructions for integrating Okta into Cognito
   3. For Sign-in redirect URIs, enter **https://\<domain prefix\>.auth.\<region\>.amazoncognito.com/oauth2/idpresponse**
      Note: Replace **domain prefix** and **region** with your Cognito user pool's domain prefix and region
   4. In Controlled access, choose your preferred access setting, and then click **Save**
-  5. On the General page, in Client Credentials, note the Client ID and Client secret. You need these credentials for configuring Okta in your Amazon Cognito user pool
+  5. On the General page, in Client Credentials, note the **Client ID** and **Client secret**. You need these credentials for configuring Okta in your Amazon Cognito user pool
   6. On the Sign On page, in OpenID Connect ID Token, click **Edit**
-  7. Change **Issuer** from **Dynamic** to **Okta URL** and note the Issuer URL. You need this URL for configuring Okta in your Amazon Cognito user pool
+  7. Change **Issuer** from **Dynamic** to **Okta URL** and note the **Issuer URL**. You need this URL for configuring Okta in your Amazon Cognito user pool
 4. Add an OIDC IdP in your user pool
   1.  In the Amazon Cognito console, navigate to your user pool
   2.  In the user pool console, click the **Sign-in experience** tab
@@ -35,10 +35,10 @@ Set-by-step instructions for integrating Okta into Cognito
   4.  Do the following:
     1. For Provider name, enter a name for the IdP. This name appears in the Amazon Cognito hosted web UI
        Note: You can't change this field after creating the provider, so use a name that you're comfortable with your app's users seeing
-    2. For Client ID, input the Client ID that you noted earlier from Okta
-    3. For Client secret, input the Client secret that you noted earlier from Okta
+    2. For Client ID, input the **Client ID** that you noted earlier from Okta
+    3. For Client secret, input the **Client secret** that you noted earlier from Okta
     4. For Authorize scope, input these scopes: `openid email profile`. These are the scopes required for the default authentication services
-    5. For Attribute request method, leave the setting as GET
+    5. For Attribute request method, leave the setting as **GET**
     6. For Issuer, leave **Auto fill through issuer URL** selected and input the Issuer URL that you copied earlier from Okta
     7. For Map attributes, add the following mappings:
       | User Pool Attribute | OpenID Connect attribute |
