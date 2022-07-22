@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-authorization": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
     "@amzn/workbench-core-datasets": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
@@ -59,8 +60,7 @@
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "md5-file": "^5.0.0",
-    "uuid": "^8.3.2",
-    "@amzn/workbench-core-authorization": "workspace:*"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",

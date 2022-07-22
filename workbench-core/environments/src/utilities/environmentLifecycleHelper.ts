@@ -83,17 +83,19 @@ export default class EnvironmentLifecycleHelper {
     const cfService = this.aws.helpers.cloudformation;
     const {
       [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
-      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn
+      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn,
+      [process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!]: mainAcctEncryptionArn
     } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
       process.env.STATUS_HANDLER_ARN_NAME!,
-      process.env.S3_DATASETS_BUCKET_ARN_NAME!
+      process.env.S3_DATASETS_BUCKET_ARN_NAME!,
+      process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!
     ]);
 
     const mainAccountRegion = statusHandlerArn.split(':')[3];
     const mainAccountId = statusHandlerArn.split(':')[4];
 
     // We create these at deploy time so this will be present in the stack
-    return { datasetsBucketArn, mainAccountRegion, mainAccountId };
+    return { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn };
   }
 
   /**
@@ -155,6 +157,7 @@ export default class EnvironmentLifecycleHelper {
    * Get the mount strings for all datasets attached to a given workspace.
    * @param dataSetIds - the list of dataset IDs attached.
    * @param envMetadata - the environment on which to mount the dataset(s)
+   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
    *
    * @returns an object containing:
    *  1. datasetsToMount - A string of a list of strigified mountString objects (curly brackets escaped for tsdoc):
@@ -163,12 +166,10 @@ export default class EnvironmentLifecycleHelper {
    */
   public async getDatasetsToMount(
     datasetIds: Array<string>,
-    envMetadata: Environment
+    envMetadata: Environment,
+    mainAcctEncryptionArn: string
   ): Promise<{ [id: string]: string }> {
     if (_.isEmpty(datasetIds)) return { s3Mounts: '[]', iamPolicyDocument: '{}' };
-
-    // TODO: Allow multiple datasets to be mounted per workspace post-preview
-    if (datasetIds.length > 1) throw new Error('Cannot mount more than one dataset per workspace');
 
     const envId = envMetadata.id!;
     const endpointsCreated: { [key: string]: string }[] = [];
@@ -211,7 +212,11 @@ export default class EnvironmentLifecycleHelper {
     );
 
     // Call IAM policy generator here, and return both strings
-    const iamPolicyDocument = this.generateIamPolicy(endpointsCreated, envMetadata.PROJ.encryptionKeyArn);
+    const iamPolicyDocument = this.generateIamPolicy(
+      endpointsCreated,
+      envMetadata.PROJ.encryptionKeyArn,
+      mainAcctEncryptionArn
+    );
     const s3Mounts = JSON.stringify(datasetsToMount);
 
     return { s3Mounts, iamPolicyDocument };
@@ -254,10 +259,15 @@ export default class EnvironmentLifecycleHelper {
    * Get the workspace IAM policy for accessing all datasets attached.
    * @param endpointsCreated - the external endpoints created for this environment
    * @param encryptionKeyArn - the encryption key ARN for env data traffic
+   * @param mainAcctEncryptionArn - the encryption key ARN for main account dataset bucket
    *
    * @returns iamPolicy - A stringified IAM policy
    */
-  public generateIamPolicy(endpointsCreated: { [id: string]: string }[], encryptionKeyArn: string): string {
+  public generateIamPolicy(
+    endpointsCreated: { [id: string]: string }[],
+    encryptionKeyArn: string,
+    mainAcctEncryptionArn: string
+  ): string {
     // Build policy statements for object-level permissions
     const statements = [];
 
@@ -312,9 +322,17 @@ export default class EnvironmentLifecycleHelper {
 
     statements.push({
       Sid: 'studyKMSAccess',
-      Action: ['kms:Decrypt', 'kms:DescribeKey', 'kms:Encrypt', 'kms:GenerateDataKey', 'kms:ReEncrypt*'],
+      Action: [
+        'kms:CreateGrant',
+        'kms:Get*',
+        'kms:List*',
+        'kms:Decrypt',
+        'kms:DescribeKey',
+        'kms:Encrypt',
+        'kms:GenerateDataKey'
+      ],
       Effect: 'Allow',
-      Resource: encryptionKeyArn
+      Resource: [encryptionKeyArn, mainAcctEncryptionArn]
     });
 
     // Build final policyDoc

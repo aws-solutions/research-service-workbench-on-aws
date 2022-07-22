@@ -32,10 +32,12 @@ export default class HostingAccountLifecycleService {
     const cfService = this._aws.helpers.cloudformation;
     const {
       [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: artifactBucketArn
+      [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: artifactBucketArn,
+      [process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!]: mainAcctEncryptionArn
     } = await cfService.getCfnOutput(this._stackName, [
       process.env.STATUS_HANDLER_ARN_NAME!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_NAME!
+      process.env.S3_ARTIFACT_BUCKET_ARN_NAME!,
+      process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!
     ]);
 
     // Update main account default event bus to accept hosting account state change events
@@ -44,8 +46,38 @@ export default class HostingAccountLifecycleService {
     // Add account to artifactBucket's bucket policy
     await this.updateArtifactsBucketPolicy(artifactBucketArn, accountMetadata.awsAccountId);
 
+    // Update main account encryption key policy
+    await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, accountMetadata.awsAccountId);
+
     // Finally store the new/updated account details in DDB
     return this._accountService.createOrUpdate(accountMetadata);
+  }
+
+  public async updateMainAccountEncryptionKeyPolicy(
+    mainAcctEncryptionArn: string,
+    awsAccountId: string
+  ): Promise<void> {
+    const keyId = mainAcctEncryptionArn.split('/').pop()!;
+    const keyPolicyResponse = await this._aws.clients.kms.getKeyPolicy({
+      KeyId: keyId,
+      PolicyName: 'default'
+    });
+    let keyPolicy = PolicyDocument.fromJson(JSON.parse(keyPolicyResponse.Policy!));
+
+    keyPolicy = IamHelper.addPrincipalToStatement(
+      keyPolicy,
+      'main-key-share-statement',
+      `arn:aws:iam::${awsAccountId}:root`
+    );
+
+    const putPolicyParams = {
+      KeyId: keyId,
+      PolicyName: 'default',
+      Policy: JSON.stringify(keyPolicy.toJSON())
+    };
+
+    // Update key policy
+    await this._aws.clients.kms.putKeyPolicy(putPolicyParams);
   }
 
   /**

@@ -1,3 +1,6 @@
+import CreateDataSetSchema from './schemas/createDataSet';
+import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
+
 export { DataSet } from './dataSet';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 export { DataSetService } from './dataSetService';
@@ -8,3 +11,4 @@ export { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './errors
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
+export { CreateDataSetSchema, CreateExternalEndpointSchema };
