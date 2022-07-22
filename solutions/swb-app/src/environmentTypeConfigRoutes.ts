@@ -22,13 +22,9 @@ export function setUpEnvTypeConfigRoutes(
         throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
       }
       processValidatorResult(validate(req.body, CreateEnvironmentTypeConfigSchema));
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: 'owner-123'
-      };
+      const user = res.locals.user;
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
-        user.ownerId,
+        user.id,
         req.params.envTypeId,
         req.body
       );
@@ -91,14 +87,9 @@ export function setUpEnvTypeConfigRoutes(
       }
 
       processValidatorResult(validate(req.body, UpdateEnvironmentTypeConfigSchema));
-
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: 'owner-123'
-      };
+      const user = res.locals.user;
       const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
-        user.ownerId,
+        user.id,
         req.params.envTypeId,
         req.params.envTypeConfigId,
         req.body

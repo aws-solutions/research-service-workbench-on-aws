@@ -169,7 +169,7 @@ export class SWBStack extends Stack {
     return key;
   }
 
-private _createLaunchConstraintIAMRole(
+  private _createLaunchConstraintIAMRole(
     launchConstraintRoleNameOutput: string,
     artifactS3Bucket: Bucket
   ): Role {
@@ -506,59 +506,59 @@ private _createLaunchConstraintIAMRole(
     const amiIdsList: string[] = JSON.parse(amiIdsToShare);
 
     const lambdaPolicy = new Policy(this, 'accountHandlerPolicy', {
-        statements: [
-          new PolicyStatement({
-            sid: 'CreatePortfolioShare',
-            actions: ['servicecatalog:CreatePortfolioShare'],
-            resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
-          }),
-          // Allows accountHandler to get portfolioId based on portfolioName
-          // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
-          new PolicyStatement({
-            sid: 'ListPortfolios',
-            actions: ['servicecatalog:ListPortfolios'],
-            resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
-          }),
-          new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
-            resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
-            sid: 'KMSAccess'
-          }),
-          new PolicyStatement({
-            sid: 'AssumeRole',
-            actions: ['sts:AssumeRole'],
-            // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
-            resources: ['arn:aws:iam::*:role/*hosting-account-role']
-          }),
-          new PolicyStatement({
-            sid: 'GetLaunchConstraint',
-            actions: [
-              'iam:GetRole',
-              'iam:GetRolePolicy',
-              'iam:ListRolePolicies',
-              'iam:ListAttachedRolePolicies'
-            ],
-            resources: [launchConstraintRole.roleArn]
-          }),
-          new PolicyStatement({
-            sid: 'ShareSSM',
-            actions: ['ssm:ModifyDocumentPermission'],
-            resources: [
-              this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
-            ]
-          }),
-          new PolicyStatement({
-            sid: 'Cloudformation',
-            actions: ['cloudformation:DescribeStacks'],
-            resources: [this.stackId]
-          }),
-          new PolicyStatement({
-            sid: 'S3Bucket',
-            actions: ['s3:GetObject'],
-            resources: [`${artifactS3Bucket.bucketArn}/*`]
-          })
-        ]
-      })
+      statements: [
+        new PolicyStatement({
+          sid: 'CreatePortfolioShare',
+          actions: ['servicecatalog:CreatePortfolioShare'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+        }),
+        // Allows accountHandler to get portfolioId based on portfolioName
+        // '*/*' is the minimum permission required because ListPortfolios API does not allow filtering
+        new PolicyStatement({
+          sid: 'ListPortfolios',
+          actions: ['servicecatalog:ListPortfolios'],
+          resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
+        }),
+        new PolicyStatement({
+          actions: ['kms:Decrypt', 'kms:GenerateDataKey', 'kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+          resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
+          sid: 'KMSAccess'
+        }),
+        new PolicyStatement({
+          sid: 'AssumeRole',
+          actions: ['sts:AssumeRole'],
+          // Confirm the suffix `hosting-account-role` matches with the suffix in `onboard-account.cfn.yaml`
+          resources: ['arn:aws:iam::*:role/*hosting-account-role']
+        }),
+        new PolicyStatement({
+          sid: 'GetLaunchConstraint',
+          actions: [
+            'iam:GetRole',
+            'iam:GetRolePolicy',
+            'iam:ListRolePolicies',
+            'iam:ListAttachedRolePolicies'
+          ],
+          resources: [launchConstraintRole.roleArn]
+        }),
+        new PolicyStatement({
+          sid: 'ShareSSM',
+          actions: ['ssm:ModifyDocumentPermission'],
+          resources: [
+            this.formatArn({ service: 'ssm', resource: 'document', resourceName: `${this.stackName}-*` })
+          ]
+        }),
+        new PolicyStatement({
+          sid: 'Cloudformation',
+          actions: ['cloudformation:DescribeStacks'],
+          resources: [this.stackId]
+        }),
+        new PolicyStatement({
+          sid: 'S3Bucket',
+          actions: ['s3:GetObject'],
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
+        })
+      ]
+    });
 
     if (!_.isEmpty(amiIdsList)) {
       lambdaPolicy.addStatements(

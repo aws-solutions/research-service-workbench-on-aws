@@ -139,7 +139,7 @@ const Environment: NextPage = () => {
   const connectButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
   const startButtonEnableStatuses: string[] = ['STOPPED'];
   const stopButtonEnableStatuses: string[] = ['AVAILABLE', 'STARTED', 'COMPLETED'];
-  const terminateButtonEnableStatuses: string[] = ['FAILED', 'STOPPED', 'COMPLETED'];
+  const terminateButtonEnableStatuses: string[] = ['FAILED', 'STOPPED'];
   // Constant buttons should show loading based on statuses in the array
   const stopButtonLoadingStatuses: string[] = ['STOPPING'];
   const terminateButtonLoadingStatuses: string[] = ['TERMINATING'];

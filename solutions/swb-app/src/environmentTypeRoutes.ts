@@ -25,12 +25,8 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
           `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
         );
       }
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: 'owner-123'
-      };
-      const envType = await environmentTypeService.createNewEnvironmentType(user.ownerId, {
+      const user = res.locals.user;
+      const envType = await environmentTypeService.createNewEnvironmentType(user.id, {
         ...req.body
       });
       res.status(201).send(envType);
@@ -76,22 +72,14 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         throw Boom.badRequest('id request parameter must be a valid uuid.');
       }
       processValidatorResult(validate(req.body, UpdateEnvironmentTypeSchema));
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: 'owner-123'
-      };
+      const user = res.locals.user;
       const { status } = req.body;
       if (!isEnvironmentTypeStatus(status)) {
         throw Boom.badRequest(
           `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
         );
       }
-      const envType = await environmentTypeService.updateEnvironmentType(
-        user.ownerId,
-        req.params.id,
-        req.body
-      );
+      const envType = await environmentTypeService.updateEnvironmentType(user.id, req.params.id, req.body);
       res.status(200).send(envType);
     })
   );
