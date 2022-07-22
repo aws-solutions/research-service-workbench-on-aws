@@ -111,7 +111,7 @@ export const getPanelContent = (items: any, itemType: string): any => {
 };
 
 export const useSplitPanel = (selectedItems: any): AppLayoutProps => {
-  const [splitPanelSize, setSplitPanelSize] = useState(300);
+  const [splitPanelSize, setSplitPanelSize] = useState(650);
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
   const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
 

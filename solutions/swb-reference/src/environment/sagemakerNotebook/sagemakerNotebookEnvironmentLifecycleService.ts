@@ -30,6 +30,14 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
       .value!;
 
+    const { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn } =
+      await this.helper.getCfnOutputs();
+    const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
+      envMetadata.datasetIds,
+      envMetadata,
+      mainAcctEncryptionArn
+    );
+
     const ssmParameters = {
       InstanceName: [`basicnotebookinstance-${Date.now()}`],
       VPC: [envMetadata.PROJ.vpcId],
@@ -40,9 +48,15 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       EncryptionKeyArn: [envMetadata.PROJ.encryptionKeyArn],
       CIDR: [cidr],
       InstanceType: [instanceSize],
+      DatasetsBucketArn: [datasetsBucketArn],
       EnvId: [envMetadata.id],
       EnvironmentInstanceFiles: [envMetadata.PROJ.environmentInstanceFiles],
-      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes]
+      AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
+      IamPolicyDocument: [iamPolicyDocument],
+      S3Mounts: [s3Mounts],
+      MainAccountKeyArn: [mainAcctEncryptionArn],
+      MainAccountRegion: [mainAccountRegion],
+      MainAccountId: [mainAccountId]
     };
 
     await this.helper.launch({
@@ -74,6 +88,9 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       envMgmtRoleArn: envDetails.PROJ.envMgmtRoleArn,
       externalId: envDetails.PROJ.externalId
     });
+
+    // Delete access point(s) for this workspace
+    await this.helper.removeAccessPoints(envDetails);
 
     // Store env row in DDB
     await this.envService.updateEnvironment(envId, { status: 'TERMINATING' });

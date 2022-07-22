@@ -83,12 +83,12 @@ cdk.out
 cdk.context.json
 cdk-outputs.json
 out.txt
-solutions/managed-blockchain-for-patient-consent/fabric-infrastructure/cdk.json
 build/
 
 .idea
 
 # Reference package
+solutions/swb-reference/src/environment-files/offline-packages/*
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
@@ -97,7 +97,6 @@ solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
 solutions/swb-reference/.aws-sam/
-solutions/managed-blockchain-for-patient-consent/*/build
 
 # local environment variables
 .env*.local
@@ -105,5 +104,10 @@ solutions/managed-blockchain-for-patient-consent/*/build
 # example package
 workbench-core/example/infrastructure/build
 
-#patient consent app cdk-outputs
-solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure/cdk-outputs.json
+#next static export
+solutions/swb-ui/out
+
+#swb-ui cdk-infrastructure
+solutions/swb-ui/infrastructure/src/config/*.yaml
+!solutions/swb-ui/infrastructure/src/config/example.yaml
+

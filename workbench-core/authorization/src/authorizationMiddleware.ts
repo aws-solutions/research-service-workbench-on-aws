@@ -12,6 +12,7 @@ import { HTTPMethod, HTTPMethods } from './routesMap';
 function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
   return user instanceof Object && user.hasOwnProperty('roles') && user.hasOwnProperty('id');
 }
+
 /**
  * Retrieves the user from the {@link Response}.
  * @param res - {@link Response}

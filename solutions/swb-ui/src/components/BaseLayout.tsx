@@ -6,29 +6,26 @@ import { useState } from 'react';
 import { layoutLabels } from '../common/labels';
 import Navigation from '../components/Navigation';
 import { useNotifications } from '../context/NotificationContext';
-import styles from '../styles/BaseLayout.module.scss';
 
-const breadcrumbs: BreadcrumbGroupProps.Item[] = [
-  {
-    text: 'Service Workbench',
-    href: '#'
-  },
-  {
-    text: 'Login',
-    href: '#'
-  }
-];
 
 export interface LayoutProps {
   navigationHide?: boolean;
   appName?: string;
   children: React.ReactNode;
+  breadcrumbs: BreadcrumbGroupProps.Item[];
 }
 
-export default function Layout({ navigationHide, appName, children }: LayoutProps): JSX.Element {
+export default function Layout({ navigationHide, children, breadcrumbs }: LayoutProps): JSX.Element {
   // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
-  const { notifications } = useNotifications();
+  const { notifications, displayNotification } = useNotifications();
+  const id = 'BetaCodeWarning';
+  displayNotification(id, {
+    type: 'warning',
+    dismissible: false,
+    content:
+      'This software is in active development/testing mode. Do not put any critical, production, or otherwise important data in workspaces or studies.'
+  });
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
 
@@ -40,7 +37,7 @@ export default function Layout({ navigationHide, appName, children }: LayoutProp
   return (
     <AppLayout
       id="app-layout"
-      className={styles.baseLayout}
+
       headerSelector="#header"
       stickyNotifications
       toolsHide

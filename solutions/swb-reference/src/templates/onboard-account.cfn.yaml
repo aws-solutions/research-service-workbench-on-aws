@@ -20,6 +20,10 @@ Parameters:
     Type: String
     Description: A unique ID used to identify this account
 
+  ParallelClusterApiID:
+    Type: String
+    Description: API ID for ParallelCluster API stack on hosting account.
+
   VpcCidr:
     Description: Please enter the IP range (CIDR notation) for this VPC
     Type: String
@@ -66,6 +70,7 @@ Metadata:
         Parameters:
           - MainAccountId
           - ExternalId
+          - ParallelClusterApiID
       - Label:
           default: Deployment Configuration
         Parameters:
@@ -110,6 +115,14 @@ Resources:
                 Action:
                   - events:PutEvents
                 Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+         - PolicyName: execute-api
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - execute-api:Invoke
+                Resource: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ParallelClusterApiID}/*/*/*'
         - PolicyName: cfn-access
           PolicyDocument:
             Version: '2012-10-17'
@@ -136,9 +149,13 @@ Resources:
               Action:
                 - ssm:SendCommand
                 - ssm:StartAutomationExecution
+                - ssm:GetCommandInvocation
               Resource:
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}::document/AWS-RunShellScript'
                 - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*'
+                - !Sub 'arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*'
         - PolicyName: iam-pass-role
           PolicyDocument:
             Statement:
@@ -220,6 +237,11 @@ Resources:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -241,7 +263,8 @@ Resources:
               - ssm:*
               - config:*
               - servicecatalog:*
-              - ec2-instance-connect:*
+
+              - execute-api:*
             Resource: '*'
           - Effect: Allow
             Action:
@@ -293,6 +316,15 @@ Resources:
               - iam:ListRoles
               - iam:ListUsers
             Resource: '*' # These non-mutating IAM actions cover the permissions in managed policy AWSServiceCatalogAdminFullAccess
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: F40
+            reason: "There is a condition so that this role can only be passed to Service Catalog per these instructions: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_iam-passrole-service.html"
+          - id: F5
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+          - id: W13
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
 
   PolicyHostingAccountHandler:
     Type: AWS::IAM::ManagedPolicy
@@ -364,6 +396,12 @@ Resources:
               - servicecatalog:AcceptPortfolioShare
               - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: "For the cost explorer and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+
 
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
@@ -507,6 +545,11 @@ Resources:
             Condition:
               StringEquals:
                 kms:CallerAccount: !Ref 'AWS::AccountId'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F76
+            reason: "There is a condition so that the only caller that can use this KMS key is the aws account. The syntax for the Principal element does not provide a way to specify all identities in an AWS account. But you can achieve this effect by combining the condition key kms:CallerAccount with a Principal element that specifies all AWS identities."
 
   EncryptionKeyAlias:
     Type: AWS::KMS::Alias
@@ -515,6 +558,7 @@ Resources:
       TargetKeyId: !Ref EncryptionKey
 
   StateChangeEventRuleMainRouting:
+
     Type: 'AWS::Events::Rule'
     Properties:
       Description: Routes environment state changes to the main event bus
