@@ -59,7 +59,7 @@ export default class ProjectService {
     }
   }
 
-  public async getProjects(): Promise<{ data: Project[] }> {
+  public async listProjects(): Promise<{ data: Project[] }> {
     const queryParams = {
       key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByCreatedAt'

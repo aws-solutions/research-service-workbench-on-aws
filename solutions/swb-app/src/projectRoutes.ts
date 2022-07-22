@@ -7,7 +7,7 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
   router.get(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      const projects = await projectService.getProjects();
+      const projects = await projectService.listProjects();
       res.send(projects);
     })
   );

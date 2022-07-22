@@ -48,11 +48,11 @@ describe('authorization middleware', () => {
   let logger: LoggingService;
   beforeEach(() => {
     mockAdmin = {
-      id: 'sampleUID',
+      id: 'sampleAdminUID',
       roles: ['admin']
     };
     mockGuest = {
-      id: 'sampleUID',
+      id: 'sampleGuestUID',
       roles: ['guest']
     };
     logger = new LoggingService();

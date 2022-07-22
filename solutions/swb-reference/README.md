@@ -66,7 +66,8 @@ const adminSession = await setup.createAdminSession();
 const { data: response } = await adminSession.resources.environments.get({status: 'COMPLETED'});
 ```
 
-
+## Update static auth permissions
+Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
 ## FAQ
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**

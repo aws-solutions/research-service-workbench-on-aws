@@ -47,3 +47,24 @@ export const paginationLables: PaginationProps.Labels = {
   previousPageLabel: 'Previous page',
   pageLabel: (pageNumber: number) => `Page ${pageNumber} of all pages`
 };
+
+export const headerLabels = {
+  searchIconAriaLabel: 'Search',
+  searchDismissIconAriaLabel: 'Close search',
+  overflowMenuTriggerText: 'More',
+  overflowMenuTitleText: 'All',
+  overflowMenuBackIconAriaLabel: 'Back',
+  overflowMenuDismissIconAriaLabel: 'Close menu',
+  signout: 'Sign out'
+};
+
+export const Navigation = {
+  Administration: 'Administration',
+  CreateDashboard: 'Create new dashboard',
+  Dashboards: 'Dashboards',
+  InviteUsers: 'Invite users',
+  ManageDashboards: 'Manage dashboards',
+  ManageUsers: 'Manage users',
+  Users: 'Users',
+  ViewPublishedDashboards: 'View published dashboards'
+};

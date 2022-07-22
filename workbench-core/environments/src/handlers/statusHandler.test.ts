@@ -111,7 +111,11 @@ describe('StatusHandler', () => {
       envId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       status: 'COMPLETED',
       operation: 'Launch',
-      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      recordOutputKeys: {
+        instanceName: 'NotebookInstanceName',
+        instanceArn: 'NotebookArn',
+        instanceRoleName: 'EnvironmentInstanceRoleArn'
+      },
       metadata: {
         version: '0',
         id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -135,7 +139,8 @@ describe('StatusHandler', () => {
     mockSC.on(DescribeRecordCommand).resolves({
       RecordOutputs: [
         { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
-        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' },
+        { OutputKey: 'EnvironmentInstanceRoleArn', OutputValue: 'sampleNotebookRoleArn' }
       ]
     });
     envService.getEnvironment = jest.fn(async () => environment);
@@ -166,7 +171,11 @@ describe('StatusHandler', () => {
       status: 'COMPLETED',
       operation: 'Launch',
       instanceId: 'notebookInstance-abc',
-      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      recordOutputKeys: {
+        instanceName: 'NotebookInstanceName',
+        instanceArn: 'NotebookArn',
+        instanceRoleName: 'EnvironmentInstanceRoleArn'
+      },
       metadata: {
         version: '0',
         id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -190,7 +199,8 @@ describe('StatusHandler', () => {
     mockSC.on(DescribeRecordCommand).resolves({
       RecordOutputs: [
         { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
-        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' },
+        { OutputKey: 'EnvironmentInstanceRoleArn', OutputValue: 'sampleNotebookRoleArn' }
       ]
     });
     envService.getEnvironment = jest.fn(async () => environment);
@@ -307,7 +317,11 @@ describe('StatusHandler', () => {
       status: 'COMPLETED',
       operation: 'Launch',
       instanceId: 'notebookInstance-abc',
-      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      recordOutputKeys: {
+        instanceName: 'NotebookInstanceName',
+        instanceArn: 'NotebookArn',
+        instanceRoleName: 'EnvironmentInstanceRoleArn'
+      },
       metadata: {
         version: '0',
         id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -331,7 +345,8 @@ describe('StatusHandler', () => {
     mockSC.on(DescribeRecordCommand).resolves({
       RecordOutputs: [
         { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
-        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' },
+        { OutputKey: 'EnvironmentInstanceRoleArn', OutputValue: 'sampleNotebookRoleArn' }
       ]
     });
     envService.getEnvironment = jest.fn(async () => environment);
@@ -364,7 +379,11 @@ describe('StatusHandler', () => {
       status: 'COMPLETED',
       operation: 'Launch',
       instanceId: 'notebookInstance-abc',
-      recordOutputKeys: { instanceName: 'NotebookInstanceName', instanceArn: 'NotebookArn' },
+      recordOutputKeys: {
+        instanceName: 'NotebookInstanceName',
+        instanceArn: 'NotebookArn',
+        instanceRoleName: 'EnvironmentInstanceRoleArn'
+      },
       metadata: {
         version: '0',
         id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -388,7 +407,8 @@ describe('StatusHandler', () => {
     mockSC.on(DescribeRecordCommand).resolves({
       RecordOutputs: [
         { OutputKey: 'NotebookInstanceName', OutputValue: 'sampleNotebookInstanceName' },
-        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' }
+        { OutputKey: 'NotebookArn', OutputValue: 'sampleNotebookArn' },
+        { OutputKey: 'EnvironmentInstanceRoleArn', OutputValue: 'sampleNotebookRoleArn' }
       ]
     });
     envService.getEnvironment = jest.fn(async () => environment);
