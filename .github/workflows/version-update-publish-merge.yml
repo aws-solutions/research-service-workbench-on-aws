@@ -183,9 +183,9 @@ jobs:
         
       - name: Merge to develop
         run: |
-          echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no readme commit was made"
+          echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no version change commit was made"
           echo "Else"
-          echo "Set the COMMIT_ID to README commit id"
+          echo "Set the COMMIT_ID to version commit id"
           COMMIT_ID=''
           if $CHANGES_DETECTED; then
             COMMIT_ID=$COMMIT_HASH
@@ -195,7 +195,7 @@ jobs:
           git checkout develop
           echo
           echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
-          echo "  into the 'stage' branch ($(git log -1 --pretty=%H stage))"
+          echo "  into the 'develop' branch ($(git log -1 --pretty=%H develop))"
           echo
           git merge $COMMIT_ID --ff --no-edit
           git push origin develop
