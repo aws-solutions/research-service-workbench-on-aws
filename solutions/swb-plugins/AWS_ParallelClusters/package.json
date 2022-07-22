@@ -15,7 +15,7 @@
   "main": "lib/App.js",
   "typings": "lib/App.d.ts",
   "scripts": {
-    "build": "react-scripts build && tsc && rushx pkg-json-lint",
+    "build": "react-scripts build && tsc && rm tsconfig.tsbuildinfo &&rushx pkg-json-lint",
     "eject": "react-scripts eject",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",

@@ -403,6 +403,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "my-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "nconf",
       "allowedCategories": [ "prototypes" ]
     },
