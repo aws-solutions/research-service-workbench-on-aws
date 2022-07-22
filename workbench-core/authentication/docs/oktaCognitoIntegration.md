@@ -23,7 +23,7 @@ Set-by-step instructions for integrating Okta into Cognito
    1. Give your app a name. For example, **ExampleApp**
    2. Under **Grant type**, ensure only **Authorization Code** is checked
    3. For Sign-in redirect URIs, enter **https://\<domain prefix\>.auth.\<region\>.amazoncognito.com/oauth2/idpresponse**
-      Note: Replace **domain prefix** and **region** with your Cognito user pool's domain prefix and region
+      - Note: Replace **domain prefix** and **region** with your Cognito user pool's domain prefix and region
    4. In Controlled access, choose your preferred access setting, and then click **Save**
    5. On the General page, in Client Credentials, note the **Client ID** and **Client secret**. You need these credentials for configuring Okta in your Amazon Cognito user pool
    6. On the Sign On page, in OpenID Connect ID Token, click **Edit**
