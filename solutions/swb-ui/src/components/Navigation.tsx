@@ -20,13 +20,29 @@ export default function Navigation({
     text: 'Service Workbench',
     href: '#/'
   };
-  const adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
+  let adminNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     { type: 'link', text: 'Users', href: '/users' },
     { type: 'link', text: 'Workspaces', href: '/environments' }
   ];
-  const userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
+  let userNavItems: ReadonlyArray<SideNavigationProps.Item> = [
     { type: 'link', text: 'Workspaces', href: '/environments' }
   ];
+
+  const apps = (process.env.apps_menu as unknown as string[]).map((item) => {
+    return { type: 'link', text: item.replace(/_/g, ' '), href: `/apps/${item}` };
+  }) as unknown as SideNavigationProps.Item[];
+
+  if (apps.length) {
+    const apps_menu: ReadonlyArray<SideNavigationProps.Item> = [
+      {
+        type: 'section',
+        text: 'Apps',
+        items: apps
+      }
+    ];
+    adminNavItems = adminNavItems.concat(apps_menu);
+    userNavItems = userNavItems.concat(apps_menu);
+  }
 
   // Role-based navigation display
   const { user } = useAuthentication();

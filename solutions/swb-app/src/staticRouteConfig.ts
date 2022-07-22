@@ -195,6 +195,44 @@ export const routesMap: RoutesMap = {
         subject: 'Role'
       }
     ]
+  },
+  '/projects/[A-Za-z0-9-]+/clusters/[A-Za-z0-9-]+': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'SingleAWSCluster'
+      }
+    ]
+  },
+  '/projects/[A-Za-z0-9-]+/clusters': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AllAWSClusters'
+      }
+    ]
+  },
+  '/projects/[A-Za-z0-9-]+/clusters/[A-Za-z0-9-]+/headNode/[A-Za-z0-9-]+/jobs': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'JobQueue'
+      }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'SubmitJob'
+      }
+    ]
+  },
+  '/projects/[A-Za-z0-9-]+/clusters/[A-Za-z0-9-]+/headNode/[A-Za-z0-9-]+/jobs/[0-9]+/cancel': {
+    PUT: [
+      {
+        action: 'DELETE',
+        subject: 'CancelJob'
+      }
+    ]
   }
 };
 

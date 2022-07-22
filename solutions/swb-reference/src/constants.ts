@@ -45,6 +45,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const PCLUSTER_API_URL = config.parallelClusterApiURL;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;

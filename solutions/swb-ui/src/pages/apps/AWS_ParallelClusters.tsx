@@ -1,9 +1,22 @@
 import App from '@amzn/hpc-ui';
+import { BreadcrumbGroupProps } from '@awsui/components-react';
 import BaseLayout from '../../components/BaseLayout';
 
+const breadcrumbs: BreadcrumbGroupProps.Item[] = [
+  {
+    text: 'Service Workbench',
+    href: '#'
+  },
+  {
+    text: 'AWS_ParallelClusters',
+    href: '#'
+  }
+];
+
 function AWS_PARALLELCLUSTERS_APP(): JSX.Element {
+  breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
   return (
-    <BaseLayout appName="AWS_ParallelClusters">
+    <BaseLayout breadcrumbs={breadcrumbs}>
       <App />
     </BaseLayout>
   );

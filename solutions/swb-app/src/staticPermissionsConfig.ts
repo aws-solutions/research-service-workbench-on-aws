@@ -94,7 +94,27 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'READ',
-    subject: 'User'
+    subject: 'SingleAWSCluster'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'AllAWSClusters'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'JobQueue'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'SubmitJob'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'CancelJob'
   }
 ];
 
@@ -148,6 +168,31 @@ const researcherPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Project'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'SingleAWSCluster'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'AllAWSClusters'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'JobQueue'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'SubmitJob'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'CancelJob'
   }
 ];
 

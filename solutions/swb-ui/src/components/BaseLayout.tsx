@@ -7,10 +7,8 @@ import { layoutLabels } from '../common/labels';
 import Navigation from '../components/Navigation';
 import { useNotifications } from '../context/NotificationContext';
 
-
 export interface LayoutProps {
   navigationHide?: boolean;
-  appName?: string;
   children: React.ReactNode;
   breadcrumbs: BreadcrumbGroupProps.Item[];
 }
@@ -29,15 +27,9 @@ export default function Layout({ navigationHide, children, breadcrumbs }: Layout
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
 
-  if (appName !== undefined) {
-    breadcrumbs[1].text = appName;
-    breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
-  }
-
   return (
     <AppLayout
       id="app-layout"
-
       headerSelector="#header"
       stickyNotifications
       toolsHide

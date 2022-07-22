@@ -1,9 +1,22 @@
 import App from '<--Insert--Plugin--Package--Name-->';
+import { BreadcrumbGroupProps } from '@awsui/components-react';
 import BaseLayout from '../../components/BaseLayout';
 
+const breadcrumbs: BreadcrumbGroupProps.Item[] = [
+  {
+    text: 'Service Workbench',
+    href: '#'
+  },
+  {
+    text: '<--Insert--Formal--Plugin--Name-->',
+    href: '#'
+  }
+];
+
 function <--Insert--Plugin--Name-->_APP(): JSX.Element {
+  breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
   return (
-    <BaseLayout appName="<--Insert--Formal--Plugin--Name-->">
+    <BaseLayout breadcrumbs={breadcrumbs}>
       <App />
     </BaseLayout>
   );

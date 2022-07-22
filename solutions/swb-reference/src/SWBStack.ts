@@ -68,6 +68,7 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_NAME,
       SC_PORTFOLIO_NAME,
       PCLUSTER_API_URL,
+      ALLOWED_ORIGINS,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -143,7 +144,6 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
-
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
@@ -281,7 +281,6 @@ export class SWBStack extends Stack {
           resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
-
           actions: [
             'cloudformation:CreateStack',
             'cloudformation:DeleteStack',
@@ -453,7 +452,6 @@ export class SWBStack extends Stack {
     statusHandlerLambda.role?.attachInlinePolicy(
       new Policy(this, 'statusHandlerLambdaPolicy', {
         statements: [
-
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
             resources: ['arn:aws:iam::*:role/*env-mgmt'],
@@ -547,7 +545,6 @@ export class SWBStack extends Stack {
           resources: [launchConstraintRole.roleArn]
         }),
         new PolicyStatement({
-
           sid: 'ShareSSM',
           actions: ['ssm:ModifyDocumentPermission'],
           resources: [
@@ -563,7 +560,6 @@ export class SWBStack extends Stack {
           sid: 'S3Bucket',
           actions: ['s3:GetObject'],
           resources: [`${artifactS3Bucket.bucketArn}/*`]
-
         })
       ]
     });
@@ -607,7 +603,6 @@ export class SWBStack extends Stack {
     apiLambda.role?.attachInlinePolicy(
       new Policy(this, 'apiLambdaPolicy', {
         statements: [
-
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
             resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
