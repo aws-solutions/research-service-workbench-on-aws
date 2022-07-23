@@ -1,4 +1,4 @@
-name: version-update-and-publish
+name: version-update-and-publish-merge
 on:
   pull_request_target:
     types:
@@ -29,6 +29,13 @@ jobs:
           commit_hash=`git log -1 --format='%H'`
           echo "::set-output name=commit_hash::$commit_hash"
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
       - name: Temporarily disable branch protection on main
@@ -40,15 +47,7 @@ jobs:
           branch: main
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-
+      
       - name: Set git config
         run: |
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
@@ -155,7 +154,14 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
       - name: Temporarily disable branch protection on develop
@@ -167,20 +173,13 @@ jobs:
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
+      
       - name: Set git config
         run: |
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
-        
+
       - name: Merge to develop
         run: |
           echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no version change commit was made"
