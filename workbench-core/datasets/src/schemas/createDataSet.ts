@@ -5,13 +5,13 @@ const CreateDataSetSchema: Schema = {
   id: '/createDataSet',
   type: 'object',
   properties: {
-    dataSetName: { type: 'string' },
+    datasetName: { type: 'string' },
     storageName: { type: 'string' },
     path: { type: 'string' },
     awsAccountId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['dataSetName', 'storageName', 'path', 'awsAccountId']
+  required: ['datasetName', 'storageName', 'path', 'awsAccountId']
 };
 
 export default CreateDataSetSchema;
