@@ -47,6 +47,11 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
+  authFlows: {
+    adminUserPassword: true,
+    userSrp: true,
+    custom: true
+  },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true
 };
