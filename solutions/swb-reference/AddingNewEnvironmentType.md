@@ -231,7 +231,8 @@ STAGE=<STAGE> rushx run-postDeployment      # Update Service Catalog portfolio
 ## Step 7 (Optional): Test Launch new Environment
 Do the following steps if you would like to launch your new environment type, and assuming your new envType is named `sagemakerExample`
 
-TODO: Add instructions for getting access token
+To access the APIs you'll need to get an `accessToken`. To get the `accessToken` use the UI to log into SWBv2. Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!! 
+
 1. Create a new `envType` for your environment, by making the following API request.
 
 **POST {{API_URL}}/environmentTypes**
