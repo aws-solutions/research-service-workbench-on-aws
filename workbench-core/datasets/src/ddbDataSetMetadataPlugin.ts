@@ -27,7 +27,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     if (!response || !response.Item)
       throw Boom.notFound(`Could not find the endpoint '${endPointId}' on '${dataSetId}'.`);
     const endPoint: ExternalEndpoint = response.Item as unknown as ExternalEndpoint;
-    if (_.isUndefined(endPoint.terminated)) endPoint.terminated = false;
+    if (_.isUndefined(endPoint.status)) endPoint.status = 'ACTIVE';
     return endPoint;
   }
 
@@ -103,7 +103,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     const endPoints = dataSetEndPoints.Items as unknown as ExternalEndpoint[];
 
     endPoints.map((e) => {
-      if (_.isUndefined(e.terminated)) e.terminated = false;
+      if (_.isUndefined(e.status)) e.status = 'ACTIVE';
     });
     return endPoints;
   }
@@ -114,9 +114,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endPointParam;
   }
 
-  public async terminateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
-    const endPointParam: ExternalEndpoint = endPoint;
-    endPoint.terminated = true;
+  public async terminateExternalEndpoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
+    const endPointParam: ExternalEndpoint = await this.getDataSetEndPointDetails(dataSetId, endPointId);
+    endPointParam.status = 'TERMINATED';
     return this.updateExternalEndpoint(endPointParam);
   }
 
@@ -169,7 +169,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       }
     };
 
-    if (_.isUndefined(endPoint.terminated)) {
+    if (_.isUndefined(endPoint.status)) {
       endPointParams.item.terminated = 'false';
     }
 

@@ -259,7 +259,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           awsAccountId: { S: mockAwsAccountId },
           storageType: { S: mockDataSetStorageType },
           storageName: { S: mockDataSetStorageName },
-          terminated: { BOOL: false }
+          status: { S: 'ACTIVE' }
         }
       });
       mockDdb.on(UpdateItemCommand).resolves({});
@@ -273,7 +273,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole],
         createdAt: mockCreatedDate,
-        terminated: false
+        status: 'ACTIVE'
       };
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
@@ -285,7 +285,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         path: mockDataSetPath,
         allowedRoles: [mockEndPointRole],
         createdAt: mockCreatedDate,
-        terminated: false
+        status: 'ACTIVE'
       });
     });
 
@@ -298,7 +298,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole],
         id: mockEndPointName,
-        terminated: false
+        status: 'ACTIVE'
       };
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
@@ -328,7 +328,7 @@ describe('DdbDataSetMetadataPlugin', () => {
             endPointUrl: { S: mockEndPointUrl },
             allowedRoles: { L: [{ S: mockEndPointRole }] },
             id: { S: mockEndPointName },
-            terminated: { BOOL: false }
+            status: { S: 'ACTIVE' }
           }
         ]
       });
@@ -340,7 +340,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole],
-        terminated: false
+        status: 'ACTIVE'
       };
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).rejects.toThrow(
@@ -391,7 +391,7 @@ describe('DdbDataSetMetadataPlugin', () => {
           path: { S: mockDataSetPath },
           endPointUrl: { S: mockEndPointUrl },
           allowedRoles: { L: [{ S: mockEndPointRole }] },
-          terminated: { BOOL: false }
+          status: { S: 'ACTIVE' }
         }
       });
       await expect(plugin.getDataSetEndPointDetails(mockDataSetId, mockEndPointName)).resolves.toEqual({
@@ -401,7 +401,7 @@ describe('DdbDataSetMetadataPlugin', () => {
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole],
-        terminated: false
+        status: 'ACTIVE'
       });
     });
   });

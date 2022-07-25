@@ -116,7 +116,7 @@ describe('DataSetService', () => {
           endPointUrl: mockEndPointUrl,
           endPointAlias: mockAccessPointAlias,
           allowedRoles: [mockRoleArn],
-          terminated: false
+          status: 'ACTIVE'
         };
       });
 
@@ -130,7 +130,7 @@ describe('DataSetService', () => {
         endPointUrl: mockEndPointUrl,
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn],
-        terminated: false
+        status: 'ACTIVE'
       };
     });
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateExternalEndpoint').mockImplementation(async () => {
@@ -143,7 +143,7 @@ describe('DataSetService', () => {
         endPointUrl: mockEndPointUrl,
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn, mockAlternateRoleArn],
-        terminated: false
+        status: 'ACTIVE'
       };
     });
 
@@ -533,7 +533,7 @@ describe('DataSetService', () => {
             dataSetName: mockDataSetName,
             endPointUrl: '',
             allowedRoles: [],
-            terminated: true
+            status: 'TERMINATED'
           };
         });
 

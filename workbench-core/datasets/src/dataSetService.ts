@@ -167,7 +167,7 @@ export class DataSetService {
       return;
 
     await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
-    targetEndpoint = await this._dbProvider.terminateExternalEndpoint(targetEndpoint);
+    targetEndpoint = await this._dbProvider.terminateExternalEndpoint(dataSetId, externalEndpointId);
 
     targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
       return endpoint === externalEndpointId;
@@ -212,7 +212,7 @@ export class DataSetService {
       path: targetDS.path,
       endPointUrl: connections.endPointUrl,
       endPointAlias: connections.endPointAlias,
-      terminated: false
+      status: 'ACTIVE'
     };
 
     if (externalRoleName) {
@@ -255,7 +255,7 @@ export class DataSetService {
       endPointId
     );
 
-    if (endPointDetails.terminated) {
+    if (endPointDetails.status === 'TERMINATED') {
       throw new EndPointTerminatedError(
         `Endpoint '${endPointId}' on DataSet '${dataSetId} has been terminated.`
       );

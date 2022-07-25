@@ -45,7 +45,10 @@ export interface ExternalEndpoint {
   endPointAlias?: string;
 
   /**
-   * True if the endpoint is no longer valid.
+   * undefined is assumed to be 'ACTIVE'
+   * An 'ACTIVE' endpoint should have a corresponding accesspoint configured on the DataSet.
+   * A 'TERMINATED' endpoint no longer has an underlying accesspoint and is no longer usable.
    */
-  terminated?: boolean;
+
+  status?: 'ACTIVE' | 'TERMINATED';
 }
