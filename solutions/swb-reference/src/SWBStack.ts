@@ -625,7 +625,7 @@ export class SWBStack extends Stack {
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'],
             resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
             sid: 'KMSAccess'
           }),
