@@ -88,4 +88,13 @@ export interface DataSetMetadataPlugin {
    * @returns the updated details of the Endpoint.
    */
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  /**
+   * Updates an external endpoint record to mark it as termintaed.
+   *
+   * @param endPoint - the endpoint to mark as terminated.
+   *
+   * @returns the updated record.
+   */
+  terminateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
 }

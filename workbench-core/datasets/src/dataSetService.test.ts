@@ -7,7 +7,7 @@ import { AwsService } from '@amzn/workbench-core-base';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
+import { DataSet, DataSetService, EndPointTerminatedError, S3DataSetStoragePlugin } from '.';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -115,7 +115,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           endPointUrl: mockEndPointUrl,
           endPointAlias: mockAccessPointAlias,
-          allowedRoles: [mockRoleArn]
+          allowedRoles: [mockRoleArn],
+          terminated: false
         };
       });
 
@@ -128,7 +129,8 @@ describe('DataSetService', () => {
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
         endPointAlias: mockAccessPointAlias,
-        allowedRoles: [mockRoleArn]
+        allowedRoles: [mockRoleArn],
+        terminated: false
       };
     });
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateExternalEndpoint').mockImplementation(async () => {
@@ -140,7 +142,8 @@ describe('DataSetService', () => {
         path: mockDataSetPath,
         endPointUrl: mockEndPointUrl,
         endPointAlias: mockAccessPointAlias,
-        allowedRoles: [mockRoleArn, mockAlternateRoleArn]
+        allowedRoles: [mockRoleArn, mockAlternateRoleArn],
+        terminated: false
       };
     });
 
@@ -272,7 +275,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: 's3://sampleBucket'
+          endPointUrl: 's3://sampleBucket',
+          terminated: false
         };
       });
 
@@ -304,7 +308,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: ''
+          endPointUrl: '',
+          terminated: false
         };
       });
 
@@ -332,7 +337,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           dataSetId: mockDataSetId,
           dataSetName: mockDataSetName,
-          endPointUrl: ''
+          endPointUrl: '',
+          terminated: false
         };
       });
 
@@ -513,6 +519,31 @@ describe('DataSetService', () => {
       await expect(
         service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockAlternateRoleArn, plugin)
       ).resolves.toBeUndefined();
+    });
+
+    it('throws if the given endpoint has been terminated.', async () => {
+      jest
+        .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
+        .mockImplementationOnce(async () => {
+          return {
+            id: mockExistingEndpointId,
+            name: mockExistingEndpointName,
+            path: mockDataSetPath,
+            dataSetId: mockDataSetId,
+            dataSetName: mockDataSetName,
+            endPointUrl: '',
+            allowedRoles: [],
+            terminated: true
+          };
+        });
+
+      await expect(
+        service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockAlternateRoleArn, plugin)
+      ).rejects.toThrow(
+        new EndPointTerminatedError(
+          `Endpoint '${mockExistingEndpointId}' on DataSet '${mockDataSetId} has been terminated.`
+        )
+      );
     });
   });
 });

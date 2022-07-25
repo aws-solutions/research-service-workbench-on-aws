@@ -26,7 +26,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (!response || !response.Item)
       throw Boom.notFound(`Could not find the endpoint '${endPointId}' on '${dataSetId}'.`);
-    return response.Item as unknown as ExternalEndpoint;
+    const endPoint: ExternalEndpoint = response.Item as unknown as ExternalEndpoint;
+    if (_.isUndefined(endPoint.terminated)) endPoint.terminated = false;
+    return endPoint;
   }
 
   public async listDataSets(): Promise<DataSet[]> {
@@ -97,13 +99,25 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     const dataSetEndPoints: QueryCommandOutput = await this._aws.helpers.ddb.query(params).execute();
 
     if (!dataSetEndPoints || !dataSetEndPoints.Items) return [];
-    return dataSetEndPoints.Items as unknown as ExternalEndpoint[];
+
+    const endPoints = dataSetEndPoints.Items as unknown as ExternalEndpoint[];
+
+    endPoints.map((e) => {
+      if (_.isUndefined(e.terminated)) e.terminated = false;
+    });
+    return endPoints;
   }
 
   public async updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
+  }
+
+  public async terminateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
+    const endPointParam: ExternalEndpoint = endPoint;
+    endPoint.terminated = true;
+    return this.updateExternalEndpoint(endPointParam);
   }
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
@@ -154,6 +168,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         resourceType: 'endpoint'
       }
     };
+
+    if (_.isUndefined(endPoint.terminated)) {
+      endPointParams.item.terminated = 'false';
+    }
 
     if (endPoint.allowedRoles) {
       endPointParams.item.allowedRoles = endPoint.allowedRoles;

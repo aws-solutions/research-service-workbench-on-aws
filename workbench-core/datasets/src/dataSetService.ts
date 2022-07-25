@@ -3,7 +3,13 @@ import { LoggingService } from '@amzn/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
+import {
+  DataSet,
+  DataSetMetadataPlugin,
+  DataSetsStoragePlugin,
+  EndPointTerminatedError,
+  ExternalEndpoint
+} from '.';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -155,12 +161,13 @@ export class DataSetService {
     storageProvider: DataSetsStoragePlugin
   ): Promise<void> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
-    const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
+    let targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
 
     if (!targetDS.externalEndpoints || !_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
       return;
 
     await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
+    targetEndpoint = await this._dbProvider.terminateExternalEndpoint(targetEndpoint);
 
     targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
       return endpoint === externalEndpointId;
@@ -204,7 +211,8 @@ export class DataSetService {
       dataSetName: targetDS.name,
       path: targetDS.path,
       endPointUrl: connections.endPointUrl,
-      endPointAlias: connections.endPointAlias
+      endPointAlias: connections.endPointAlias,
+      terminated: false
     };
 
     if (externalRoleName) {
@@ -246,6 +254,13 @@ export class DataSetService {
       dataSetId,
       endPointId
     );
+
+    if (endPointDetails.terminated) {
+      throw new EndPointTerminatedError(
+        `Endpoint '${endPointId}' on DataSet '${dataSetId} has been terminated.`
+      );
+    }
+
     endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
     if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) return;
 

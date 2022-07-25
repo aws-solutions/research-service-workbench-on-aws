@@ -43,4 +43,9 @@ export interface ExternalEndpoint {
    * An optional alias through which the endpoint can be accessed.
    */
   endPointAlias?: string;
+
+  /**
+   * True if the endpoint is no longer valid.
+   */
+  terminated?: boolean;
 }
