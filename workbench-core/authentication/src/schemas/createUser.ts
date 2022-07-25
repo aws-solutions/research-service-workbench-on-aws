@@ -5,13 +5,12 @@ const CreateUserSchema: Schema = {
   id: '/createUser',
   type: 'object',
   properties: {
-    uid: { type: 'string' },
     firstName: { type: 'string' },
     lastName: { type: 'string' },
     email: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['uid', 'firstname', 'lastName', 'email']
+  required: ['firstName', 'lastName', 'email']
 };
 
 export default CreateUserSchema;
