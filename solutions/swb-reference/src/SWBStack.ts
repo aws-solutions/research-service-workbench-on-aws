@@ -32,12 +32,12 @@ export class SWBStack extends Stack {
   public lambdaEnvVars: {
     STAGE: string;
     STACK_NAME: string;
-    SSM_DOC_NAME_SUFFIX: string;
+    SSM_DOC_OUTPUT_KEY_SUFFIX: string;
     AMI_IDS_TO_SHARE: string;
-    LAUNCH_CONSTRAINT_ROLE_NAME: string;
-    S3_ARTIFACT_BUCKET_ARN_NAME: string;
-    S3_DATASETS_BUCKET_ARN_NAME: string;
-    STATUS_HANDLER_ARN_NAME: string;
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
@@ -45,7 +45,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     WEBSITE_URL: string;
-    MAIN_ACCT_ENCRYPTION_KEY_ARN: string;
+    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -55,15 +55,15 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
-      S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT,
+      S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
       S3_ACCESS_BUCKET_PREFIX,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
-      S3_DATASETS_BUCKET_ARN_NAME,
-      LAUNCH_CONSTRAINT_ROLE_NAME,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
       STACK_NAME,
-      SSM_DOC_NAME_SUFFIX,
+      SSM_DOC_OUTPUT_KEY_SUFFIX,
       AMI_IDS_TO_SHARE,
-      STATUS_HANDLER_ARN_NAME,
+      STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN,
@@ -73,7 +73,7 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -110,12 +110,12 @@ export class SWBStack extends Stack {
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
-      SSM_DOC_NAME_SUFFIX,
+      SSM_DOC_OUTPUT_KEY_SUFFIX,
       AMI_IDS_TO_SHARE,
-      LAUNCH_CONSTRAINT_ROLE_NAME,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
-      S3_DATASETS_BUCKET_ARN_NAME,
-      STATUS_HANDLER_ARN_NAME,
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN: cognitoDomain,
@@ -123,18 +123,21 @@ export class SWBStack extends Stack {
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
       WEBSITE_URL,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     const mainAcctEncryptionKey = this._createEncryptionKey();
-    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT);
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(
-      S3_ARTIFACT_BUCKET_ARN_NAME,
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+    const datasetBucket = this._createS3DatasetsBuckets(
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
       mainAcctEncryptionKey
     );
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      mainAcctEncryptionKey
+    );
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
@@ -146,7 +149,6 @@ export class SWBStack extends Stack {
   }
 
   private _createEncryptionKey(): Key {
-    const { MAIN_ACCT_ENCRYPTION_KEY_ARN } = getConstants();
     const mainKeyPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -163,7 +165,7 @@ export class SWBStack extends Stack {
       policy: mainKeyPolicy
     });
 
-    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_ARN, {
+    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY, {
       value: key.keyArn
     });
     return key;
