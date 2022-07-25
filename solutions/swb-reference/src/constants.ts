@@ -47,7 +47,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const uiClientURL = getClientURL();
+  const uiClientURL = getUiClientUrl();
   if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
@@ -98,7 +98,7 @@ function getConstants(): {
   };
 }
 
-function getClientURL(): string {
+function getUiClientUrl(): string {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const uiClientOutput: any = JSON.parse(
