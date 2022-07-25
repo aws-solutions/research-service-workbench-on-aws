@@ -7,6 +7,7 @@ export { DataSetService } from './dataSetService';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExistsError';
+export { EndPointTerminatedError, isEndPointTerminatedError } from './errors/endPointTerminatedError';
 export { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './iamHelper';
