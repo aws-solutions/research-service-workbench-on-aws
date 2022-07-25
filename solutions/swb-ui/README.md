@@ -74,7 +74,9 @@ Project swb-ui can be deployed as a static website using S3 Bucket and CloudFron
 
 1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
 
-2. Copy value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+2. Copy API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+
+    API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
 
 3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
 
