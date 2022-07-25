@@ -250,6 +250,7 @@ export class SWBStack extends Stack {
         })
       ]
     });
+
     const sagemakerNotebookPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -324,11 +325,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
-          resources: ['*']
-        }),
-        new PolicyStatement({
-          actions: ['servicecatalog:*'],
-          resources: ['*']
+          resources: [`${artifactS3Bucket.bucketArn}/*`]
         }),
         new PolicyStatement({
           actions: [
@@ -349,7 +346,7 @@ export class SWBStack extends Stack {
             'ec2:CreateNetworkInterface',
             'ec2:DeleteNetworkInterface'
           ],
-          resources: ['*']
+          resources: ['*'] // DescribeNetworkInterfaces does not allow resource-level permissions
         })
       ]
     });

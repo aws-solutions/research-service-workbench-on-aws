@@ -1,4 +1,4 @@
-import { EnvironmentConnectionService } from '@amzn/environments';
+import { EnvironmentConnectionService, EnvironmentConnectionLinkPlaceholder } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 
 export default class SagemakerExampleEnvironmentConnectionService implements EnvironmentConnectionService {
@@ -26,6 +26,12 @@ export default class SagemakerExampleEnvironmentConnectionService implements Env
    * Instructions for connecting to the workspace that can be shown verbatim in the UI
    */
   public getConnectionInstruction(): Promise<string> {
-    return Promise.resolve('Open the provided sagemaker url to access the Jupyter Notebook');
+    // "url" is the key of the response returned by the method `getAuthCreds`
+    const link: EnvironmentConnectionLinkPlaceholder = {
+      type: 'link',
+      hrefKey: 'url',
+      text: 'Sagemaker URL'
+    };
+    return Promise.resolve(`To access Sagemaker Notebook, open #${JSON.stringify(link)}`);
   }
 }
