@@ -13,8 +13,8 @@ async function run(): Promise<void> {
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     SC_PORTFOLIO_NAME,
-    S3_ARTIFACT_BUCKET_ARN_NAME,
-    LAUNCH_CONSTRAINT_ROLE_NAME,
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME
@@ -23,8 +23,8 @@ async function run(): Promise<void> {
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     SC_PORTFOLIO_NAME,
-    S3_ARTIFACT_BUCKET_ARN_NAME,
-    LAUNCH_CONSTRAINT_ROLE_NAME,
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
     STACK_NAME
   });
   const cognitoSetup = new CognitoSetup({
@@ -183,11 +183,12 @@ async function uploadBootstrapScriptsToS3(): Promise<void> {
 }
 
 async function getS3BucketArn(awsService: AwsService): Promise<string> {
-  const { S3_ARTIFACT_BUCKET_ARN_NAME, STACK_NAME } = getConstants();
+  const { S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY, STACK_NAME } = getConstants();
   const cfService = awsService.helpers.cloudformation;
-  const { [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn } = await cfService.getCfnOutput(STACK_NAME, [
-    S3_ARTIFACT_BUCKET_ARN_NAME
-  ]);
+  const { [S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY]: s3ArtifactBucketArn } = await cfService.getCfnOutput(
+    STACK_NAME,
+    [S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY]
+  );
   return s3ArtifactBucketArn;
 }
 
