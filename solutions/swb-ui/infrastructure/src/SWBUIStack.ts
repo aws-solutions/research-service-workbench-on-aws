@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Fn, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Distribution,
   Function,
@@ -12,7 +12,7 @@ import {
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
@@ -73,7 +73,7 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_ARTIFACT_NAME,
       RESPONSE_HEADERS_NAME
     };
-    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_ARN_NAME);
+    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_NAME);
     this._deployS3Bucket(bucket);
     this._createDistribution(bucket);
   }
@@ -109,18 +109,30 @@ export class SWBUIStack extends Stack {
     );
   }
 
-  private _createS3Bucket(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
-      accessControl: BucketAccessControl.PRIVATE
+  private _createS3Bucket(bucketName: string, outputKey: string): Bucket {
+    const { S3_ACCESS_LOGS_BUCKET_PREFIX, S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT } = getConstants();
+    const accessLogsBucketName: string = Fn.importValue(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT);
+    const accessLogsBucket = Bucket.fromBucketName(
+      this,
+      'imported-access-logs-bucket',
+      accessLogsBucketName
+    ) as Bucket;
+    const s3Bucket = new Bucket(this, bucketName, {
+      accessControl: BucketAccessControl.PRIVATE,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: accessLogsBucket,
+      serverAccessLogsPrefix: S3_ACCESS_LOGS_BUCKET_PREFIX,
+      encryption: BucketEncryption.S3_MANAGED // CloudFront requires S3 managed key
     });
 
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
-    new CfnOutput(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_ARN_NAME, {
+    new CfnOutput(this, outputKey, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
   }
+
   private _deployS3Bucket(bucket: Bucket): void {
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,

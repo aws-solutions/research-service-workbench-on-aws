@@ -7,6 +7,8 @@ function getConstants(): {
   API_BASE_URL: string;
   AWS_REGION: string;
   STACK_NAME: string;
+  S3_ACCESS_LOGS_BUCKET_PREFIX: string;
+  S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT: string;
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
   S3_ARTIFACT_BUCKET_NAME: string;
   S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
@@ -40,12 +42,17 @@ function getConstants(): {
   const DISTRIBUTION_FUNCTION_NAME = `${namePrefix}-RedirectRoutingFunction`;
   const RESPONSE_HEADERS_ARTIFACT_NAME = `${namePrefix}-response-header-policy`;
   const RESPONSE_HEADERS_NAME = `${namePrefix}-SWBResponseHeadersPolicy`;
+  const S3_ACCESS_LOGS_BUCKET_PREFIX = 'service-workbench-access-log';
+  // The output name below must match the value in swb-reference
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT = 'S3BucketAccessLogsNameOutput';
 
   return {
     STAGE: config.stage,
     API_BASE_URL,
     AWS_REGION,
     STACK_NAME,
+    S3_ACCESS_LOGS_BUCKET_PREFIX,
+    S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT,
     S3_ARTIFACT_BUCKET_ARN_NAME,
     S3_ARTIFACT_BUCKET_NAME,
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,

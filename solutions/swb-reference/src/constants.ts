@@ -8,7 +8,7 @@ function getConstants(): {
   SC_PORTFOLIO_NAME: string;
   AWS_REGION: string;
   SSM_DOC_NAME_SUFFIX: string;
-  S3_ACCESS_BUCKET_ARN_NAME: string;
+  S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT: string;
   S3_ACCESS_BUCKET_PREFIX: string;
   S3_ARTIFACT_BUCKET_ARN_NAME: string;
   S3_DATASETS_BUCKET_ARN_NAME: string;
@@ -26,7 +26,7 @@ function getConstants(): {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
-  MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
+  MAIN_ACCT_ENCRYPTION_KEY_ARN: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -55,12 +55,12 @@ function getConstants(): {
 
   // These are the OutputKey for the SWB Main Account CFN stack
   const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
-  const S3_ACCESS_BUCKET_ARN_NAME = 'S3BucketAccessLogArnOutput';
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT = 'S3BucketAccessLogsNameOutput';
   const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
   const S3_DATASETS_BUCKET_ARN_NAME = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
   const STATUS_HANDLER_ARN_NAME = 'StatusHandlerLambdaArnOutput';
-  const MAIN_ACCT_ENCRYPTION_KEY_NAME = 'MainAccountEncryptionKeyOutput';
+  const MAIN_ACCT_ENCRYPTION_KEY_ARN = 'MainAccountEncryptionKeyOutput';
 
   return {
     STAGE: config.stage,
@@ -68,7 +68,7 @@ function getConstants(): {
     SC_PORTFOLIO_NAME,
     AWS_REGION,
     SSM_DOC_NAME_SUFFIX,
-    S3_ACCESS_BUCKET_ARN_NAME,
+    S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT,
     S3_ACCESS_BUCKET_PREFIX,
     S3_ARTIFACT_BUCKET_ARN_NAME,
     S3_DATASETS_BUCKET_ARN_NAME,
@@ -86,7 +86,7 @@ function getConstants(): {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    MAIN_ACCT_ENCRYPTION_KEY_NAME
+    MAIN_ACCT_ENCRYPTION_KEY_ARN
   };
 }
 

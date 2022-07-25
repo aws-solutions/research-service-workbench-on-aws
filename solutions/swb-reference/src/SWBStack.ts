@@ -45,7 +45,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     WEBSITE_URL: string;
-    MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
+    MAIN_ACCT_ENCRYPTION_KEY_ARN: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -55,7 +55,7 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
-      S3_ACCESS_BUCKET_ARN_NAME,
+      S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT,
       S3_ACCESS_BUCKET_PREFIX,
       S3_ARTIFACT_BUCKET_ARN_NAME,
       S3_DATASETS_BUCKET_ARN_NAME,
@@ -73,7 +73,7 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_NAME
+      MAIN_ACCT_ENCRYPTION_KEY_ARN
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -123,12 +123,12 @@ export class SWBStack extends Stack {
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
       WEBSITE_URL,
-      MAIN_ACCT_ENCRYPTION_KEY_NAME
+      MAIN_ACCT_ENCRYPTION_KEY_ARN
     };
 
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     const mainAcctEncryptionKey = this._createEncryptionKey();
-    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT);
     const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
     const artifactS3Bucket = this._createS3ArtifactsBuckets(
       S3_ARTIFACT_BUCKET_ARN_NAME,
@@ -146,7 +146,7 @@ export class SWBStack extends Stack {
   }
 
   private _createEncryptionKey(): Key {
-    const { MAIN_ACCT_ENCRYPTION_KEY_NAME } = getConstants();
+    const { MAIN_ACCT_ENCRYPTION_KEY_ARN } = getConstants();
     const mainKeyPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -163,7 +163,7 @@ export class SWBStack extends Stack {
       policy: mainKeyPolicy
     });
 
-    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_NAME, {
+    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_ARN, {
       value: key.keyArn
     });
     return key;
@@ -323,11 +323,29 @@ export class SWBStack extends Stack {
    * @param bucketName - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
-  private _createAccessLogsBucket(bucketName: string, mainAcctEncryptionKey: Key): Bucket {
+  private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED,
-      encryptionKey: undefined
+      encryption: BucketEncryption.S3_MANAGED
+    });
+
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
+        actions: ['s3:PutObject'],
+        resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        conditions: {
+          StringEquals: {
+            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+          }
+        }
+      })
+    );
+
+    new CfnOutput(this, bucketNameOutput, {
+      value: s3Bucket.bucketName,
+      exportName: bucketNameOutput
     });
 
     return s3Bucket;
@@ -403,31 +421,11 @@ export class SWBStack extends Stack {
       encryptionKey: mainAcctEncryptionKey
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
-    this._setupAccessLogsBucketPolicy(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
-  }
-
-  private _setupAccessLogsBucketPolicy(sourceBucket: Bucket): void {
-    this._accessLogsBucket.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
-        actions: ['s3:PutObject'],
-        resources: [`${this._accessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
-        conditions: {
-          ArnLike: {
-            'aws:SourceArn': sourceBucket.bucketArn
-          },
-          StringEquals: {
-            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
-          }
-        }
-      })
-    );
   }
 
   private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
