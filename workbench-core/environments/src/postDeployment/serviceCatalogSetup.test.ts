@@ -22,8 +22,8 @@ describe('ServiceCatalogSetup', () => {
     AWS_REGION: 'us-east-1',
     S3_ARTIFACT_BUCKET_SC_PREFIX: 'service-catalog-cfn-templates/',
     SC_PORTFOLIO_NAME: 'swb-dev-va',
-    S3_ARTIFACT_BUCKET_ARN_NAME: 'S3BucketArtifactsArnOutput',
-    LAUNCH_CONSTRAINT_ROLE_NAME: 'LaunchConstraintIamRoleNameOutput',
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: 'S3BucketArtifactsArnOutput',
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: 'LaunchConstraintIamRoleNameOutput',
     STACK_NAME: 'swb-dev-va'
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,11 +36,11 @@ describe('ServiceCatalogSetup', () => {
           CreationTime: new Date(),
           Outputs: [
             {
-              OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_NAME,
+              OutputKey: constants.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
               OutputValue: 'arn:aws:s3:::swb-dev-va-s3artifacts'
             },
             {
-              OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_NAME,
+              OutputKey: constants.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
               OutputValue: 'swb-dev-va-LaunchConstraint'
             }
           ]
