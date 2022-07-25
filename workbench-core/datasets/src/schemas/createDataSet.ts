@@ -11,7 +11,7 @@ const CreateDataSetSchema: Schema = {
     awsAccountId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['dataSetName', 'storageName', 'path', 'awsAccountId']
+  required: ['datasetName', 'storageName', 'path', 'awsAccountId']
 };
 
 export default CreateDataSetSchema;
