@@ -5,3 +5,6 @@
 #envTypeConfigId: ''
 #projectId: ''
 #envType: ''
+
+# Negative Testing
+#alreadyTerminateEnvId: ''   # id of an environment that has already been terminated

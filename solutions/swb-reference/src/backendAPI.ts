@@ -7,14 +7,29 @@ import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  ProjectService
 } from '@amzn/environments';
 import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
+import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
+import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
+import {
+  DataSetService,
+  S3DataSetStoragePlugin,
+  DdbDataSetMetadataPlugin
+} from '@amzn/workbench-core-datasets';
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { Express } from 'express';
 import SagemakerExampleEnvironmentConnectionService from './environment/sagemakerExample/sagemakerExampleEnvironmentConnectionService';
 import SagemakerExampleEnvironmentLifecycleService from './environment/sagemakerExample/sagemakerExampleEnvironmentLifecycleService';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+
+const logger: LoggingService = new LoggingService();
+const aws: AwsService = new AwsService({
+  region: process.env.AWS_REGION!,
+  ddbTableName: process.env.STACK_NAME!
+});
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -45,11 +60,20 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
+  dataSetService: new DataSetService(
+    new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+    logger,
+    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
+  ),
+  dataSetsStoragePlugin: new S3DataSetStoragePlugin(aws),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
   environmentTypeConfigService: new EnvironmentTypeConfigService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
+  projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   })
 };

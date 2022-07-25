@@ -10,6 +10,11 @@ export const mockAdminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'Sample'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Role'
   }
 ];
 

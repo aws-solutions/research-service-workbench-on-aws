@@ -35,6 +35,8 @@ describe('HostingAccountLifecycleService', () => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
+    process.env.S3_ARTIFACT_BUCKET_ARN_NAME = 'SampleArtifactBucketArnOutput';
+    process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
   });
@@ -48,7 +50,7 @@ describe('HostingAccountLifecycleService', () => {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
         {
-          StackName: 'swb-swbv2-va',
+          StackName: process.env.STACK_NAME!,
           StackStatus: 'CREATE_COMPLETE',
           CreationTime: new Date(),
           Outputs: [
@@ -57,8 +59,16 @@ describe('HostingAccountLifecycleService', () => {
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
             },
             {
-              OutputKey: process.env.STATUS_HANDLER_ARN_NAME,
+              OutputKey: process.env.STATUS_HANDLER_ARN_NAME!,
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+            },
+            {
+              OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_NAME!,
+              OutputValue: 'arn:aws:s3:::sampleArtifactsBucketName'
+            },
+            {
+              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!,
+              OutputValue: 'arn:aws:kms:::key/123-123-123'
             },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
             { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
@@ -72,6 +82,8 @@ describe('HostingAccountLifecycleService', () => {
   test('initializeAccount does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
+    hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
 

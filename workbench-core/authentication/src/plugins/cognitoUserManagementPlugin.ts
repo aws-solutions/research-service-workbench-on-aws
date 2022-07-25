@@ -118,7 +118,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       await this._cognitoClient.send(
         new AdminCreateUserCommand({
           UserPoolId: this._userPoolId,
-          Username: user.uid,
+          Username: user.email,
           UserAttributes: [
             {
               Name: 'given_name',

@@ -126,10 +126,10 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/fabric-infrastructure",
-      "projectFolder": "solutions/managed-blockchain-for-patient-consent/fabric-infrastructure",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }

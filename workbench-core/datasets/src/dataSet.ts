@@ -1,5 +1,4 @@
 export interface DataSet {
-  [key: string]: string | string[] | undefined;
   /**
    * an internally generated value which uniquely identifies the dataset.
    */
