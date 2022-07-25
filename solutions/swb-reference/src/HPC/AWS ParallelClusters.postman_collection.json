@@ -1,0 +1,481 @@
+{
+  "info": {
+    "_postman_id": "5ec2603f-60e6-4474-ab61-222ec6204409",
+    "name": "AWS ParallelClusters",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "16429073"
+  },
+  "item": [
+    {
+      "name": "clusters",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "clientSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "clientId",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "authUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "headerPrefix",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "tokenType",
+              "value": "Bearer",
+              "type": "string"
+            },
+            {
+              "key": "useBrowser",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addTokenTo",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "string"
+            },
+            {
+              "key": "client_authentication",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "tokenName",
+              "value": "accessToken",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{API_URL}}/projects/:projectId/clusters",
+          "host": ["{{API_URL}}"],
+          "path": ["projects", ":projectId", "clusters"],
+          "variable": [
+            {
+              "key": "projectId",
+              "value": "proj-123"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "cluster",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "clientSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "clientId",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "authUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "headerPrefix",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "tokenType",
+              "value": "Bearer",
+              "type": "string"
+            },
+            {
+              "key": "useBrowser",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addTokenTo",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "string"
+            },
+            {
+              "key": "client_authentication",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "tokenName",
+              "value": "accessToken",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{API_URL}}/projects/:projectId/clusters/:clusterName",
+          "host": ["{{API_URL}}"],
+          "path": ["projects", ":projectId", "clusters", ":clusterName"],
+          "variable": [
+            {
+              "key": "projectId",
+              "value": "proj-123"
+            },
+            {
+              "key": "clusterName",
+              "value": "hosting-cluster"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "jobQueue",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "clientSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "clientId",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "authUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "headerPrefix",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "tokenType",
+              "value": "Bearer",
+              "type": "string"
+            },
+            {
+              "key": "useBrowser",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addTokenTo",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "string"
+            },
+            {
+              "key": "client_authentication",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "tokenName",
+              "value": "accessToken",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{API_URL}}/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs",
+          "host": ["{{API_URL}}"],
+          "path": ["projects", ":projectId", "clusters", ":clusterName", "headNode", ":instanceId", "jobs"],
+          "variable": [
+            {
+              "key": "projectId",
+              "value": "proj-123"
+            },
+            {
+              "key": "clusterName",
+              "value": "hosting-cluster"
+            },
+            {
+              "key": "instanceId",
+              "value": "{{INSTANCE_ID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "submitJob",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "clientSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "clientId",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "authUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "headerPrefix",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "tokenType",
+              "value": "Bearer",
+              "type": "string"
+            },
+            {
+              "key": "useBrowser",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addTokenTo",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "string"
+            },
+            {
+              "key": "client_authentication",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "tokenName",
+              "value": "accessToken",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"command\": \"/home/ec2-user/test.sh\",\n    \"job_name\": \"test2\",\n    \"nodes\": 1,\n    \"ntasks\": 1,\n    \"partition\": \"queue0\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs",
+          "host": ["{{API_URL}}"],
+          "path": ["projects", ":projectId", "clusters", ":clusterName", "headNode", ":instanceId", "jobs"],
+          "variable": [
+            {
+              "key": "projectId",
+              "value": "proj-123"
+            },
+            {
+              "key": "clusterName",
+              "value": "hosting-cluster"
+            },
+            {
+              "key": "instanceId",
+              "value": "{{INSTANCE_ID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "cancelJob",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "clientSecret",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "clientId",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "authUrl",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "redirect_uri",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "headerPrefix",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "key": "tokenType",
+              "value": "Bearer",
+              "type": "string"
+            },
+            {
+              "key": "useBrowser",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "key": "addTokenTo",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "authorization_code",
+              "type": "string"
+            },
+            {
+              "key": "client_authentication",
+              "value": "header",
+              "type": "string"
+            },
+            {
+              "key": "tokenName",
+              "value": "accessToken",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "{{API_URL}}/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs/:jobId/cancel",
+          "host": ["{{API_URL}}"],
+          "path": [
+            "projects",
+            ":projectId",
+            "clusters",
+            ":clusterName",
+            "headNode",
+            ":instanceId",
+            "jobs",
+            ":jobId",
+            "cancel"
+          ],
+          "variable": [
+            {
+              "key": "projectId",
+              "value": "proj-123"
+            },
+            {
+              "key": "clusterName",
+              "value": "hosting-cluster"
+            },
+            {
+              "key": "instanceId",
+              "value": "{{INSTANCE_ID}}"
+            },
+            {
+              "key": "jobId",
+              "value": "110"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
