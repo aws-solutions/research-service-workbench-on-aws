@@ -108,7 +108,7 @@ VpcSubnet
 ```
 
 ## Setup UI and Get access token
-Follow the instructions [here](../swb-ui/README.md#getting-started) to run the UI locally.
+Follow the instructions [here](../swb-ui/README.md#running-ui-app-locally) to run the UI locally.
 
 Go to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
 
