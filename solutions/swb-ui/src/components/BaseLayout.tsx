@@ -16,7 +16,14 @@ export interface LayoutProps {
 export default function Layout({ navigationHide, children, breadcrumbs }: LayoutProps): JSX.Element {
   // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
-  const { notifications } = useNotifications();
+  const { notifications, displayNotification } = useNotifications();
+  const id = 'BetaCodeWarning';
+  displayNotification(id, {
+    type: 'warning',
+    dismissible: false,
+    content:
+      'This software is in active development/testing mode. Do not put any critical, production, or otherwise important data in workspaces or studies.'
+  });
 
   const appLayoutLabels: AppLayoutProps.Labels = layoutLabels;
   return (

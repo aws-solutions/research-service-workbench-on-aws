@@ -30,10 +30,12 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
     const autoStopIdleTimeInMinutes = _.find(envMetadata.ETC.params, { key: 'AutoStopIdleTimeInMinutes' })!
       .value!;
 
-    const { datasetsBucketArn, mainAccountRegion, mainAccountId } = await this.helper.getCfnOutputs();
+    const { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn } =
+      await this.helper.getCfnOutputs();
     const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
       envMetadata.datasetIds,
-      envMetadata
+      envMetadata,
+      mainAcctEncryptionArn
     );
 
     const ssmParameters = {
@@ -52,6 +54,7 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
       AutoStopIdleTimeInMinutes: [autoStopIdleTimeInMinutes],
       IamPolicyDocument: [iamPolicyDocument],
       S3Mounts: [s3Mounts],
+      MainAccountKeyArn: [mainAcctEncryptionArn],
       MainAccountRegion: [mainAccountRegion],
       MainAccountId: [mainAccountId]
     };
