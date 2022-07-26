@@ -36,12 +36,7 @@ The following example is a snapshot from the [monorepo-for-service-workbench REA
 ### --- End of Example ---
 
 ## Usage
-This package was built for use with a 'Rush' monorepo and this usage documentation will assume you are using rush. `$(PROJ_ROOT)` refers to the root directory of the repository which is assumed to contain the `Rush` repository `common` folder.
-
-Install the package.
-```bash
-npm install @aws/workbench-core-repo-toolbox
-```
+This package was built for use with a 'Rush' monorepo and this usage documentation will assume you are using rush.
 
 Edit the top-level `README.md` file and add necessary tags for the `repo-toolbox` `readme` tool to locate the area where the table should be placed.
 
@@ -51,9 +46,12 @@ Edit the top-level `README.md` file and add necessary tags for the `repo-toolbox
 <!-- GENERATED PROJECT SUMMARY END -->
 ```
 
-Use the `install-run-rushx.js` script from the `Rush` repository `common` folder to execute the `readme` action from within the project folder.
+Use the `install-run-rushx.js` script from the `Rush` repository `common` folder to execute the `readme` action from within the project folder. The following script can be used within a CICD mechanism to keep the README up to date. Paths are relative to the root of the `monorepo-for-service-workbench` repository.
 
 ```bash
-cd node_modules/@aws/workbench-core-repo-toolbox
-node $(PROJ_ROOT)/common/scripts/install-run-rushx.js readme
+cd workbench-core/repo-scripts/repo-toolbox
+node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
+if [[ $exit_status != 0 ]]; then
+  node ../../../common/scripts/install-run-rushx.js readme
+fi
 ```
