@@ -1,0 +1,31 @@
+name: CodeQL Scan
+on: ['pull_request']
+
+jobs:
+  codeql-scan:
+    name: CodeQL Scan
+    runs-on: ubuntu-20.04
+    permissions:
+      # required for all workflows
+      security-events: write
+
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+      
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Print remediation message
+        if: failure()
+        run: echo "CodeQL scan failed, potential vulnerability. Please review the logs"
