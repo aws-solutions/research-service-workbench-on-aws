@@ -46,6 +46,7 @@ function getConstants(): {
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const PCLUSTER_API_URL = config.parallelClusterApiURL;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
   const USER_POOL_ID = config.userPoolId;

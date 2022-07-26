@@ -114,6 +114,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@amzn/hpc-ui",
+      "projectFolder": "solutions/swb-plugins/AWS_ParallelClusters",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
