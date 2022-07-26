@@ -161,13 +161,13 @@ export class DataSetService {
     storageProvider: DataSetsStoragePlugin
   ): Promise<void> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
-    let targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
+    const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
 
     if (!targetDS.externalEndpoints || !_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
       return;
 
     await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
-    targetEndpoint = await this._dbProvider.terminateExternalEndpoint(dataSetId, externalEndpointId);
+    await this._dbProvider.terminateExternalEndpoint(dataSetId, externalEndpointId);
 
     targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
       return endpoint === externalEndpointId;

@@ -114,10 +114,8 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endPointParam;
   }
 
-  public async terminateExternalEndpoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
-    const endPointParam: ExternalEndpoint = await this.getDataSetEndPointDetails(dataSetId, endPointId);
-    endPointParam.status = 'TERMINATED';
-    return this.updateExternalEndpoint(endPointParam);
+  public async terminateExternalEndpoint(dataSetId: string, endPointId: string): Promise<void> {
+    return this._updateEndPointStatusInDdb(dataSetId, endPointId, 'TERMINATED');
   }
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
@@ -151,6 +149,23 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     }
   }
 
+  private async _updateEndPointStatusInDdb(
+    dataSetId: string,
+    endPointId: string,
+    status: string
+  ): Promise<void> {
+    const endPointKey = {
+      pk: `${this._dataSetKeyType}#${dataSetId}`,
+      sk: `${this._endPointKeyType}#${endPointId}`
+    };
+    const updateParams: { item: { [key: string]: string | string[] } } = {
+      item: {
+        status: status
+      }
+    };
+    await this._aws.helpers.ddb.update(endPointKey, updateParams).execute();
+  }
+
   private async _storeEndPointToDdb(endPoint: ExternalEndpoint): Promise<string> {
     const endPointKey = {
       pk: `${this._dataSetKeyType}#${endPoint.dataSetId}`,
@@ -170,7 +185,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
 
     if (_.isUndefined(endPoint.status)) {
-      endPointParams.item.status = 'TERMINATED';
+      endPointParams.item.status = 'ACTIVE';
     }
 
     if (endPoint.allowedRoles) {

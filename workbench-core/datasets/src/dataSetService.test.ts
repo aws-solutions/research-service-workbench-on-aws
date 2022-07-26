@@ -14,6 +14,8 @@ describe('DataSetService', () => {
   let audit: AuditService;
   let log: LoggingService;
   let aws: AwsService;
+  let terminatedSpy: jest.SpyInstance;
+
   const notImplementedText: string = 'Not yet implemented.';
   let metaPlugin: DdbDataSetMetadataPlugin;
 
@@ -145,6 +147,10 @@ describe('DataSetService', () => {
         allowedRoles: [mockRoleArn, mockAlternateRoleArn],
         status: 'ACTIVE'
       };
+    });
+    terminatedSpy = jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'terminateExternalEndpoint');
+    terminatedSpy.mockImplementation(async () => {
+      return;
     });
 
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
@@ -497,6 +503,7 @@ describe('DataSetService', () => {
       await expect(
         service.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, plugin)
       ).resolves.not.toThrow();
+      expect(terminatedSpy).toHaveBeenCalled();
     });
   });
 

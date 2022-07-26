@@ -94,8 +94,6 @@ export interface DataSetMetadataPlugin {
    *
    *  @param dataSetId - the Id of the DataSet the endpoint accessed
    *  @param endPointId - the Id of the Endpoint to mark as terminated.
-   *
-   * @returns the updated ExternalEndpoint record.
    */
-  terminateExternalEndpoint(dataSetId: string, endPontId: string): Promise<ExternalEndpoint>;
+  terminateExternalEndpoint(dataSetId: string, endPontId: string): Promise<void>;
 }
