@@ -1,5 +1,4 @@
-# Service Workbench App
-
+# swb-ui
 ## Code Coverage
 
 | Statements | Branches | Functions | Lines |
@@ -27,16 +26,13 @@ In `swb-ui` directory create a file named `.env.local` and add the API URL varia
 NEXT_PUBLIC_API_BASE_URL="<API_URL>"
 ```
 
-
-
-
 In the project directory, ensure all dependencies are installed. Run:
 ```
 rush update
 rush build
 ```
-Run the server:
 
+Run the server:
 ```
 rushx start
 ```
@@ -46,7 +42,7 @@ If needed, run the development server with:
 rushx dev
 ```
 
-## App
+## UI App
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to access the app.
 
