@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import CreateRoleSchema from './schemas/createRole';
 import CreateUserSchema from './schemas/createUser';
 import UpdateRoleSchema from './schemas/updateRole';

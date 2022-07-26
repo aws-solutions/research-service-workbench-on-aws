@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LoggingPlugin } from './loggingPlugin';
 import { LogLevel } from './logLevel';
 import { LogMessage, LogMessageMeta, LogMessageObject } from './logMessage';

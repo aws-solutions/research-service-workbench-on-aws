@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Json } from 'aws-jwt-verify/safe-json-parse';
 
 // https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims

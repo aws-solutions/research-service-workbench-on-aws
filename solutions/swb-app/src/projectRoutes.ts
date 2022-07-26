@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { ProjectService } from '@amzn/environments';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
