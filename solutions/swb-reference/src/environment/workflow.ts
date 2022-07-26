@@ -5,6 +5,7 @@ import fs from 'fs';
 import { join } from 'path';
 import { CfnOutput, Stack } from 'aws-cdk-lib';
 import { Document } from 'cdk-ssm-document';
+import { getConstants } from '../constants';
 
 export default class Workflow {
   private _stack: Stack;
@@ -14,6 +15,7 @@ export default class Workflow {
   }
 
   public createSSMDocuments(): void {
+    const { SSM_DOC_OUTPUT_KEY_SUFFIX } = getConstants();
     // Add your new environment type here. The name should exactly match the folder name of the new environment type in the environment folder
     const envTypes = ['sagemakerNotebook', 'sagemakerExample'];
 
@@ -33,13 +35,17 @@ export default class Workflow {
             )
             .toString()
         });
-        new CfnOutput(this._stack, `${this._capitalizeFirstLetter(envType)}${docType}SSMDocOutput`, {
-          value: this._stack.formatArn({
-            service: 'ssm',
-            resource: 'document',
-            resourceName: cfnDoc.name
-          })
-        });
+        new CfnOutput(
+          this._stack,
+          `${this._capitalizeFirstLetter(envType)}${docType}${SSM_DOC_OUTPUT_KEY_SUFFIX}`,
+          {
+            value: this._stack.formatArn({
+              service: 'ssm',
+              resource: 'document',
+              resourceName: cfnDoc.name
+            })
+          }
+        );
       });
     });
   }
