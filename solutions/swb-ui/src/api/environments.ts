@@ -1,9 +1,17 @@
 import useSWR from 'swr';
-import { httpApiGet, httpApiPut, httpApiDelete, httpApiPost } from './apiHelper';
-import { EnvironmentItem, EnvironmentConnectResponse, CreateEnvironmentForm } from '../models/Environment';
+import {
+  EnvironmentItem,
+  EnvironmentConnectResponse,
+  CreateEnvironmentForm,
+  EnvironmentsQueryParams
+} from '../models/Environment';
+import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
+import { convertToRecord } from '../common/utils';
 
-const useEnvironments = () => {
-  const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
+const useEnvironments = (params?: EnvironmentsQueryParams) => {
+  let queryString = new URLSearchParams(convertToRecord(params)).toString();
+  queryString = queryString ? `?${queryString}` : '';
+  const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);
 
   // `/environments` API returns a JSON in this format
   // { data: [], paginationToken: ''}
@@ -13,9 +21,13 @@ const useEnvironments = () => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;
     item.project = item.projectId;
-    item.workspaceCost = 0;
   });
-  return { environments, mutate };
+  return {
+    environments,
+    mutate,
+    paginationToken: data && data.paginationToken,
+    areEnvironmentsLoading: isValidating
+  };
 };
 
 const createEnvironment = async (environment: CreateEnvironmentForm): Promise<void> => {
@@ -31,10 +43,11 @@ const stop = async (id: string): Promise<void> => {
 };
 
 const terminate = async (id: string): Promise<void> => {
-  await httpApiDelete(`environments/${id}`, {});
+  await httpApiPut(`environments/${id}/terminate`, {});
 };
 
 const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
-  return await httpApiGet(`environments/${id}/connections`, {});
+  return httpApiGet(`environments/${id}/connections`, {});
 };
+
 export { useEnvironments, start, stop, terminate, connect, createEnvironment };

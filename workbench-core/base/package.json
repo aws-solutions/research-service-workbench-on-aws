@@ -38,6 +38,8 @@
   },
   "dependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
     "@aws-cdk/aws-dynamodb": "^1.152.0",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
@@ -49,7 +51,7 @@
     "@aws-sdk/client-lambda": "^3.82.0",
     "@aws-sdk/client-s3": "^3.118.1",
     "@aws-sdk/client-s3-control": "^3.118.1",
-    "@aws-sdk/client-sagemaker": "^3.58.0",
+    "@aws-sdk/client-sagemaker": "^3.118.1",
     "@aws-sdk/client-service-catalog": "^3.118.1",
     "@aws-sdk/client-ssm": "^3.118.1",
     "@aws-sdk/client-sts": "^3.118.1",

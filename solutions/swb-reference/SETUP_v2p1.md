@@ -27,6 +27,9 @@ These manual steps will not be required in the final implementation of SWBv2.
 1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
 1. Uncomment `rootUserEmail` and provide the main account user's email address
+1. Uncomment `cognitoDomain` and provide a unique string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
+1. Uncomment `websiteUrl` and set it to the website url that will be used for the SWB UI.
+1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
 ### Setup CDK
@@ -75,6 +78,7 @@ Run the post deployment step
 STAGE=<STAGE> rushx run-postDeployment      # Setup Service Catalog portfolio and products
 ```
 
+## Deploy to the Hosting Account
 After the deployment succeeds, we will need to set up the `Hosting account`
 1. Log into your AWS `Hosting Account` and go to Cloudformation
 1. Choose to create a new stack. On the prompt `Create Stack`, choose `Upload a template file`. Upload [onboard-account.cfn.yaml](./src/templates/onboard-account.cfn.yaml)
@@ -103,28 +107,41 @@ VPC
 VpcSubnet
 ```
 
-### Store account and environment config information in DDB
-Since we have not built the API for account and environment config setup in DDB yet, you'll need to manually add these values to DDB. You can
+## Setup UI and Get access token
+Follow the instructions [here](../swb-ui/README.md#getting-started) to run the UI locally.
+
+Go to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the `accessToken` in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+
+## POSTMAN Setup
+In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
+Your environment should have two variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second one `ACCESS_TOKEN` and the value should be the `accessToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
+
+Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
+
+
+### Setup project configurations, environmentType, and environmentTypeConfig
+
+Since we have not built the API for Projects setup in DDB yet, you'll need to manually add these values to DDB. You can
 do so, by logging into the DDB page on the AWS console for your `Main account`. There should be a table there with the following
 name `swb-<stage>-<awsRegionShortName>`
 
-**Store `PROJ` resource in DDB** 
+**Store `PROJ` resource in DDB**
 
-Remember to fill in the correct values for your account. 
+Remember to fill in the correct values for your account.
 Custom values that needed to be provided by you will be `<INSIDE THIS>`
 
 ```json
 {
-    "pk": "PROJ#proj-123",
-    "sk": "PROJ#proj-123",
-    "id": "proj-123",
+    "pk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
+    "sk": "PROJ#cf3019e3-88d5-4a64-9025-26a177e36f59",
+    "id": "cf3019e3-88d5-4a64-9025-26a177e36f59",
     "accountId": "acc-123",
     "indexId": "index-123",
-    "desc": "Example project",
+    "description": "Example project 1",
     "owner": "abc",
     "projectAdmins": [],
     "resourceType": "project",
-    "name": "Example project",
+    "name": "Project 1",
     "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
     "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
     "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
@@ -140,26 +157,77 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 }
 ```
 
-**Store `ETC` resource in DDB**
+**Create Environment Type**
 
-Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of
-the following values
+Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
 * productId: `Product ID` of `sagemakerNotebook` product
-* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the 
-`sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
+* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
+  `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
 
+In POSTMAN, uses the `envType` => `Create envType` request to make a request with the following `body`
 ```json
 {
-    "pk": "ETC",
-    "sk": "ET#envType-123ETC#envTypeConfig-123",
-    "id": "envTypeConfig-123",
+    "status": "APPROVED",
+    "name": "Sagemaker Jupyter Notebook",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
-    "allowRoleIds": [],
+    "allowedRoleIds": [],
+    "params": [
+        {
+            "DefaultValue": "ml.t3.xlarge",
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "EC2 instance type to launch",
+            "ParameterKey": "InstanceType"
+        },
+        {
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "Number",
+            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+            "ParameterKey": "AutoStopIdleTimeInMinutes"
+        },
+        {
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "The IAM policy to be associated with the launched workstation",
+            "ParameterKey": "IamPolicyDocument"
+        },
+        {
+            "DefaultValue": "1.1.1.1/1",
+            "IsNoEcho": false,
+            "ParameterConstraints": {
+                "AllowedValues": []
+            },
+            "ParameterType": "String",
+            "Description": "CIDR to restrict IPs that can access the environment",
+            "ParameterKey": "CIDR"
+        }
+    ],
+    "description": "An Amazon SageMaker Jupyter Notebook",
+    "type": "sagemakerNotebook"
+}
+```
+
+In the response make note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
+
+**Create Environment Type Config**
+
+In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+```json
+{
     "type": "sagemakerNotebook",
-    "desc": "Description for config 1",
+    "description": "Description for config 1",
     "name": "Config 1",
-    "owner": "abc",
+    "allowedRoleIds": [], 
     "params": [
      {
       "key": "IamPolicyDocument",
@@ -177,38 +245,16 @@ the following values
        "key": "CIDR",
        "value": "0.0.0.0/0"
      }
-    ],
-    "createdAt": "2022-02-03T20:07:50.573Z",
-    "createdBy": "abc",
-    "updatedAt": "2022-02-03T20:07:50.573Z",
-    "updatedBy": "abc",
-    "resourceType": "envTypeConfig"
+    ]
 }
 ```
 
-If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value
-in the JSON above.
-
-### Setup API URL in client Application
-
-Setup environment variable `NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"`
-
-For local instances, in `swb-ui` directory create a file with name .env.local containing the API URL variable with the format:
-
-```
-NEXT_PUBLIC_API_BASE_URL="<CFN_OUTPUT.APIGatewayAPIEndpoint>"
-```
-
+If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
 
 ### Setup Account Resources
-
-#### POSTMAN Setup
-In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have one variable. Name it `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. 
-
-Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
-
 #### Onboard hosting account
+Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+
 Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
 
 In POSTMAN this is the `Create Hosting Account` API
@@ -228,6 +274,29 @@ Wait for account handler to run. It runs once every 5 minutes. You'll know that 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
 # Test the API
+
+**Create new DataSet**
+
+In POSTMAN this is the `Create DataSet` API
+
+During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket from the CFN stack output (key named `DataSetsBucketName`) in the main account and construct the following API call
+
+POST `{{API_URL}}/datasets`
+
+```json
+{
+    "datasetName": "<Enter a unique DataSet name>",
+    "storageName": "<Enter the main account DataSets bucket name>",
+    "path": "<Folder name to be created for this in the bucket>",
+    "awsAccountId": "<Main account ID>"
+}
+```
+
+Note: You could also use the above request body for POST `{{API_URL}}/datasets/import` API if the folder already exists in the bucket.
+
+At this point you'll receive a JSON response. That response will have an `id` value. You could use that `id` value in the `datasetIds` array while launching an environment.
+
+Once registered a DataSet using this API, you could also upload files to its bucket folder directly so they're available at environment boot time.
 
 **Launch Sagemaker Notebook Instance**
 
@@ -289,3 +358,11 @@ In POSTMAN this is the `Terminate Environment` API. Under the `Path Variable` se
 DELETE `{{API_URL}}/environments/:id`
 
 Replace `:id` with the `id` value from launching the environment. You should receive a response with an HTTP status code of `200` for success.
+
+# User Management
+Going to the SWB UI `http:localhost:3000/users` (or your CloudFront distribution if you deployed swb-ui) allows you to see and create additional Researchers.
+In order to create new Admins: 
+1. You must go to the Cognito console in your AWS Console.
+1. Under "User pools", look for and click on `swb-userpool-<stage>-<abbreviation>`.
+1. Under the Users tab, click the "Create user" button to create a new user.
+1. Once the user is created, click on the username and under "Group memberships", click on "Add user to group" to add the user to the Admin group.

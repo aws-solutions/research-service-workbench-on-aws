@@ -7,11 +7,18 @@ import {
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
 import AccountHandler from './handlers/accountHandler';
 import StatusHandler from './handlers/statusHandler';
+import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
+import CreateAccountSchema from './schemas/createAccount';
+import CreateEnvironmentSchema from './schemas/createEnvironment';
+import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
+import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
+import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
+import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import AccountService from './services/accountService';
 import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
@@ -44,5 +51,12 @@ export {
   EnvironmentTypeStatus,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
-  EnvironmentTypeConfigService
+  EnvironmentTypeConfigService,
+  CreateEnvironmentSchema,
+  CreateAccountSchema,
+  CreateEnvironmentTypeConfigSchema,
+  UpdateEnvironmentTypeConfigSchema,
+  CreateEnvironmentTypeSchema,
+  UpdateEnvironmentTypeSchema,
+  EnvironmentConnectionLinkPlaceholder
 };

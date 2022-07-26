@@ -1,6 +1,4 @@
 export interface ExternalEndpoint {
-  [key: string]: string | string[] | undefined;
-
   /**
    * The endpoint's unique identifier.
    */
@@ -37,7 +35,12 @@ export interface ExternalEndpoint {
   allowedRoles?: string[];
 
   /**
-   * The S3 URL to reach this endpoint.
+   * A URL to reach this endpoint.
    */
   endPointUrl: string;
+
+  /**
+   * An optional alias through which the endpoint can be accessed.
+   */
+  endPointAlias?: string;
 }

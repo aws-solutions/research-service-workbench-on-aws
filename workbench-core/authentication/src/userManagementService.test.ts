@@ -1,6 +1,6 @@
 import { User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
-import UserManagementService from './userManagementService';
+import { UserManagementService } from './userManagementService';
 
 describe('User Management Service', () => {
   const mockUserManagementPlugin: UserManagementPlugin = {

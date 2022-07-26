@@ -5,18 +5,18 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     id: 'workspaceName',
     header: 'Workspace name',
     cell: (e: { workspaceName: string }) => e.workspaceName,
-    sortingField: 'workspaceName'
+    sortingField: 'name'
   },
   {
     id: 'workspaceStatus',
     header: 'Workspace status',
     cell: (e: { workspaceStatus: string }) => e.workspaceStatus,
-    sortingField: 'workspaceStatus'
+    sortingField: 'status'
   },
   {
     id: 'createdAt',
     header: 'Created at',
-    cell: (e: { createdAt: string }) => e.createdAt,
+    cell: (e: { createdAt: string }) => new Date(e.createdAt).toLocaleString(),
     sortingField: 'createdAt'
   },
   {
@@ -30,12 +30,6 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     header: 'Owner',
     cell: (e: { owner: string }) => e.owner,
     sortingField: 'owner'
-  },
-  {
-    id: 'workspaceCost',
-    header: 'Workspace cost (last 7 days)',
-    cell: (e: { workspaceCost: number }) => `$ ${e.workspaceCost}`,
-    sortingField: 'workspaceCost'
   }
 ];
 
@@ -44,6 +38,5 @@ export const searchableColumns: string[] = [
   'workspaceStatus',
   'createdAt',
   'project',
-  'owner',
-  'workspaceCost'
+  'owner'
 ];
