@@ -147,7 +147,6 @@ jobs:
     env: 
       COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
       CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
-      SECOND_COMMIT_HASH: " ${{ needs.rush-version.outputs.version_second_commit_hash }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
