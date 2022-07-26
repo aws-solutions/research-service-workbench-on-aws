@@ -8,7 +8,8 @@ import {
   HeadersFrameOption,
   HeadersReferrerPolicy,
   OriginAccessIdentity,
-  ResponseHeadersPolicy
+  ResponseHeadersPolicy,
+  ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
@@ -74,8 +75,8 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_NAME
     };
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
-    this._deployS3Bucket(bucket);
-    this._createDistribution(bucket);
+    const distribution = this._createDistribution(bucket);
+    this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -133,10 +134,12 @@ export class SWBUIStack extends Stack {
     return s3Bucket;
   }
 
-  private _deployS3Bucket(bucket: Bucket): void {
+  private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../out'))]
+      sources: [Source.asset(path.resolve(__dirname, '../../out'))],
+      distribution: distribution,
+      distributionPaths: ['/*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });
   }
 
@@ -155,7 +158,7 @@ export class SWBUIStack extends Stack {
     const securityPolicy = this._createSecurityPolicy(this.distributionEnvVars.API_BASE_URL);
     const distribution = new Distribution(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_NAME, {
       defaultRootObject: 'index.html',
-
+      enableLogging: true,
       defaultBehavior: {
         origin: new S3Origin(bucket, { originAccessIdentity }),
         responseHeadersPolicy: securityPolicy,
@@ -164,7 +167,8 @@ export class SWBUIStack extends Stack {
             function: redirectFunction,
             eventType: FunctionEventType.VIEWER_REQUEST
           }
-        ]
+        ],
+        viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY
       },
       additionalBehaviors: {}
     });
