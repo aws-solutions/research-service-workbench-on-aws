@@ -170,7 +170,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     };
 
     if (_.isUndefined(endPoint.status)) {
-      endPointParams.item.terminated = 'false';
+      endPointParams.item.status = 'TERMINATED';
     }
 
     if (endPoint.allowedRoles) {
