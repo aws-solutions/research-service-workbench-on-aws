@@ -45,6 +45,3 @@ aws.clients.cognito
   .then((response) => {
     console.log(response.AuthenticationResult);
   });
-// AWS CLI command
-// const command = `aws cognito-idp admin-initiate-auth --user-pool-id ${userPoolId} --client-id ${clientId} --auth-flow ADMIN_NO_SRP_AUTH --auth-parameters USERNAME=${username},PASSWORD='${password}',SECRET_HASH=${secretHash} --region ${region}`;
-// console.log(command);

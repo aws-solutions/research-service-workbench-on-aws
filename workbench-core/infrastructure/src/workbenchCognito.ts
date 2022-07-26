@@ -47,6 +47,11 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
+  authFlows: {
+    adminUserPassword: true,
+    userSrp: true,
+    custom: true
+  },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true
 };
@@ -71,7 +76,6 @@ export class WorkbenchCognito extends Construct {
   public readonly userPoolId: string;
   public readonly userPoolClientId: string;
   public readonly userPoolClientSecret: SecretValue;
-  public readonly integTestUserPoolClientId: string;
 
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
@@ -117,21 +121,6 @@ export class WorkbenchCognito extends Construct {
     });
     this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
 
-    const integTestUserPoolClientProps = merge(userPoolClientDefaults, {
-      authFlows: {
-        adminUserPassword: true
-      }
-    });
-
-    const integTestUserPoolClient = new UserPoolClient(this, 'WorkbenchIntegTestUserPoolClient', {
-      ...integTestUserPoolClientProps,
-      userPool: this.userPool,
-      userPoolClientName
-    });
-    this.userPool.identityProviders.forEach((provider) =>
-      integTestUserPoolClient.node.addDependency(provider)
-    );
-
     const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
       resourceType: 'Custom::DescribeCognitoUserPoolClient',
       onCreate: {
@@ -157,7 +146,5 @@ export class WorkbenchCognito extends Construct {
     this.userPoolId = this.userPool.userPoolId;
     this.userPoolClientId = this.userPoolClient.userPoolClientId;
     this.userPoolClientSecret = SecretValue.unsafePlainText(userPoolClientSecret);
-
-    this.integTestUserPoolClientId = integTestUserPoolClient.userPoolClientId;
   }
 }

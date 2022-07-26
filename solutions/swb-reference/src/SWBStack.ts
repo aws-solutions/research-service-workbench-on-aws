@@ -832,10 +832,6 @@ export class SWBStack extends Stack {
       value: workbenchCognito.userPoolClientId
     });
 
-    new CfnOutput(this, 'cognitoIntegTestUserPoolClientId', {
-      value: workbenchCognito.integTestUserPoolClientId
-    });
-
     new CfnOutput(this, 'cognitoDomainName', {
       value: workbenchCognito.cognitoDomain
     });
