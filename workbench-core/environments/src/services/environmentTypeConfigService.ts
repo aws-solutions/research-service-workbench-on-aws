@@ -41,6 +41,13 @@ export default class EnvironmentTypeConfigService {
     this._envTypeService = new EnvironmentTypeService({ TABLE_NAME });
   }
 
+  /**
+   * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
+   * @param envTypeId - the environment type identifier for this config
+   * @param envTypeConfigId - the environment type config identifier
+   *
+   * @returns environment type config object
+   */
   public async getEnvironmentTypeConfig(
     envTypeId: string,
     envTypeConfigId: string
@@ -57,6 +64,14 @@ export default class EnvironmentTypeConfigService {
     }
   }
 
+  /**
+   * List environment type config objects from DDB
+   * @param envTypeId - the environment type identifier for this config
+   * @param pageSize - the number of environment type config objects to get (optional)
+   * @param paginationToken - the token from the previous page for continuation (optional)
+   *
+   * @returns environment type config objects
+   */
   public async listEnvironmentTypeConfigs(
     envTypeId: string,
     pageSize?: number,
@@ -77,6 +92,14 @@ export default class EnvironmentTypeConfigService {
     };
   }
 
+  /**
+   * Create environment type config object in DDB
+   * @param ownerId - the user requesting the operation
+   * @param envTypeId - the environment type identifier for this config
+   * @param params - the environment type config object attribute key value pairs
+   *
+   * @returns environment type config object
+   */
   public async createNewEnvironmentTypeConfig(
     ownerId: string,
     envTypeId: string,
@@ -130,6 +153,15 @@ export default class EnvironmentTypeConfigService {
     throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
   }
 
+  /**
+   * Update environment type config object in DDB
+   * @param ownerId - the user requesting the update
+   * @param envTypeId - the environment type identifier
+   * @param envTypeConfigId - the environment type config identifier
+   * @param updatedValues - the attribute values to update for the given environment type config
+   *
+   * @returns environment type config object with updated attributes
+   */
   public async updateEnvironmentTypeConfig(
     ownerId: string,
     envTypeId: string,
