@@ -1,0 +1,17 @@
+name: check change files are created
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches:
+      - test-main
+
+jobs:
+  check-change-files:
+      name: check change files are created
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Rush change --verify
+          run: |
+            node common/scripts/install-run-rush.js change --verify
