@@ -8,38 +8,96 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
 
-### Retrieve API URL
+## Deploy UI to AWS
 
-In order to run the application We need to setup the base API URL environment variable first.
+### Prerequisite:
 
-Copy API URL from [Installation](../swb-reference/SETUP_v2p1.md##deploy-the-code) step.
+1. Make sure to Follow instructions in [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
-Look for the cloud formation output `apiUrlOutput`. The API URL has the format `https://{api}.{region}.amazonaws.com/dev/`
 
-API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
+### Deploy static website
 
-Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL="<API_URL>"`
+Project swb-ui can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
-In `swb-ui` directory create a file named `.env.local` and add the API URL variable with the format:
+
+1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
+
+2. Copy API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+
+    API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
+
+3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
+
+4. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
+    ```
+    NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
+    ```
+
+5. Navigate to `solutions/swb-ui`
+
+6. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
+
+
+After the deployment is completed you'll see the following output:
+
 ```
-NEXT_PUBLIC_API_BASE_URL="<API_URL>"
+✨  Deployment time: 183.7s
+
+Outputs:
+swb-<STAGE>-<awsRegionShortName>.APIGatewayAPIEndpoint67A1C4AD = https://<apiId>.execute-<region>.amazonaws.com/dev/
+swb-<STAGE>-<awsRegionShortName>.AccountHandlerLambdaRoleOutput = accountrole
+swb-<STAGE>-<awsRegionShortName>.ApiLambdaRoleOutput = ApiLambdaRoleOutput
+swb-<STAGE>-<awsRegionShortName>.LaunchConstraintIamRoleNameOutput = LaunchConstraintIamRoleNameOutput
+swb-<STAGE>-<awsRegionShortName>.S3BucketArtifactsArnOutput = S3BucketArtifactsArnOutput
+swb-<STAGE>-<awsRegionShortName>.S3BucketDatasetsArnOutput = S3BucketDatasetsArnOutput
+swb-<STAGE>-<awsRegionShortName>.SagemakerNotebookLaunchSSMDocOutput = SagemakerNotebookLaunchSSMDocOutput
+swb-<STAGE>-<awsRegionShortName>.SagemakerNotebookTerminateSSMDocOutput = SagemakerNotebookTerminateSSMDocOutput
+swb-<STAGE>-<awsRegionShortName>.StatusHandlerLambdaArnOutput = StatusHandlerLambdaArnOutput
+swb-<STAGE>-<awsRegionShortName>.StatusHandlerLambdaRoleOutput = StatusHandlerLambdaRoleOutput
+swb-<STAGE>-<awsRegionShortName>.apiUrlOutput = https://<apiId>.execute-<region>.amazonaws.com/dev/
+swb-<STAGE>-<awsRegionShortName>.awsRegion = awsRegion
+swb-<STAGE>-<awsRegionShortName>.awsRegionShortName = awsRegionShortName
+swb-<STAGE>-<awsRegionShortName>.dynamoDBTableOutput = dynamoDBTableOutput
+swb-<STAGE>-<awsRegionShortName>.uiClientURL = https://<id>.cloudfront.net
+Stack ARN: ARN
+
+✨  Total time: 186.07s
 ```
+To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionShortName>.uiClientURL`.
 
 
 
+## Running UI App locally
 
-In the project directory, ensure all dependencies are installed. Run:
-```
-rush update
-rush build
-```
-Run the server:
+### Prerequisite
 
-```
-rushx start
-```
+1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
+
+
+### Start App
+
+1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
+
+2. Copy the API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
+
+    API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
+
+3. Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL` by creating a file with name `.env.local` in `swb-ui` directory containing the API URL with the format:
+    ```
+    NEXT_PUBLIC_API_BASE_URL="<API_URL>"
+    ```
+
+4. In the project directory, ensure all dependencies are installed. Run:
+    ```
+    rush update
+    rush build
+    ```
+5. Run the server:
+
+    ```
+    rushx start
+    ```
 
 If needed, run the development server with:
 ```
@@ -56,61 +114,6 @@ The environments page is at [http://localhost:3000/environments](http://localhos
 
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/environments](http://localhost:3000/api/environments).
 
-
-## Deploy UI
-
-Make sure to follow instructions [Retrieve API URL](##retrieve-api-url) and assign value to `NEXT_PUBLIC_API_BASE_URL` in `.env.local` before starting next steps for deploy process.
-
-### Setup Config File
-
-1. Navigate to `solutions/swb-ui/cdk/infrastructure/src/config`
-
-1. Copy `solutions/swb-ui/cdk/infrastructure/src/config/example.yaml` and create a new file in the format `<STAGE>.yaml` in the config folder. The stage value uniquely identifies this deployment. Some common values that can be used are `dev`, `beta`, and `gamma`.`
-
-1. Open your new `<STAGE>.yaml` file and uncomment the `stage` attribute. Provide the correct `<STAGE>` value for the attribute
-
-1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
-
-1. Open your new `<STAGE>.yaml` file and uncomment the `apiBaseUrl` attribute. Provide a value for `apiBaseUrl` with the next steps: 
-    1. Follow instructions from step [Retrieve API URL](##retrieve-api-url) and copy the value with format `https://{api}.{region}.amazonaws.com/dev/`
-    1. Remove the last part of the URL `/dev/`.
-    1. Assign value to `apiBaseUrl`,  `apiBaseUrl` must have the next format  `https://{api}.{region}.amazonaws.com`.
-
-1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
-
-
-### Export Site
-
-In order to deploy application we need to export the application as a static website
-
-1. Navigate to `solutions/swb-ui/`
-
-1. Run command `rushx export`
-
-
-### Deploy static website
-
-1. In `solutions/swb-ui/cdk/infrastructure` root directory run commands
-
-```
-rush install
-STAGE=<STAGE> rushx cdk bootstrap
-STAGE=<STAGE> rushx cdk-deploy
-
-```
-
-After the deployment is completed you'll see the following output:
-
-```
-Outputs:
-swb-ui-dev-va.S3BucketArtifactsArnOutput = arn:aws:s3:::swb-ui-dev-va-arn-id
-swb-ui-dev-va.WebsiteURL = https://domainId.cloudfront.net
-Stack ARN:
-arn:aws:cloudformation:region:account:stack/swb-ui-dev-va/id
-
-✨  Total time: 250.4s
-```
-To navigate to the website, follow the link provided by `swb-ui-dev-va.WebsiteURL`.
 
 
 ## Design system
