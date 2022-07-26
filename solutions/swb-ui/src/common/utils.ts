@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export const nameRegex: RegExp = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-\\s]*$');
 
 /* eslint-disable security/detect-unsafe-regex */

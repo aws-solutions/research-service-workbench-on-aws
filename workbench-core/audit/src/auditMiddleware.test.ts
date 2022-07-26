@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 jest.mock('./auditService');
 jest.mock('./baseExtractor');
 import { NextFunction, Request, Response } from 'express';

@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import '../styles/globals.scss';
 import '@awsui/global-styles/index.css';
 import { appWithTranslation } from 'next-i18next';
