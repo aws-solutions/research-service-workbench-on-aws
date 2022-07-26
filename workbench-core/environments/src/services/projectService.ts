@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
 
 import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';

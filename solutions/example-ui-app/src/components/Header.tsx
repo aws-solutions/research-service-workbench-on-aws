@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import Input from '@awsui/components-react/input';
 import TopNavigation from '@awsui/components-react/top-navigation';
 import { useTranslation } from 'next-i18next';
