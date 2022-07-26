@@ -5,10 +5,10 @@ const UpdateRoleSchema: Schema = {
   id: '/updateRole',
   type: 'object',
   properties: {
-    userName: { type: 'string' }
+    username: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['userName']
+  required: ['username']
 };
 
 export default UpdateRoleSchema;
