@@ -36,7 +36,7 @@ Project swb-ui can be deployed as a static website using S3 Bucket and CloudFron
 
 5. Navigate to `solutions/swb-ui`
 
-6. Run command `STAGE=<STAGE> rushx deploy`
+6. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
 
 
 After the deployment is completed you'll see the following output:
