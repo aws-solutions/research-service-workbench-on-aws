@@ -23,7 +23,7 @@ function getConstants(): {
   const STAGE = process.env.STAGE || '';
   const namePrefix = `swb-ui-${process.env.STAGE}-${config.awsRegionShortName}`;
   const API_BASE_URL = config.apiUrlOutput?.replace('/dev/', '') || '';
-  const AWS_REGION = config.awsRegion || '';
+  const AWS_REGION = config.awsRegion;
   const STACK_NAME = namePrefix;
   const S3_ARTIFACT_BUCKET_NAME = `${namePrefix}-bucket`;
   const S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME = `${namePrefix}-deployment-bucket`;
@@ -61,7 +61,7 @@ function getConstants(): {
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getAPIOutputs(): any {
+function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; awsRegion: string } {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const apiStackOutputs: any = JSON.parse(
@@ -72,7 +72,16 @@ function getAPIOutputs(): any {
     );
     const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
     // eslint-disable-next-line security/detect-object-injection
-    return apiStackOutputs[apiStackName];
+    const outputs = apiStackOutputs[apiStackName];
+
+    if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
+      throw `Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`; //validate when API unsuccessfully finished and UI is deployed
+    }
+    return {
+      awsRegionShortName: outputs.awsRegionShortName,
+      apiUrlOutput: outputs.apiUrlOutput,
+      awsRegion: outputs.awsRegion
+    };
   } catch {
     console.error(
       `No API Stack deployed found for ${process.env.STAGE}.Please deploy application swb-reference and try again.`
