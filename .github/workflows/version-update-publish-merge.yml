@@ -79,13 +79,13 @@ jobs:
       
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on develop
+      - name: Temporarily disable branch protection on test-develop
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: monorepo-for-service-workbench
-          branch: develop
+          branch: test-develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       
@@ -95,25 +95,25 @@ jobs:
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
 
-      - name: Merge to develop
+      - name: Merge to test-develop
         run: |
           echo "Set COMMIT_ID to current workflow commit"
           COMMIT_ID=$GITHUB_SHA
-          git checkout develop
+          git checkout test-develop
           echo
-          echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
-          echo "  into the 'develop' branch"
+          echo "  Attempting to merge the 'test-develop' branch ($COMMIT_ID)"
+          echo "  into the 'test-develop' branch"
           echo
           git merge $COMMIT_ID --ff --no-edit
-          git push origin develop
+          git push origin test-develop
       
-      - name: Enable branch protection on develop
+      - name: Enable branch protection on test-develop
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: monorepo-for-service-workbench
-          branch: develop
+          branch: test-develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
