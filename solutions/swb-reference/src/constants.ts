@@ -20,6 +20,7 @@ function getConstants(): {
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
+  PCLUSTER_API_URL: string;
   ALLOWED_ORIGINS: string;
   COGNITO_DOMAIN: string;
   WEBSITE_URL: string;
@@ -44,6 +45,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
+  const PCLUSTER_API_URL = config.parallelClusterApiURL;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
@@ -80,6 +82,7 @@ function getConstants(): {
     USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
+    PCLUSTER_API_URL,
     ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
     COGNITO_DOMAIN,
     WEBSITE_URL,

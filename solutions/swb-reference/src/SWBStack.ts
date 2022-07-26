@@ -7,6 +7,7 @@ import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
+
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 import {
@@ -39,6 +40,7 @@ export class SWBStack extends Stack {
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
+    PCLUSTER_API_URL: string;
     ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
     CLIENT_ID: string;
@@ -66,6 +68,7 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
+      PCLUSTER_API_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -117,6 +120,7 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
+      PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN: cognitoDomain,
       CLIENT_ID: clientId,

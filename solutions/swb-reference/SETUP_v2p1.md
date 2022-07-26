@@ -160,6 +160,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 **Create Environment Type**
 
 Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
+
 * productId: `Product ID` of `sagemakerNotebook` product
 * provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
   `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
@@ -169,6 +170,7 @@ In POSTMAN, uses the `envType` => `Create envType` request to make a request wit
 {
     "status": "APPROVED",
     "name": "Sagemaker Jupyter Notebook",
+
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
     "allowedRoleIds": [],
@@ -246,12 +248,15 @@ In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a
        "value": "0.0.0.0/0"
      }
     ]
+
 }
 ```
 
 If you would like to launch a sagemaker notebook instance with a different instance type than `ml.t3.medium`, you can replace that value in the JSON above.
 
+
 ### Setup Account Resources
+
 #### Onboard hosting account
 Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
 

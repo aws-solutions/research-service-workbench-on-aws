@@ -259,6 +259,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "aws4",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "axios",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -351,6 +355,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "http-request-mock",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "https",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -405,6 +417,10 @@
     {
       "name": "next-transpile-modules",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "nock",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "nodemon",
