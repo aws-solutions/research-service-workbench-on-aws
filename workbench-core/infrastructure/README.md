@@ -46,9 +46,4 @@ this.myWorkbenchCognito = new WorkbenchCognito(this, 'my-workbench-cognito', cog
 ```
 
 Now build and deploy.
-```bash
-npm run build
-cdk synth
-cdk deploy
-```
 
