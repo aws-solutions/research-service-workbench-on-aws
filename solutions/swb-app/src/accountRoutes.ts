@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 // AWS Account management
 import { CreateAccountSchema, HostingAccountService } from '@amzn/environments';
 import { Request, Response, Router } from 'express';

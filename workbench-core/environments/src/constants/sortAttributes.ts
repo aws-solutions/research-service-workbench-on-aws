@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 // https://www.damirscorner.com/blog/posts/20200619-StringLiteralTypeGuardInTypescript.html
 // This file is structured this way so we can verify whether a user input is of type `SortAttribute`
 export const SORT_ATTRIBUTE: string[] = ['status', 'name', 'createdAt', 'project', 'owner', 'type'];

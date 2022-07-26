@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 // No BaseLayout for the global _app.tsx because login page should have no nav
 import '@awsui/global-styles/index.css';
 import '../styles/globals.scss';

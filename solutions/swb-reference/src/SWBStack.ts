@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
@@ -55,6 +60,7 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
+      AWS_REGION_SHORT_NAME,
       S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
       S3_ACCESS_BUCKET_PREFIX,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
@@ -66,6 +72,7 @@ export class SWBStack extends Stack {
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
+      UI_CLIENT_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -126,6 +133,7 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
+    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
@@ -146,6 +154,18 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+  }
+
+  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+    new CfnOutput(this, 'awsRegion', {
+      value: awsRegion
+    });
+    new CfnOutput(this, 'awsRegionShortName', {
+      value: awsRegionName
+    });
+    new CfnOutput(this, 'uiClientURL', {
+      value: uiClientURL
+    });
   }
 
   private _createEncryptionKey(): Key {
