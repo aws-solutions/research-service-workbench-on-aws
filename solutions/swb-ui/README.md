@@ -1,5 +1,4 @@
 # swb-ui
-
 ## Code Coverage
 
 | Statements | Branches | Functions | Lines |
@@ -8,43 +7,27 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-
-
 ## Deploy UI to AWS
 
 ### Prerequisite:
 
 1. Make sure to Follow instructions in [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
-
-
 ### Deploy static website
 
 Project swb-ui can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
-
-
 1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
-
 2. Copy API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
 
     API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
-
-
 3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
-
-
 4. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
     ```
     NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
     ```
-
 5. Navigate to `solutions/swb-ui`
-
-
 6. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
-
-
 
 After the deployment is completed you'll see the following output:
 
@@ -73,61 +56,37 @@ Stack ARN: ARN
 ```
 To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionShortName>.uiClientURL`.
 
-
-
-
-
 ## Running UI App locally
 
 ### Prerequisite
-
-1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
-
-
+Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
 ### Start App
-
 1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
-
 2. Copy the API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
 
     API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
-
 3. Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL` by creating a file with name `.env.local` in `swb-ui` directory containing the API URL with the format:
     ```
     NEXT_PUBLIC_API_BASE_URL="<API_URL>"
     ```
-
 4. In the project directory, ensure all dependencies are installed. Run:
     ```
     rush update
     rush build
     ```
 5. Run the server:
-
     ```
     rushx start
     ```
 
-If needed, run the development server with:
+If you would like the UI to update as you edit code, you can run the code in development mode
 ```
 rushx dev
 ```
 
 ## App
-
 Open [http://localhost:3000](http://localhost:3000) in your browser to access the app.
-
-
-The environments page is at [http://localhost:3000/environments](http://localhost:3000/environments).
-
-## API
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/environments](http://localhost:3000/api/environments).
-
-
-
-
 
 ## Design system
 
