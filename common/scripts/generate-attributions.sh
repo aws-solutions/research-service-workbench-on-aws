@@ -37,3 +37,30 @@ if [ -f ./package.json ]; then
   rm -rf oss-attribution
 fi
 popd
+
+pushd workbench-core/example/express
+if [ -f ./package.json ]; then
+  echo "checking attributions in workbench-core/example/express"
+  generate-attribution
+  mv oss-attribution/attribution.txt NOTICE
+  rm -rf oss-attribution
+fi
+popd
+
+pushd workbench-core/example/infrastructure
+if [ -f ./package.json ]; then
+  echo "checking attributions in workbench-core/example/infrastructure"
+  generate-attribution
+  mv oss-attribution/attribution.txt NOTICE
+  rm -rf oss-attribution
+fi
+popd
+
+pushd solutions/swb-ui/infrastructure
+if [ -f ./package.json ]; then
+  echo "checking attributions in solutions/swb-ui/infrastructure"
+  generate-attribution
+  mv oss-attribution/attribution.txt NOTICE
+  rm -rf oss-attribution
+fi
+popd

@@ -30,3 +30,24 @@ if [ -f ./package.json ]; then
   license-checker --production --exclude MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
 fi
 popd
+
+pushd workbench-core/example/express
+if [ -f ./package.json ]; then
+  echo "checking licenses in workbench-core/example/express"
+  license-checker --production --exclude MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
+fi
+popd
+
+pushd workbench-core/example/infrastructure
+if [ -f ./package.json ]; then
+  echo "checking licenses in workbench-core/example/infrastructure"
+  license-checker --production --exclude MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
+fi
+popd
+
+pushd solutions/swb-ui/infrastructure
+if [ -f ./package.json ]; then
+  echo "checking licenses in solutions/swb-ui/infrastructure"
+  license-checker --production --exclude MIT,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC
+fi
+popd
