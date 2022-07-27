@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable no-new */
 import { join } from 'path';
 import { HttpApi } from '@aws-cdk/aws-apigatewayv2-alpha';
