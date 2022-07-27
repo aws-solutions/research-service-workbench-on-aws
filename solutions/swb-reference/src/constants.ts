@@ -58,7 +58,6 @@ function getConstants(): {
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const PCLUSTER_API_URL = config.parallelClusterApiURL;
-  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = uiClientURL || config.websiteUrl;
   const USER_POOL_ID = config.userPoolId;
@@ -98,7 +97,6 @@ function getConstants(): {
     UI_CLIENT_URL: uiClientURL,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
     PCLUSTER_API_URL,
-    ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
     COGNITO_DOMAIN,
     WEBSITE_URL,
     USER_POOL_ID,

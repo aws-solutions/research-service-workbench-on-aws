@@ -11,6 +11,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@amzn/hpc-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@amzn/patient-consent-express",
       "allowedCategories": [ "production" ]
     },
