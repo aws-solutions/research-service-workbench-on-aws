@@ -1,0 +1,37 @@
+Config
+glob-parent
+rush.json
+package.json
+.tools
+.vscode
+common
+node_modules
+build
+coverage
+README.md
+cdk.out
+
+#Fake account id used
+123456789012
+
+#Fake access key id used
+solutions/swb-reference/lib/environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService.test.js
+solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService.test.ts
+solutions/swb-reference/lib/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.js
+solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts
+workbench-core/environments/lib/utilities/environmentLifecycleHelper.test.js
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts
+
+#Fake email used
+solutions/example-ui-app/src/models/User.ts
+solutions/swb-reference/src/config/testEnv.yaml
+solutions/swb-reference/src/config/demo.yaml
+solutions/example-ui-app/.next/server/pages/_app.js
+solutions/example-ui-app/.next/server/pages/_document.js
+solutions/example-ui-app/.next/server/pages/en/404.html
+solutions/example-ui-app/.next/server/pages/en/500.html
+solutions/example-ui-app/.next/server/pages/es/404.html
+solutions/example-ui-app/.next/server/pages/es/500.html
+solutions/example-ui-app/.next/static/chunks/pages
+solutions/swb-ui/.next/server/pages/_document.js
+workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts
