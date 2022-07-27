@@ -76,7 +76,11 @@ const User: NextPage = () => {
       </Box>
     );
   };
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/users">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default User;

@@ -47,7 +47,9 @@ export default class ProjectService {
 
   /**
    * Get project
-   * projectID - Project Id of project to retrieve
+   * @param projectID - Project Id of project to retrieve
+   *
+   * @returns Project entry in DDB
    */
   public async getProject(projectId: string): Promise<Project> {
     const response = await this._aws.helpers.ddb
@@ -64,6 +66,11 @@ export default class ProjectService {
     }
   }
 
+  /**
+   * List projects
+   *
+   * @returns Project entries in DDB
+   */
   public async listProjects(): Promise<{ data: Project[] }> {
     const queryParams = {
       key: { name: 'resourceType', value: this._resourceType },

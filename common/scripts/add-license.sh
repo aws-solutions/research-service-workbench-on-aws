@@ -1,7 +1,8 @@
 #!/bin/bash
 
-solutions=$(ls solutions)
-workbenchCore=("repo-scripts/repo-toolbox ")
+solutions=("swb-ui/infrastructure ")
+solutions+=$(ls solutions)
+workbenchCore=("repo-scripts/repo-toolbox example/express example/infrastructure ")
 workbenchCore+=$(ls workbench-core)
 
 for d in $solutions; do
