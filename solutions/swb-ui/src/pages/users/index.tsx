@@ -46,10 +46,6 @@ const User: NextPage = () => {
   const getContent = (): JSX.Element => {
     return (
       <Box margin={{ bottom: 'l' }}>
-        <Head>
-          <title>{settings.name}</title>
-          <link rel="icon" href={settings.favicon} />
-        </Head>
         {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
         <Table
           header={

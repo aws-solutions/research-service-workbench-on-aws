@@ -28,11 +28,6 @@ const Home: NextPage = () => {
   return (
     <BaseLayout breadcrumbs={breadcrumbs} navigationHide>
       <Box margin={{ bottom: 'l' }}>
-        <Head>
-          <title>{settings.name}</title>
-          <meta name="description" content={settings.description} />
-          <link rel="icon" href={settings.favicon} />
-        </Head>
         <Hero />
       </Box>
     </BaseLayout>

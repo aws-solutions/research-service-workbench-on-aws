@@ -22,7 +22,6 @@ import {
 import { FlashbarProps } from '@awsui/components-react/flashbar';
 
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
@@ -49,7 +48,6 @@ const Environment: NextPage = () => {
   // For functions to return content specific to the table
   const itemType: string = 'workspace';
   // App settings constant
-  const { settings } = useSettings();
 
   const pageSizeOptions = [
     { label: '20', value: 20 },
@@ -325,10 +323,6 @@ const Environment: NextPage = () => {
             authCredResponse={envConnectResponse.authCredResponse}
           />
         )}
-        <Head>
-          <title>{settings.name}</title>
-          <link rel="icon" href={settings.favicon} />
-        </Head>
         {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
         <Table
           {...collectionProps}
