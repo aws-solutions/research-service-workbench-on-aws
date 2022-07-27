@@ -1,4 +1,4 @@
-name: version-update-and-publish-merge
+name: publish-and-merge-to-develop
 on:
   pull_request_target:
     types:
@@ -7,94 +7,14 @@ on:
       - main
 
 jobs:  
-  rush-version:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-20.04
-    permissions:
-      id-token: write
-      contents: read
-    outputs:
-        version_commit_hash: "${{ steps.rush-version.outputs.commit_hash }}"
-        version_changes_detected: "${{ steps.rush-version.outputs.changes_detected }}"
-    steps:
-      - name: git checkout
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.MERGE_TOKEN }}
-          ref: ${{ steps.set-ref.outputs.ref }}
-          fetch-depth: 0
-      - name: Get Current SHA
-        id: last_sha
-        run: |
-          commit_hash=`git log -1 --format='%H'`
-          echo "::set-output name=commit_hash::$commit_hash"
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-      # There's no way for github actions to push to a protected branch. This is a workaround
-      # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on main
-        uses: octokit/request-action@v2.x
-        with:
-          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
-          repo: monorepo-for-service-workbench
-          branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-      
-      - name: Set git config
-        run: |
-          git config user.email ${{ secrets.BOT-USER-EMAIL }}
-          git config user.name ${{ secrets.BOT-USER }}
-          git config commit.gpgsign true
-      
-      - name: Rush Version
-        id: rush-version
-        run: |
-          node common/scripts/install-run-rush.js version --bump --target-branch main --ignore-git-hooks
-          commit_hash=`git log -1 --format='%H'`
-          echo $commit_hash
-          echo "::set-output name=changes_detected::false"
-          if [ ${{ steps.last_sha.outputs.commit_hash }} != $commit_hash ]; then
-            echo "::set-output name=changes_detected::true"
-            echo "::set-output name=commit_hash::$commit_hash"
-          fi
-      
-      - name: Enable branch protection on main
-        uses: octokit/request-action@v2.x
-        if: always() # Make sure to enable branch protection even if other steps fail
-        with:
-          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
-          repo: monorepo-for-service-workbench
-          branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-
   rush-publish:  
     runs-on: ubuntu-20.04
-    needs: [rush-version]
     permissions:
       id-token: write
       contents: read
     env: 
       CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.CODEARTIFACT_DOMAIN_NAME }}-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/npm/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
     steps:
-      - name: Set ref
-        id: set-ref
-        run: |
-          ref=''
-          if ${{ needs.rush-version.outputs.version_changes_detected }}; then
-            ref=${{ needs.rush-version.outputs.version_commit_hash }}
-          fi
-          echo "::set-output name=ref::$ref"
-      
       - name: git checkout
         uses: actions/checkout@v3
         with:
@@ -140,13 +60,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
   merge-to-develop:
     runs-on: ubuntu-20.04
-    needs: [rush-version, rush-publish]
+    needs: [rush-publish]
     permissions:
       id-token: write
       contents: read
-    env: 
-      COMMIT_HASH: "${{ needs.rush-version.outputs.version_commit_hash }}"
-      CHANGES_DETECTED: "${{ needs.rush-version.outputs.version_changes_detected }}"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
@@ -181,19 +98,12 @@ jobs:
 
       - name: Merge to develop
         run: |
-          echo "Set the COMMIT_ID to merge to develop, to current workflow commit id, if no version change commit was made"
-          echo "Else"
-          echo "Set the COMMIT_ID to version commit id"
-          COMMIT_ID=''
-          if $CHANGES_DETECTED; then
-            COMMIT_ID=$COMMIT_HASH
-          else
-            COMMIT_ID=$GITHUB_SHA
-          fi
+          echo "Set the COMMIT_ID to merge to develop to current workflow commit id"
+          COMMIT_ID=$GITHUB_SHA
           git checkout develop
           echo
           echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
-          echo "  into the 'develop' branch ($(git log -1 --pretty=%H develop))"
+          echo "  into the 'develop' branch"
           echo
           git merge $COMMIT_ID --ff --no-edit
           git push origin develop
