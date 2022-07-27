@@ -82,7 +82,7 @@ jobs:
         id: auto-commit-action
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "docs: Auto README.md updates"
+          commit_message: "docs: Auto README.md updates [skip ci]"
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.bot-user }} # defaults to "github-actions[bot]"
           commit_user_email: ${{ secrets.bot-user-email }}
