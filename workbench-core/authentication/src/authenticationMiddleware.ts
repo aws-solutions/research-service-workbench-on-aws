@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUser, RoutesIgnored } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
@@ -5,11 +10,6 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
-
-// TODO add to doc
-// requires use of cookieParser and bodyParser middlewares
-// app.use(cookieParser());
-// app.use(express.json());
 
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
@@ -48,6 +48,11 @@ export function getTokensFromAuthorizationCode(
         const now = Date.now();
 
         // set cookies.
+        // TODO: Delete code below adding access token to response and rely solely on cookies
+        const data = {
+          idToken: idToken.token,
+          accessToken: accessToken.token
+        };
         res.cookie('access_token', accessToken.token, {
           httpOnly: true,
           secure: true,
@@ -63,7 +68,7 @@ export function getTokensFromAuthorizationCode(
           });
         }
 
-        res.status(200).json({ idToken: idToken.token });
+        res.status(200).json(data);
       } catch (error) {
         if (loggingService) {
           loggingService.error(error);
@@ -139,17 +144,14 @@ export function verifyToken(
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.cookies.access_token;
-
+      const accessToken = req.headers ? req.headers.authorization : undefined;
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
-
           const user: AuthenticatedUser = {
             id: authenticationService.getUserIdFromToken(decodedAccessToken),
             roles: authenticationService.getUserRolesFromToken(decodedAccessToken)
           };
-
           res.locals.user = user;
 
           next();

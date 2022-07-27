@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -42,9 +47,13 @@ export default class StatusHandler {
       return;
     }
 
-    const updateRequest: { status: string; error?: { type: string; value: string } } = {
-      status: event.status
-    };
+    const updateRequest: { status: string; error?: { type: string; value: string }; resourceType?: string } =
+      {
+        status: event.status
+      };
+    if (event.status === 'TERMINATED') {
+      updateRequest.resourceType = 'terminated_environment';
+    }
     if (event.errorMsg) {
       updateRequest.error = {
         // We use event.operation for Launch/Terminate SSM doc events
@@ -82,6 +91,10 @@ export default class StatusHandler {
       .OutputValue!;
     const instanceArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceArn })!
       .OutputValue!;
+    const instanceRoleArn = _.find(RecordOutputs, { OutputKey: event.recordOutputKeys!.instanceRoleName })!
+      .OutputValue!;
+
+    await envHelper.addRoleToAccessPoint(envDetails, instanceRoleArn);
 
     // We store the provisioned product ID sent in event metadata
     // We only update the provisioned product ID once right after the workspace becomes available

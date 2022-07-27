@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
@@ -118,7 +123,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       await this._cognitoClient.send(
         new AdminCreateUserCommand({
           UserPoolId: this._userPoolId,
-          Username: user.uid,
+          Username: user.email,
           UserAttributes: [
             {
               Name: 'given_name',

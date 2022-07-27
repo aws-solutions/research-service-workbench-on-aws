@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -72,7 +77,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProjects();
+      const actualResponse = await projService.listProjects();
 
       // CHECK
       expect(actualResponse.data).toEqual(items);

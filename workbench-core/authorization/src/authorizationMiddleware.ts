@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';
@@ -12,6 +17,7 @@ import { HTTPMethod, HTTPMethods } from './routesMap';
 function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
   return user instanceof Object && user.hasOwnProperty('roles') && user.hasOwnProperty('id');
 }
+
 /**
  * Retrieves the user from the {@link Response}.
  * @param res - {@link Response}

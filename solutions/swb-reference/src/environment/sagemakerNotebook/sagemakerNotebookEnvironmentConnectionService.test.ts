@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CreatePresignedNotebookInstanceUrlCommand, SageMakerClient } from '@aws-sdk/client-sagemaker';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -38,7 +43,7 @@ describe('SagemakerNotebookEnvironmentConnectionService', () => {
   test('getConnectionInstruction should return mocked value', async () => {
     const sm = new SagemakerNotebookEnvironmentConnectionService();
     await expect(sm.getConnectionInstruction()).resolves.toEqual(
-      'Open the provided sagemaker url to access the Jupyter Notebook'
+      'To access Sagemaker Notebook, open #{"type":"link","hrefKey":"url","text":"Sagemaker URL"}'
     );
   });
 });

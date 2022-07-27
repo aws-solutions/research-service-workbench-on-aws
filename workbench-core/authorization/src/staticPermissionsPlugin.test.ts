@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { fc, itProp } from 'jest-fast-check';
 import { RouteNotSecuredError } from './errors/routeNotSecuredError';
@@ -22,6 +27,7 @@ describe('StaticPermissionsPlugin', () => {
   let logger: LoggingService;
   let routesMap: RoutesMap;
   let userRoute: MethodToOperations;
+  let userPathParamRoute: MethodToOperations;
   let routesIgnored: RoutesIgnored;
   let userRouteGetOperations: Operation[];
   beforeEach(() => {
@@ -67,8 +73,13 @@ describe('StaticPermissionsPlugin', () => {
     userRoute = {
       GET: userRouteGetOperations
     };
+
+    userPathParamRoute = {
+      GET: userRouteGetOperations
+    };
     routesMap = {
-      '/user': userRoute
+      '/user': userRoute,
+      '/user/[0-9a-z]{5}': userPathParamRoute
     };
     routesIgnored = {
       '/user': {
@@ -86,7 +97,7 @@ describe('StaticPermissionsPlugin', () => {
     );
   });
 
-  describe('getPermissionsByRoute', () => {
+  describe('getOperationsByRoute', () => {
     test('GET user route operations', async () => {
       const getOperations = await staticPermissionsPlugin.getOperationsByRoute('/user', 'GET');
       expect(getOperations).toStrictEqual(userRouteGetOperations);
@@ -105,6 +116,11 @@ describe('StaticPermissionsPlugin', () => {
         expect(err).toBeInstanceOf(RouteNotSecuredError);
         expect(err.message).toBe('Route has not been secured');
       }
+    });
+
+    test('GET user route operations with path param using regex', async () => {
+      const getOperations = await staticPermissionsPlugin.getOperationsByRoute('/user/01234', 'GET');
+      expect(getOperations).toStrictEqual(userRouteGetOperations);
     });
 
     test('user route operations can not be modified', async () => {

@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LEVEL, MESSAGE } from 'triple-beam';
 import TransportStream from 'winston-transport';
 import { LogLevel } from '../../logLevel';

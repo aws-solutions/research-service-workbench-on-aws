@@ -1,28 +1,30 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import TopNavigation from '@awsui/components-react/top-navigation';
-import { useTranslation } from 'next-i18next';
+import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
+import { researcherUser } from '../models/User';
 import styles from '../styles/Header.module.scss';
 
 export default function Header(): JSX.Element {
-  const { t } = useTranslation();
   const { settings } = useSettings();
-  const { user } = useAuthentication();
+  // eslint-disable-next-line prefer-const
+  let { user, signOut } = useAuthentication();
 
-  const i18nStrings = {
-    searchIconAriaLabel: t('Header.Search'),
-    searchDismissIconAriaLabel: t('Header. CloseSearch'),
-    overflowMenuTriggerText: t('Header.More'),
-    overflowMenuTitleText: t('Header.All'),
-    overflowMenuBackIconAriaLabel: t('Header.Back'),
-    overflowMenuDismissIconAriaLabel: t('Header.CloseMenu')
-  };
-  const profileActions = [{ type: 'button', id: 'signout', text: t('Header.SignOut') }];
+  if (user === undefined) {
+    user = researcherUser;
+  }
+
+  const profileActions = [{ id: 'signout', text: headerLabels.signout }];
   return (
     <TopNavigation
       id="header"
       className={styles.header}
-      i18nStrings={i18nStrings}
+      i18nStrings={headerLabels}
       identity={{
         href: '/',
         title: settings.name,
@@ -31,13 +33,10 @@ export default function Header(): JSX.Element {
       utilities={[
         {
           type: 'menu-dropdown',
-          text: user.name,
+          text: `${user.givenName} ${user.familyName}`,
           description: user.email,
-          iconName: user.avatar.name,
-          iconAlt: user.avatar.alt,
-          iconSvg: user.avatar.svg,
-          iconUrl: user.avatar.url,
-          items: profileActions
+          items: profileActions,
+          onItemClick: async () => await signOut()
         }
       ]}
     />

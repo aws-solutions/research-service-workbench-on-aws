@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export interface EndpointConnectionStrings {
   /**
    * a URL which can be used to access the storage endpoint.
@@ -66,20 +71,34 @@ export interface DataSetsStoragePlugin {
   ): Promise<EndpointConnectionStrings>;
 
   /**
+   * Removes an existing dataset connection which was used for access by an external environment
+   *
+   * @param name - the name of the storage destination
+   * @param externalEndpointName - a name to uniquely identify the endpoint.
+   * @param ownerAccountId - the owning AWS account for the storage destination.
+   */
+  removeExternalEndpoint(externalEndpointName: string, ownerAccountId: string): Promise<void>;
+
+  /**
    * Add a role used to access an external endpoint.
+   * If provided, update the policy on the KMS key to grant
+   * encrypt/decrypt access for the given role.
    *
    * @param name - the name of the storage destination accessed by the external endpoint.
    * @param externalEndpointName - a name which uniquely identifies the external endpoint.
    * @param externalRoleName - the name of the role which will replace the current role accessing the endpoint.
-
+   * @param endPointUrl - a URL which can be used to reach the endpoint.
+   * @param kmsKeyArn - an optional Arn which identifies a KMS key used to encrypt/decrypt data in the storage location.
    * @returns a string which can be used to mount the Dataset to an external environment.
    */
   addRoleToExternalEndpoint(
     name: string,
     path: string,
     externalEndpointName: string,
-    externalRoleName: string
-  ): Promise<string>;
+    externalRoleName: string,
+    endPointUrl: string,
+    kmsKeyArn?: string
+  ): Promise<void>;
 
   /**
    * Remove a role from an external endpoint.

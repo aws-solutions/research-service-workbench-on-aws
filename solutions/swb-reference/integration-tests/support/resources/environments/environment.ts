@@ -9,12 +9,16 @@ export default class Environment extends Resource {
     super(clientSession, 'environment', id, parentApi);
   }
 
-  public async stopEnvironment(): Promise<AxiosResponse> {
+  public async stop(): Promise<AxiosResponse> {
     return this._axiosInstance.put(`${this._api}/stop`);
   }
 
-  public async startEnvironment(): Promise<AxiosResponse> {
+  public async start(): Promise<AxiosResponse> {
     return this._axiosInstance.put(`${this._api}/start`);
+  }
+
+  public async terminate(): Promise<AxiosResponse> {
+    return this._axiosInstance.put(`${this._api}/terminate`);
   }
 
   protected async cleanup(): Promise<void> {

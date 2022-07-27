@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export interface ExternalEndpoint {
   /**
    * The endpoint's unique identifier.
@@ -35,7 +40,7 @@ export interface ExternalEndpoint {
   allowedRoles?: string[];
 
   /**
-   * The S3 URL to reach this endpoint.
+   * A URL to reach this endpoint.
    */
   endPointUrl: string;
 

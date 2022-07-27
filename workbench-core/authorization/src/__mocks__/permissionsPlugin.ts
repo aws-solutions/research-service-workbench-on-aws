@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUser, HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
 import { RoutesIgnored } from '../routesMap';
 import {
@@ -8,7 +13,7 @@ import {
 } from './mockPermissions';
 
 export class MockPermissionsPlugin implements PermissionsPlugin {
-  private _routesIgnored: RoutesIgnored = { '/login': { GET: true } };
+  private _routesIgnored: RoutesIgnored = { '/login': { GET: true }, '/sample/*': { GET: true } };
 
   public async getPermissionsByUser(user: AuthenticatedUser): Promise<Permission[]> {
     if (user.roles.includes('admin')) {

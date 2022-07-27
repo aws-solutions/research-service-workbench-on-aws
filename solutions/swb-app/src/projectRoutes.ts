@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { ProjectService } from '@amzn/environments';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -7,7 +12,7 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
   router.get(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      const projects = await projectService.getProjects();
+      const projects = await projectService.listProjects();
       res.send(projects);
     })
   );

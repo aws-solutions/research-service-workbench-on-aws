@@ -5,7 +5,6 @@ common/config/rush/pnpm-lock.yaml
 .gitallowed
 .gitattributes
 .gitignore
-.viperlightignore
 common/changes/
 solutions/example-ui-app                              @mabreuortega
 solutions/swb-ui                                      @awslabs/aws-ma-swb
@@ -14,7 +13,6 @@ solutions/swb-reference                               @awslabs/aws-ma-swb
 common/changes/@amzn/swb-reference                    @awslabs/aws-ma-swb
 solutions/swb-app                                     @awslabs/aws-ma-swb
 common/changes/@amzn/swb-app                          @awslabs/aws-ma-swb
-solutions/managed-blockchain-for-patient-consent      @awslabs/aws-ma-magellan
 workbench-core/base                                   @awslabs/aws-ma-swb
 common/changes/@amzn/workbench-core-base              @awslabs/aws-ma-swb
 workbench-core/environments                           @awslabs/aws-ma-swb

@@ -117,7 +117,7 @@
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
@@ -126,20 +126,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/fabric-infrastructure",
-      "projectFolder": "solutions/managed-blockchain-for-patient-consent/fabric-infrastructure",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
-    },
-    {
-      "packageName": "@amzn/patient-consent-infrastructure",
-      "projectFolder": "solutions/managed-blockchain-for-patient-consent/patient-consent-infrastructure",
-      "reviewCategory": "production",
-      "shouldPublish": true
-    },
-    {
-      "packageName": "@amzn/patient-consent-express",
-      "projectFolder": "solutions/managed-blockchain-for-patient-consent/patient-consent-express",
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }

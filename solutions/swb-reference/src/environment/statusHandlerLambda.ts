@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
 import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
 import _ from 'lodash';
@@ -30,7 +35,8 @@ export async function handler(event: any) {
     // This is the `envType` defined in the "LaunchSSM.yaml" SSM document
     sagemakerNotebook: {
       instanceNameRecordKey: 'NotebookInstanceName',
-      instanceArnRecordKey: 'NotebookArn'
+      instanceArnRecordKey: 'NotebookArn',
+      instanceRoleName: 'EnvironmentInstanceRoleArn'
     }
 
     // Add your new env types here
@@ -52,7 +58,7 @@ export async function handler(event: any) {
     return;
   }
 
-  const recordOutputKeys = { instanceName: '', instanceArn: '' };
+  const recordOutputKeys = { instanceName: '', instanceArn: '', instanceRoleName: '' };
   let instanceId;
   let status;
   status = _.get(event.detail, statusLocation[source]);
@@ -62,6 +68,7 @@ export async function handler(event: any) {
     const envType = event.detail.EnvType;
     recordOutputKeys.instanceName = envTypeRecordOutputKeys[envType].instanceNameRecordKey;
     recordOutputKeys.instanceArn = envTypeRecordOutputKeys[envType].instanceArnRecordKey;
+    recordOutputKeys.instanceRoleName = envTypeRecordOutputKeys[envType].instanceRoleName;
   } else {
     // For when events arise from start/stop operations (not from SSM docs)
     if (_.includes(Object.keys(alternateStatuses[source]), status))
@@ -74,7 +81,7 @@ export async function handler(event: any) {
     envId: event.detail.EnvId || event.detail.Tags?.Env,
     instanceId,
     recordOutputKeys,
-    status: status.toUpperCase(),
+    status: status?.toUpperCase(),
     // TODO: This propagates error messages (if any) for launch/terminate failure events. Add logic for propagating start/stop failure event messages
     errorMsg: _.isObject(event.detail.ErrorMessage)
       ? JSON.stringify(event.detail.ErrorMessage)

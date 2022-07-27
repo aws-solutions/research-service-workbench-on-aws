@@ -1,4 +1,9 @@
-import { EnvironmentConnectionService } from '@amzn/environments';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import { EnvironmentConnectionService, EnvironmentConnectionLinkPlaceholder } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
 
 export default class SagemakerNotebookEnvironmentConnectionService implements EnvironmentConnectionService {
@@ -26,6 +31,12 @@ export default class SagemakerNotebookEnvironmentConnectionService implements En
    * Instructions for connecting to the workspace that can be shown verbatim in the UI
    */
   public getConnectionInstruction(): Promise<string> {
-    return Promise.resolve('Open the provided sagemaker url to access the Jupyter Notebook');
+    // "url" is the key of the response returned by the method `getAuthCreds`
+    const link: EnvironmentConnectionLinkPlaceholder = {
+      type: 'link',
+      hrefKey: 'url',
+      text: 'Sagemaker URL'
+    };
+    return Promise.resolve(`To access Sagemaker Notebook, open #${JSON.stringify(link)}`);
   }
 }

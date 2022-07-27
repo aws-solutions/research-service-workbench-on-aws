@@ -1,5 +1,11 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import {
+  GroupExistsException,
   ListUserPoolsCommandInput,
   UserPoolDescriptionType,
   UsernameExistsException
@@ -24,16 +30,31 @@ export default class CognitoSetup {
   public async run(): Promise<void> {
     const { USER_POOL_NAME, ROOT_USER_EMAIL } = this._constants;
 
-    // Create Cognito user pool if pool does not exist
-    let userPoolId = await this._getUserPoolId();
-    if (userPoolId === undefined) {
-      console.log('Creating new user pool because user pool does not exist');
-      userPoolId = await this.createUserPool();
-      console.log('New user pool created');
-    } else {
-      console.log('User pool previously created');
-    }
+    const userPoolId = await this._getUserPoolId();
     console.log(`User pool id: ${userPoolId}`);
+
+    // Create Admin and Researcher groups in user pool if they do not exist
+    try {
+      await this.createGroup('Admin', userPoolId);
+      console.log('Creating Admin group because group does not exist');
+    } catch (e) {
+      if (e instanceof GroupExistsException) {
+        console.log(`Admin group already exists in user pool ${USER_POOL_NAME}`);
+      } else {
+        throw e;
+      }
+    }
+
+    try {
+      await this.createGroup('Researcher', userPoolId);
+      console.log('Creating Researcher group because group does not exist');
+    } catch (e) {
+      if (e instanceof GroupExistsException) {
+        console.log(`Researcher group already exists in user pool ${USER_POOL_NAME}`);
+      } else {
+        throw e;
+      }
+    }
 
     // Create root user in user pool if user does not exist in pool
     try {
@@ -49,22 +70,26 @@ export default class CognitoSetup {
         throw e;
       }
     }
+
+    // Add user to Admin user group if it has not already been added
+    await this.adminAddUserToGroup('Admin', userPoolId, ROOT_USER_EMAIL);
+    console.log(`User ${ROOT_USER_EMAIL} added to Admin group`);
   }
 
   /**
-   * Creates a new Amazon Cognito user pool with the specified user pool name
-   *
-   * @returns the id of the newly created user pool
+   * Creates a new Amazon Cognito group in the specified user pool
+   * @param groupName - Name of Group to create in Cognito user pool
+   * @param userPoolId - ID for Cognito User Pool to add group to
    */
-  public async createUserPool(): Promise<string | undefined> {
-    const createUserPoolInput = {
-      AutoVerifiedAttributes: ['email'],
-      PoolName: this._constants.USER_POOL_NAME,
-      UsernameAttributes: ['email']
+  public async createGroup(groupName: string, userPoolId: string | undefined): Promise<void> {
+    if (!userPoolId) {
+      userPoolId = await this._getUserPoolId();
+    }
+    const createGroupInput = {
+      GroupName: groupName,
+      UserPoolId: userPoolId
     };
-
-    const response = await this._aws.clients.cognito.createUserPool(createUserPoolInput);
-    return response?.UserPool?.Id;
+    await this._aws.clients.cognito.createGroup(createGroupInput);
   }
 
   /**
@@ -81,6 +106,28 @@ export default class CognitoSetup {
     };
 
     await this._aws.clients.cognito.adminCreateUser(adminCreateUserInput);
+  }
+
+  /**
+   * Add Cognito user to given group
+   * @param groupName - Name of Cognito group
+   * @param userPoolId - ID of Cognito user pool
+   * @param username - Username of user to add to group
+   */
+  public async adminAddUserToGroup(
+    groupName: string,
+    userPoolId: string | undefined,
+    username: string
+  ): Promise<void> {
+    if (!userPoolId) {
+      userPoolId = await this._getUserPoolId();
+    }
+    const adminAddUserToGroupInput = {
+      GroupName: groupName,
+      UserPoolId: userPoolId,
+      Username: username
+    };
+    await this._aws.clients.cognito.adminAddUserToGroup(adminAddUserToGroupInput);
   }
 
   /**

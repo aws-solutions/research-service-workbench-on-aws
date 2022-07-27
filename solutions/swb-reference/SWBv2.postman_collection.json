@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "94dc7ac2-7e3f-4ac5-8ae8-ffe85734bffb",
-    "name": "SWBv2",
+    "_postman_id": "c7f31b8c-0e10-4a2c-90f6-38fe38bfe8ed",
+    "name": "SWBv2 Official",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "4320586"
   },
@@ -12,8 +12,14 @@
         {
           "name": "Terminate Environment",
           "request": {
-            "method": "DELETE",
-            "header": [],
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
               "host": ["{{API_URL}}"],
@@ -33,10 +39,16 @@
           "name": "Launch Environment",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemaker\"\n}",
+              "raw": "{\n    \"description\": \"test 123\",\n    \"name\": \"testEnv1\",\n    \"envTypeId\": \"envType-123\",\n    \"envTypeConfigId\": \"envTypeConfig-123\",\n    \"projectId\": \"proj-123\",\n    \"datasetIds\": [],\n    \"envType\": \"sagemakerNotebook\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -55,7 +67,13 @@
           "name": "Start Environment",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/start",
               "host": ["{{API_URL}}"],
@@ -75,7 +93,13 @@
           "name": "Stop Environment",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/stop",
               "host": ["{{API_URL}}"],
@@ -95,7 +119,13 @@
           "name": "Get Environment",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
               "host": ["{{API_URL}}"],
@@ -112,10 +142,16 @@
           "response": []
         },
         {
-          "name": "Get All Environments",
+          "name": "List Environments",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments",
               "host": ["{{API_URL}}"],
@@ -163,12 +199,12 @@
                 },
                 {
                   "key": "paginationToken",
-                  "value": null,
+                  "value": "",
                   "disabled": true
                 },
                 {
                   "key": "pageSize",
-                  "value": null,
+                  "value": "",
                   "disabled": true
                 }
               ]
@@ -180,7 +216,13 @@
           "name": "Get Connection",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/connections",
               "host": ["{{API_URL}}"],
@@ -205,10 +247,16 @@
           "name": "Create envType",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemaker\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
+              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemakerNotebook\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -227,7 +275,13 @@
           "name": "Update envType",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"status\": \"APPROVED\"\n}",
@@ -252,10 +306,16 @@
           "response": []
         },
         {
-          "name": "Get All envTypes",
+          "name": "List envTypes",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environmentTypes",
               "host": ["{{API_URL}}"],
@@ -268,7 +328,13 @@
           "name": "Get envType",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:id",
               "host": ["{{API_URL}}"],
@@ -293,10 +359,16 @@
           "name": "Create envTypeConfig",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-77ncg2cb3bx4g\",\n    \"provisioningArtifactId\": \"pa-hs4ex4okpbl7e\",\n    \"allowRoleIds\": [],\n    \"type\": \"sagemaker\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -310,7 +382,7 @@
               "variable": [
                 {
                   "key": "envTypeId",
-                  "value": "",
+                  "value": "9a115bda-ab83-464b-ae94-c258370beeb6",
                   "description": "ID of environment type associated with this config"
                 }
               ]
@@ -319,10 +391,16 @@
           "response": []
         },
         {
-          "name": "Create envTypeConfig",
+          "name": "Update envTypeConfig",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"allowRoleIds\": [],\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
@@ -356,7 +434,13 @@
           "name": "Get envTypeConfig",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
               "host": ["{{API_URL}}"],
@@ -378,10 +462,16 @@
           "response": []
         },
         {
-          "name": "Get All envTypeConfigs",
+          "name": "List envTypeConfigs",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations",
               "host": ["{{API_URL}}"],
@@ -415,10 +505,16 @@
       "name": "projects",
       "item": [
         {
-          "name": "Get All projects",
+          "name": "List projects",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{ACCESS_TOKEN}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{API_URL}}/projects",
               "host": ["{{API_URL}}"],
@@ -433,7 +529,13 @@
       "name": "Create Hosting Account",
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{ACCESS_TOKEN}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
@@ -444,7 +546,7 @@
           }
         },
         "url": {
-          "raw": "{{API_URL}}/aws-accounts",
+          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
           "host": ["{{API_URL}}"],
           "path": ["aws-accounts"]
         }

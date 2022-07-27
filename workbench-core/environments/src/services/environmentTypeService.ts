@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService, buildDynamoDBPkSk, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 
@@ -44,6 +49,12 @@ export default class EnvironmentTypeService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
+  /**
+   * Get environment type object from DDB for given envTypeId
+   * @param envTypeId - the environment type identifier
+   *
+   * @returns environment type object
+   */
   public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType))
@@ -57,7 +68,14 @@ export default class EnvironmentTypeService {
     }
   }
 
-  public async getEnvironmentTypes(
+  /**
+   * List environment type objects from DDB
+   * @param pageSize - the number of environment type objects to get (optional)
+   * @param paginationToken - the token from the previous page for continuation (optional)
+   *
+   * @returns environment type objects
+   */
+  public async listEnvironmentTypes(
     pageSize?: number,
     paginationToken?: string
   ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {
@@ -77,6 +95,14 @@ export default class EnvironmentTypeService {
     };
   }
 
+  /**
+   * Update environment type object in DDB
+   * @param ownerId - the user requesting the update
+   * @param envTypeId - the environment type identifier
+   * @param updatedValues - the attribute values to update for the given environment type
+   *
+   * @returns environment type object with updated attributes
+   */
   public async updateEnvironmentType(
     ownerId: string,
     envTypeId: string,
@@ -116,6 +142,13 @@ export default class EnvironmentTypeService {
     throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
   }
 
+  /**
+   * Create environment type object in DDB
+   * @param ownerId - the user requesting the operation
+   * @param params - the environment type object attribute key value pairs
+   *
+   * @returns environment type object
+   */
   public async createNewEnvironmentType(
     ownerId: string,
     params: {

@@ -1,8 +1,15 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
 
+import { AuthenticatedUser } from '@amzn/workbench-core-authorization';
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
+import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { EnvironmentStatus } from '../constants/environmentStatus';
@@ -32,8 +39,11 @@ export interface Environment {
   ETC?: any;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   PROJ?: any;
+  // TODO: Replace any[] with <type>[]
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DS?: any[];
+  DATASETS?: any[];
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ENDPOINTS?: any[];
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   INID?: any;
 }
@@ -87,7 +97,8 @@ export class EnvironmentService {
         return item;
       });
       let envWithMetadata: Environment = { ...defaultEnv };
-      envWithMetadata.DS = [];
+      envWithMetadata.DATASETS = [];
+      envWithMetadata.ENDPOINTS = [];
       for (const item of items) {
         // parent environment item
         const sk = item.sk as unknown as string;
@@ -95,8 +106,10 @@ export class EnvironmentService {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           const envKey = sk.split('#')[0];
-          if (envKey === 'DS') {
-            envWithMetadata.DS!.push(item);
+          if (envKey === 'DATASET') {
+            envWithMetadata.DATASETS!.push(item);
+          } else if (envKey === 'ENDPOINT') {
+            envWithMetadata.ENDPOINTS!.push(item);
           } else {
             // metadata of environment item
             // @ts-ignore
@@ -118,19 +131,20 @@ export class EnvironmentService {
   }
 
   /**
-   * Get all environments with option to filter by status
+   * List all environments with options for filtering, pagination, and sort
    * @param user - User information
    * @param filter - Provide which attribute to filter by
    * @param pageSize - Number of results per page
    * @param paginationToken - Token used for getting specific page of results
    * @param sort - Provide which attribute to sort by. True for ascending sort; False for descending sort
    */
-  public async getEnvironments(
-    user: { role: string; ownerId: string },
+  public async listEnvironments(
+    user: AuthenticatedUser,
     filter?: {
       status?: EnvironmentStatus;
       name?: string;
-      createdAt?: string;
+      createdAtFrom?: string;
+      createdAtTo?: string;
       project?: string;
       owner?: string;
       type?: string;
@@ -150,9 +164,13 @@ export class EnvironmentService {
     if (filter && sort) {
       throw Boom.badRequest('Cannot apply a filter and sort at the same time');
     }
-
+    const filterAttributesLength = filter ? Object.keys(filter).length : 0;
     // Check that at most one filter is defined because we not support more than one filter
-    if (filter && Object.keys(filter).length > 1) {
+    if (
+      filterAttributesLength > 1 &&
+      !(filterAttributesLength === 2 && filter?.createdAtFrom && filter?.createdAtTo)
+    ) {
+      //catch case for range
       throw Boom.badRequest('Cannot apply more than one filter.');
     }
 
@@ -168,7 +186,7 @@ export class EnvironmentService {
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
 
-    if (user.role === 'admin') {
+    if (user.roles.includes('Admin')) {
       if (filter) {
         if (filter.status) {
           // if admin and status is selected in the filter, use GSI getResourceByStatus
@@ -178,9 +196,14 @@ export class EnvironmentService {
           // if admin and name is selected in the filter, use GSI getResourceByName
           const addFilter = this._setFilter('getResourceByName', 'name', filter.name);
           queryParams = { ...queryParams, ...addFilter };
-        } else if (filter.createdAt) {
+        } else if (filter.createdAtFrom && filter.createdAtTo) {
           // if admin and createdAt is selected in the filter, use GSI getResourceByCreatedAt
-          const addFilter = this._setFilter('getResourceByCreatedAt', 'createdAt', filter.createdAt);
+          const addFilter = this._setRangeFilter(
+            'getResourceByCreatedAt',
+            'createdAt',
+            filter.createdAtFrom,
+            filter.createdAtTo
+          );
           queryParams = { ...queryParams, ...addFilter };
         } else if (filter.project) {
           // if admin and project is selected in the filter, use GSI getResourceByProject
@@ -227,7 +250,7 @@ export class EnvironmentService {
       }
     } else {
       // if nonadmin, use GSI getResourceByOwner
-      const addFilter = this._setFilter('getResourceByOwner', 'owner', user?.ownerId);
+      const addFilter = this._setFilter('getResourceByOwner', 'owner', user.id);
       queryParams = { ...queryParams, ...addFilter };
     }
 
@@ -265,6 +288,15 @@ export class EnvironmentService {
     return queryParams;
   }
 
+  private _setRangeFilter(gsi: string, sortKey: string, from: string, to: string): QueryParams {
+    const queryParams: QueryParams = {
+      index: gsi,
+      sortKey: sortKey,
+      between: { value1: { S: from }, value2: { S: to } }
+    };
+    return queryParams;
+  }
+
   private _setSort(gsi: string, sortKey: string, forward: boolean): QueryParams {
     const queryParams: QueryParams = {
       index: gsi,
@@ -274,6 +306,13 @@ export class EnvironmentService {
     return queryParams;
   }
 
+  /**
+   * Update environment object in DDB
+   * @param envId - the identifier of the environment to update
+   * @param updatedValues - the attribute values to update for the given environment
+   *
+   * @returns environment object with updated attributes
+   */
   public async updateEnvironment(
     envId: string,
     updatedValues: {
@@ -309,19 +348,29 @@ export class EnvironmentService {
     return `${type}#${id}`;
   }
 
-  public async createEnvironment(params: {
-    instanceId?: string;
-    cidr: string;
-    description: string;
-    error?: { type: string; value: string };
-    name: string;
-    outputs: { id: string; value: string; description: string }[];
-    projectId: string;
-    datasetIds: string[];
-    envTypeId: string;
-    envTypeConfigId: string;
-    status?: EnvironmentStatus;
-  }): Promise<Environment> {
+  /**
+   * Create new environment
+   * @param params - the attribute values to create a given environment
+   * @param user - the user requesting this operation
+   *
+   * @returns environment object from DDB
+   */
+  public async createEnvironment(
+    params: {
+      instanceId?: string;
+      cidr: string;
+      description: string;
+      error?: { type: string; value: string };
+      name: string;
+      outputs: { id: string; value: string; description: string }[];
+      projectId: string;
+      datasetIds: string[];
+      envTypeId: string;
+      envTypeConfigId: string;
+      status?: EnvironmentStatus;
+    },
+    user: AuthenticatedUser
+  ): Promise<Environment> {
     const itemsToGet = [
       // ETC
       {
@@ -330,8 +379,8 @@ export class EnvironmentService {
       },
       // PROJ
       this._buildPkSk(params.projectId, envResourceTypeToKey.project),
-      // DS
-      ...params.datasetIds.map((dsId) => {
+      // DATASETS
+      ..._.map(params.datasetIds, (dsId) => {
         return this._buildPkSk(dsId, envResourceTypeToKey.dataset);
       })
     ];
@@ -351,10 +400,10 @@ export class EnvironmentService {
       datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
-      updatedBy: 'user-1', // TODO: Get this from request context
+      updatedBy: user.id,
       createdAt: new Date().toISOString(),
-      createdBy: 'user-1', // TODO: Get this from request context
-      owner: 'owner-1', // TODO: Get this from request context
+      createdBy: user.id,
+      owner: user.id,
       status: params.status || 'PENDING',
       type: params.envTypeId,
       dependency: params.projectId

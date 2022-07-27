@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   CognitoIdentityProviderClient,
   DescribeUserPoolClientCommand,
@@ -145,9 +150,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public async validateToken(token: string): Promise<CognitoJwtPayload> {
     try {
-      const parts = await this._verifier.verify(token);
-
-      return parts;
+      return await this._verifier.verify(token);
     } catch (error) {
       throw new InvalidJWTError('token is invalid');
     }

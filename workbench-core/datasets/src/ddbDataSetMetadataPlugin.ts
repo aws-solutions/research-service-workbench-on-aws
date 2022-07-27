@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
@@ -98,6 +103,12 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (!dataSetEndPoints || !dataSetEndPoints.Items) return [];
     return dataSetEndPoints.Items as unknown as ExternalEndpoint[];
+  }
+
+  public async updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
+    const endPointParam: ExternalEndpoint = endPoint;
+    await this._storeEndPointToDdb(endPointParam);
+    return endPointParam;
   }
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {

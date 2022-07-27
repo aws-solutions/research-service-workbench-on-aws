@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
 jest.mock('uuid', () => ({ v4: () => envTypeConfigId }));
 import {
@@ -123,7 +128,7 @@ describe('environmentTypeConfigService', () => {
         'eyJwayI6IkVUQyIsInNrIjoiRVQjMWIwNTAyZjMtMTIxZi00ZDYzLWIwM2EtNDRkYzc1NmU0YzIwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9';
 
       // OPERATE
-      const actualResponse = await envTypeConfigService.getEnvironmentTypeConfigs(
+      const actualResponse = await envTypeConfigService.listEnvironmentTypeConfigs(
         envTypeId,
         1,
         validPaginationToken
@@ -135,7 +140,7 @@ describe('environmentTypeConfigService', () => {
     test('invalidPaginationToken', async () => {
       // BUILD & OPERATE & CHECK
       await expect(
-        envTypeConfigService.getEnvironmentTypeConfigs(envTypeId, 1, 'invalidPaginationToken')
+        envTypeConfigService.listEnvironmentTypeConfigs(envTypeId, 1, 'invalidPaginationToken')
       ).rejects.toThrow('Invalid paginationToken');
     });
   });

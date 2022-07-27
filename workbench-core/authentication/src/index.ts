@@ -1,3 +1,12 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import CreateRoleSchema from './schemas/createRole';
+import CreateUserSchema from './schemas/createUser';
+import UpdateRoleSchema from './schemas/updateRole';
+
 export { AuthenticationPlugin } from './authenticationPlugin';
 export { AuthenticationService } from './authenticationService';
 export { User } from './user';
@@ -33,3 +42,5 @@ export {
   verifyToken
 } from './authenticationMiddleware';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
+export { UserManagementService } from './userManagementService';
+export { CreateRoleSchema, CreateUserSchema, UpdateRoleSchema };
