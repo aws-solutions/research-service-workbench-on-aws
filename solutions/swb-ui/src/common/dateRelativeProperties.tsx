@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { DateRangePickerProps } from '@awsui/components-react';
 import { addDays, addHours, addMinutes, addMonths, addSeconds, addWeeks, addYears } from 'date-fns';
 

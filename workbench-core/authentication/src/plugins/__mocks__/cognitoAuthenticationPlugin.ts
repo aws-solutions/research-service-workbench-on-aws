@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
 import { AuthenticationPlugin } from '../../authenticationPlugin';
 import { Tokens } from '../../tokens';
