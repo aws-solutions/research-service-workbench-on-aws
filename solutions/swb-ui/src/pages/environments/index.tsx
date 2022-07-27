@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useCollection } from '@awsui/collection-hooks';
 import {
   Box,
@@ -17,7 +22,6 @@ import {
 import { FlashbarProps } from '@awsui/components-react/flashbar';
 
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
@@ -31,7 +35,6 @@ import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
 import BaseLayout from '../../components/BaseLayout';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
 import { useNotifications } from '../../context/NotificationContext';
-import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
   searchableColumns
@@ -44,7 +47,6 @@ const Environment: NextPage = () => {
   // For functions to return content specific to the table
   const itemType: string = 'workspace';
   // App settings constant
-  const { settings } = useSettings();
 
   const pageSizeOptions = [
     { label: '20', value: 20 },
@@ -320,10 +322,6 @@ const Environment: NextPage = () => {
             authCredResponse={envConnectResponse.authCredResponse}
           />
         )}
-        <Head>
-          <title>{settings.name}</title>
-          <link rel="icon" href={settings.favicon} />
-        </Head>
         {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
         <Table
           {...collectionProps}
@@ -460,7 +458,11 @@ const Environment: NextPage = () => {
       </Box>
     );
   };
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/environments">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default Environment;

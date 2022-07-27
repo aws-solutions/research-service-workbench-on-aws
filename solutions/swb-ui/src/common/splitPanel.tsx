@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AppLayoutProps, BarChart, Box, Button, SplitPanelProps } from '@awsui/components-react';
 import { useEffect, useState } from 'react';
 

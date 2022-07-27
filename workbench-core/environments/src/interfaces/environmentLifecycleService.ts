@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export default interface EnvironmentLifecycleService {
   /**

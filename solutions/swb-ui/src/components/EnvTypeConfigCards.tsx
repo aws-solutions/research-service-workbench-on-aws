@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useCollection } from '@awsui/collection-hooks';
 import { Cards, Box, CardsProps } from '@awsui/components-react';
 import React, { useEffect, useState } from 'react';
