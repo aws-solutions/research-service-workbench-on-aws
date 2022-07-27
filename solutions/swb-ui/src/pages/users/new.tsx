@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   Box,
   BreadcrumbGroupProps,
@@ -244,7 +249,11 @@ const User: NextPage = () => {
     );
   };
 
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/users">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default User;

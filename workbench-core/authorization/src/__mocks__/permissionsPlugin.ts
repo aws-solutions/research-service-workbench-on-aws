@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUser, HTTPMethod, Operation, Permission, PermissionsPlugin } from '..';
 import { RoutesIgnored } from '../routesMap';
 import {

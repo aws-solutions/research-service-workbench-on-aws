@@ -1,15 +1,24 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import {
+  AccessLogFormat,
+  LambdaIntegration,
+  LogGroupLogDestination,
+  RestApi
+} from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-
 import {
   AccountPrincipal,
   AnyPrincipal,
@@ -22,6 +31,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants } from './constants';
@@ -57,6 +67,7 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
+      AWS_REGION_SHORT_NAME,
       S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
       S3_ACCESS_BUCKET_PREFIX,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
@@ -67,9 +78,9 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
-      ALLOWED_ORIGINS,
       PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
+      UI_CLIENT_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -131,6 +142,7 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
+    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
@@ -151,6 +163,18 @@ export class SWBStack extends Stack {
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+  }
+
+  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+    new CfnOutput(this, 'awsRegion', {
+      value: awsRegion
+    });
+    new CfnOutput(this, 'awsRegionShortName', {
+      value: awsRegionName
+    });
+    new CfnOutput(this, 'uiClientURL', {
+      value: uiClientURL
+    });
   }
 
   private _createEncryptionKey(): Key {
@@ -704,11 +728,28 @@ export class SWBStack extends Stack {
 
   // API Gateway
   private _createRestApi(apiLambda: Function): void {
+    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: 'Backend API Name',
       description: 'Backend API',
       deployOptions: {
-        stageName: 'dev'
+        stageName: 'dev',
+        accessLogDestination: new LogGroupLogDestination(logGroup),
+        accessLogFormat: AccessLogFormat.custom(
+          JSON.stringify({
+            stage: '$context.stage',
+            requestId: '$context.requestId',
+            integrationRequestId: '$context.integration.requestId',
+            status: '$context.status',
+            apiId: '$context.apiId',
+            resourcePath: '$context.resourcePath',
+            path: '$context.path',
+            resourceId: '$context.resourceId',
+            httpMethod: '$context.httpMethod',
+            sourceIp: '$context.identity.sourceIp',
+            userAgent: '$context.identity.userAgent'
+          })
+        )
       },
       defaultCorsPreflightOptions: {
         allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],

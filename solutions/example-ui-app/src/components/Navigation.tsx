@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
 import { useTranslation } from 'next-i18next';
 

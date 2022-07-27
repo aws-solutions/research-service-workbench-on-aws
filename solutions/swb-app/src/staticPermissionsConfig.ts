@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Permission, PermissionsMap } from '@amzn/workbench-core-authorization';
 
 const adminPermissions: Permission[] = [
