@@ -80,18 +80,36 @@ cdk.out
 .vscode
 .heft
 .tools
+cdk.context.json
+cdk-outputs.json
+out.txt
 build/
 
 .idea
 
 # Reference package
+solutions/swb-reference/src/environment-files/offline-packages/*
 solutions/swb-reference/build
 solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
+solutions/swb-reference/integration-tests/config/*.yaml
+!solutions/swb-reference/integration-tests/config/example.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
+solutions/swb-reference/src/config/*.js
 solutions/swb-reference/.aws-sam/
 
+# local environment variables
+.env*.local
 
 # example package
 workbench-core/example/infrastructure/build
+
+#next static export
+solutions/swb-ui/out
+
+#swb-ui cdk-infrastructure
+solutions/swb-ui/infrastructure/src/config/*.yaml
+solutions/swb-ui/infrastructure/src/config/*.js
+!solutions/swb-ui/infrastructure/src/config/example.yaml
+

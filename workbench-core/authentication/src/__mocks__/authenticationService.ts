@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticationPlugin } from '../authenticationPlugin';
 import { DecodedJWT } from '../decodedJWT';
 import { Tokens } from '../tokens';
@@ -67,5 +72,9 @@ export class AuthenticationService {
       return tokens;
     }
     throw new Error();
+  }
+
+  public getLogoutUrl(state: string, codeChallenge: string): string {
+    return 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com';
   }
 }

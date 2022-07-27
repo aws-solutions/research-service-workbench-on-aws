@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { DateRangePickerProps } from '@awsui/components-react';
 import { addDays, addHours, addMinutes, addMonths, addSeconds, addWeeks, addYears } from 'date-fns';
 
@@ -78,7 +83,7 @@ export const isValidRangeFunction = (range: any): DateRangePickerProps.Validatio
   return { valid: true };
 };
 
-export function convertToAbsoluteRange(range: any): any {
+export function convertToAbsoluteRange(range: any): { start: Date | undefined; end: Date } {
   if (range.type === 'absolute') {
     return {
       start: new Date(range.startDate),

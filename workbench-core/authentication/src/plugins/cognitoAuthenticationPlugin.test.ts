@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 jest.mock('../utils');
 
 import {
@@ -23,7 +28,6 @@ import {
 } from '..';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'us-west-2',
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
@@ -31,7 +35,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   websiteUrl: 'fake-website-url'
 } as const;
 
-const baseUrl = `${cognitoPluginOptions.cognitoDomain}/oauth2`;
+const baseUrl = cognitoPluginOptions.cognitoDomain;
 
 const encodedClientId = Buffer.from(
   `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
@@ -51,14 +55,30 @@ const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
 } as const;
 
 describe('CognitoAuthenticationPlugin tests', () => {
-  const plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
+  let plugin: CognitoAuthenticationPlugin;
 
-  it('constructor should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
-    const badUserPoolIdConfig = { ...cognitoPluginOptions, userPoolId: 'badId' };
+  beforeEach(() => {
+    plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
+  });
 
-    expect(() => {
-      new CognitoAuthenticationPlugin(badUserPoolIdConfig);
-    }).toThrow(PluginConfigurationError);
+  describe('constructor tests', () => {
+    it('should throw PluginConfigurationError when the user pool id is invalid. Must match "<region>_<some string>" format', () => {
+      const badUserPoolIdConfig = { ...cognitoPluginOptions, userPoolId: 'badId' };
+
+      expect(() => {
+        new CognitoAuthenticationPlugin(badUserPoolIdConfig);
+      }).toThrow(PluginConfigurationError);
+    });
+
+    it('should throw PluginConfigurationError when the verifier throws an error', () => {
+      jest.spyOn(CognitoJwtVerifier, 'create').mockImplementationOnce(() => {
+        throw new Error();
+      });
+
+      expect(() => {
+        new CognitoAuthenticationPlugin(cognitoPluginOptions);
+      }).toThrow(PluginConfigurationError);
+    });
   });
 
   describe('isUserLoggedIn tests', () => {
@@ -68,7 +88,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       const loggedIn = await plugin.isUserLoggedIn(validToken);
 
-      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/userInfo`, {
+      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/oauth2/userInfo`, {
         headers: { Authorization: `Bearer ${validToken}` }
       });
       expect(loggedIn).toBe(true);
@@ -80,7 +100,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       const loggedIn = await plugin.isUserLoggedIn(invalidToken);
 
-      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/userInfo`, {
+      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/oauth2/userInfo`, {
         headers: { Authorization: `Bearer ${invalidToken}` }
       });
       expect(loggedIn).toBe(false);
@@ -93,7 +113,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       await expect(plugin.isUserLoggedIn(validToken)).rejects.toThrow(
         new IdpUnavailableError('Cognito is unavailable')
       );
-      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/userInfo`, {
+      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/oauth2/userInfo`, {
         headers: { Authorization: `Bearer ${validToken}` }
       });
     });
@@ -138,12 +158,16 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       await plugin.revokeToken(validToken);
 
-      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/revoke`, new URLSearchParams({ token: validToken }), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${encodedClientId}`
+      expect(axiosSpy).toHaveBeenCalledWith(
+        `${baseUrl}/oauth2/revoke`,
+        new URLSearchParams({ token: validToken }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${encodedClientId}`
+          }
         }
-      });
+      );
     });
 
     it('should throw InvalidTokenTypeError when a non-refresh token is passed in', async () => {
@@ -156,7 +180,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new InvalidTokenTypeError('only refresh tokens may be revoked')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/revoke`,
+        `${baseUrl}/oauth2/revoke`,
         new URLSearchParams({ token: invalidToken }),
         {
           headers: {
@@ -177,7 +201,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('token revocation is disabled for this app client')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/revoke`,
+        `${baseUrl}/oauth2/revoke`,
         new URLSearchParams({ token: invalidToken }),
         {
           headers: {
@@ -198,7 +222,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('invalid client id or client secret')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/revoke`,
+        `${baseUrl}/oauth2/revoke`,
         new URLSearchParams({ token: invalidToken }),
         {
           headers: {
@@ -218,12 +242,16 @@ describe('CognitoAuthenticationPlugin tests', () => {
       await expect(plugin.revokeToken(validToken)).rejects.toThrow(
         new IdpUnavailableError('Cognito is unavailable')
       );
-      expect(axiosSpy).toHaveBeenCalledWith(`${baseUrl}/revoke`, new URLSearchParams({ token: validToken }), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${encodedClientId}`
+      expect(axiosSpy).toHaveBeenCalledWith(
+        `${baseUrl}/oauth2/revoke`,
+        new URLSearchParams({ token: validToken }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${encodedClientId}`
+          }
         }
-      });
+      );
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -232,7 +260,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       await expect(plugin.revokeToken(invalidToken)).rejects.toThrow(Error);
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/revoke`,
+        `${baseUrl}/oauth2/revoke`,
         new URLSearchParams({ token: invalidToken }),
         {
           headers: {
@@ -317,7 +345,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const tokens = await plugin.handleAuthorizationCode(validCode, codeVerifier);
 
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: validCode,
@@ -358,7 +386,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new InvalidAuthorizationCodeError('authorization code has been used already or is invalid')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: invalidCode,
@@ -385,7 +413,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('invalid client id or client secret')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: invalidCode,
@@ -412,7 +440,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('authorization code grant is disabled for this app client')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: invalidCode,
@@ -439,7 +467,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new InvalidCodeVerifierError('pkce code verifier is invalid')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: validCode,
@@ -466,7 +494,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new IdpUnavailableError('Cognito is unavailable')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: validCode,
@@ -489,7 +517,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       await expect(plugin.handleAuthorizationCode(invalidCode, codeVerifier)).rejects.toThrow(Error);
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: invalidCode,
@@ -513,7 +541,17 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const url = plugin.getAuthorizationCodeUrl(state, codeChallenge);
 
       expect(url).toBe(
-        `${baseUrl}/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${cognitoPluginOptions.websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+        `${baseUrl}/oauth2/authorize?client_id=${cognitoPluginOptions.clientId}&response_type=code&scope=openid&redirect_uri=${cognitoPluginOptions.websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+      );
+    });
+  });
+
+  describe('getLogoutUrl tests', () => {
+    it('should return the full URL of the authentication servers logout endpoint', () => {
+      const url = plugin.getLogoutUrl();
+
+      expect(url).toBe(
+        `${baseUrl}/logout?client_id=${cognitoPluginOptions.clientId}&logout_uri=${cognitoPluginOptions.websiteUrl}`
       );
     });
   });
@@ -535,7 +573,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
       const tokens = await plugin.refreshAccessToken(refreshToken);
 
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: refreshToken
@@ -569,7 +607,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new InvalidTokenError('refresh token is invalid or has been revoked')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: invalidRefreshToken
@@ -593,7 +631,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('invalid client id or client secret')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: invalidRefreshToken
@@ -617,7 +655,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new PluginConfigurationError('refreshing access tokens is disabled for this app client')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: invalidRefreshToken
@@ -641,7 +679,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         new IdpUnavailableError('Cognito is unavailable')
       );
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: validRefreshToken
@@ -661,7 +699,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       await expect(plugin.refreshAccessToken(invalidRefreshToken)).rejects.toThrow(Error);
       expect(axiosSpy).toHaveBeenCalledWith(
-        `${baseUrl}/token`,
+        `${baseUrl}/oauth2/token`,
         new URLSearchParams({
           grant_type: 'refresh_token',
           refresh_token: invalidRefreshToken

@@ -28,15 +28,16 @@
   "dependencies": {
     "@amzn/workbench-core-authorization": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
-    "@aws-sdk/client-cognito-identity-provider": "^3.67.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1",
+    "jsonschema": "^1.4.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@aws-sdk/client-s3": "^3.58.0",
-    "@aws-sdk/types": "^3.55.0",
+    "@aws-sdk/client-s3": "^3.118.1",
+    "@aws-sdk/types": "^3.110.0",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",

@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
@@ -51,6 +56,14 @@ describe('CognitoUserManagementPlugin tests', () => {
     cognitoMock.reset();
     plugin = new CognitoUserManagementPlugin('us-west-2_fakeId');
     roles = ['Role1', 'Role2'];
+  });
+
+  describe('constructor tests', () => {
+    it('should throw PluginConfigurationError when the userPoolId is invalid', async () => {
+      expect(() => {
+        new CognitoUserManagementPlugin('bad-user-pool-id');
+      }).toThrow(PluginConfigurationError);
+    });
   });
 
   describe('getUser tests', () => {

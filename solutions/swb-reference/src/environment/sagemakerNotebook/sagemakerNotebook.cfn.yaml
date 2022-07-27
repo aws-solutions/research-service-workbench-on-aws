@@ -1,0 +1,292 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Service-Workbench-on-AWS SageMaker-Jupyter
+
+Parameters:
+  Namespace:
+    Type: String
+    Description: An environment name that will be prefixed to resource names
+  InstanceType:
+    Type: String
+    Description: EC2 instance type to launch
+    Default: ml.t3.xlarge
+  VPC:
+    Description: VPC for Sagemaker Notebook
+    Type: AWS::EC2::VPC::Id
+  Subnet:
+    Description: Subnet for Sagemaker Notebook, from the VPC selected above
+    Type: AWS::EC2::Subnet::Id
+  AccessFromCIDRBlock:
+    Type: String
+    Description: The CIDR used to access sagemaker notebook
+    Default: 10.0.0.0/19
+  S3Mounts:
+    Type: String
+    Description: A JSON array of objects with name, bucket and prefix properties used to mount data
+  IamPolicyDocument:
+    Type: String
+    Description: The IAM policy to be associated with the launched workstation
+  EnvironmentInstanceFiles:
+    Type: String
+    Description: >-
+      An S3 URI (starting with "s3://") that specifies the location of files to be copied to
+      the environment instance, including any bootstrap scripts
+  EncryptionKeyArn:
+    Type: String
+    Description: The ARN of the KMS encryption Key used to encrypt data in the notebook
+  AutoStopIdleTimeInMinutes:
+    Type: Number
+    Description: Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)
+  DatasetsBucketArn:
+    Type: String
+    Description: Name of the datasets bucket in the main account
+  MainAccountId:
+    Type: String
+    Description: The Main Account ID where application is deployed
+  MainAccountRegion:
+    Type: String
+    Description: The region of application deployment in main account
+  MainAccountKeyArn:
+    Type: String
+    Description: The ARN of main account bucket encryption key
+
+Conditions:
+  IamPolicyEmpty: !Equals [!Ref IamPolicyDocument, '{}']
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SageMaker Notebook Instance
+      VpcId:
+        Ref: VPC
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref AccessFromCIDRBlock
+
+  InstanceRolePermissionBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permission boundary for EC2 instance role
+      ManagedPolicyName: !Join ['-', [Ref: Namespace, 'ec2-sagemaker-permission-boundary']]
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+              - 's3:AbortMultipartUpload'
+              - 's3:ListMultipartUploadParts'
+              - 's3:PutObject'
+              - 's3:GetObjectAcl'
+              - 's3:PutObjectAcl'
+            Resource:
+              - !Join ['/', [Ref: DatasetsBucketArn, '*']]
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
+              - !Join [
+                  ':',
+                  ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*/object/*']
+                ]
+          - Effect: Allow
+            Action:
+              - 's3:GetAccessPoint'
+              - 's3:ListAccessPoints'
+            Resource: '*' # These actions require wildcard resources
+          - Effect: Allow
+            Action:
+              - 's3:ListBucket'
+            Resource:
+              - !Ref DatasetsBucketArn
+              - !Join [':', ['arn:aws:s3', Ref: MainAccountRegion, Ref: MainAccountId, 'accesspoint/*']]
+          - Effect: Allow
+            Action:
+              - 's3:ListBucket'
+            Resource: !Sub
+              - 'arn:aws:s3:::${S3Bucket}'
+              - S3Bucket: !Select [2, !Split ['/', !Ref EnvironmentInstanceFiles]]
+            Condition:
+              StringLike:
+                s3:prefix: !Sub
+                  - '${S3Prefix}/*'
+                  - S3Prefix: !Select [3, !Split ['/', !Ref EnvironmentInstanceFiles]]
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+            Resource: !Sub
+              - 'arn:aws:s3:::${S3Location}/*'
+              # Remove "s3://" prefix from EnvironmentInstanceFiles
+              - S3Location: !Select [1, !Split ['s3://', !Ref EnvironmentInstanceFiles]]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:DescribeLogStreams
+              - logs:PutLogEvents
+              - logs:CreateLogGroup
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
+          - Effect: Allow
+            Action:
+              - 'kms:CreateGrant'
+              - 'kms:CreateKey'
+              - 'kms:DescribeKey'
+              - 'kms:EnableKeyRotation'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+              - 'kms:Get*'
+              - 'kms:List*'
+            Resource:
+              - !Ref EncryptionKeyArn
+              - !Ref MainAccountKeyArn
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource: 'arn:aws:iam::*:role/swb-*'
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstance
+              - sagemaker:StopNotebookInstance
+            Resource: '*'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: 'We allow the wildcard resource for sagemaker permissions since we do not know the sagemaker notebook instance identifier at the time of creation of this permisison boundary'
+
+  IAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join ['-', [Ref: Namespace, 'sagemaker-notebook-role']]
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'sagemaker.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - !If
+          - IamPolicyEmpty
+          - !Ref 'AWS::NoValue'
+          - PolicyName: !Join ['-', [Ref: Namespace, 's3-studydata-policy']]
+            PolicyDocument: !Ref IamPolicyDocument
+        - PolicyName: !Join ['-', [Ref: Namespace, 's3-bootstrap-script-policy']]
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 's3:GetObject'
+                Resource: !Sub
+                  - 'arn:aws:s3:::${S3Location}/*'
+                  # Remove "s3://" prefix from EnvironmentInstanceFiles
+                  - S3Location: !Select [1, !Split ['s3://', !Ref EnvironmentInstanceFiles]]
+              - Effect: 'Allow'
+                Action: 's3:ListBucket'
+                Resource: !Sub
+                  - 'arn:aws:s3:::${S3Bucket}'
+                  - S3Bucket: !Select [2, !Split ['/', !Ref EnvironmentInstanceFiles]]
+                Condition:
+                  StringLike:
+                    s3:prefix: !Sub
+                      - '${S3Prefix}/*'
+                      - S3Prefix: !Select [3, !Split ['/', !Ref EnvironmentInstanceFiles]]
+              - Effect: Allow
+                Action:
+                  - 'kms:CreateGrant'
+                  - 'kms:Get*'
+                  - 'kms:List*'
+                  - 'kms:Decrypt'
+                  - 'kms:DescribeKey'
+                  - 'kms:Encrypt'
+                  - 'kms:GenerateDataKey'
+                Resource:
+                  - !Ref MainAccountKeyArn
+        - PolicyName: cw-logs
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:DescribeLogStreams
+                - logs:PutLogEvents
+                - logs:CreateLogGroup
+              Resource:
+                - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
+      PermissionsBoundary: !Ref InstanceRolePermissionBoundary
+
+  # This policy is attached to the role after the instance is created
+  # so that the instance can be referenced in the resource section
+  NotebookStopPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: NotebookStop
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeNotebookInstance
+              - sagemaker:StopNotebookInstance
+            Resource:
+              - !Ref BasicNotebookInstance
+      Roles:
+        - !Ref IAMRole
+
+  # TODO: Consider also passing DefaultCodeRepository to allow persisting notebook data
+  BasicNotebookInstance:
+    Type: 'AWS::SageMaker::NotebookInstance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      RoleArn: !GetAtt IAMRole.Arn
+      SubnetId: !Ref Subnet
+      SecurityGroupIds:
+        - !Ref SecurityGroup
+      DirectInternetAccess: Enabled
+      LifecycleConfigName: !GetAtt BasicNotebookInstanceLifecycleConfig.NotebookInstanceLifecycleConfigName
+      KmsKeyId: !Ref EncryptionKeyArn
+
+  # Add script for mounting studies and autostop
+  BasicNotebookInstanceLifecycleConfig:
+    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
+    Properties:
+      OnStart:
+        - Content:
+            Fn::Base64: !Sub |
+              #!/usr/bin/env bash
+              # Download and execute bootstrap script
+              aws s3 cp "${EnvironmentInstanceFiles}/get_bootstrap.sh" "/tmp"
+              chmod 500 "/tmp/get_bootstrap.sh"
+              /tmp/get_bootstrap.sh "${EnvironmentInstanceFiles}" '${S3Mounts}'
+
+              # Stop Idle Script
+              if [ "${AutoStopIdleTimeInMinutes}" != "0" ]; then
+                echo "Fetching the autostop script"
+                aws s3 cp "${EnvironmentInstanceFiles}/offline-packages/sagemaker/autostop.py" "/usr/local/bin"
+                chmod a+x /usr/local/bin/autostop.py
+                IDLE_TIME=`expr ${AutoStopIdleTimeInMinutes} \* 60`
+                echo "Starting the SageMaker autostop script in cron"
+                (crontab -l 2>/dev/null; echo "*/1 * * * * /usr/bin/python /usr/local/bin/autostop.py --time $IDLE_TIME --ignore-connections >> /var/log/autostop.log") | crontab -
+              fi
+
+Outputs:
+  NotebookInstanceName:
+    Description: The name of the SageMaker notebook instance.
+    Value: !GetAtt [BasicNotebookInstance, NotebookInstanceName]
+
+  EnvironmentInstanceRoleArn:
+    Description: IAM role assumed by the SageMaker environment
+    Value: !GetAtt IAMRole.Arn
+
+  NotebookArn:
+    Description: SageMaker Notebook Arn
+    Value: !Ref BasicNotebookInstance

@@ -1,37 +1,19 @@
-.github                                               @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-common                                                @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
+*                                                     @awslabs/aws-ma-foundation
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
 common/config/rush/pnpm-lock.yaml
+.gitallowed
+.gitattributes
+.gitignore
+common/changes/
 solutions/example-ui-app                              @mabreuortega
-solutions/swb-ui                                      @kpark277
-solutions/swb-reference                               @nguyen102 @SanketD92 @maghirardelli
-solutions/swb-app                                     @nguyen102 @SanketD92 @maghirardelli
-solutions/managed-blockchain-for-patient-consent      @Bingjiling
-workbench-core/audit                                  @htztomic
-workbench-core/authentication                         @bhudnell
-workbench-core/authorization                          @htztomic
-workbench-core/base                                   @nguyen102 @SanketD92 @maghirardelli
-workbench-core/datasets                               @DaveMadsen
-workbench-core/environments                           @nguyen102 @SanketD92 @maghirardelli
-workbench-core/eslint-custom                          @insignias
-workbench-core/infrastructure                         @bhudnell
-workbench-core/example                                @insignias
-workbench-core/logging                                @bhudnell
-workbench-core/repo-scripts/repo-toolbox              @insignias
-.czrc                                                 @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.gitallowed                                           @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.gitattributes                                        @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.gitignore                                            @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.npmpackagejsonlintrc.json                            @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.prettierignore                                       @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-.prettierrc.js                                        @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-CODE_OF_CONDUCT.md                                    @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-CONTRIBUTING.md                                       @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-DEVELOPMENT.md                                        @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-LICENSE                                               @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-NOTICE                                                @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-README.md                                             @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-commitlint.config.js                                  @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-release.config.js                                     @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
-rush.json                                             @rsmayda @DaveMadsen @insignias @htztomic @bhudnell
+solutions/swb-ui                                      @awslabs/aws-ma-swb
+common/changes/@amzn/swb-ui                           @awslabs/aws-ma-swb
+solutions/swb-reference                               @awslabs/aws-ma-swb
+common/changes/@amzn/swb-reference                    @awslabs/aws-ma-swb
+solutions/swb-app                                     @awslabs/aws-ma-swb
+common/changes/@amzn/swb-app                          @awslabs/aws-ma-swb
+workbench-core/base                                   @awslabs/aws-ma-swb
+common/changes/@amzn/workbench-core-base              @awslabs/aws-ma-swb
+workbench-core/environments                           @awslabs/aws-ma-swb
+common/changes/@amzn/environments                     @awslabs/aws-ma-swb

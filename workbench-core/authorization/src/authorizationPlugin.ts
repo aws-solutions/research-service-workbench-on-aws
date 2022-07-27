@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import Operation from './operation';
 import Permission from './permission';
 
@@ -10,7 +15,7 @@ export default interface AuthorizationPlugin {
    * @param userPermissions - {@link Permission}.
    * @param operations - An array of {@link Operation}s that the user wants to perform.
    *
-   * @returns A promise when user is authorized, otherwise throw on failure.
+   * @throws - {@link ForbiddenError} when user is not authorized.
    */
   isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<void>;
 }

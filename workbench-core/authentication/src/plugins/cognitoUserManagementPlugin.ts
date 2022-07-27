@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
@@ -39,7 +44,14 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   public constructor(userPoolId: string) {
     this._userPoolId = userPoolId;
 
-    const region = userPoolId.split('_')[0];
+    // eslint-disable-next-line security/detect-unsafe-regex
+    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
+
+    if (!regionMatch) {
+      throw new PluginConfigurationError('Invalid Cognito user pool id');
+    }
+
+    const region = regionMatch.groups!.region;
 
     this._cognitoClient = new CognitoIdentityProviderClient({ region });
   }
@@ -111,7 +123,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       await this._cognitoClient.send(
         new AdminCreateUserCommand({
           UserPoolId: this._userPoolId,
-          Username: user.uid,
+          Username: user.email,
           UserAttributes: [
             {
               Name: 'given_name',

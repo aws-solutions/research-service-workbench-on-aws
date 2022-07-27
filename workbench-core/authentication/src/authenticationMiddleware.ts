@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUser, RoutesIgnored } from '@amzn/workbench-core-authorization';
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
@@ -7,7 +12,7 @@ import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
 
 /**
- * An Express middleware function used to exchange the authorization code received from the authentication server for authentication tokens.
+ * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
  * This route places the access token and refresh token, if it exists, into http only, secure, same site strict cookies and returns the id token
  * in the response body.
  *
@@ -17,7 +22,7 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -43,6 +48,11 @@ export function getTokensFromAuthorizationCode(
         const now = Date.now();
 
         // set cookies.
+        // TODO: Delete code below adding access token to response and rely solely on cookies
+        const data = {
+          idToken: idToken.token,
+          accessToken: accessToken.token
+        };
         res.cookie('access_token', accessToken.token, {
           httpOnly: true,
           secure: true,
@@ -58,7 +68,7 @@ export function getTokensFromAuthorizationCode(
           });
         }
 
-        res.status(200).json({ idToken: idToken.token });
+        res.status(200).json(data);
       } catch (error) {
         if (loggingService) {
           loggingService.error(error);
@@ -76,7 +86,7 @@ export function getTokensFromAuthorizationCode(
 }
 
 /**
- * An Express middleware function used to get the url to the authentication hosted UI.
+ * An Express route handler function used to get the url to the authentication hosted UI.
  * The `stateVerifier` and `codeChallenge` request query parameters are temporary values passed in by the client. The client will replace these values later
  * in order to keep them a client secret.
  *
@@ -85,7 +95,7 @@ export function getTokensFromAuthorizationCode(
  *  - a request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -113,6 +123,7 @@ export function getAuthorizationCodeUrl(
  * If authenticated, the user's id and roles will be stored in `res.locals.user`
  *
  * This function assumes:
+ *  - the middleware is mounted using `app.use()`
  *  - the access token is stored in a cookie named `access_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
@@ -121,7 +132,7 @@ export function getAuthorizationCodeUrl(
  *
  * @example
  * ```
- * app.get('protectedRoute', verifyToken(authenticationService), ...other_middleware);
+ * app.use(verifyToken(authenticationService));
  * ```
  */
 export function verifyToken(
@@ -133,17 +144,14 @@ export function verifyToken(
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.cookies.access_token;
-
+      const accessToken = req.headers ? req.headers.authorization : undefined;
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
-
           const user: AuthenticatedUser = {
             id: authenticationService.getUserIdFromToken(decodedAccessToken),
             roles: authenticationService.getUserRolesFromToken(decodedAccessToken)
           };
-
           res.locals.user = user;
 
           next();
@@ -161,7 +169,7 @@ export function verifyToken(
 }
 
 /**
- * An Express middleware function used to logout a user.
+ * An Express route handler function used to logout a user.
  *
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
@@ -169,7 +177,7 @@ export function verifyToken(
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -206,14 +214,14 @@ export function logoutUser(
 }
 
 /**
- * An Express middleware function used to refresh an expired access code.
+ * An Express route handler function used to refresh an expired access code.
  *
  * This function assumes:
  *  - the refresh token is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -260,7 +268,9 @@ export function refreshAccessToken(
 }
 
 /**
- * An Express middleware function used to check if there is a logged in user.
+ * An Express route handler function used to check if there is a logged in user.
+ * If there is valid refresh_token cookie present, the function will set a new access_token cookie
+ * and return a new idToken as well as the logged in status in the response body.
  *
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
@@ -268,7 +278,7 @@ export function refreshAccessToken(
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - an options object containing an optional logging service parameter
- * @returns the middleware function
+ * @returns the route handler function
  *
  * @example
  * ```
@@ -285,11 +295,7 @@ export function isUserLoggedIn(
     const refreshToken = req.cookies.refresh_token;
 
     try {
-      if (typeof accessToken === 'string') {
-        const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
-
-        res.status(200).json({ loggedIn });
-      } else if (typeof refreshToken === 'string') {
+      if (typeof refreshToken === 'string') {
         const { idToken, accessToken } = await authenticationService.refreshAccessToken(refreshToken);
 
         // set access cookie
@@ -301,6 +307,10 @@ export function isUserLoggedIn(
         });
 
         res.status(200).json({ idToken: idToken.token, loggedIn: true });
+      } else if (typeof accessToken === 'string') {
+        const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
+
+        res.status(200).json({ loggedIn });
       } else {
         res.status(200).json({ loggedIn: false });
       }

@@ -1,6 +1,10 @@
-import { ForbiddenError } from '@casl/ability';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { fc, itProp } from 'jest-fast-check';
-import { Operation, Permission, CASLAuthorizationPlugin } from '.';
+import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError } from '.';
 
 describe('CASL Authorization Plugin', () => {
   let caslAuthorizationPlugin: CASLAuthorizationPlugin;

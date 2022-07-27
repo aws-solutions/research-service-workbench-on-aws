@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticationPlugin } from './authenticationPlugin';
 import { DecodedJWT } from './decodedJWT';
 import { Tokens } from './tokens';
@@ -25,7 +30,7 @@ export class AuthenticationService {
    * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async isUserLoggedIn(accessToken: string): Promise<boolean> {
-    return await this._authenticationPlugin.isUserLoggedIn(accessToken);
+    return this._authenticationPlugin.isUserLoggedIn(accessToken);
   }
 
   /**
@@ -37,7 +42,7 @@ export class AuthenticationService {
    * @throws {@link InvalidJWTError} if the token is invalid
    */
   public async validateToken(token: string): Promise<DecodedJWT> {
-    return await this._authenticationPlugin.validateToken(token);
+    return this._authenticationPlugin.validateToken(token);
   }
 
   /**
@@ -91,7 +96,7 @@ export class AuthenticationService {
    * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
-    return await this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
+    return this._authenticationPlugin.handleAuthorizationCode(code, codeVerifier);
   }
 
   /**
@@ -119,7 +124,16 @@ export class AuthenticationService {
    * @throws {@link IdpUnavailableError} if the plugin's IDP is unavailable
    */
   public async refreshAccessToken(refreshToken: string): Promise<Tokens> {
-    return await this._authenticationPlugin.refreshAccessToken(refreshToken);
+    return this._authenticationPlugin.refreshAccessToken(refreshToken);
+  }
+
+  /**
+   * Gets the URL of the endpoint used to logout the user.
+   *
+   * @returns the endpoint URL string
+   */
+  public getLogoutUrl(): string {
+    return this._authenticationPlugin.getLogoutUrl();
   }
 
   /**

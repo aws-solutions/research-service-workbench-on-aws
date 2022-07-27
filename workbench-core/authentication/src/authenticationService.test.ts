@@ -1,9 +1,13 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 jest.mock('./plugins/cognitoAuthenticationPlugin');
 
 import { AuthenticationService, CognitoAuthenticationPlugin, CognitoAuthenticationPluginOptions } from '.';
 
 const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
-  region: 'fake-region',
   cognitoDomain: 'fake-domain',
   userPoolId: 'fake-user-pool',
   clientId: 'fake-client-id',
@@ -107,5 +111,13 @@ describe('AuthenticationService tests', () => {
         expiresIn: 1234
       }
     });
+  });
+
+  it('getLogoutUrl should return the full URL of the authentication servers logout endpoint', () => {
+    const url = service.getLogoutUrl();
+
+    expect(url).toBe(
+      'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
+    );
   });
 });

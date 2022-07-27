@@ -270,13 +270,6 @@
       "shellCommand": "bash .github/workflows/scripts/git-secrets-scan.sh"
     },
     {
-      "name": "viperlight-scan",
-      "commandKind": "global",
-      "summary": "Used to perform a viperlight scan on the packages",
-      "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "bash .github/workflows/scripts/viperlight-scan.sh"
-    },
-    {
       "name": "prettier",
       "commandKind": "global",
       "summary": "Used by the pre-commit Git hook. This command invokes Prettier to reformat staged changes.",
@@ -284,6 +277,20 @@
       "autoinstallerName": "rush-prettier",
       // This will invoke common/autoinstallers/rush-prettier/node_modules/.bin/pretty-quick
       "shellCommand": "pretty-quick --staged"
+    },
+    {
+      "name": "cinstall",
+      "commandKind": "global",
+      "summary": "Run rush install with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy && node common/scripts/install-hooks"
+    },
+    {
+      "name": "cupdate",
+      "commandKind": "global",
+      "summary": "Run rush update with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy && node common/scripts/install-hooks"
     }
   ],
 

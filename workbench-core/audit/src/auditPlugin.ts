@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import AuditEntry from './auditEntry';
 import Metadata from './metadata';
 
@@ -17,7 +22,7 @@ export default interface AuditPlugin {
    * Writes the audit entry to an output source
    *
    * @param metadata - {@link Metadata}
-   * @param auditEntry - {@link AuditEntry}
+   * @param auditEntry - {@link Readonly} {@link AuditEntry}
    */
-  write(metadata: Metadata, auditEntry: AuditEntry): Promise<void>;
+  write(metadata: Metadata, auditEntry: Readonly<AuditEntry>): Promise<void>;
 }

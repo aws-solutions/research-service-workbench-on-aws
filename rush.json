@@ -129,11 +129,17 @@
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
       "projectFolder": "workbench-core/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     }
