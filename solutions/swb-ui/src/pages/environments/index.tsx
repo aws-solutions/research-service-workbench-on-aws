@@ -465,7 +465,11 @@ const Environment: NextPage = () => {
       </Box>
     );
   };
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/environments">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default Environment;
