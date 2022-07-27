@@ -39,11 +39,11 @@ describe('HostingAccountLifecycleService', () => {
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
-    process.env.STATUS_HANDLER_ARN_NAME = 'SampleStatusHandlerArnOutput';
-    process.env.S3_ARTIFACT_BUCKET_ARN_NAME = 'SampleArtifactBucketArnOutput';
-    process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME = 'SampleMainKeyOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'SampleStatusHandlerArnOutput';
+    process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
+    process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
-    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+    process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDoc';
   });
 
   afterAll(() => {
@@ -60,19 +60,19 @@ describe('HostingAccountLifecycleService', () => {
           CreationTime: new Date(),
           Outputs: [
             {
-              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
+              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_OUTPUT_KEY_SUFFIX}`,
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
             },
             {
-              OutputKey: process.env.STATUS_HANDLER_ARN_NAME!,
+              OutputKey: process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             },
             {
-              OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_NAME!,
+              OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:s3:::sampleArtifactsBucketName'
             },
             {
-              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!,
+              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:kms:::key/123-123-123'
             },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
