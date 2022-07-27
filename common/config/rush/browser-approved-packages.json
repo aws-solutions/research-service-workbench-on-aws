@@ -11,10 +11,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@amzn/hpc-ui",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@amzn/patient-consent-express",
       "allowedCategories": [ "production" ]
     },
@@ -400,10 +396,6 @@
     },
     {
       "name": "md5-file",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "my-app",
       "allowedCategories": [ "production" ]
     },
     {

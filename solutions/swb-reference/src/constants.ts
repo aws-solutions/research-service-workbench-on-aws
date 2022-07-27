@@ -7,19 +7,19 @@ function getConstants(): {
   STACK_NAME: string;
   SC_PORTFOLIO_NAME: string;
   AWS_REGION: string;
-  SSM_DOC_NAME_SUFFIX: string;
-  S3_ACCESS_BUCKET_ARN_NAME: string;
+  SSM_DOC_OUTPUT_KEY_SUFFIX: string;
+  S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
   S3_ACCESS_BUCKET_PREFIX: string;
-  S3_ARTIFACT_BUCKET_ARN_NAME: string;
-  S3_DATASETS_BUCKET_ARN_NAME: string;
+  S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+  S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
   S3_ARTIFACT_BUCKET_SC_PREFIX: string;
   S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX: string;
-  LAUNCH_CONSTRAINT_ROLE_NAME: string;
+  LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
   AMI_IDS_TO_SHARE: string;
   ROOT_USER_EMAIL: string;
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
-  STATUS_HANDLER_ARN_NAME: string;
+  STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   PCLUSTER_API_URL: string;
   ALLOWED_ORIGINS: string;
   COGNITO_DOMAIN: string;
@@ -27,7 +27,7 @@ function getConstants(): {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
-  MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
+  MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -47,6 +47,7 @@ function getConstants(): {
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const PCLUSTER_API_URL = config.parallelClusterApiURL;
+  const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URL = config.websiteUrl;
   const USER_POOL_ID = config.userPoolId;
@@ -56,32 +57,32 @@ function getConstants(): {
   const AMI_IDS: string[] = [];
 
   // These are the OutputKey for the SWB Main Account CFN stack
-  const SSM_DOC_NAME_SUFFIX = 'SSMDocOutput';
-  const S3_ACCESS_BUCKET_ARN_NAME = 'S3BucketAccessLogArnOutput';
-  const S3_ARTIFACT_BUCKET_ARN_NAME = 'S3BucketArtifactsArnOutput';
-  const S3_DATASETS_BUCKET_ARN_NAME = 'S3BucketDatasetsArnOutput';
-  const LAUNCH_CONSTRAINT_ROLE_NAME = 'LaunchConstraintIamRoleNameOutput';
-  const STATUS_HANDLER_ARN_NAME = 'StatusHandlerLambdaArnOutput';
-  const MAIN_ACCT_ENCRYPTION_KEY_NAME = 'MainAccountEncryptionKeyOutput';
+  const SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
+  const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
+  const S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
+  const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
+  const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+  const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
 
   return {
     STAGE: config.stage,
     STACK_NAME,
     SC_PORTFOLIO_NAME,
     AWS_REGION,
-    SSM_DOC_NAME_SUFFIX,
-    S3_ACCESS_BUCKET_ARN_NAME,
+    SSM_DOC_OUTPUT_KEY_SUFFIX,
+    S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
     S3_ACCESS_BUCKET_PREFIX,
-    S3_ARTIFACT_BUCKET_ARN_NAME,
-    S3_DATASETS_BUCKET_ARN_NAME,
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+    S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
     S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX,
-    LAUNCH_CONSTRAINT_ROLE_NAME,
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
     ROOT_USER_EMAIL,
     USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
-    STATUS_HANDLER_ARN_NAME,
+    STATUS_HANDLER_ARN_OUTPUT_KEY,
     PCLUSTER_API_URL,
     ALLOWED_ORIGINS: JSON.stringify(config.allowedOrigins),
     COGNITO_DOMAIN,
@@ -89,7 +90,7 @@ function getConstants(): {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    MAIN_ACCT_ENCRYPTION_KEY_NAME
+    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
   };
 }
 
