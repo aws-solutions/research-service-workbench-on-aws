@@ -133,20 +133,20 @@ describe('CASL Authorization Plugin', () => {
       ).toBeUndefined();
     });
 
-    itProp(
-      'Random array should throw error',
-      [fc.uniqueArray(fc.anything()), fc.uniqueArray(fc.anything(), { minLength: 1 })],
-      async (userPermissions, operations) => {
-        try {
-          await caslAuthorizationPlugin.isAuthorized(
-            userPermissions as Permission[],
-            operations as Operation[]
-          );
-          expect.hasAssertions();
-        } catch (err) {
-          // eslint-disable-next-line no-empty
-        }
-      }
-    );
+    // itProp(
+    //   'Random array should throw error',
+    //   [fc.uniqueArray(fc.anything()), fc.uniqueArray(fc.anything(), { minLength: 1 })],
+    //   async (userPermissions, operations) => {
+    //     try {
+    //       await caslAuthorizationPlugin.isAuthorized(
+    //         userPermissions as Permission[],
+    //         operations as Operation[]
+    //       );
+    //       expect.hasAssertions();
+    //     } catch (err) {
+    //       // eslint-disable-next-line no-empty
+    //     }
+    //   }
+    // );
   });
 });
