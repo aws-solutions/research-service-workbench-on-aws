@@ -123,64 +123,64 @@ jobs:
           branch: test-develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-  merge-to-test-stage:
-    runs-on: ubuntu-20.04
-    needs: [merge-to-test-develop]
-    permissions:
-      id-token: write
-      contents: read
-    env:
-      COMMIT_HASH: "${{ needs.merge-to-test-develop.outputs.develop_commit_hash }}"
-    steps:
-      - name: git checkout
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.MERGE_TOKEN }}
-          fetch-depth: 0
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-      # There's no way for github actions to push to a protected branch. This is a workaround
-      # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on test-stage
-        uses: octokit/request-action@v2.x
-        with:
-          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
-          repo: monorepo-for-service-workbench
-          branch: test-stage
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+  # merge-to-test-stage:
+  #   runs-on: ubuntu-20.04
+  #   needs: [merge-to-test-develop]
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   env:
+  #     COMMIT_HASH: "${{ needs.merge-to-test-develop.outputs.develop_commit_hash }}"
+  #   steps:
+  #     - name: git checkout
+  #       uses: actions/checkout@v3
+  #       with:
+  #         token: ${{ secrets.MERGE_TOKEN }}
+  #         fetch-depth: 0
+  #     - name: Import GPG key
+  #       uses: crazy-max/ghaction-import-gpg@v4
+  #       with:
+  #         gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+  #         passphrase: ${{ secrets.PASSPHRASE }}
+  #         git_user_signingkey: true
+  #         git_commit_gpgsign: true
+  #     # There's no way for github actions to push to a protected branch. This is a workaround
+  #     # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+  #     - name: Temporarily disable branch protection on test-stage
+  #       uses: octokit/request-action@v2.x
+  #       with:
+  #         route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+  #         owner: awslabs
+  #         repo: monorepo-for-service-workbench
+  #         branch: test-stage
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
       
-      - name: Set git config
-        run: |
-          git config user.email ${{ secrets.BOT-USER-EMAIL }}
-          git config user.name ${{ secrets.BOT-USER }}
-          git config commit.gpgsign true
+  #     - name: Set git config
+  #       run: |
+  #         git config user.email ${{ secrets.BOT-USER-EMAIL }}
+  #         git config user.name ${{ secrets.BOT-USER }}
+  #         git config commit.gpgsign true
 
-      - name: Merge to test-stage
-        run: |
-          echo "Set COMMIT_ID to 'develop' commit hash"
-          COMMIT_ID=$COMMIT_HASH
-          git checkout test-stage
-          echo
-          echo "  Attempting to merge the 'test-develop' branch ($COMMIT_ID)"
-          echo "  into the 'test-develop' branch"
-          echo
-          git merge $COMMIT_ID --ff-only --no-edit
-          git push origin test-stage
+  #     - name: Merge to test-stage
+  #       run: |
+  #         echo "Set COMMIT_ID to 'develop' commit hash"
+  #         COMMIT_ID=$COMMIT_HASH
+  #         git checkout test-stage
+  #         echo
+  #         echo "  Attempting to merge the 'test-develop' branch ($COMMIT_ID)"
+  #         echo "  into the 'test-develop' branch"
+  #         echo
+  #         git merge $COMMIT_ID --ff-only --no-edit
+  #         git push origin test-stage
       
-      - name: Enable branch protection on test-stage
-        uses: octokit/request-action@v2.x
-        if: always() # Make sure to enable branch protection even if other steps fail
-        with:
-          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
-          repo: monorepo-for-service-workbench
-          branch: test-stage
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+  #     - name: Enable branch protection on test-stage
+  #       uses: octokit/request-action@v2.x
+  #       if: always() # Make sure to enable branch protection even if other steps fail
+  #       with:
+  #         route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+  #         owner: awslabs
+  #         repo: monorepo-for-service-workbench
+  #         branch: test-stage
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
