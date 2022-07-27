@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';

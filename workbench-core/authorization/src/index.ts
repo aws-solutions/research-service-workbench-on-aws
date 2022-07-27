@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export { default as PermissionsPlugin } from './permissionsPlugin';
 export { default as Operation } from './operation';
 export { default as AuthorizationPlugin } from './authorizationPlugin';

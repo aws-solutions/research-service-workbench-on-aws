@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
@@ -71,7 +76,11 @@ const User: NextPage = () => {
       </Box>
     );
   };
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/users">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default User;

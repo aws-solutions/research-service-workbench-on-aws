@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
 
 import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
@@ -42,7 +47,9 @@ export default class ProjectService {
 
   /**
    * Get project
-   * projectID - Project Id of project to retrieve
+   * @param projectID - Project Id of project to retrieve
+   *
+   * @returns Project entry in DDB
    */
   public async getProject(projectId: string): Promise<Project> {
     const response = await this._aws.helpers.ddb
@@ -59,6 +66,11 @@ export default class ProjectService {
     }
   }
 
+  /**
+   * List projects
+   *
+   * @returns Project entries in DDB
+   */
   public async listProjects(): Promise<{ data: Project[] }> {
     const queryParams = {
       key: { name: 'resourceType', value: this._resourceType },

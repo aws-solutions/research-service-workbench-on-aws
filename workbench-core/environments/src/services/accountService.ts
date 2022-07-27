@@ -35,7 +35,9 @@ export default class AccountService {
 
   /**
    * Get account from DDB
-   * @param accountId - Env Id of account to retrieve
+   * @param accountId - ID of account to retrieve
+   *
+   * @returns Account entry in DDB
    */
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
@@ -52,6 +54,12 @@ export default class AccountService {
     }
   }
 
+  /**
+   * Create or update hosting account record in DDB
+   * @param accountMetadata - Attributes of account to create/update
+   *
+   * @returns Account entry in DDB
+   */
   public async createOrUpdate(accountMetadata: {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
@@ -60,6 +68,11 @@ export default class AccountService {
     return this.update(accountMetadata);
   }
 
+  /**
+   * Get all account entries from DDB
+   *
+   * @returns Account entries in DDB
+   */
   public async getAccounts(): Promise<Account[]> {
     const queryParams = {
       index: 'getResourceByCreatedAt',
@@ -75,6 +88,12 @@ export default class AccountService {
     return accounts;
   }
 
+  /**
+   * Create hosting account record in DDB
+   * @param accountMetadata - Attributes of account to create
+   *
+   * @returns Account entry in DDB
+   */
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
     const id = uuidv4();
@@ -84,10 +103,14 @@ export default class AccountService {
     return { id, ...accountMetadata };
   }
 
+  /**
+   * Update hosting account record in DDB
+   * @param accountMetadata - Attributes of account to update
+   *
+   * @returns Account entry in DDB
+   */
   public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateUpdate(accountMetadata);
-
-    console.log(JSON.stringify(accountMetadata));
 
     const id = await this._storeToDdb(accountMetadata);
 
@@ -143,8 +166,6 @@ export default class AccountService {
 
     // We add the only optional attribute for account
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
-
-    console.log(JSON.stringify(accountMetadata));
 
     // Store Account row in DDB
     await this._aws.helpers.ddb.update(accountKey, accountParams).execute();

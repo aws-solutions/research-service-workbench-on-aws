@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';

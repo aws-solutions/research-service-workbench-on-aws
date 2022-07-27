@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { Effect, IPrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import _ from 'lodash';
 

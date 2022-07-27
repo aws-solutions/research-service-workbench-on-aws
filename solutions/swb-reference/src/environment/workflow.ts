@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable no-new */
 // cdk-ssm-document is used instead of 'aws-cdk-lib/aws-ssm` because aws-ssm creates new SSM documents instead of updating existing SSM document
 // https://github.com/aws-cloudformation/cloudformation-coverage-roadmap/issues/339

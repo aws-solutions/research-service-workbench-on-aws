@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { useCollection } from '@awsui/collection-hooks';
 import {
   Box,
@@ -460,7 +465,11 @@ const Environment: NextPage = () => {
       </Box>
     );
   };
-  return <BaseLayout breadcrumbs={breadcrumbs}>{getContent()}</BaseLayout>;
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs} activeHref="/environments">
+      {getContent()}
+    </BaseLayout>
+  );
 };
 
 export default Environment;

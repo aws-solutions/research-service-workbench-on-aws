@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CreatePresignedNotebookInstanceUrlCommand, SageMakerClient } from '@aws-sdk/client-sagemaker';
 import { AssumeRoleCommand, STSClient } from '@aws-sdk/client-sts';
 import { mockClient } from 'aws-sdk-client-mock';
