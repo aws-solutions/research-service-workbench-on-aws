@@ -20,6 +20,7 @@ import {
   Multiselect
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useDatasets } from '../../api/datasets';
@@ -31,13 +32,12 @@ import { nameRegex } from '../../common/utils';
 import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
+import { useSettings } from '../../context/SettingsContext';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';
 import { EnvTypeItem } from '../../models/EnvironmentType';
 import { EnvTypeConfigItem } from '../../models/EnvironmentTypeConfig';
 
 const Environment: NextPage = () => {
-  // App settings constant
-
   const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
@@ -49,6 +49,7 @@ const Environment: NextPage = () => {
   const { envTypeConfigs, areEnvTypeConfigsLoading } = useEnvTypeConfigs(formData?.envTypeId || '');
   const { projects, areProjectsLoading } = useProjects();
   const { datasets, areDatasetsLoading } = useDatasets();
+  const { settings } = useSettings();
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -178,6 +179,10 @@ const Environment: NextPage = () => {
     return (
       <Container>
         <Box>
+          <Head>
+            <title>{settings.name}</title>
+            <link rel="icon" href={settings.favicon} />
+          </Head>
           <form onSubmit={(e) => e.preventDefault()}>
             <Form
               errorText={error}

@@ -15,11 +15,13 @@ import {
   Container
 } from '@awsui/components-react';
 import type { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { addUserToRole, createUser } from '../../api/users';
 import { emailRegex, nameRegex } from '../../common/utils';
 import BaseLayout from '../../components/BaseLayout';
+import { useSettings } from '../../context/SettingsContext';
 import { CreateUserForm, CreateUserFormValidation } from '../../models/User';
 
 export interface UserProps {
@@ -27,14 +29,13 @@ export interface UserProps {
 }
 
 const User: NextPage = () => {
-  // App settings constant
-
   const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<CreateUserForm>({ email: '' });
   const [formErrors, setFormErrors] = useState<CreateUserFormValidation>({});
+  const { settings } = useSettings();
 
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
@@ -155,6 +156,10 @@ const User: NextPage = () => {
     return (
       <Container id="userContainer">
         <Box>
+          <Head>
+            <title>{settings.name}</title>
+            <link rel="icon" href={settings.favicon} />
+          </Head>
           <form onSubmit={(e) => e.preventDefault()}>
             <Form
               id="createUser"
