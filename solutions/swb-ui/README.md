@@ -20,23 +20,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 Project swb-ui can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
+1. Navigate to `solutions/swb-ui`
 
-1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
-
-2. Copy API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
-
-    API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
-
-3. Create a file in directory `solutions/swb-ui` with name `.env.local` if it does not exist.
-
-4. Assign `apiUrlOutput` value to environment variable `NEXT_PUBLIC_API_BASE_URL` by updating `.env.local` file with the next format:
-    ```
-    NEXT_PUBLIC_API_BASE_URL="<apiUrlOutput>"
-    ```
-
-5. Navigate to `solutions/swb-ui`
-
-6. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
+2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
 
 
 After the deployment is completed you'll see the following output:
@@ -77,32 +63,19 @@ To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionS
 
 ### Start App
 
-1. Open file `solutions/swb-reference/src/config/<STAGE>.js`
+1. Navigate to `solutions/swb-ui`
 
-2. Copy the API URL value from variable `apiUrlOutput`, the value has the format `https://{apiId}.execute-api.{region}.amazonaws.com/dev/`
-
-    API URL can also be found by logging AWS. Log into the main account and go to Cloudformation on the console. Find the Cloudformation stack for your main account. It should have the format `<swb>-<stage>-<awsRegionShortName>`. In the outputs you'll find `apiUrlOutput` 
-
-3. Assign value to environment variable `NEXT_PUBLIC_API_BASE_URL` by creating a file with name `.env.local` in `swb-ui` directory containing the API URL with the format:
-    ```
-    NEXT_PUBLIC_API_BASE_URL="<API_URL>"
-    ```
-
-4. In the project directory, ensure all dependencies are installed. Run:
+2. In the project directory, ensure all dependencies are installed. Run:
     ```
     rush update
     rush build
     ```
-5. Run the server:
 
+3. Run the server:
     ```
-    rushx start
+    STAGE=<STAGE> rushx dev
     ```
 
-If needed, run the development server with:
-```
-rushx dev
-```
 
 ## App
 
