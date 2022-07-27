@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import Box from '@awsui/components-react/box';
 import Button from '@awsui/components-react/button';
 import Container from '@awsui/components-react/container';

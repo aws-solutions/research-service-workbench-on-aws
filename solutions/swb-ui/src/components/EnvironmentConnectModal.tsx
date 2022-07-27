@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { EnvironmentConnectionLinkPlaceholder } from '@amzn/environments';
 import { Modal, SpaceBetween, Link } from '@awsui/components-react';
 import Box from '@awsui/components-react/box';

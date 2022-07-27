@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { fc, itProp } from 'jest-fast-check';
 import { LEVEL, MESSAGE } from 'triple-beam';
 import { ConsoleTransport } from '../..';

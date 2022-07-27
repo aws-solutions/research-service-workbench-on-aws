@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuditEntry, Writer } from '@amzn/workbench-core-audit';
 import Metadata from '@amzn/workbench-core-audit/lib/metadata';
 import { LoggingService } from '@amzn/workbench-core-logging';

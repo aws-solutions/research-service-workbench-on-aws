@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { BreadcrumbGroupProps } from '@awsui/components-react';
 import AppLayout, { AppLayoutProps } from '@awsui/components-react/app-layout';
 import BreadcrumbGroup from '@awsui/components-react/breadcrumb-group';
@@ -11,9 +16,15 @@ export interface LayoutProps {
   navigationHide?: boolean;
   children: React.ReactNode;
   breadcrumbs: BreadcrumbGroupProps.Item[];
+  activeHref?: string;
 }
 
-export default function Layout({ navigationHide, children, breadcrumbs }: LayoutProps): JSX.Element {
+export default function Layout({
+  navigationHide,
+  children,
+  breadcrumbs,
+  activeHref = '#/'
+}: LayoutProps): JSX.Element {
   // eslint-disable-next-line prefer-const
   let [navigationOpen, setNavigationOpen] = useState(false);
   const { notifications, displayNotification } = useNotifications();
@@ -35,7 +46,7 @@ export default function Layout({ navigationHide, children, breadcrumbs }: Layout
       ariaLabels={appLayoutLabels}
       navigationOpen={navigationOpen}
       navigationHide={navigationHide}
-      navigation={<Navigation activeHref="#/" />}
+      navigation={<Navigation activeHref={activeHref} />}
       notifications={<Flashbar items={Object.values(notifications)} />}
       breadcrumbs={
         <BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />

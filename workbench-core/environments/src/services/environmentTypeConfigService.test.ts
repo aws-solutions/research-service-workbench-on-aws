@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
 jest.mock('uuid', () => ({ v4: () => envTypeConfigId }));
 import {
