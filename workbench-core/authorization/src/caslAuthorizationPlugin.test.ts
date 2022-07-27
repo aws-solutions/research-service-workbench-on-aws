@@ -1,4 +1,3 @@
-import { fc, itProp } from 'jest-fast-check';
 import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError } from '.';
 
 describe('CASL Authorization Plugin', () => {
