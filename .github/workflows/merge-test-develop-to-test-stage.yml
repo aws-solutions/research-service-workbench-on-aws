@@ -5,15 +5,13 @@
 
 name: Merge-develop-to-stage
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
     branches:
       - 'test-develop'
   
 jobs:
   readme-commit:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit-test-develop.yml@test-develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
