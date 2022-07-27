@@ -20,8 +20,8 @@ This project provides the library and utilities function for setting up and mana
   * **statusHandler:** This should execute when an EventBridge event is received from the hosting account. It parses the event and updates environment status in DDB.
 * **interfaces:** Interfaces that reference projects should implement to manage new environment types 
 * **postDeployment**
-  * **cognitoSetup:** This is run after deployment completes and setups root cognito users and groups.
-  * **serviceCataglogSetup:** This is run after deployment completes and setups Service Catalog portfolio in the main account. It also uploads SC products to the portfolio.
+  * **cognitoSetup:** This should be run after deployment completes. This will set up root cognito users and groups.
+  * **serviceCataglogSetup:** This should be run after deployment completes. This will set up Service Catalog portfolio in the main account. It also uploads SC products to the portfolio.
 * **schemas:** JSON schema for API request to manage environment related resources
 * **services:** Manages create/read/update/delete of environment related resources in DDB
 * **utilities:** Helper functions
