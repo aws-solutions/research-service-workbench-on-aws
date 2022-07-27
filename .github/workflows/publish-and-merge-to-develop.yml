@@ -105,7 +105,7 @@ jobs:
           echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
           echo "  into the 'develop' branch"
           echo
-          git merge $COMMIT_ID --ff --no-edit
+          git merge $COMMIT_ID --ff --no-edit -m "Merge main to develop"
           git push origin develop
       
       - name: Enable branch protection on develop
