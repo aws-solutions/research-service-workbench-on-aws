@@ -12,6 +12,7 @@ interface JobSubmitModalProps {
 
 export default function JobSubmitModal(props: JobSubmitModalProps): JSX.Element {
   const [jobForm, setJobForm] = useState<JobParameters>({
+    s3DataFolder: '',
     command: '',
     job_name: '',
     nodes: 0,
@@ -21,6 +22,7 @@ export default function JobSubmitModal(props: JobSubmitModalProps): JSX.Element 
 
   const shouldDisableSubmitButton = (): boolean => {
     return !(
+      jobForm.s3DataFolder !== '' &&
       jobForm.command !== '' &&
       jobForm.job_name !== '' &&
       jobForm.nodes !== 0 &&
@@ -83,11 +85,21 @@ export default function JobSubmitModal(props: JobSubmitModalProps): JSX.Element 
             placeholder="queue0"
           />
         </FormField>
-        <FormField label="Script Path" description="Path to the script to run.">
+        <FormField
+          label="S3 Bucket Data Folder URI"
+          description="S3 URI to data folder containing script and data for job."
+        >
+          <Input
+            onChange={({ detail }) => setJobForm({ ...jobForm, s3DataFolder: detail.value })}
+            value={jobForm.s3DataFolder}
+            placeholder={'s3://my_bucket/my_job/'}
+          />
+        </FormField>
+        <FormField label="Script Name" description="Name of script to run. Must be on S3 bucket.">
           <Input
             onChange={({ detail }) => setJobForm({ ...jobForm, command: detail.value })}
             value={jobForm.command}
-            placeholder={'/home/ec2-user/myscript.sh'}
+            placeholder={'myscript.sh'}
           />
         </FormField>
       </SpaceBetween>

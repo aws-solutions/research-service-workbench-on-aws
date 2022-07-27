@@ -1,6 +1,7 @@
 import { AwsService } from '@amzn/workbench-core-base';
 
 export interface JobParameters {
+  s3DataFolder: string;
   command: string;
   job_name: string;
   nodes: number;

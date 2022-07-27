@@ -77,11 +77,17 @@ export default class HPCService {
   public async submitJob(req: Request): Promise<SSMCommandStatus> {
     const jobParams = req.body as JobParameters;
 
+    const regex = /(?<=\/)([A-Za-z0-9-].*?)(?=\/)/g;
+
+    const pathMatches = jobParams.s3DataFolder.match(regex);
+
+    const s3FolderName = pathMatches![pathMatches!.length - 1];
+
     return this.helper.executeSSMCommand(
       req.params.projectId,
       req.params.instanceId,
       'sbatch',
-      `sbatch --job-name ${jobParams.job_name} --nodes ${jobParams.nodes} --ntasks ${jobParams.ntasks}  --partition ${jobParams.partition} ${jobParams.command}`
+      `rm -rf ${s3FolderName} && mkdir ${s3FolderName} && mkdir ${s3FolderName}/output && aws s3 cp ${jobParams.s3DataFolder} ${s3FolderName} --recursive && cd ${s3FolderName}/output && sbatch --job-name ${jobParams.job_name} --nodes ${jobParams.nodes} --ntasks ${jobParams.ntasks}  --partition ${jobParams.partition} ../${jobParams.command}`
     );
   }
 

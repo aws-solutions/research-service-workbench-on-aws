@@ -34,6 +34,7 @@ export interface SSMCommandStatus {
 }
 
 export interface JobParameters {
+  s3DataFolder: string;
   command: string;
   job_name: string;
   nodes: number;
