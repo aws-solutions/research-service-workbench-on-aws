@@ -3,7 +3,6 @@
 [![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
-[![Viperlight-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Viperlight-scan/badge.svg)
 [![GitHub-release](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)
 [![Lint-PR](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
