@@ -1,0 +1,69 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Cfn-nag-scan
+on: ['pull_request']
+
+jobs:
+  cfn-nag-scan:
+    name: Run cfn-nag scan
+    runs-on: ubuntu-20.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: cdk synth swb-reference
+        run: |
+          cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
+          STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
+
+      - name: cdk synth example
+        run: |
+          cd workbench-core/example/infrastructure
+          node ../../../common/scripts/install-run-rushx.js compile
+          node ../../../common/scripts/install-run-rushx.js cdk synth
+
+      - name: Run cfn-nag on swb-reference cdk.out
+        id: cdk-swb-reference
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
+          extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on example cdk.out
+        id: cdk-example
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
+          extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on onboarding template
+        id: template
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: solutions/swb-reference/src/templates
+          extra_args: --fail-on-warnings -o json
+
+      - name: Grep cfn-nag for violations
+        uses: sergeysova/jq-action@v2
+        id: cfn-nag
+        # No. of violations: warnings + errors
+        with:
+          cmd: jq '.[].file_results.violations | length' cfn_nag.out
+
+      - name: echo violation count
+        run: echo ${{ steps.cfn-nag.outputs.value }}
+
+      # - name: Fail if violations detected in cfn-nag
+      #   run: exit ${{ steps.cfn-nag.outputs.value }}

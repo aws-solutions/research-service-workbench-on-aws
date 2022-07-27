@@ -1,0 +1,195 @@
+description: SSM document to provision a Sagemaker Notebook instance
+assumeRole: ''
+schemaVersion: '0.3'
+parameters:
+  ProductId:
+    type: String
+    description: 'The ProductId to be used from Service Catalog'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
+  EncryptionKeyArn:
+    type: String
+    description: 'The encryption key ARN to be used'
+    allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+  CIDR:
+    type: String
+    description: 'The initial CIDR block to be granted access'
+    allowedPattern: ^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$
+  ProvisioningArtifactId:
+    type: String
+    description: 'The ProvisioningArtifactId to be used from Service Catalog'
+    allowedPattern: ^pa-[a-zA-Z0-9_\-]{1,100}$
+  VPC:
+    type: String
+    description: 'The VPC to be used where the environment will reside'
+    allowedPattern: ^vpc-[a-zA-Z0-9]+$
+  Subnet:
+    type: String
+    description: 'The Subnet to be used where the environment will reside'
+    allowedPattern: ^subnet-[a-zA-Z0-9]+$
+  EnvId:
+    type: String
+    description: 'The ID of the environment resource stored in DDB'
+    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+  Namespace:
+    type: String
+    description: 'The namespace to be used for creating the CfN stack resources'
+    default: 'swbv2-Sagemaker'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
+  InstanceName:
+    type: String
+    description: '(Required) The name of the Sagemaker instance being provisioned.'
+    allowedPattern: ^[a-zA-Z0-9][a-zA-Z0-9._-]{1,128}$
+  PathId:
+    type: String
+    description: 'The Path ID for the Service Catalog product.'
+    allowedPattern: ^[a-zA-Z0-9_\-]{1,100}$
+  EnvironmentInstanceFiles:
+    type: String
+    description: 'An S3 URI (starting with "s3://") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts'
+    allowedPattern: ^s3:\/\/[a-zA-Z0-9_\-\/]+$
+  AutoStopIdleTimeInMinutes:
+    type: String
+    description: 'Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)'
+    default: '0'
+    allowedPattern: \d+
+  InstanceType:
+    type: String
+    description: 'The size of the notebook instance coming from environment type config'
+    allowedPattern: ^[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+$
+  S3Mounts:
+    type: String
+    description: Stringified array of dataset objects containing their mountString
+    allowedPattern: ^\[.*\]$
+  IamPolicyDocument:
+    type: String
+    description: The IAM policy to be associated with the launched workstation
+    allowedPattern: ^\{.*\}$
+  DatasetsBucketArn:
+    type: String
+    description: The ARN of the Datasets bucket in the main account
+    allowedPattern: ^arn:aws:s3:::[a-zA-Z0-9_\-\/]+$
+  MainAccountId:
+    type: String
+    description: The Main Account ID where application is deployed
+    allowedPattern: \d{12}
+  MainAccountRegion:
+    type: String
+    description: The region of application deployment in main account
+    allowedPattern: ^\w{2,3}-\w+-\d{1}$
+  MainAccountKeyArn:
+    type: String
+    description: The ARN of main account bucket encryption key
+    allowedPattern: ^arn:aws:kms:(us(-gov)?|ap|ca|cn|eu|sa)-(central|(north|south)?(east|west)?)-\d:\d{12}:key\/[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+mainSteps:
+  - name: Launch
+    action: 'aws:executeAwsApi'
+    maxAttempts: 3
+    timeoutSeconds: 30
+    inputs:
+      Service: servicecatalog
+      Api: ProvisionProduct
+      ProductId: '{{ ProductId }}'
+      ProvisionedProductName: '{{ InstanceName }}'
+      PathId: '{{ PathId }}'
+      ProvisioningArtifactId: '{{ ProvisioningArtifactId }}'
+      ProvisioningParameters:
+        - Key: EncryptionKeyArn
+          Value: '{{ EncryptionKeyArn }}'
+        - Key: VPC
+          Value: '{{ VPC }}'
+        - Key: AccessFromCIDRBlock
+          Value: '{{ CIDR }}'
+        - Key: S3Mounts
+          Value: '{{ S3Mounts }}'
+        - Key: Namespace
+          Value: '{{ Namespace }}'
+        - Key: IamPolicyDocument
+          Value: '{{ IamPolicyDocument }}'
+        - Key: InstanceType
+          Value: '{{ InstanceType }}'
+        - Key: Subnet
+          Value: '{{ Subnet }}'
+        - Key: EnvironmentInstanceFiles
+          Value: '{{ EnvironmentInstanceFiles }}'
+        - Key: AutoStopIdleTimeInMinutes
+          Value: '{{ AutoStopIdleTimeInMinutes }}'
+        - Key: DatasetsBucketArn
+          Value: '{{ DatasetsBucketArn }}'
+        - Key: MainAccountId
+          Value: '{{ MainAccountId }}'
+        - Key: MainAccountRegion
+          Value: '{{ MainAccountRegion }}'
+        - Key: MainAccountKeyArn
+          Value: '{{ MainAccountKeyArn }}'
+      Tags:
+        - Key: Env
+          Value: '{{ EnvId }}'
+    outputs:
+      - Name: ProvisionedProductId
+        Type: String
+        Selector: '$.RecordDetail.ProvisionedProductId'
+      - Name: RecordId
+        Type: String
+        Selector: '$.RecordDetail.RecordId'
+    description: Launch Sagemaker
+    nextStep: WaitForProvisioning
+  - name: WaitForProvisioning
+    action: 'aws:waitForAwsResourceProperty'
+    timeoutSeconds: 600
+    inputs:
+      Service: servicecatalog
+      Api: DescribeProvisionedProduct
+      Id: '{{ Launch.ProvisionedProductId }}'
+      DesiredValues:
+        - AVAILABLE
+        - ERROR
+      PropertySelector: '$.ProvisionedProductDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetProvisionedProductDetail
+  - name: GetProvisionedProductDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeProvisionedProduct
+      Id: '{{ Launch.ProvisionedProductId }}'
+    outputs:
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.ProvisionedProductDetail.Status'
+      - Name: ErrorMessage
+        Type: String
+        Selector: '$.ProvisionedProductDetail.StatusMessage'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: AVAILABLE
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetProvisionedProductDetail.ProductStatus }}'
+          StringEquals: ERROR
+      Default: PushFailureStatusToEventBridge
+  - name: PushMetadataToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ Launch.ProvisionedProductId }}", "RecordId": "{{ Launch.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Launch", "Status": "COMPLETED" }'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
+    isEnd: true
+  - name: PushFailureStatusToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ Launch.ProvisionedProductId }}", "RecordId": "{{ Launch.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Launch", "Status": "FAILED", "ErrorMessage": "{{ GetProvisionedProductDetail.ErrorMessage }}" }'
+          DetailType: 'Launch'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
+    isEnd: true

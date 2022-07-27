@@ -1,8 +1,30 @@
-import { EnvironmentConnectionService, EnvironmentLifecycleService } from '@amzn/environments';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import {
+  HostingAccountService,
+  EnvironmentConnectionService,
+  EnvironmentLifecycleService,
+  EnvironmentService,
+  EnvironmentTypeService,
+  EnvironmentTypeConfigService,
+  ProjectService
+} from '@amzn/environments';
+import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
+  account: HostingAccountService;
+  environmentService: EnvironmentService;
+  dataSetService: DataSetService;
+  dataSetsStoragePlugin: DataSetsStoragePlugin;
+  allowedOrigins: string[];
+  environmentTypeService: EnvironmentTypeService;
+  environmentTypeConfigService: EnvironmentTypeConfigService;
+  projectService: ProjectService;
 }
 
 export interface ApiRoute {

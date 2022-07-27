@@ -2,10 +2,12 @@
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
   "coveragePathIgnorePatterns": [
+    "<rootDir>/src/hostingAccountService.ts",
     "<rootDir>/src/environmentConnectionService.ts",
     "<rootDir>/src/environmentLifecycleService.ts",
     "<rootDir>/src/eventBridgeEventToDDB.ts",
     "<rootDir>/src/environmentStatus.ts",
+    "<rootDir>/src/accountHandler.ts",
     "<rootDir>/src/index.ts"
   ],
   "coverageThreshold": {

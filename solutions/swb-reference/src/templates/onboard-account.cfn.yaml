@@ -10,7 +10,7 @@ Parameters:
 
   Namespace:
     Type: String
-    Description: An environment name that will be prefixed to resource names
+    Description: An environment name that will be prefixed to resource names. Make sure this matches the one declared in your constants file.
 
   MainAccountId:
     Type: String
@@ -31,11 +31,11 @@ Parameters:
 
   AccountHandlerRoleArn:
     Type: String
-    Description: The arn of accountHandler role
-
-  MainAccountEventBusArn:
+    Description: The arn of main account accountHandler role
+  
+  StatusHandlerRoleArn:
     Type: String
-    Description: The arn of the event bus in the main account's EventBridge service
+    Description: The arn of statusHandler role
 
   # Generous subnet allocation of 8192 addresses
   # Range from 10.0.0.0 to 10.0.31.255
@@ -83,7 +83,7 @@ Resources:
   EnvManagementRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'xacc-env-mgmt']]
+      RoleName: !Join ['-', [Ref: Namespace, 'env-mgmt']]
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -93,6 +93,7 @@ Resources:
               AWS:
                 - !Join [':', ['arn:aws:iam:', Ref: MainAccountId, 'root']]
                 - !Ref ApiHandlerRoleArn
+                - !Ref StatusHandlerRoleArn
             Action:
               - 'sts:AssumeRole'
             Condition:
@@ -101,6 +102,14 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess
       Policies:
+        - PolicyName: eventbus-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
         - PolicyName: cfn-access
           PolicyDocument:
             Version: '2012-10-17'
@@ -125,9 +134,19 @@ Resources:
             Statement:
               Effect: Allow
               Action:
+                - ssm:SendCommand
                 - ssm:StartAutomationExecution
               Resource:
-                - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:document/${Namespace}'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*'
+        - PolicyName: iam-pass-role
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${Namespace}*'
         - PolicyName: s3-access
           PolicyDocument:
             Statement:
@@ -136,7 +155,15 @@ Resources:
                 - s3:GetObject
               Resource:
                 - 'arn:aws:s3:::cf-templates-*/*'
-        - PolicyName: sagemaker-access
+        - PolicyName: servicecatalog-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicecatalog:DescribeRecord
+              Resource:
+                - '*'
+        - PolicyName: sagemakerNotebook-access
           PolicyDocument:
             Statement:
               Effect: Allow
@@ -145,7 +172,24 @@ Resources:
                 - sagemaker:ListNotebookInstances
                 - sagemaker:StartNotebookInstance
                 - sagemaker:StopNotebookInstance
+                - sagemaker:DescribeNotebookInstance
               Resource: '*'
+        # Needed for performing start operation on instances in a given network
+        - PolicyName: network-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:DescribeSubnets
+                - ec2:DescribeVpcs
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DescribeSecurityGroups
+                - ec2:DescribeAvailabilityZones
+                - ec2:DescribeAccountAttributes
+                - ec2:CreateTags
+                - ec2:DeleteTags
+                - ec2:DescribeInternetGateways
+              Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
         - PolicyName: iam-role-access
           PolicyDocument:
             Statement:
@@ -176,14 +220,23 @@ Resources:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Permission boundary for cross account EnvMgmt role
+      Description: Permission boundary for hosting account EnvMgmt role
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
           - Effect: Allow
             Action:
               - s3:*
@@ -193,7 +246,6 @@ Resources:
               - ssm:*
               - config:*
               - servicecatalog:*
-              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:
@@ -245,11 +297,20 @@ Resources:
               - iam:ListRoles
               - iam:ListUsers
             Resource: '*' # These non-mutating IAM actions cover the permissions in managed policy AWSServiceCatalogAdminFullAccess
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: F40
+            reason: "There is a condition so that this role can only be passed to Service Catalog per these instructions: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_iam-passrole-service.html"
+          - id: F5
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+          - id: W13
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
 
-  PolicyCrossAccountHandler:
+  PolicyHostingAccountHandler:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Description: Allows main account to perform critical analytics on workspaces provisioned in member accounts
+      Description: Allows main account to setup hosting account with required resources for launching environments
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -263,6 +324,12 @@ Resources:
             Resource:
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SC-*'
               - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/initial-stack*'
+          - Effect: Allow
+            Action:
+              - cloudformation:GetTemplate
+              - cloudformation:DescribeStacks
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
           - Effect: Allow
             Action:
               - sagemaker:ListNotebookInstances
@@ -280,6 +347,7 @@ Resources:
           - Effect: Allow
             Action:
               - iam:CreateRole
+              - iam:GetRole
               - iam:TagRole
               - iam:GetRolePolicy
               - iam:PutRolePolicy
@@ -293,6 +361,10 @@ Resources:
             Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
           - Effect: Allow
             Action:
+              - iam:GetRole
+            Resource: !GetAtt EnvManagementRole.Arn
+          - Effect: Allow
+            Action:
               - ce:GetCostAndUsage
             Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
           - Effect: Allow
@@ -303,12 +375,19 @@ Resources:
           - Effect: Allow
             Action:
               - servicecatalog:AcceptPortfolioShare
+              - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: "For the cost explorer and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
 
-  CrossAccountHandlerRole:
+
+  HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'cross-account-role']]
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -324,8 +403,8 @@ Resources:
               StringEquals:
                 sts:ExternalId: !Ref ExternalId
       ManagedPolicyArns:
-        - !Ref PolicyCrossAccountHandler
-      PermissionsBoundary: !Ref PolicyCrossAccountHandler
+        - !Ref PolicyHostingAccountHandler
+      PermissionsBoundary: !Ref PolicyHostingAccountHandler
 
   VPC:
     Type: AWS::EC2::VPC
@@ -447,6 +526,11 @@ Resources:
             Condition:
               StringEquals:
                 kms:CallerAccount: !Ref 'AWS::AccountId'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F76
+            reason: "There is a condition so that the only caller that can use this KMS key is the aws account. The syntax for the Principal element does not provide a way to specify all identities in an AWS account. But you can achieve this effect by combining the condition key kms:CallerAccount with a Principal element that specifies all AWS identities."
 
   EncryptionKeyAlias:
     Type: AWS::KMS::Alias
@@ -454,30 +538,31 @@ Resources:
       AliasName: !Join ['', ['alias/', Ref: Namespace, '-encryption-key']]
       TargetKeyId: !Ref EncryptionKey
 
-  HostEventBus:
-    Type: AWS::Events::EventBus
-    Properties:
-      Name: !Ref Namespace
-
-  EventRuleMainRouting:
+  StateChangeEventRuleMainRouting:
     Type: 'AWS::Events::Rule'
     Properties:
-      Description: Routes to the main event bus
-      EventBusName: !Ref HostEventBus
+      Description: Routes environment state changes to the main event bus
+      EventBusName: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
       State: ENABLED
       EventPattern:
+        account:
+          - !Ref 'AWS::AccountId'
+        detail-type:
+          - anything-but: 'AWS API Call via CloudTrail'
         source:
-          - aws.sagemaker
-        detail:
-          - SageMaker Notebook Instance State Change
+          - anything-but:
+            - 'aws-config'
+            - 'aws-cloudtrail'
+            - 'aws-ssm'
+            - 'aws-tag'
       Targets:
-        - Arn: !Ref MainAccountEventBusArn
+        - Arn: !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
           Id: 'MainAccountRoutingRule'
           RoleArn: !GetAtt 
-            - EventBridgeIAMrole
+            - StateChangeEventBridgeIAMrole
             - Arn
 
-  EventBridgeIAMrole:
+  StateChangeEventBridgeIAMrole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -485,7 +570,11 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Service: !Sub events.amazonaws.com
+              Service: events.amazonaws.com
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
             Action: 'sts:AssumeRole'
       Path: /
       Policies:
@@ -495,24 +584,24 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - 'events:PutEvents'
+                  - 'events:Put*'
                 Resource:
-                  - !Ref MainAccountEventBusArn
+                  - !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
 
 Outputs:
   EnvMgmtRoleArn:
-    Description: The arn of the cross account role for environment management using AWS Service Catalog
+    Description: The arn of the hosting account role for environment management using AWS Service Catalog
     Value: !GetAtt [EnvManagementRole, Arn]
 
-  CrossAccountHandlerRoleArn:
-    Description: The arn of the cross account role.
-    Value: !GetAtt [CrossAccountHandlerRole, Arn]
+  HostingAccountHandlerRoleArn:
+    Description: The arn of the hosting account role.
+    Value: !GetAtt [HostingAccountHandlerRole, Arn]
 
   VPC:
     Description: VPC ID
     Value: !Ref VPC
 
-  VpcPublicSubnet:
+  VpcSubnet:
     Description: A reference to the public subnet in the 1st Availability Zone
     Value: !Ref PublicSubnet
 
@@ -523,7 +612,4 @@ Outputs:
   PublicRouteTableId:
     Description: The public route table assigned to the workspace VPC
     Value: !Ref PublicRouteTable
-
-  HostEventBusArn:
-    Description: The arn of the hosting account EventBus
-    Value: !GetAtt [HostEventBus, Arn]
+    

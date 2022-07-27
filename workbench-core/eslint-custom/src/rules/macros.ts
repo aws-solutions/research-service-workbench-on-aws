@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
@@ -60,7 +65,8 @@
 //   },
 //   . . .
 // ]
-const expandNamingConventionSelectors = (inputBlocks: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const expandNamingConventionSelectors = (inputBlocks: any): any[] => {
   const firstPassBlocks = [];
 
   // Expand "selectors" --> "selector"

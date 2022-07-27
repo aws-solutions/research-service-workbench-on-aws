@@ -188,6 +188,13 @@
       "enableParallelism": true
     },
     {
+      "name": "sort-package-json",
+      "commandKind": "bulk",
+      "summary": "Sort package.json file",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "make-badges",
       "commandKind": "bulk",
       "summary": "Used to update README file with code coverage report for the packages",
@@ -195,28 +202,73 @@
       "enableParallelism": true
     },
     {
+      "name": "pkg-json-lint",
+      "commandKind": "bulk",
+      "summary": "Run lint on package.json files",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "lint:fix",
+      "commandKind": "bulk",
+      "summary": "lint fix",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "depcheck",
+      "commandKind": "bulk",
+      "summary": "Check unused dependecies and devDependencies",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
+      "commandKind": "global",
+      "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\""
+    },
+    {
+      "name": "common-coverage",
+      "commandKind": "global",
+      "summary": "Updates the common code coverage report in root README file",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "istanbul",
+      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --exitCode=1"
+    },
+    {
+      "name": "common-coverage-make-badge",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir and updates the code coverage report in root README file",
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage && git add README.md"
+      "shellCommand": "istanbul-combine -d coverage -p summary -r json-summary \"*/**/temp/coverage/coverage-final.json\" && istanbul-badges-readme --coverageDir=coverage --exitCode=1 && git add README.md"
     },
     {
-      "name": "common-coverage-ci",
+      "name": "commitlint",
       "commandKind": "global",
-      "summary": "[To be used in the Pipeline] The --ci argument will throw an error if the badges generated do not match what is already in the README file",
+      "summary": "Conventional commit check on commit messages",
       "safeForSimultaneousRushProcesses": true,
-      "autoinstallerName": "istanbul",
-      "shellCommand": "istanbul-badges-readme --coverageDir=coverage --ci"
+      "autoinstallerName": "commitlint",
+      "shellCommand": "commitlint"
     },
-    // {
-    //   "name": "heft:build",
-    //   "commandKind": "bulk",
-    //   "summary": "Run heft build, also performs eslint",
-    //   "safeForSimultaneousRushProcesses": true,
-    //   "enableParallelism": true
-    // },
+    {
+      "name": "commitizen",
+      "commandKind": "global",
+      "summary": "Prepare conventional commit messages",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "commitizen",
+      "shellCommand": "bash .github/workflows/scripts/commitizen.sh"
+    },
+    {
+      "name": "git-secrets-scan",
+      "commandKind": "global",
+      "summary": "Used to perform a git-secrets scan on the packages",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "bash .github/workflows/scripts/git-secrets-scan.sh"
+    },
     {
       "name": "prettier",
       "commandKind": "global",
@@ -225,6 +277,20 @@
       "autoinstallerName": "rush-prettier",
       // This will invoke common/autoinstallers/rush-prettier/node_modules/.bin/pretty-quick
       "shellCommand": "pretty-quick --staged"
+    },
+    {
+      "name": "cinstall",
+      "commandKind": "global",
+      "summary": "Run rush install with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy && node common/scripts/install-hooks"
+    },
+    {
+      "name": "cupdate",
+      "commandKind": "global",
+      "summary": "Run rush update with bypass-policy and perform custom git-hook install",
+      "safeForSimultaneousRushProcesses": true,
+      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy && node common/scripts/install-hooks"
     }
   ],
 
@@ -234,10 +300,29 @@
    */
   "parameters": [
     {
+      "parameterKind": "string",
+      "argumentName": "FILE",
+      "longName": "--edit",
+      "description": "read last commit message from the specified file or fallbacks to ./.git/COMMIT_EDITMSG",
+      "associatedCommands": ["commitlint"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Option to run make install in ci jobs",
+      "associatedCommands": ["git-secrets-scan"]
+    },
+    {
       "parameterKind": "flag",
       "longName": "--ci",
       "description": "Throws an error if the badges generated do not match what is already in the README.md",
       "associatedCommands": ["make-badges"]
+    },
+    {
+      "parameterKind": "flag",
+      "longName": "--ci",
+      "description": "Throws an error if the badges generated do not match what is already in the README.md",
+      "associatedCommands": ["common-coverage"]
     }
     // {
     //   /**
