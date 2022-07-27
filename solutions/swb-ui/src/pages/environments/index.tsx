@@ -35,7 +35,6 @@ import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
 import BaseLayout from '../../components/BaseLayout';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
 import { useNotifications } from '../../context/NotificationContext';
-import { useSettings } from '../../context/SettingsContext';
 import {
   columnDefinitions,
   searchableColumns
