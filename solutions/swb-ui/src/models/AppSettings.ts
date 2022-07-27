@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export enum Language {
   en = 'en',
   es = 'es',
@@ -15,9 +20,9 @@ export interface AppSettings {
 
 export const defaultAppSettings: AppSettings = {
   language: Language.en,
-  logo: 'logo-image.png',
-  favicon: 'favicon.ico',
-  name: 'Service Workbench on AWS',
+  logo: '/logo-image.png',
+  favicon: '/favicon.ico',
+  name: 'Service Workbench on AWS (BETA)',
   slogan: '',
   description: ''
 };

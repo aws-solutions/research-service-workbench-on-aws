@@ -1,6 +1,13 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import { LoggingService } from '@amzn/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationService from './authorizationService';
+import { AuthenticatedUserNotFoundError } from './errors/authenticatedUserNotFoundError';
 import { HTTPMethod, HTTPMethods } from './routesMap';
 /**
  * Checks to ensure user object is an instance of {@link AuthenticatedUser}.
@@ -10,19 +17,20 @@ import { HTTPMethod, HTTPMethods } from './routesMap';
 function instanceOfAuthenticatedUser(user: object): user is AuthenticatedUser {
   return user instanceof Object && user.hasOwnProperty('roles') && user.hasOwnProperty('id');
 }
+
 /**
  * Retrieves the user from the {@link Response}.
  * @param res - {@link Response}
  * @returns - {@link AuthenticatedUser}
  *
- * @throws {@link Error}
+ * @throws {@link AuthenticatedUserNotFoundError}
  * Throws an error when authenticated user is not found.
  */
 export function retrieveUser(res: Response): AuthenticatedUser {
   if (instanceOfAuthenticatedUser(res.locals.user)) {
     return res.locals.user;
   }
-  throw new Error('Authenticated user is not found');
+  throw new AuthenticatedUserNotFoundError('Authenticated user is not found');
 }
 /**
  * Checks whether the string method is a valid {@link HTTPMethod}
@@ -39,7 +47,10 @@ function checkMethod(method: string): method is HTTPMethod {
  * @returns - The authorization middleware function.
  */
 export default function withAuth(
-  authorizationService: AuthorizationService
+  authorizationService: AuthorizationService,
+  options?: {
+    logger?: LoggingService;
+  }
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   /**
    * Authorization Middleware
@@ -58,6 +69,8 @@ export default function withAuth(
         }
       } else throw new Error('Method is not valid');
     } catch (err) {
+      // log if a logger is provided
+      options?.logger?.error(err);
       res.status(403).json({ error: 'User is not authorized' });
     }
   };

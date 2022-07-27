@@ -163,7 +163,7 @@ Resources:
                 - servicecatalog:DescribeRecord
               Resource:
                 - '*'
-        - PolicyName: sagemaker-access
+        - PolicyName: sagemakerNotebook-access
           PolicyDocument:
             Statement:
               Effect: Allow
@@ -220,6 +220,11 @@ Resources:
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
                 - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
       PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -241,7 +246,6 @@ Resources:
               - ssm:*
               - config:*
               - servicecatalog:*
-              - ec2-instance-connect:*
             Resource: '*'
           - Effect: Allow
             Action:
@@ -293,6 +297,15 @@ Resources:
               - iam:ListRoles
               - iam:ListUsers
             Resource: '*' # These non-mutating IAM actions cover the permissions in managed policy AWSServiceCatalogAdminFullAccess
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: F40
+            reason: "There is a condition so that this role can only be passed to Service Catalog per these instructions: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_iam-passrole-service.html"
+          - id: F5
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+          - id: W13
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
 
   PolicyHostingAccountHandler:
     Type: AWS::IAM::ManagedPolicy
@@ -364,6 +377,12 @@ Resources:
               - servicecatalog:AcceptPortfolioShare
               - servicecatalog:AssociatePrincipalWithPortfolio
             Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: "For the cost explorer and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+
 
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
@@ -507,6 +526,11 @@ Resources:
             Condition:
               StringEquals:
                 kms:CallerAccount: !Ref 'AWS::AccountId'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F76
+            reason: "There is a condition so that the only caller that can use this KMS key is the aws account. The syntax for the Principal element does not provide a way to specify all identities in an AWS account. But you can achieve this effect by combining the condition key kms:CallerAccount with a Principal element that specifies all AWS identities."
 
   EncryptionKeyAlias:
     Type: AWS::KMS::Alias

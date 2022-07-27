@@ -1,9 +1,22 @@
-import useSWR from 'swr';
-import { EnvironmentItem, EnvironmentConnectResponse } from '../models/Environment';
-import { httpApiGet, httpApiPut, httpApiDelete } from './apiHelper';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 
-const useEnvironments = () => {
-  const { data, mutate } = useSWR('environments', httpApiGet, { refreshInterval: 5000 });
+import useSWR from 'swr';
+import {
+  EnvironmentItem,
+  EnvironmentConnectResponse,
+  CreateEnvironmentForm,
+  EnvironmentsQueryParams
+} from '../models/Environment';
+import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
+import { convertToRecord } from '../common/utils';
+
+const useEnvironments = (params?: EnvironmentsQueryParams) => {
+  let queryString = new URLSearchParams(convertToRecord(params)).toString();
+  queryString = queryString ? `?${queryString}` : '';
+  const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);
 
   // `/environments` API returns a JSON in this format
   // { data: [], paginationToken: ''}
@@ -14,7 +27,16 @@ const useEnvironments = () => {
     item.workspaceStatus = item.status;
     item.project = item.projectId;
   });
-  return { environments, mutate };
+  return {
+    environments,
+    mutate,
+    paginationToken: data && data.paginationToken,
+    areEnvironmentsLoading: isValidating
+  };
+};
+
+const createEnvironment = async (environment: CreateEnvironmentForm): Promise<void> => {
+  await httpApiPost('environments', { ...environment });
 };
 
 const start = async (id: string): Promise<void> => {
@@ -26,11 +48,11 @@ const stop = async (id: string): Promise<void> => {
 };
 
 const terminate = async (id: string): Promise<void> => {
-  await httpApiDelete(`environments/${id}`, {});
+  await httpApiPut(`environments/${id}/terminate`, {});
 };
 
 const connect = async (id: string): Promise<EnvironmentConnectResponse> => {
-  return await httpApiGet(`environments/${id}/connections`, {});
+  return httpApiGet(`environments/${id}/connections`, {});
 };
 
-export { useEnvironments, start, stop, terminate, connect };
+export { useEnvironments, start, stop, terminate, connect, createEnvironment };

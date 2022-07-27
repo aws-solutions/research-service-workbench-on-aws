@@ -1,5 +1,9 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 export interface DataSet {
-  [key: string]: string | string[] | undefined;
   /**
    * an internally generated value which uniquely identifies the dataset.
    */
@@ -26,7 +30,7 @@ export interface DataSet {
   path: string;
 
   /**
-   * the endpoints through which the dataset is accessible.
+   * the Ids endpoints through which the dataset is accessible.
    */
   externalEndpoints?: string[];
 

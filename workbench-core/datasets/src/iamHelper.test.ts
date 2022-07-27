@@ -1,5 +1,10 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
-import IamHelper from './iamHelper';
+import { IamHelper } from './iamHelper';
 
 describe('IamHelper', () => {
   describe('compareStatementPrincipal', () => {
@@ -250,6 +255,131 @@ describe('IamHelper', () => {
       `)
       );
       expect(IamHelper.compareStatementAction(source, target)).toBe(true);
+    });
+  });
+
+  describe('containsStatementId', () => {
+    it('returns false when the source and target SIDs do not match.', () => {
+      const source = PolicyDocument.fromJson({
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Sid: 'StatementToCheck',
+            Principal: {
+              AWS: '*'
+            },
+            Action: '*',
+            Effect: 'Allow',
+            Resource: '*'
+          }
+        ]
+      });
+      const targetSid = 'StatementDifferentThanExpected';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeFalsy();
+    });
+
+    it('returns true when the a statement SID in source doc and target SID match.', () => {
+      const source = PolicyDocument.fromJson({
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Sid: 'StatementToCheck',
+            Principal: {
+              AWS: '*'
+            },
+            Action: '*',
+            Effect: 'Allow',
+            Resource: '*'
+          }
+        ]
+      });
+      const targetSid = 'StatementToCheck';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeTruthy();
+    });
+
+    it('returns false when statements do not exist in source doc', () => {
+      const source = new PolicyDocument();
+      const targetSid = 'StatementToCheck';
+      expect(IamHelper.containsStatementId(source, targetSid)).toBeFalsy();
+    });
+  });
+
+  describe('addPrincipalToStatement', () => {
+    it('returns empty doc if source doc is empty', () => {
+      const source = new PolicyDocument();
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = `arn:aws:iam::newAccountId:root`;
+      try {
+        IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
+      } catch (err) {
+        expect(err.message).toBe('Cannot add principal. Policy document is invalid');
+      }
+    });
+
+    it('adds principal in new array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: 'arn:aws:iam::oldAccountId:root'
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::newAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
+    });
+
+    it('adds principal in existing array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::oldAccountId2:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: [
+            'arn:aws:iam::oldAccountId:root',
+            'arn:aws:iam::oldAccountId2:root',
+            'arn:aws:iam::newAccountId:root'
+          ]
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.addPrincipalToStatement(source, targetSid, newPrincipal);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
     });
   });
 

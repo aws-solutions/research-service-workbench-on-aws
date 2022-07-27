@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AppLayoutProps, BarChart, Box, Button, SplitPanelProps } from '@awsui/components-react';
 import { useEffect, useState } from 'react';
 
@@ -111,7 +116,7 @@ export const getPanelContent = (items: any, itemType: string): any => {
 };
 
 export const useSplitPanel = (selectedItems: any): AppLayoutProps => {
-  const [splitPanelSize, setSplitPanelSize] = useState(300);
+  const [splitPanelSize, setSplitPanelSize] = useState(650);
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
   const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
 

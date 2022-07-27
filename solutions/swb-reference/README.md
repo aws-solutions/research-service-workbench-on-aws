@@ -1,8 +1,8 @@
+# swb-reference
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
 | ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
-# `swb-reference`
 
 ## Requirements
 The requirements below are for running the lambda locally
@@ -66,7 +66,8 @@ const adminSession = await setup.createAdminSession();
 const { data: response } = await adminSession.resources.environments.get({status: 'COMPLETED'});
 ```
 
-
+## Update static auth permissions
+Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
 ## FAQ
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**

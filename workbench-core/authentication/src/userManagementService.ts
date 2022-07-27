@@ -1,9 +1,14 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 /**
  *
  */
-export default class UserManagementService {
+export class UserManagementService {
   private _userManagementPlugin: UserManagementPlugin;
 
   public constructor(userManagementPlugin: UserManagementPlugin) {
@@ -20,7 +25,7 @@ export default class UserManagementService {
    * @throws {@link UserNotFoundError} - user could not be found
    */
   public async getUser(uid: string): Promise<User> {
-    return await this._userManagementPlugin.getUser(uid);
+    return this._userManagementPlugin.getUser(uid);
   }
   /**
    * Create a new user with the given details.
@@ -67,7 +72,7 @@ export default class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
   public async listUsers(): Promise<string[]> {
-    return await this._userManagementPlugin.listUsers();
+    return this._userManagementPlugin.listUsers();
   }
 
   /**
@@ -80,7 +85,7 @@ export default class UserManagementService {
    * @throws {@link RoleNotFoundError} - role could not be found
    */
   public async listUsersForRole(role: string): Promise<string[]> {
-    return await this._userManagementPlugin.listUsersForRole(role);
+    return this._userManagementPlugin.listUsersForRole(role);
   }
 
   /**
@@ -92,7 +97,7 @@ export default class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
   public async listRoles(): Promise<string[]> {
-    return await this._userManagementPlugin.listRoles();
+    return this._userManagementPlugin.listRoles();
   }
 
   /**

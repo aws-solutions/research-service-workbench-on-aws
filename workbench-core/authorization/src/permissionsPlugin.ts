@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuthenticatedUser } from './authenticatedUser';
 import Operation from './operation';
 import Permission from './permission';
@@ -19,6 +24,10 @@ export default interface PermissionsPlugin {
    * Returns a set of {@link Operation} given a Route and {@link HTTPMethod}.
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
+   *
+   * @returns A set of {@link Operation}s associated to the route.
+   *
+   * @throws - {@link RouteNotSecuredError} when route is not secured
    */
   getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]>;
 

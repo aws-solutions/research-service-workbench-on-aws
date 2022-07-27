@@ -1,10 +1,21 @@
-// Environment launch
-import { EnvironmentService, isEnvironmentStatus, isSortAttribute } from '@amzn/environments';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import {
+  EnvironmentService,
+  isEnvironmentStatus,
+  isSortAttribute,
+  CreateEnvironmentSchema
+} from '@amzn/environments';
 import Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
-import _ = require('lodash');
+import { validate } from 'jsonschema';
+import _ from 'lodash';
 import { Environment } from './apiRouteConfig';
 import { wrapAsync } from './errorHandlers';
+import { processValidatorResult } from './validatorHelper';
 
 export function setUpEnvRoutes(
   router: Router,
@@ -13,24 +24,19 @@ export function setUpEnvRoutes(
 ): void {
   const supportedEnvs = Object.keys(environments);
 
-  async function getEnvironmentType(envId: string): Promise<string> {
-    const env = await environmentService.getEnvironment(envId, true);
-    return env.ETC.type;
-  }
-
   // Launch
   router.post(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
+      processValidatorResult(validate(req.body, CreateEnvironmentSchema));
       const envType = req.body.envType;
       if (supportedEnvs.includes(envType)) {
-        // We check that envType is in list of supportedEnvs before calling the environments object
         if (req.body.id) {
           throw Boom.badRequest(
             'id cannot be passed in the request body when trying to launch a new environment'
           );
         }
-        const env = await environmentService.createEnvironment(req.body);
+        const env = await environmentService.createEnvironment(req.body, res.locals.user);
         try {
           // We check that envType is in list of supportedEnvs before calling the environments object
           //eslint-disable-next-line security/detect-object-injection
@@ -46,7 +52,7 @@ export function setUpEnvRoutes(
         }
         res.status(201).send(env);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -54,18 +60,25 @@ export function setUpEnvRoutes(
   );
 
   // Terminate
-  router.delete(
-    '/environments/:id',
+  router.put(
+    '/environments/:id/terminate',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
-
-      if (supportedEnvs.includes(envType)) {
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const envType = environment.ETC.type;
+      const envStatus = environment.status;
+      if (['TERMINATING', 'TERMINATED'].includes(envStatus)) {
+        res.status(204).send();
+      } else if (envStatus === 'TERMINATING_FAILED') {
+        throw Boom.conflict(
+          'Environment cannot be terminated, environment is already in TERMINATING_FAILED state'
+        );
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.terminate(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.terminate(req.params.id);
+        res.status(204).send();
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -76,15 +89,19 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/start',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
-
-      if (supportedEnvs.includes(envType)) {
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const envType = environment.ETC.type;
+      if (environment.status === 'STOPPING') {
+        throw Boom.conflict('Cannot start environment while environment is currently being stopped');
+      } else if (['STARTING', 'PENDING', 'COMPLETED'].includes(environment.status)) {
+        res.status(204).send();
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.start(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.start(req.params.id);
+        res.status(204).send();
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -95,15 +112,20 @@ export function setUpEnvRoutes(
   router.put(
     '/environments/:id/stop',
     wrapAsync(async (req: Request, res: Response) => {
-      const envType = await getEnvironmentType(req.params.id);
+      const environment = await environmentService.getEnvironment(req.params.id, true);
+      const envType = environment.ETC.type;
 
-      if (supportedEnvs.includes(envType)) {
+      if (['PENDING', 'STARTING'].includes(environment.status)) {
+        throw Boom.conflict('Cannot stop environment while environment is currently being started');
+      } else if (['STOPPING', 'STOPPED'].includes(environment.status)) {
+        res.status(204).send();
+      } else if (supportedEnvs.includes(envType)) {
         // We check that envType is in list of supportedEnvs before calling the environments object
         //eslint-disable-next-line security/detect-object-injection
-        const response = await environments[envType].lifecycle.stop(req.params.id);
-        res.send(response);
+        await environments[envType].lifecycle.stop(req.params.id);
+        res.status(204).send();
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -141,7 +163,7 @@ export function setUpEnvRoutes(
         };
         res.send(response);
       } else {
-        res.send(
+        throw Boom.badRequest(
           `No service provided for environment ${envType}. Supported environments types are: ${supportedEnvs}`
         );
       }
@@ -161,15 +183,11 @@ export function setUpEnvRoutes(
   router.get(
     '/environments',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO: Get user information from req context once Auth has been integrated
-      const user = {
-        role: 'admin',
-        ownerId: ''
-      };
       const {
         status,
         name,
-        createdAt,
+        createdAtFrom,
+        createdAtTo,
         owner,
         type,
         project,
@@ -186,8 +204,11 @@ export function setUpEnvRoutes(
       if (name && typeof name === 'string') {
         filter = { ...filter, name };
       }
-      if (createdAt && typeof createdAt === 'string') {
-        filter = { ...filter, createdAt };
+      if (createdAtFrom && typeof createdAtFrom === 'string') {
+        filter = { ...filter, createdAtFrom };
+      }
+      if (createdAtTo && typeof createdAtTo === 'string') {
+        filter = { ...filter, createdAtTo };
       }
       if (owner && typeof owner === 'string') {
         filter = { ...filter, owner };
@@ -213,18 +234,22 @@ export function setUpEnvRoutes(
       }
       // Apply pagination if applicable
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+        throw Boom.badRequest(
+          'Invalid pagination token and/or page size. Please try again with valid inputs.'
+        );
       } else if (status && !isEnvironmentStatus(status)) {
-        res.status(400).send('Invalid environment status. Please try again with valid inputs.');
+        throw Boom.badRequest('Invalid environment status. Please try again with valid inputs.');
       } else if ((ascending && !isSortAttribute(ascending)) || (descending && !isSortAttribute(descending))) {
-        res.status(400).send('Invalid sort attribute. Please try again with valid inputs.');
+        throw Boom.badRequest('Invalid sort attribute. Please try again with valid inputs.');
       } else if (ascending && descending) {
-        res.status(400).send('Cannot sort on two attributes. Please try again with valid inputs.');
+        throw Boom.badRequest('Cannot sort on two attributes. Please try again with valid inputs.');
+      } else if ((createdAtFrom && !createdAtTo) || (!createdAtFrom && createdAtTo)) {
+        throw Boom.badRequest(
+          `Invalid value for attribute ${createdAtTo ? 'createdAtTo' : 'createdAtFrom'}.`
+        );
       } else {
-        const response = await environmentService.getEnvironments(
-          user,
+        const response = await environmentService.listEnvironments(
+          res.locals.user,
           filter,
           pageSize ? Number(pageSize) : undefined,
           paginationToken,

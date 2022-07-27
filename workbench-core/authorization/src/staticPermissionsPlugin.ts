@@ -1,6 +1,12 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LoggingService } from '@amzn/workbench-core-logging';
 import _ from 'lodash';
 import { AuthenticatedUser } from './authenticatedUser';
+import { RouteNotSecuredError } from './errors/routeNotSecuredError';
 import Operation from './operation';
 import Permission, { PermissionsMap } from './permission';
 import PermissionsPlugin from './permissionsPlugin';
@@ -44,13 +50,27 @@ export default class StaticPermissionsPlugin implements PermissionsPlugin {
   }
 
   public async getOperationsByRoute(route: string, method: HTTPMethod): Promise<Operation[]> {
+    let methodToOperations;
     if (await this.isRouteIgnored(route, method)) {
       return [];
     } else if (_.has(this._routesMap, route)) {
-      const methodToOperations = _.get(_.get(this._routesMap, route), method);
-      if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
+      methodToOperations = _.get(_.get(this._routesMap, route), method);
+    } else {
+      const BreakException = {};
+      try {
+        _.forEach(Object.entries(this._routesMap), ([routeRegex, operations]) => {
+          const match = route.match(routeRegex);
+          if (match && route === match[0]) {
+            methodToOperations = _.get(operations, method);
+            throw BreakException;
+          }
+        });
+      } catch (e) {
+        if (e !== BreakException) throw e;
+      }
     }
-    throw new Error('Route has not been secured');
+    if (methodToOperations !== undefined) return _.cloneDeep(methodToOperations);
+    throw new RouteNotSecuredError('Route has not been secured');
   }
   /**
    * Checks if a route is being ignored for Authorization.

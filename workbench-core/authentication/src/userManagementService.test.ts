@@ -1,6 +1,11 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
-import UserManagementService from './userManagementService';
+import { UserManagementService } from './userManagementService';
 
 describe('User Management Service', () => {
   const mockUserManagementPlugin: UserManagementPlugin = {

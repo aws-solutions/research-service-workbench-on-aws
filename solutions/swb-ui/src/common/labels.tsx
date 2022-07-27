@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AppLayoutProps, PaginationProps, PropertyFilterProps } from '@awsui/components-react';
 
 // i18nStrings labels for <PropertyFilter>
@@ -46,4 +51,25 @@ export const paginationLables: PaginationProps.Labels = {
   nextPageLabel: 'Next page',
   previousPageLabel: 'Previous page',
   pageLabel: (pageNumber: number) => `Page ${pageNumber} of all pages`
+};
+
+export const headerLabels = {
+  searchIconAriaLabel: 'Search',
+  searchDismissIconAriaLabel: 'Close search',
+  overflowMenuTriggerText: 'More',
+  overflowMenuTitleText: 'All',
+  overflowMenuBackIconAriaLabel: 'Back',
+  overflowMenuDismissIconAriaLabel: 'Close menu',
+  signout: 'Sign out'
+};
+
+export const Navigation = {
+  Administration: 'Administration',
+  CreateDashboard: 'Create new dashboard',
+  Dashboards: 'Dashboards',
+  InviteUsers: 'Invite users',
+  ManageDashboards: 'Manage dashboards',
+  ManageUsers: 'Manage users',
+  Users: 'Users',
+  ViewPublishedDashboards: 'View published dashboards'
 };

@@ -117,7 +117,7 @@
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",
@@ -126,10 +126,10 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/fabric-infrastructure",
-      "projectFolder": "solutions/managed-blockchain-for-patient-consent/fabric-infrastructure",
-      "reviewCategory": "prototypes",
-      "shouldPublish": false
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
