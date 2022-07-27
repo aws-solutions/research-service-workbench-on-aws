@@ -11,7 +11,7 @@ for d in $solutions; do
     if [ -f ./package.json ]; then
       echo "checking attributions in solutions/$d"
       generate-attribution
-      mv oss-attribution/attribution.txt LICENSE-THIRD-PARTY
+      mv oss-attribution/attribution.txt NOTICE
       rm -rf oss-attribution
     fi
     popd
@@ -23,7 +23,7 @@ for d in $workbenchCore; do
     if [ -f ./package.json ]; then
       echo "checking attributions in workbench-core/$d"
       generate-attribution
-      mv oss-attribution/attribution.txt LICENSE-THIRD-PARTY
+      mv oss-attribution/attribution.txt NOTICE
       rm -rf oss-attribution
     fi
     popd
@@ -33,7 +33,7 @@ pushd workbench-core/repo-scripts/repo-toolbox
 if [ -f ./package.json ]; then
   echo "checking attributions in workbench-core/repo-script/repo-toolbox"
   generate-attribution
-  mv oss-attribution/attribution.txt LICENSE-THIRD-PARTY
+  mv oss-attribution/attribution.txt NOTICE
   rm -rf oss-attribution
 fi
 popd
