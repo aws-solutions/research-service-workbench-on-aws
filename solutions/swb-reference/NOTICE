@@ -1,4 +1,4 @@
-@amzn/environments
+@amzn/workbench-core-environments
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>

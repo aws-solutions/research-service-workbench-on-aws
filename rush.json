@@ -39,10 +39,10 @@
       "packageName": "@amzn/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
-      "packageName": "@amzn/environments",
+      "packageName": "@amzn/workbench-core-environments",
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
       "shouldPublish": true
@@ -63,7 +63,7 @@
       "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-authorization",
@@ -111,7 +111,7 @@
       "packageName": "@amzn/swb-ui",
       "projectFolder": "solutions/swb-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-repo-toolbox",
@@ -129,7 +129,7 @@
       "packageName": "@amzn/swb-ui-infrastructure",
       "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     }
   ]
 }
