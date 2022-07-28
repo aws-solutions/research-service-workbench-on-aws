@@ -20,7 +20,7 @@ describe('StatusHandler', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.AWS_REGION = 'us-east-1';
-    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+    process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
     ebToDDB = {
       envId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       status: 'TERMINATING',

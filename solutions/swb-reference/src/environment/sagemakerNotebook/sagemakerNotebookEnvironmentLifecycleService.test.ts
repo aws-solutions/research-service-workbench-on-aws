@@ -8,19 +8,24 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { EnvironmentLifecycleHelper, EnvironmentService, Environment } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
+import {
+  EnvironmentLifecycleHelper,
+  EnvironmentService,
+  Environment
+} from '@amzn/workbench-core-environments';
 import SagemakerNotebookEnvironmentLifecycleService from './sagemakerNotebookEnvironmentLifecycleService';
 
 describe('SagemakerNotebookEnvironmentLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   let environment: Environment;
+  const MOCK_DATASETS_BUCKET_ARN = 'arn:aws:s3:::sampleDatasetsBucket';
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.AWS_REGION = 'us-east-1';
     process.env.STACK_NAME = 'swb-swbv2-va';
-    process.env.S3_DATASETS_BUCKET_ARN_NAME = 'arn:aws:s3:::sampleDatasetsBucket';
+    process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
     mockUuid.v4.mockImplementationOnce(() => 'sampleEnvId');
     environment = {
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -107,7 +112,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
       return {
-        datasetsBucketArn: process.env.S3_DATASETS_BUCKET_ARN_NAME!,
+        datasetsBucketArn: MOCK_DATASETS_BUCKET_ARN,
         mainAccountRegion: 'us-east-1',
         mainAccountId: '123456789012'
       };
@@ -130,7 +135,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
       return {
-        datasetsBucketArn: process.env.S3_DATASETS_BUCKET_ARN_NAME!,
+        datasetsBucketArn: MOCK_DATASETS_BUCKET_ARN,
         mainAccountRegion: 'us-east-1',
         mainAccountId: '123456789012'
       };

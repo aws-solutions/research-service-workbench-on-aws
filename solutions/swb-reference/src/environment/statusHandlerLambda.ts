@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable security/detect-object-injection */
-import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
+import { StatusHandler, EventBridgeEventToDDB } from '@amzn/workbench-core-environments';
 import _ from 'lodash';
 
 /* eslint-disable-next-line */
