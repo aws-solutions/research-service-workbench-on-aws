@@ -1,0 +1,9 @@
+{
+  "name": "istanbul",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "istanbul-badges-readme": "1.8.1",
+    "istanbul-combine": "0.3.0"
+  }
+}

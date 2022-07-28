@@ -1,0 +1,120 @@
+name: publish-and-merge-to-develop
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:  
+  rush-publish:  
+    runs-on: ubuntu-20.04
+    permissions:
+      id-token: write
+      contents: read
+    env: 
+      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.CODEARTIFACT_DOMAIN_NAME }}-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/npm/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          ref: ${{ steps.set-ref.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.CODEARTIFACT_REGION }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE }}
+          role-session-name: OIDCSessionName
+      # change to NPM
+      - name: CodeArtifact Auth
+        id: codeartifact
+        run: |
+          TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN_NAME }} --domain-owner ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }} --query authorizationToken --duration-seconds 900 --output text`
+          echo "::add-mask::$TOKEN"
+          echo "::set-output name=auth_token::$TOKEN"
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.BOT-USER-EMAIL }}
+          git config user.name ${{ secrets.BOT-USER }}
+          git config commit.gpgsign true
+          
+      - name: Rush Publish
+        run: |
+          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --ignore-git-hooks --include-all --target-branch main --publish"
+          node common/scripts/install-run-rush.js publish $PUBLISH_CMD
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+  merge-to-develop:
+    runs-on: ubuntu-20.04
+    needs: [rush-publish]
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MERGE_TOKEN }}
+          fetch-depth: 0
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      
+      # There's no way for github actions to push to a protected branch. This is a workaround
+      # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+      - name: Temporarily disable branch protection on develop
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      
+      - name: Set git config
+        run: |
+          git config user.email ${{ secrets.BOT-USER-EMAIL }}
+          git config user.name ${{ secrets.BOT-USER }}
+          git config commit.gpgsign true
+
+      - name: Merge to develop
+        run: |
+          echo "Set the COMMIT_ID to merge to develop to current workflow commit id"
+          COMMIT_ID=$GITHUB_SHA
+          git checkout develop
+          echo
+          echo "  Attempting to merge the 'main' branch ($COMMIT_ID)"
+          echo "  into the 'develop' branch"
+          echo
+          git merge $COMMIT_ID --ff --no-edit -m "Merge main to develop"
+          git push origin develop
+      
+      - name: Enable branch protection on develop
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

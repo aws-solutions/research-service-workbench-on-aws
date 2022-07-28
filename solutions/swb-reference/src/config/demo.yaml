@@ -1,0 +1,8 @@
+# Stage Name
+stage: demo
+awsRegion: us-east-2
+awsRegionShortName: oh
+rootUserEmail: aws-chamonix-dev+demoRoot@amazon.com
+allowedOrigins: ['http://localhost:3000']
+cognitoDomain: 'chamonix-dev-demo-domain'
+websiteUrl: 'http://localhost:3000'
