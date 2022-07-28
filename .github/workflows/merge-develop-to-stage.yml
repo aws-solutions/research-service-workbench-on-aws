@@ -59,7 +59,7 @@ jobs:
   merge-test-develop-1-to-stage:
     name: Merge test-develop-1 to test-stage-1
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference]
+    needs: [readme-commit]
     env: 
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
