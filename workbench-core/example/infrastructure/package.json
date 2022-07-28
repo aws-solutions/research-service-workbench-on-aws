@@ -1,0 +1,73 @@
+{
+  "name": "@amzn/workbench-core-example-infrastructure",
+  "version": "0.0.1",
+  "description": "Example infrastructure to deploy express app",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
+  "bin": {
+    "infrastructure": "lib/index.js"
+  },
+  "scripts": {
+    "build": "rushx compile && heft build --clean && rushx pkg-json-lint",
+    "build:test": "rushx compile && heft test -u --clean --test-path-pattern infrastructure-stack && rushx pkg-json-lint && rushx make-badges",
+    "cdk": "cdk",
+    "cdk:bootstrap": "cdk bootstrap",
+    "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file cdk-outputs.json",
+    "cdk:synth": "cdk synth",
+    "compile": "node scripts/buildLambda.js",
+    "depcheck": "depcheck",
+    "lint:fix": "eslint . --fix",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
+    "sort-package-json": "sort-package-json package.json",
+    "test": "rushx test:only && rushx make-badges",
+    "test:integration": "heft test -u --clean --no-build",
+    "test:only": "heft test -u --clean --no-build --test-path-pattern infrastructure-stack"
+  },
+  "dependencies": {
+    "@amzn/workbench-core-example-express": "workspace:*",
+    "aws-cdk-lib": "^2.29.1",
+    "constructs": "^10.0.0",
+    "lodash": "^4.17.21",
+    "source-map-support": "^0.5.16"
+  },
+  "devDependencies": {
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws-cdk/assert": "^2.0.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.22.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.22.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.22.0-alpha.0",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/express": "^4.17.13",
+    "@types/heft-jest": "1.0.2",
+    "@types/lodash": "^4.14.181",
+    "@types/node": "^14",
+    "@vendia/serverless-express": "^4.5.4",
+    "aws-cdk": "^2.12.0",
+    "axios": "^0.27.1",
+    "cdk-nag": "^2.12.25",
+    "depcheck": "^1.4.3",
+    "esbuild": "^0.14.21",
+    "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-security": "^1.4.0",
+    "express": "^4.17.3",
+    "istanbul-badges-readme": "1.8.1",
+    "jest": "^27.5.1",
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
+    "sort-package-json": "^1.57.0",
+    "typescript": "^4.5.2"
+  }
+}

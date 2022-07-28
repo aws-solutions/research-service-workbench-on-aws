@@ -1,0 +1,615 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: This stack provisions resources necessary to use this AWS account with Service Workbench.
+
+Parameters:
+  EnableFlowLogs:
+    Type: String
+    AllowedValues: [true, false]
+    Description: Enable flow logs on VPCs and Subnets created on this account
+
+  Namespace:
+    Type: String
+    Description: An environment name that will be prefixed to resource names. Make sure this matches the one declared in your constants file.
+
+  MainAccountId:
+    Type: String
+    Description: The account id of the main AWS account where the solution is deployed.
+
+  ExternalId:
+    Type: String
+    Description: A unique ID used to identify this account
+
+  VpcCidr:
+    Description: Please enter the IP range (CIDR notation) for this VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  ApiHandlerRoleArn:
+    Type: String
+    Description: The arn of apiHandler role
+
+  AccountHandlerRoleArn:
+    Type: String
+    Description: The arn of main account accountHandler role
+  
+  StatusHandlerRoleArn:
+    Type: String
+    Description: The arn of statusHandler role
+
+  # Generous subnet allocation of 8192 addresses
+  # Range from 10.0.0.0 to 10.0.31.255
+  PublicSubnetCidr:
+    Description: Please enter the IP range (CIDR notation) for the public subnet.
+    Type: String
+    Default: 10.0.0.0/19
+
+  LaunchConstraintRolePrefix:
+    Description: Role name prefix to use when creating a launch constraint role in the on-boarded account
+    Type: String
+    Default: '*'
+
+  LaunchConstraintPolicyPrefix:
+    Description: Customer managed policy name prefix to use when creating a launch constraint role in the on-boarded account
+    Type: String
+    Default: '*'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Shared Configuration
+        Parameters:
+          - Namespace
+      - Label:
+          default: Account Configuration
+        Parameters:
+          - MainAccountId
+          - ExternalId
+      - Label:
+          default: Deployment Configuration
+        Parameters:
+          - VpcCidr
+          - PublicSubnetCidr
+
+Conditions:
+  enableFlowLogs: !Equals [!Ref EnableFlowLogs, true]
+
+Resources:
+  # A role used for launching environments using AWS Service Catalog
+  # This is the role that code (ApiHandlerLambda) in main account
+  # assumes before performing any AWS Service Catalog interactions in this account (the on-boarded account)
+  # for launching environments.
+  EnvManagementRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join ['-', [Ref: Namespace, 'env-mgmt']]
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              AWS:
+                - !Join [':', ['arn:aws:iam:', Ref: MainAccountId, 'root']]
+                - !Ref ApiHandlerRoleArn
+                - !Ref StatusHandlerRoleArn
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSServiceCatalogAdminFullAccess
+      Policies:
+        - PolicyName: eventbus-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - events:PutEvents
+                Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+        - PolicyName: cfn-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:GetTemplate
+                Resource: 'arn:aws:cloudformation:*:*:stack/SC-*/*'
+        - PolicyName: ssm-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ssm:PutParameter
+                - ssm:GetParameter
+                - ssm:GetParameters
+                - ssm:DeleteParameter
+              Resource:
+                - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/*/sc-environments/*'
+        - PolicyName: ssm-doc-execution
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ssm:SendCommand
+                - ssm:StartAutomationExecution
+              Resource:
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:document/${Namespace}*'
+                - !Sub 'arn:aws:ssm:${AWS::Region}:${MainAccountId}:automation-definition/${Namespace}*'
+        - PolicyName: iam-pass-role
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - iam:PassRole
+              Resource:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${Namespace}*'
+        - PolicyName: s3-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - 'arn:aws:s3:::cf-templates-*/*'
+        - PolicyName: servicecatalog-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - servicecatalog:DescribeRecord
+              Resource:
+                - '*'
+        - PolicyName: sagemakerNotebook-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - sagemaker:CreatePresignedNotebookInstanceUrl
+                - sagemaker:ListNotebookInstances
+                - sagemaker:StartNotebookInstance
+                - sagemaker:StopNotebookInstance
+                - sagemaker:DescribeNotebookInstance
+              Resource: '*'
+        # Needed for performing start operation on instances in a given network
+        - PolicyName: network-access
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - ec2:DescribeSubnets
+                - ec2:DescribeVpcs
+                - ec2:DescribeNetworkInterfaces
+                - ec2:DescribeSecurityGroups
+                - ec2:DescribeAvailabilityZones
+                - ec2:DescribeAccountAttributes
+                - ec2:CreateTags
+                - ec2:DeleteTags
+                - ec2:DescribeInternetGateways
+              Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
+        - PolicyName: iam-role-access
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:TagRole
+                  - iam:GetRolePolicy
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:ListAttachedRolePolicies
+                  - iam:UpdateAssumeRolePolicy
+                  - iam:UpdateRoleDescription
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*presigned-url-sagemaker-notebook-role'
+        - PolicyName: cloudwatch-access-policy
+          PolicyDocument:
+            Statement:
+              Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource:
+                - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
+                - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
+      PermissionsBoundary: !Ref EnvMgmtPermissionsBoundary
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W11
+            reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+
+  EnvMgmtPermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permission boundary for hosting account EnvMgmt role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+          - Effect: Allow
+            Action:
+              - s3:*
+              - cloudformation:*
+              - sagemaker:*
+              - ec2:*
+              - ssm:*
+              - config:*
+              - servicecatalog:*
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:*'
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${Namespace}-*:log-stream:*'
+          - Effect: Allow
+            Action:
+              - iam:PassRole
+            Resource: '*'
+            Condition:
+              StringEquals:
+                iam:PassedToService: 'servicecatalog.amazonaws.com'
+          - Effect: Allow
+            Action:
+              - iam:CreateRole
+              - iam:TagRole
+              - iam:GetRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:ListRolePolicies
+              - iam:ListAttachedRolePolicies
+              - iam:UpdateAssumeRolePolicy
+              - iam:UpdateRoleDescription
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}'
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/*presigned-url-sagemaker-notebook-role'
+          - Effect: Allow
+            Action:
+              - iam:CreatePolicy
+              - iam:GetPolicy
+              - iam:GetPolicyVersion
+              - iam:ListPolicyVersions
+              - iam:DeletePolicy
+              - iam:DeletePolicyVersion
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/${LaunchConstraintPolicyPrefix}'
+          - Effect: Allow
+            Action:
+              - iam:GetGroup
+              - iam:GetRole
+              - iam:GetUser
+              - iam:ListGroups
+              - iam:ListRoles
+              - iam:ListUsers
+            Resource: '*' # These non-mutating IAM actions cover the permissions in managed policy AWSServiceCatalogAdminFullAccess
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: F40
+            reason: "There is a condition so that this role can only be passed to Service Catalog per these instructions: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_examples_iam-passrole-service.html"
+          - id: F5
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+          - id: W13
+            reason: "This is flagging on a permissions boundary. The role that this boundary is attached too has more strict actions explicitly allowed."
+
+  PolicyHostingAccountHandler:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Allows main account to setup hosting account with required resources for launching environments
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:CreateStack
+              - cloudformation:DeleteStack
+              - cloudformation:DescribeStacks
+              - cloudformation:DescribeStackEvents
+              - cloudformation:GetTemplate
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SC-*'
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/initial-stack*'
+          - Effect: Allow
+            Action:
+              - cloudformation:GetTemplate
+              - cloudformation:DescribeStacks
+            Resource:
+              - !Sub 'arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*'
+          - Effect: Allow
+            Action:
+              - sagemaker:ListNotebookInstances
+            Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
+          - Effect: Allow
+            Action:
+              - iam:GetRole
+              - iam:TagRole
+              - iam:GetRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:DeleteRole
+              - iam:PassRole
+              - iam:PutRolePolicy
+            Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/analysis-*'
+          - Effect: Allow
+            Action:
+              - iam:CreateRole
+              - iam:GetRole
+              - iam:TagRole
+              - iam:GetRolePolicy
+              - iam:PutRolePolicy
+              - iam:DeleteRolePolicy
+              - iam:ListRolePolicies
+              - iam:ListAttachedRolePolicies
+              - iam:UpdateAssumeRolePolicy
+              - iam:UpdateRoleDescription
+              - iam:AttachRolePolicy
+              - iam:DetachRolePolicy
+            Resource: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LaunchConstraintRolePrefix}LaunchConstraint'
+          - Effect: Allow
+            Action:
+              - iam:GetRole
+            Resource: !GetAtt EnvManagementRole.Arn
+          - Effect: Allow
+            Action:
+              - ce:GetCostAndUsage
+            Resource: '*' # For the actions listed above IAM does not support resource-level permissions and requires all resources to be chosen
+          - Effect: Allow
+            Action:
+              - budgets:ViewBudget
+              - budgets:ModifyBudget
+            Resource: !Sub 'arn:aws:budgets::${AWS::AccountId}:budget/service-workbench-system-generated*'
+          - Effect: Allow
+            Action:
+              - servicecatalog:AcceptPortfolioShare
+              - servicecatalog:AssociatePrincipalWithPortfolio
+            Resource: !Sub 'arn:${AWS::Partition}:catalog:${AWS::Region}:${AWS::AccountId}:portfolio/*'
+    Metadata: 
+      cfn_nag:
+        rules_to_suppress:
+          - id: W13
+            reason: "For the cost explorer and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+
+
+  HostingAccountHandlerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              AWS:
+                - !Join [':', ['arn:aws:iam:', Ref: MainAccountId, 'root']]
+                - !Ref AccountHandlerRoleArn
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref ExternalId
+      ManagedPolicyArns:
+        - !Ref PolicyHostingAccountHandler
+      PermissionsBoundary: !Ref PolicyHostingAccountHandler
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Namespace} vpc
+
+  FlowLogVPC:
+    Type: AWS::EC2::FlowLog
+    Condition: enableFlowLogs
+    Properties:
+      ResourceId: !Ref VPC
+      ResourceType: VPC
+      TrafficType: ACCEPT
+      DeliverLogsPermissionArn: !GetAtt EnvManagementRole.Arn
+      LogGroupName: VPCLogGroup
+      LogFormat: '${version} ${vpc-id} ${subnet-id} ${instance-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${tcp-flags} ${type} ${pkt-srcaddr} ${pkt-dstaddr}'
+      Tags:
+        - Key: Name
+          Value: FlowLogForVPC
+        - Key: Purpose
+          Value: AcceptTraffic
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${Namespace} igw
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref PublicSubnetCidr
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${Namespace} public subnet 1
+
+  FlowLogPublicSubnet:
+    Type: AWS::EC2::FlowLog
+    Condition: enableFlowLogs
+    Properties:
+      ResourceId: !Ref PublicSubnet
+      ResourceType: Subnet
+      TrafficType: ACCEPT
+      DeliverLogsPermissionArn: !GetAtt EnvManagementRole.Arn
+      LogGroupName: PublicSubnetLogGroup
+      LogFormat: '${version} ${vpc-id} ${subnet-id} ${instance-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${tcp-flags} ${type} ${pkt-srcaddr} ${pkt-dstaddr}'
+      Tags:
+        - Key: Name
+          Value: FlowLogForPublicSubnet
+        - Key: Purpose
+          Value: AcceptTraffic
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${Namespace} public routes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
+
+  EncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: 'This is the key used to secure resources in this account'
+      EnableKeyRotation: True
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Allow root access
+            Effect: 'Allow'
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - 'kms:*'
+            Resource: '*'
+          - Sid: Allow use of the key by this account
+            Effect: 'Allow'
+            Principal:
+              AWS: '*'
+            Action:
+              - 'kms:DescribeKey'
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey'
+              - 'kms:GenerateDataKeyWithoutPlaintext'
+              - 'kms:CreateGrant'
+              - 'kms:RevokeGrant'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                kms:CallerAccount: !Ref 'AWS::AccountId'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F76
+            reason: "There is a condition so that the only caller that can use this KMS key is the aws account. The syntax for the Principal element does not provide a way to specify all identities in an AWS account. But you can achieve this effect by combining the condition key kms:CallerAccount with a Principal element that specifies all AWS identities."
+
+  EncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Join ['', ['alias/', Ref: Namespace, '-encryption-key']]
+      TargetKeyId: !Ref EncryptionKey
+
+  StateChangeEventRuleMainRouting:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: Routes environment state changes to the main event bus
+      EventBusName: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+      State: ENABLED
+      EventPattern:
+        account:
+          - !Ref 'AWS::AccountId'
+        detail-type:
+          - anything-but: 'AWS API Call via CloudTrail'
+        source:
+          - anything-but:
+            - 'aws-config'
+            - 'aws-cloudtrail'
+            - 'aws-ssm'
+            - 'aws-tag'
+      Targets:
+        - Arn: !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
+          Id: 'MainAccountRoutingRule'
+          RoleArn: !GetAtt 
+            - StateChangeEventBridgeIAMrole
+            - Arn
+
+  StateChangeEventBridgeIAMrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: PutEventsDestinationBus
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:Put*'
+                Resource:
+                  - !Sub 'arn:aws:events:${AWS::Region}:${MainAccountId}:event-bus/default'
+
+Outputs:
+  EnvMgmtRoleArn:
+    Description: The arn of the hosting account role for environment management using AWS Service Catalog
+    Value: !GetAtt [EnvManagementRole, Arn]
+
+  HostingAccountHandlerRoleArn:
+    Description: The arn of the hosting account role.
+    Value: !GetAtt [HostingAccountHandlerRole, Arn]
+
+  VPC:
+    Description: VPC ID
+    Value: !Ref VPC
+
+  VpcSubnet:
+    Description: A reference to the public subnet in the 1st Availability Zone
+    Value: !Ref PublicSubnet
+
+  EncryptionKeyArn:
+    Description: KMS Encryption Key Arn
+    Value: !GetAtt [EncryptionKey, Arn]
+
+  PublicRouteTableId:
+    Description: The public route table assigned to the workspace VPC
+    Value: !Ref PublicRouteTable
+    

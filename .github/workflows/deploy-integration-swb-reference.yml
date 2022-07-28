@@ -1,0 +1,48 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Deploy-and-integration-test-swb-reference
+on:
+  workflow_call:
+    secrets: 
+      aws-dev-region:
+        required: true
+      role-to-assume:
+        required: true
+      aws-dev-account-region:
+        required: true
+
+jobs:
+# deploy only when files specific to swb package changed
+  deploy-and-integration-test-swb-reference:
+    runs-on: ubuntu-20.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+      
+    steps:        
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws-dev-region }}
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: OIDCSessionName
+      
+      - name: Deploy SWB-Reference
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        run: |
+          cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment

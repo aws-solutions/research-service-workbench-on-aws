@@ -1,0 +1,9 @@
+.github/workflows/*
+.gitallowed
+
+
+# Fake Account id used
+123456789012
+
+# example package
+workbench-core/example/infrastructure/build/buildLambda.js
