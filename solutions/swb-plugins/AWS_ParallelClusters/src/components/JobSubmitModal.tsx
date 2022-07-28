@@ -46,7 +46,11 @@ export default function JobSubmitModal(props: JobSubmitModalProps): JSX.Element 
         <Box float="right">
           <SpaceBetween direction="horizontal" size="xs">
             <Button onClick={() => props.closeModal()}>Cancel</Button>
-            <Button disabled={shouldDisableSubmitButton()} onClick={() => executeSubmitJobProcess()}>
+            <Button
+              variant="primary"
+              disabled={shouldDisableSubmitButton()}
+              onClick={() => executeSubmitJobProcess()}
+            >
               Submit
             </Button>
           </SpaceBetween>

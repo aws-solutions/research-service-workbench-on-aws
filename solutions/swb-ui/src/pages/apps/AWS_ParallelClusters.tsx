@@ -6,11 +6,11 @@ import BaseLayout from '../../components/BaseLayout';
 const breadcrumbs: BreadcrumbGroupProps.Item[] = [
   {
     text: 'Service Workbench',
-    href: '#'
+    href: '/'
   },
   {
     text: 'AWS_ParallelClusters',
-    href: '#'
+    href: '/apps/AWS_ParallelClusters'
   }
 ];
 

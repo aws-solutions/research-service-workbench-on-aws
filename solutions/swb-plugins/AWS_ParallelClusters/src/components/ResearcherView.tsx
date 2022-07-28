@@ -15,12 +15,13 @@ import {
   Link,
   Pagination,
   Select,
+  SpaceBetween,
   SplitPanel,
   Table
 } from '@awsui/components-react';
 import JobsTable from './JobsTable';
 
-export default function ClustersTable(): JSX.Element {
+export default function ResearcherView(): JSX.Element {
   const [projects, setProjects] = useState<Project[]>([]);
 
   const projectOptions = projects.map((project) => {
@@ -89,20 +90,7 @@ export default function ClustersTable(): JSX.Element {
 
   return (
     <AppLayout
-      contentHeader={
-        <Header
-          description="View and manage your batch jobs within Service Workbench."
-          variant="h1"
-          info={
-            <Link href="https://aws.amazon.com/hpc/parallelcluster/" variant="info">
-              Info
-            </Link>
-          }
-        >
-          AWS ParallelClusters
-        </Header>
-      }
-      disableContentHeaderOverlap
+      disableContentPaddings
       navigationHide
       toolsHide
       splitPanelOpen={isSplitOpen}
@@ -131,45 +119,60 @@ export default function ClustersTable(): JSX.Element {
           }
         >
           {collectionProps.selectedItems?.length !== 0 ? (
-            <JobsTable
-              projectId={isSplitOpen ? selectedProject!.value! : undefined!}
-              clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}
-            />
+            <Box padding={{ left: 'l', right: 'l' }}>
+              <JobsTable
+                projectId={isSplitOpen ? selectedProject!.value! : undefined!}
+                clusterName={isSplitOpen ? collectionProps.selectedItems?.at(0)?.clusterName! : undefined!}
+              />
+            </Box>
           ) : (
-            <Box>Select a cluster to see its details.</Box>
+            <Box padding={{ left: 'l', right: 'l' }}>Select a cluster to see its details.</Box>
           )}
         </SplitPanel>
       }
       content={
-        <Table
-          {...collectionProps}
-          selectionType="single"
-          selectedItems={collectionProps.selectedItems}
-          columnDefinitions={columnDefinitions}
-          loading={isClustersLoading}
-          loadingText="Loading clusters..."
-          items={items}
-          filter={
-            <FormField label="Project">
-              <Select
-                expandToViewport
-                selectedOption={selectedProject!}
-                onChange={({ detail }) => setSelectedProject(detail.selectedOption!)}
-                options={projectOptions}
-                loadingText="Loading projects..."
-                placeholder="Choose a project"
-                selectedAriaLabel="Selected"
-                empty="No projects"
-              />
-            </FormField>
-          }
-          pagination={<Pagination {...paginationProps} />}
-          header={
-            <Header counter={`(${clusters.length})`} variant="h2">
-              Clusters
-            </Header>
-          }
-        />
+        <SpaceBetween direction="vertical" size="m">
+          <Header
+            description="View and manage your batch jobs within Service Workbench."
+            variant="h1"
+            info={
+              <Link href="https://aws.amazon.com/hpc/parallelcluster/" variant="info">
+                Info
+              </Link>
+            }
+          >
+            AWS ParallelClusters
+          </Header>
+          <Table
+            {...collectionProps}
+            selectionType="single"
+            selectedItems={collectionProps.selectedItems}
+            columnDefinitions={columnDefinitions}
+            loading={isClustersLoading}
+            loadingText="Loading clusters..."
+            items={items}
+            filter={
+              <FormField label="Project">
+                <Select
+                  expandToViewport
+                  selectedOption={selectedProject!}
+                  onChange={({ detail }) => setSelectedProject(detail.selectedOption!)}
+                  options={projectOptions}
+                  loadingText="Loading projects..."
+                  placeholder="Choose a project"
+                  selectedAriaLabel="Selected"
+                  empty="No projects"
+                />
+              </FormField>
+            }
+            pagination={<Pagination {...paginationProps} />}
+            header={
+              <Header counter={`(${clusters.length})`} variant="h2">
+                Clusters
+              </Header>
+            }
+          />
+        </SpaceBetween>
       }
     />
   );

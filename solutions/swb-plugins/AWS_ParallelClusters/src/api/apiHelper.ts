@@ -50,6 +50,7 @@ const fetchData = async (options: any): Promise<any> => {
   const { data } = await axios(options).catch(function (error) {
     console.log(error);
     //TODO: call logger to capture exception
+    // eslint-disable-next-line no-throw-literal
     throw 'there was an error while trying to retrieve data';
   });
   return data;

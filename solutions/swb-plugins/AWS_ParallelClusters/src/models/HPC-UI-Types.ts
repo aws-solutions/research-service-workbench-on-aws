@@ -1,3 +1,7 @@
+export interface Account {
+  id: string;
+}
+
 export interface Cluster {
   cloudformationStackArn: string;
   clusterName: string;
