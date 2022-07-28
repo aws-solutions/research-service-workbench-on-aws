@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/environments",
+  "name": "@amzn/workbench-core-environments",
   "version": "0.0.1",
   "description": "Implementation of environment APIs and resources.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
