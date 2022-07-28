@@ -26,7 +26,7 @@ The following example is a snapshot from the [monorepo-for-service-workbench REA
 | [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
 | [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
-| [workbench-core/environments](./workbench-core/environments/) | [@amzn/environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/environments](./workbench-core/environments/) | [@amzn/workbench-core-environments] | [README](./workbench-core/environments/README.md)
 | [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
