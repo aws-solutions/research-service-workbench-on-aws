@@ -1,0 +1,101 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Readme-commit
+on:
+  workflow_call:
+    secrets: 
+      gpg-private-key:
+        required: true
+      passphrase:
+        required: true
+      merge-token:
+        required: true
+      bot-user:
+        required: true
+      bot-user-email:
+        required: true
+    outputs:
+      commit_hash:
+        description: 'README update commit hash'
+        value: "${{ jobs.readme-commit.outputs.commit_hash }}"
+      changes_detected:
+        description: 'Flag to detect whether README was updated or not'
+        value: "${{ jobs.readme-commit.outputs.changes_detected }}"
+
+jobs:
+  readme-commit:  
+    runs-on: ubuntu-20.04
+    outputs:
+        commit_hash: "${{ steps.auto-commit-action.outputs.commit_hash }}"
+        changes_detected: "${{ steps.auto-commit-action.outputs.changes_detected }}"
+
+    steps:        
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.merge-token }}
+          fetch-depth: 0
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Rush test and update the README file in each package with the coverage badge
+        run: node common/scripts/install-run-rush.js test --verbose
+
+      - name: Update root README file with common coverage badge
+        run: node common/scripts/install-run-rush.js common-coverage-make-badge
+      
+      - name: Update package info in root README file
+        run: |
+          cd workbench-core/repo-scripts/repo-toolbox
+          node ../../../common/scripts/install-run-rushx.js readme -v || exit_status=$?
+          if [[ $exit_status != 0 ]]; then
+            node ../../../common/scripts/install-run-rushx.js readme
+          fi
+
+      - name: echo modified files
+        run: git status
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.gpg-private-key }}
+          passphrase: ${{ secrets.passphrase }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+        # There's no way for github actions to push to a protected branch. This is a workaround
+        # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+      - name: Temporarily disable branch protection on develop
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
+
+      - name: Auto commit updated README files to develop
+        id: auto-commit-action
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "docs: Auto README.md updates [skip ci]"
+          commit_options: '--no-verify --gpg-sign'
+          commit_user_name: ${{ secrets.bot-user }} # defaults to "github-actions[bot]"
+          commit_user_email: ${{ secrets.bot-user-email }}
+          file_pattern: "README.md **/README.md"
+          branch: develop
+          
+      - name: Enable branch protection on develop
+        uses: octokit/request-action@v2.x
+        if: always() # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: monorepo-for-service-workbench
+          branch: develop
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}

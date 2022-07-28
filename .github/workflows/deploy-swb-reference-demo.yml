@@ -1,0 +1,42 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Deploy-swb-reference-demo
+on:
+  workflow_call:
+    secrets:
+      role-to-assume:
+        required: true
+
+jobs:
+  # deploy only when files specific to swb package changed
+  deploy-swb-ref-demo:
+    runs-on: ubuntu-20.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Base Action
+        uses: ./.github/actions/baseAction
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-2
+          role-to-assume: ${{ secrets.role-to-assume }}
+          role-session-name: OIDCSessionName
+
+      - name: Deploy SWB-reference Demo
+        run: |
+          cd solutions/swb-reference
+          node ../../common/scripts/install-run-rushx.js compile
+          STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk bootstrap
+          STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='demo' node ../../common/scripts/install-run-rushx.js run-postDeployment
