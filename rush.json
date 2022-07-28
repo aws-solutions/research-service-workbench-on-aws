@@ -111,7 +111,7 @@
       "packageName": "@amzn/swb-ui",
       "projectFolder": "solutions/swb-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-repo-toolbox",
