@@ -277,11 +277,8 @@ export default class HostingAccountLifecycleService {
       StackName: hostingAccountStackName
     });
 
-    const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
-      StackName: hostingAccountStackName
-    });
-    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
-      const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
+    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeStackResponse.Stacks![0]!.StackStatus!)) {
+      const outputs: Output[] = describeStackResponse.Stacks![0]!.Outputs as Output[];
       const vpcId = outputs.find((output) => {
         return output.OutputKey === 'VPC';
       })!.OutputValue;
