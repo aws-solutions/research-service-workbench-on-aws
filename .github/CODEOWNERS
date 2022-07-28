@@ -16,4 +16,4 @@ common/changes/@amzn/swb-app                          @awslabs/aws-ma-swb
 workbench-core/base                                   @awslabs/aws-ma-swb
 common/changes/@amzn/workbench-core-base              @awslabs/aws-ma-swb
 workbench-core/environments                           @awslabs/aws-ma-swb
-common/changes/@amzn/environments                     @awslabs/aws-ma-swb
+common/changes/@amzn/workbench-core-environments                     @awslabs/aws-ma-swb
