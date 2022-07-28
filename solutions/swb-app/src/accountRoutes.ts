@@ -4,7 +4,7 @@
  */
 
 // AWS Account management
-import { CreateAccountSchema, HostingAccountService } from '@amzn/environments';
+import { CreateAccountSchema, HostingAccountService } from '@amzn/workbench-core-environments';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';

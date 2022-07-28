@@ -9,7 +9,7 @@ import {
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
   UpdateEnvironmentTypeSchema
-} from '@amzn/environments';
+} from '@amzn/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
