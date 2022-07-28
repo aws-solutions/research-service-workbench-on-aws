@@ -1,0 +1,89 @@
+{
+  "name": "@amzn/workbench-core-environments",
+  "version": "0.0.1",
+  "description": "Implementation of environment APIs and resources.",
+  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "http://aws.amazon.com"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "heft build --clean && rushx pkg-json-lint",
+    "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
+    "depcheck": "depcheck",
+    "jest": "jest",
+    "lint:fix": "eslint . --fix",
+    "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
+    "sort-package-json": "sort-package-json package.json",
+    "test": "rushx test:only && rushx make-badges",
+    "test:only": "heft test --clean --no-build"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
+  },
+  "dependencies": {
+    "@amzn/workbench-core-audit": "workspace:*",
+    "@amzn/workbench-core-authorization": "workspace:*",
+    "@amzn/workbench-core-base": "workspace:*",
+    "@amzn/workbench-core-datasets": "workspace:*",
+    "@amzn/workbench-core-logging": "workspace:*",
+    "@aws-cdk/aws-iam": "^1.159.0",
+    "@aws-sdk/client-cloudformation": "^3.118.1",
+    "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
+    "@aws-sdk/client-dynamodb": "^3.118.1",
+    "@aws-sdk/client-ec2": "^3.119.0",
+    "@aws-sdk/client-eventbridge": "^3.118.1",
+    "@aws-sdk/client-iam": "^3.118.1",
+    "@aws-sdk/client-lambda": "^3.82.0",
+    "@aws-sdk/client-s3": "^3.118.1",
+    "@aws-sdk/client-service-catalog": "^3.118.1",
+    "@aws-sdk/client-ssm": "^3.118.1",
+    "@aws-sdk/client-sts": "^3.118.1",
+    "@aws-sdk/util-dynamodb": "^3.87.0",
+    "@hapi/boom": "^10.0.0",
+    "generate-password": "^1.7.0",
+    "jsonschema": "^1.4.1",
+    "lodash": "^4.17.21",
+    "md5-file": "^5.0.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws-sdk/types": "^3.110.0",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
+    "@types/jest": "^27.4.1",
+    "@types/lodash": "^4.14.181",
+    "@types/node": "^14",
+    "@types/uuid": "^8.3.4",
+    "aws-sdk-client-mock": "^0.6.2",
+    "depcheck": "^1.4.3",
+    "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.26.0",
+    "istanbul-badges-readme": "1.8.1",
+    "jest": "^27.5.1",
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
+    "sort-package-json": "^1.57.0",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.2"
+  }
+}

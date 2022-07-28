@@ -1,0 +1,135 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.62.1",
+  "pnpmVersion": "6.30.0",
+  "pnpmOptions": {
+    "strictPeerDependencies": true,
+    "useWorkspaces": true
+  },
+  "nodeSupportedVersionRange": ">=14.15.0 <15.0.0 || >=16.13.0 <17.0.0",
+  "ensureConsistentVersions": true,
+  "projectFolderMaxDepth": 3,
+  "approvedPackagesPolicy": {
+    "reviewCategories": ["production", "tools", "prototypes"],
+    "ignoredNpmScopes": ["@types"]
+  },
+  "gitPolicy": {
+    "versionBumpCommitMessage": "Bump versions [skip ci]",
+    "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
+  },
+  "repository": {
+    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
+    "defaultBranch": "main"
+  },
+  "eventHooks": {
+    "preRushInstall": [],
+    "postRushInstall": [],
+    "preRushBuild": [],
+    "postRushBuild": []
+  },
+  "variants": [],
+  "projects": [
+    {
+      "packageName": "@amzn/swb-app",
+      "projectFolder": "solutions/swb-app",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/swb-reference",
+      "projectFolder": "solutions/swb-reference",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-environments",
+      "projectFolder": "workbench-core/environments",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-logging",
+      "projectFolder": "workbench-core/logging",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-base",
+      "projectFolder": "workbench-core/base",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
+      "projectFolder": "workbench-core/eslint-custom",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-authorization",
+      "projectFolder": "workbench-core/authorization",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-authentication",
+      "projectFolder": "workbench-core/authentication",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-audit",
+      "projectFolder": "workbench-core/audit",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/example-ui-app",
+      "projectFolder": "solutions/example-ui-app",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-datasets",
+      "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/workbench-core-example-express",
+      "projectFolder": "workbench-core/example/express",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-example-infrastructure",
+      "projectFolder": "workbench-core/example/infrastructure",
+      "reviewCategory": "prototypes",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/swb-ui",
+      "projectFolder": "solutions/swb-ui",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-repo-toolbox",
+      "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@amzn/workbench-core-infrastructure",
+      "projectFolder": "workbench-core/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@amzn/swb-ui-infrastructure",
+      "projectFolder": "solutions/swb-ui/infrastructure",
+      "reviewCategory": "production",
+      "shouldPublish": false
+    }
+  ]
+}

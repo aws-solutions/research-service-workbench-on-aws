@@ -1,0 +1,90 @@
+description: SSM document to terminate a Sagemaker Notebook instance
+schemaVersion: '0.3'
+parameters:
+  ProvisionedProductId:
+    type: String
+    description: 'The ID of the Sagemaker provisioned product being terminated.'
+    allowedPattern: ^pp-[a-zA-Z0-9_\-]+$
+  TerminateToken:
+    type: String
+    description: '(Required) The unique token ID assigned to this request.'
+    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+  EnvId:
+    type: String
+    description: 'The ID of the environment resource stored in DDB'
+    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+mainSteps:
+  - name: Terminate
+    action: 'aws:executeAwsApi'
+    maxAttempts: 3
+    timeoutSeconds: 30
+    inputs:
+      Service: servicecatalog
+      Api: TerminateProvisionedProduct
+      ProvisionedProductId: '{{ ProvisionedProductId }}'
+      TerminateToken: '{{ TerminateToken }}'
+    outputs:
+      - Name: RecordId
+        Type: String
+        Selector: '$.RecordDetail.RecordId'
+    nextStep: WaitForTerminating
+  - name: WaitForTerminating
+    action: 'aws:waitForAwsResourceProperty'
+    timeoutSeconds: 600
+    inputs:
+      Service: servicecatalog
+      Api: DescribeRecord
+      Id: '{{ Terminate.RecordId }}'
+      DesiredValues:
+        - SUCCEEDED
+        - FAILED
+      PropertySelector: '$.RecordDetail.Status'
+    # aws.waitForAwsResourceProperty does not support outputs so creating another step
+    nextStep: GetRecordDetail
+  - name: GetRecordDetail
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: servicecatalog
+      Api: DescribeRecord
+      Id: '{{ Terminate.RecordId }}'
+    outputs:
+      - Name: ProductStatus
+        Type: String
+        Selector: '$.RecordDetail.Status'
+      - Name: ErrorMessage
+        Type: StringList
+        Selector: '$.RecordDetail.RecordErrors'
+    nextStep: ChooseByStatus
+  - name: ChooseByStatus
+    action: 'aws:branch'
+    inputs:
+      Choices:
+        - NextStep: PushMetadataToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: SUCCEEDED
+        - NextStep: PushFailureStatusToEventBridge
+          Variable: '{{ GetRecordDetail.ProductStatus }}'
+          StringEquals: FAILED
+      Default: PushFailureStatusToEventBridge
+  - name: PushMetadataToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ Terminate.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Terminate", "Status": "TERMINATED" }'
+          DetailType: 'Terminate'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
+    isEnd: true
+  - name: PushFailureStatusToEventBridge
+    action: 'aws:executeAwsApi'
+    inputs:
+      Service: events
+      Api: PutEvents
+      Entries:
+        - Detail: '{ "EnvId": "{{ EnvId }}", "ProvisionedProductId": "{{ ProvisionedProductId }}", "RecordId": "{{ Terminate.RecordId }}", "EnvType": "sagemakerNotebook", "Operation": "Terminate", "Status": "TERMINATING_FAILED", "ErrorMessage": {{ GetRecordDetail.ErrorMessage }} }'
+          DetailType: 'Terminate'
+          EventBusName: 'default'
+          Source: 'automation' # This is being used for updating env in statusHandler lambda
+    isEnd: true
