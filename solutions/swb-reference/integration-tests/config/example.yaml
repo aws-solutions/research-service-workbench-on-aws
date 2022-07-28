@@ -10,9 +10,8 @@
 #alreadyTerminateEnvId: ''   # id of an environment that has already been terminated
 
 #Cognito Integ Test Client
-#awsRegionParamStorePath: ''
-#userPoolIdParamStorePath: ''
-#clientIdParamStorePath: ''
-#clientSecretParamStorePath: ''
-#rootUsernameParamStorePath: ''
+#awsRegion: ''
+#userPoolId: ''
+#clientId: ''
+#rootUsername: ''
 #rootPasswordParamStorePath: ''

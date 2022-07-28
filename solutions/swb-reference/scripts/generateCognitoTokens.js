@@ -14,31 +14,40 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const { AwsService } = require('@amzn/workbench-core-base');
 
-async function run() {
-  const config = yaml.load(
-    // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-    // correct file
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(join(__dirname, `../integration-tests/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-  );
+const config = yaml.load(
+  // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+  // correct file
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.readFileSync(join(__dirname, `../integration-tests/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
+);
 
-  const clientSecret = config.clientSecret;
-  const clientId = config.clientId;
-  const userPoolId = config.userPoolId;
-  const region = config.awsRegion;
-  const username = process.argv[2];
-  const password = process.argv[3];
+const clientId = config.clientId;
+const userPoolId = config.userPoolId;
+const region = config.awsRegion;
+const username = process.argv[2];
+const password = process.argv[3];
 
-  const secretHash = crypto
-    .createHmac('SHA256', clientSecret)
-    .update(username + clientId)
-    .digest('base64');
+const aws = new AwsService({
+  region
+});
 
-  const aws = new AwsService({
-    region
+async function getClientSecret() {
+  const response = await aws.clients.cognito.describeUserPoolClient({
+    UserPoolId: userPoolId,
+    ClientId: clientId
   });
+  return response.UserPoolClient.ClientSecret;
+}
 
+async function run() {
   try {
+    const clientSecret = await getClientSecret();
+
+    const secretHash = crypto
+      .createHmac('SHA256', clientSecret)
+      .update(username + clientId)
+      .digest('base64');
+
     const response = await aws.clients.cognito.adminInitiateAuth({
       UserPoolId: userPoolId,
       ClientId: clientId,

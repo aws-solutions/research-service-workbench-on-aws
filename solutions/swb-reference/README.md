@@ -39,7 +39,8 @@ This step is necessary to setup Service Catalog portfolio and products
 ## Integration Tests
 To run integration tests 
 1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config value.
-2. In this root directory run `STAGE=<STAGE> rushx integration-tests`
+2. For `rootPasswordParamsStorePath`, go to the AWS console for your Main account, and [create a parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) to store the root user password. The name of the parameter should be  `/swb/<STAGE>/rootUser/password`
+3. In this root directory run `STAGE=<STAGE> rushx integration-tests`
 
 To use the framework for calling the SWBv2 API, create a `ClientSession` and then use the `resources` attribute to call the `CRUD` commands
 
