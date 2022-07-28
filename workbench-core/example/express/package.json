@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-example-express",
+  "name": "@aws/workbench-core-example-express",
   "version": "0.0.1",
   "description": "Example Express App",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -27,11 +27,11 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@amzn/workbench-core-audit": "workspace:*",
-    "@amzn/workbench-core-logging": "workspace:*"
+    "@aws/workbench-core-audit": "workspace:*",
+    "@aws/workbench-core-logging": "workspace:*"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",

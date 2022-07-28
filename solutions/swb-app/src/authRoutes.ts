@@ -4,6 +4,7 @@
  */
 
 // Auth management
+import { LoggingService } from '@amzn/workbench-core-logging';
 import {
   AuthenticationService,
   getAuthorizationCodeUrl,
@@ -11,8 +12,7 @@ import {
   isUserLoggedIn,
   logoutUser,
   refreshAccessToken
-} from '@amzn/workbench-core-authentication';
-import { LoggingService } from '@amzn/workbench-core-logging';
+} from '@aws/workbench-core-authentication';
 import { Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 

@@ -1,5 +1,7 @@
 # Workbench Core ESLint Config Custom
 
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 ## Description
 Custom ESLint rules
 
@@ -10,7 +12,7 @@ Custom ESLint rules
 "devDependencies": {
     .
     .
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*"
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*"
   }
 ```
 

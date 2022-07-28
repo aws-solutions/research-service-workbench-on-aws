@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-jest.mock('@amzn/workbench-core-audit');
-jest.mock('@amzn/workbench-core-logging');
+jest.mock('@aws/workbench-core-audit');
+jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 
-import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
-import { AwsService } from '@amzn/workbench-core-base';
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
+import { AwsService } from '@aws/workbench-core-base';
+import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';

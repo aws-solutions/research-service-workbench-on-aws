@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser, RoutesIgnored } from '@amzn/workbench-core-authorization';
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { AuthenticatedUser, RoutesIgnored } from '@aws/workbench-core-authorization';
+import { LoggingService } from '@aws/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import get from 'lodash/get';
 import has from 'lodash/has';

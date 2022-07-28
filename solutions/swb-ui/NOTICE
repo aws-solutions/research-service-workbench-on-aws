@@ -1,39 +1,39 @@
-@amzn/workbench-core-environments
+@aws/workbench-core-environments
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/eslint-config-workbench-core-eslint-custom
+@aws/eslint-config-workbench-core-eslint-custom
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-audit
+@aws/workbench-core-audit
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-authorization
+@aws/workbench-core-authorization
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-base
+@aws/workbench-core-base
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-datasets
+@aws/workbench-core-datasets
 0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>

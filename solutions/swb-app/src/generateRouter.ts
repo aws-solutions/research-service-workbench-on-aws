@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { LoggingService } from '@amzn/workbench-core-logging';
 import {
   verifyToken,
   AuthenticationService,
@@ -10,7 +11,7 @@ import {
   CognitoAuthenticationPlugin,
   UserManagementService,
   CognitoUserManagementPlugin
-} from '@amzn/workbench-core-authentication';
+} from '@aws/workbench-core-authentication';
 import {
   withAuth,
   AuthorizationService,
@@ -19,8 +20,7 @@ import {
   RoutesIgnored,
   RoutesMap,
   StaticPermissionsPlugin
-} from '@amzn/workbench-core-authorization';
-import { LoggingService } from '@amzn/workbench-core-logging';
+} from '@aws/workbench-core-authorization';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express = require('express');

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Permission, PermissionsMap } from '@amzn/workbench-core-authorization';
+import { Permission, PermissionsMap } from '@aws/workbench-core-authorization';
 
 const adminPermissions: Permission[] = [
   {

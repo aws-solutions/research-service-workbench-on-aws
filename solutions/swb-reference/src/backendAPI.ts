@@ -3,22 +3,22 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { generateRouter, ApiRouteConfig } from '@amzn/swb-app';
-import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
-import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
+import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
+import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { AwsService, AuditLogger } from '@aws/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
   DdbDataSetMetadataPlugin
-} from '@amzn/workbench-core-datasets';
+} from '@aws/workbench-core-datasets';
 import {
   HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
   EnvironmentTypeConfigService,
   ProjectService
-} from '@amzn/workbench-core-environments';
-import { LoggingService } from '@amzn/workbench-core-logging';
+} from '@aws/workbench-core-environments';
+import { LoggingService } from '@aws/workbench-core-logging';
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';

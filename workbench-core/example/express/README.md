@@ -1,5 +1,7 @@
 # `example-express`
 
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 ## Description
 
 #### Sample express app along with integration to Logging and Auditing Service
@@ -12,5 +14,5 @@
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
-| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
-| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
+| [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
