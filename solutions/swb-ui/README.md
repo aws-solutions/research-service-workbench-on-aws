@@ -78,7 +78,6 @@ To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionS
 ## App
 Open [http://localhost:3000](http://localhost:3000) in your browser to access the app.
 
-
 ## Design system
 
 For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).

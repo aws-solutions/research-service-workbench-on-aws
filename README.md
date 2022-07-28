@@ -1,6 +1,7 @@
 # Workflow Status
 [![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
-[![Merge-develop-to-main](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-main/badge.svg)
+[![Merge-develop-to-stage](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-stage/badge.svg)
+[![Publish-and-merge-to-develop](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Publish-and-merge-to-develop/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
 [![GitHub-release](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)
