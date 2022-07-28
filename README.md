@@ -11,7 +11,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-87.73%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.71%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-89.09%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-88.24%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-87.73%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.71%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-89.09%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-88.23%25-yellow.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -32,16 +32,12 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | Folder | Package | README |
 | ------ | ------- | ------ |
 | [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
-| [solutions/swb-reference](./solutions/swb-reference/) | [@amzn/swb-reference] | [README](./solutions/swb-reference/README.md)
-| [solutions/swb-ui](./solutions/swb-ui/) | [@amzn/swb-ui] | [README](./solutions/swb-ui/README.md)
-| [solutions/swb-ui/infrastructure](./solutions/swb-ui/infrastructure/) | [@amzn/swb-ui-infrastructure] | [README](./solutions/swb-ui/infrastructure/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
 | [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
 | [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
 | [workbench-core/environments](./workbench-core/environments/) | [@amzn/workbench-core-environments] | [README](./workbench-core/environments/README.md)
-| [workbench-core/eslint-custom](./workbench-core/eslint-custom/) | [@amzn/eslint-config-workbench-core-eslint-custom] | [README](./workbench-core/eslint-custom/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
