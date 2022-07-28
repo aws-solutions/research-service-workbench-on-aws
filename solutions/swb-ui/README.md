@@ -1,5 +1,4 @@
-# Service Workbench App
-
+# swb-ui
 ## Code Coverage
 
 | Statements | Branches | Functions | Lines |
@@ -8,13 +7,11 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-
 ## Deploy UI to AWS
 
 ### Prerequisite:
 
 1. Make sure to Follow instructions in [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
-
 
 ### Deploy static website
 
@@ -49,6 +46,7 @@ swb-<STAGE>-<awsRegionShortName>.uiClientURL = https://<id>.cloudfront.net
 Stack ARN: ARN
 
 ✨  Total time: 186.07s
+
 ```
 To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionShortName>.uiClientURL`.
 
@@ -78,15 +76,7 @@ To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionS
 
 
 ## App
-
 Open [http://localhost:3000](http://localhost:3000) in your browser to access the app.
-
-The environments page is at [http://localhost:3000/environments](http://localhost:3000/environments).
-
-## API
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/environments](http://localhost:3000/api/environments).
-
 
 
 ## Design system

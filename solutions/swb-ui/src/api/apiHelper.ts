@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import axios from 'axios';
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;

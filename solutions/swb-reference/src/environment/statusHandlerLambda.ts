@@ -1,5 +1,10 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
-import { StatusHandler, EventBridgeEventToDDB } from '@amzn/environments';
+import { StatusHandler, EventBridgeEventToDDB } from '@amzn/workbench-core-environments';
 import _ from 'lodash';
 
 /* eslint-disable-next-line */

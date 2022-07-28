@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
@@ -23,11 +28,11 @@ export default class AccountHandler {
 
     const cfService = this._mainAccountAwsService.helpers.cloudformation;
     const {
-      [process.env.LAUNCH_CONSTRAINT_ROLE_NAME!]: launchConstraintRoleName,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: s3ArtifactBucketArn
+      [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstraintRoleName,
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: s3ArtifactBucketArn
     } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
-      process.env.LAUNCH_CONSTRAINT_ROLE_NAME!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_NAME!
+      process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
     ]);
 
     for (const hostingAccount of hostingAccounts) {
@@ -54,7 +59,7 @@ export default class AccountHandler {
         targetAccountAwsService: hostingAccountAwsService,
         targetAccountStackName: hostingAccount.stackName,
         portfolioId,
-        ssmDocNameSuffix: process.env.SSM_DOC_NAME_SUFFIX!,
+        ssmDocNameSuffix: process.env.SSM_DOC_OUTPUT_KEY_SUFFIX!,
         principalArnForScPortfolio: hostingAccount.envMgmtRoleArn,
         roleToCopyToTargetAccount: launchConstraintRoleName,
         s3ArtifactBucketName

@@ -1,10 +1,15 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-non-literal-fs-filename */
 import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
-import { CognitoSetup, ServiceCatalogSetup } from '@amzn/environments';
 import { AwsService } from '@amzn/workbench-core-base';
+import { CognitoSetup, ServiceCatalogSetup } from '@amzn/workbench-core-environments';
 import Axios from 'axios';
 import { getConstants } from './constants';
 

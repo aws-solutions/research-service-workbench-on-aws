@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import { ListLaunchPathsCommand, ServiceCatalogClient } from '@aws-sdk/client-service-catalog';
@@ -13,7 +18,7 @@ describe('EnvironmentLifecycleHelper', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.AWS_REGION = 'us-east-1';
-    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+    process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
   });
 
   afterAll(() => {
@@ -30,11 +35,11 @@ describe('EnvironmentLifecycleHelper', () => {
           CreationTime: new Date(),
           Outputs: [
             {
-              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_NAME_SUFFIX}`,
+              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_OUTPUT_KEY_SUFFIX}`,
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
             },
             {
-              OutputKey: `SagemakerTerminate${process.env.SSM_DOC_NAME_SUFFIX}`,
+              OutputKey: `SagemakerTerminate${process.env.SSM_DOC_OUTPUT_KEY_SUFFIX}`,
               OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerTerminate'
             }
           ]
@@ -187,7 +192,7 @@ describe('EnvironmentLifecycleHelper', () => {
     mockCloudformationOutputs(cfnMock);
     const helper = new EnvironmentLifecycleHelper();
 
-    const validOutputName = 'SagemakerLaunchSSMDoc';
+    const validOutputName = 'SagemakerLaunchSSMDocOutput';
 
     // OPERATE & CHECK
     await expect(helper.getSSMDocArn(validOutputName)).resolves.toEqual(

@@ -42,7 +42,7 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/environments",
+      "packageName": "@amzn/workbench-core-environments",
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
       "shouldPublish": true
@@ -117,7 +117,7 @@
       "packageName": "@amzn/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@amzn/workbench-core-infrastructure",

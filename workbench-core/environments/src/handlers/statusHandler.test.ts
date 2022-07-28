@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AwsService } from '@amzn/workbench-core-base';
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -15,7 +20,7 @@ describe('StatusHandler', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.AWS_REGION = 'us-east-1';
-    process.env.SSM_DOC_NAME_SUFFIX = 'SSMDoc';
+    process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
     ebToDDB = {
       envId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       status: 'TERMINATING',

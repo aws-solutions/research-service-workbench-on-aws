@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import jwt from 'jwt-decode';
 import pkceChallenge from 'pkce-challenge';
 import React, { createContext, useContext, useEffect, Context, useState, useMemo } from 'react';

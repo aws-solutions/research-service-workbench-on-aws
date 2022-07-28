@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { LoggingService } from '@amzn/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
 import { AuthenticatedUser } from './authenticatedUser';

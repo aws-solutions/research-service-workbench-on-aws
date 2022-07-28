@@ -1,8 +1,13 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import {
   CreateEnvironmentTypeConfigSchema,
   EnvironmentTypeConfigService,
   UpdateEnvironmentTypeConfigSchema
-} from '@amzn/environments';
+} from '@amzn/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';

@@ -26,18 +26,24 @@ export default class HostingAccountLifecycleService {
     this._accountService = new AccountService(ddbTableName);
   }
 
+  /**
+   * Links hosting account with main account policies for cross account communication
+   * @param accountMetadata - the attributes of the given hosting account from the onboarded CFN stack outputs
+   *
+   * @returns account record in DDB
+   */
   public async initializeAccount(accountMetadata: {
     [key: string]: string;
   }): Promise<{ [key: string]: string }> {
     const cfService = this._aws.helpers.cloudformation;
     const {
-      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_NAME!]: artifactBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!]: mainAcctEncryptionArn
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
     } = await cfService.getCfnOutput(this._stackName, [
-      process.env.STATUS_HANDLER_ARN_NAME!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_NAME!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!
+      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     // Update main account default event bus to accept hosting account state change events
@@ -53,6 +59,11 @@ export default class HostingAccountLifecycleService {
     return this._accountService.createOrUpdate(accountMetadata);
   }
 
+  /**
+   * Updates main account encryption key policy to include new hosting account
+   * @param mainAcctEncryptionArn - the encryption key in main account
+   * @param awsAccountId - AWS Account ID of hosting account
+   */
   public async updateMainAccountEncryptionKeyPolicy(
     mainAcctEncryptionArn: string,
     awsAccountId: string
@@ -266,11 +277,8 @@ export default class HostingAccountLifecycleService {
       StackName: hostingAccountStackName
     });
 
-    const describeCfResponse = await hostingAccountAwsService.clients.cloudformation.describeStacks({
-      StackName: hostingAccountStackName
-    });
-    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeCfResponse.Stacks![0]!.StackStatus!)) {
-      const outputs: Output[] = describeCfResponse.Stacks![0]!.Outputs as Output[];
+    if (['CREATE_COMPLETE', 'UPDATE_COMPLETE'].includes(describeStackResponse.Stacks![0]!.StackStatus!)) {
+      const outputs: Output[] = describeStackResponse.Stacks![0]!.Outputs as Output[];
       const vpcId = outputs.find((output) => {
         return output.OutputKey === 'VPC';
       })!.OutputValue;

@@ -1,3 +1,9 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
 import {
   HostingAccountService,
   EnvironmentConnectionService,
@@ -6,8 +12,7 @@ import {
   EnvironmentTypeService,
   EnvironmentTypeConfigService,
   ProjectService
-} from '@amzn/environments';
-import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
+} from '@amzn/workbench-core-environments';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
