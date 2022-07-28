@@ -3,11 +3,9 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-name: Merge-develop-to-main
+name: Merge-develop-to-stage
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
     branches:
       - 'develop'
   
@@ -60,8 +58,8 @@ jobs:
   #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
   #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
 
-  merge-develop-to-main:
-    name: Merge develop to main
+  merge-develop-to-stage:
+    name: Merge develop to stage
     runs-on: ubuntu-20.04
     needs: [readme-commit, deploy-swb-reference]
     env: 
@@ -75,19 +73,19 @@ jobs:
 
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
-      - name: Temporarily disable branch protection on main
+      - name: Temporarily disable branch protection on stage
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: monorepo-for-service-workbench
-          branch: main
+          branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
-      - name: Merge to main
+      - name: Merge to stage
         run: |
-          echo "Set the COMMIT_ID to merge to main, to current workflow commit id, if no readme commit was made"
+          echo "Set the COMMIT_ID to merge to stage, to current workflow commit id, if no readme commit was made"
           echo "Else"
           echo "Set the COMMIT_ID to README commit id"
           COMMIT_ID=''
@@ -96,21 +94,21 @@ jobs:
           else
             COMMIT_ID=$GITHUB_SHA
           fi
-          git checkout main
+          git checkout stage
           echo
           echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
-          echo "  into the 'main' branch ($(git log -1 --pretty=%H main))"
+          echo "  into the 'stage' branch ($(git log -1 --pretty=%H stage))"
           echo
           git merge $COMMIT_ID --ff-only --no-edit
-          git push origin main
+          git push origin stage
           
-      - name: Enable branch protection on main
+      - name: Enable branch protection on stage
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: monorepo-for-service-workbench
-          branch: main
+          branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

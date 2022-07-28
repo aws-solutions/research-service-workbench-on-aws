@@ -31,11 +31,11 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@amzn/environments": "workspace:*",
     "@amzn/swb-app": "workspace:*",
     "@amzn/workbench-core-audit": "workspace:*",
     "@amzn/workbench-core-base": "workspace:*",
     "@amzn/workbench-core-datasets": "workspace:*",
+    "@amzn/workbench-core-environments": "workspace:*",
     "@amzn/workbench-core-infrastructure": "workspace:*",
     "@amzn/workbench-core-logging": "workspace:*",
     "@aws-sdk/client-cloudformation": "^3.118.1",

@@ -3,7 +3,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
   "packages": [
     {
-      "name": "@amzn/environments",
+      "name": "@amzn/workbench-core-environments",
       "allowedCategories": [ "production" ]
     },
     {
@@ -163,14 +163,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@babel/plugin-syntax-flow",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@babel/plugin-transform-react-jsx",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@babel/preset-env",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -257,10 +249,6 @@
     {
       "name": "aws-sdk-client-mock",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "aws4",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "axios",
@@ -355,14 +343,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "http-request-mock",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "https",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "istanbul-badges-readme",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -419,10 +399,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "nock",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "nodemon",
       "allowedCategories": [ "production" ]
     },
@@ -452,10 +428,6 @@
     },
     {
       "name": "react-router-dom",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "react-scripts",
       "allowedCategories": [ "production" ]
     },
     {
@@ -496,10 +468,6 @@
     },
     {
       "name": "uuid",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "web-vitals",
       "allowedCategories": [ "production" ]
     },
     {
