@@ -1,8 +1,9 @@
 import crypto from 'crypto';
-import { AwsService } from '@amzn/workbench-core-base';
+import AwsService from './aws/awsService';
 
 export default class CognitoTokenService {
   private _aws: AwsService;
+
   public constructor(awsRegion: string) {
     this._aws = new AwsService({ region: awsRegion });
   }
@@ -11,19 +12,28 @@ export default class CognitoTokenService {
     userPoolId: string,
     clientId: string,
     rootUsername: string,
-    rootPasswordParamStorePath: string
+    rootPasswordParamStorePath?: string,
+    rootPassword?: string
   ): Promise<{
     accessToken: string;
     idToken: string;
     refreshToken: string;
   }> {
+    let password: string = rootPassword || '';
+    if (rootPasswordParamStorePath && rootPassword) {
+      throw new Error(
+        'Both "rootPasswordParamStorePath" and "rootPassword" are defined. Please pass in only one of the two parameters.'
+      );
+    } else if (rootPasswordParamStorePath) {
+      password = await this._getSSMParamValue(rootPasswordParamStorePath);
+    }
+
     const clientSecret = await this._getClientSecret(userPoolId, clientId);
     const secretHash = crypto
       .createHmac('SHA256', clientSecret)
       .update(rootUsername + clientId)
       .digest('base64');
 
-    const password = await this._getSSMParamValue(rootPasswordParamStorePath);
     const response = await this._aws.clients.cognito.adminInitiateAuth({
       UserPoolId: userPoolId,
       ClientId: clientId,

@@ -1,6 +1,6 @@
+import { CognitoTokenService } from '@amzn/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
-import CognitoTokenService from './utils/cognitoTokenService';
 import Settings from './utils/settings';
 
 export default class Setup {
