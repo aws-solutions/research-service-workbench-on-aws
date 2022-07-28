@@ -102,7 +102,7 @@ jobs:
           COMMIT_ID=$GITHUB_SHA
           git checkout develop
           echo
-          echo "  Attempting to merge the 'develop' branch ($COMMIT_ID)"
+          echo "  Attempting to merge the 'main' branch ($COMMIT_ID)"
           echo "  into the 'develop' branch"
           echo
           git merge $COMMIT_ID --ff --no-edit -m "Merge main to develop"
