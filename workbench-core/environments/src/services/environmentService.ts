@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-object-injection */
 
 import { AuthenticatedUser } from '@amzn/workbench-core-authorization';
@@ -301,6 +306,13 @@ export class EnvironmentService {
     return queryParams;
   }
 
+  /**
+   * Update environment object in DDB
+   * @param envId - the identifier of the environment to update
+   * @param updatedValues - the attribute values to update for the given environment
+   *
+   * @returns environment object with updated attributes
+   */
   public async updateEnvironment(
     envId: string,
     updatedValues: {
@@ -336,6 +348,13 @@ export class EnvironmentService {
     return `${type}#${id}`;
   }
 
+  /**
+   * Create new environment
+   * @param params - the attribute values to create a given environment
+   * @param user - the user requesting this operation
+   *
+   * @returns environment object from DDB
+   */
   public async createEnvironment(
     params: {
       instanceId?: string;

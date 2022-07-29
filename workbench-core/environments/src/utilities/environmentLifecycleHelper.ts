@@ -24,7 +24,7 @@ export default class EnvironmentLifecycleHelper {
   public dataSetService: DataSetService;
   public environmentService: EnvironmentService;
   public constructor() {
-    this.ssmDocSuffix = process.env.SSM_DOC_NAME_SUFFIX!;
+    this.ssmDocSuffix = process.env.SSM_DOC_OUTPUT_KEY_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
     const logger: LoggingService = new LoggingService();
     this.dataSetService = new DataSetService(
@@ -79,16 +79,22 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
+  /**
+   * Get multiple main account CFN stack outputs
+   *
+   * @returns output values retrieved from main CFN stack:
+   *    datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn
+   */
   public async getCfnOutputs(): Promise<{ [id: string]: string }> {
     const cfService = this.aws.helpers.cloudformation;
     const {
-      [process.env.STATUS_HANDLER_ARN_NAME!]: statusHandlerArn,
-      [process.env.S3_DATASETS_BUCKET_ARN_NAME!]: datasetsBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!]: mainAcctEncryptionArn
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
+      [process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!]: datasetsBucketArn,
+      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
     } = await cfService.getCfnOutput(process.env.STACK_NAME!, [
-      process.env.STATUS_HANDLER_ARN_NAME!,
-      process.env.S3_DATASETS_BUCKET_ARN_NAME!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_NAME!
+      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.S3_DATASETS_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     const mainAccountRegion = statusHandlerArn.split(':')[3];
@@ -222,6 +228,12 @@ export default class EnvironmentLifecycleHelper {
     return { s3Mounts, iamPolicyDocument };
   }
 
+  /**
+   * Get SSM document ARN from main account CFN stack outputs
+   * @param ssmDocOutputName - SSM document CFN output name
+   *
+   * @returns SSM Document ARN
+   */
   public async getSSMDocArn(ssmDocOutputName: string): Promise<string> {
     const describeStackParam = {
       StackName: process.env.STACK_NAME!
@@ -238,6 +250,11 @@ export default class EnvironmentLifecycleHelper {
     }
   }
 
+  /**
+   * Adds new environment role to external endpoint
+   * @param envDetails - Environment object in DDB
+   * @param instanceRoleArn - Environment instance role ARN
+   */
   public async addRoleToAccessPoint(envDetails: Environment, instanceRoleArn: string): Promise<void> {
     const s3DataSetStoragePlugin = new S3DataSetStoragePlugin(this.aws);
 
@@ -344,6 +361,12 @@ export default class EnvironmentLifecycleHelper {
     return JSON.stringify(policyDoc);
   }
 
+  /**
+   * Get an AWS SDK instance in hosting account for EnvMgmt role
+   * @param payload - Object containing role ARN to assume and other attributes required for role assumption
+   *
+   * @returns AWS SDK instance in hosting account
+   */
   public async getAwsSdkForEnvMgmtRole(payload: {
     envMgmtRoleArn: string;
     externalId?: string;

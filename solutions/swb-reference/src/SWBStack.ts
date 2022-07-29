@@ -1,15 +1,24 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import {
+  AccessLogFormat,
+  LambdaIntegration,
+  LogGroupLogDestination,
+  RestApi
+} from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-
 import {
   AccountPrincipal,
   AnyPrincipal,
@@ -22,6 +31,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants } from './constants';
@@ -33,12 +43,12 @@ export class SWBStack extends Stack {
   public lambdaEnvVars: {
     STAGE: string;
     STACK_NAME: string;
-    SSM_DOC_NAME_SUFFIX: string;
+    SSM_DOC_OUTPUT_KEY_SUFFIX: string;
     AMI_IDS_TO_SHARE: string;
-    LAUNCH_CONSTRAINT_ROLE_NAME: string;
-    S3_ARTIFACT_BUCKET_ARN_NAME: string;
-    S3_DATASETS_BUCKET_ARN_NAME: string;
-    STATUS_HANDLER_ARN_NAME: string;
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
     PCLUSTER_API_URL: string;
     ALLOWED_ORIGINS: string;
@@ -47,7 +57,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     WEBSITE_URL: string;
-    MAIN_ACCT_ENCRYPTION_KEY_NAME: string;
+    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -57,18 +67,20 @@ export class SWBStack extends Stack {
     const {
       STAGE,
       AWS_REGION,
-      S3_ACCESS_BUCKET_ARN_NAME,
+      AWS_REGION_SHORT_NAME,
+      S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
       S3_ACCESS_BUCKET_PREFIX,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
-      S3_DATASETS_BUCKET_ARN_NAME,
-      LAUNCH_CONSTRAINT_ROLE_NAME,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
       STACK_NAME,
-      SSM_DOC_NAME_SUFFIX,
+      SSM_DOC_OUTPUT_KEY_SUFFIX,
       AMI_IDS_TO_SHARE,
-      STATUS_HANDLER_ARN_NAME,
+      STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
+      UI_CLIENT_URL,
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
@@ -76,7 +88,7 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_NAME
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -113,12 +125,12 @@ export class SWBStack extends Stack {
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
-      SSM_DOC_NAME_SUFFIX,
+      SSM_DOC_OUTPUT_KEY_SUFFIX,
       AMI_IDS_TO_SHARE,
-      LAUNCH_CONSTRAINT_ROLE_NAME,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
-      S3_DATASETS_BUCKET_ARN_NAME,
-      STATUS_HANDLER_ARN_NAME,
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
@@ -127,18 +139,22 @@ export class SWBStack extends Stack {
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
       WEBSITE_URL,
-      MAIN_ACCT_ENCRYPTION_KEY_NAME
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
+    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     const mainAcctEncryptionKey = this._createEncryptionKey();
-    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
-    const datasetBucket = this._createS3DatasetsBuckets(S3_DATASETS_BUCKET_ARN_NAME, mainAcctEncryptionKey);
-    const artifactS3Bucket = this._createS3ArtifactsBuckets(
-      S3_ARTIFACT_BUCKET_ARN_NAME,
+    this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+    const datasetBucket = this._createS3DatasetsBuckets(
+      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
       mainAcctEncryptionKey
     );
-    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_NAME, artifactS3Bucket);
+    const artifactS3Bucket = this._createS3ArtifactsBuckets(
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      mainAcctEncryptionKey
+    );
+    const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
@@ -149,8 +165,19 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
   }
 
+  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+    new CfnOutput(this, 'awsRegion', {
+      value: awsRegion
+    });
+    new CfnOutput(this, 'awsRegionShortName', {
+      value: awsRegionName
+    });
+    new CfnOutput(this, 'uiClientURL', {
+      value: uiClientURL
+    });
+  }
+
   private _createEncryptionKey(): Key {
-    const { MAIN_ACCT_ENCRYPTION_KEY_NAME } = getConstants();
     const mainKeyPolicy = new PolicyDocument({
       statements: [
         new PolicyStatement({
@@ -167,7 +194,7 @@ export class SWBStack extends Stack {
       policy: mainKeyPolicy
     });
 
-    new CfnOutput(this, MAIN_ACCT_ENCRYPTION_KEY_NAME, {
+    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY, {
       value: key.keyArn
     });
     return key;
@@ -327,11 +354,29 @@ export class SWBStack extends Stack {
    * @param bucketName - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
-  private _createAccessLogsBucket(bucketName: string, mainAcctEncryptionKey: Key): Bucket {
+  private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const s3Bucket = new Bucket(this, 's3-access-logs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED,
-      encryptionKey: undefined
+      encryption: BucketEncryption.S3_MANAGED
+    });
+
+    s3Bucket.addToResourcePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
+        actions: ['s3:PutObject'],
+        resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        conditions: {
+          StringEquals: {
+            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
+          }
+        }
+      })
+    );
+
+    new CfnOutput(this, bucketNameOutput, {
+      value: s3Bucket.bucketName,
+      exportName: bucketNameOutput
     });
 
     return s3Bucket;
@@ -407,31 +452,11 @@ export class SWBStack extends Stack {
       encryptionKey: mainAcctEncryptionKey
     });
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
-    this._setupAccessLogsBucketPolicy(s3Bucket);
 
     new CfnOutput(this, s3OutputId, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
-  }
-
-  private _setupAccessLogsBucketPolicy(sourceBucket: Bucket): void {
-    this._accessLogsBucket.addToResourcePolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
-        actions: ['s3:PutObject'],
-        resources: [`${this._accessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
-        conditions: {
-          ArnLike: {
-            'aws:SourceArn': sourceBucket.bucketArn
-          },
-          StringEquals: {
-            'aws:SourceAccount': process.env.CDK_DEFAULT_ACCOUNT
-          }
-        }
-      })
-    );
   }
 
   private _createStatusHandlerLambda(datasetBucket: Bucket): Function {
@@ -629,7 +654,7 @@ export class SWBStack extends Stack {
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
+            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
             resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
             sid: 'KMSAccess'
           }),
@@ -703,11 +728,28 @@ export class SWBStack extends Stack {
 
   // API Gateway
   private _createRestApi(apiLambda: Function): void {
+    const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: 'Backend API Name',
       description: 'Backend API',
       deployOptions: {
-        stageName: 'dev'
+        stageName: 'dev',
+        accessLogDestination: new LogGroupLogDestination(logGroup),
+        accessLogFormat: AccessLogFormat.custom(
+          JSON.stringify({
+            stage: '$context.stage',
+            requestId: '$context.requestId',
+            integrationRequestId: '$context.integration.requestId',
+            status: '$context.status',
+            apiId: '$context.apiId',
+            resourcePath: '$context.resourcePath',
+            path: '$context.path',
+            resourceId: '$context.resourceId',
+            httpMethod: '$context.httpMethod',
+            sourceIp: '$context.identity.sourceIp',
+            userAgent: '$context.identity.userAgent'
+          })
+        )
       },
       defaultCorsPreflightOptions: {
         allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],

@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { FilteringProperty } from '@awsui/collection-hooks/dist/cjs/interfaces';
 
 export const filteringProperties: readonly FilteringProperty[] = [

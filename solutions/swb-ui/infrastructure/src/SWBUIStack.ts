@@ -1,5 +1,10 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import * as path from 'path';
-import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Fn, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Distribution,
   Function,
@@ -8,11 +13,12 @@ import {
   HeadersFrameOption,
   HeadersReferrerPolicy,
   OriginAccessIdentity,
-  ResponseHeadersPolicy
+  ResponseHeadersPolicy,
+  ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
@@ -23,7 +29,7 @@ export class SWBUIStack extends Stack {
     STACK_NAME: string;
     API_BASE_URL: string;
     AWS_REGION: string;
-    S3_ARTIFACT_BUCKET_ARN_NAME: string;
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_NAME: string;
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
     ACCESS_IDENTITY_ARTIFACT_NAME: string;
@@ -40,7 +46,7 @@ export class SWBUIStack extends Stack {
       STACK_NAME,
       API_BASE_URL,
       AWS_REGION,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -62,7 +68,7 @@ export class SWBUIStack extends Stack {
       STACK_NAME,
       API_BASE_URL,
       AWS_REGION,
-      S3_ARTIFACT_BUCKET_ARN_NAME,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -73,9 +79,9 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_ARTIFACT_NAME,
       RESPONSE_HEADERS_NAME
     };
-    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_ARN_NAME);
-    this._deployS3Bucket(bucket);
-    this._createDistribution(bucket);
+    const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
+    const distribution = this._createDistribution(bucket);
+    this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -109,22 +115,36 @@ export class SWBUIStack extends Stack {
     );
   }
 
-  private _createS3Bucket(s3ArtifactName: string): Bucket {
-    const s3Bucket = new Bucket(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_NAME, {
-      accessControl: BucketAccessControl.PRIVATE
+  private _createS3Bucket(bucketName: string, outputKey: string): Bucket {
+    const { S3_ACCESS_LOGS_BUCKET_PREFIX, S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY } = getConstants();
+    const accessLogsBucketName: string = Fn.importValue(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
+    const accessLogsBucket = Bucket.fromBucketName(
+      this,
+      'imported-access-logs-bucket',
+      accessLogsBucketName
+    ) as Bucket;
+    const s3Bucket = new Bucket(this, bucketName, {
+      accessControl: BucketAccessControl.PRIVATE,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: accessLogsBucket,
+      serverAccessLogsPrefix: S3_ACCESS_LOGS_BUCKET_PREFIX,
+      encryption: BucketEncryption.S3_MANAGED // CloudFront requires S3 managed key
     });
 
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
-    new CfnOutput(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_ARN_NAME, {
+    new CfnOutput(this, outputKey, {
       value: s3Bucket.bucketArn
     });
     return s3Bucket;
   }
-  private _deployS3Bucket(bucket: Bucket): void {
+
+  private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../out'))]
+      sources: [Source.asset(path.resolve(__dirname, '../../out'))],
+      distribution: distribution,
+      distributionPaths: ['/*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });
   }
 
@@ -143,7 +163,7 @@ export class SWBUIStack extends Stack {
     const securityPolicy = this._createSecurityPolicy(this.distributionEnvVars.API_BASE_URL);
     const distribution = new Distribution(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_NAME, {
       defaultRootObject: 'index.html',
-
+      enableLogging: true,
       defaultBehavior: {
         origin: new S3Origin(bucket, { originAccessIdentity }),
         responseHeadersPolicy: securityPolicy,
@@ -152,7 +172,8 @@ export class SWBUIStack extends Stack {
             function: redirectFunction,
             eventType: FunctionEventType.VIEWER_REQUEST
           }
-        ]
+        ],
+        viewerProtocolPolicy: ViewerProtocolPolicy.HTTPS_ONLY
       },
       additionalBehaviors: {}
     });

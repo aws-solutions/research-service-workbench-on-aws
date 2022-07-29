@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { createLogger, format, Logger } from 'winston';
 import TransportStream from 'winston-transport';
 import { LoggingPlugin } from '../loggingPlugin';

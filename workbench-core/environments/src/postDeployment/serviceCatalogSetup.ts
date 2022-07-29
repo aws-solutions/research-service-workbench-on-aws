@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable security/detect-non-literal-fs-filename */
 
 import fs from 'fs';
@@ -14,8 +19,8 @@ export default class ServiceCatalogSetup {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
     SC_PORTFOLIO_NAME: string;
-    S3_ARTIFACT_BUCKET_ARN_NAME: string;
-    LAUNCH_CONSTRAINT_ROLE_NAME: string;
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     STACK_NAME: string;
   };
 
@@ -23,8 +28,8 @@ export default class ServiceCatalogSetup {
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_SC_PREFIX: string;
     SC_PORTFOLIO_NAME: string;
-    S3_ARTIFACT_BUCKET_ARN_NAME: string;
-    LAUNCH_CONSTRAINT_ROLE_NAME: string;
+    S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     STACK_NAME: string;
   }) {
     this._constants = constants;
@@ -38,8 +43,8 @@ export default class ServiceCatalogSetup {
       S3_ARTIFACT_BUCKET_SC_PREFIX,
       SC_PORTFOLIO_NAME,
       STACK_NAME,
-      LAUNCH_CONSTRAINT_ROLE_NAME,
-      S3_ARTIFACT_BUCKET_ARN_NAME
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY
     } = this._constants;
     const portfolioName = SC_PORTFOLIO_NAME;
 
@@ -53,9 +58,12 @@ export default class ServiceCatalogSetup {
 
     const cfService = this._aws.helpers.cloudformation;
     const {
-      [S3_ARTIFACT_BUCKET_ARN_NAME]: s3ArtifactBucketArn,
-      [LAUNCH_CONSTRAINT_ROLE_NAME]: launchConstraintRoleName
-    } = await cfService.getCfnOutput(STACK_NAME, [LAUNCH_CONSTRAINT_ROLE_NAME, S3_ARTIFACT_BUCKET_ARN_NAME]);
+      [S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY]: s3ArtifactBucketArn,
+      [LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY]: launchConstraintRoleName
+    } = await cfService.getCfnOutput(STACK_NAME, [
+      LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
+      S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY
+    ]);
 
     const prefix = S3_ARTIFACT_BUCKET_SC_PREFIX;
 

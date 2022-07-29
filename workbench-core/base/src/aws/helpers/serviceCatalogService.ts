@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { ServiceCatalog, ListPortfoliosCommandInput, PortfolioDetail } from '@aws-sdk/client-service-catalog';
 
 export default class ServiceCatalogService {

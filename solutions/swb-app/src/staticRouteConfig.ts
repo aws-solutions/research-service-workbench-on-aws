@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { RoutesIgnored, RoutesMap } from '@amzn/workbench-core-authorization';
 
 export const routesMap: RoutesMap = {

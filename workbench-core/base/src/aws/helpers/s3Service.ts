@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import fs from 'fs';
 import { join } from 'path';
 import { S3 } from '@aws-sdk/client-s3';
