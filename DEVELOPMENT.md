@@ -1,4 +1,4 @@
-# Monorepo for Service Workbench Development Instructions
+# Development Instructions
 
 ## Prerequisites for development
 

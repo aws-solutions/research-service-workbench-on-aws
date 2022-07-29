@@ -36,7 +36,7 @@ These manual steps will not be required in the final implementation of SWBv2.
 We'll be using AWS CDK to deploy our code to AWS. Follow the steps below to onboard CDK onto your AWS `Main Account`.
 
 In `swb-reference` root directory run the follow code
-```
+```bash
 rush install
 rush build
 rushx compile
@@ -44,8 +44,8 @@ STAGE=<STAGE> rushx cdk bootstrap
 ```
 
 After bootstrap is completed you'll see a message like this
-```
-Found configuration in /Users/thingut/workplace/ma-mono/rush.json
+```bash
+Found configuration in /Users/<user>/workplace/solution-spark-on-aws/rush.json
 
 Rush Multi-Project Build Tool 5.62.1 - Node.js 14.17.0 (LTS)
 > "cdk bootstrap"
