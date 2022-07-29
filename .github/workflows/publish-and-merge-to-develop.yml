@@ -1,4 +1,4 @@
-name: publish-and-merge-to-develop
+name: Publish-and-merge-to-develop
 on:
   pull_request_target:
     types:
@@ -39,7 +39,7 @@ jobs:
           
       - name: Rush Publish
         run: |
-          PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --target-branch main --publish"
+          PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch main --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -99,7 +99,7 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

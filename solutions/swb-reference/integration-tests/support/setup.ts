@@ -1,5 +1,7 @@
-// TODO: Import this class from SWBv1
-
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';

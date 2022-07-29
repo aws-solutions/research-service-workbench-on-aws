@@ -1,11 +1,11 @@
 {
   "name": "@aws/workbench-core-infrastructure",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Package containing CDK constructs used in workbench core",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
