@@ -120,7 +120,7 @@ extractor?: Extractor;
 ```
 - **auditService**: A configured audit service
 - **excludePaths**: An array string with paths to exclude from auditing
-- **extractor**: An extractor used to extract the metadata. This gives developers flexibility in the way they want to extract the metadata from the Request and Response. The default is set to [BaseExtractor](https://github.com/awslabs/monorepo-for-service-workbench/blob/main/workbench-core/audit/src/baseExtractor.ts).
+- **extractor**: An extractor used to extract the metadata. This gives developers flexibility in the way they want to extract the metadata from the Request and Response. The default is set to [BaseExtractor](https://github.com/awslabs/solution-spark-on-aws/blob/main/workbench-core/audit/src/baseExtractor.ts).
 ```ts
 const app = express();
 const excludePaths = ['\login','\signin'];
