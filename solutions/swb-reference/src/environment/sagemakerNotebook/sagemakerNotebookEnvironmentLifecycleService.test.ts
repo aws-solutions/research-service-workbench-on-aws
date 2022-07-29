@@ -8,12 +8,12 @@ jest.mock('uuid', () => ({
 }));
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService } from '@aws/workbench-core-base';
 import {
   EnvironmentLifecycleHelper,
   EnvironmentService,
   Environment
-} from '@amzn/workbench-core-environments';
+} from '@aws/workbench-core-environments';
 import SagemakerNotebookEnvironmentLifecycleService from './sagemakerNotebookEnvironmentLifecycleService';
 
 describe('SagemakerNotebookEnvironmentLifecycleService', () => {

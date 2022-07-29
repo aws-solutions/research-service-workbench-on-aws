@@ -8,7 +8,7 @@ import {
   CreateExternalEndpointSchema,
   DataSetService,
   DataSetsStoragePlugin
-} from '@amzn/workbench-core-datasets';
+} from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';

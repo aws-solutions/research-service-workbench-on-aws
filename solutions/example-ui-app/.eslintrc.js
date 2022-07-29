@@ -2,7 +2,7 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution');
 
 module.exports = {
-  extends: ['@amzn/eslint-config-workbench-core-eslint-custom', 'next/core-web-vitals'],
+  extends: ['@aws/eslint-config-workbench-core-eslint-custom', 'next/core-web-vitals'],
   parserOptions: { tsconfigRootDir: __dirname },
   plugins: ['testing-library'],
   overrides: [

@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/swb-app",
+  "name": "@aws/swb-app",
   "version": "0.0.1",
   "description": "This package sets up API routes for SWB",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -28,11 +28,11 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@amzn/workbench-core-authentication": "workspace:*",
-    "@amzn/workbench-core-authorization": "workspace:*",
-    "@amzn/workbench-core-datasets": "workspace:*",
-    "@amzn/workbench-core-environments": "workspace:*",
-    "@amzn/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-authentication": "workspace:*",
+    "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-datasets": "workspace:*",
+    "@aws/workbench-core-environments": "workspace:*",
+    "@aws/workbench-core-logging": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -42,7 +42,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",

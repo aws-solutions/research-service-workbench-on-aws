@@ -1,5 +1,5 @@
 ignores: [
-    '@amzn/eslint-config-workbench-core-eslint-custom',
+    '@aws/eslint-config-workbench-core-eslint-custom',
     '@rushstack/heft-jest-plugin',
     '@rushstack/heft-node-rig',
     '@types/heft-jest',

@@ -5,9 +5,9 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { AuthenticatedUser } from '@amzn/workbench-core-authorization';
-import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AwsService, QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ = require('lodash');
 import { v4 as uuidv4 } from 'uuid';

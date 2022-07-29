@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@amzn/workbench-core-base';
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
+import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
 import { EnvironmentService, Environment } from '../services/environmentService';

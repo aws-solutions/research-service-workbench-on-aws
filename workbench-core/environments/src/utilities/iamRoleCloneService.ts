@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@amzn/workbench-core-base';
 import {
   AttachedPolicy,
   GetRolePolicyCommandInput,
@@ -12,6 +11,7 @@ import {
   ListRolePoliciesCommandOutput,
   Role
 } from '@aws-sdk/client-iam';
+import { AwsService } from '@aws/workbench-core-base';
 
 export default class IamRoleCloneService {
   private _sourceAccount: AwsService;

@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
-import Metadata from '@amzn/workbench-core-audit/lib/metadata';
+import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
+import Metadata from '@aws/workbench-core-audit/lib/metadata';
 import { Request, Response, Router } from 'express';
 import AuditLogger from '../auditLogger';
 import { logger } from '../loggingService';
