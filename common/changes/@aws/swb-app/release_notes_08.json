@@ -1,0 +1,12 @@
+{
+    "changes": [
+      {
+        "packageName": "@aws/swb-app",
+        "comment": "Improved performance on workspace page with pagination"
+        ,
+        "type": "minor"
+      }
+    ],
+    "packageName": "@aws/swb-app"
+  }
+  

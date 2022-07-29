@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "Initial release"
+      ,
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
