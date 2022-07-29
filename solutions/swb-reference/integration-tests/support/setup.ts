@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CognitoTokenService } from '@amzn/workbench-core-base';
+import { CognitoTokenService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';

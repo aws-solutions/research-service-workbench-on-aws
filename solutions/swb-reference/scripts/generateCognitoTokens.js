@@ -11,7 +11,7 @@
 const { join } = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
-const { CognitoTokenService } = require('@amzn/workbench-core-base');
+const { CognitoTokenService } = require('@aws/workbench-core-base');
 
 const config = yaml.load(
   // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
