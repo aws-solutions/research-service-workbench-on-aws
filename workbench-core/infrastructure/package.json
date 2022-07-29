@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/workbench-core-infrastructure",
+  "name": "@aws/workbench-core-infrastructure",
   "version": "0.0.1",
   "description": "Package containing CDK constructs used in workbench core",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -31,7 +31,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",

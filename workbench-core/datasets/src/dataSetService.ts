@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService } from '@amzn/workbench-core-audit';
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { AuditService } from '@aws/workbench-core-audit';
+import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';

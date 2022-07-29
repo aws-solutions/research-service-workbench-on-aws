@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/workbench-core-logging",
+  "name": "@aws/workbench-core-logging",
   "version": "0.0.1",
   "description": "Package to handle server-side logging",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -32,7 +32,7 @@
     "winston-transport": "^4.5.0"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
     "@rushstack/heft-node-rig": "^1.7.1",

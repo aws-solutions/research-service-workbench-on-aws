@@ -10,7 +10,7 @@ import {
   CognitoAuthenticationPlugin,
   UserManagementService,
   CognitoUserManagementPlugin
-} from '@amzn/workbench-core-authentication';
+} from '@aws/workbench-core-authentication';
 import {
   withAuth,
   AuthorizationService,
@@ -19,8 +19,8 @@ import {
   RoutesIgnored,
   RoutesMap,
   StaticPermissionsPlugin
-} from '@amzn/workbench-core-authorization';
-import { LoggingService } from '@amzn/workbench-core-logging';
+} from '@aws/workbench-core-authorization';
+import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express = require('express');

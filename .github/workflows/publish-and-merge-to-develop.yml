@@ -12,8 +12,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    env: 
-      CODEARTIFACT_PACKAGE_REGISTRY: "${{ secrets.CODEARTIFACT_DOMAIN_NAME }}-${{ secrets.CODEARTIFACT_DOMAIN_OWNER }}.d.codeartifact.${{ secrets.CODEARTIFACT_REGION }}.amazonaws.com/npm/${{ secrets.CODEARTIFACT_REPO_NAME }}/"
     steps:
       - name: git checkout
         uses: actions/checkout@v3
@@ -25,19 +23,6 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ secrets.CODEARTIFACT_REGION }}
-          role-to-assume: ${{ secrets.ASSUME_ROLE }}
-          role-session-name: OIDCSessionName
-      # change to NPM
-      - name: CodeArtifact Auth
-        id: codeartifact
-        run: |
-          TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN_NAME }} --domain-owner ${{ secrets.CODEARTIFACT_DOMAIN_OWNER }} --query authorizationToken --duration-seconds 900 --output text`
-          echo "::add-mask::$TOKEN"
-          echo "::set-output name=auth_token::$TOKEN"
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -54,7 +39,7 @@ jobs:
           
       - name: Rush Publish
         run: |
-          PUBLISH_CMD="--add-commit-details --apply --registry https://$CODEARTIFACT_PACKAGE_REGISTRY --npm-auth-token ${{ steps.codeartifact.outputs.auth_token }} --ignore-git-hooks --include-all --target-branch main --publish"
+          PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch main --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -85,7 +70,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -114,7 +99,7 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

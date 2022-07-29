@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/swb-ui-infrastructure",
+  "name": "@aws/swb-ui-infrastructure",
   "version": "0.0.1",
   "description": "CDK project for deploying swb-ui as a static site with S3 Bucket and CloudFront..",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {

@@ -1,5 +1,7 @@
 # MA Foundation Starter App - POC
 
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 This application is a POC of the proposed [HLD](https://quip-amazon.com/OmfQA9ehOu62/Mission-Accelerator-Starter-App-SDK-High-Level-Design) for MA Foundation SDK. This is a prototype app and you should expect to modify the source code to reflect your project needs.
 
 ## Code Coverage
