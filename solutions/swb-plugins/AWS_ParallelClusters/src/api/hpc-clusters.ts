@@ -3,7 +3,8 @@ import { httpApiGet, httpApiPost, httpApiPut } from './apiHelper';
 import { Account, Cluster, Job, JobParameters, Project } from '../models/HPC-UI-Types';
 
 const getAccounts = async (): Promise<{ data: Account[] }> => {
-  return await { data: [{ id: '123456789012' }, { id: '987654321012' }, { id: 'proj-123' }] };
+  //TODO: mocked for Hosting Account IDs; create API to do httpApiGet('hosting-accounts', {})
+  return await { data: [{ id: '123456789012' }, { id: '987654321012' }] };
 };
 
 const getProjects = async (): Promise<{ data: Project[] }> => {
