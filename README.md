@@ -7,7 +7,6 @@
 [![Publish-and-merge-to-develop](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
 [![Cfn-nag-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
 [![Secret-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
-[![GitHub-release](https://github.com/awslabs/solution-spark-on-aws/workflows/GitHub-release/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/GitHub-release/badge.svg)
 [![Lint-PR](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
