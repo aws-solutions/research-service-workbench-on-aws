@@ -1,0 +1,12 @@
+{
+    "changes": [
+      {
+        "packageName": "@aws/swb-app",
+        "comment": "Workspaces include search/filter/sort functions"
+        ,
+        "type": "minor"
+      }
+    ],
+    "packageName": "@aws/swb-app"
+  }
+  

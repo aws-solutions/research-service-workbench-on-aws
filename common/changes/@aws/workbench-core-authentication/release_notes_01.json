@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Initial release"
+      ,
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
