@@ -1,4 +1,4 @@
-name: publish-and-merge-to-develop
+name: Publish-and-merge-to-develop
 on:
   pull_request_target:
     types:
