@@ -70,7 +70,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -99,7 +99,7 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
