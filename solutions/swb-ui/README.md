@@ -93,4 +93,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to access th
 
 ## Design system
 
-For the design system we are using @awsui project. More information can be found on the [Cloudscape GitHub](https://github.com/aws/awsui-documentation).
+For the design system we are using @awsui project. More information can be found on the [AWS-UI GitHub](https://github.com/aws/awsui-documentation).

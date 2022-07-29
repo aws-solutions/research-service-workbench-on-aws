@@ -2,7 +2,7 @@
     "changes": [
       {
         "packageName": "@aws/swb-app",
-        "comment": "New user experience for workspace based on Cloudscape Design System"
+        "comment": "New user experience for workspace based on AWS-UI Design System"
         ,
         "type": "minor"
       }
