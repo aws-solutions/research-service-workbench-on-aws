@@ -1,5 +1,5 @@
 @aws/workbench-core-environments
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
@@ -13,35 +13,35 @@ authors: Amazon Web Services <http://aws.amazon.com>
 ******************************
 
 @aws/workbench-core-audit
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-authorization
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-base
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-datasets
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-logging
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
