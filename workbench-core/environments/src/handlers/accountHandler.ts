@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService } from '@aws/workbench-core-base';
 import AccountService from '../services/accountService';
 import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/swb-ui",
+  "name": "@aws/swb-ui",
   "version": "0.0.1",
   "description": "NextJS frontend UI for Service Workbench v2",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -32,7 +32,7 @@
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "dependencies": {
-    "@amzn/workbench-core-environments": "workspace:*",
+    "@aws/workbench-core-environments": "workspace:*",
     "axios": "^0.27.1",
     "date-fns": "^2.28.0",
     "express": "^4.17.3",
@@ -47,7 +47,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@awsui/collection-hooks": "^1.0.0",
     "@awsui/components-react": "^3.0.0",
     "@awsui/design-tokens": "^3.0.0",

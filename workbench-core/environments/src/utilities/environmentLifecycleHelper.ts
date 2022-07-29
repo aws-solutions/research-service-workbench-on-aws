@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService, BaseAuditPlugin } from '@amzn/workbench-core-audit';
-import { AwsService, AuditLogger } from '@amzn/workbench-core-base';
+import { Output } from '@aws-sdk/client-cloudformation';
+import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { AwsService, AuditLogger } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
   S3DataSetStoragePlugin
-} from '@amzn/workbench-core-datasets';
-import { LoggingService } from '@amzn/workbench-core-logging';
-import { Output } from '@aws-sdk/client-cloudformation';
+} from '@aws/workbench-core-datasets';
+import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { Environment, EnvironmentService } from '../services/environmentService';

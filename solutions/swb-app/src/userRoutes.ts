@@ -9,7 +9,7 @@ import {
   CreateUserSchema,
   UpdateRoleSchema,
   UserManagementService
-} from '@amzn/workbench-core-authentication';
+} from '@aws/workbench-core-authentication';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';

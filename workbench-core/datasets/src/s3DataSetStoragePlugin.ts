@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@amzn/workbench-core-base';
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import {
   GetKeyPolicyCommandInput,
@@ -24,6 +23,7 @@ import {
   GetAccessPointPolicyCommandOutput,
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
+import { AwsService } from '@aws/workbench-core-base';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { IamHelper, InsertStatementResult } from './iamHelper';
 import { DataSetsStoragePlugin } from '.';

@@ -1,6 +1,8 @@
 
 # DataSets Service
 
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 ## Code Coverage
 
 | Statements                  | Branches                | Functions                 | Lines             |
@@ -28,10 +30,10 @@ At minimum, DataSets requires
 ### Initializaton
 
 ```typescript
-import { AuditService, BaseAuditPlugin, Writer } from '@amzn/workbench-core-audit';
+import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 
 // the AwsService is a wrapper around @aws-sdk and handles interaction with AWS Services.
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService } from '@aws/workbench-core-base';
 
 // the DataSets components
 import {
@@ -39,8 +41,8 @@ import {
     DdbDataSetMetadataPlugin,
     S3DataSetStoragePlugin,
     DataSet,
-    ExternaEndpoint } from '@amzn/workbench-core-datasets';
-import { LoggingService } from '@amzn/workbench-core-logging';
+    ExternaEndpoint } from '@aws/workbench-core-datasets';
+import { LoggingService } from '@aws/workbench-core-logging';
 
 // set up the logger and the audit services.
 const logger: LoggingService = new LoggingService({

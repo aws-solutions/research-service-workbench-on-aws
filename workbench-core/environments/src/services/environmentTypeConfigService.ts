@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, QueryParams } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AwsService, QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
