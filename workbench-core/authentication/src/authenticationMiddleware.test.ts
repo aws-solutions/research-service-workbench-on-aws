@@ -6,7 +6,7 @@
 jest.mock('./authenticationService');
 jest.mock('./plugins/cognitoAuthenticationPlugin');
 
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { LoggingService } from '@aws/workbench-core-logging';
 import { NextFunction, Request, Response } from 'express';
 import { tokens } from './__mocks__/authenticationService';
 import {

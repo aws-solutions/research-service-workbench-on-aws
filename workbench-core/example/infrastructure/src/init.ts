@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { router } from '@amzn/workbench-core-example-express';
+import { router } from '@aws/workbench-core-example-express';
 import serverlessExpress from '@vendia/serverless-express';
 import express, { Express } from 'express';
 

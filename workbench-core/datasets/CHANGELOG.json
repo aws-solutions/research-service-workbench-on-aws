@@ -1,0 +1,28 @@
+{
+  "name": "@aws/workbench-core-datasets",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@aws/workbench-core-datasets_v0.1.0",
+      "date": "Fri, 29 Jul 2022 16:54:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Initial release"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-audit\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-base\" to `0.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@aws/workbench-core-logging\" to `0.1.0`"
+          }
+        ]
+      }
+    }
+  ]
+}

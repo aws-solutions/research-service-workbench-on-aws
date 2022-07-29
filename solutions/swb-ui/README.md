@@ -1,4 +1,7 @@
 # swb-ui
+
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 ## Code Coverage
 
 | Statements | Branches | Functions | Lines |
@@ -90,4 +93,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to access th
 
 ## Design system
 
-For the design system we are using @awsui project. More information can be found on its [website](https://polaris.a2z.com) or [GitHub](https://github.com/aws/awsui-documentation).
+For the design system we are using @awsui project. More information can be found on the [AWS-UI GitHub](https://github.com/aws/awsui-documentation).

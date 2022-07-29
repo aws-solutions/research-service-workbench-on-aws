@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSetService, DataSetsStoragePlugin } from '@amzn/workbench-core-datasets';
+import { DataSetService, DataSetsStoragePlugin } from '@aws/workbench-core-datasets';
 import {
   HostingAccountService,
   EnvironmentConnectionService,
@@ -12,7 +12,7 @@ import {
   EnvironmentTypeService,
   EnvironmentTypeConfigService,
   ProjectService
-} from '@amzn/workbench-core-environments';
+} from '@aws/workbench-core-environments';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];

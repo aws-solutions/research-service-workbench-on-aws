@@ -1,26 +1,26 @@
-@amzn/eslint-config-workbench-core-eslint-custom
-0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
+@aws/eslint-config-workbench-core-eslint-custom
+0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-audit
-0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
+@aws/workbench-core-audit
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-authorization
-0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
+@aws/workbench-core-authorization
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
-@amzn/workbench-core-logging
-0.0.1 <https://github.com/awslabs/monorepo-for-service-workbench>
+@aws/workbench-core-logging
+0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 

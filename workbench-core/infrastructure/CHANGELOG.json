@@ -1,0 +1,17 @@
+{
+  "name": "@aws/workbench-core-infrastructure",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "@aws/workbench-core-infrastructure_v0.1.0",
+      "date": "Fri, 29 Jul 2022 16:54:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Initial release"
+          }
+        ]
+      }
+    }
+  ]
+}

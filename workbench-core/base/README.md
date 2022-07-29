@@ -1,5 +1,7 @@
 # Workbench Core ESLint Config Custom
 
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 ## Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
@@ -11,7 +13,7 @@
 ## Usage
 
 ```
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService } from '@aws/workbench-core-base';
 const aws = new AwsService({ region: 'us-east-1' });
 const params = { StackName: 'testStack' };                            // construct params
 const response = await aws.cloudformation.describeStacks(params);     // perform SDK call

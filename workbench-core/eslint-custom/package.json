@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/eslint-config-workbench-core-eslint-custom",
+  "name": "@aws/eslint-config-workbench-core-eslint-custom",
   "version": "0.0.1",
   "description": "Custom eslint rules",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
