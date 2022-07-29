@@ -3,56 +3,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/approved-packages.schema.json",
   "packages": [
     {
-      "name": "@amzn/workbench-core-environments",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/eslint-config-workbench-core-eslint-custom",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@amzn/patient-consent-express",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/swb-app",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-audit",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@amzn/workbench-core-authentication",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-authorization",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-base",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-datasets",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-example-express",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "@amzn/workbench-core-infrastructure",
-      "allowedCategories": [ "production" ]
-    },
-    {
-      "name": "@amzn/workbench-core-logging",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "@aws-cdk/assert",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
@@ -108,7 +60,7 @@
     },
     {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
@@ -132,11 +84,55 @@
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/eslint-config-workbench-core-eslint-custom",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws/swb-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-audit",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws/workbench-core-authentication",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-authorization",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-base",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-datasets",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-example-express",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
+      "name": "@aws/workbench-core-infrastructure",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-logging",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/collection-hooks",
@@ -248,7 +244,7 @@
     },
     {
       "name": "aws-sdk-client-mock",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "axios",
@@ -259,12 +255,8 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "cdk-ec2-key-pair",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -327,14 +319,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "fabric-ca-client",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
-      "name": "fabric-common",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "fast-check",
       "allowedCategories": [ "production" ]
     },
@@ -379,10 +363,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "nconf",
-      "allowedCategories": [ "prototypes" ]
-    },
-    {
       "name": "next",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -392,7 +372,7 @@
     },
     {
       "name": "next-i18next",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "next-transpile-modules",
@@ -415,20 +395,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "pnpm",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "react-router-dom",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "sass",
@@ -460,7 +432,7 @@
     },
     {
       "name": "ts-node",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "typescript",

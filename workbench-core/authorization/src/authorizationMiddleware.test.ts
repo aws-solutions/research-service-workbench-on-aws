@@ -27,7 +27,7 @@ jest.mock('./authorizationService', () => {
 });
 jest.mock('./authorizationPlugin');
 jest.mock('./permissionsPlugin');
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { LoggingService } from '@aws/workbench-core-logging';
 import { Request, Response, NextFunction } from 'express';
 import { MockAuthorizationPlugin } from './__mocks__/authorizationPlugin';
 import { MockPermissionsPlugin } from './__mocks__/permissionsPlugin';

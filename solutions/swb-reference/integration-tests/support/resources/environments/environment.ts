@@ -1,4 +1,4 @@
-import { EnvironmentStatus } from '@amzn/workbench-core-environments';
+import { EnvironmentStatus } from '@aws/workbench-core-environments';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { sleep } from '../../utils/utilities';

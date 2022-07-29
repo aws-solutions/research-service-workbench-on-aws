@@ -8,12 +8,12 @@ common/config/rush/pnpm-lock.yaml
 common/changes/
 solutions/example-ui-app                              @mabreuortega
 solutions/swb-ui                                      @awslabs/aws-ma-swb
-common/changes/@amzn/swb-ui                           @awslabs/aws-ma-swb
+common/changes/@aws/swb-ui                           @awslabs/aws-ma-swb
 solutions/swb-reference                               @awslabs/aws-ma-swb
-common/changes/@amzn/swb-reference                    @awslabs/aws-ma-swb
+common/changes/@aws/swb-reference                    @awslabs/aws-ma-swb
 solutions/swb-app                                     @awslabs/aws-ma-swb
-common/changes/@amzn/swb-app                          @awslabs/aws-ma-swb
+common/changes/@aws/swb-app                          @awslabs/aws-ma-swb
 workbench-core/base                                   @awslabs/aws-ma-swb
-common/changes/@amzn/workbench-core-base              @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-base              @awslabs/aws-ma-swb
 workbench-core/environments                           @awslabs/aws-ma-swb
-common/changes/@amzn/workbench-core-environments                     @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-environments                     @awslabs/aws-ma-swb

@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryParams } from '@amzn/workbench-core-base';
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 
 export function addPaginationToken(

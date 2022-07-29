@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-base",
+  "name": "@aws/workbench-core-base",
   "version": "0.0.1",
   "description": "Package to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -37,9 +37,6 @@
     }
   },
   "dependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@amzn/workbench-core-audit": "workspace:*",
-    "@amzn/workbench-core-logging": "workspace:*",
     "@aws-cdk/aws-dynamodb": "^1.152.0",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
@@ -57,6 +54,9 @@
     "@aws-sdk/client-sts": "^3.118.1",
     "@aws-sdk/types": "^3.110.0",
     "@aws-sdk/util-dynamodb": "^3.87.0",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/workbench-core-audit": "workspace:*",
+    "@aws/workbench-core-logging": "workspace:*",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

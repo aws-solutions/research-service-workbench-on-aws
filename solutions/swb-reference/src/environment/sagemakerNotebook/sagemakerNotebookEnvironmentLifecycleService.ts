@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@amzn/workbench-core-base';
+import { AwsService } from '@aws/workbench-core-base';
 import {
   EnvironmentLifecycleService,
   EnvironmentLifecycleHelper,
   EnvironmentService
-} from '@amzn/workbench-core-environments';
+} from '@aws/workbench-core-environments';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 

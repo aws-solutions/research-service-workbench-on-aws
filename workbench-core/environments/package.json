@@ -1,5 +1,5 @@
 {
-  "name": "@amzn/workbench-core-environments",
+  "name": "@aws/workbench-core-environments",
   "version": "0.0.1",
   "description": "Implementation of environment APIs and resources.",
   "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
@@ -37,11 +37,6 @@
     }
   },
   "dependencies": {
-    "@amzn/workbench-core-audit": "workspace:*",
-    "@amzn/workbench-core-authorization": "workspace:*",
-    "@amzn/workbench-core-base": "workspace:*",
-    "@amzn/workbench-core-datasets": "workspace:*",
-    "@amzn/workbench-core-logging": "workspace:*",
     "@aws-cdk/aws-iam": "^1.159.0",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
@@ -55,6 +50,11 @@
     "@aws-sdk/client-ssm": "^3.118.1",
     "@aws-sdk/client-sts": "^3.118.1",
     "@aws-sdk/util-dynamodb": "^3.87.0",
+    "@aws/workbench-core-audit": "workspace:*",
+    "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-base": "workspace:*",
+    "@aws/workbench-core-datasets": "workspace:*",
+    "@aws/workbench-core-logging": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "generate-password": "^1.7.0",
     "jsonschema": "^1.4.1",
@@ -63,8 +63,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws-sdk/types": "^3.110.0",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
