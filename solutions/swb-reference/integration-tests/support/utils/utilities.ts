@@ -17,5 +17,4 @@ function checkHttpError(actualError: Error, expectedError: HttpError): void {
   expect(actualError instanceof HttpError).toBeTruthy();
   expect(expectedError.isEqual(actualError)).toBeTruthy();
 }
-
 export { sleep, checkHttpError };
