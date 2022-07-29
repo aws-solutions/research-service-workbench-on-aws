@@ -179,14 +179,15 @@ describe('HPCService', () => {
     exReq.params.clusterName = 'hosting-cluster';
     exReq.params.instanceId = 'i-0123456789abcdefg';
     exReq.body = {
-      command: '/home/ec2-user/test.sh',
+      s3DataFolder: 's3://my_bucket/my_data/',
+      command: 'test.sh',
       job_name: 'test',
       nodes: 1,
       ntasks: 1,
       partition: 'queue0'
     };
     ssm_command.Parameters.commands = [
-      `runuser -l ec2-user -c 'sbatch --job-name ${exReq.body.job_name} --nodes ${exReq.body.nodes} --ntasks ${exReq.body.ntasks}  --partition ${exReq.body.partition} ${exReq.body.command}'`
+      `runuser -l ec2-user -c 'rm -rf my_data && mkdir my_data && mkdir my_data/output && aws s3 cp ${exReq.body.s3DataFolder} my_data --recursive && cd my_data/output && sbatch --job-name ${exReq.body.job_name} --nodes ${exReq.body.nodes} --ntasks ${exReq.body.ntasks}  --partition ${exReq.body.partition} ../${exReq.body.command}'`
     ];
     sendCommandResponse.Command.CommandId = 'JobQueue123';
     ssmStatusCommand.CommandId = 'JobQueue123';
