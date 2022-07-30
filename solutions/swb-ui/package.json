@@ -19,7 +19,7 @@
     "build:test": "rushx build && rushx test",
     "depcheck": "depcheck",
     "deploy-ui-and-api": "./scripts/deploy.sh",
-    "dev": "next dev",
+    "dev": "./scripts/dev.sh",
     "export": "next build && next export",
     "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
@@ -27,7 +27,6 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
-    "start": "next start",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
