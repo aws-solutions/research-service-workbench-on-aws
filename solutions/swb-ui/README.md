@@ -14,7 +14,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ### Prerequisite:
 
-1. Make sure to Follow instructions in [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
+1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
 ### Deploy static website
 
@@ -54,7 +54,7 @@ To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionS
 ## Running UI App locally
 
 ### Prerequisite
-Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
+1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
 ### Start App
 
