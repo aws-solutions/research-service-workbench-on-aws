@@ -97,7 +97,7 @@
           "response": []
         },
         {
-          "name": "Get DataSets",
+          "name": "List DataSets",
           "request": {
             "method": "GET",
             "header": [
