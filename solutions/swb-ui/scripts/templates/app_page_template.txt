@@ -1,0 +1,25 @@
+import App from '<--Insert--Plugin--Package--Name-->';
+// eslint-disable-next-line import/order
+import { BreadcrumbGroupProps } from '@awsui/components-react';
+import BaseLayout from '../../components/BaseLayout';
+
+const breadcrumbs: BreadcrumbGroupProps.Item[] = [
+  {
+    text: 'Service Workbench',
+    href: '/'
+  },
+  {
+    text: '<--Insert--Formal--Plugin--Name-->',
+    href: '/apps/<--Insert--Formal--Plugin--Name-->'
+  }
+];
+
+function <--Insert--Plugin--Name-->_APP(): JSX.Element {
+  breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
+  return (
+    <BaseLayout breadcrumbs={breadcrumbs}>
+      <App />
+    </BaseLayout>
+  );
+}
+export default <--Insert--Plugin--Name-->_APP;

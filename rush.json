@@ -130,6 +130,12 @@
       "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": false
+    },
+    {
+      "packageName": "@aws/hpc-ui",
+      "projectFolder": "solutions/swb-plugins/AWS_ParallelClusters",
+      "reviewCategory": "production",
+      "shouldPublish": true
     }
   ]
 }
