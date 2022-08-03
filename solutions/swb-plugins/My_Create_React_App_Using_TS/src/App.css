@@ -1,9 +1,3 @@
-@use '~@awsui/design-tokens/index.scss' as awsui;
-
-body {
-  background: awsui.$color-background-layout-main;
-}
-
 .App {
   text-align: center;
 }

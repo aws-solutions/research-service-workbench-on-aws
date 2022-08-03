@@ -132,8 +132,8 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@aws/hpc-ui",
-      "projectFolder": "solutions/swb-plugins/AWS_ParallelClusters",
+      "packageName": "my-app",
+      "projectFolder": "solutions/swb-plugins/My_Create_React_App_Using_TS",
       "reviewCategory": "production",
       "shouldPublish": true
     }

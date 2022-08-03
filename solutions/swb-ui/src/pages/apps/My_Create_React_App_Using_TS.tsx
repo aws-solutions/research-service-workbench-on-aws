@@ -1,4 +1,4 @@
-import App from '@aws/hpc-ui';
+import App from 'my-app';
 // eslint-disable-next-line import/order
 import { BreadcrumbGroupProps } from '@awsui/components-react';
 import BaseLayout from '../../components/BaseLayout';
@@ -9,12 +9,12 @@ const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     href: '/'
   },
   {
-    text: 'AWS_ParallelClusters',
-    href: '/apps/AWS_ParallelClusters'
+    text: 'My_Create_React_App_Using_TS',
+    href: '/apps/My_Create_React_App_Using_TS'
   }
 ];
 
-function AWS_PARALLELCLUSTERS_APP(): JSX.Element {
+function MY_CREATE_REACT_APP_USING_TS_APP(): JSX.Element {
   breadcrumbs[1].text = breadcrumbs[1].text.replace(/_/g, ' ');
   return (
     <BaseLayout breadcrumbs={breadcrumbs}>
@@ -22,4 +22,4 @@ function AWS_PARALLELCLUSTERS_APP(): JSX.Element {
     </BaseLayout>
   );
 }
-export default AWS_PARALLELCLUSTERS_APP;
+export default MY_CREATE_REACT_APP_USING_TS_APP;
