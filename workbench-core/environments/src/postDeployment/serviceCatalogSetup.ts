@@ -215,8 +215,6 @@ export default class ServiceCatalogSetup {
       const fileName = filePath.split('/').pop();
       if (fileName) {
         const localCfnTemplateMd5Sum = md5File.sync(cfnFilePaths[0]);
-        console.log('S3FileNameToMd5Sum', S3FileNameToMd5Sum);
-        console.log('localCfnTemplateMd5Sum', localCfnTemplateMd5Sum);
         // eslint-disable-next-line security/detect-object-injection
         if (localCfnTemplateMd5Sum !== S3FileNameToMd5Sum[fileName]) {
           const envType = fileName.replace('.cfn.yaml', '');
@@ -225,7 +223,6 @@ export default class ServiceCatalogSetup {
         }
       }
     });
-    console.log('envsToFilePath', envsToFilePath);
     return envsToFilePath;
   }
 

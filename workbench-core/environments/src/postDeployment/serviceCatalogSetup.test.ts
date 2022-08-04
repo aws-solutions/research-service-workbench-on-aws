@@ -4,7 +4,6 @@
  */
 
 jest.mock('md5-file');
-// jest.mock('fs');
 
 import { Readable } from 'stream';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
@@ -248,7 +247,7 @@ describe('ServiceCatalogSetup', () => {
         ]
       });
 
-      // Mock Get S3 files
+      // Mock Get List of S3 files
       s3Mock.on(ListObjectsCommand).resolves({
         Contents: [
           {
@@ -257,6 +256,7 @@ describe('ServiceCatalogSetup', () => {
         ]
       });
 
+      // Mock Reading S3 File
       const readableStream = new Readable({
         read() {}
       });
@@ -268,6 +268,7 @@ describe('ServiceCatalogSetup', () => {
         Body: readableStream
       });
 
+      // MD5 Sum of S3 file
       md5File.sync = jest.fn(() => {
         return '902fbdd2b1df0c4f70b4a5d23525e932';
       });
