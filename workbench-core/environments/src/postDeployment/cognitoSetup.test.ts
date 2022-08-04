@@ -14,6 +14,7 @@ import {
   UsernameExistsException
 } from '@aws-sdk/client-cognito-identity-provider';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import md5File from 'md5-file';
 import CognitoSetup from './cognitoSetup';
 
 describe('CognitoSetup', () => {
@@ -22,6 +23,11 @@ describe('CognitoSetup', () => {
     ROOT_USER_EMAIL: 'user@example.com',
     USER_POOL_NAME: 'swb-userpool-test-va'
   };
+
+  test('foo', () => {
+    const md5 = md5File.sync('hello world');
+    console.log('md5', md5);
+  });
 
   describe('execute private methods', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
