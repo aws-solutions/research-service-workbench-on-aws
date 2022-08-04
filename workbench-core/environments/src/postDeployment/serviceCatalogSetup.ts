@@ -214,8 +214,8 @@ export default class ServiceCatalogSetup {
     cfnFilePaths.forEach((filePath: string) => {
       const fileName = filePath.split('/').pop();
       if (fileName) {
-        console.log('S3FileNameToMd5Sum', S3FileNameToMd5Sum);
         const localCfnTemplateMd5Sum = md5File.sync(cfnFilePaths[0]);
+        console.log('S3FileNameToMd5Sum', S3FileNameToMd5Sum);
         console.log('localCfnTemplateMd5Sum', localCfnTemplateMd5Sum);
         // eslint-disable-next-line security/detect-object-injection
         if (localCfnTemplateMd5Sum !== S3FileNameToMd5Sum[fileName]) {
@@ -225,6 +225,7 @@ export default class ServiceCatalogSetup {
         }
       }
     });
+    console.log('envsToFilePath', envsToFilePath);
     return envsToFilePath;
   }
 
