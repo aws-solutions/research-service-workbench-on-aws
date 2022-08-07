@@ -29,30 +29,30 @@ export default class Setup {
   }
 
   public async createAdminSession(): Promise<ClientSession> {
-    const userPoolId = this._settings.get('userPoolId');
-    const clientId = this._settings.get('clientId');
-    const rootUsername = this._settings.get('rootUsername');
-    const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
-    const awsRegion = this._settings.get('awsRegion');
-
-    const cognitoTokenService = new CognitoTokenService(awsRegion);
-    const { accessToken } = await cognitoTokenService.generateCognitoToken(
-      userPoolId,
-      clientId,
-      rootUsername,
-      rootPasswordParamStorePath
-    );
-
-    const session = this._getClientSession(accessToken);
-    this._sessions.push(session);
-
-    return session;
+    throw new Error('Implement createAdminSession');
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
-      this._defaultAdminSession = await this.createAdminSession();
+      // this._defaultAdminSession = await this.createAdminSession();
+      const userPoolId = this._settings.get('userPoolId');
+      const clientId = this._settings.get('clientId');
+      const rootUsername = this._settings.get('rootUsername');
+      const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
+      const awsRegion = this._settings.get('awsRegion');
+
+      const cognitoTokenService = new CognitoTokenService(awsRegion);
+      const { accessToken } = await cognitoTokenService.generateCognitoToken(
+        userPoolId,
+        clientId,
+        rootUsername,
+        rootPasswordParamStorePath
+      );
+
+      const session = this._getClientSession(accessToken);
+      this._sessions.push(session);
+      this._defaultAdminSession = session;
     }
     return this._defaultAdminSession;
   }

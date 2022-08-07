@@ -16,7 +16,7 @@ describe('environment start negative tests', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.createAdminSession();
+    adminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {
