@@ -8,3 +8,10 @@
 
 # Negative Testing
 #alreadyTerminateEnvId: ''   # id of an environment that has already been terminated
+
+#Cognito Integ Test Client
+#awsRegion: ''
+#userPoolId: ''
+#clientId: ''
+#rootUsername: ''
+#rootPasswordParamStorePath: ''
