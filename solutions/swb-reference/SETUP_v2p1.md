@@ -274,7 +274,7 @@ is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account hand
 
 ## Setup UI and Get access token
 
-Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy UI to AWS and navigate to the website URL provided.
+Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
 
 # Test the API
 
