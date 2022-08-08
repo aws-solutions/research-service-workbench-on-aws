@@ -6,7 +6,7 @@
  */
 
 // To use the script, follow the example below
-// STAGE=<STAGE> generateCognitoToken.js <userName> '<password>'
+// STAGE=<STAGE> node generateCognitoToken.js <userName> '<password>'
 
 const { join } = require('path');
 const yaml = require('js-yaml');

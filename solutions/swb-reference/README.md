@@ -105,6 +105,19 @@ const { data: response } = await adminSession.resources.environments.get({status
 
 Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermissionsConfig.ts` with any necessary changes to routes/permissions.
 
+## Obtain Access Token for making authenticated API requests
+1. Create a staging file in `integration-tests/config` with these three fields filled out
+```yaml
+#Cognito Integ Test Client
+awsRegion: '<REGION>'
+userPoolId: '<USER_POOL_ID>'
+clientId: '<CLIENT_ID>'
+```
+2. Go to `swb-reference/scripts` folder
+3. Pull down all required dependencies by running `rushx build`
+4. Run `STAGE=<STAGE> node generateCognitoToken.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
+5. In the console output, use the `accessToken` that is provided to make authenticated API requests.
+
 ## FAQ
 
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**
