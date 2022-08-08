@@ -109,7 +109,7 @@ VpcSubnet
 
 ## Setup UI and Get access token
 
-To get the `access_token` for making authenticated requests using the API please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
+To get the `access_token` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
 
 ## POSTMAN Setup
 In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
