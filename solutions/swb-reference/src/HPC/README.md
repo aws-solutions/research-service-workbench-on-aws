@@ -4,8 +4,7 @@
 The requirements utilizing the HPC backend on SWB:
 1. Deploy Pcluster Manager stack and deploy clusters to Hosting Account. 
 Instructions for deploying the stack can be found [here](https://pcluster.cloud/01-getting-started.html). Information on creating clusters are also here in [this video review of Pcluster Manager](https://www.youtube.com/watch?v=Z1vlpJYb1KQ).
-2. Deploy ParallelCluster Stack API onto the Hosting Account under the region for the
-where your clusters reside such as `us-east-1`. Use version `3.14` of [ParallelCluster Stack API](https://docs.aws.amazon.com/parallelcluster/latest/ug/api-reference-v3.html). 
+2. Deploy ParallelCluster Stack API onto the Hosting Account under the region for where your clusters reside such as `us-east-1`. Use version `3.14` of [ParallelCluster Stack API](https://docs.aws.amazon.com/parallelcluster/latest/ug/api-reference-v3.html). 
 
 ## Set Up
 1. In the root directory at `ma-mono` run `rush install`
