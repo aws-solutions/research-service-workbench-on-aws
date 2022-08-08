@@ -5,6 +5,7 @@
 #allowedOrigins: ["http://localhost:3000"] # SWB API will allow this domains to make requests.
 #cognitoDomain: 'user-test' # Must be globally unique
 #websiteUrl: 'http://localhost:3000'
+#parallelClusterApiURL: '' # API endpoint to ParallelCluster API stack, e.g. abcd123.execute-api.us-west-2.amazonaws.com'
 
 # Used for local Lambda development; grab them from Cognito console after cdk-deploy completes.
 # Once values are entered, re-run cdk-deploy.

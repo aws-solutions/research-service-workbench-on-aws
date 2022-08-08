@@ -1,10 +1,41 @@
-# `AWS ParallelClusters API Backend on SWB`
+# AWS ParallelClusters API Backend on SWB
 
 ## Requirements
 The requirements utilizing the HPC backend on SWB:
 1. Deploy Pcluster Manager stack and deploy clusters to Hosting Account. 
 Instructions for deploying the stack can be found [here](https://pcluster.cloud/01-getting-started.html). Information on creating clusters are also here in [this video review of Pcluster Manager](https://www.youtube.com/watch?v=Z1vlpJYb1KQ).
-2. Deploy ParallelCluster Stack API onto the Hosting Account under the region for where your clusters reside such as `us-east-1`. Use version `3.14` of [ParallelCluster Stack API](https://docs.aws.amazon.com/parallelcluster/latest/ug/api-reference-v3.html). For the parameters make sure to set CreateAPIUserRole to `false` to invoke the API from any IAM role, and as well specify the region for where the clusters reside such as `us-east-1`.
+2. Deploy ParallelCluster Stack API onto the Hosting Account under the region for where your clusters reside such as `us-east-1`. Use version `3.14` of [ParallelCluster Stack API](https://docs.aws.amazon.com/parallelcluster/latest/ug/api-reference-v3.html). For the parameters make sure to set CreateAPIUserRole to `false` to invoke the API from any IAM role, and as well specify the region for where the clusters reside such as `us-east-1`. Take note of the `ParallelClusterApiID` in CFN stack output `ParallelClusterApiInvokeUrl`. The value should have this format `https://<ParallelClusterApiID>.execute-api.<region>.amazonaws.com/prod`. This value will be used when onboarding a hosting account.
+3. An email should be sent to the email address you provided in Step 1. Follow the instructions in that email to log into PCluster manager and create a PCluster.
+4. In the UI, click `Create Cluster` and then choose `Wizard`. Follow the wizard to generate a `Configuration` for launching your PCluster. The configuration should look something like this.
+```yaml
+HeadNode:
+  InstanceType: t2.medium
+  Networking:
+    SubnetId: subnet-abc123
+  LocalStorage:
+    RootVolume:
+      Size: 50
+  Iam:
+    AdditionalIamPolicies:
+      - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+    - Name: queue0
+      ComputeResources:
+        - Name: queue0-c5xlarge
+          MinCount: 0
+          MaxCount: 5
+          InstanceType: c5.xlarge
+      Networking:
+        SubnetIds:
+          - subnet-abc123
+Region: us-west-2
+Image:
+  Os: alinux2
+```
+**Note**
+The region and subnet should be unique to your deployment
 
 ## Set Up
 1. In the root directory at `ma-mono` run `rush install`
@@ -12,47 +43,10 @@ Instructions for deploying the stack can be found [here](https://pcluster.cloud/
 3. Uncomment the `stage` attribute and provide the correct `<STAGE>` value for the attribute
 4. Uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing.
 5. Uncomment `rootUserEmail` and provide the main account user's email address
-6. Uncomment `parallelClusterApiURL` and provide API endpoint to ParallelCluster API stack. Deployed in same region as its corresponding clusters.
+6. Uncomment `parallelClusterApiURL` and provide API endpoint to ParallelCluster API stack. Deployed in same region as its corresponding clusters. The url should not include the `https://` part. It should look something like this `<parallelClusterApiGwId>.execute-api.<region>.amazonaws.com`
 7. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
-## Running Code Locally
-If you have made changes to the `environment` package or the `swb-reference` package follow these steps
-1. In `ma-mono` root directory run `rush build`
-2. In `ma-mono/solutions/swb-reference` root directory run `STAGE=<STAGE TO RUN LOCALLY> ./scripts/runLocally.sh`. This will run a local lambda server.
+Refer to [here](../../README.md#deploying-code) for additional deployment steps.
 
-## Deploying Code
-Run one time to Bootstrap the CDK
-
-`STAGE=<STAGE> rushx cdk bootstrap`
-
-Deploy/Update code
-
-`STAGE=<STAGE TO DEPLOY> rushx cdk-deploy`
-
-## Run Post Deployment 
-This step is necessary to setup Service Catalog portfolio and products
-
-`STAGE=<STAGE> rushx run-postDeployment`
-
-## FAQ
-1. **Why is there `jest.config.js` and `config/jest.config.json`?**
-* `config/jest.config.json` is the settings for unit tests in the `src` folder
-* `jest.config.js` is the settings for tests in `integration-tests`. These tests require setup steps that are not required by unit tests in the `src` folder.
-
-2. **When I try to run the code locally or deploy the code, I'm getting dependency errors between the local packages.**
-
-The `lib` folders for your project might have been deleted. Try running `rush purge; rush build` in the root 
-directory of this project to build the `lib` folders from scratch. 
-
-3. **How do I see which line of code my unit tests did not cover?**
-
-Run `rushx jest --coverage`
-
-4. **Why am I'm getting the error "Cannot find module in `common/temp`"?**
-
-Your `node_modules`  might have been corrupted. Try the following command
-```
-rush purge
-rush install
-rush build
-```
+## Onboarding hosting account
+Refer to [here](../../SETUP_v2p1.md#deploy-to-the-hosting-account) for instructions on how to add a hosting account to SWB.
