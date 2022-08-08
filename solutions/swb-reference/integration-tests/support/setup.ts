@@ -35,7 +35,6 @@ export default class Setup {
   public async getDefaultAdminSession(): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
-      // this._defaultAdminSession = await this.createAdminSession();
       const userPoolId = this._settings.get('userPoolId');
       const clientId = this._settings.get('clientId');
       const rootUsername = this._settings.get('rootUsername');

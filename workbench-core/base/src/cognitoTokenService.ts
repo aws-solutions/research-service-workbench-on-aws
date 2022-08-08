@@ -29,6 +29,8 @@ export default class CognitoTokenService {
       throw new Error(
         'Both "rootPasswordParamStorePath" and "rootPassword" are defined. Please pass in only one of the two parameters.'
       );
+    } else if (rootPasswordParamStorePath === undefined && rootPassword === undefined) {
+      throw new Error('Either "rootPasswordParamStorePath" or "rootPassword" should be defined');
     } else if (rootPasswordParamStorePath) {
       password = await this._getSSMParamValue(rootPasswordParamStorePath);
     }
