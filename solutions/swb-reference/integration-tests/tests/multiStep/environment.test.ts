@@ -11,7 +11,7 @@ describe('multiStep environment test', () => {
   let adminSession: ClientSession;
 
   beforeAll(async () => {
-    adminSession = await setup.createAdminSession();
+    adminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {

@@ -2,6 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
+import { CognitoTokenService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';
@@ -27,17 +29,29 @@ export default class Setup {
   }
 
   public async createAdminSession(): Promise<ClientSession> {
-    // TODO: Authenticate and get actual Admin Session
-    const session = this._getClientSession();
-    this._sessions.push(session);
-
-    return session;
+    throw new Error('Implement createAdminSession');
   }
 
   public async getDefaultAdminSession(): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
-      this._defaultAdminSession = await this.createAdminSession();
+      const userPoolId = this._settings.get('userPoolId');
+      const clientId = this._settings.get('clientId');
+      const rootUsername = this._settings.get('rootUsername');
+      const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
+      const awsRegion = this._settings.get('awsRegion');
+
+      const cognitoTokenService = new CognitoTokenService(awsRegion);
+      const { accessToken } = await cognitoTokenService.generateCognitoToken(
+        userPoolId,
+        clientId,
+        rootUsername,
+        rootPasswordParamStorePath
+      );
+
+      const session = this._getClientSession(accessToken);
+      this._sessions.push(session);
+      this._defaultAdminSession = session;
     }
     return this._defaultAdminSession;
   }
@@ -61,7 +75,7 @@ export default class Setup {
     return this._settings;
   }
 
-  private _getClientSession(idToken?: string): ClientSession {
-    return new ClientSession(this, idToken);
+  private _getClientSession(accessToken?: string): ClientSession {
+    return new ClientSession(this, accessToken);
   }
 }
