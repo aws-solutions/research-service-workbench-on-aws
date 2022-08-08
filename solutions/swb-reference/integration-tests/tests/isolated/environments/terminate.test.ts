@@ -24,8 +24,9 @@ describe('environment terminate negative tests', () => {
   });
 
   test('environment does not exist', async () => {
+    const fakeEnvId = '927ff6bd-9d0e-44d0-b754-47ee50e68edb';
     try {
-      await adminSession.resources.environments.environment('fakeEnv').terminate();
+      await adminSession.resources.environments.environment(fakeEnvId).terminate();
     } catch (e) {
       console.log('error is', e);
       checkHttpError(
@@ -33,7 +34,7 @@ describe('environment terminate negative tests', () => {
         new HttpError(404, {
           statusCode: 404,
           error: 'Not Found',
-          message: 'Could not find environment fakeEnv'
+          message: `Could not find environment ${fakeEnvId}`
         })
       );
     }
