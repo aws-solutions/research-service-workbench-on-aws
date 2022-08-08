@@ -14,11 +14,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ### Prerequisite:
 
-1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
+Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
 ### Deploy static website
 
-Project swb-ui can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
+Project `swb-ui` can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
 1. Navigate to `solutions/swb-ui`
 
@@ -54,7 +54,7 @@ To navigate to the website, follow the link provided by `swb-<STAGE>-<awsRegionS
 ## Running UI App locally
 
 ### Prerequisite
-1. Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
+Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setup installation of API.
 
 ### Start App
 
