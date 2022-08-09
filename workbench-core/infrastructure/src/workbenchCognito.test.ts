@@ -105,7 +105,13 @@ describe('WorkbenchCognito tests', () => {
         IdToken: 'minutes',
         AccessToken: 'minutes',
         RefreshToken: 'minutes'
-      }
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
     });
   });
 
