@@ -11,7 +11,7 @@ for plugin in *; do #Iterate through swb-plugins
         pluginUpper=$(echo "${plugin}" | tr “[a-z]” “[A-Z]”);
         if ! $(jq --arg pluginName $pluginPackageName 'any(.projects[].packageName == $pluginName; .)' ../../rush.json); then
             echo "Adding $pluginPackageName to rush.json";
-            jq --arg pluginName $pluginPackageName --arg pluginFolder "solutions/swb-plugins/$plugin" '.projects += [{"packageName": $pluginName, "projectFolder": $pluginFolder, "reviewCategory": "production", "shouldPublish": true}]' ../../rush.json > ../../output_rush.json;
+            jq --arg pluginName $pluginPackageName --arg pluginFolder "solutions/swb-plugins/$plugin" '.projects += [{"packageName": $pluginName, "projectFolder": $pluginFolder, "reviewCategory": "production", "shouldPublish": false}]' ../../rush.json > ../../output_rush.json;
             mv ../../output_rush.json  ../../rush.json;
             echo "Added $pluginPackageName to rush.json";
             echo "Adding $pluginPackageName to package.json of swb-ui";
@@ -56,5 +56,5 @@ for page in ../swb-ui/src/pages/apps/*; do #Iterate through all items in pages/a
 done 
 echo "Running rush update";
 rush update;
-echo "Fininshed Updating of Plugins";
+echo "Finished Updating of Plugins";
 echo "You may now run 'rush build' to build Service Workbench.";

@@ -22,7 +22,6 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
-import HPCService from './HPC/HPCService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
@@ -33,34 +32,10 @@ const aws: AwsService = new AwsService({
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
     {
-      path: '/projects/:projectId/clusters/:clusterName',
-      serviceAction: 'getAwsCluster',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters',
-      serviceAction: 'listAwsClusters',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
-      serviceAction: 'getJobQueue',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
-      serviceAction: 'submitJob',
+      path: '/foo',
+      serviceAction: 'launch',
       httpMethod: 'post',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs/:jobId/cancel',
-      serviceAction: 'cancelJob',
-      httpMethod: 'put',
-      service: new HPCService()
+      service: new SagemakerNotebookEnvironmentLifecycleService()
     }
   ],
   environments: {
