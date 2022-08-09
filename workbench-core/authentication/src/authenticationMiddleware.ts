@@ -5,11 +5,17 @@
 
 import { AuthenticatedUser, RoutesIgnored } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, CookieOptions } from 'express';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
+
+const defaultCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'none'
+} as const;
 
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
@@ -45,8 +51,6 @@ export function getTokensFromAuthorizationCode(
           codeVerifier
         );
 
-        const now = Date.now();
-
         // set cookies.
         // TODO: Delete code below adding access token to response and rely solely on cookies
         const data = {
@@ -54,17 +58,13 @@ export function getTokensFromAuthorizationCode(
           accessToken: accessToken.token
         };
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(now + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
         });
         if (refreshToken) {
           res.cookie('refresh_token', refreshToken.token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            expires: refreshToken.expiresIn ? new Date(now + refreshToken.expiresIn * 1000) : undefined
+            ...defaultCookieOptions,
+            maxAge: refreshToken.expiresIn ? refreshToken.expiresIn * 1000 : undefined
           });
         }
 
@@ -206,8 +206,8 @@ export function logoutUser(
       }
     }
 
-    res.cookie('access_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
-    res.cookie('refresh_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
+    res.clearCookie('access_token', defaultCookieOptions);
+    res.clearCookie('refresh_token', defaultCookieOptions);
 
     res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl() });
   };
@@ -242,10 +242,8 @@ export function refreshAccessToken(
 
         // set access cookie
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
         });
 
         res.status(200).json({ idToken: idToken.token });
@@ -300,10 +298,8 @@ export function isUserLoggedIn(
 
         // set access cookie
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
         });
 
         res.status(200).json({ idToken: idToken.token, loggedIn: true });
