@@ -293,6 +293,7 @@ export class SWBStack extends Stack {
           actions: [
             'sagemaker:DescribeNotebookInstance',
             'sagemaker:CreateNotebookInstance',
+            'sagemaker:AddTags',
             'sagemaker:StopNotebookInstance',
             'sagemaker:StopNotebookInstance',
             'sagemaker:DeleteNotebookInstance'
