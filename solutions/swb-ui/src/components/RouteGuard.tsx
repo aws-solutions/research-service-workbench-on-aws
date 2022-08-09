@@ -17,7 +17,7 @@ function RouteGuard({ children }: Props): JSX.Element {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('idToken');
     if (!token) {
-      // window.location.assign(window.location.origin);
+      window.location.assign(window.location.origin);
     }
   }
 
