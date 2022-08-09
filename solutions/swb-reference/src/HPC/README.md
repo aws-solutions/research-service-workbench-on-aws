@@ -30,20 +30,19 @@ Scheduling:
       Networking:
         SubnetIds:
           - subnet-abc123
-Region: us-west-2
+Region: us-east-1
 Image:
   Os: alinux2
 ```
-4. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Add the `S3 Full Access` policy to the IAM role assumed by the head node of your cluster to have permission to execute S3 actions. Lastly, similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your cluster head node to access the bucket.
-
-```
+5. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Attach the `S3 Full Access` policy to both the IAM role of the head node (`clusterName-RoleHeadNode`) and the IAM role of the compute nodes (`clusterName-Role`) of your ParallelCluster for the nodes to execute S3 operations. Lastly, similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your ParallelCluster to access the bucket.
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:Hosting-Cluster-InstanceProfileHeadNode-123456789"
+                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:role/parallelcluster/*"
             },
             "Action": "s3:*",
             "Resource": [
@@ -56,7 +55,7 @@ Image:
 ```
 
 **Note**
-The region and subnet should be unique to your deployment
+The region and subnet should be unique to your deployment.
 
 ## Set Up
 1. In the root directory at `ma-mono` run `rush install`
@@ -77,10 +76,10 @@ Job Name: test (can be any name)
 Nodes: 1 (capped by max # of nodes on your worker queue)
 Number of Tasks: 1 (how many times you want your job to be performed)
 Queue: queue0 (name of a worker queue on your cluster)
-S3 Bucket Data Folder URI: s3://my_bucket/my_test/ (a sub folder called output will be created)
+S3 Bucket Data Folder URI: s3://my_bucket/my_test/ (final backslash is required, and sub output folder will be created)
 Script Name: test.sh
 ```
-
+A test job is provided in `./HPC/artifacts/test_job` which can be uploaded to your S3 bucket. Make sure that the S3 folder name is `test_job` and to update the last `aws s3 cp` command with the proper S3 URI (bucket name and folder location of `test_job`).
 
 ## Onboarding hosting account
 Refer to [here](../../SETUP_v2p1.md#deploy-to-the-hosting-account) for instructions on how to add a hosting account to SWB.
