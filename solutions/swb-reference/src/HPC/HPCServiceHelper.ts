@@ -87,6 +87,7 @@ export default class HPCServiceHelper {
             };
             resolve(cluster);
           } else {
+            console.log('response_body', response_body);
             const body = JSON.parse(response_body);
             const clusterList: Cluster[] = body.clusters as Cluster[];
             resolve(clusterList);
