@@ -7,6 +7,7 @@ jest.mock('../utils');
 
 import {
   CognitoIdentityProviderClient,
+  DescribeUserPoolClientCommand,
   DescribeUserPoolClientCommandOutput,
   NotAuthorizedException,
   ResourceNotFoundException,
@@ -14,6 +15,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { mockClient } from 'aws-sdk-client-mock';
 import axios from 'axios';
 import {
   CognitoAuthenticationPlugin,
@@ -41,6 +43,8 @@ const encodedClientId = Buffer.from(
   `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
 ).toString('base64');
 
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
   UserPoolClient: {
     TokenValidityUnits: {
@@ -58,6 +62,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
   let plugin: CognitoAuthenticationPlugin;
 
   beforeEach(() => {
+    cognitoMock.reset();
     plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
   });
 
@@ -338,9 +343,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       };
       const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
       const tokens = await plugin.handleAuthorizationCode(validCode, codeVerifier);
 
@@ -566,9 +569,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       };
       const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
       const tokens = await plugin.refreshAccessToken(refreshToken);
 
@@ -720,31 +721,31 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       expect(encodedId).toBe(encodedClientId);
     });
+  });
 
+  describe('_getTokensExpiration tests', () => {
     it('should return a TokensExpiration object when user pool has token expiration defined', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
       const tokens = await plugin['_getTokensExpiration']();
 
       expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
-    it('should return an empty TokensExpiration object when user pool doesnt have token expiration defined', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve({}));
+    it('should return a TokensExpiration object when user pool token expiration is undefined', async () => {
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves({
+        UserPoolClient: {
+          TokenValidityUnits: {}
+        }
+      });
 
       const tokens = await plugin['_getTokensExpiration']();
 
-      expect(tokens).toMatchObject({});
+      expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new NotAuthorizedException({ $metadata: {} })));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
 
       await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
         new PluginConfigurationError(
@@ -754,9 +755,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new ResourceNotFoundException({ $metadata: {} })));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
 
       await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
         new PluginConfigurationError('invalid user pool id or client id')
@@ -764,9 +763,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new Error()));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new Error());
 
       await expect(plugin['_getTokensExpiration']()).rejects.toThrow(Error);
     });
