@@ -395,6 +395,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "my-app",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "next",
       "allowedCategories": [ "production", "prototypes" ]
     },

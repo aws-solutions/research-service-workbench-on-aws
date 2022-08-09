@@ -34,6 +34,7 @@ Region: us-west-2
 Image:
   Os: alinux2
 ```
+
 **Note**
 The region and subnet should be unique to your deployment
 
@@ -47,6 +48,19 @@ The region and subnet should be unique to your deployment
 7. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
 Refer to [here](../../README.md#deploying-code) for additional deployment steps.
+
+
+## Example Job Parameters
+
+```
+Job Name: test (can be any name)
+Nodes: 1 (capped by max # of nodes on your worker queue)
+Number of Tasks: 1 (how many times you want your job to be performed)
+Queue: queue0 (name of a worker queue on your cluster)
+S3 Bucket Data Folder URI: s3://my_bucket/my_test/ (a sub folder called output will be created)
+Script Name: test.sh
+```
+
 
 ## Onboarding hosting account
 Refer to [here](../../SETUP_v2p1.md#deploy-to-the-hosting-account) for instructions on how to add a hosting account to SWB.
