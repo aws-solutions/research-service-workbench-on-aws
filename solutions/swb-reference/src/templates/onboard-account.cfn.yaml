@@ -20,7 +20,7 @@ Parameters:
     Type: String
     Description: A unique ID used to identify this account
 
-ParallelClusterApiID:
+  ParallelClusterApiID:
     Type: String
     Description: API ID for ParallelCluster API stack on hosting account.
   
@@ -114,7 +114,7 @@ Resources:
                 Action:
                   - events:PutEvents
                 Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
-         - PolicyName: execute-api
+        - PolicyName: execute-api
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -141,7 +141,7 @@ Resources:
                 - ssm:DeleteParameter
               Resource:
                 - !Sub 'arn:aws:ssm:*:${AWS::AccountId}:parameter/*/sc-environments/*'
-       - PolicyName: ssm-doc-execution
+        - PolicyName: ssm-doc-execution
           PolicyDocument:
             Statement:
               Effect: Allow
