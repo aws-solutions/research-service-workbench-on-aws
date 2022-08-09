@@ -61,7 +61,6 @@ export default class HPCService {
     };
 
     const signed: aws4.Request = aws4.sign(opts, creds);
-    console.log('signed', signed);
 
     return this.helper.sendSignedClusterRequest(req, signed) as Promise<Cluster[]>;
   }
