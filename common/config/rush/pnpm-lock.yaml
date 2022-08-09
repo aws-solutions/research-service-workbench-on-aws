@@ -230,13 +230,11 @@ importers:
       '@aws/workbench-core-environments': workspace:*
       '@aws/workbench-core-infrastructure': workspace:*
       '@aws/workbench-core-logging': workspace:*
-      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
       '@types/aws-lambda': ^8.10.92
-      '@types/aws4': ^1.11.2
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': ^27.4.1
@@ -249,7 +247,6 @@ importers:
       aws-cdk-lib: ^2.29.1
       aws-lambda: ^1.0.7
       aws-sdk-client-mock: ^0.6.2
-      aws4: ^1.11.0
       axios: ^0.27.1
       cdk-ssm-document: ^3.1.1
       constructs: ^10.0.0
@@ -258,13 +255,11 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       express: ^4.17.3
-      https: ^1.0.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-circus: ^26.6.3
       js-yaml: ^4.1.0
       lodash: ^4.17.21
-      nock: 13.2.8
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -287,12 +282,9 @@ importers:
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-infrastructure': link:../../workbench-core/infrastructure
       '@aws/workbench-core-logging': link:../../workbench-core/logging
-      '@hapi/boom': 10.0.0
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
-      aws4: 1.11.0
       express: 4.18.1
-      https: 1.0.0
       js-yaml: 4.1.0
       lodash: 4.17.21
       uuid: 8.3.2
@@ -304,7 +296,6 @@ importers:
       '@rushstack/heft-jest-plugin': 0.2.15_04f3c65f6de4a5e5529a6fededa44e1d
       '@rushstack/heft-node-rig': 1.9.6_04f3c65f6de4a5e5529a6fededa44e1d
       '@types/aws-lambda': 8.10.97
-      '@types/aws4': 1.11.2
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/jest': 27.5.2
@@ -325,7 +316,6 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.8.0
       jest-circus: 26.6.3_ts-node@10.8.0
-      nock: 13.2.8
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -6991,12 +6981,6 @@ packages:
     resolution: {integrity: sha512-BZk3qO4R2KN8Ts3eR6CW1n8LI46UOgv1KoDZjo8J9vOQvDeX/rsrv1H0BpEAMcSqZ1mLwTEyAMtlua5tlSn0kw==}
     dev: true
 
-  /@types/aws4/1.11.2:
-    resolution: {integrity: sha512-x0f96eBPrCCJzJxdPbUvDFRva4yPpINJzTuXXpmS2j9qLUpF2nyGzvXPlRziuGbCsPukwY4JfuO+8xwsoZLzGw==}
-    dependencies:
-      '@types/node': 14.18.20
-    dev: true
-
   /@types/babel__core/7.1.19:
     resolution: {integrity: sha512-WEOTgRsbYkvA/KCsDwVEGkd7WAr1e3g31VHQ8zy5gul/V1qKullU/BU5I68X5v7V3GnB9eotmom4v5a5gjxorw==}
     dependencies:
@@ -8244,10 +8228,6 @@ packages:
       uuid: 8.0.0
       xml2js: 0.4.19
     dev: true
-
-  /aws4/1.11.0:
-    resolution: {integrity: sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==}
-    dev: false
 
   /axe-core/4.4.2:
     resolution: {integrity: sha512-LVAaGp/wkkgYJcjmHsoKx4juT1aQvJyPcW09MLCjVTh3V2cc6PnyempiLMNH5iMdfIX/zdbjUx2KDjMLCTdPeA==}
@@ -11754,10 +11734,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /https/1.0.0:
-    resolution: {integrity: sha512-4EC57ddXrkaF0x83Oj8sM6SLQHAWXw90Skqu2M4AEWENZ3F02dFJE/GARA8igO79tcgYqGrD7ae4f5L3um2lgg==}
-    dev: false
-
   /human-signals/2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
@@ -13522,10 +13498,6 @@ packages:
   /json-stable-stringify-without-jsonify/1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
-  /json-stringify-safe/5.0.1:
-    resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
-    dev: true
-
   /json5/1.0.1:
     resolution: {integrity: sha512-aKS4WQjPenRxiQsC93MNfjx+nbF4PAdYzmd/1JIj8HYzqfbu86beTuNgXDzPknWk0n0uARlyewZo4s++ES36Ow==}
     hasBin: true
@@ -14244,18 +14216,6 @@ packages:
       lower-case: 2.0.2
       tslib: 2.4.0
     dev: false
-
-  /nock/13.2.8:
-    resolution: {integrity: sha512-JT42FrXfQRpfyL4cnbBEJdf4nmBpVP0yoCcSBr+xkT8Q1y3pgtaCKHGAAOIFcEJ3O3t0QbVAmid0S0f2bj3Wpg==}
-    engines: {node: '>= 10.13'}
-    dependencies:
-      debug: 4.3.4
-      json-stringify-safe: 5.0.1
-      lodash: 4.17.21
-      propagate: 2.0.1
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
 
   /node-abi/3.22.0:
     resolution: {integrity: sha512-u4uAs/4Zzmp/jjsD9cyFYDXeISfUWaAVWshPmDZOFOv4Xl4SbzTXm53I04C2uRueYJ+0t5PEtLH/owbn2Npf/w==}
@@ -15738,11 +15698,6 @@ packages:
       loose-envify: 1.4.0
       object-assign: 4.1.1
       react-is: 16.13.1
-
-  /propagate/2.0.1:
-    resolution: {integrity: sha512-vGrhOavPSTz4QVNuBNdcNXePNdNMaO1xj9yBeH1ScQPjk/rhg9sSlCXPhMkFuaNNW/syTvYqsnbIJxMBfRbbag==}
-    engines: {node: '>= 8'}
-    dev: true
 
   /proxy-addr/2.0.7:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}

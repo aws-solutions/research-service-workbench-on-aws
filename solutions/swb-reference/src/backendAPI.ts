@@ -30,7 +30,14 @@ const aws: AwsService = new AwsService({
 });
 
 const apiRouteConfig: ApiRouteConfig = {
-  routes: [],
+  routes: [
+    {
+      path: '/foo',
+      serviceAction: 'launch',
+      httpMethod: 'post',
+      service: new SagemakerNotebookEnvironmentLifecycleService()
+    }
+  ],
   environments: {
     sagemakerNotebook: {
       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),
