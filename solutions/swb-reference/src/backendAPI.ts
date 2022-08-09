@@ -22,7 +22,6 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
-import HPCService from './HPC/HPCService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
