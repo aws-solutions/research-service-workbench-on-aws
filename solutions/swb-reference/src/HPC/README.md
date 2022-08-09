@@ -34,7 +34,7 @@ Region: us-east-1
 Image:
   Os: alinux2
 ```
-5. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Attach the `S3 Full Access` policy to both the IAM role of the head node (`clusterName-RoleHeadNode`) and the IAM role of the compute nodes (`clusterName-Role`) of your ParallelCluster for the nodes to execute S3 operations. Lastly, similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your ParallelCluster to access the bucket.
+5. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your ParallelCluster to access the bucket. Lastly, within your AWS Hosting Account attach the `S3 Full Access` policy to both the IAM role of the head node (prefix of `<clusterName>-RoleHeadNode`) and the IAM role of the compute nodes (prefix of `<clusterName>-Role`) of your ParallelCluster for the nodes to execute S3 operations.
 ```json
 {
     "Version": "2012-10-17",
@@ -42,7 +42,7 @@ Image:
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:role/parallelcluster/*"
+                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:role/parallelcluster/*/*"
             },
             "Action": "s3:*",
             "Resource": [
