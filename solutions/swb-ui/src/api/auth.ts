@@ -18,7 +18,7 @@ const login = async (): Promise<any> => {
 };
 
 const logout = async (): Promise<any> => {
-  return await httpApiGet('logout', {});
+  return await httpApiPost('logout', {});
 };
 
 const checkIfloggedIn = async (): Promise<any> => {

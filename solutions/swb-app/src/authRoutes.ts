@@ -23,7 +23,7 @@ export function setUpAuthRoutes(router: Router, auth: AuthenticationService, log
   // User would have manually logged in at this point, and received an auth code. Exchange auth code for token
   router.post('/token', wrapAsync(getTokensFromAuthorizationCode(auth, { loggingService: logger })));
 
-  router.get('/logout', wrapAsync(logoutUser(auth, { loggingService: logger })));
+  router.post('/logout', wrapAsync(logoutUser(auth, { loggingService: logger })));
 
   router.get('/refresh', wrapAsync(refreshAccessToken(auth, { loggingService: logger })));
 
