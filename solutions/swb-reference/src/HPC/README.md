@@ -34,6 +34,26 @@ Region: us-west-2
 Image:
   Os: alinux2
 ```
+4. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Add the `S3 Full Access` policy to the IAM role assumed by the head node of your cluster to have permission to execute S3 actions. Lastly, similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your cluster head node to access the bucket.
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:Hosting-Cluster-InstanceProfileHeadNode-123456789"
+            },
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::main-account-bucket",
+                "arn:aws:s3:::main-account-bucket/*"
+            ]
+        }
+    ]
+}
+```
 
 **Note**
 The region and subnet should be unique to your deployment
