@@ -31,38 +31,7 @@ const aws: AwsService = new AwsService({
 });
 
 const apiRouteConfig: ApiRouteConfig = {
-  routes: [
-    {
-      path: '/projects/:projectId/clusters/:clusterName',
-      serviceAction: 'getAwsCluster',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters',
-      serviceAction: 'listAwsClusters',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
-      serviceAction: 'getJobQueue',
-      httpMethod: 'get',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs',
-      serviceAction: 'submitJob',
-      httpMethod: 'post',
-      service: new HPCService()
-    },
-    {
-      path: '/projects/:projectId/clusters/:clusterName/headNode/:instanceId/jobs/:jobId/cancel',
-      serviceAction: 'cancelJob',
-      httpMethod: 'put',
-      service: new HPCService()
-    }
-  ],
+  routes: [],
   environments: {
     sagemakerNotebook: {
       lifecycle: new SagemakerNotebookEnvironmentLifecycleService(),

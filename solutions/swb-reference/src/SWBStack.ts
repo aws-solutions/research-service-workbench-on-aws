@@ -49,7 +49,6 @@ export class SWBStack extends Stack {
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
-    PCLUSTER_API_URL: string;
     ALLOWED_ORIGINS: string;
     COGNITO_DOMAIN: string;
     CLIENT_ID: string;
@@ -77,7 +76,6 @@ export class SWBStack extends Stack {
       AMI_IDS_TO_SHARE,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
-      PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
       UI_CLIENT_URL,
       COGNITO_DOMAIN,
@@ -131,7 +129,6 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
-      PCLUSTER_API_URL,
       ALLOWED_ORIGINS,
       COGNITO_DOMAIN: cognitoDomain,
       CLIENT_ID: clientId,
