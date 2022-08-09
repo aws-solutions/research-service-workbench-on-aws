@@ -5,6 +5,26 @@ The requirements utilizing the HPC backend on SWB:
 1. Deploy Pcluster Manager stack and deploy clusters to Hosting Account. 
 Instructions for deploying the stack can be found [here](https://pcluster.cloud/01-getting-started.html). Information on creating clusters are also here in [this video review of Pcluster Manager](https://www.youtube.com/watch?v=Z1vlpJYb1KQ).
 2. Deploy ParallelCluster Stack API onto the Hosting Account under the region for where your clusters reside such as `us-east-1`. Use version `3.14` of [ParallelCluster Stack API](https://docs.aws.amazon.com/parallelcluster/latest/ug/api-reference-v3.html). For the parameters make sure to set CreateAPIUserRole to `false` to invoke the API from any IAM role, and as well specify the region for where the clusters reside such as `us-east-1`.
+3. Create atleast one S3 bucket on your AWS Main Account containing files necessary to complete a job such as scripts and data. Add the `S3 Full Access` policy to the IAM role assumed by the head node of your cluster to have permission to execute S3 actions. Lastly, similar to the policy below, attach the appropriate bucket policy to your S3 bucket to allow your cluster head node to access the bucket.
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::AWS-Hosting-Account-ID:Hosting-Cluster-InstanceProfileHeadNode-123456789"
+            },
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::main-account-bucket",
+                "arn:aws:s3:::main-account-bucket/*"
+            ]
+        }
+    ]
+}
+```
 
 ## Set Up
 1. In the root directory at `ma-mono` run `rush install`
@@ -33,6 +53,17 @@ Deploy/Update code
 This step is necessary to setup Service Catalog portfolio and products
 
 `STAGE=<STAGE> rushx run-postDeployment`
+
+## Example Job Parameters
+
+```
+Job Name: test (can be any name)
+Nodes: 1 (capped by max # of nodes on your worker queue)
+Number of Tasks: 1 (how many times you want your job to be performed)
+Queue: queue0 (name of a worker queue on your cluster)
+S3 Bucket Data Folder URI: s3://my_bucket/my_test/ (a sub folder called output will be created)
+Script Name: test.sh
+```
 
 ## FAQ
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**
