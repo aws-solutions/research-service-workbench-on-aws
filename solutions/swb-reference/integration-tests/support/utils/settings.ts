@@ -14,6 +14,11 @@ interface Setting {
   envType: string;
   runId: string;
   alreadyTerminateEnvId: string;
+  awsRegion: string;
+  userPoolId: string;
+  clientId: string;
+  rootUsername: string;
+  rootPasswordParamStorePath: string;
 }
 
 type SettingKey = keyof Setting;
