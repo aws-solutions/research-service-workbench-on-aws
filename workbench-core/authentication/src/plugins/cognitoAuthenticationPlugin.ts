@@ -10,7 +10,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
@@ -73,7 +73,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
-    tokenUse: null;
+    tokenUse: 'access';
     clientId: string;
   }>;
 
@@ -106,7 +106,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     try {
       this._verifier = CognitoJwtVerifier.create({
         userPoolId,
-        tokenUse: null, // can check both access and ID tokens
+        tokenUse: 'access',
         clientId
       });
     } catch (error) {
@@ -140,14 +140,14 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   }
 
   /**
-   * Validates an id or access token and returns the values on the token.
+   * Validates an access token and returns the values on the token.
    *
-   * @param token - an Id or Access token to be validated
+   * @param token - an access token to be validated
    * @returns the decoded jwt
    *
    * @throws {@link InvalidJWTError} if the token is invalid
    */
-  public async validateToken(token: string): Promise<CognitoJwtPayload> {
+  public async validateToken(token: string): Promise<CognitoAccessTokenPayload> {
     try {
       return await this._verifier.verify(token);
     } catch (error) {
@@ -204,7 +204,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @param decodedToken - a decoded Id or access token from which to extract the user Id.
    * @returns the user Id found within the token.
    */
-  public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
+  public getUserIdFromToken(decodedToken: CognitoAccessTokenPayload): string {
     return decodedToken.sub;
   }
 
@@ -216,7 +216,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
-  public getUserRolesFromToken(decodedToken: CognitoJwtPayload): string[] {
+  public getUserRolesFromToken(decodedToken: CognitoAccessTokenPayload): string[] {
     const roles = decodedToken['cognito:groups'];
     if (!roles) {
       // jwt does not have a cognito:roles claim

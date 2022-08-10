@@ -14,7 +14,7 @@ import {
   TimeUnitsType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 import { mockClient } from 'aws-sdk-client-mock';
 import axios from 'axios';
 import {
@@ -42,6 +42,21 @@ const baseUrl = cognitoPluginOptions.cognitoDomain;
 const encodedClientId = Buffer.from(
   `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
 ).toString('base64');
+
+const baseDecodedAccessToken: CognitoAccessTokenPayload = {
+  token_use: 'access',
+  client_id: 'client_id',
+  version: 1,
+  username: 'username',
+  scope: 'scope',
+  sub: 'sub',
+  iss: 'iss',
+  exp: 3600,
+  iat: 123,
+  auth_time: 456,
+  jti: 'jti',
+  origin_jti: 'origin_jti'
+};
 
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
 
@@ -126,21 +141,11 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('validateToken tests', () => {
     it('should return the decoded token when a valid token is passed in', async () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(decodedToken);
+      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(baseDecodedAccessToken);
 
       const decoded = await plugin.validateToken('validToken');
 
-      expect(decoded).toMatchObject(decodedToken);
+      expect(decoded).toMatchObject(baseDecodedAccessToken);
     });
 
     it('should throw InvalidJWTError when an invalid token is passed in', async () => {
@@ -279,54 +284,20 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('getUserIdFromToken tests', () => {
     it('should return the sub claim from the decoded token', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-
-      const userId = plugin.getUserIdFromToken(decodedToken);
+      const userId = plugin.getUserIdFromToken(baseDecodedAccessToken);
 
       expect(userId).toBe('sub');
     });
 
     it('should return the cognito:groups claim from the decoded token', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti',
-        'cognito:groups': ['Admin']
-      };
-
-      const userId = plugin.getUserRolesFromToken(decodedToken);
+      const userId = plugin.getUserRolesFromToken({ ...baseDecodedAccessToken, 'cognito:groups': ['Admin'] });
 
       expect(userId).toMatchObject(['Admin']);
     });
 
     it('should throw InvalidJWTError when the decoded token doesnt have the cognito:groups claim', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-
       expect(() => {
-        plugin.getUserRolesFromToken(decodedToken);
+        plugin.getUserRolesFromToken(baseDecodedAccessToken);
       }).toThrow(new InvalidJWTError('no cognito:roles claim'));
     });
   });

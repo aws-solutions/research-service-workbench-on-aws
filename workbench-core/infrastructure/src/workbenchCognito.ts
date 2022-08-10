@@ -59,8 +59,8 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true,
-  idTokenValidity: Duration.minutes(60),
-  accessTokenValidity: Duration.minutes(60),
+  idTokenValidity: Duration.minutes(15),
+  accessTokenValidity: Duration.minutes(15),
   refreshTokenValidity: Duration.days(30)
 };
 
