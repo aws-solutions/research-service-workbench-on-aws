@@ -20,7 +20,7 @@ authors: Amazon Web Services <http://aws.amazon.com>
 ******************************
 
 @aws/workbench-core-base
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.2 <https://github.com/awslabs/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 

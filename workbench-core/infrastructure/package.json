@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-infrastructure",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Package containing CDK constructs used in workbench core",
   "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
