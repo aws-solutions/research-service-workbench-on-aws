@@ -1,6 +1,6 @@
 #!/bin/bash
-shortName=$(cat src/config/${STAGE}.yaml | grep awsRegionShortName: | awk '{print $NF}')
-region=$(cat src/config/${STAGE}.yaml | grep awsRegion: | awk '{print $NF}')
+shortName=$(cat src/config/${STAGE}.yaml | grep awsRegionShortName: | cut -f1 -d "#" | awk '{print $NF}')
+region=$(cat src/config/${STAGE}.yaml | grep awsRegion: | cut -f1 -d "#" | awk '{print $NF}')
 stackName="swb-${STAGE}-${shortName}"
 
 # SWBStack.ts read this value to set up API to be run locally
