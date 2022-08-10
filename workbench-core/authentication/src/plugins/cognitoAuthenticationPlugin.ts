@@ -21,7 +21,7 @@ import { InvalidTokenError } from '../errors/invalidTokenError';
 import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
 import { Tokens } from '../tokens';
-import { getTimeInSeconds, TimeUnits } from '../utils';
+import { getTimeInMS, TimeUnits } from '../utils';
 
 interface TokensExpiration {
   idToken: number; // in seconds
@@ -410,9 +410,9 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
       const refreshTokenUnits = UserPoolClient!.TokenValidityUnits!.RefreshToken ?? TimeUnits.DAYS;
 
       return {
-        idToken: getTimeInSeconds(idTokenTime, idTokenUnits as TimeUnits),
-        accessToken: getTimeInSeconds(accessTokenTime, accessTokenUnits as TimeUnits),
-        refreshToken: getTimeInSeconds(refreshTokenTime, refreshTokenUnits as TimeUnits)
+        idToken: getTimeInMS(idTokenTime, idTokenUnits as TimeUnits),
+        accessToken: getTimeInMS(accessTokenTime, accessTokenUnits as TimeUnits),
+        refreshToken: getTimeInMS(refreshTokenTime, refreshTokenUnits as TimeUnits)
       };
     } catch (error) {
       if (error.name === 'NotAuthorizedException') {

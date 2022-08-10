@@ -78,11 +78,11 @@ describe('authenticationMiddleware integration tests', () => {
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
         ...cookieOpts,
-        maxAge: tokens.accessToken.expiresIn * 1000
+        maxAge: tokens.accessToken.expiresIn
       });
       expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', tokens.refreshToken.token, {
         ...cookieOpts,
-        maxAge: tokens.refreshToken.expiresIn * 1000
+        maxAge: tokens.refreshToken.expiresIn
       });
       expect(res.status).toHaveBeenCalledWith(200);
       //TODO: Remove accessToken once cookies are properly set
@@ -591,7 +591,7 @@ describe('authenticationMiddleware integration tests', () => {
 
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...cookieOpts,
-        maxAge: tokens.accessToken.expiresIn * 1000
+        maxAge: tokens.accessToken.expiresIn
       });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
@@ -738,7 +738,7 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...cookieOpts,
-        maxAge: tokens.accessToken.expiresIn * 1000
+        maxAge: tokens.accessToken.expiresIn
       });
     });
 

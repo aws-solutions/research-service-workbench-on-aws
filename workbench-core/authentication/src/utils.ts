@@ -10,15 +10,15 @@ export enum TimeUnits {
   SECONDS = 'seconds'
 }
 
-export function getTimeInSeconds(length: number, units: TimeUnits): number {
+export function getTimeInMS(length: number, units: TimeUnits): number {
   if (units === TimeUnits.DAYS) {
-    return length * 86400;
+    return length * 24 * 60 * 60 * 1000;
   }
   if (units === TimeUnits.HOURS) {
-    return length * 3600;
+    return length * 60 * 60 * 1000;
   }
   if (units === TimeUnits.MINUTES) {
-    return length * 60;
+    return length * 60 * 1000;
   }
-  return length;
+  return length * 1000;
 }

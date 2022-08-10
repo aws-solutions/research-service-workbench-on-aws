@@ -59,12 +59,12 @@ export function getTokensFromAuthorizationCode(
         };
         res.cookie('access_token', accessToken.token, {
           ...defaultCookieOptions,
-          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
+          maxAge: accessToken.expiresIn
         });
         if (refreshToken) {
           res.cookie('refresh_token', refreshToken.token, {
             ...defaultCookieOptions,
-            maxAge: refreshToken.expiresIn ? refreshToken.expiresIn * 1000 : undefined
+            maxAge: refreshToken.expiresIn
           });
         }
 
@@ -243,7 +243,7 @@ export function refreshAccessToken(
         // set access cookie
         res.cookie('access_token', accessToken.token, {
           ...defaultCookieOptions,
-          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
+          maxAge: accessToken.expiresIn
         });
 
         res.status(200).json({ idToken: idToken.token });
@@ -299,7 +299,7 @@ export function isUserLoggedIn(
         // set access cookie
         res.cookie('access_token', accessToken.token, {
           ...defaultCookieOptions,
-          maxAge: accessToken.expiresIn ? accessToken.expiresIn * 1000 : undefined
+          maxAge: accessToken.expiresIn
         });
 
         res.status(200).json({ idToken: idToken.token, loggedIn: true });
