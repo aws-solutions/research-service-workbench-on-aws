@@ -118,6 +118,12 @@ clientId: '<CLIENT_ID>'
 4. Run `STAGE=<STAGE> node generateCognitoToken.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
 5. In the console output, use the `accessToken` that is provided to make authenticated API requests.
 
+## Appendix
+### Cloudwatch Logs
+* `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to SWB APIs. 
+* `swb-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
+* `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
+* 
 ## FAQ
 
 1. **Why is there `jest.config.js` and `config/jest.config.json`?**
