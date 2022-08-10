@@ -6,7 +6,7 @@
 import { httpApiGet, httpApiPost } from './apiHelper';
 
 const token = async (body: { code: string; codeVerifier: string | null }): Promise<any> => {
-  return await httpApiPost('token', body, false);
+  return await httpApiPost('token', body);
 };
 
 const login = async (): Promise<any> => {
