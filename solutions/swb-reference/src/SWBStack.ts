@@ -844,7 +844,7 @@ export class SWBStack extends Stack {
   ): WorkbenchCognito {
     const props: WorkbenchCognitoProps = {
       domainPrefix: domainPrefix,
-      websiteUrl: websiteUrl,
+      websiteUrls: [websiteUrl],
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: []

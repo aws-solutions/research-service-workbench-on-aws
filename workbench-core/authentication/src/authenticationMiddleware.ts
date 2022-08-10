@@ -37,12 +37,14 @@ export function getTokensFromAuthorizationCode(
     const { loggingService } = options || {};
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
+    const websiteUrl = req.headers.origin;
 
-    if (typeof code === 'string' && typeof codeVerifier === 'string') {
+    if (typeof code === 'string' && typeof codeVerifier === 'string' && typeof websiteUrl === 'string') {
       try {
         const { idToken, accessToken, refreshToken } = await authenticationService.handleAuthorizationCode(
           code,
-          codeVerifier
+          codeVerifier,
+          websiteUrl
         );
 
         const now = Date.now();
@@ -108,10 +110,18 @@ export function getAuthorizationCodeUrl(
   return async function (req: Request, res: Response) {
     const stateVerifier = req.query.stateVerifier;
     const codeChallenge = req.query.codeChallenge;
-    if (typeof stateVerifier === 'string' && typeof codeChallenge === 'string') {
+    const websiteUrl = req.headers.origin;
+
+    if (
+      typeof stateVerifier === 'string' &&
+      typeof codeChallenge === 'string' &&
+      typeof websiteUrl === 'string'
+    ) {
       res
         .status(200)
-        .json({ redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge) });
+        .json({
+          redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl)
+        });
     } else {
       res.sendStatus(400);
     }
@@ -141,10 +151,12 @@ export function verifyToken(
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const { ignoredRoutes, loggingService } = options || {};
+
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
       const accessToken = req.headers ? req.headers.authorization : undefined;
+
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
@@ -191,6 +203,12 @@ export function logoutUser(
   return async function (req: Request, res: Response) {
     const { loggingService } = options || {};
     const refreshToken = req.cookies.refresh_token;
+    const websiteUrl = req.headers.origin;
+
+    if (!websiteUrl) {
+      res.sendStatus(400);
+      return;
+    }
 
     if (typeof refreshToken === 'string') {
       try {
@@ -202,6 +220,7 @@ export function logoutUser(
         }
         if (isIdpUnavailableError(error)) {
           res.sendStatus(503);
+          return;
         }
       }
     }
@@ -209,7 +228,7 @@ export function logoutUser(
     res.cookie('access_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
     res.cookie('refresh_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
 
-    res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl() });
+    res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl(websiteUrl) });
   };
 }
 

@@ -50,14 +50,6 @@ export interface CognitoAuthenticationPluginOptions {
    * The Cognito app client secret.
    */
   clientSecret: string;
-
-  /**
-   * The website URL to redirect back to once login in is completed on the hosted UI.
-   * The URL must exist in the Cognito app client allowed callback URLs list.
-   *
-   * @example "https://www.exampleURL.com"
-   */
-  websiteUrl: string;
 }
 
 /**
@@ -66,7 +58,6 @@ export interface CognitoAuthenticationPluginOptions {
  */
 export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _region: string;
-  private _websiteUrl: string;
   private _userPoolId: string;
   private _clientId: string;
   private _clientSecret: string;
@@ -86,12 +77,10 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    */
   public constructor({
     cognitoDomain,
-    websiteUrl,
     userPoolId,
     clientId,
     clientSecret
   }: CognitoAuthenticationPluginOptions) {
-    this._websiteUrl = websiteUrl;
     this._userPoolId = userPoolId;
     this._clientId = clientId;
     this._clientSecret = clientSecret;
@@ -231,6 +220,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param code - the authorization code
    * @param codeVerifier - the PKCE code verifier
+   * @param websiteUrl - the url to redirect to after login is completed. Must be the same url used in the {@link getAuthorizationCodeUrl} function
    * @returns a {@link Tokens} object containing the id, access, and refresh tokens and their expiration (in seconds)
    *
    * @throws {@link InvalidAuthorizationCodeError} if the authorization code is invalid
@@ -238,7 +228,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @throws {@link InvalidCodeVerifierError} if the PCKE verifier is invalid
    * @throws {@link IdpUnavailableError} if Cognito is unavailable
    */
-  public async handleAuthorizationCode(code: string, codeVerifier: string): Promise<Tokens> {
+  public async handleAuthorizationCode(
+    code: string,
+    codeVerifier: string,
+    websiteUrl: string
+  ): Promise<Tokens> {
     try {
       const encodedClientId = this._getEncodedClientId();
 
@@ -248,7 +242,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         new URLSearchParams({
           grant_type: 'authorization_code',
           code: code,
-          redirect_uri: this._websiteUrl,
+          redirect_uri: websiteUrl,
           code_verifier: codeVerifier
         }),
         {
@@ -303,10 +297,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @param state - a temporary value to represent the state parameter
    * @param codeChallenge - a temporary value to represent the code challenge parameter
+   * @param websiteUrl - the url to redirect to after login is completed
    * @returns the endpoint URL string
    */
-  public getAuthorizationCodeUrl(state: string, codeChallenge: string): string {
-    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${this._websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+  public getAuthorizationCodeUrl(state: string, codeChallenge: string, websiteUrl: string): string {
+    return `${this._baseUrl}/oauth2/authorize?client_id=${this._clientId}&response_type=code&scope=openid&redirect_uri=${websiteUrl}&state=${state}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
   }
 
   /**
@@ -370,10 +365,11 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   /**
    * Gets the URL of the endpoint used to logout the user.
    *
+   * @param websiteUrl - the url to redirect to after logout is completed
    * @returns the endpoint URL string
    */
-  public getLogoutUrl(): string {
-    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${this._websiteUrl}`;
+  public getLogoutUrl(websiteUrl: string): string {
+    return `${this._baseUrl}/logout?client_id=${this._clientId}&logout_uri=${websiteUrl}`;
   }
 
   /**
