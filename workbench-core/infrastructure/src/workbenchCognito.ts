@@ -52,6 +52,11 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
+  authFlows: {
+    adminUserPassword: true,
+    userSrp: true,
+    custom: true
+  },
   preventUserExistenceErrors: true,
   enableTokenRevocation: true
 };
@@ -119,7 +124,6 @@ export class WorkbenchCognito extends Construct {
       userPool: this.userPool,
       userPoolClientName
     });
-
     this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
 
     const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {
