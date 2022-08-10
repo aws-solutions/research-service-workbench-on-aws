@@ -122,7 +122,7 @@ clientId: '<CLIENT_ID>'
 ### Cloudwatch Logs
 * `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to SWB APIs. 
 * `swb-<stage>-<awsRegionShortName>-accountHandlerLambda`: Logs for account handler lambda. This lamba runs every 5 minutes and is responsible for keeping the hosting account resources in sync with the main account. 
-* `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
+* `swb-<stage>-<awsRegionShortName>-statusHandlerLambda`: Logs for status handler lambda. This lambda is triggered by EventBridge events that originated in hosting accounts. It updates DDB with environment statuses from the hosting accounts. 
 * 
 ## FAQ
 
