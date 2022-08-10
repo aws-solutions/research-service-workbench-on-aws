@@ -1,6 +1,6 @@
 {
   "name": "@aws/swb-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "This package sets up API routes for SWB",
   "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
