@@ -107,7 +107,7 @@ VPC
 VpcSubnet
 ```
 
-## Setup UI and Get access token
+## Get access token
 
 To get the `access_token` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
 
@@ -272,7 +272,7 @@ POST `{{API_URL}}/aws-accounts`
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
-## Setup UI and Get access token
+## Setup UI 
 
 Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
 
