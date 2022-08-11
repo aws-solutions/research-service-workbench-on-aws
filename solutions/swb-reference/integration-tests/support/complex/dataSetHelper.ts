@@ -42,7 +42,7 @@ export class DataSetHelper {
         if (data.Count === 0) return;
 
         const endpoints = data.Items!;
-        // 
+        // Tests are not expected to create more than a couple of endpoints per DS max, so no support needed for pagintated query results
         await Promise.all(
             _.map(endpoints, async endpoint => {
                 await this._awsSdk.helpers.ddb.delete({pk: endpoint.pk, sk: endpoint.sk}).execute();
