@@ -279,7 +279,7 @@ export function refreshAccessToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
