@@ -13,6 +13,6 @@ jobs:
         with:
           token: ${{ secrets.MERGE_TOKEN }}
           fetch-depth: 0
-      - name: rush-check-verify
+      - name: rush-change-verify
         run: |
-          node common/scripts/install-run-rush.js change --verify -b test-develop
+          node common/scripts/install-run-rush.js change --verify -b origin/test-develop
