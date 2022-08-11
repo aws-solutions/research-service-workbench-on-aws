@@ -19,7 +19,7 @@
     "build": "heft build --clean",
     "build:test": "rushx build && rushx test",
     "cdk": "cdk",
-    "cdk-deploy": "rushx build && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.js",
+    "cdk-deploy": "rushx build && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only",
     "test:only": "heft test --clean --no-build",
