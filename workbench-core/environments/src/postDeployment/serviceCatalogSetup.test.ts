@@ -5,8 +5,9 @@
 
 jest.mock('md5-file');
 
+import { Readable } from 'stream';
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
-import { ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsCommand, S3Client } from '@aws-sdk/client-s3';
 import {
   CreateConstraintCommand,
   CreatePortfolioCommand,
@@ -246,17 +247,30 @@ describe('ServiceCatalogSetup', () => {
         ]
       });
 
-      // Mock Get S3 files
+      // Mock Get List of S3 files
       s3Mock.on(ListObjectsCommand).resolves({
         Contents: [
           {
-            Key: `${constants.S3_ARTIFACT_BUCKET_SC_PREFIX}sagemaker.cfn.yaml`,
-            ETag: 'abc123'
+            Key: `${constants.S3_ARTIFACT_BUCKET_SC_PREFIX}sagemaker.cfn.yaml`
           }
         ]
       });
+
+      // Mock Reading S3 File
+      const readableStream = new Readable({
+        read() {}
+      });
+
+      readableStream.push('ABC');
+      readableStream.push(null);
+
+      s3Mock.on(GetObjectCommand).resolves({
+        Body: readableStream
+      });
+
+      // MD5 Sum of S3 file
       md5File.sync = jest.fn(() => {
-        return 'abc123';
+        return '902fbdd2b1df0c4f70b4a5d23525e932';
       });
 
       // Mock Create Launch Constraint
