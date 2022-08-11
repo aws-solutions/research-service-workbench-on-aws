@@ -15,4 +15,4 @@ jobs:
         uses: ./.github/actions/baseAction
       
       - name: Rush license-checker
-        run: node common/scripts/install-run-rush.js test:only --verbose
+        run: node common/scripts/install-run-rush.js license-checker
