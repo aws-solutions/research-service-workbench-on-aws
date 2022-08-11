@@ -98,8 +98,8 @@ describe('WorkbenchCognito tests', () => {
       GenerateSecret: true,
       LogoutURLs: [workbenchCognitoProps.websiteUrl],
       PreventUserExistenceErrors: 'ENABLED',
-      IdTokenValidity: 60,
-      AccessTokenValidity: 60,
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
       RefreshTokenValidity: 43200,
       TokenValidityUnits: {
         IdToken: 'minutes',
