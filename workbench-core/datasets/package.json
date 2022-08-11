@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-datasets",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Access and management of data files for the purpose of connecting to various AWS environments.",
   "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {

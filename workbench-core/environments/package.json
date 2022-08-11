@@ -1,6 +1,6 @@
 {
   "name": "@aws/workbench-core-environments",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Implementation of environment APIs and resources.",
   "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
