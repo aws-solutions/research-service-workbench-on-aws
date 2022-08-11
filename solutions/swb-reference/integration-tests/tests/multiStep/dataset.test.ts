@@ -3,27 +3,19 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { v4 as uuidv4 } from 'uuid';
-import { getConstants } from '../../../src/constants';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 import { uuidRegExp } from '../../support/utils/regExpressions';
+import Settings from '../../support/utils/settings';
 
 describe('multiStep dataset integration test', () => {
   const setup: Setup = new Setup();
+  const settings: Settings = setup.getSettings();
   let adminSession: ClientSession;
-  let datasetsBucketName: string;
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-    const aws = setup.getMainAwsClient();
-    const { S3_DATASETS_BUCKET_ARN_OUTPUT_KEY } = getConstants();
-    const {
-      [S3_DATASETS_BUCKET_ARN_OUTPUT_KEY]: datasetsBucketArn
-    } = await aws.helpers.cloudformation.getCfnOutput(setup.getStackName(), [
-      S3_DATASETS_BUCKET_ARN_OUTPUT_KEY
-    ]);
-    datasetsBucketName = datasetsBucketArn.split(':').pop()!;
   });
 
   afterAll(async () => {
@@ -31,13 +23,13 @@ describe('multiStep dataset integration test', () => {
   });
 
   test('Environment provisioning with dataset', async () => {
-    const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+    const randomTextGenerator = new RandomTextGenerator(settings.get('runId'));
     const datasetName = randomTextGenerator.getFakeText('env-DS-test');
 
     // Create dataset
     const dataSetBody = {
-      storageName: datasetsBucketName,
-      awsAccountId: setup.getSettings().get('mainAccountId'),
+      storageName: settings.get('DataSetsBucketName'),
+      awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
       datasetName
     };
@@ -49,26 +41,26 @@ describe('multiStep dataset integration test', () => {
 
     // Provision environment with dataset
     const envBody = {
-      envTypeId: setup.getSettings().get('envTypeId'),
-      envTypeConfigId: setup.getSettings().get('envTypeConfigId'),
-      envType: setup.getSettings().get('envType'),
+      envTypeId: settings.get('envTypeId'),
+      envTypeConfigId: settings.get('envTypeConfigId'),
+      envType: settings.get('envType'),
       datasetIds: [dataSet.id],
       name: uuidv4(),
-      projectId: setup.getSettings().get('projectId'),
+      projectId: settings.get('projectId'),
       description: 'Temporary DataSet for integration test'
     };
     const { data: env } = await adminSession.resources.environments.create(envBody);
 
     // Verify environment has access point for dataset
     const { data: envDetails } = await adminSession.resources.environments.environment(env.id).get();
-    const awsRegion = setup.getSettings().get('awsRegion');
-    const mainAccountId = setup.getSettings().get('mainAccountId');
+    const awsRegion = settings.get('awsRegion');
+    const mainAccountId = settings.get('mainAccountId');
     const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 13)}`;
     expect(envDetails).toMatchObject({
       datasetIds: [dataSet.id],
       ENDPOINTS: expect.arrayContaining([expect.objectContaining({
         endPointUrl: `s3://arn:aws:s3:${awsRegion}:${mainAccountId}:accesspoint/${accessPointName}`,
-        storageArn: `arn:aws:s3:::${datasetsBucketName}`,
+        storageArn: `arn:aws:s3:::${settings.get('DataSetsBucketName')}`,
         dataSetId: dataSet.id,
         path: datasetName
       })]),

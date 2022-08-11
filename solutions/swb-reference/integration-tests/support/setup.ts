@@ -35,8 +35,8 @@ export default class Setup {
   public async getDefaultAdminSession(): Promise<ClientSession> {
     // TODO: Handle token expiration and getting defaultAdminSession instead of creating a new Admin Session
     if (this._defaultAdminSession === undefined) {
-      const userPoolId = this._settings.get('userPoolId');
-      const clientId = this._settings.get('clientId');
+      const userPoolId = this._settings.get('cognitoUserPoolId');
+      const clientId = this._settings.get('cognitoUserPoolClientId');
       const rootUsername = this._settings.get('rootUsername');
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
       const awsRegion = this._settings.get('awsRegion');
@@ -57,7 +57,7 @@ export default class Setup {
   }
 
   public getStackName(): string {
-    return `swb-${process.env.STAGE}-${this._settings.get('regionShortName')}`;
+    return `swb-${process.env.STAGE}-${this._settings.get('awsRegionShortName')}`;
   }
 
   public getMainAwsClient(): AwsService {

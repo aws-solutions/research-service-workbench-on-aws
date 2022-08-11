@@ -5,7 +5,7 @@
 
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
-import { DatasetHelper } from '../../complex/dataSetHelper';
+import { DatasetHelper } from '../../complex/datasetHelper';
 import Resource from '../base/resource';
 
 export default class Dataset extends Resource {
