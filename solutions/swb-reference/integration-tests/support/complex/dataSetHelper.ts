@@ -3,7 +3,7 @@ import { AwsService } from "@aws/workbench-core-base";
 import _ from "lodash";
 import ClientSession from "../clientSession";
 
-export class DataSetHelper {
+export class DatasetHelper {
     private _awsSdk: AwsService;
     private _adminSession: ClientSession;
     public constructor(awsSdkClient: AwsService, adminSession: ClientSession) {

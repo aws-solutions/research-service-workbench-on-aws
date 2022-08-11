@@ -16,4 +16,4 @@
 #rootUsername: ''
 #rootPasswordParamStorePath: ''
 
-# mainAccountId: '' # Main AWS Account ID where SWB is deployed
+#mainAccountId: '' # Main AWS Account ID where SWB is deployed
