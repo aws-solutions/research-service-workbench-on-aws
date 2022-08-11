@@ -15,7 +15,7 @@ const defaultCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   sameSite: 'strict'
-} as const;
+};
 
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
