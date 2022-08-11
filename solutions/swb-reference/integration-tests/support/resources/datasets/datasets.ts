@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
@@ -16,6 +16,10 @@ export default class Datasets extends CollectionResource {
 
   public dataset(id: string): Dataset {
     return new Dataset(id, this._clientSession, this._api);
+  }
+
+  public async import(requestBody: {[id: string]: string}): Promise<AxiosResponse> {
+    return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
 
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {
