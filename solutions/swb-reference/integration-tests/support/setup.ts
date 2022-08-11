@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CognitoTokenService } from '@aws/workbench-core-base';
+import { AwsService, CognitoTokenService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';
@@ -54,6 +54,17 @@ export default class Setup {
       this._defaultAdminSession = session;
     }
     return this._defaultAdminSession;
+  }
+
+  public getStackName(): string {
+    return `swb-${process.env.STAGE}-${this._settings.get('regionShortName')}`;
+  }
+
+  public getMainAwsClient(): AwsService {
+    return new AwsService({
+      region: this._settings.get('awsRegion'),
+      ddbTableName: this.getStackName() // table name is same as stack name
+    });
   }
 
   public async cleanup(): Promise<void> {

@@ -13,12 +13,14 @@ interface Setting {
   projectId: string;
   envType: string;
   runId: string;
-  alreadyTerminateEnvId: string;
+  terminatedEnvId: string;
   awsRegion: string;
   userPoolId: string;
   clientId: string;
   rootUsername: string;
   rootPasswordParamStorePath: string;
+  regionShortName: string;
+  mainAccountId: string;
 }
 
 type SettingKey = keyof Setting;
