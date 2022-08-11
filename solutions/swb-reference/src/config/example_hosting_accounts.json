@@ -1,0 +1,11 @@
+[
+  {
+    "awsAccountId": "<Hosting Account 12 Digit ID>",
+    "envMgmtRoleArn": "<CFN_OUTPUT.EnvMgmtRoleArn>",
+    "hostingAccountHandlerRoleArn": "<CFN_OUTPUT.HostingAccountHandlerRoleArn>",
+    "encryptionKeyArn": "<CFN_OUTPUT.EncryptionKeyArn>",
+    "subnetId": "<CFN_OUTPUT.VpcSubnet>",
+    "vpcId": "<CFN_OUTPUT.VPC>",
+    "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files"
+  }
+]
