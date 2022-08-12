@@ -27,7 +27,7 @@ async function init() {
   let outputs;
   try {
     const apiStackOutputs = JSON.parse(
-      fs.readFileSync(join(__dirname, `../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
+      fs.readFileSync(join(__dirname, `src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
     );
     const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
     outputs = apiStackOutputs[apiStackName];
