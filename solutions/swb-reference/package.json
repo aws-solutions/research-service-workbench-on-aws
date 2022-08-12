@@ -16,7 +16,7 @@
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "cdk": "cdk",
-    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.js",
+    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "compile": "scripts/buildLambda.js",
     "depcheck": "depcheck",

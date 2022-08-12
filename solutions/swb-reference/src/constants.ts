@@ -111,7 +111,7 @@ function getUiClientUrl(): string {
       // correct file
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       fs.readFileSync(
-        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.js`),
+        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
         'utf8'
       ) // nosemgrep
     );
