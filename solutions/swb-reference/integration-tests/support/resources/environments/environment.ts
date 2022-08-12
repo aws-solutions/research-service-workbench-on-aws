@@ -37,16 +37,22 @@ export default class Environment extends Resource {
       // Exit early because environment has already been terminated
       return;
     }
-    while (envStatus === 'PENDING' && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
-      await sleep(15000);
-      const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
-      envStatus = resource.status;
-      totalTimeWaitedInSeconds = (Date.now() - startTimeInMs) / 1000;
+    try{
+      console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`)
+      while (envStatus === 'PENDING' && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
+        await sleep(15000);
+        const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
+        envStatus = resource.status;
+        totalTimeWaitedInSeconds = (Date.now() - startTimeInMs) / 1000;
+      }
+      await defAdminSession.resources.environments.environment(this._id).terminate();
+      console.log(`Deleted environment ${this._id}`);
+    } catch (e){
       console.log(
-        `Cleanup for environments. Trying to delete env ${this._id}. Current env status is "${envStatus}". Waiting till environment is in valid state for deleting. Total waited time so far is ${totalTimeWaitedInSeconds} seconds`
+        `Could not delete environment. Last known status for env ${this._id} was "${envStatus}". 
+        Waited ${totalTimeWaitedInSeconds} seconds for environment to reach valid state so it could be deleted; encountered error: ${e}`
       );
     }
-    await defAdminSession.resources.environments.environment(this._id).delete();
-    console.log(`Deleting environment ${this._id}`);
+    
   }
 }

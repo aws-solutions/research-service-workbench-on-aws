@@ -20,8 +20,21 @@ const config = yaml.load(
   fs.readFileSync(join(__dirname, `../integration-tests/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
 );
 
-const clientId = config.clientId;
-const userPoolId = config.userPoolId;
+let outputs;
+try {
+  const apiStackOutputs = JSON.parse(
+    fs.readFileSync(join(__dirname, `../src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
+  );
+  const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+  outputs = apiStackOutputs[apiStackName];
+} catch (e) {
+  throw new Error(
+    'There was a problem reading the main stage file. Please run cdk-deploy prior to running this script'
+  );
+}
+
+const clientId = outputs.cognitoUserPoolClientId;
+const userPoolId = outputs.cognitoUserPoolId;
 const region = config.awsRegion;
 const username = process.argv[2];
 const password = process.argv[3];

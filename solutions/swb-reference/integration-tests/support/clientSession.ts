@@ -34,7 +34,7 @@ export default class ClientSession {
     }
 
     this._axiosInstance = axios.create({
-      baseURL: this._settings.get('apiBaseUrl'),
+      baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });
