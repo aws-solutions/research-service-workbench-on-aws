@@ -73,7 +73,7 @@ function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; aw
       // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
       // correct file
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.readFileSync(join(__dirname, `../../../swb-reference/src/config/${process.env.STAGE}.js`), 'utf8') // nosemgrep
+      fs.readFileSync(join(__dirname, `../../../swb-reference/src/config/${process.env.STAGE}.json`), 'utf8') // nosemgrep
     );
     const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
     // eslint-disable-next-line security/detect-object-injection
