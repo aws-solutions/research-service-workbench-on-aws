@@ -54,7 +54,6 @@ export class SWBStack extends Stack {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
-    WEBSITE_URL: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   };
 
@@ -81,7 +80,7 @@ export class SWBStack extends Stack {
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
-      WEBSITE_URL,
+      WEBSITE_URLS,
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
@@ -96,7 +95,7 @@ export class SWBStack extends Stack {
 
     const workbenchCognito = this._createCognitoResources(
       COGNITO_DOMAIN,
-      WEBSITE_URL,
+      WEBSITE_URLS,
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
     );
@@ -134,7 +133,6 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      WEBSITE_URL,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
@@ -838,13 +836,13 @@ export class SWBStack extends Stack {
 
   private _createCognitoResources(
     domainPrefix: string,
-    websiteUrl: string,
+    websiteUrls: string[],
     userPoolName: string,
     userPoolClientName: string
   ): WorkbenchCognito {
     const props: WorkbenchCognitoProps = {
       domainPrefix: domainPrefix,
-      websiteUrls: [websiteUrl],
+      websiteUrls: websiteUrls,
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: []
