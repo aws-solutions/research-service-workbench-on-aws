@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'GET',
     url: `${urlBase}${urlPath}`,
@@ -16,7 +16,7 @@ const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
-const httpApiPost = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiPost = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'POST',
     url: `${urlBase}${urlPath}`,
@@ -25,7 +25,7 @@ const httpApiPost = async (urlPath: string, params: any, withCredentials: boolea
   };
   return await fetchData(options);
 };
-const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'PUT',
     url: `${urlBase}${urlPath}`,
@@ -34,11 +34,7 @@ const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
-const httpApiDelete = async (
-  urlPath: string,
-  params: any,
-  withCredentials: boolean = false
-): Promise<any> => {
+const httpApiDelete = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'DELETE',
     url: `${urlBase}${urlPath}`,

@@ -32,7 +32,7 @@ export { UserAlreadyExistsError, isUserAlreadyExistsError } from './errors/userA
 export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundError';
 export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
-export { getTimeInSeconds } from './utils';
+export { getTimeInMS, TimeUnits } from './utils';
 export {
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
