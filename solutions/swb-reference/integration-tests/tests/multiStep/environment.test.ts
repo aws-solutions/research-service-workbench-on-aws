@@ -6,8 +6,8 @@ import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
-  ENVIRONMENT_STOP_AND_TERMINATE_MAX_WAITING_SECONDS,
-  ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+  ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
+  ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
 import { uuidRegExp } from '../../support/utils/regExpressions';
 
@@ -214,18 +214,10 @@ describe('multiStep environment test', () => {
     //Wait for Environments A and B to terminate
     await adminSession.resources.environments
       .environment(environmentA.id)
-      .pollEnvironment(
-        15,
-        ENVIRONMENT_STOP_AND_TERMINATE_MAX_WAITING_SECONDS,
-        (env) => env?.status === 'TERMINATING'
-      ); //wait for environmentA to stop
+      .pollEnvironment(15, ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS, (env) => env?.status === 'TERMINATING'); //wait for environmentA to stop
     await adminSession.resources.environments
       .environment(environmentB.id)
-      .pollEnvironment(
-        15,
-        ENVIRONMENT_STOP_AND_TERMINATE_MAX_WAITING_SECONDS,
-        (env) => env?.status === 'TERMINATING'
-      ); //wait for environmentB to stop
+      .pollEnvironment(15, ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS, (env) => env?.status === 'TERMINATING'); //wait for environmentB to stop
 
     //Validate Environments A and B are not retrieved on get all environments call
     console.log('Searching Environment A filtering by owner');
