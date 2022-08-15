@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-infrastructure",
-      "comment": "added default token validity length (15 minutes for id and access, 30 days for refresh)",
+      "comment": "Added default token validity length (15 minutes for id and access, 30 days for refresh)",
       "type": "patch"
     }
   ],
