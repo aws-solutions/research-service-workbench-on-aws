@@ -698,7 +698,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should return a TokensExpiration object when user pool has token expiration defined', async () => {
       cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
-      const tokens = await plugin['_getTokensExpiration']();
+      const tokens = await plugin['_getTokensExpirationinMS']();
 
       expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
@@ -710,7 +710,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       });
 
-      const tokens = await plugin['_getTokensExpiration']();
+      const tokens = await plugin['_getTokensExpirationinMS']();
 
       expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
@@ -718,7 +718,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
       cognitoMock.on(DescribeUserPoolClientCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError(
           'service is not authorized to perform this action. Check IAM permissions'
         )
@@ -728,7 +728,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
       cognitoMock.on(DescribeUserPoolClientCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError('invalid user pool id or client id')
       );
     });
@@ -736,7 +736,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(DescribeUserPoolClientCommand).rejects(new Error());
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(Error);
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(Error);
     });
   });
 });
