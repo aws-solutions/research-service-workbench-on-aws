@@ -23,8 +23,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express = require('express');
-import { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
