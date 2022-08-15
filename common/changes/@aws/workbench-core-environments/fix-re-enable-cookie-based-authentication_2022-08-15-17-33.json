@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-environments",
-      "comment": "replaced require with import",
+      "comment": "Replaced require with import",
       "type": "patch"
     }
   ],
