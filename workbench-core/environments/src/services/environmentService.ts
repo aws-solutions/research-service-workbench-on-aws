@@ -9,7 +9,7 @@ import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { AwsService, QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import _ = require('lodash');
+import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { EnvironmentStatus } from '../constants/environmentStatus';

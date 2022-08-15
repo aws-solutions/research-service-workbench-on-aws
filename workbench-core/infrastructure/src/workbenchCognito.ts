@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { SecretValue, Stack } from 'aws-cdk-lib';
+import { Duration, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -58,7 +58,10 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     custom: true
   },
   preventUserExistenceErrors: true,
-  enableTokenRevocation: true
+  enableTokenRevocation: true,
+  idTokenValidity: Duration.minutes(15),
+  accessTokenValidity: Duration.minutes(15),
+  refreshTokenValidity: Duration.days(30)
 };
 
 export interface WorkbenchCognitoProps {
