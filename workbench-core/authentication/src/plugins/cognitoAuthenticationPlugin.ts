@@ -6,12 +6,11 @@
 import {
   CognitoIdentityProviderClient,
   DescribeUserPoolClientCommand,
-  DescribeUserPoolClientCommandInput,
-  TimeUnitsType
+  DescribeUserPoolClientCommandInput
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { CognitoJwtVerifierSingleUserPool } from 'aws-jwt-verify/cognito-verifier';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 import axios, { AxiosError } from 'axios';
 import { AuthenticationPlugin } from '../authenticationPlugin';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
@@ -22,12 +21,12 @@ import { InvalidTokenError } from '../errors/invalidTokenError';
 import { InvalidTokenTypeError } from '../errors/invalidTokenTypeError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
 import { Tokens } from '../tokens';
-import { getTimeInSeconds } from '../utils';
+import { getTimeInMS, TimeUnits } from '../utils';
 
 interface TokensExpiration {
-  idToken?: number; // in seconds
-  accessToken?: number; // in seconds
-  refreshToken?: number; // in seconds
+  idToken: number; // ms
+  accessToken: number; // ms
+  refreshToken: number; // ms
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -65,7 +64,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   private _baseUrl: string;
   private _verifier: CognitoJwtVerifierSingleUserPool<{
     userPoolId: string;
-    tokenUse: null;
+    tokenUse: 'access';
     clientId: string;
   }>;
 
@@ -96,7 +95,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     try {
       this._verifier = CognitoJwtVerifier.create({
         userPoolId,
-        tokenUse: null, // can check both access and ID tokens
+        tokenUse: 'access',
         clientId
       });
     } catch (error) {
@@ -130,14 +129,14 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
   }
 
   /**
-   * Validates an id or access token and returns the values on the token.
+   * Validates an access token and returns the values on the token.
    *
-   * @param token - an Id or Access token to be validated
+   * @param token - an access token to be validated
    * @returns the decoded jwt
    *
    * @throws {@link InvalidJWTError} if the token is invalid
    */
-  public async validateToken(token: string): Promise<CognitoJwtPayload> {
+  public async validateToken(token: string): Promise<CognitoAccessTokenPayload> {
     try {
       return await this._verifier.verify(token);
     } catch (error) {
@@ -194,7 +193,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @param decodedToken - a decoded Id or access token from which to extract the user Id.
    * @returns the user Id found within the token.
    */
-  public getUserIdFromToken(decodedToken: CognitoJwtPayload): string {
+  public getUserIdFromToken(decodedToken: CognitoAccessTokenPayload): string {
     return decodedToken.sub;
   }
 
@@ -206,7 +205,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
-  public getUserRolesFromToken(decodedToken: CognitoJwtPayload): string[] {
+  public getUserRolesFromToken(decodedToken: CognitoAccessTokenPayload): string[] {
     const roles = decodedToken['cognito:groups'];
     if (!roles) {
       // jwt does not have a cognito:roles claim
@@ -253,7 +252,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -333,7 +332,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -386,7 +385,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @returns a {@link TokensExpiration} object
    */
-  private async _getTokensExpiration(): Promise<TokensExpiration> {
+  private async _getTokensExpirationinMS(): Promise<TokensExpiration> {
     const client = new CognitoIdentityProviderClient({ region: this._region });
 
     const describeInput: DescribeUserPoolClientCommandInput = {
@@ -396,35 +395,20 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
     const describeCommand = new DescribeUserPoolClientCommand(describeInput);
 
     try {
-      const clientInfo = await client.send(describeCommand);
+      const { UserPoolClient } = await client.send(describeCommand);
 
-      const {
-        IdToken: idTokenUnits,
-        AccessToken: accessTokenUnits,
-        RefreshToken: refreshTokenUnits
-      } = clientInfo.UserPoolClient?.TokenValidityUnits || {};
+      const idTokenTime = UserPoolClient!.IdTokenValidity ?? 60;
+      const accessTokenTime = UserPoolClient!.AccessTokenValidity ?? 60;
+      const refreshTokenTime = UserPoolClient!.RefreshTokenValidity ?? 30;
 
-      const refreshTokenTime = clientInfo.UserPoolClient?.RefreshTokenValidity;
-      const idTokenTime = clientInfo.UserPoolClient?.IdTokenValidity;
-      const accessTokenTime = clientInfo.UserPoolClient?.AccessTokenValidity;
-
-      const idTokenExpiresIn =
-        idTokenTime && idTokenUnits
-          ? getTimeInSeconds(idTokenTime, idTokenUnits as TimeUnitsType)
-          : undefined;
-      const accessTokenExpiresIn =
-        accessTokenTime && accessTokenUnits
-          ? getTimeInSeconds(accessTokenTime, accessTokenUnits as TimeUnitsType)
-          : undefined;
-      const refreshTokenExpiresIn =
-        refreshTokenTime && refreshTokenUnits
-          ? getTimeInSeconds(refreshTokenTime, refreshTokenUnits as TimeUnitsType)
-          : undefined;
+      const idTokenUnits = UserPoolClient!.TokenValidityUnits!.IdToken ?? TimeUnits.MINUTES;
+      const accessTokenUnits = UserPoolClient!.TokenValidityUnits!.AccessToken ?? TimeUnits.MINUTES;
+      const refreshTokenUnits = UserPoolClient!.TokenValidityUnits!.RefreshToken ?? TimeUnits.DAYS;
 
       return {
-        idToken: idTokenExpiresIn,
-        accessToken: accessTokenExpiresIn,
-        refreshToken: refreshTokenExpiresIn
+        idToken: getTimeInMS(idTokenTime, idTokenUnits as TimeUnits),
+        accessToken: getTimeInMS(accessTokenTime, accessTokenUnits as TimeUnits),
+        refreshToken: getTimeInMS(refreshTokenTime, refreshTokenUnits as TimeUnits)
       };
     } catch (error) {
       if (error.name === 'NotAuthorizedException') {

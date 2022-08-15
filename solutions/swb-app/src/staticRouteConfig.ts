@@ -211,7 +211,7 @@ export const routesIgnored: RoutesIgnored = {
     POST: true
   },
   '/logout': {
-    GET: true
+    POST: true
   },
   '/refresh': {
     GET: true

@@ -5,11 +5,17 @@
 
 import { AuthenticatedUser, RoutesIgnored } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, CookieOptions } from 'express';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import { AuthenticationService } from './authenticationService';
 import { isIdpUnavailableError } from './errors/idpUnavailableError';
+
+const defaultCookieOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict'
+};
 
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
@@ -21,7 +27,7 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing an optional logging service parameter
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -31,10 +37,10 @@ import { isIdpUnavailableError } from './errors/idpUnavailableError';
  */
 export function getTokensFromAuthorizationCode(
   authenticationService: AuthenticationService,
-  options?: { loggingService?: LoggingService }
+  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict' }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { loggingService } = options || {};
+    const { loggingService, sameSite } = options || {};
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
     const websiteUrl = req.headers.origin;
@@ -47,30 +53,21 @@ export function getTokensFromAuthorizationCode(
           websiteUrl
         );
 
-        const now = Date.now();
-
-        // set cookies.
-        // TODO: Delete code below adding access token to response and rely solely on cookies
-        const data = {
-          idToken: idToken.token,
-          accessToken: accessToken.token
-        };
+        // set cookies
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(now + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          sameSite: sameSite ?? defaultCookieOptions.sameSite,
+          maxAge: accessToken.expiresIn
         });
         if (refreshToken) {
           res.cookie('refresh_token', refreshToken.token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
-            expires: refreshToken.expiresIn ? new Date(now + refreshToken.expiresIn * 1000) : undefined
+            ...defaultCookieOptions,
+            sameSite: sameSite ?? defaultCookieOptions.sameSite,
+            maxAge: refreshToken.expiresIn
           });
         }
 
-        res.status(200).json(data);
+        res.status(200).json({ idToken: idToken.token });
       } catch (error) {
         if (loggingService) {
           loggingService.error(error);
@@ -117,11 +114,9 @@ export function getAuthorizationCodeUrl(
       typeof codeChallenge === 'string' &&
       typeof websiteUrl === 'string'
     ) {
-      res
-        .status(200)
-        .json({
-          redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl)
-        });
+      res.status(200).json({
+        redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl)
+      });
     } else {
       res.sendStatus(400);
     }
@@ -188,7 +183,7 @@ export function verifyToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing an optional logging service parameter
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -198,10 +193,10 @@ export function verifyToken(
  */
 export function logoutUser(
   authenticationService: AuthenticationService,
-  options?: { loggingService?: LoggingService }
+  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict' }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { loggingService } = options || {};
+    const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
     const websiteUrl = req.headers.origin;
 
@@ -225,8 +220,14 @@ export function logoutUser(
       }
     }
 
-    res.cookie('access_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
-    res.cookie('refresh_token', 'cleared', { sameSite: 'lax', expires: new Date(0) });
+    res.clearCookie('access_token', {
+      ...defaultCookieOptions,
+      sameSite: sameSite ?? defaultCookieOptions.sameSite
+    });
+    res.clearCookie('refresh_token', {
+      ...defaultCookieOptions,
+      sameSite: sameSite ?? defaultCookieOptions.sameSite
+    });
 
     res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl(websiteUrl) });
   };
@@ -239,7 +240,7 @@ export function logoutUser(
  *  - the refresh token is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing an optional logging service parameter
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -249,10 +250,10 @@ export function logoutUser(
  */
 export function refreshAccessToken(
   authenticationService: AuthenticationService,
-  options?: { loggingService?: LoggingService }
+  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict' }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { loggingService } = options || {};
+    const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
 
     if (typeof refreshToken === 'string') {
@@ -261,10 +262,9 @@ export function refreshAccessToken(
 
         // set access cookie
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          sameSite: sameSite ?? defaultCookieOptions.sameSite,
+          maxAge: accessToken.expiresIn
         });
 
         res.status(200).json({ idToken: idToken.token });
@@ -296,7 +296,7 @@ export function refreshAccessToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing an optional logging service parameter
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -306,10 +306,10 @@ export function refreshAccessToken(
  */
 export function isUserLoggedIn(
   authenticationService: AuthenticationService,
-  options?: { loggingService?: LoggingService }
+  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict' }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { loggingService } = options || {};
+    const { loggingService, sameSite } = options || {};
     const accessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;
 
@@ -319,10 +319,9 @@ export function isUserLoggedIn(
 
         // set access cookie
         res.cookie('access_token', accessToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: accessToken.expiresIn ? new Date(Date.now() + accessToken.expiresIn * 1000) : undefined
+          ...defaultCookieOptions,
+          sameSite: sameSite ?? defaultCookieOptions.sameSite,
+          maxAge: accessToken.expiresIn
         });
 
         res.status(200).json({ idToken: idToken.token, loggedIn: true });

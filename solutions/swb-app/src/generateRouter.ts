@@ -46,7 +46,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(
     cors({
       origin: apiRouteConfig.allowedOrigins,
-      allowedHeaders: ['Set-Cookie', 'Content-Type'],
       credentials: true
     })
   );

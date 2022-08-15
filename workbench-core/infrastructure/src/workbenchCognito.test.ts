@@ -97,7 +97,21 @@ describe('WorkbenchCognito tests', () => {
       EnableTokenRevocation: true,
       GenerateSecret: true,
       LogoutURLs: workbenchCognitoProps.websiteUrls,
-      PreventUserExistenceErrors: 'ENABLED'
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
+      RefreshTokenValidity: 43200,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
     });
   });
 
