@@ -25,6 +25,7 @@ const defaultCookieOptions: CookieOptions = {
  * This function assumes:
  *  - a request body parameter named `code` that holds the authorization code
  *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - object containing optional sameSite cookie and logging service parameters
@@ -92,6 +93,7 @@ export function getTokensFromAuthorizationCode(
  * This function assumes:
  *  - a request query parameter named `stateVerifier` that holds a temporary state value
  *  - a request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @returns the route handler function
@@ -181,6 +183,7 @@ export function verifyToken(
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - object containing optional sameSite cookie and logging service parameters
