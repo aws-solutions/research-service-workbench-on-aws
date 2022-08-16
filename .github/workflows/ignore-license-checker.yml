@@ -5,7 +5,7 @@ on:
     paths-ignore:
       - '**/package.json'
 jobs:
-  build:
+  license-checker:
     runs-on: ubuntu-20.04
     steps:
       - run: 'echo "License checker not required" '
