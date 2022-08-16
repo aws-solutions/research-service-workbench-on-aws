@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-infrastructure",
-      "comment": "renamed `websiteUrl` to `websiteUrls` and changed type to string array to allow one backend api to serve multiple ui clients",
+      "comment": "Renamed `websiteUrl` to `websiteUrls` and changed type to string array to allow one backend API to serve multiple UI clients",
       "type": "minor"
     }
   ],
