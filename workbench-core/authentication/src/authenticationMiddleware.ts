@@ -138,10 +138,12 @@ export function verifyToken(
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const { ignoredRoutes, loggingService } = options || {};
+
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.headers ? req.headers.authorization : undefined;
+      const accessToken = req.cookies.access_token;
+
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
