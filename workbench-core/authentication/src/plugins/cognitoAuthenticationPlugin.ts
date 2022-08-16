@@ -24,9 +24,9 @@ import { Tokens } from '../tokens';
 import { getTimeInMS, TimeUnits } from '../utils';
 
 interface TokensExpiration {
-  idToken: number; // in seconds
-  accessToken: number; // in seconds
-  refreshToken: number; // in seconds
+  idToken: number; // ms
+  accessToken: number; // ms
+  refreshToken: number; // ms
 }
 
 export interface CognitoAuthenticationPluginOptions {
@@ -258,7 +258,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -337,7 +337,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
         }
       );
 
-      const expiresIn = await this._getTokensExpiration();
+      const expiresIn = await this._getTokensExpirationinMS();
 
       return {
         idToken: {
@@ -389,7 +389,7 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    *
    * @returns a {@link TokensExpiration} object
    */
-  private async _getTokensExpiration(): Promise<TokensExpiration> {
+  private async _getTokensExpirationinMS(): Promise<TokensExpiration> {
     const client = new CognitoIdentityProviderClient({ region: this._region });
 
     const describeInput: DescribeUserPoolClientCommandInput = {

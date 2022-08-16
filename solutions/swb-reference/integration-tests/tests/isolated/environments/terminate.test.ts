@@ -28,7 +28,6 @@ describe('environment terminate negative tests', () => {
     try {
       await adminSession.resources.environments.environment(fakeEnvId).terminate();
     } catch (e) {
-      console.log('error is', e);
       checkHttpError(
         e,
         new HttpError(404, {
@@ -41,7 +40,7 @@ describe('environment terminate negative tests', () => {
   });
 
   test('terminate an environment that is already terminated should return a 204 and not change the environment status', async () => {
-    const envId = setup.getSettings().get('alreadyTerminateEnvId');
+    const envId = setup.getSettings().get('terminatedEnvId');
     const terminateResponse = await adminSession.resources.environments.environment(envId).terminate();
     expect(terminateResponse.status).toEqual(204);
 

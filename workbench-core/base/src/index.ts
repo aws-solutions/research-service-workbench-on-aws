@@ -9,4 +9,4 @@ import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbU
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 
-export { AuditLogger, AwsService, QueryParams, buildDynamoDbKey, buildDynamoDBPkSk, CognitoTokenService };
+export { AuditLogger, AwsService, CognitoTokenService, QueryParams, buildDynamoDbKey, buildDynamoDBPkSk };

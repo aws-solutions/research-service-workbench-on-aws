@@ -359,6 +359,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "license-checker",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
