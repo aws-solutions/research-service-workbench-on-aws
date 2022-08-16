@@ -1,0 +1,11 @@
+name: license checker
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    paths-ignore:
+      - '**/package.json'
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: 'echo "No build required" '
