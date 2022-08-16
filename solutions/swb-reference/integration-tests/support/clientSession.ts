@@ -17,10 +17,10 @@ export default class ClientSession {
   private _setup: Setup;
   public resources: Resources;
 
-  public constructor(setup: Setup, idToken?: string) {
+  public constructor(setup: Setup, accessToken?: string) {
     this._settings = setup.getSettings();
     this._setup = setup;
-    this._isAnonymousSession = idToken === undefined;
+    this._isAnonymousSession = accessToken === undefined;
     this._cleanupQueue = [];
 
     const headers: {
@@ -30,11 +30,11 @@ export default class ClientSession {
 
     // For anonymous sessions, authorization header is not required
     if (!this._isAnonymousSession) {
-      headers.Authorization = idToken;
+      headers.Authorization = accessToken;
     }
 
     this._axiosInstance = axios.create({
-      baseURL: this._settings.get('apiBaseUrl'),
+      baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });

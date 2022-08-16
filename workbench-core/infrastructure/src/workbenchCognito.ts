@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { SecretValue, Stack } from 'aws-cdk-lib';
+import { Duration, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -52,8 +52,16 @@ const userPoolClientDefaults: UserPoolClientOptions = {
     },
     scopes: [OAuthScope.OPENID]
   },
+  authFlows: {
+    adminUserPassword: true,
+    userSrp: true,
+    custom: true
+  },
   preventUserExistenceErrors: true,
-  enableTokenRevocation: true
+  enableTokenRevocation: true,
+  idTokenValidity: Duration.minutes(15),
+  accessTokenValidity: Duration.minutes(15),
+  refreshTokenValidity: Duration.days(30)
 };
 
 export interface WorkbenchCognitoProps {
@@ -119,7 +127,6 @@ export class WorkbenchCognito extends Construct {
       userPool: this.userPool,
       userPoolClientName
     });
-
     this.userPool.identityProviders.forEach((provider) => this.userPoolClient.node.addDependency(provider));
 
     const describeCognitoUserPoolClient = new AwsCustomResource(this, 'DescribeCognitoUserPoolClient', {

@@ -7,13 +7,15 @@ jest.mock('../utils');
 
 import {
   CognitoIdentityProviderClient,
+  DescribeUserPoolClientCommand,
   DescribeUserPoolClientCommandOutput,
   NotAuthorizedException,
   ResourceNotFoundException,
   TimeUnitsType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import { CognitoJwtPayload } from 'aws-jwt-verify/jwt-model';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
+import { mockClient } from 'aws-sdk-client-mock';
 import axios from 'axios';
 import {
   CognitoAuthenticationPlugin,
@@ -41,6 +43,23 @@ const encodedClientId = Buffer.from(
   `${cognitoPluginOptions.clientId}:${cognitoPluginOptions.clientSecret}`
 ).toString('base64');
 
+const baseDecodedAccessToken: CognitoAccessTokenPayload = {
+  token_use: 'access',
+  client_id: 'client_id',
+  version: 1,
+  username: 'username',
+  scope: 'scope',
+  sub: 'sub',
+  iss: 'iss',
+  exp: 3600,
+  iat: 123,
+  auth_time: 456,
+  jti: 'jti',
+  origin_jti: 'origin_jti'
+};
+
+const cognitoMock = mockClient(CognitoIdentityProviderClient);
+
 const userPoolClientInfo: Partial<DescribeUserPoolClientCommandOutput> = {
   UserPoolClient: {
     TokenValidityUnits: {
@@ -58,6 +77,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
   let plugin: CognitoAuthenticationPlugin;
 
   beforeEach(() => {
+    cognitoMock.reset();
     plugin = new CognitoAuthenticationPlugin(cognitoPluginOptions);
   });
 
@@ -121,21 +141,11 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('validateToken tests', () => {
     it('should return the decoded token when a valid token is passed in', async () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(decodedToken);
+      jest.spyOn(CognitoJwtVerifier.prototype, 'verify').mockResolvedValueOnce(baseDecodedAccessToken);
 
       const decoded = await plugin.validateToken('validToken');
 
-      expect(decoded).toMatchObject(decodedToken);
+      expect(decoded).toMatchObject(baseDecodedAccessToken);
     });
 
     it('should throw InvalidJWTError when an invalid token is passed in', async () => {
@@ -274,54 +284,20 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
   describe('getUserIdFromToken tests', () => {
     it('should return the sub claim from the decoded token', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-
-      const userId = plugin.getUserIdFromToken(decodedToken);
+      const userId = plugin.getUserIdFromToken(baseDecodedAccessToken);
 
       expect(userId).toBe('sub');
     });
 
     it('should return the cognito:groups claim from the decoded token', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti',
-        'cognito:groups': ['Admin']
-      };
-
-      const userId = plugin.getUserRolesFromToken(decodedToken);
+      const userId = plugin.getUserRolesFromToken({ ...baseDecodedAccessToken, 'cognito:groups': ['Admin'] });
 
       expect(userId).toMatchObject(['Admin']);
     });
 
     it('should throw InvalidJWTError when the decoded token doesnt have the cognito:groups claim', () => {
-      const decodedToken: CognitoJwtPayload = {
-        token_use: 'access',
-        sub: 'sub',
-        iss: 'iss',
-        exp: 3600,
-        iat: 123,
-        auth_time: 456,
-        jti: 'jti',
-        origin_jti: 'origin_jti'
-      };
-
       expect(() => {
-        plugin.getUserRolesFromToken(decodedToken);
+        plugin.getUserRolesFromToken(baseDecodedAccessToken);
       }).toThrow(new InvalidJWTError('no cognito:roles claim'));
     });
   });
@@ -338,9 +314,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       };
       const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
       const tokens = await plugin.handleAuthorizationCode(validCode, codeVerifier);
 
@@ -566,9 +540,7 @@ describe('CognitoAuthenticationPlugin tests', () => {
         }
       };
       const axiosSpy = jest.spyOn(axios, 'post').mockResolvedValueOnce(fakeTokens);
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
       const tokens = await plugin.refreshAccessToken(refreshToken);
 
@@ -720,33 +692,33 @@ describe('CognitoAuthenticationPlugin tests', () => {
 
       expect(encodedId).toBe(encodedClientId);
     });
+  });
 
+  describe('_getTokensExpiration tests', () => {
     it('should return a TokensExpiration object when user pool has token expiration defined', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve(userPoolClientInfo));
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves(userPoolClientInfo);
 
-      const tokens = await plugin['_getTokensExpiration']();
+      const tokens = await plugin['_getTokensExpirationinMS']();
 
       expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
-    it('should return an empty TokensExpiration object when user pool doesnt have token expiration defined', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.resolve({}));
+    it('should return a TokensExpiration object when user pool token expiration is undefined', async () => {
+      cognitoMock.on(DescribeUserPoolClientCommand).resolves({
+        UserPoolClient: {
+          TokenValidityUnits: {}
+        }
+      });
 
-      const tokens = await plugin['_getTokensExpiration']();
+      const tokens = await plugin['_getTokensExpirationinMS']();
 
-      expect(tokens).toMatchObject({});
+      expect(tokens).toMatchObject({ idToken: 1, accessToken: 1, refreshToken: 1 });
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new NotAuthorizedException({ $metadata: {} })));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError(
           'service is not authorized to perform this action. Check IAM permissions'
         )
@@ -754,21 +726,17 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new ResourceNotFoundException({ $metadata: {} })));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError('invalid user pool id or client id')
       );
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
-      jest
-        .spyOn(CognitoIdentityProviderClient.prototype, 'send')
-        .mockImplementationOnce(() => Promise.reject(new Error()));
+      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new Error());
 
-      await expect(plugin['_getTokensExpiration']()).rejects.toThrow(Error);
+      await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(Error);
     });
   });
 });

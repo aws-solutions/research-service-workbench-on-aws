@@ -30,7 +30,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   websiteUrl: 'fake-website-url'
 } as const;
 
-const cookieOpts = {
+const defaultCookieOpts = {
   httpOnly: true,
   secure: true,
   sameSite: 'strict'
@@ -51,6 +51,7 @@ describe('authenticationMiddleware integration tests', () => {
   beforeEach(() => {
     res = {
       cookie: jest.fn((name, val, opts) => res),
+      clearCookie: jest.fn((name, opts) => res),
       status: jest.fn((code) => res),
       sendStatus: jest.fn((code) => res),
       json: jest.fn((body) => res),
@@ -66,9 +67,6 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should return 200, the id token in the response body, and set the access and refresh tokens as cookies when the code and codeVerifier params are valid', async () => {
-      const accessExpires = new Date(tokens.accessToken.expiresIn * 1000);
-      const refreshExpires = new Date(tokens.refreshToken.expiresIn * 1000);
-
       const req: Request = {
         body: {
           code: 'validCode',
@@ -79,19 +77,15 @@ describe('authenticationMiddleware integration tests', () => {
       await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
-        ...cookieOpts,
-        expires: accessExpires
+        ...defaultCookieOpts,
+        maxAge: tokens.accessToken.expiresIn
       });
       expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', tokens.refreshToken.token, {
-        ...cookieOpts,
-        expires: refreshExpires
+        ...defaultCookieOpts,
+        maxAge: tokens.refreshToken.expiresIn
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      //TODO: Remove accessToken once cookies are properly set
-      expect(res.json).toHaveBeenCalledWith({
-        idToken: tokens.idToken.token,
-        accessToken: tokens.accessToken.token
-      });
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
     });
 
     it('should set the access and refresh tokens as session cookies when the AuthenticationService IDP sets them as such', async () => {
@@ -117,16 +111,13 @@ describe('authenticationMiddleware integration tests', () => {
       await getTokensFromAuthorizationCodeRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
-        ...cookieOpts
+        ...defaultCookieOpts
       });
       expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', tokens.refreshToken.token, {
-        ...cookieOpts
+        ...defaultCookieOpts
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({
-        idToken: tokens.idToken.token,
-        accessToken: tokens.accessToken.token
-      });
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
     });
 
     it('should return 400 when code param is missing', async () => {
@@ -237,6 +228,33 @@ describe('authenticationMiddleware integration tests', () => {
 
       expect(res.sendStatus).toHaveBeenCalledWith(401);
       expect(loggingSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200, the id token in the response body, and set the access and refresh tokens as cookies when the sameSite option is set to "none"', async () => {
+      getTokensFromAuthorizationCodeRouteHandler = getTokensFromAuthorizationCode(authenticationService, {
+        sameSite: 'none'
+      });
+      const req: Request = {
+        body: {
+          code: 'validCode',
+          codeVerifier: 'validCodeVerifier'
+        }
+      } as Request;
+
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
+
+      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        sameSite: 'none',
+        maxAge: tokens.accessToken.expiresIn
+      });
+      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', tokens.refreshToken.token, {
+        ...defaultCookieOpts,
+        sameSite: 'none',
+        maxAge: tokens.refreshToken.expiresIn
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
     });
   });
 
@@ -483,14 +501,8 @@ describe('authenticationMiddleware integration tests', () => {
 
       await logoutUserRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
-      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
@@ -504,14 +516,8 @@ describe('authenticationMiddleware integration tests', () => {
 
       await logoutUserRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
-      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
@@ -527,14 +533,8 @@ describe('authenticationMiddleware integration tests', () => {
 
       await logoutUserRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
-      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
@@ -550,14 +550,8 @@ describe('authenticationMiddleware integration tests', () => {
 
       await logoutUserRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
-      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
@@ -589,19 +583,37 @@ describe('authenticationMiddleware integration tests', () => {
 
       await logoutUserRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenNthCalledWith(1, 'access_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
-      expect(res.cookie).toHaveBeenNthCalledWith(2, 'refresh_token', 'cleared', {
-        sameSite: 'lax',
-        expires: new Date(0)
-      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', defaultCookieOpts);
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', defaultCookieOpts);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
       });
       expect(loggingSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200, clear cookies, and revoke refresh token when the sameSite option is set to "none"', async () => {
+      logoutUserRouteHandler = logoutUser(authenticationService, { sameSite: 'none' });
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        }
+      } as Request;
+
+      await logoutUserRouteHandler(req, res);
+
+      expect(res.clearCookie).toHaveBeenNthCalledWith(1, 'access_token', {
+        ...defaultCookieOpts,
+        sameSite: 'none'
+      });
+      expect(res.clearCookie).toHaveBeenNthCalledWith(2, 'refresh_token', {
+        ...defaultCookieOpts,
+        sameSite: 'none'
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        logoutUrl: 'https://www.fakeurl.com/logout?client_id=fake-id&logout_uri=https://www.fakewebsite.com'
+      });
     });
   });
 
@@ -613,8 +625,6 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should return 200, the id token in the response body, and set the access token as a cookie when the refresh_token cookie is present and valid', async () => {
-      const accessExpires = new Date(tokens.accessToken.expiresIn * 1000);
-
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
@@ -624,8 +634,8 @@ describe('authenticationMiddleware integration tests', () => {
       await refreshAccessTokenRouteHandler(req, res);
 
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
-        ...cookieOpts,
-        expires: accessExpires
+        ...defaultCookieOpts,
+        maxAge: tokens.accessToken.expiresIn
       });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
@@ -649,7 +659,9 @@ describe('authenticationMiddleware integration tests', () => {
 
       await refreshAccessTokenRouteHandler(req, res);
 
-      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, { ...cookieOpts });
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
     });
@@ -718,6 +730,25 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.sendStatus).toHaveBeenCalledWith(401);
       expect(loggingSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('should return 200, the id token in the response body, and set the access token as a cookie when the sameSite option is set to "none"', async () => {
+      refreshAccessTokenRouteHandler = refreshAccessToken(authenticationService, { sameSite: 'none' });
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        }
+      } as Request;
+
+      await refreshAccessTokenRouteHandler(req, res);
+
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        sameSite: 'none',
+        maxAge: tokens.accessToken.expiresIn
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token });
+    });
   });
 
   describe('isUserLoggedIn tests', () => {
@@ -760,8 +791,6 @@ describe('authenticationMiddleware integration tests', () => {
     });
 
     it('should return 200, set the access token as a cookie, set the id token in the response body, and set loggedIn to true in the response body when the access_token cookie is missing and the refresh_token cookie is present and valid', async () => {
-      const accessExpires = new Date(tokens.accessToken.expiresIn * 1000);
-
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
@@ -773,8 +802,8 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
-        ...cookieOpts,
-        expires: accessExpires
+        ...defaultCookieOpts,
+        maxAge: tokens.accessToken.expiresIn
       });
     });
 
@@ -798,7 +827,9 @@ describe('authenticationMiddleware integration tests', () => {
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
-      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, { ...cookieOpts });
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts
+      });
     });
 
     it('should return 200 and set loggedIn to false in the response body when the access_token and refresh_token cookies are missing', async () => {
@@ -871,6 +902,25 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
       expect(loggingSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return 200, set the access token as a cookie, set the id token in the response body, and set loggedIn to true in the response body when the sameSite option is set to "none"', async () => {
+      isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService, { sameSite: 'none' });
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        }
+      } as Request;
+
+      await isUserLoggedInRouteHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        sameSite: 'none',
+        maxAge: tokens.accessToken.expiresIn
+      });
     });
   });
 });
