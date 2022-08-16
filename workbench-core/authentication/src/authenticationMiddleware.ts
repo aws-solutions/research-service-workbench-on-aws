@@ -27,7 +27,7 @@ const defaultCookieOptions: CookieOptions = {
  *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -138,10 +138,12 @@ export function verifyToken(
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const { ignoredRoutes, loggingService } = options || {};
+
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.headers ? req.headers.authorization : undefined;
+      const accessToken = req.cookies.access_token;
+
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
@@ -173,7 +175,7 @@ export function verifyToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -223,7 +225,7 @@ export function logoutUser(
  *  - the refresh token is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
@@ -279,7 +281,7 @@ export function refreshAccessToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie and logging service parameters
  * @returns the route handler function
  *
  * @example
