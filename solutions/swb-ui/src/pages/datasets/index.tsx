@@ -37,9 +37,9 @@ import { useNotifications } from '../../context/NotificationContext';
 import {
   columnDefinitions,
   searchableColumns
-} from '../../environments-table-config/workspacesColumnDefinitions';
-import { filteringOptions } from '../../environments-table-config/workspacesFilteringOptions';
-import { filteringProperties } from '../../environments-table-config/workspacesFilteringProperties';
+} from '../../datasets-table-config/workspacesColumnDefinitions';
+import { filteringOptions } from '../../datasets-table-config/workspacesFilteringOptions';
+import { filteringProperties } from '../../datasets-table-config/workspacesFilteringProperties';
 import { EnvironmentConnectResponse, EnvironmentsTableFilter } from '../../models/Environment';
 
 const Dataset: NextPage = () => {

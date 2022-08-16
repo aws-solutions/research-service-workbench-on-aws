@@ -56,12 +56,12 @@ const Environment: NextPage = () => {
       href: '/'
     },
     {
-      text: 'Workspaces',
-      href: '/environments'
+      text: 'Datasets',
+      href: '/datasets'
     },
     {
-      text: 'Create Workspace',
-      href: '/environments/new'
+      text: 'Create Dataset',
+      href: '/datasets/new'
     }
   ];
   const validationRules = [
@@ -154,7 +154,7 @@ const Environment: NextPage = () => {
     try {
       await createEnvironment(formData);
       await router.push({
-        pathname: '/environments',
+        pathname: '/datasets',
         query: {
           message: 'Workspace Created Successfully',
           notificationType: 'success'
