@@ -5,4 +5,3 @@ awsRegionShortName: va
 rootUserEmail: aws-chamonix-dev+testEnvRoot@amazon.com
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: 'chamonix-dev-test-domain'
-websiteUrl: 'http://localhost:3000'

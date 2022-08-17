@@ -37,8 +37,8 @@ export default class Environment extends Resource {
       // Exit early because environment has already been terminated
       return;
     }
-    try{
-      console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`)
+    try {
+      console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
       while (envStatus === 'PENDING' && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
         await sleep(15000);
         const { data: resource } = await defAdminSession.resources.environments.environment(this._id).get();
@@ -47,12 +47,11 @@ export default class Environment extends Resource {
       }
       await defAdminSession.resources.environments.environment(this._id).terminate();
       console.log(`Deleted environment ${this._id}`);
-    } catch (e){
+    } catch (e) {
       console.log(
         `Could not delete environment. Last known status for env ${this._id} was "${envStatus}". 
         Waited ${totalTimeWaitedInSeconds} seconds for environment to reach valid state so it could be deleted; encountered error: ${e}`
       );
     }
-    
   }
 }

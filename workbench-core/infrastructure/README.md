@@ -37,7 +37,7 @@ Next, set the properties and initialize the construct.
 // If a user pool name or user pool client name are not provided, CDK will generate them for you.
 const cognitoProps: WorkbenchCognitoProps = {
   domainPrefix = 'myDomainPrefix',
-  websiteUrl = 'https://mysite.mydomain.com',
+  websiteUrls = ['https://mysite.mydomain.com'],
   // oidcIdentityProviders = [ myWorkbenchUserPoolOidcIdentityProviderConfig ]
 };
 
