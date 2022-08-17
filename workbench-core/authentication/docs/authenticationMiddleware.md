@@ -42,7 +42,7 @@ const ignoredRoutes: RoutesIgnored = {
     POST: true
   },
   '/logout': {
-    GET: true
+    POST: true
   },
   '/refresh': {
     GET: true
@@ -65,7 +65,7 @@ app.use(verifyToken(authenticationService, { ignoredRoutes, loggingService }));
 // These routes are public (as defined in the ignoredRoutes object above) 
 app.get('/login', getAuthorizationCodeUrl(authenticationService));
 app.post('/token', getTokensFromAuthorizationCode(authenticationService, { loggingService }));
-app.get('/logout', logoutUser(authenticationService, { loggingService }));
+app.post('/logout', logoutUser(authenticationService, { loggingService }));
 app.get('/refresh', refreshAccessToken(authenticationService, { loggingService }));
 app.get('/loggedIn', isUserLoggedIn(authenticationService, { loggingService }));
 
@@ -91,6 +91,7 @@ The `stateVerifier` and `codeChallenge` request query parameters are temporary v
 #### Assumptions
 - a url request query parameter named `stateVerifier` that holds a temporary state value
 - a url request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
+- the request origin header exists
 
 #### Parameters
 - authenticationService: a configured AuthenticationService instance
@@ -107,16 +108,18 @@ This route places the access token and refresh token, if it exists, into http on
 #### Assumptions
 - a url request body parameter named `code` that holds the authorization code
 - a url request body parameter named `codeVerifier` that holds a pkce code verifier value
+- the request origin header exists
 
 #### Parameters
 - authenticationService: a configured AuthenticationService instance
 - options:
   - loggingService: an optional LoggingService instance. If included errors from the AuthenticationService will be logged here
+  - sameSite: an optional sameSite cookie paramater for the access and refresh tokens. Options are: `'strict'`, `'lax'`, and `'none'`. Defaults to `'strict'`
 
 #### Example
 ```ts
 const loggingService = new LoggingService();
-app.get('tokens', getTokensFromAuthorizationCode(authenticationService, { loggingService }));
+app.get('tokens', getTokensFromAuthorizationCode(authenticationService, { loggingService, sameSite: 'strict' }));
 ```
 
 ### verifyToken
@@ -143,7 +146,7 @@ const ignoredRoutes: RoutesIgnored = {
     POST: true
   },
   '/logout': {
-    GET: true
+    POST: true
   },
   '/refresh': {
     GET: true
@@ -167,11 +170,12 @@ This route handler used to refresh an expired access code.
 - authenticationService: a configured AuthenticationService instance
 - options:
   - loggingService: an optional LoggingService instance. If included errors from the AuthenticationService will be logged here
+  - sameSite: an optional sameSite cookie paramater for the access and refresh tokens. Options are: `'strict'`, `'lax'`, and `'none'`. Defaults to `'strict'`
 
 #### Example
 ```ts
 const loggingService = new LoggingService();
-app.get('refresh', refreshAccessToken(authenticationService, { loggingService }));
+app.get('refresh', refreshAccessToken(authenticationService, { loggingService, sameSite: 'strict' }));
 ```
 
 ### logoutUser
@@ -180,16 +184,18 @@ This route handler is used to logout a user.
 #### Assumptions
 - the access token is stored in a cookie named `access_token`
 - if there is a refresh token, it is stored in a cookie named `refresh_token`
+- the request origin header exists
 
 #### Parameters
 - authenticationService: a configured AuthenticationService instance
 - options:
   - loggingService: an optional LoggingService instance. If included errors from the AuthenticationService will be logged here
+  - sameSite: an optional sameSite cookie paramater for the access and refresh tokens. Options are: `'strict'`, `'lax'`, and `'none'`. Defaults to `'strict'`
 
 #### Example
 ```ts
 const loggingService = new LoggingService();
-app.get('logout', logoutUser(authenticationService, { loggingService }));
+app.get('logout', logoutUser(authenticationService, { loggingService, sameSite: 'strict' }));
 ```
 
 ### isUserLoggedIn
@@ -203,9 +209,10 @@ This route handler is used to check if the user making the request is logged in.
 - authenticationService: a configured AuthenticationService instance
 - options:
   - loggingService: an optional LoggingService instance. If included errors from the AuthenticationService will be logged here
+  - sameSite: an optional sameSite cookie paramater for the access and refresh tokens. Options are: `'strict'`, `'lax'`, and `'none'`. Defaults to `'strict'`
 
 #### Example
 ```ts
 const loggingService = new LoggingService();
-app.get('loggedIn', isUserLoggedIn(authenticationService, { loggingService }));
+app.get('loggedIn', isUserLoggedIn(authenticationService, { loggingService, sameSite: 'strict' }));
 ```
