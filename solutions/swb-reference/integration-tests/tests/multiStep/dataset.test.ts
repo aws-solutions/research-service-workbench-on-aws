@@ -58,21 +58,27 @@ describe('multiStep dataset integration test', () => {
     const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 13)}`;
     expect(envDetails).toMatchObject({
       datasetIds: [dataSet.id],
-      ENDPOINTS: expect.arrayContaining([expect.objectContaining({
-        endPointUrl: `s3://arn:aws:s3:${awsRegion}:${mainAccountId}:accesspoint/${accessPointName}`,
-        storageArn: `arn:aws:s3:::${settings.get('DataSetsBucketName')}`,
-        dataSetId: dataSet.id,
-        path: datasetName
-      })]),
-      DATASETS: expect.arrayContaining([expect.objectContaining({
-        id: dataSet.id,
-        name: datasetName
-      })])}
-    );
+      ENDPOINTS: expect.arrayContaining([
+        expect.objectContaining({
+          endPointUrl: `s3://arn:aws:s3:${awsRegion}:${mainAccountId}:accesspoint/${accessPointName}`,
+          storageArn: `arn:aws:s3:::${settings.get('DataSetsBucketName')}`,
+          dataSetId: dataSet.id,
+          path: datasetName
+        })
+      ]),
+      DATASETS: expect.arrayContaining([
+        expect.objectContaining({
+          id: dataSet.id,
+          name: datasetName
+        })
+      ])
+    });
 
     // Verify dataset has env access point listed in its external endpoints
     const { data: dataSetDetails } = await adminSession.resources.datasets.dataset(dataSet.id).get();
     // Dataset was created just for this test case, so we expect only one endpoint
-    expect(dataSetDetails.externalEndpoints).toMatchObject([envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]]);
+    expect(dataSetDetails.externalEndpoints).toMatchObject([
+      envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]
+    ]);
   });
 });

@@ -18,7 +18,7 @@ export default class Datasets extends CollectionResource {
     return new Dataset(id, this._clientSession, this._api);
   }
 
-  public async import(requestBody: {[id: string]: string}): Promise<AxiosResponse> {
+  public async import(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
 
@@ -35,8 +35,8 @@ export default class Datasets extends CollectionResource {
 }
 
 interface DataSetCreateRequest {
-  datasetName: string,
-  storageName: string,
-  path: string,
-  awsAccountId: string
+  datasetName: string;
+  storageName: string;
+  path: string;
+  awsAccountId: string;
 }

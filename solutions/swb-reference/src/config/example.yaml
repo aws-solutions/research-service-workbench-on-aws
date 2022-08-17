@@ -4,7 +4,6 @@
 #rootUserEmail: user@example.com    # SWB will automatically create this Cognito user for you.
 #allowedOrigins: ["http://localhost:3000"] # SWB API will allow this domains to make requests.
 #cognitoDomain: 'user-test' # Must be globally unique
-#websiteUrl: 'http://localhost:3000'
 
 # Used for local Lambda development; grab them from Cognito console after cdk-deploy completes.
 # Once values are entered, re-run cdk-deploy.
