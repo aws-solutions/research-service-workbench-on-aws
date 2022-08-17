@@ -15,8 +15,8 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -43,8 +43,8 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -74,8 +74,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -102,8 +102,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -135,8 +135,8 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -161,8 +161,8 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -189,8 +189,8 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -215,8 +215,8 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -241,8 +241,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -267,8 +267,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -343,8 +343,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -374,8 +374,8 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -402,8 +402,8 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -436,8 +436,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -455,8 +455,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -486,8 +486,8 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -521,8 +521,8 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -561,8 +561,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -592,8 +592,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -635,8 +635,8 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -656,8 +656,8 @@
         "method": "POST",
         "header": [
           {
-            "key": "Authorization",
-            "value": "{{ACCESS_TOKEN}}",
+            "key": "Cookie",
+            "value": "access_token={{ACCESS_TOKEN}}",
             "type": "text"
           }
         ],
