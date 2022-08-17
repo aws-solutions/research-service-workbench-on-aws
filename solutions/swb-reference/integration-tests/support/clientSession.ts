@@ -48,6 +48,7 @@ export default class ClientSession {
         if (error.response) {
           return Promise.reject(new HttpError(error.response.status, error.response.data));
         }
+
         return Promise.reject(error);
       }
     );
