@@ -66,7 +66,7 @@ const userPoolClientDefaults: UserPoolClientOptions = {
 
 export interface WorkbenchCognitoProps {
   domainPrefix: string;
-  websiteUrl: string;
+  websiteUrls: string[];
   userPoolName?: string;
   userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
@@ -89,7 +89,7 @@ export class WorkbenchCognito extends Construct {
   public constructor(scope: Construct, id: string, props: WorkbenchCognitoProps) {
     const {
       domainPrefix,
-      websiteUrl,
+      websiteUrls,
       userPoolName,
       userPoolClientName,
       oidcIdentityProviders: oidcIdentityProviderProps
@@ -118,8 +118,8 @@ export class WorkbenchCognito extends Construct {
 
     const tempProps: UserPoolClientOptions = {
       oAuth: {
-        callbackUrls: [websiteUrl],
-        logoutUrls: [websiteUrl]
+        callbackUrls: websiteUrls,
+        logoutUrls: websiteUrls
       },
       accessTokenValidity: props.accessTokenValidity
     };

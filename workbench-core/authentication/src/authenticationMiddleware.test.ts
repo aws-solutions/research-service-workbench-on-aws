@@ -26,8 +26,7 @@ const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: 'fake-domain',
   userPoolId: 'us-west-2_fakeId',
   clientId: 'fake-client-id',
-  clientSecret: 'fake-client-secret',
-  websiteUrl: 'fake-website-url'
+  clientSecret: 'fake-client-secret'
 } as const;
 
 const defaultCookieOpts = {
@@ -71,6 +70,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -93,6 +95,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -124,6 +129,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         body: {
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -137,6 +145,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 123,
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -149,6 +160,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         body: {
           code: 'validCode'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -162,7 +176,24 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 123
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
+      } as Request;
+
+      await getTokensFromAuthorizationCodeRouteHandler(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(400);
+    });
+
+    it('should return 400 when origin header is missing', async () => {
+      const req: Request = {
+        body: {
+          code: 'validCode',
+          codeVerifier: 'validCodeVerifier'
+        },
+        headers: {}
       } as Request;
 
       await getTokensFromAuthorizationCodeRouteHandler(req, res);
@@ -175,6 +206,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'invalidCode',
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -188,6 +222,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'invalidCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -201,6 +238,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
       jest
@@ -220,6 +260,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'invalidCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
       const loggingSpy = jest.spyOn(loggingService, 'error').mockImplementationOnce(() => {});
@@ -238,6 +281,9 @@ describe('authenticationMiddleware integration tests', () => {
         body: {
           code: 'validCode',
           codeVerifier: 'validCodeVerifier'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -273,6 +319,9 @@ describe('authenticationMiddleware integration tests', () => {
         query: {
           stateVerifier,
           codeChallenge
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as unknown as Request;
 
@@ -288,6 +337,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         query: {
           codeChallenge: 'validCodeChallenge'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as unknown as Request;
 
@@ -301,6 +353,9 @@ describe('authenticationMiddleware integration tests', () => {
         query: {
           stateVerifier: 123,
           codeChallenge: 'validCodeChallenge'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as unknown as Request;
 
@@ -313,6 +368,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         query: {
           stateVerifier: 'validState'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as unknown as Request;
 
@@ -326,7 +384,24 @@ describe('authenticationMiddleware integration tests', () => {
         query: {
           stateVerifier: 'validState',
           codeChallenge: 123
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
+      } as unknown as Request;
+
+      await getAuthorizationCodeUrlRouteHandler(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(400);
+    });
+
+    it('should return 400 when origin header is missing', async () => {
+      const req: Request = {
+        query: {
+          stateVerifier: 'validState',
+          codeChallenge: 'validCodeChallenge'
+        },
+        headers: {}
       } as unknown as Request;
 
       await getAuthorizationCodeUrlRouteHandler(req, res);
@@ -346,9 +421,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
-        },
-        headers: {
-          authorization: 'validToken'
         }
       } as Request;
 
@@ -373,9 +445,6 @@ describe('authenticationMiddleware integration tests', () => {
         method: 'GET',
         cookies: {
           access_token: 'validToken'
-        },
-        headers: {
-          authorization: 'validToken'
         }
       } as Request;
 
@@ -401,9 +470,6 @@ describe('authenticationMiddleware integration tests', () => {
         method: 'POST',
         cookies: {
           access_token: 'validToken'
-        },
-        headers: {
-          authorization: 'validToken'
         }
       } as Request;
 
@@ -448,9 +514,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
-        },
-        headers: {
-          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -467,9 +530,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
-        },
-        headers: {
-          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -496,6 +556,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -511,7 +574,10 @@ describe('authenticationMiddleware integration tests', () => {
 
     it('should return 200 and clear cookies when refresh_token cookie is missing', async () => {
       const req: Request = {
-        cookies: {}
+        cookies: {},
+        headers: {
+          origin: 'https://www.fakewebsite.com'
+        }
       } as Request;
 
       await logoutUserRouteHandler(req, res);
@@ -528,6 +594,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 123
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -545,6 +614,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -558,10 +630,26 @@ describe('authenticationMiddleware integration tests', () => {
       });
     });
 
+    it('should return 400 when origin header is missing', async () => {
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        },
+        headers: {}
+      } as Request;
+
+      await logoutUserRouteHandler(req, res);
+
+      expect(res.sendStatus).toHaveBeenCalledWith(400);
+    });
+
     it('should return 503 when authN service IDP is unavailable', async () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
       jest.spyOn(authenticationService, 'revokeToken').mockRejectedValueOnce(new IdpUnavailableError());
@@ -576,6 +664,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'invalidToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -597,6 +688,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
         }
       } as Request;
 
@@ -762,9 +856,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
-        },
-        headers: {
-          authorization: 'validToken'
         }
       } as Request;
 
@@ -778,9 +869,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'invalidToken'
-        },
-        headers: {
-          authorization: 'invalidToken'
         }
       } as Request;
 
@@ -860,9 +948,6 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
-        },
-        headers: {
-          authorization: 'validToken'
         }
       } as Request;
       jest.spyOn(authenticationService, 'isUserLoggedIn').mockRejectedValueOnce(new IdpUnavailableError());
