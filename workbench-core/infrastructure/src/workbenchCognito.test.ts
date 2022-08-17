@@ -99,7 +99,7 @@ describe('WorkbenchCognito tests', () => {
       LogoutURLs: [workbenchCognitoProps.websiteUrl],
       PreventUserExistenceErrors: 'ENABLED',
       IdTokenValidity: 15,
-      AccessTokenValidity: 60,
+      AccessTokenValidity: 15,
       RefreshTokenValidity: 43200,
       TokenValidityUnits: {
         IdToken: 'minutes',

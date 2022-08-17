@@ -60,7 +60,7 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   preventUserExistenceErrors: true,
   enableTokenRevocation: true,
   idTokenValidity: Duration.minutes(15),
-  accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+  accessTokenValidity: Duration.minutes(15),
   refreshTokenValidity: Duration.days(30)
 };
 
@@ -70,6 +70,7 @@ export interface WorkbenchCognitoProps {
   userPoolName?: string;
   userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
+  accessTokenValidity?: Duration;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
