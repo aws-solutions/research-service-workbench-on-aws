@@ -123,9 +123,7 @@ export class WorkbenchCognito extends Construct {
       },
       accessTokenValidity: props.accessTokenValidity
     };
-    console.log('tempProps', tempProps);
     const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
-    console.log('userPoolClientProps', userPoolClientProps);
     this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
       ...userPoolClientProps,
       userPool: this.userPool,
