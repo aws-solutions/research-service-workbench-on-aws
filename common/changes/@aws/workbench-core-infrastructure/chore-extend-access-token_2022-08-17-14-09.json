@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-infrastructure",
-      "comment": "extend access token expiration time",
+      "comment": "Added optional parameter to override default access token expiration time",
       "type": "none"
     }
   ],
