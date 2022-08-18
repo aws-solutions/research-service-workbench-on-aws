@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser, RoutesIgnored } from '@aws/workbench-core-authorization';
 import { LoggingService } from '@aws/workbench-core-logging';
+import csrf from 'csurf';
 import { Request, Response, NextFunction, CookieOptions } from 'express';
 import get from 'lodash/get';
 import has from 'lodash/has';
@@ -16,6 +17,40 @@ const defaultCookieOptions: CookieOptions = {
   secure: true,
   sameSite: 'strict'
 };
+
+/**
+ * An Express middleware function used to add csrf protection to an Express app.
+ * Uses Express's [csurf](http://expressjs.com/en/resources/middleware/csurf.html) library with the cookie implementation.
+ *
+ * This function assumes:
+ *  - the middleware is mounted using `app.use()`
+ *  - the csrf token returned by the `getAuthorizationCodeUrl` or `isUserLoggedIn` route handler is included in all requests in one of the following colations:
+ *    - req.body._csrf
+ *    - req.query._csrf
+ *    - req.headers['csrf-token']
+ *    - req.headers['xsrf-token']
+ *    - req.headers['x-csrf-token']
+ *    - req.headers['x-xsrf-token']
+
+ *
+ * @param sameSite - (optional) the csrf cookie's `sameSite` value. Defaults to `'strict'` if not included
+ * @returns the middleware function
+ *
+ * @example
+ * ```
+ * app.use(csurf());
+ * ```
+ */
+export function csurf(
+  sameSite?: 'none' | 'lax' | 'strict'
+): (req: Request, res: Response, next: NextFunction) => void {
+  return csrf({
+    cookie: {
+      ...defaultCookieOptions,
+      sameSite: sameSite ?? defaultCookieOptions.sameSite
+    }
+  });
+}
 
 /**
  * An Express route handler function used to exchange the authorization code received from the authentication server for authentication tokens.
@@ -33,7 +68,7 @@ const defaultCookieOptions: CookieOptions = {
  *
  * @example
  * ```
- * app.get('tokens', getTokensFromAuthorizationCode(authenticationService));
+ * app.post('token', getTokensFromAuthorizationCode(authenticationService));
  * ```
  */
 export function getTokensFromAuthorizationCode(
@@ -96,29 +131,36 @@ export function getTokensFromAuthorizationCode(
  *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
+ * @param options - an options object containing optional routes to ignore and logging service parameters
  * @returns the route handler function
  *
  * @example
  * ```
- * app.get('codeUrl', getAuthorizationCodeUrl(authenticationService));
+ * app.get('login', getAuthorizationCodeUrl(authenticationService));
  * ```
  */
 export function getAuthorizationCodeUrl(
-  authenticationService: AuthenticationService
+  authenticationService: AuthenticationService,
+  options?: { csrf?: boolean }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
+    const { csrf } = options || {};
     const stateVerifier = req.query.stateVerifier;
     const codeChallenge = req.query.codeChallenge;
     const websiteUrl = req.headers.origin;
+    const includeCsrfToken = csrf ?? true;
 
     if (
       typeof stateVerifier === 'string' &&
       typeof codeChallenge === 'string' &&
       typeof websiteUrl === 'string'
     ) {
-      res.status(200).json({
-        redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl)
-      });
+      const data = {
+        signInUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl),
+        csrfToken: includeCsrfToken ? req.csrfToken() : undefined
+      };
+
+      res.status(200).json(data);
     } else {
       res.sendStatus(400);
     }
@@ -191,7 +233,7 @@ export function verifyToken(
  *
  * @example
  * ```
- * app.get('logout', logoutUser(authenticationService));
+ * app.post('logout', logoutUser(authenticationService));
  * ```
  */
 export function logoutUser(
@@ -309,12 +351,13 @@ export function refreshAccessToken(
  */
 export function isUserLoggedIn(
   authenticationService: AuthenticationService,
-  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict' }
+  options?: { loggingService?: LoggingService; sameSite?: 'none' | 'lax' | 'strict'; csrf?: boolean }
 ): (req: Request, res: Response) => Promise<void> {
   return async function (req: Request, res: Response) {
-    const { loggingService, sameSite } = options || {};
+    const { loggingService, sameSite, csrf } = options || {};
     const accessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;
+    const includeCsrfToken = csrf ?? true;
 
     try {
       if (typeof refreshToken === 'string') {
@@ -327,11 +370,22 @@ export function isUserLoggedIn(
           maxAge: accessToken.expiresIn
         });
 
-        res.status(200).json({ idToken: idToken.token, loggedIn: true });
+        const data = {
+          idToken: idToken.token,
+          loggedIn: true,
+          csrfToken: includeCsrfToken ? req.csrfToken() : undefined
+        };
+
+        res.status(200).json(data);
       } else if (typeof accessToken === 'string') {
         const loggedIn = await authenticationService.isUserLoggedIn(accessToken);
 
-        res.status(200).json({ loggedIn });
+        const data = {
+          loggedIn,
+          csrfToken: includeCsrfToken && loggedIn ? req.csrfToken() : undefined
+        };
+
+        res.status(200).json(data);
       } else {
         res.status(200).json({ loggedIn: false });
       }
