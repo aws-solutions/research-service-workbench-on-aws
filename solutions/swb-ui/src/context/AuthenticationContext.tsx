@@ -54,7 +54,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
           });
 
           localStorage.setItem('idToken', response.idToken);
-          localStorage.setItem('accessToken', response.accessToken);
           decodeTokenAndSetUser(response.idToken);
 
           localStorage.removeItem('stateVerifier');
@@ -90,7 +89,7 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     try {
       const response = await login();
       let signInUrl: string = response.signInUrl;
-      localStorage.setItem('_csrf', response.csrfToken);
+      localStorage.setItem('csrfToken', response.csrfToken);
 
       const challenge = pkceChallenge(128);
       localStorage.setItem('pkceVerifier', challenge.code_verifier);
@@ -110,7 +109,6 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
       const response = await logout();
       const logoutUrl = response.logoutUrl;
 
-      window.localStorage.removeItem('accessToken');
       window.localStorage.removeItem('idToken');
       window.location.assign(logoutUrl);
     } catch (e) {

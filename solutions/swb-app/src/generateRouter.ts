@@ -4,6 +4,7 @@
  */
 
 import {
+  csurf,
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
@@ -23,7 +24,6 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import csurf from 'csurf';
 import express, { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
@@ -52,15 +52,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
-  app.use(
-    csurf({
-      cookie: {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none'
-      }
-    })
-  );
+  app.use(csurf('none'));
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
