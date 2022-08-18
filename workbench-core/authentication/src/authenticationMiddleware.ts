@@ -25,6 +25,7 @@ const defaultCookieOptions: CookieOptions = {
  * This function assumes:
  *  - a request body parameter named `code` that holds the authorization code
  *  - a request body parameter named `codeVerifier` that holds a pkce code verifier value
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - object containing optional sameSite cookie and logging service parameters
@@ -43,12 +44,14 @@ export function getTokensFromAuthorizationCode(
     const { loggingService, sameSite } = options || {};
     const code = req.body.code;
     const codeVerifier = req.body.codeVerifier;
+    const websiteUrl = req.headers.origin;
 
-    if (typeof code === 'string' && typeof codeVerifier === 'string') {
+    if (typeof code === 'string' && typeof codeVerifier === 'string' && typeof websiteUrl === 'string') {
       try {
         const { idToken, accessToken, refreshToken } = await authenticationService.handleAuthorizationCode(
           code,
-          codeVerifier
+          codeVerifier,
+          websiteUrl
         );
 
         // set cookies
@@ -90,6 +93,7 @@ export function getTokensFromAuthorizationCode(
  * This function assumes:
  *  - a request query parameter named `stateVerifier` that holds a temporary state value
  *  - a request query parameter named `codeChallenge` that holds a temporary pkce code challenge value
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @returns the route handler function
@@ -105,10 +109,16 @@ export function getAuthorizationCodeUrl(
   return async function (req: Request, res: Response) {
     const stateVerifier = req.query.stateVerifier;
     const codeChallenge = req.query.codeChallenge;
-    if (typeof stateVerifier === 'string' && typeof codeChallenge === 'string') {
-      res
-        .status(200)
-        .json({ redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge) });
+    const websiteUrl = req.headers.origin;
+
+    if (
+      typeof stateVerifier === 'string' &&
+      typeof codeChallenge === 'string' &&
+      typeof websiteUrl === 'string'
+    ) {
+      res.status(200).json({
+        redirectUrl: authenticationService.getAuthorizationCodeUrl(stateVerifier, codeChallenge, websiteUrl)
+      });
     } else {
       res.sendStatus(400);
     }
@@ -138,10 +148,12 @@ export function verifyToken(
 ): (req: Request, res: Response, next: NextFunction) => Promise<void> {
   return async function (req: Request, res: Response, next: NextFunction) {
     const { ignoredRoutes, loggingService } = options || {};
+
     if (has(ignoredRoutes, req.path) && get(get(ignoredRoutes, req.path), req.method)) {
       next();
     } else {
-      const accessToken = req.headers ? req.headers.authorization : undefined;
+      const accessToken = req.cookies.access_token;
+
       if (typeof accessToken === 'string') {
         try {
           const decodedAccessToken = await authenticationService.validateToken(accessToken);
@@ -171,6 +183,7 @@ export function verifyToken(
  * This function assumes:
  *  - the access token is stored in a cookie named `access_token`
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
+ *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
  * @param options - object containing optional sameSite cookie and logging service parameters
@@ -188,6 +201,12 @@ export function logoutUser(
   return async function (req: Request, res: Response) {
     const { loggingService, sameSite } = options || {};
     const refreshToken = req.cookies.refresh_token;
+    const websiteUrl = req.headers.origin;
+
+    if (!websiteUrl) {
+      res.sendStatus(400);
+      return;
+    }
 
     if (typeof refreshToken === 'string') {
       try {
@@ -199,6 +218,7 @@ export function logoutUser(
         }
         if (isIdpUnavailableError(error)) {
           res.sendStatus(503);
+          return;
         }
       }
     }
@@ -212,7 +232,7 @@ export function logoutUser(
       sameSite: sameSite ?? defaultCookieOptions.sameSite
     });
 
-    res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl() });
+    res.status(200).json({ logoutUrl: authenticationService.getLogoutUrl(websiteUrl) });
   };
 }
 
