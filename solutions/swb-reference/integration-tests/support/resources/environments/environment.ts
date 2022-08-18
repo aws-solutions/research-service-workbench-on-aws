@@ -41,7 +41,7 @@ export default class Environment extends Resource {
     try {
       console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
       await poll(
-        async () => await defAdminSession.resources.environments.environment(this._id).get(),
+        async () => defAdminSession.resources.environments.environment(this._id).get(),
         (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
         ENVIRONMENT_START_MAX_WAITING_SECONDS
       );
