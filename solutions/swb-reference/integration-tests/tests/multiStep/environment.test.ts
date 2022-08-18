@@ -53,7 +53,7 @@ describe('multiStep environment test', () => {
     //Verify Environment A was started and is available
     console.log('Verify Environment A was started and is available');
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => adminSession.resources.environments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'PENDING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentA to complete
@@ -71,7 +71,7 @@ describe('multiStep environment test', () => {
     //Verify Environment B was started and is available
     console.log('Verify Environment B was started and is available');
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSession.resources.environments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'PENDING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentB to complete
@@ -102,7 +102,7 @@ describe('multiStep environment test', () => {
     console.log('Stopping Environment A');
     await adminSession.resources.environments.environment(environmentA.id).stop();
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => adminSession.resources.environments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentA to stop
@@ -162,7 +162,7 @@ describe('multiStep environment test', () => {
     console.log('Starting Environment A after being stopped');
     await adminSession.resources.environments.environment(environmentA.id).start();
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => adminSession.resources.environments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
       ENVIRONMENT_START_MAX_WAITING_SECONDS
     ); //wait for environmentA to complete
@@ -184,7 +184,7 @@ describe('multiStep environment test', () => {
 
     //Wait for Environment A to stop
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => adminSession.resources.environments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentA to stop
@@ -201,7 +201,7 @@ describe('multiStep environment test', () => {
 
     //Wait for Environment B to stop
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSession.resources.environments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'STOPPING',
       ENVIRONMENT_STOP_MAX_WAITING_SECONDS
     ); //wait for environmentB to stop
@@ -223,12 +223,12 @@ describe('multiStep environment test', () => {
 
     //Wait for Environments A and B to terminate
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      async () => adminSession.resources.environments.environment(environmentA.id).get(),
       (env) => env?.data?.status !== 'TERMINATING',
       ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     ); //wait for environmentA to Terminate
     await poll(
-      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      async () => adminSession.resources.environments.environment(environmentB.id).get(),
       (env) => env?.data?.status !== 'TERMINATING',
       ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
     ); //wait for environmentB to Terminate
