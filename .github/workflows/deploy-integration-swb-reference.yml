@@ -46,3 +46,15 @@ jobs:
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-dev-account-region }} -v
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
+
+      - name: Deploy SWB-UI
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        run: |
+          cd solutions/swb-ui
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js deploy-ui-and-api
+
+      - name: Run Integration tests
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        run: |
+          cd solutions/swb-reference
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests

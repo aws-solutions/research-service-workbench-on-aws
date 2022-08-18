@@ -70,6 +70,7 @@ export interface WorkbenchCognitoProps {
   userPoolName?: string;
   userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
+  accessTokenValidity?: Duration;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -119,7 +120,8 @@ export class WorkbenchCognito extends Construct {
       oAuth: {
         callbackUrls: websiteUrls,
         logoutUrls: websiteUrls
-      }
+      },
+      accessTokenValidity: props.accessTokenValidity
     };
     const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
     this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {

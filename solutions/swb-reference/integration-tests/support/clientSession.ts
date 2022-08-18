@@ -25,12 +25,12 @@ export default class ClientSession {
 
     const headers: {
       'Content-Type': string;
-      Authorization?: string;
+      Cookie?: string;
     } = { 'Content-Type': 'application/json' };
 
     // For anonymous sessions, authorization header is not required
     if (!this._isAnonymousSession) {
-      headers.Authorization = accessToken;
+      headers.Cookie = `access_token=${accessToken}`;
     }
 
     this._axiosInstance = axios.create({
