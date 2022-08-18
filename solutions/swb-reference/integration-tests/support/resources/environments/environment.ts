@@ -6,42 +6,12 @@ import { EnvironmentStatus } from '@aws/workbench-core-environments';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../utils/constants';
-import { sleep } from '../../utils/utilities';
+import { poll } from '../../utils/utilities';
 import Resource from '../base/resource';
 
 export default class Environment extends Resource {
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
     super(clientSession, 'environment', id, parentApi);
-  }
-
-  public async pollEnvironment(
-    pollingIntervalInSeconds: number,
-    maxWaitTimeInSeconds: number,
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pollingWhile: (env: any) => boolean
-  ): Promise<void> {
-    const startTimeInMs = Date.now();
-    let totalTimeWaitedInSeconds = 0;
-
-    const { data: resource } = await this.get();
-    let currentEnv = resource;
-    try {
-      console.log(`Polling environment ${this._id}. This will take a few minutes.`);
-      while (pollingWhile(currentEnv) && totalTimeWaitedInSeconds < maxWaitTimeInSeconds) {
-        await sleep(pollingIntervalInSeconds);
-        const { data: resource } = await this.get();
-        currentEnv = resource;
-        totalTimeWaitedInSeconds = (Date.now() - startTimeInMs) / 1000;
-      }
-      if (totalTimeWaitedInSeconds >= maxWaitTimeInSeconds)
-        console.log(`Polling for environment ${this._id} exceeded the time limit.`);
-      else console.log(`Polling for environment ${this._id} finished successfully.`);
-    } catch (e) {
-      console.log(
-        `Polling failed for environment. Last known status for env ${this._id} was "${currentEnv.status}". 
-        Waited ${totalTimeWaitedInSeconds} seconds for environment to reach valid state so it could finish polling; encountered error: ${e}`
-      );
-    }
   }
 
   public async connect(): Promise<AxiosResponse> {
@@ -70,11 +40,11 @@ export default class Environment extends Resource {
     }
     try {
       console.log(`Attempting to delete environment ${this._id}. This will take a few minutes.`);
-      await this.pollEnvironment(
-        1500,
-        ENVIRONMENT_START_MAX_WAITING_SECONDS,
-        (env) => env.status === 'PENDING'
-      ); //wating for environment to be completed
+      await poll(
+        async () => await defAdminSession.resources.environments.environment(this._id).get(),
+        (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
+        ENVIRONMENT_START_MAX_WAITING_SECONDS
+      );
       const { data: completedResource } = await defAdminSession.resources.environments
         .environment(this._id)
         .get();
