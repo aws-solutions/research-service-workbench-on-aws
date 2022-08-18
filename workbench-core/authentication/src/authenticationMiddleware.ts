@@ -131,7 +131,7 @@ export function getTokensFromAuthorizationCode(
  *  - the request origin header exists
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional routes to ignore and logging service parameters
+ * @param options - object containing optional csrf parameter
  * @returns the route handler function
  *
  * @example
@@ -176,7 +176,7 @@ export function getAuthorizationCodeUrl(
  *  - the access token is stored in a cookie named `access_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - an options object containing optional routes to ignore and logging service parameters
+ * @param options - object containing optional routes to ignore and logging service parameters
  * @returns the middleware function
  *
  * @example
@@ -341,7 +341,7 @@ export function refreshAccessToken(
  *  - if there is a refresh token, it is stored in a cookie named `refresh_token`
  *
  * @param authenticationService - a configured {@link AuthenticationService} instance
- * @param options - object containing optional sameSite cookie and logging service parameters
+ * @param options - object containing optional sameSite cookie, csrf, and logging service parameters
  * @returns the route handler function
  *
  * @example
