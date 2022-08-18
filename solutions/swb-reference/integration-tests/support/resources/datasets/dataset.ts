@@ -13,7 +13,7 @@ export default class Dataset extends Resource {
     super(clientSession, 'dataset', id, parentApi);
   }
 
-  public async share(requestBody: {[id: string]: string}): Promise<AxiosResponse> {
+  public async share(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/share`, requestBody);
   }
 

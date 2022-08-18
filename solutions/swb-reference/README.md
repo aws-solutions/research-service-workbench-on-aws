@@ -108,7 +108,7 @@ Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermission
 ## Obtain Access Token for making authenticated API requests
 1. Go to `swb-reference/scripts` folder
 2. Pull down all required dependencies by running `rushx build`
-3. Run `STAGE=<STAGE> node generateCognitoToken.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
+3. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
 4. In the console output, use the `accessToken` that is provided to make authenticated API requests.
 
 ## Appendix

@@ -29,13 +29,13 @@ describe('datasets create negative tests', () => {
     datasetName: randomTextGenerator.getFakeText('fakeName'),
     storageName: randomTextGenerator.getFakeText('fakeBucket'),
     path: randomTextGenerator.getFakeText('fakePath'),
-    awsAccountId: randomTextGenerator.getFakeText('fakeAccount'),
+    awsAccountId: randomTextGenerator.getFakeText('fakeAccount')
   };
 
   describe('missing parameters', () => {
     test('datasetName', async () => {
       try {
-        const invalidParam: {[id: string]: string} = { ...validLaunchParameters };
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
         delete invalidParam.datasetName;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {
@@ -49,10 +49,10 @@ describe('datasets create negative tests', () => {
         );
       }
     });
-  
+
     test('path', async () => {
       try {
-        const invalidParam: {[id: string]: string} = { ...validLaunchParameters };
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
         delete invalidParam.path;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {
@@ -69,7 +69,7 @@ describe('datasets create negative tests', () => {
 
     test('storageName', async () => {
       try {
-        const invalidParam: {[id: string]: string} = { ...validLaunchParameters };
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
         delete invalidParam.storageName;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {
@@ -86,7 +86,7 @@ describe('datasets create negative tests', () => {
 
     test('awsAccountId', async () => {
       try {
-        const invalidParam: {[id: string]: string} = { ...validLaunchParameters };
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
         delete invalidParam.awsAccountId;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {

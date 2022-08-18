@@ -26,7 +26,7 @@ describe('list environments', () => {
     try {
       const queryParams = {
         status: 'someInvalidStatus'
-      }
+      };
       await adminSession.resources.environments.get(queryParams);
     } catch (e) {
       checkHttpError(
@@ -57,10 +57,10 @@ describe('list environments', () => {
   test.each(validEnvStatuses)('list environments when status query is %s', async (status) => {
     const queryParams = {
       status
-    }
+    };
 
     const { data: response } = await adminSession.resources.environments.get(queryParams);
-    
+
     expect(Array.isArray(response.data)).toBe(true);
   });
 });
