@@ -29,7 +29,7 @@ function getConstants(): {
   AWS_REGION_SHORT_NAME: string;
   UI_CLIENT_URL: string;
   COGNITO_DOMAIN: string;
-  WEBSITE_URL: string;
+  WEBSITE_URLS: string[];
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
@@ -57,7 +57,7 @@ function getConstants(): {
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
-  const WEBSITE_URL = uiClientURL || config.websiteUrl;
+  const WEBSITE_URLS = allowedOrigins;
   const USER_POOL_ID = config.userPoolId;
   const CLIENT_ID = config.clientId;
   const CLIENT_SECRET = config.clientSecret;
@@ -95,7 +95,7 @@ function getConstants(): {
     UI_CLIENT_URL: uiClientURL,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
     COGNITO_DOMAIN,
-    WEBSITE_URL,
+    WEBSITE_URLS,
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,

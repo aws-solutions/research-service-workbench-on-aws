@@ -15,7 +15,7 @@ interface Setting {
   terminatedEnvId: string;
   rootUsername: string;
   rootPasswordParamStorePath: string;
-  
+
   // Main CFN template outputs
   cognitoUserPoolClientId: string;
   MainAccountEncryptionKeyOutput: string;

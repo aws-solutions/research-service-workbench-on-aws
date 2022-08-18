@@ -23,8 +23,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express = require('express');
-import { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
@@ -57,8 +56,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     clientId: process.env.CLIENT_ID!,
-    clientSecret: process.env.CLIENT_SECRET!,
-    websiteUrl: process.env.WEBSITE_URL!
+    clientSecret: process.env.CLIENT_SECRET!
   };
 
   const authenticationService = new AuthenticationService(
