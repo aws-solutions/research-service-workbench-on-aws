@@ -5,6 +5,18 @@
 
 import axios from 'axios';
 
+axios.interceptors.request.use(
+  async (config) => {
+    const _csrf = localStorage.getItem('_csrf');
+    config.data._csrf = _csrf;
+
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
+
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {

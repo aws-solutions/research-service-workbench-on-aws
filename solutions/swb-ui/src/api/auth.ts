@@ -10,19 +10,15 @@ const token = async (body: { code: string; codeVerifier: string | null }): Promi
 };
 
 const login = async (): Promise<any> => {
-  return await httpApiGet(
-    'login/?stateVerifier=TEMP_STATE_VERIFIER&codeChallenge=TEMP_CODE_CHALLENGE',
-    {},
-    false
-  );
+  return await httpApiGet('login/?stateVerifier=TEMP_STATE_VERIFIER&codeChallenge=TEMP_CODE_CHALLENGE', {});
 };
 
 const logout = async (): Promise<any> => {
   return await httpApiPost('logout', {});
 };
 
-const checkIfloggedIn = async (): Promise<any> => {
+const checkIfLoggedIn = async (): Promise<any> => {
   return await httpApiGet('loggedIn', {});
 };
 
-export { login, logout, token, checkIfloggedIn };
+export { login, logout, token, checkIfLoggedIn };

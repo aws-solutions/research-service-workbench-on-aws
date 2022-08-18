@@ -89,7 +89,8 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
   async function signIn(): Promise<void> {
     try {
       const response = await login();
-      let signInUrl: string = response.redirectUrl;
+      let signInUrl: string = response.signInUrl;
+      localStorage.setItem('_csrf', response.csrfToken);
 
       const challenge = pkceChallenge(128);
       localStorage.setItem('pkceVerifier', challenge.code_verifier);
