@@ -1,4 +1,4 @@
-export type EnvironmentStatus = 'STOPPED' | 'STOPPING' | 'FAILED' | 'COMPLETED' | 'PENDING' | 'TERMINATING';
+import { EnvironmentStatus } from '@aws/workbench-core-environments';
 
 export interface EnvironmentItemResponse {
   id: string;
