@@ -55,6 +55,6 @@ for page in ../swb-ui/src/pages/apps/*; do #Iterate through all items in pages/a
     fi
 done 
 echo "Running rush update";
-rush update;
+rush cupdate;
 echo "Finished Updating of Plugins";
 echo "You may now run 'rush build' to build Service Workbench.";
