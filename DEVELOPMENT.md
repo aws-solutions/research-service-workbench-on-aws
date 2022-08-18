@@ -73,5 +73,8 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
 3. `rush install --bypass-policy` (This will install the `cinstall` and `cupdate` commands)
 4. Start using `rush cinstall` or `rush cupdate` instead of `rush install` or `rush update`.
 
+### Add packages using rush:
+1. `rush add -p <packageName> --caret -s; rush cupdate`
+
 ## Getting support for rush
 [Getting Support](https://rushjs.io/pages/help/support/)
