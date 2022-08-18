@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import ClientSession from '../../support/clientSession';
+import { ListEnvironmentResponse } from '../../support/models/environments';
 import Setup from '../../support/setup';
 import {
   ENVIRONMENT_START_MAX_WAITING_SECONDS,
@@ -10,6 +11,7 @@ import {
   ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
 import { uuidRegExp } from '../../support/utils/regExpressions';
+import { poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
   const setup: Setup = new Setup();
@@ -48,11 +50,13 @@ describe('multiStep environment test', () => {
       PROJ: expect.anything() // PROJ should be defined
     });
 
-    //Verify Completed Environment A
-    console.log('Verify Completed Environment A');
-    await adminSession.resources.environments
-      .environment(environmentA.id)
-      .pollEnvironment(15, ENVIRONMENT_START_MAX_WAITING_SECONDS, (env) => env.status === 'PENDING'); //wait for environmentA to complete
+    //Verify Environment A was started and is available
+    console.log('Verify Environment A was started and is available');
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      (env) => env?.data?.status !== 'PENDING',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    ); //wait for environmentA to complete
     const { data: environmentACompleted } = await adminSession.resources.environments
       .environment(environmentA.id)
       .get();
@@ -64,11 +68,13 @@ describe('multiStep environment test', () => {
     });
     console.log('Environment A Completed');
 
-    //Verify Completed Environment B
-    console.log('Verify Completed Environment B');
-    await adminSession.resources.environments
-      .environment(environmentB.id)
-      .pollEnvironment(15, ENVIRONMENT_START_MAX_WAITING_SECONDS, (env) => env.status === 'PENDING'); //wait for environmentB to complete
+    //Verify Environment B was started and is available
+    console.log('Verify Environment B was started and is available');
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      (env) => env?.data?.status !== 'PENDING',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    ); //wait for environmentB to complete
     const { data: environmentBCompleted } = await adminSession.resources.environments
       .environment(environmentB.id)
       .get();
@@ -95,9 +101,11 @@ describe('multiStep environment test', () => {
     //Stop Environment A
     console.log('Stopping Environment A');
     await adminSession.resources.environments.environment(environmentA.id).stop();
-    await adminSession.resources.environments
-      .environment(environmentA.id)
-      .pollEnvironment(15, ENVIRONMENT_STOP_MAX_WAITING_SECONDS, (env) => env.status === 'STOPPING'); //wait for environmentA to stop
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      (env) => env?.data?.status !== 'STOPPING',
+      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+    ); //wait for environmentA to stop
     const { data: environmentAStopped } = await adminSession.resources.environments
       .environment(environmentA.id)
       .get();
@@ -110,56 +118,54 @@ describe('multiStep environment test', () => {
     console.log('Environment A Stopped');
 
     //Search Environment A filtering by name
-    console.log('Searching Environment A filtering by name');
-    const { data: environmentsNameFilter } = await adminSession.resources.environments.get({
-      name: environmentAStopped.name
-    });
+    console.log('Searching for Environment A: filtering by "name"');
+    const { data: environmentsNameFilter }: ListEnvironmentResponse =
+      await adminSession.resources.environments.get({
+        name: environmentAStopped.name
+      });
     expect(
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      environmentsNameFilter?.data?.filter((env: any) => env.id === environmentAStopped.id)?.length
+      environmentsNameFilter.data.filter((env) => env.id === environmentAStopped.id).length
     ).toBeTruthy();
 
     //Search Environment A filtering by status
-    console.log('Searching Environment A filtering by status');
-    const { data: environmentsStatusFilter } = await adminSession.resources.environments.get({
-      status: environmentAStopped.status
-    });
+    console.log('Searching for Environment A: filtering by "status"');
+    const { data: environmentsStatusFilter }: ListEnvironmentResponse =
+      await adminSession.resources.environments.get({
+        status: environmentAStopped.status
+      });
     expect(
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      environmentsStatusFilter?.data?.filter((env: any) => env.id === environmentAStopped.id)?.length
+      environmentsStatusFilter.data.filter((env) => env.id === environmentAStopped.id).length
     ).toBeTruthy();
 
     //Search Environment A filtering by created at
-    console.log('Searching Environment A filtering by created at');
-    const { data: environmentsCreatedAtFilter } = await adminSession.resources.environments.get({
-      createdAtFrom: environmentAStopped.createdAt,
-      createdAtTo: environmentAStopped.createdAt
-    });
+    console.log('Searching for Environment A: filtering by "createdAt"');
+    const { data: environmentsCreatedAtFilter }: ListEnvironmentResponse =
+      await adminSession.resources.environments.get({
+        createdAtFrom: environmentAStopped.createdAt,
+        createdAtTo: environmentAStopped.createdAt
+      });
     expect(
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      environmentsCreatedAtFilter?.data?.filter((env: any) => env.id === environmentAStopped.id)?.length
+      environmentsCreatedAtFilter.data.filter((env) => env.id === environmentAStopped.id).length
     ).toBeTruthy();
 
     //Search Environment A filtering by owner
-    console.log('Searching Environment A filtering by owner');
-    const { data: environmentsOwnerFilter } = await adminSession.resources.environments.get({
-      owner: environmentAStopped.owner
-    });
+    console.log('Searching for Environment A: filtering by "owner"');
+    const { data: environmentsOwnerFilter }: ListEnvironmentResponse =
+      await adminSession.resources.environments.get({
+        owner: environmentAStopped.owner
+      });
     expect(
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      environmentsOwnerFilter?.data?.filter((env: any) => env.id === environmentAStopped.id)?.length
+      environmentsOwnerFilter.data.filter((env) => env.id === environmentAStopped.id).length
     ).toBeTruthy();
 
     //Start Environment A after being stopped
     console.log('Starting Environment A after being stopped');
     await adminSession.resources.environments.environment(environmentA.id).start();
-    await adminSession.resources.environments
-      .environment(environmentA.id)
-      .pollEnvironment(
-        15,
-        ENVIRONMENT_START_MAX_WAITING_SECONDS,
-        (env) => env.status === 'PENDING' || env.status === 'STARTING'
-      ); //wait for environmentA to complete
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      (env) => env?.data?.status !== 'PENDING' && env?.data?.status !== 'STARTING',
+      ENVIRONMENT_START_MAX_WAITING_SECONDS
+    ); //wait for environmentA to complete
     const { data: environmentAStarted } = await adminSession.resources.environments
       .environment(environmentA.id)
       .get();
@@ -176,10 +182,12 @@ describe('multiStep environment test', () => {
     await adminSession.resources.environments.environment(environmentA.id).stop();
     await adminSession.resources.environments.environment(environmentB.id).stop();
 
-    //Wait for stopeed status for Environment A
-    await adminSession.resources.environments
-      .environment(environmentA.id)
-      .pollEnvironment(15, ENVIRONMENT_STOP_MAX_WAITING_SECONDS, (env) => env.status === 'STOPPING'); //wait for environmentA to stop
+    //Wait for Environment A to stop
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      (env) => env?.data?.status !== 'STOPPING',
+      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+    ); //wait for environmentA to stop
     const { data: environmentAStopped2 } = await adminSession.resources.environments
       .environment(environmentA.id)
       .get();
@@ -191,10 +199,12 @@ describe('multiStep environment test', () => {
     });
     console.log('Environment A Stopped');
 
-    //Wait for stopeed status for Environment B
-    await adminSession.resources.environments
-      .environment(environmentB.id)
-      .pollEnvironment(15, ENVIRONMENT_STOP_MAX_WAITING_SECONDS, (env) => env.status === 'STOPPING'); //wait for environmentB to stop
+    //Wait for Environment B to stop
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      (env) => env?.data?.status !== 'STOPPING',
+      ENVIRONMENT_STOP_MAX_WAITING_SECONDS
+    ); //wait for environmentB to stop
     const { data: environmentBStopped } = await adminSession.resources.environments
       .environment(environmentB.id)
       .get();
@@ -212,20 +222,23 @@ describe('multiStep environment test', () => {
     await adminSession.resources.environments.environment(environmentB.id).terminate();
 
     //Wait for Environments A and B to terminate
-    await adminSession.resources.environments
-      .environment(environmentA.id)
-      .pollEnvironment(15, ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS, (env) => env?.status === 'TERMINATING'); //wait for environmentA to stop
-    await adminSession.resources.environments
-      .environment(environmentB.id)
-      .pollEnvironment(15, ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS, (env) => env?.status === 'TERMINATING'); //wait for environmentB to stop
-
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentA.id).get(),
+      (env) => env?.data?.status !== 'TERMINATING',
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+    ); //wait for environmentA to Terminate
+    await poll(
+      async () => await adminSession.resources.environments.environment(environmentB.id).get(),
+      (env) => env?.data?.status !== 'TERMINATING',
+      ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
+    ); //wait for environmentB to Terminate
     //Validate Environments A and B are not retrieved on get all environments call
-    console.log('Searching Environment A filtering by owner');
-    const { data: allEnvironments } = await adminSession.resources.environments.get({});
+    console.log('Check that terminated environments are not shown when listing all environments');
+    const { data: allEnvironments }: ListEnvironmentResponse = await adminSession.resources.environments.get(
+      {}
+    );
     expect(
-      //eslint-disable-next-line @typescript-eslint/no-explicit-any
-      allEnvironments?.data?.filter((env: any) => env.id === environmentA.id || env.id === environmentB.id)
-        ?.length
-    ).toBeFalsy();
+      allEnvironments.data.filter((env) => env.id === environmentA.id || env.id === environmentB.id).length
+    ).toEqual(0);
   });
 });
