@@ -12,7 +12,7 @@ import {
   SpaceBetween,
   Table,
   StatusIndicator
-} from '@awsui/components-react';
+} from '@cloudscape-design/components';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';

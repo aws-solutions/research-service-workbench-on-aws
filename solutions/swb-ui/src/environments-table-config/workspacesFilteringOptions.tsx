@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { PropertyFilterProps } from '@awsui/components-react/property-filter';
+import { PropertyFilterProps } from '@cloudscape-design/components/property-filter';
 
 export const filteringOptions: readonly PropertyFilterProps.FilteringOption[] = [
   { propertyKey: 'owner', value: '' },

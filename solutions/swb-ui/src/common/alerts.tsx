@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Alert, AlertProps, Button } from '@awsui/components-react';
+import { Alert, AlertProps, Button } from '@cloudscape-design/components';
 import React from 'react';
 
 export function TerminateWarning(

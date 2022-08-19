@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Button from '@awsui/components-react/button';
+import Button from '@cloudscape-design/components/button';
 import { useAuthentication } from '../context/AuthenticationContext';
 import styles from '../styles/Hero.module.scss';
 

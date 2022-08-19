@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Box, Button } from '@awsui/components-react';
+import { Box, Button } from '@cloudscape-design/components';
 
 /**
  * Displays the empty state of any table

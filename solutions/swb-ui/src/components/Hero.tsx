@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Box from '@awsui/components-react/box';
-import Grid from '@awsui/components-react/grid';
+import Box from '@cloudscape-design/components/box';
+import Grid from '@cloudscape-design/components/grid';
 import { useSettings } from '../context/SettingsContext';
 import Login from './Login';
 
