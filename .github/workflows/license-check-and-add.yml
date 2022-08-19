@@ -22,11 +22,11 @@ jobs:
           fetch-depth: 0
       - name: Check apache license
         run: node common/scripts/install-run-rush.js check-apache-license
- 
+        continue-on-error: true
   add-apache-license:
     runs-on: ubuntu-20.04
-    if: needs.check-apache-license.results == "failure"
-    needs: [check-apache-license]
+    if: ${{ needs.check-apache-license.results == 'failure'}}
+    needs: check-apache-license
     steps:
       - uses: actions/checkout@v3
         with:
