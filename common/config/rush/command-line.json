@@ -230,6 +230,20 @@
       "enableParallelism": true
     },
     {
+      "name": "add-apache-license",
+      "commandKind": "bulk",
+      "summary": "Add apache license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "check-apache-license",
+      "commandKind": "bulk",
+      "summary": "Check apache license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",

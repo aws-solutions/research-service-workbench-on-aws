@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /***************************************************************************************************************************************************************************************
 Cloudfront access objects in S3 Bucket as file path instead of web server routing
 This function emulates a web server routing every time a request is made to the cloudfront by adding the necessary elements in the URL requested to be accessed as filepath in S3 Bucket.

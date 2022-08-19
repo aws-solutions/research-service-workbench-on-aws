@@ -1,0 +1,15 @@
+name: testing apache header
+on:
+  push:
+    branches:
+      - test-apache-header
+
+jobs:
+  name: test-apache-header
+      uses: awslabs/solution-spark-on-aws/.github/workflows/license-check-and-add.yml@test-apache-header
+      secrets:
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        merge-token: ${{ secrets.MERGE_TOKEN }}
+        bot-user: ${{ secrets.BOT_USER }}
+        bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
