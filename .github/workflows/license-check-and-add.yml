@@ -25,7 +25,7 @@ jobs:
  
   add-apache-license:
     runs-on: ubuntu-20.04
-    if: needs.check-apache-license.results == failure
+    if: needs.check-apache-license.results == "failure"
     needs: [check-apache-license]
     steps:
       - uses: actions/checkout@v3
