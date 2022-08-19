@@ -1,9 +1,7 @@
 # WorkbenchCognito CDK Construct
 
 ## Description
-A CDK Construct to create a Cognito user pool for use with the [authentication package](../../authentication/). Creates a user pool, domain, app client, and (optionally) OpenID Connect(OIDC)-compatible Identity Providers (IdPs)
-
-The WorkbenchCognito component is a CDK construct which deploys an AWS Cognito User Pool. The User Pool will be initialized with a client application for the website URL provided in the properties. One may also initialized one or more OIDC provider configurations to allow for alternate single sign on providers to be utilized using the `workbench-core-authentication` package's Cognito interface. 
+A CDK Construct to create a Cognito user pool for use with the [authentication package](../../authentication/). The construct creates a user pool, a domain, an app client, and (optionally) one or more OpenID Connect(OIDC)-compatible Identity Providers (IdPs)
 
 ## Usage
 
