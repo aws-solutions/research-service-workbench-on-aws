@@ -21,8 +21,8 @@ jobs:
           token: ${{secrets.merge-token}}
           fetch-depth: 0
       - name: Check apache license
-          id: check-apache-license
-          run: node common/scripts/install-run-rush.js check-apache-license
+        id: check-apache-license
+        run: node common/scripts/install-run-rush.js check-apache-license
           
   add-apache-license:
     runs-on: ubuntu-20.04
