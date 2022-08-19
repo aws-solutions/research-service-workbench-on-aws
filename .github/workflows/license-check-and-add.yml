@@ -33,7 +33,7 @@ jobs:
           token: ${{secrets.merge-token}}
           fetch-depth: 0
       - name: add-apache-license
-        runs: node common/scripts/install-run-rush.js add-apache-license
+        run: node common/scripts/install-run-rush.js add-apache-license
       
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
