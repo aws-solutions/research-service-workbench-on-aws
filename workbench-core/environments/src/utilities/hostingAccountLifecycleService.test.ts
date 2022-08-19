@@ -6,7 +6,6 @@
 jest.mock('./iamRoleCloneService');
 
 import { Readable } from 'stream';
-import { AwsService } from '@amzn/workbench-core-base';
 
 import {
   CloudFormationClient,
@@ -30,6 +29,7 @@ import {
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { AwsService } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 import IamRoleCloneService from './iamRoleCloneService';

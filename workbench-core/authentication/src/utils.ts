@@ -3,17 +3,29 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { TimeUnitsType } from '@aws-sdk/client-cognito-identity-provider';
+export enum TimeUnits {
+  DAYS = 'days',
+  HOURS = 'hours',
+  MINUTES = 'minutes',
+  SECONDS = 'seconds'
+}
 
-export function getTimeInSeconds(length: number, units: TimeUnitsType): number {
-  if (units === TimeUnitsType.DAYS) {
-    return length * 86400;
+/**
+ * Converts a amount of time into milliseconds
+ *
+ * @param length - the length of time
+ * @param units - the unit of time
+ * @returns the time in milliseconds
+ */
+export function getTimeInMS(length: number, units: TimeUnits): number {
+  if (units === TimeUnits.DAYS) {
+    return length * 24 * 60 * 60 * 1000;
   }
-  if (units === TimeUnitsType.HOURS) {
-    return length * 3600;
+  if (units === TimeUnits.HOURS) {
+    return length * 60 * 60 * 1000;
   }
-  if (units === TimeUnitsType.MINUTES) {
-    return length * 60;
+  if (units === TimeUnits.MINUTES) {
+    return length * 60 * 1000;
   }
-  return length;
+  return length * 1000;
 }

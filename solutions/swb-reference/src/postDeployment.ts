@@ -8,8 +8,8 @@ import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
-import { AwsService } from '@amzn/workbench-core-base';
-import { CognitoSetup, ServiceCatalogSetup } from '@amzn/workbench-core-environments';
+import { AwsService } from '@aws/workbench-core-base';
+import { CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
 import Axios from 'axios';
 import { getConstants } from './constants';
 

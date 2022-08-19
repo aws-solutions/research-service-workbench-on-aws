@@ -18,7 +18,7 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git",
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git",
     "defaultBranch": "main"
   },
   "eventHooks": {
@@ -30,103 +30,103 @@
   "variants": [],
   "projects": [
     {
-      "packageName": "@amzn/swb-app",
+      "packageName": "@aws/swb-app",
       "projectFolder": "solutions/swb-app",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/swb-reference",
+      "packageName": "@aws/swb-reference",
       "projectFolder": "solutions/swb-reference",
       "reviewCategory": "production",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-environments",
+      "packageName": "@aws/workbench-core-environments",
       "projectFolder": "workbench-core/environments",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-logging",
+      "packageName": "@aws/workbench-core-logging",
       "projectFolder": "workbench-core/logging",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-base",
+      "packageName": "@aws/workbench-core-base",
       "projectFolder": "workbench-core/base",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/eslint-config-workbench-core-eslint-custom",
+      "packageName": "@aws/eslint-config-workbench-core-eslint-custom",
       "projectFolder": "workbench-core/eslint-custom",
       "reviewCategory": "production",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-authorization",
+      "packageName": "@aws/workbench-core-authorization",
       "projectFolder": "workbench-core/authorization",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-authentication",
+      "packageName": "@aws/workbench-core-authentication",
       "projectFolder": "workbench-core/authentication",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-audit",
+      "packageName": "@aws/workbench-core-audit",
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/example-ui-app",
+      "packageName": "@aws/example-ui-app",
       "projectFolder": "solutions/example-ui-app",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-datasets",
+      "packageName": "@aws/workbench-core-datasets",
       "projectFolder": "workbench-core/datasets",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/workbench-core-example-express",
+      "packageName": "@aws/workbench-core-example-express",
       "projectFolder": "workbench-core/example/express",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-example-infrastructure",
+      "packageName": "@aws/workbench-core-example-infrastructure",
       "projectFolder": "workbench-core/example/infrastructure",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/swb-ui",
+      "packageName": "@aws/swb-ui",
       "projectFolder": "solutions/swb-ui",
       "reviewCategory": "production",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-repo-toolbox",
+      "packageName": "@aws/workbench-core-repo-toolbox",
       "projectFolder": "workbench-core/repo-scripts/repo-toolbox",
       "reviewCategory": "production",
       "shouldPublish": false
     },
     {
-      "packageName": "@amzn/workbench-core-infrastructure",
+      "packageName": "@aws/workbench-core-infrastructure",
       "projectFolder": "workbench-core/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": true
     },
     {
-      "packageName": "@amzn/swb-ui-infrastructure",
+      "packageName": "@aws/swb-ui-infrastructure",
       "projectFolder": "solutions/swb-ui/infrastructure",
       "reviewCategory": "production",
       "shouldPublish": false

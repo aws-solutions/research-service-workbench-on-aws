@@ -9,7 +9,6 @@ jest.mock('uuid', () => ({
   })
 }));
 
-import { AwsService } from '@amzn/workbench-core-base';
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -18,6 +17,7 @@ import {
   ServiceOutputTypes,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
+import { AwsService } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { fc, itProp } from 'jest-fast-check';

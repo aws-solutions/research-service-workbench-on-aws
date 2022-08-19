@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/swb-ui",
+  "name": "@aws/swb-ui",
   "version": "0.0.1",
   "description": "NextJS frontend UI for Service Workbench v2",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -18,21 +18,21 @@
     "build": "next build && rushx lint",
     "build:test": "rushx build && rushx test",
     "depcheck": "depcheck",
-    "deploy-ui-and-api": "./scripts/deploy.sh",
-    "dev": "next dev",
+    "deploy-ui-and-api": "bash ./scripts/deploy.sh",
+    "dev": "bash ./scripts/dev.sh",
     "export": "next build && next export",
+    "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
-    "start": "next start",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "dependencies": {
-    "@amzn/workbench-core-environments": "workspace:*",
+    "@aws/workbench-core-environments": "workspace:*",
     "axios": "^0.27.1",
     "date-fns": "^2.28.0",
     "express": "^4.17.3",
@@ -47,7 +47,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@awsui/collection-hooks": "^1.0.0",
     "@awsui/components-react": "^3.0.0",
     "@awsui/design-tokens": "^3.0.0",
@@ -80,6 +80,7 @@
     "eslint-plugin-testing-library": "5.0.1",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
+    "license-checker": "~25.0.1",
     "nodemon": "^2.0.19",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",

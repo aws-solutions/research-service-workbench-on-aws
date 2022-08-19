@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Writer, AuditEntry } from '@amzn/workbench-core-audit';
-import { LoggingService } from '@amzn/workbench-core-logging';
+import { Writer, AuditEntry } from '@aws/workbench-core-audit';
+import { LoggingService } from '@aws/workbench-core-logging';
 
 export default class AuditLogger implements Writer {
   private _logger: LoggingService;

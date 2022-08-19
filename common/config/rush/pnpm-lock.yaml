@@ -7,7 +7,7 @@ importers:
 
   ../../solutions/example-ui-app:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@awsui/collection-hooks': ^1.0.0
       '@awsui/components-react': ^3.0.0
       '@awsui/design-tokens': ^3.0.0
@@ -35,6 +35,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      license-checker: ~25.0.1
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-i18next: ^11.0.0
@@ -56,7 +57,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@awsui/collection-hooks': 1.0.25_react@17.0.2
       '@awsui/components-react': 3.0.512_b3482aaf5744fc7c2aeb7941b0e0a78f
       '@awsui/design-tokens': 3.0.21
@@ -84,6 +85,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.16.0+typescript@4.7.2
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sass: 1.52.2
@@ -94,12 +96,12 @@ importers:
 
   ../../solutions/swb-app:
     specifiers:
-      '@amzn/workbench-core-environments': workspace:*
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-authentication': workspace:*
-      '@amzn/workbench-core-authorization': workspace:*
-      '@amzn/workbench-core-datasets': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-authentication': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
+      '@aws/workbench-core-environments': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -123,6 +125,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jsonschema: ^1.4.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       nodemon: ^2.0.19
       npm-package-json-lint: ^6.3.0
@@ -132,11 +135,11 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
-      '@amzn/workbench-core-environments': link:../../workbench-core/environments
-      '@amzn/workbench-core-authentication': link:../../workbench-core/authentication
-      '@amzn/workbench-core-authorization': link:../../workbench-core/authorization
-      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
-      '@amzn/workbench-core-logging': link:../../workbench-core/logging
+      '@aws/workbench-core-authentication': link:../../workbench-core/authentication
+      '@aws/workbench-core-authorization': link:../../workbench-core/authorization
+      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
+      '@aws/workbench-core-environments': link:../../workbench-core/environments
+      '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@hapi/boom': 10.0.0
       cookie-parser: 1.4.6
       cors: 2.8.5
@@ -145,7 +148,7 @@ importers:
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -164,6 +167,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       nodemon: 2.0.19
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -173,22 +177,23 @@ importers:
 
   ../../solutions/swb-reference:
     specifiers:
-      '@amzn/workbench-core-environments': workspace:*
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/swb-app': workspace:*
-      '@amzn/workbench-core-audit': workspace:*
-      '@amzn/workbench-core-base': workspace:*
-      '@amzn/workbench-core-datasets': workspace:*
-      '@amzn/workbench-core-infrastructure': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-dynamodb': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
+      '@aws-sdk/client-s3-control': ^3.118.1
       '@aws-sdk/client-sagemaker': ^3.118.1
       '@aws-sdk/client-service-catalog': ^3.118.1
       '@aws-sdk/client-ssm': ^3.118.1
       '@aws-sdk/client-sts': ^3.118.1
       '@aws-sdk/types': ^3.110.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/swb-app': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
+      '@aws/workbench-core-environments': workspace:*
+      '@aws/workbench-core-infrastructure': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -218,6 +223,7 @@ importers:
       jest: ^27.5.1
       jest-circus: ^26.6.3
       js-yaml: ^4.1.0
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -227,20 +233,21 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
-      '@amzn/workbench-core-environments': link:../../workbench-core/environments
-      '@amzn/swb-app': link:../swb-app
-      '@amzn/workbench-core-audit': link:../../workbench-core/audit
-      '@amzn/workbench-core-base': link:../../workbench-core/base
-      '@amzn/workbench-core-datasets': link:../../workbench-core/datasets
-      '@amzn/workbench-core-infrastructure': link:../../workbench-core/infrastructure
-      '@amzn/workbench-core-logging': link:../../workbench-core/logging
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-dynamodb': 3.130.0
       '@aws-sdk/client-s3': 3.130.0
+      '@aws-sdk/client-s3-control': 3.130.0
       '@aws-sdk/client-service-catalog': 3.130.0
       '@aws-sdk/client-ssm': 3.130.0
       '@aws-sdk/client-sts': 3.130.0
       '@aws-sdk/types': 3.127.0
+      '@aws/swb-app': link:../swb-app
+      '@aws/workbench-core-audit': link:../../workbench-core/audit
+      '@aws/workbench-core-base': link:../../workbench-core/base
+      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
+      '@aws/workbench-core-environments': link:../../workbench-core/environments
+      '@aws/workbench-core-infrastructure': link:../../workbench-core/infrastructure
+      '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       express: 4.18.1
@@ -248,8 +255,8 @@ importers:
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@aws-sdk/client-sagemaker': 3.130.0
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_04f3c65f6de4a5e5529a6fededa44e1d
@@ -275,6 +282,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.8.0
       jest-circus: 26.6.3_ts-node@10.8.0
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -284,8 +292,8 @@ importers:
 
   ../../solutions/swb-ui:
     specifiers:
-      '@amzn/workbench-core-environments': workspace:*
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-environments': workspace:*
       '@awsui/collection-hooks': ^1.0.0
       '@awsui/components-react': ^3.0.0
       '@awsui/design-tokens': ^3.0.0
@@ -322,6 +330,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jwt-decode: ^3.1.2
+      license-checker: ~25.0.1
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-transpile-modules: ^9.0.0
@@ -339,7 +348,7 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
-      '@amzn/workbench-core-environments': link:../../workbench-core/environments
+      '@aws/workbench-core-environments': link:../../workbench-core/environments
       axios: 0.27.2
       date-fns: 2.28.0
       express: 4.18.1
@@ -353,7 +362,7 @@ importers:
       swr: 1.3.0_react@17.0.2
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@awsui/collection-hooks': 1.0.25_react@17.0.2
       '@awsui/components-react': 3.0.512_b3482aaf5744fc7c2aeb7941b0e0a78f
       '@awsui/design-tokens': 3.0.21
@@ -386,6 +395,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.16.0+typescript@4.7.2
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       nodemon: 2.0.19
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -409,6 +419,7 @@ importers:
       constructs: ^10.0.0
       jest: ^27.5.1
       js-yaml: ^4.1.0
+      license-checker: ~25.0.1
       sort-package-json: ^1.57.0
       source-map-support: ^0.5.16
       ts-jest: ^27.1.3
@@ -428,6 +439,7 @@ importers:
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       constructs: 10.1.25
       jest: 27.5.1_ts-node@10.8.0
+      license-checker: 25.0.1
       sort-package-json: 1.57.0
       source-map-support: 0.5.21
       ts-jest: 27.1.5_4e623839ecfc1b0242d7f262e6e0b1df
@@ -436,8 +448,8 @@ importers:
 
   ../../workbench-core/audit:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-authorization': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -450,16 +462,17 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-authorization': link:../authorization
       lodash: 4.17.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -472,6 +485,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -479,12 +493,12 @@ importers:
 
   ../../workbench-core/authentication:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-authorization': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
       '@aws-sdk/client-cognito-identity-provider': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
       '@aws-sdk/types': ^3.110.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -501,23 +515,24 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jsonschema: ^1.4.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-authorization': link:../authorization
-      '@amzn/workbench-core-logging': link:../logging
       '@aws-sdk/client-cognito-identity-provider': 3.130.0
+      '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-logging': link:../logging
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
       jsonschema: 1.4.1
       lodash: 4.17.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/client-s3': 3.130.0
       '@aws-sdk/types': 3.127.0
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -531,6 +546,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -538,8 +554,8 @@ importers:
 
   ../../workbench-core/authorization:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@casl/ability': ^5.4.3
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -556,17 +572,18 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-logging': link:../logging
+      '@aws/workbench-core-logging': link:../logging
       '@casl/ability': 5.4.4
       lodash: 4.17.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -582,6 +599,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -589,9 +607,6 @@ importers:
 
   ../../workbench-core/base:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-audit': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
       '@aws-cdk/aws-dynamodb': ^1.152.0
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-cognito-identity-provider': ^3.118.1
@@ -609,6 +624,9 @@ importers:
       '@aws-sdk/client-sts': ^3.118.1
       '@aws-sdk/types': ^3.110.0
       '@aws-sdk/util-dynamodb': ^3.87.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -623,6 +641,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -630,9 +649,6 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
     dependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@amzn/workbench-core-audit': link:../audit
-      '@amzn/workbench-core-logging': link:../logging
       '@aws-cdk/aws-dynamodb': 1.158.0
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-cognito-identity-provider': 3.130.0
@@ -650,8 +666,11 @@ importers:
       '@aws-sdk/client-sts': 3.130.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-dynamodb': 3.105.0
+      '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -666,6 +685,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -674,16 +694,16 @@ importers:
 
   ../../workbench-core/datasets:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-audit': workspace:*
-      '@amzn/workbench-core-base': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
       '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-dynamodb': ^3.118.1
       '@aws-sdk/client-kms': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
       '@aws-sdk/client-s3-control': ^3.118.1
       '@aws-sdk/types': ^3.110.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -703,6 +723,7 @@ importers:
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
       jsonschema: ^1.4.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -711,21 +732,21 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
-      '@amzn/workbench-core-audit': link:../audit
-      '@amzn/workbench-core-base': link:../base
-      '@amzn/workbench-core-logging': link:../logging
       '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-dynamodb': 3.130.0
       '@aws-sdk/client-kms': 3.130.0
       '@aws-sdk/client-s3': 3.130.0
       '@aws-sdk/client-s3-control': 3.130.0
       '@aws-sdk/types': 3.127.0
+      '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-base': link:../base
+      '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -743,6 +764,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -751,12 +773,6 @@ importers:
 
   ../../workbench-core/environments:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-audit': workspace:*
-      '@amzn/workbench-core-authorization': workspace:*
-      '@amzn/workbench-core-base': workspace:*
-      '@amzn/workbench-core-datasets': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
       '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-cognito-identity-provider': ^3.118.1
@@ -771,6 +787,12 @@ importers:
       '@aws-sdk/client-sts': ^3.118.1
       '@aws-sdk/types': ^3.110.0
       '@aws-sdk/util-dynamodb': ^3.87.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -789,6 +811,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jsonschema: ^1.4.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       md5-file: ^5.0.0
       npm-package-json-lint: ^6.3.0
@@ -798,11 +821,6 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
-      '@amzn/workbench-core-audit': link:../audit
-      '@amzn/workbench-core-authorization': link:../authorization
-      '@amzn/workbench-core-base': link:../base
-      '@amzn/workbench-core-datasets': link:../datasets
-      '@amzn/workbench-core-logging': link:../logging
       '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-cloudformation': 3.130.0
       '@aws-sdk/client-cognito-identity-provider': 3.130.0
@@ -816,6 +834,11 @@ importers:
       '@aws-sdk/client-ssm': 3.130.0
       '@aws-sdk/client-sts': 3.130.0
       '@aws-sdk/util-dynamodb': 3.105.0
+      '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-base': link:../base
+      '@aws/workbench-core-datasets': link:../datasets
+      '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
       jsonschema: 1.4.1
@@ -823,8 +846,8 @@ importers:
       md5-file: 5.0.0
       uuid: 8.3.2
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@aws-sdk/types': 3.127.0
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -840,6 +863,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -858,6 +882,7 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
+      license-checker: ~25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -874,6 +899,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.20
       depcheck: 1.4.3
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -881,9 +907,9 @@ importers:
 
   ../../workbench-core/example/express:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-audit': workspace:*
-      '@amzn/workbench-core-logging': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -896,15 +922,16 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
+      license-checker: ~25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-audit': link:../../audit
-      '@amzn/workbench-core-logging': link:../../logging
+      '@aws/workbench-core-audit': link:../../audit
+      '@aws/workbench-core-logging': link:../../logging
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -917,6 +944,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
       express: 4.18.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -924,12 +952,12 @@ importers:
 
   ../../workbench-core/example/infrastructure:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@amzn/workbench-core-example-express': workspace:*
       '@aws-cdk/assert': ^2.0.0
       '@aws-cdk/aws-apigatewayv2-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-example-express': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -952,6 +980,7 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -959,17 +988,17 @@ importers:
       source-map-support: ^0.5.16
       typescript: ^4.5.2
     dependencies:
-      '@amzn/workbench-core-example-express': link:../express
+      '@aws/workbench-core-example-express': link:../express
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       constructs: 10.1.25
       lodash: 4.17.21
       source-map-support: 0.5.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@aws-cdk/assert': 2.26.0_c9e2f77c41c390210db2e247727e987d
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_8d994d7bf27edab84c843ce1928354a1
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': 2.22.0-alpha.0_321f8d5612d8741dd602b5547195cfdc
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': 2.22.0-alpha.0_321f8d5612d8741dd602b5547195cfdc
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -990,6 +1019,7 @@ importers:
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -997,7 +1027,7 @@ importers:
 
   ../../workbench-core/infrastructure:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
@@ -1012,6 +1042,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       istanbul-badges-readme: 1.8.1
+      license-checker: ~25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -1022,7 +1053,7 @@ importers:
       constructs: 10.1.25
       lodash: 4.17.21
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -1035,6 +1066,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
       istanbul-badges-readme: 1.8.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -1042,7 +1074,7 @@ importers:
 
   ../../workbench-core/logging:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
@@ -1056,6 +1088,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
+      license-checker: ~25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -1064,17 +1097,17 @@ importers:
       winston: ^3.6.0
       winston-transport: ^4.5.0
     dependencies:
+      '@types/triple-beam': 1.3.2
       triple-beam: 1.3.0
       winston: 3.7.2
       winston-transport: 4.5.0
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
       '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.20
-      '@types/triple-beam': 1.3.2
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
@@ -1082,6 +1115,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -1089,7 +1123,7 @@ importers:
 
   ../../workbench-core/repo-scripts/repo-toolbox:
     specifiers:
-      '@amzn/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@microsoft/rush-lib': ^5.69.0
       '@rushstack/eslint-config': ^2.5.1
       '@rushstack/heft': ^0.45.0
@@ -1105,6 +1139,7 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
+      license-checker: ~25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -1115,7 +1150,7 @@ importers:
       '@rushstack/ts-command-line': 4.11.0
       diff: 5.1.0
     devDependencies:
-      '@amzn/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 2.6.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
@@ -1127,6 +1162,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
+      license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
@@ -6618,7 +6654,6 @@ packages:
 
   /@types/triple-beam/1.3.2:
     resolution: {integrity: sha512-txGIh+0eDFzKGC25zORnswy+br1Ha7hj5cMVwKIU7+s0U2AxxJru/jZSMU6OC9MJWP6+pc/hc6ZjyZShpsyY2g==}
-    dev: true
 
   /@types/tunnel/0.0.1:
     resolution: {integrity: sha512-AOqu6bQu5MSWwYvehMXLukFHnupHrpZ8nvgae5Ggie9UwzDR1CCwoXgSSWNZJuyOlCdfdsWMA5F2LlmvyoTv8A==}
@@ -7197,6 +7232,11 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /array-find-index/1.0.2:
+    resolution: {integrity: sha512-M1HQyIXcBGtVywBt8WVdim+lrNaK7VHp99Qt5pSNziXznKHViIBbXWtfRTpEFpF/c4FdfxNAsCCwPp5phBYJtw==}
+    engines: {node: '>=0.10.0'}
+    dev: true
+
   /array-flatten/1.1.1:
     resolution: {integrity: sha1-ml9pkFGx5wczKPKgCJaLZOopVdI=}
 
@@ -7249,7 +7289,6 @@ packages:
 
   /asap/2.0.6:
     resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
-    dev: false
 
   /assign-symbols/1.0.0:
     resolution: {integrity: sha512-Q+JC7Whu8HhmTdBph/Tq59IoRtoy6KAm5zzPv00WdujX82lbAL8K7WVjne7vdCsAmbF4AYaDOPyO3k0kl8qIrw==}
@@ -8282,7 +8321,6 @@ packages:
 
   /debuglog/1.0.1:
     resolution: {integrity: sha512-syBZ+rnAK3EgMsH2aYEOLUW7mZSY9Gb+0wUMCFsZvcmiz+HigA0LOcq/HoQqVuGG+EKykunc7QG2bzrponfaSw==}
-    dev: false
 
   /decamelize-keys/1.1.0:
     resolution: {integrity: sha512-ocLWuYzRPoS9bfiSdDd3cxvrzovVMZnRDVEzAs+hWIVXGDbHxWMECij2OBuyB/An0FFW/nLuq6Kv1i/YC5Qfzg==}
@@ -8434,7 +8472,6 @@ packages:
     dependencies:
       asap: 2.0.6
       wrappy: 1.0.2
-    dev: false
 
   /diff-sequences/26.6.2:
     resolution: {integrity: sha512-Mv/TDa3nZ9sbc5soK+OoA74BsS3mL37yixCvUAQkiuA4Wz6YtwP/K47n2rv2ovzHZvoiQeA5FTQOschKkEwB0Q==}
@@ -11708,6 +11745,22 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  /license-checker/25.0.1:
+    resolution: {integrity: sha512-mET5AIwl7MR2IAKYYoVBBpV0OnkKQ1xGj2IMMeEFIs42QAkEVjRtFZGWmQ28WeU7MP779iAgOaOy93Mn44mn6g==}
+    hasBin: true
+    dependencies:
+      chalk: 2.4.2
+      debug: 3.2.7
+      mkdirp: 0.5.6
+      nopt: 4.0.3
+      read-installed: 4.0.3
+      semver: 5.7.1
+      spdx-correct: 3.1.1
+      spdx-expression-parse: 3.0.1
+      spdx-satisfies: 4.0.1
+      treeify: 1.1.0
+    dev: true
+
   /lie/3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
     dependencies:
@@ -11995,6 +12048,13 @@ packages:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
     dev: true
 
+  /mkdirp/0.5.6:
+    resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
+    hasBin: true
+    dependencies:
+      minimist: 1.2.6
+    dev: true
+
   /mkdirp/1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
@@ -12230,6 +12290,14 @@ packages:
       abbrev: 1.1.1
     dev: true
 
+  /nopt/4.0.3:
+    resolution: {integrity: sha512-CvaGwVMztSMJLOeXPrez7fyfObdZqNUK1cPAEzLHrTybIua9pMdmmPR5YwtfNftIOMv3DPUhFaxsZMNTQO20Kg==}
+    hasBin: true
+    dependencies:
+      abbrev: 1.1.1
+      osenv: 0.1.5
+    dev: true
+
   /normalize-package-data/2.5.0:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
     dependencies:
@@ -12266,7 +12334,6 @@ packages:
 
   /npm-normalize-package-bin/1.0.1:
     resolution: {integrity: sha512-EPfafl6JL5/rU+ot6P3gRSCpPDW5VmIzX959Ob1+ySFUuuYHWHekXpwdUZcKP5C+DS4GEtdJluwBjnsNDl+fSA==}
-    dev: false
 
   /npm-package-arg/6.1.1:
     resolution: {integrity: sha512-qBpssaL3IOZWi5vEKUKW0cO7kzLeT+EQO9W8RsLOZf76KF9E/K9+wH0C7t06HXPpaH8WH5xF1MExLuCwbTqRUg==}
@@ -12481,19 +12548,16 @@ packages:
   /os-homedir/1.0.2:
     resolution: {integrity: sha512-B5JU3cabzk8c67mRRd3ECmROafjYMXbuzlwtqdM8IbS8ktlTix8aFGb2bAGKrSRIlnfKwovGUUr72JUPyOb6kQ==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /os-tmpdir/1.0.2:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
     engines: {node: '>=0.10.0'}
-    dev: false
 
   /osenv/0.1.5:
     resolution: {integrity: sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==}
     dependencies:
       os-homedir: 1.0.2
       os-tmpdir: 1.0.2
-    dev: false
 
   /p-finally/1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
@@ -12967,6 +13031,19 @@ packages:
       object-assign: 4.1.1
     dev: false
 
+  /read-installed/4.0.3:
+    resolution: {integrity: sha512-O03wg/IYuV/VtnK2h/KXEt9VIbMUFbk3ERG0Iu4FhLZw0EP0T9znqrYDGn6ncbEsXUFaUjiVAWXHzxwt3lhRPQ==}
+    dependencies:
+      debuglog: 1.0.1
+      read-package-json: 2.1.2
+      readdir-scoped-modules: 1.1.0
+      semver: 5.7.1
+      slide: 1.1.6
+      util-extend: 1.0.3
+    optionalDependencies:
+      graceful-fs: 4.2.10
+    dev: true
+
   /read-package-json/2.1.2:
     resolution: {integrity: sha512-D1KmuLQr6ZSJS0tW8hf3WGpRlwszJOXZ3E8Yd/DNRaM5d+1wVRZdHlpGBLAuovjr28LbWvjpWkBHMxpRGGjzNA==}
     dependencies:
@@ -12974,7 +13051,6 @@ packages:
       json-parse-even-better-errors: 2.3.1
       normalize-package-data: 2.5.0
       npm-normalize-package-bin: 1.0.1
-    dev: false
 
   /read-package-tree/5.1.6:
     resolution: {integrity: sha512-FCX1aT3GWyY658wzDICef4p+n0dB+ENRct8E/Qyvppj6xVpOYerBHfUu7OP5Rt1/393Tdglguf5ju5DEX4wZNg==}
@@ -13040,7 +13116,6 @@ packages:
       dezalgo: 1.0.4
       graceful-fs: 4.2.10
       once: 1.4.0
-    dev: false
 
   /readdirp/3.5.0:
     resolution: {integrity: sha512-cMhu7c/8rdhkHXWsY+osBhfSy0JikwpHK/5+imo+LpeasTF8ouErHrlYkwT0++njiyuDvc7OFY5T3ukvZ8qmFQ==}
@@ -13514,6 +13589,10 @@ packages:
       is-fullwidth-code-point: 3.0.0
     dev: true
 
+  /slide/1.1.6:
+    resolution: {integrity: sha512-NwrtjCg+lZoqhFU8fOwl4ay2ei8PaqCBOUV3/ektPY9trO1yQ1oXEfmHAhKArUVUr/hOHvy5f6AdP17dCM0zMw==}
+    dev: true
+
   /snapdragon-node/2.1.1:
     resolution: {integrity: sha512-O27l4xaMYt/RSQ5TR3vpWCAB5Kb/czIcqUFOM/C4fYcLnbZUc1PkjTAMjof2pBWaSTwOUd6qUHcFGVGj7aIwnw==}
     engines: {node: '>=0.10.0'}
@@ -13623,6 +13702,14 @@ packages:
     resolution: {integrity: sha1-YvXpRmmBwbeW3Fkpk34RycaSG9A=}
     dev: true
 
+  /spdx-compare/1.0.0:
+    resolution: {integrity: sha512-C1mDZOX0hnu0ep9dfmuoi03+eOdDoz2yvK79RxbcrVEG1NO1Ph35yW102DHWKN4pk80nwCgeMmSY5L25VE4D9A==}
+    dependencies:
+      array-find-index: 1.0.2
+      spdx-expression-parse: 3.0.1
+      spdx-ranges: 2.1.1
+    dev: true
+
   /spdx-correct/3.1.1:
     resolution: {integrity: sha512-cOYcUWwhCuHCXi49RhFRCyJEK3iPj1Ziz9DpViV3tbZOwXD49QzIN3MpOLJNxh2qwq2lJJZaKMVw9qNi4jTC0w==}
     dependencies:
@@ -13640,6 +13727,18 @@ packages:
 
   /spdx-license-ids/3.0.11:
     resolution: {integrity: sha512-Ctl2BrFiM0X3MANYgj3CkygxhRmr9mi6xhejbdO960nF6EDJApTYpn0BQnDKlnNBULKiCN1n3w9EBkHK8ZWg+g==}
+
+  /spdx-ranges/2.1.1:
+    resolution: {integrity: sha512-mcdpQFV7UDAgLpXEE/jOMqvK4LBoO0uTQg0uvXUewmEFhpiZx5yJSZITHB8w1ZahKdhfZqP5GPEOKLyEq5p8XA==}
+    dev: true
+
+  /spdx-satisfies/4.0.1:
+    resolution: {integrity: sha512-WVzZ/cXAzoNmjCWiEluEA3BjHp5tiUmmhn9MK+X0tBbR9sOqtC6UQwmgCNrAIZvNlMuBUYAaHYfb2oqlF9SwKA==}
+    dependencies:
+      spdx-compare: 1.0.0
+      spdx-expression-parse: 3.0.1
+      spdx-ranges: 2.1.1
+    dev: true
 
   /split-string/3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
@@ -14045,6 +14144,11 @@ packages:
     hasBin: true
     dev: true
 
+  /treeify/1.1.0:
+    resolution: {integrity: sha512-1m4RA7xVAJrSGrrXGs0L3YTwyvBs2S8PbRHaLZAkFw7JR8oIFwYtysxlBZhYIa7xSyiYJKZ3iGrrk55cGA3i9A==}
+    engines: {node: '>=0.6'}
+    dev: true
+
   /trim-newlines/3.0.1:
     resolution: {integrity: sha512-c1PTsA3tYrIsLGkJkzHF+w9F2EyxfXGo4UyJc4pFL++FMjnq0HJS69T3M7d//gKrFKwy429bouPescbjecU+Zw==}
     engines: {node: '>=8'}
@@ -14448,6 +14552,10 @@ packages:
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=}
+
+  /util-extend/1.0.3:
+    resolution: {integrity: sha512-mLs5zAK+ctllYBj+iAQvlDCwoxU/WDOUaJkcFudeiAX6OajC6BKXJUa9a+tbtkC11dz2Ufb7h0lyvIOVn4LADA==}
+    dev: true
 
   /utils-merge/1.0.1:
     resolution: {integrity: sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=}

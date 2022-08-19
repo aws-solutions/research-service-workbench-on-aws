@@ -6,14 +6,14 @@
 export interface Tokens {
   idToken: {
     token: string;
-    expiresIn?: number; // seconds
+    expiresIn?: number; // ms
   };
   accessToken: {
     token: string;
-    expiresIn?: number; // seconds
+    expiresIn?: number; // ms
   };
   refreshToken?: {
     token: string;
-    expiresIn?: number; // seconds
+    expiresIn?: number; // ms
   };
 }

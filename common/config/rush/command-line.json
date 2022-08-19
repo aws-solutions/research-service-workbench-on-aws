@@ -223,6 +223,13 @@
       "enableParallelism": true
     },
     {
+      "name": "license-checker",
+      "commandKind": "bulk",
+      "summary": "Run license checker on dependencies",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",

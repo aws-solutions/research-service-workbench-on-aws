@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/example-ui-app",
+  "name": "@aws/example-ui-app",
   "version": "0.0.1",
   "description": "This is a prototype app and you should modify the source code to reflect your project needs",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -17,6 +17,7 @@
     "build:test": "rushx build && rushx test",
     "depcheck": "depcheck",
     "dev": "next dev",
+    "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint": "next lint --max-warnings 0 && rushx pkg-json-lint",
     "lint:fix": "next lint --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
@@ -36,7 +37,7 @@
     "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@awsui/collection-hooks": "^1.0.0",
     "@awsui/components-react": "^3.0.0",
     "@awsui/design-tokens": "^3.0.0",
@@ -64,6 +65,7 @@
     "eslint-plugin-testing-library": "5.0.1",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
+    "license-checker": "~25.0.1",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sass": "^1.49.8",

@@ -1,3 +1,7 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
@@ -13,24 +17,24 @@ export default class ClientSession {
   private _setup: Setup;
   public resources: Resources;
 
-  public constructor(setup: Setup, idToken?: string) {
+  public constructor(setup: Setup, accessToken?: string) {
     this._settings = setup.getSettings();
     this._setup = setup;
-    this._isAnonymousSession = idToken === undefined;
+    this._isAnonymousSession = accessToken === undefined;
     this._cleanupQueue = [];
 
     const headers: {
       'Content-Type': string;
-      Authorization?: string;
+      Cookie?: string;
     } = { 'Content-Type': 'application/json' };
 
     // For anonymous sessions, authorization header is not required
     if (!this._isAnonymousSession) {
-      headers.Authorization = idToken;
+      headers.Cookie = `access_token=${accessToken}`;
     }
 
     this._axiosInstance = axios.create({
-      baseURL: this._settings.get('apiBaseUrl'),
+      baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });

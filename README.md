@@ -1,18 +1,20 @@
+
+⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
+
 # Workflow Status
-[![Build Status](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Build-and-test/badge.svg)
-[![Merge-develop-to-stage](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Merge-develop-to-stage/badge.svg)
-[![Publish-and-merge-to-develop](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Publish-and-merge-to-develop/badge.svg)
-[![Cfn-nag-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Cfn-nag-scan/badge.svg)
-[![Secret-scan](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Secret-scan/badge.svg)
-[![GitHub-release](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/GitHub-release/badge.svg)
-[![Lint-PR](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/monorepo-for-service-workbench/workflows/Lint-pr/badge.svg)
+[![Build Status](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
+[![Merge-develop-to-stage](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
+[![Publish-and-merge-to-develop](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
+[![Cfn-nag-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
+[![Secret-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
+[![Lint-PR](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-87.73%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.71%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-89.09%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-88.23%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-87.17%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.03%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.52%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-87.67%25-yellow.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -22,7 +24,7 @@ Please read through this document before submitting any issues or pull requests 
 
 ## Code development and testing
 
-In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#monorepo-for-service-workbench-development-instructions)
+In order to start developement please refer to [Development Instructions](./DEVELOPMENT.md#solution-spark-on-aws-development-instructions)
 
 <!-- GENERATED PROJECT SUMMARY START -->
 
@@ -32,15 +34,15 @@ In order to start developement please refer to [Development Instructions](./DEVE
 
 | Folder | Package | README |
 | ------ | ------- | ------ |
-| [solutions/swb-app](./solutions/swb-app/) | [@amzn/swb-app] | [README](./solutions/swb-app/README.md)
-| [workbench-core/audit](./workbench-core/audit/) | [@amzn/workbench-core-audit] | [README](./workbench-core/audit/README.md)
-| [workbench-core/authentication](./workbench-core/authentication/) | [@amzn/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
-| [workbench-core/authorization](./workbench-core/authorization/) | [@amzn/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
-| [workbench-core/base](./workbench-core/base/) | [@amzn/workbench-core-base] | [README](./workbench-core/base/README.md)
-| [workbench-core/datasets](./workbench-core/datasets/) | [@amzn/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
-| [workbench-core/environments](./workbench-core/environments/) | [@amzn/workbench-core-environments] | [README](./workbench-core/environments/README.md)
-| [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@amzn/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
-| [workbench-core/logging](./workbench-core/logging/) | [@amzn/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
+| [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
+| [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)
+| [workbench-core/authorization](./workbench-core/authorization/) | [@aws/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
+| [workbench-core/base](./workbench-core/base/) | [@aws/workbench-core-base] | [README](./workbench-core/base/README.md)
+| [workbench-core/datasets](./workbench-core/datasets/) | [@aws/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
+| [workbench-core/environments](./workbench-core/environments/) | [@aws/workbench-core-environments] | [README](./workbench-core/environments/README.md)
+| [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
+| [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on
