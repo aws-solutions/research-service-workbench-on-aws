@@ -20,6 +20,8 @@ jobs:
         with:
           token: ${{secrets.merge-token}}
           fetch-depth: 0
+      - name: Base Action
+        uses: ./.github/actions/baseAction
       - name: Check apache license
         run: node common/scripts/install-run-rush.js check-apache-license
         continue-on-error: true
@@ -32,6 +34,8 @@ jobs:
         with:
           token: ${{secrets.merge-token}}
           fetch-depth: 0
+      - name: Base Action
+        uses: ./.github/actions/baseAction
       - name: add-apache-license
         run: node common/scripts/install-run-rush.js add-apache-license
       
