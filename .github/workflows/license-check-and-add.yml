@@ -27,7 +27,7 @@ jobs:
         run: node common/scripts/install-run-rush.js check-apache-license
       - name: Add apache license
         id: add-apache-license
-        if: steps.check-apache-license.conclusion == 'failure'
+        if: always() && steps.check-apache-license.conclusion == 'failure'
         run: node common/scripts/install-run-rush.js add-apache-license
       - name: Import GPG key
         if: steps.add-apache-license.conclusion == 'success'
