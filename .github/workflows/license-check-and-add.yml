@@ -23,31 +23,24 @@ jobs:
       - name: Base Action
         uses: ./.github/actions/baseAction
       - name: Check apache license
+        id: check-apache-license
         run: node common/scripts/install-run-rush.js check-apache-license
         continue-on-error: true
-  add-apache-license:
-    runs-on: ubuntu-20.04
-    if: ${{ needs.check-apache-license.results == 'failure'}}
-    needs: check-apache-license
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          token: ${{secrets.merge-token}}
-          fetch-depth: 0
-      - name: Base Action
-        uses: ./.github/actions/baseAction
-      - name: add-apache-license
+      - name: Add apache license
+        id: add-apache-license
+        if: steps.check-apache-license.conclusion == 'failure'
         run: node common/scripts/install-run-rush.js add-apache-license
-      
       - name: Import GPG key
+        if: steps.add-apache-license.conclusion == 'success'
+        id: import-gpg-key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.gpg-private-key }}
           passphrase: ${{ secrets.passphrase }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-        
       - name: Auto commit updated files with Apache license headers
+        if: steps.import-gpg-key.conclusion == 'success'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs: Auto add Apache license headers [skip ci]"
@@ -55,4 +48,22 @@ jobs:
           commit_user_name: ${{ secrets.bot-user }}
           commit_user_email: ${{ secrets.bot-user-email }}
           branch: test-apache-header
+
+
+  # add-apache-license:
+  #   runs-on: ubuntu-20.04
+  #   if: ${{ needs.check-apache-license.results == 'failure'}}
+  #   needs: check-apache-license
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         token: ${{secrets.merge-token}}
+  #         fetch-depth: 0
+  #     - name: Base Action
+  #       uses: ./.github/actions/baseAction
+  #     - name: add-apache-license
+  #       run: node common/scripts/install-run-rush.js add-apache-license
+      
+      
+      
           
