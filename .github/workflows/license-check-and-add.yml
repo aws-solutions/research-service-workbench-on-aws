@@ -30,7 +30,7 @@ jobs:
         continue-on-error: true
   add-apache-license:
     runs-on: ubuntu-20.04
-    if: ${{ needs.check-apache-license.outputs.verified-apache-license == 'failure'}}
+    if: ${{ needs.check-apache-license.outputs.verified-apache-license == 'success'}}
     needs: [check-apache-license]
     steps:
       - uses: actions/checkout@v3
