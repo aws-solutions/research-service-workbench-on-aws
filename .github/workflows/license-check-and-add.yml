@@ -16,7 +16,7 @@ jobs:
   check-apache-license:
     runs-on: ubuntu-20.04
     outputs:
-      verified-apache-license: steps.check-apache-license.conclusion
+      verified-apache-license: steps.check-apache-license.outcome
     steps:
       - uses: actions/checkout@v3
         with:
@@ -27,7 +27,7 @@ jobs:
       - name: Check apache license
         id: check-apache-license
         run: node common/scripts/install-run-rush.js check-apache-license
-
+        continue-on-error: true
   add-apache-license:
     runs-on: ubuntu-20.04
     if: ${{ needs.check-apache-license.outputs.verified-apache-license == 'failure'}}
@@ -42,12 +42,9 @@ jobs:
         uses: ./.github/actions/baseAction
     
       - name: Add apache license
-        id: add-apache-license
         run: node common/scripts/install-run-rush.js add-apache-license
 
       - name: Import GPG key
-        if: steps.add-apache-license.conclusion == 'success'
-        id: import-gpg-key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.gpg-private-key }}
@@ -55,7 +52,6 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
       - name: Auto commit updated files with Apache license headers
-        if: steps.import-gpg-key.conclusion == 'success'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs: Auto add Apache license headers [skip ci]"
