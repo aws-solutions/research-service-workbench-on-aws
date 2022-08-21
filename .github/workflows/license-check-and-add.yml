@@ -15,6 +15,8 @@ on:
 jobs:
   check-apache-license:
     runs-on: ubuntu-20.04
+    outputs:
+      verified-apache-license: steps.check-apache-license.conclusion
     steps:
       - uses: actions/checkout@v3
         with:
@@ -28,7 +30,7 @@ jobs:
 
   add-apache-license:
     runs-on: ubuntu-20.04
-    if: ${{ needs.check-apache-license.results == 'failure'}}
+    if: ${{ needs.check-apache-license.outputs.verified-apache-license == 'failure'}}
     needs: check-apache-license
     steps:
       - uses: actions/checkout@v3
