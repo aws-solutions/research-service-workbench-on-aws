@@ -19,7 +19,7 @@
   },
   "repository": {
     "url": "https://github.com/awslabs/solution-spark-on-aws.git",
-    "defaultBranch": "main"
+    "defaultBranch": "develop"
   },
   "eventHooks": {
     "preRushInstall": [],
