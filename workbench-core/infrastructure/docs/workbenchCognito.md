@@ -49,7 +49,7 @@ const cognitoProps: WorkbenchCognitoProps = {
   websiteUrls: ['https://mysite.mydomain.com'],
   // Include your created OidcProvider if including a SSO component
   oidcIdentityProviders = [ myWorkbenchUserPoolOidcIdentityProvider ]
-  // If an access token validity of 15 minutes isnt sufficient, you mach change it here
+  // If an access token validity of 15 minutes is insufficient, you may change it here
   accessTokenValidity: Duration.minutes(60) // 1 hour
 };
 
