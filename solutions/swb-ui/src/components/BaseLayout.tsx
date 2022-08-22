@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { BreadcrumbGroupProps } from '@awsui/components-react';
-import AppLayout, { AppLayoutProps } from '@awsui/components-react/app-layout';
-import BreadcrumbGroup from '@awsui/components-react/breadcrumb-group';
-import Flashbar from '@awsui/components-react/flashbar';
+import { BreadcrumbGroupProps } from '@cloudscape-design/components';
+import AppLayout, { AppLayoutProps } from '@cloudscape-design/components/app-layout';
+import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
+import Flashbar from '@cloudscape-design/components/flashbar';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { layoutLabels } from '../common/labels';
