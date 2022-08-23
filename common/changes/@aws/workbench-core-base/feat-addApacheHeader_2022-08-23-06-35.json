@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "add license-check-and-add to package.json",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

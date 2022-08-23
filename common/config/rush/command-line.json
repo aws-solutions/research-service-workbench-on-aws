@@ -230,6 +230,20 @@
       "enableParallelism": true
     },
     {
+      "name": "add-license-header",
+      "commandKind": "bulk",
+      "summary": "Add license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "check-license-header",
+      "commandKind": "bulk",
+      "summary": "Check license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
