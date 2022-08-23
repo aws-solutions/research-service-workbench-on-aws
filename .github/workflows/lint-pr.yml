@@ -17,7 +17,6 @@ jobs:
         if: always()
         with:
           status: ${{ job.status }}
-          notify_when: "failure"
+          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.TEST_SLACK }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
