@@ -16,13 +16,21 @@ jobs:
     name: test-2
     runs-on: ubuntu-20.04
     steps:
-      - name: Echo Context
-        if: always()
-        run: echo "${{ toJson(github) }}"
+      - name: Echo 
+        run: echo "test-2"
+
+  dep:
+    name: dep
+    needs: [test-1, test-2]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Echo 
+        run: echo "dep"
 
   notification: 
     name: notification
     if: failure()
+    needs: [dep]
     runs-on: ubuntu-20.04
     steps:
       - name: Slack Failure Notification
