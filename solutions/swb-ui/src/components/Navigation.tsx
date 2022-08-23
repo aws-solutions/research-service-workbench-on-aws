@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import SideNavigation, { SideNavigationProps } from '@awsui/components-react/side-navigation';
+import SideNavigation, { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
 import React from 'react';
 import { useAuthentication } from '../context/AuthenticationContext';
 import RouteGuard from './RouteGuard';

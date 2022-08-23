@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import TopNavigation from '@awsui/components-react/top-navigation';
+import TopNavigation from '@cloudscape-design/components/top-navigation';
 import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';

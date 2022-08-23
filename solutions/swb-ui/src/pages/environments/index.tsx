@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCollection } from '@awsui/collection-hooks';
+import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -18,8 +18,8 @@ import {
   SpaceBetween,
   Table,
   StatusIndicator
-} from '@awsui/components-react';
-import { FlashbarProps } from '@awsui/components-react/flashbar';
+} from '@cloudscape-design/components';
+import { FlashbarProps } from '@cloudscape-design/components/flashbar';
 
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';

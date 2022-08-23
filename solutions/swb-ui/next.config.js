@@ -1,4 +1,4 @@
-const withTM = require('next-transpile-modules')(['@awsui/components-react']);
+const withTM = require('next-transpile-modules')(['@cloudscape-design/components']);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

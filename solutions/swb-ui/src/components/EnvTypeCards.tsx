@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCollection } from '@awsui/collection-hooks';
+import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   CollectionPreferences,
   Cards,
@@ -12,7 +12,7 @@ import {
   TextFilter,
   CardsProps,
   TextContent
-} from '@awsui/components-react';
+} from '@cloudscape-design/components';
 import { useState } from 'react';
 import { TableEmptyDisplay } from '../common/tableEmptyState';
 import { TableNoMatchDisplay } from '../common/tableNoMatchState';
