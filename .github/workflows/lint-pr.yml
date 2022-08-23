@@ -9,15 +9,6 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        
       - uses: amannn/action-semantic-pull-request@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-
-      - name: Slack Failure Notification
-        if: failure()
-        uses: ./.github/actions/notification
-        with:
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
