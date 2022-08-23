@@ -1,0 +1,32 @@
+{
+  "license": "../../../apache-license-header.txt",
+  "ignoreFile": "../../../.licenseignorefile",
+  "defaultFormat": {
+    "gitignore|npmignore|eslintignore|dockerignore|sh|py": {
+      "eachLine": {
+        "prepend": "# "
+      }
+    },
+    "html|xml|svg": {
+      "prepend": "<!--",
+      "append": "-->"
+    },
+    "js|ts|tsx|css|scss|less|php|as|c|java|cpp|go|cto|acl": {
+      "prepend": "/*",
+      "append": " */\n",
+      "eachLine": {
+        "prepend": " *  "
+      }
+    },
+    "txt": {}
+  },
+  "licenseFormats": {
+    "ts|tsx": {
+      "prepend": "/*",
+      "append": " */\n",
+      "eachLine": {
+        "prepend": " *  "
+      }
+    }
+  }
+}
