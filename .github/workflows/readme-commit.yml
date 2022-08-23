@@ -99,3 +99,9 @@ jobs:
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.merge-token }}
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
