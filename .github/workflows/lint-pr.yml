@@ -17,10 +17,18 @@ jobs:
         if: always()
         run: echo "${{ toJson(github) }}"
 
+      - name: Dump job context
+        if: always()
+        run: echo '${{ toJSON(job) }}'
+
+      - name: Dump steps context
+        if: always()
+        run: echo '${{ toJSON(steps) }}'
+
       - name: Slack Message
         if: failure()
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Failure ${{ job.status }} ${{ github.workflow }}"}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.event.base.repo.html_url }}/actions/runs/${{ github.run_id }} ] "}' ${{ secrets.SLACK_WEBHOOK }}
 
 
       # - uses: ravsamhq/notify-slack-action@v2
