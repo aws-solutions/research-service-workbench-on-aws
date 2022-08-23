@@ -36,8 +36,7 @@ jobs:
     
       - name: Add apache license
         run: node common/scripts/install-run-rush.js add-apache-license
-
-
+      
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -71,7 +70,6 @@ jobs:
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.BOT_USER }}
           commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
-          file_pattern: "**/src/**/*.ts*"
           branch: ${{ steps.branch-name.outputs.head_ref_branch }}
 
       - name: Enable branch protection on PR branch
