@@ -110,3 +110,7 @@ jobs:
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification

@@ -13,28 +13,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
 
-      - name: Echo Context
-        if: always()
-        run: echo "${{ toJson(github) }}"
-
-      - name: Dump job context
-        if: always()
-        run: echo '${{ toJSON(job) }}'
-
-      - name: Dump steps context
-        if: always()
-        run: echo '${{ toJSON(steps) }}'
-
       - name: Slack Failure Notification
         if: failure()
-        run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ] "}' ${{ secrets.SLACK_WEBHOOK }}
-
-
-      # - uses: ravsamhq/notify-slack-action@v2
-      #   if: failure()
-      #   with:
-      #     status: ${{ job.status }}
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.TEST_SLACK }}
+        uses: ./.github/actions/notification
