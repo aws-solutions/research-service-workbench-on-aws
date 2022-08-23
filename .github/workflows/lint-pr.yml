@@ -12,3 +12,15 @@ jobs:
       - uses: amannn/action-semantic-pull-request@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+
+      - name: Slack Notification
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: general
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_MESSAGE: '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ] "}'
+          SLACK_TITLE: "${{ github.workflow }}-${{ github.job }}"
+          SLACK_USERNAME: mafoundation-ci
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
