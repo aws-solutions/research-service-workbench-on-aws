@@ -1,17 +1,10 @@
 name: license-check-and-add
 on:
-  workflow_call:
-    secrets: 
-      gpg-private-key:
-        required: true
-      passphrase:
-        required: true
-      merge-token:
-        required: true
-      bot-user:
-        required: true
-      bot-user-email:
-        required: true
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches:
+      - test-develop
+
 jobs:
   check-apache-license:
     runs-on: ubuntu-20.04
@@ -44,6 +37,7 @@ jobs:
       - name: Add apache license
         run: node common/scripts/install-run-rush.js add-apache-license
 
+
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
@@ -51,13 +45,37 @@ jobs:
           passphrase: ${{ secrets.passphrase }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+        
+        # There's no way for github actions to push to a protected branch. This is a workaround
+        # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
+        # Conditional on if branch is protected or not
+      - name: Temporaily disable branch protection on PR branch
+        if: ${{ github.ref_protected == true }}
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: solution-spark-on-aws
+          branch: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
+
       - name: Auto commit updated files with Apache license headers
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "docs: Auto add Apache license headers [skip ci]"
+          commit_message: "docs: Auto add Apache license headers"
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.bot-user }}
           commit_user_email: ${{ secrets.bot-user-email }}
-          branch: test-apache-header
-      
-          
+          branch: ${{ github.ref_name }}
+
+      - name: Enable branch protection on PR branch
+        uses: octokit/request-action@v2.x
+        if: always() && ${{ github.ref_protected == true }}  # Make sure to enable branch protection even if other steps fail
+        with:
+          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          owner: awslabs
+          repo: solution-spark-on-aws
+          branch: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.merge-token }}
