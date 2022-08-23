@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened, synchronize, edited, reopened]
     branches:
-      - test-develop
+      - test-apache-header
 
 jobs:
   check-apache-license:
