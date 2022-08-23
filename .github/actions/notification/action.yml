@@ -6,7 +6,7 @@
 name: Slack Notification
 description: Action to send slack notification on failure
 inputs:
-  slack_webhook:
+  slack_webhook_url:
     description: "Slack WebHook URL"
     required: true
 
