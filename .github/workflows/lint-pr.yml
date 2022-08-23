@@ -28,7 +28,7 @@ jobs:
       - name: Slack Message
         if: failure()
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.event.base.repo.html_url }}/actions/runs/${{ github.run_id }} ] "}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID ] "}' ${{ secrets.SLACK_WEBHOOK }}
 
 
       # - uses: ravsamhq/notify-slack-action@v2
