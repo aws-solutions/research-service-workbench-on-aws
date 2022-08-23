@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Box, Button } from '@awsui/components-react';
+import { Box } from '@cloudscape-design/components';
 
 /**
  * Displays the no match state of any table

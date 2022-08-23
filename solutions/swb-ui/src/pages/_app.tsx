@@ -4,7 +4,7 @@
  */
 
 // No BaseLayout for the global _app.tsx because login page should have no nav
-import '@awsui/global-styles/index.css';
+import '@cloudscape-design/global-styles/index.css';
 import '../styles/globals.scss';
 import type { AppProps } from 'next/app';
 import Header from '../components/Header';

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DateRangePickerProps } from '@awsui/components-react';
+import { DateRangePickerProps } from '@cloudscape-design/components';
 import { addDays, addHours, addMinutes, addMonths, addSeconds, addWeeks, addYears } from 'date-fns';
 
 const differenceInDays = (dateOne: Date, dateTwo: Date): number => {

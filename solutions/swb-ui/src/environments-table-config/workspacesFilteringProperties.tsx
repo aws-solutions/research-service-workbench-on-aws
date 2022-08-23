@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { FilteringProperty } from '@awsui/collection-hooks/dist/cjs/interfaces';
+import { PropertyFilterProperty } from '@cloudscape-design/collection-hooks/dist/cjs/interfaces';
 
-export const filteringProperties: readonly FilteringProperty[] = [
+export const filteringProperties: readonly PropertyFilterProperty[] = [
   {
     key: 'workspaceName',
     operators: ['=', '!=', ':', '!:'],

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AppLayoutProps, BarChart, Box, Button, SplitPanelProps } from '@awsui/components-react';
+import { AppLayoutProps, BarChart, Box, Button, SplitPanelProps } from '@cloudscape-design/components';
 import { useEffect, useState } from 'react';
 
 export const splitPaneli18nstrings: SplitPanelProps.I18nStrings = {

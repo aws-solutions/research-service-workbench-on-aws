@@ -175,6 +175,22 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@cloudscape-design/collection-hooks",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/components",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/design-tokens",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/global-styles",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@hapi/boom",
       "allowedCategories": [ "production" ]
     },
@@ -373,6 +389,10 @@
     {
       "name": "next",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "next-compose-plugins",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "next-global-css",

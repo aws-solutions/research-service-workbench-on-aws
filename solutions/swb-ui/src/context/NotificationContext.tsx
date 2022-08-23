@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { FlashbarProps } from '@awsui/components-react/flashbar';
+import { FlashbarProps } from '@cloudscape-design/components/flashbar';
 import { createContext, useContext, Context, useState } from 'react';
 
 export interface Notifications {
