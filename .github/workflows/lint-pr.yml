@@ -13,10 +13,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
 
-      - uses: ravsamhq/notify-slack-action@v2
-        if: always()
-        with:
-          status: ${{ job.status }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.TEST_SLACK }}
+      - name: Echo Context
+        run: echo "${{ toJson(github) }}"
+
+      - name: Slack Message
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"Failure {repo_url}"}' ${{ secrets.SLACK_WEBHOOK }}
+
+
+      # - uses: ravsamhq/notify-slack-action@v2
+      #   if: failure()
+      #   with:
+      #     status: ${{ job.status }}
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.TEST_SLACK }}
