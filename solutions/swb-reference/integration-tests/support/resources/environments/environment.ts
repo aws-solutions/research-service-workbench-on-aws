@@ -5,8 +5,11 @@
 import { EnvironmentStatus } from '@aws/workbench-core-environments';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
-import { ENVIRONMENT_START_MAX_WAITING_SECONDS } from '../../utils/constants';
-import { poll } from '../../utils/utilities';
+import {
+  ENVIRONMENT_START_MAX_WAITING_SECONDS,
+  AVOID_THROTTLE_WAITING_MILISECONDS
+} from '../../utils/constants';
+import { poll, sleep } from '../../utils/utilities';
 import Resource from '../base/resource';
 
 export default class Environment extends Resource {
@@ -15,18 +18,22 @@ export default class Environment extends Resource {
   }
 
   public async connect(): Promise<AxiosResponse> {
+    await sleep(AVOID_THROTTLE_WAITING_MILISECONDS); //Avoid throttling when connecting to multiple environments
     return this._axiosInstance.get(`${this._api}/connections`);
   }
 
   public async stop(): Promise<AxiosResponse> {
+    await sleep(AVOID_THROTTLE_WAITING_MILISECONDS); //Avoid throttling when stopping multiple environments
     return this._axiosInstance.put(`${this._api}/stop`);
   }
 
   public async start(): Promise<AxiosResponse> {
+    await sleep(AVOID_THROTTLE_WAITING_MILISECONDS); //Avoid throttling when starting multiple environments
     return this._axiosInstance.put(`${this._api}/start`);
   }
 
   public async terminate(): Promise<AxiosResponse> {
+    await sleep(AVOID_THROTTLE_WAITING_MILISECONDS); //Avoid throttling when terminating multiple environments
     return this._axiosInstance.put(`${this._api}/terminate`);
   }
 
