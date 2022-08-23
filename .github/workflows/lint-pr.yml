@@ -14,11 +14,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Echo Context
+        if: always()
         run: echo "${{ toJson(github) }}"
 
       - name: Slack Message
         if: failure()
         run: |
+          echo "${{ toJson(github) }}"
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Failure {repo_url}"}' ${{ secrets.SLACK_WEBHOOK }}
 
 
