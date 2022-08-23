@@ -42,7 +42,7 @@ const myWorkbenchUserPoolOidcIdentityProvider: WorkbenchUserPoolOidcIdentityProv
   }
 }
 
-// Set the cognito properites
+// Set the cognito properties
 // If a user pool name or user pool client name are not provided, CDK will generate them for you
 const cognitoProps: WorkbenchCognitoProps = {
   domainPrefix: 'myDomainPrefix',
