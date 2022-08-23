@@ -40,3 +40,9 @@ jobs:
           STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk bootstrap
           STAGE='demo' node ../../common/scripts/install-run-rushx.js cdk-deploy
           STAGE='demo' node ../../common/scripts/install-run-rushx.js run-postDeployment
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
