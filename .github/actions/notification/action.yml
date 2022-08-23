@@ -5,6 +5,10 @@
 
 name: Slack Notification
 description: Action to send slack notification on failure
+inputs:
+  slack_webhook:
+    description: "Slack WebHook URL"
+    required: true
 
 runs:
   using: "composite"
@@ -12,4 +16,4 @@ runs:
     - name: Slack Notification
       shell: bash
       run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ] "}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> [ STATUS: ${{ job.status }} WORKFLOW_NAME: ${{ github.workflow }}  JOB: ${{ github.job }}  JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} ] "}' ${{ inputs.slack_webhook_url }}

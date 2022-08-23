@@ -114,3 +114,5 @@ jobs:
       - name: Slack Failure Notification
         if: failure()
         uses: ./.github/actions/notification
+        with:
+          slack_webhook: ${{ secrets.SLACK_WEBHOOK }}
