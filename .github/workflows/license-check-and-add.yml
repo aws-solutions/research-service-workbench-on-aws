@@ -67,7 +67,7 @@ jobs:
       - name: Auto commit updated files with Apache license headers
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "docs: Auto add Apache license headers"
+          commit_message: "docs: Auto add Apache license headers [skip ci]"
           commit_options: '--no-verify --gpg-sign'
           commit_user_name: ${{ secrets.BOT_USER }}
           commit_user_email: ${{ secrets.BOT_USER_EMAIL }}
