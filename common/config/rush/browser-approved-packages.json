@@ -295,6 +295,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "csurf",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -369,6 +373,10 @@
     {
       "name": "jwt-decode",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "license-check-and-add",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "license-checker",

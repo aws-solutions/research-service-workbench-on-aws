@@ -35,7 +35,8 @@ importers:
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-i18next: ^11.0.0
@@ -85,6 +86,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.16.0+typescript@4.7.2
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -125,7 +127,8 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jsonschema: ^1.4.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       nodemon: ^2.0.19
       npm-package-json-lint: ^6.3.0
@@ -167,6 +170,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       nodemon: 2.0.19
       npm-package-json-lint: 6.3.0
@@ -223,7 +227,8 @@ importers:
       jest: ^27.5.1
       jest-circus: ^26.6.3
       js-yaml: ^4.1.0
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -282,6 +287,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1_ts-node@10.8.0
       jest-circus: 26.6.3_ts-node@10.8.0
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -329,7 +335,8 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jwt-decode: ^3.1.2
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-transpile-modules: ^9.0.0
@@ -393,6 +400,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1_eslint@8.16.0+typescript@4.7.2
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       nodemon: 2.0.19
       npm-package-json-lint: 6.3.0
@@ -417,7 +425,8 @@ importers:
       constructs: ^10.0.0
       jest: ^27.5.1
       js-yaml: ^4.1.0
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       sort-package-json: ^1.57.0
       source-map-support: ^0.5.16
       ts-jest: ^27.1.3
@@ -437,6 +446,7 @@ importers:
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       constructs: 10.1.25
       jest: 27.5.1_ts-node@10.8.0
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       sort-package-json: 1.57.0
       source-map-support: 0.5.21
@@ -460,7 +470,8 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -483,6 +494,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -501,6 +513,7 @@ importers:
       '@rushstack/heft': ^0.45.0
       '@rushstack/heft-jest-plugin': ^0.2.3
       '@rushstack/heft-node-rig': ^1.7.1
+      '@types/csurf': ^1.11.2
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
@@ -508,12 +521,14 @@ importers:
       aws-jwt-verify: ^3.0.0
       aws-sdk-client-mock: ^0.6.2
       axios: ^0.27.1
+      csurf: ^1.11.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jsonschema: ^1.4.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -525,6 +540,7 @@ importers:
       '@aws/workbench-core-logging': link:../logging
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
+      csurf: 1.11.0
       jsonschema: 1.4.1
       lodash: 4.17.21
     devDependencies:
@@ -535,6 +551,7 @@ importers:
       '@rushstack/heft': 0.45.5
       '@rushstack/heft-jest-plugin': 0.2.15_@rushstack+heft@0.45.5
       '@rushstack/heft-node-rig': 1.9.6_@rushstack+heft@0.45.5
+      '@types/csurf': 1.11.2
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
@@ -544,6 +561,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -570,7 +588,8 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -597,6 +616,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -639,7 +659,8 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -683,6 +704,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -721,7 +743,8 @@ importers:
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
       jsonschema: ^1.4.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -762,6 +785,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -809,7 +833,8 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jsonschema: ^1.4.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       md5-file: ^5.0.0
       npm-package-json-lint: ^6.3.0
@@ -861,6 +886,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -880,7 +906,8 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -897,6 +924,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.20
       depcheck: 1.4.3
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -920,7 +948,8 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -942,6 +971,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
       express: 4.18.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -978,7 +1008,8 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -1017,6 +1048,7 @@ importers:
       express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -1040,7 +1072,8 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       istanbul-badges-readme: 1.8.1
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
@@ -1064,6 +1097,7 @@ importers:
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
       istanbul-badges-readme: 1.8.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -1086,7 +1120,8 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
       jest-fast-check: ^1.0.2
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -1113,6 +1148,7 @@ importers:
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -1137,7 +1173,8 @@ importers:
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
-      license-checker: ~25.0.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
@@ -1160,6 +1197,7 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
+      license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
@@ -6531,6 +6569,12 @@ packages:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
     dev: true
 
+  /@types/csurf/1.11.2:
+    resolution: {integrity: sha512-9bc98EnwmC1S0aSJiA8rWwXtgXtXHHOQOsGHptImxFgqm6CeH+mIOunHRg6+/eg2tlmDMX3tY7XrWxo2M/nUNQ==}
+    dependencies:
+      '@types/express-serve-static-core': 4.17.28
+    dev: true
+
   /@types/diff/5.0.1:
     resolution: {integrity: sha512-XIpxU6Qdvp1ZE6Kr3yrkv1qgUab0fyf4mHYvW8N3Bx3PCsbN6or1q9/q72cv5jIFWolaGH08U9XyYoLLIykyKQ==}
     dev: true
@@ -7191,6 +7235,11 @@ packages:
   /ansi-regex/2.1.1:
     resolution: {integrity: sha512-TIGnTpdo+E3+pCyAluZvtED5p5wCqLdezCyhPZzKPcxvFplEt4i+W7OONCKgeZFT3+y5NZZfOOS/Bdcanm1MYA==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /ansi-regex/4.1.1:
+    resolution: {integrity: sha512-ILlv4k/3f6vfQ4OoP2AGvirOktlQ98ZEL1k9FaQjxa3L1abBgbuTDAdPOpvbGncC0BTVQrl+OM8xZGK6tWXt7g==}
+    engines: {node: '>=6'}
     dev: true
 
   /ansi-regex/5.0.1:
@@ -7978,6 +8027,14 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
+  /cliui/5.0.0:
+    resolution: {integrity: sha512-PYeGSEmmHM6zvoef2w8TPzlrnNpXIjTipYK780YswmIP9vjxmd6Y2a3CB2Ks6/AU8NHjZugXvo8w3oWM2qnwXA==}
+    dependencies:
+      string-width: 3.1.0
+      strip-ansi: 5.2.0
+      wrap-ansi: 5.1.0
+    dev: true
+
   /cliui/6.0.0:
     resolution: {integrity: sha512-t6wbgtoCXvAzst7QgXxJYqPt0usEfbgQdftEPbLL/cvv6HPE5VgvqCuAIDR0NgU52ds6rFwqrgakNLrHEjCbrQ==}
     dependencies:
@@ -8158,6 +8215,11 @@ packages:
   /cookie-signature/1.0.6:
     resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
 
+  /cookie/0.4.0:
+    resolution: {integrity: sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
   /cookie/0.4.1:
     resolution: {integrity: sha512-ZwrFkGJxUR3EIoXtO+yVE69Eb7KlixbaeAWfBQB9vVsNn/o+Yw69gBWSSDK825hQNdN+wF8zELf3dFNl/kxkUA==}
     engines: {node: '>= 0.6'}
@@ -8242,6 +8304,15 @@ packages:
     resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
     dev: false
 
+  /csrf/3.1.0:
+    resolution: {integrity: sha512-uTqEnCvWRk042asU6JtapDTcJeeailFy4ydOQS28bj1hcLnYRiqi8SsD2jS412AY1I/4qdOwWZun774iqywf9w==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      rndm: 1.2.0
+      tsscmp: 1.0.6
+      uid-safe: 2.1.5
+    dev: false
+
   /css-selector-tokenizer/0.8.0:
     resolution: {integrity: sha512-Jd6Ig3/pe62/qe5SBPTN8h8LeUg/pT4lLgtavPf7updwwHpvFzxvOQBHYj2LZDMjUnBzgvIUSjRcf6oT5HzHFg==}
     dependencies:
@@ -8284,6 +8355,16 @@ packages:
 
   /csstype/3.1.0:
     resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
+
+  /csurf/1.11.0:
+    resolution: {integrity: sha512-UCtehyEExKTxgiu8UHdGvHj4tnpE/Qctue03Giq5gPgMQ9cg/ciod5blZQ5a4uCEenNQjxyGuzygLdKUmee/bQ==}
+    engines: {node: '>= 0.8.0'}
+    dependencies:
+      cookie: 0.4.0
+      cookie-signature: 1.0.6
+      csrf: 3.1.0
+      http-errors: 1.7.3
+    dev: false
 
   /d3-array/1.2.4:
     resolution: {integrity: sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==}
@@ -8494,6 +8575,11 @@ packages:
       - supports-color
     dev: true
 
+  /depd/1.1.2:
+    resolution: {integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
   /depd/2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
@@ -8606,6 +8692,10 @@ packages:
   /emittery/0.8.1:
     resolution: {integrity: sha512-uDfvUjVrfGJJhymx/kz6prltenw1u7WrCg1oa94zYY8xxVpLLUu045LAT0dhDZdXG58/EpPL/5kA180fQ/qudg==}
     engines: {node: '>=10'}
+    dev: true
+
+  /emoji-regex/7.0.3:
+    resolution: {integrity: sha512-CwBLREIQ7LvYFB0WyRvwhq5N5qPhc6PMjD6bYggFlI5YyDgl+0vxq5VHbMOFqLg7hfWzmu8T5Z1QofhmTIhItA==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -9571,6 +9661,13 @@ packages:
     dependencies:
       locate-path: 2.0.0
 
+  /find-up/3.0.0:
+    resolution: {integrity: sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==}
+    engines: {node: '>=6'}
+    dependencies:
+      locate-path: 3.0.0
+    dev: true
+
   /find-up/4.1.0:
     resolution: {integrity: sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==}
     engines: {node: '>=8'}
@@ -9656,6 +9753,15 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 4.0.0
       universalify: 0.1.2
+
+  /fs-extra/8.1.0:
+    resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==}
+    engines: {node: '>=6 <7 || >=8'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 4.0.0
+      universalify: 0.1.2
+    dev: true
 
   /fs-extra/9.1.0:
     resolution: {integrity: sha512-hcg3ZmepS30/7BSFqRvoo3DOMQu7IjqxO5nCDt+zM9XWjb33Wg7ziNT+Qvqbuc3+gWpzO02JubVyk2G4Zvo1OQ==}
@@ -9787,6 +9893,11 @@ packages:
     resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
     dev: true
 
+  /gitignore-to-glob/0.3.0:
+    resolution: {integrity: sha512-mk74BdnK7lIwDHnotHddx1wsjMOFIThpLY3cPNniJ/2fA/tlLzHnFxIdR+4sLOu5KGgQJdij4kjJ2RoUNnCNMA==}
+    engines: {node: '>=4.4 <5 || >=6.9'}
+    dev: true
+
   /glob-escape/0.0.2:
     resolution: {integrity: sha512-L/cXYz8x7qer1HAyUQ+mbjcUsJVdpRxpAf7CwqHoNBs9vTpABlGfNN4tzkDxt+u3Z7ZncVyKlCNPtzb0R/7WbA==}
     engines: {node: '>= 0.10'}
@@ -9851,6 +9962,20 @@ packages:
 
   /globby/10.0.0:
     resolution: {integrity: sha512-3LifW9M4joGZasyYPz2A1U74zbC/45fvpXUvO/9KbSa+VV0aGZarWkfdgKyR9sExNP0t0x0ss/UMJpNpcaTspw==}
+    engines: {node: '>=8'}
+    dependencies:
+      '@types/glob': 7.2.0
+      array-union: 2.1.0
+      dir-glob: 3.0.1
+      fast-glob: 3.2.11
+      glob: 7.2.3
+      ignore: 5.2.0
+      merge2: 1.4.1
+      slash: 3.0.0
+    dev: true
+
+  /globby/10.0.2:
+    resolution: {integrity: sha512-7dUi7RvCoT/xast/o/dLN53oqND4yk0nsHkhRgn9w65C4PofCLOoJ39iSOg+qVDdWQPIEj+eszMHQ+aLVwwQSg==}
     engines: {node: '>=8'}
     dependencies:
       '@types/glob': 7.2.0
@@ -9982,6 +10107,17 @@ packages:
     resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
     dependencies:
       void-elements: 3.1.0
+    dev: false
+
+  /http-errors/1.7.3:
+    resolution: {integrity: sha512-ZTTX0MWrsQ2ZAhA1cejAwDLycFsd7I7nVtnkT3Ol0aqodaKW+0CTZDQ1uBv5whptCnc8e8HeRRJxRs0kmm/Qfw==}
+    engines: {node: '>= 0.6'}
+    dependencies:
+      depd: 1.1.2
+      inherits: 2.0.4
+      setprototypeof: 1.1.1
+      statuses: 1.5.0
+      toidentifier: 1.0.0
     dev: false
 
   /http-errors/2.0.0:
@@ -10272,6 +10408,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       number-is-nan: 1.0.1
+    dev: true
+
+  /is-fullwidth-code-point/2.0.0:
+    resolution: {integrity: sha512-VHskAKYM8RfSFXwee5t5cbN5PZeq1Wrh6qd5bkyiXIf6UQcN6w/A0eXM9r6t8d+GYOh+o6ZhiEnb88LN/Y8m2w==}
+    engines: {node: '>=4'}
     dev: true
 
   /is-fullwidth-code-point/3.0.0:
@@ -11802,6 +11943,17 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  /license-check-and-add/4.0.5:
+    resolution: {integrity: sha512-FySnMi3Kf/vO5jka8tcbVF1FhDFb8PWsQ8pg5Y7U/zkQgta+fIrJGcGHO58WFjfKlgvhneG1uQ00Fpxzhau3QA==}
+    hasBin: true
+    dependencies:
+      fs-extra: 8.1.0
+      gitignore-to-glob: 0.3.0
+      globby: 10.0.2
+      ignore: 5.2.0
+      yargs: 13.3.2
+    dev: true
+
   /license-checker/25.0.1:
     resolution: {integrity: sha512-mET5AIwl7MR2IAKYYoVBBpV0OnkKQ1xGj2IMMeEFIs42QAkEVjRtFZGWmQ28WeU7MP779iAgOaOy93Mn44mn6g==}
     hasBin: true
@@ -11843,6 +11995,14 @@ packages:
     dependencies:
       p-locate: 2.0.0
       path-exists: 3.0.0
+
+  /locate-path/3.0.0:
+    resolution: {integrity: sha512-7AO748wWnIhNqAuaty2ZWHkQHRSNfPVIsPIfwEOWO22AmaoVrWavlOcMR5nzTLNYvp36X220/maaRsrec1G65A==}
+    engines: {node: '>=6'}
+    dependencies:
+      p-locate: 3.0.0
+      path-exists: 3.0.0
+    dev: true
 
   /locate-path/5.0.0:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
@@ -12639,6 +12799,13 @@ packages:
     dependencies:
       p-limit: 1.3.0
 
+  /p-locate/3.0.0:
+    resolution: {integrity: sha512-x+12w/To+4GFfgJhBEpiDcLozRJGegY+Ei7/z0tSLkMmxGZNybVMSfWj9aJn8Z5Fc7dBUNJOOVgPv2H7IwulSQ==}
+    engines: {node: '>=6'}
+    dependencies:
+      p-limit: 2.3.0
+    dev: true
+
   /p-locate/4.1.0:
     resolution: {integrity: sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==}
     engines: {node: '>=8'}
@@ -12935,6 +13102,11 @@ packages:
 
   /ramda/0.27.2:
     resolution: {integrity: sha512-SbiLPU40JuJniHexQSAgad32hfwd+DRUdwF2PlVuI5RZD0/vahUco7R8vD86J/tcEKKF9vZrUVwgtmGCqlCKyA==}
+    dev: false
+
+  /random-bytes/1.0.0:
+    resolution: {integrity: sha512-iv7LhNVO047HzYR3InF6pUcUsPQiHTM1Qal51DcGSuZFBil1aBBWG5eHPNek7bvILMaYJ/8RU1e8w1AMdHmLQQ==}
+    engines: {node: '>= 0.8'}
     dev: false
 
   /range-parser/1.2.1:
@@ -13369,6 +13541,10 @@ packages:
     dependencies:
       glob: 7.2.3
 
+  /rndm/1.2.0:
+    resolution: {integrity: sha512-fJhQQI5tLrQvYIYFpOnFinzv9dwmR7hRnUz1XqP3OJ1jIweTNOd6aTO4jwQSgcBSFUB+/KHJxuGneime+FdzOw==}
+    dev: false
+
   /rsvp/4.8.5:
     resolution: {integrity: sha512-nfMOlASu9OnRJo1mbEk2cz0D56a1MBNrJ7orjRZQG10XDyuvwksKbuXNp6qa+kbn839HwjwhBzhFmdsaEAfauA==}
     engines: {node: 6.* || >= 7.*}
@@ -13523,7 +13699,7 @@ packages:
       send: 0.18.0
 
   /set-blocking/2.0.0:
-    resolution: {integrity: sha1-BF+XgtARrppoA93TgrJDkrPYkPc=}
+    resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
     dev: true
 
   /set-immediate-shim/1.0.1:
@@ -13540,6 +13716,10 @@ packages:
       is-plain-object: 2.0.4
       split-string: 3.1.0
     dev: true
+
+  /setprototypeof/1.1.1:
+    resolution: {integrity: sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==}
+    dev: false
 
   /setprototypeof/1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
@@ -13833,6 +14013,11 @@ packages:
       object-copy: 0.1.0
     dev: true
 
+  /statuses/1.5.0:
+    resolution: {integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
   /statuses/2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
@@ -13861,6 +14046,15 @@ packages:
       code-point-at: 1.1.0
       is-fullwidth-code-point: 1.0.0
       strip-ansi: 3.0.1
+    dev: true
+
+  /string-width/3.1.0:
+    resolution: {integrity: sha512-vafcv6KjVZKSgz06oM/H6GDBrAtz8vdhQakGjFIvNrHA6y3HCF1CInLy+QLq8dTJPQ1b+KDUqDFctkdRW44e1w==}
+    engines: {node: '>=6'}
+    dependencies:
+      emoji-regex: 7.0.3
+      is-fullwidth-code-point: 2.0.0
+      strip-ansi: 5.2.0
     dev: true
 
   /string-width/4.2.3:
@@ -13912,6 +14106,13 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       ansi-regex: 2.1.1
+    dev: true
+
+  /strip-ansi/5.2.0:
+    resolution: {integrity: sha512-DuRs1gKbBqsMKIZlrffwlug8MHkcnpjs5VPmL1PAh+mA30U0DTotfDZ0d2UUsXpPmPmMMJ6W773MaA3J+lbiWA==}
+    engines: {node: '>=6'}
+    dependencies:
+      ansi-regex: 4.1.1
     dev: true
 
   /strip-ansi/6.0.1:
@@ -14166,6 +14367,11 @@ packages:
       safe-regex: 1.1.0
     dev: true
 
+  /toidentifier/1.0.0:
+    resolution: {integrity: sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==}
+    engines: {node: '>=0.6'}
+    dev: false
+
   /toidentifier/1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
@@ -14401,6 +14607,11 @@ packages:
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
 
+  /tsscmp/1.0.6:
+    resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
+    engines: {node: '>=0.6.x'}
+    dev: false
+
   /tsutils/3.21.0_typescript@4.7.2:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
     engines: {node: '>= 6'}
@@ -14488,6 +14699,13 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
+
+  /uid-safe/2.1.5:
+    resolution: {integrity: sha512-KPHm4VL5dDXKz01UuEd88Df+KzynaohSL9fBh096KWAxSKZQDI2uBrVqtvRM4rwrIrRRKsdLNML/lnaaVSRioA==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      random-bytes: 1.0.0
+    dev: false
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
@@ -14810,6 +15028,15 @@ packages:
     resolution: {integrity: sha1-J1hIEIkUVqQXHI0CJkQa3pDLyus=}
     dev: false
 
+  /wrap-ansi/5.1.0:
+    resolution: {integrity: sha512-QC1/iN/2/RPVJ5jYK8BGttj5z83LmSKmvbvrXPNCLZSEb32KKVDJDl/MOt2N01qU2H/FkzEa9PKto1BqDjtd7Q==}
+    engines: {node: '>=6'}
+    dependencies:
+      ansi-styles: 3.2.1
+      string-width: 3.1.0
+      strip-ansi: 5.2.0
+    dev: true
+
   /wrap-ansi/6.2.0:
     resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}
     engines: {node: '>=8'}
@@ -14909,6 +15136,13 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
 
+  /yargs-parser/13.1.2:
+    resolution: {integrity: sha512-3lbsNRf/j+A4QuSZfDRA7HRSfWrzO0YjqTJd5kjAq37Zep1CEgaYmrH9Q3GwPiB9cHyd1Y1UwggGhJGoxipbzg==}
+    dependencies:
+      camelcase: 5.3.1
+      decamelize: 1.2.0
+    dev: true
+
   /yargs-parser/18.1.3:
     resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}
     engines: {node: '>=6'}
@@ -14925,6 +15159,21 @@ packages:
   /yargs-parser/21.0.1:
     resolution: {integrity: sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==}
     engines: {node: '>=12'}
+    dev: true
+
+  /yargs/13.3.2:
+    resolution: {integrity: sha512-AX3Zw5iPruN5ie6xGRIDgqkT+ZhnRlZMLMHAs8tg7nRruy2Nb+i5o9bwghAogtM08q1dpr2LVoS8KSTMYpWXUw==}
+    dependencies:
+      cliui: 5.0.0
+      find-up: 3.0.0
+      get-caller-file: 2.0.5
+      require-directory: 2.1.1
+      require-main-filename: 2.0.0
+      set-blocking: 2.0.0
+      string-width: 3.1.0
+      which-module: 2.0.0
+      y18n: 4.0.3
+      yargs-parser: 13.1.2
     dev: true
 
   /yargs/15.4.1:
