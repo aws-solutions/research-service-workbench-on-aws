@@ -27,8 +27,6 @@ export const getPanelContent = (items: any, itemType: string): any => {
     };
   }
 
-  const item = items[0];
-
   // All data returned is dummy data for POC
   return {
     header: 'Cost',

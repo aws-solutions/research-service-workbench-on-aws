@@ -9,7 +9,7 @@ import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
 import Flashbar from '@cloudscape-design/components/flashbar';
 import Head from 'next/head';
 import React, { useState } from 'react';
-import { layoutLabels } from '../common/labels';
+import { layoutLabels } from '@aws/workbench-core-common-ui';
 import Navigation from '../components/Navigation';
 import { useNotifications } from '../context/NotificationContext';
 import { useSettings } from '../context/SettingsContext';

@@ -18,7 +18,7 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { addUserToRole, createUser } from '../../api/users';
-import { emailRegex, nameRegex } from '../../common/utils';
+import { emailRegex, nameRegex } from '@aws/workbench-core-common-ui';
 import BaseLayout from '../../components/BaseLayout';
 import { CreateUserForm, CreateUserFormValidation } from '../../models/User';
 

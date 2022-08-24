@@ -4,7 +4,7 @@
  */
 
 import TopNavigation from '@cloudscape-design/components/top-navigation';
-import { headerLabels } from '../common/labels';
+import { headerLabels } from '@aws/workbench-core-common-ui';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
 import { researcherUser } from '../models/User';

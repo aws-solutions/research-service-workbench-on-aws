@@ -24,14 +24,9 @@ import { FlashbarProps } from '@cloudscape-design/components/flashbar';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
+import { datei18nStrings, relativeOptions, convertToAbsoluteRange, isValidRangeFunction, 
+  getFilterCounterText, TableEmptyDisplay, TableNoMatchDisplay, i18nStrings, paginationLables } from '@aws/workbench-core-common-ui';
 import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
-import { datei18nStrings, relativeOptions } from '../../common/dateRelativeOptions';
-import { convertToAbsoluteRange, isValidRangeFunction } from '../../common/dateRelativeProperties';
-import { i18nStrings, paginationLables } from '../../common/labels';
-
-import { getFilterCounterText } from '../../common/tableCounterStrings';
-import { TableEmptyDisplay } from '../../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
 import BaseLayout from '../../components/BaseLayout';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
 import { useNotifications } from '../../context/NotificationContext';

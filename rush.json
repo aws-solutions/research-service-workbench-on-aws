@@ -48,6 +48,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@aws/workbench-core-common-ui",
+      "projectFolder": "workbench-core/common-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@aws/workbench-core-logging",
       "projectFolder": "workbench-core/logging",
       "reviewCategory": "production",

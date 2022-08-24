@@ -14,8 +14,7 @@ import {
   TextContent
 } from '@cloudscape-design/components';
 import { useState } from 'react';
-import { TableEmptyDisplay } from '../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../common/tableNoMatchState';
+import { TableEmptyDisplay, TableNoMatchDisplay } from '@aws/workbench-core-common-ui';
 import { EnvTypeItem } from '../models/EnvironmentType';
 
 interface OnSelectEnvTypeFunction {
