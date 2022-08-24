@@ -17,6 +17,9 @@ on:
         required: true
       bot-user-email:
         required: true
+      slack_webhook_url:
+        required: true
+      
     outputs:
       commit_hash:
         description: 'README update commit hash'
@@ -104,4 +107,4 @@ jobs:
         if: failure()
         uses: ./.github/actions/notification
         with:
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          slack_webhook_url: ${{ secrets.slack_webhook_url }}

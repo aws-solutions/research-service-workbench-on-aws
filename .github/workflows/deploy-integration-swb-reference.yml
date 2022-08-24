@@ -13,6 +13,8 @@ on:
         required: true
       aws-dev-account-region:
         required: true
+      slack_webhook_url:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -63,4 +65,4 @@ jobs:
         if: failure()
         uses: ./.github/actions/notification
         with:
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          slack_webhook_url: ${{ secrets.slack_webhook_url }}
