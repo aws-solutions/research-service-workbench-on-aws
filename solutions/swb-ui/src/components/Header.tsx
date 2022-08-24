@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import TopNavigation from '@cloudscape-design/components/top-navigation';
 import { headerLabels } from '@aws/workbench-core-common-ui';
+import TopNavigation from '@cloudscape-design/components/top-navigation';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
 import { researcherUser } from '../models/User';

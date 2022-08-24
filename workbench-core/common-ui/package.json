@@ -38,11 +38,11 @@
   },
   "dependencies": {
     "@babel/core": "^7.17.9",
+    "@babel/plugin-syntax-flow": "^7.14.5",
+    "@babel/plugin-transform-react-jsx": "^7.14.9",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@babel/plugin-syntax-flow": "^7.14.5",
-    "@babel/plugin-transform-react-jsx": "^7.14.9",
     "@types/node": "^14",
     "@types/react": "17.0.38",
     "@types/react-dom": "^18.0.6",
@@ -55,16 +55,19 @@
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@rushstack/heft": "^0.45.0",
-    "@rushstack/heft-jest-plugin": "^0.2.3",
-    "@rushstack/heft-node-rig": "^1.7.1",
-    "@types/heft-jest": "1.0.2",
     "@cloudscape-design/collection-hooks": "^1.0.3",
     "@cloudscape-design/components": "^3.0.27",
     "@cloudscape-design/design-tokens": "^3.0.1",
     "@cloudscape-design/global-styles": "^1.0.1",
+    "@rushstack/eslint-config": "^2.5.1",
+    "@rushstack/heft": "^0.45.0",
+    "@rushstack/heft-jest-plugin": "^0.2.3",
+    "@rushstack/heft-node-rig": "^1.7.1",
+    "@types/heft-jest": "1.0.2",
     "eslint": "^8.7.0",
     "eslint-plugin-import": "^2.26.0",
-    "@rushstack/eslint-config": "^2.5.1"
+    "npm-package-json-lint": "^6.3.0",
+    "npm-package-json-lint-config-default": "^5.0.0",
+    "sort-package-json": "^1.57.0"
   }
 }

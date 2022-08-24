@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable security/detect-object-injection */
+/* eslint-disable security/detect-unsafe-regex */
 /*
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
@@ -14,7 +17,7 @@ export const emailRegex: RegExp = new RegExp(
 );
 
 export const convertToRecord = (queryObject: any): Record<string, string> => {
-  let result: Record<string, string> = {};
+  const result: Record<string, string> = {};
   if (!queryObject) return result;
   Object.entries(queryObject).forEach(([key, value]) => {
     if (value) result[key] = value as string;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
@@ -13,7 +14,7 @@ import {
 } from '../models/Environment';
 import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
 
-const useEnvironments = (params?: EnvironmentsQueryParams) => {
+const useEnvironments = (params?: EnvironmentsQueryParams): any => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();
   queryString = queryString ? `?${queryString}` : '';
   const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);

@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { nameRegex } from '@aws/workbench-core-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -22,7 +23,6 @@ import {
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { nameRegex } from '@aws/workbench-core-common-ui';
 import { useDatasets } from '../../api/datasets';
 import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
