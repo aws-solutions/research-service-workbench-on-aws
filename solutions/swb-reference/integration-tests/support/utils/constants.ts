@@ -15,4 +15,4 @@ export const DEFAULT_POLLING_INTERVAL_SECONDS: number = 15;
 
 export const DEFAULT_POLLING_MAX_WAITING_SECONDS: number = 600;
 
-export const AVOID_THROTTLE_WAITING_MILISECONDS: number = 2000;
+export const DEFLAKE_DELAY_IN_MILLISECONDS: number = 2000;
