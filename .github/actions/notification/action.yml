@@ -16,4 +16,4 @@ runs:
     - name: Slack Notification
       shell: bash
       run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":" -> \n[ \n\tSTATUS: \"${{ job.status }}\" \n\tWORKFLOW_NAME: \"${{ github.workflow }}\" \n\tJOB: \"${{ github.job }}\" \n\tJOB_URL: \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\" \n] "}' ${{ inputs.slack_webhook_url }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"\n[ \n\tSTATUS: \"${{ job.status }}\" \n\tWORKFLOW_NAME: \"${{ github.workflow }}\" \n\tJOB: \"${{ github.job }}\" \n\tJOB_URL: \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\" \n] "}' ${{ inputs.slack_webhook_url }}
