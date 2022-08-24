@@ -40,7 +40,7 @@ const defaultCookieOpts = {
 
 const csrfToken = 'csrfToken';
 
-describe('authenticationMiddleware integration tests', () => {
+describe('authenticationMiddleware tests', () => {
   let authenticationService: AuthenticationService;
   let loggingService: LoggingService;
   let res: Response;
