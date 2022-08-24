@@ -1,0 +1,30 @@
+name: test_workflow
+on:
+  workflow_call:
+    secrets:
+      slack_webhook_url:
+        required: true
+
+jobs:
+  # deploy only when files specific to swb package changed
+  test-fail-demo:
+    runs-on: ubuntu-20.04
+    environment: dev
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Error out
+        run: exit 1
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.slack_webhook_url }}
+
+      

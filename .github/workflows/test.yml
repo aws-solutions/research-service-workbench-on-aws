@@ -1,0 +1,11 @@
+name: "Test"
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+
+jobs:
+  test-fail-demo:
+    uses: awslabs/solution-spark-on-aws/.github/workflows/test_worflow_call.yml
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
