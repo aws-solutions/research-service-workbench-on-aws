@@ -5,14 +5,17 @@
 
 jest.mock('./authenticationService');
 jest.mock('./plugins/cognitoAuthenticationPlugin');
+jest.mock('csurf');
 
 import { LoggingService } from '@aws/workbench-core-logging';
+import csrf from 'csurf';
 import { NextFunction, Request, Response } from 'express';
 import { tokens } from './__mocks__/authenticationService';
 import {
   AuthenticationService,
   CognitoAuthenticationPlugin,
   CognitoAuthenticationPluginOptions,
+  csurf,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
   IdpUnavailableError,
@@ -35,7 +38,9 @@ const defaultCookieOpts = {
   sameSite: 'strict'
 } as const;
 
-describe('authenticationMiddleware integration tests', () => {
+const csrfToken = 'csrfToken';
+
+describe('authenticationMiddleware tests', () => {
   let authenticationService: AuthenticationService;
   let loggingService: LoggingService;
   let res: Response;
@@ -56,6 +61,38 @@ describe('authenticationMiddleware integration tests', () => {
       json: jest.fn((body) => res),
       locals: {}
     } as unknown as Response;
+  });
+
+  describe('csurf tests', () => {
+    it('should return an instance of the csrf middleware configured to use default cookie options when sameSite parameter is undefined', () => {
+      csurf();
+
+      expect(csrf).toHaveBeenCalledWith({ cookie: defaultCookieOpts });
+    });
+
+    it('should return an instance of the csrf middleware configured to use sameSite: "strict" when sameSite parameter is "strict"', () => {
+      const sameSite = 'strict';
+
+      csurf(sameSite);
+
+      expect(csrf).toHaveBeenCalledWith({ cookie: { ...defaultCookieOpts, sameSite } });
+    });
+
+    it('should return an instance of the csrf middleware configured to use sameSite: "lax" when sameSite parameter is "lax"', () => {
+      const sameSite = 'lax';
+
+      csurf(sameSite);
+
+      expect(csrf).toHaveBeenCalledWith({ cookie: { ...defaultCookieOpts, sameSite } });
+    });
+
+    it('should return an instance of the csrf middleware configured to use sameSite: "none" when sameSite parameter is "none"', () => {
+      const sameSite = 'none';
+
+      csurf(sameSite);
+
+      expect(csrf).toHaveBeenCalledWith({ cookie: { ...defaultCookieOpts, sameSite } });
+    });
   });
 
   describe('getTokensFromAuthorizationCode tests', () => {
@@ -311,7 +348,7 @@ describe('authenticationMiddleware integration tests', () => {
       getAuthorizationCodeUrlRouteHandler = getAuthorizationCodeUrl(authenticationService);
     });
 
-    it('should return 200 and the authorization code url when the stateVerifier and codeChallenge params are valid', async () => {
+    it('should return 200 and the authorization code url and csrf token in the response body when the stateVerifier and codeChallenge params are valid', async () => {
       const stateVerifier = 'stateVerifier';
       const codeChallenge = 'codeChallenge';
 
@@ -322,14 +359,16 @@ describe('authenticationMiddleware integration tests', () => {
         },
         headers: {
           origin: 'https://www.fakewebsite.com'
-        }
+        },
+        csrfToken: jest.fn(() => csrfToken)
       } as unknown as Request;
 
       await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
-        redirectUrl: `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+        signInUrl: `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`,
+        csrfToken
       });
     });
 
@@ -407,6 +446,54 @@ describe('authenticationMiddleware integration tests', () => {
       await getAuthorizationCodeUrlRouteHandler(req, res);
 
       expect(res.sendStatus).toHaveBeenCalledWith(400);
+    });
+
+    it('should return 200 and the authorization code url and csrfToken in the response body when the csrf parameter is true', async () => {
+      getAuthorizationCodeUrlRouteHandler = getAuthorizationCodeUrl(authenticationService, { csrf: true });
+      const stateVerifier = 'stateVerifier';
+      const codeChallenge = 'codeChallenge';
+
+      const req: Request = {
+        query: {
+          stateVerifier,
+          codeChallenge
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
+
+      await getAuthorizationCodeUrlRouteHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        signInUrl: `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`,
+        csrfToken
+      });
+    });
+
+    it('should return 200 and the authorization code url when the csrf parameter is false', async () => {
+      getAuthorizationCodeUrlRouteHandler = getAuthorizationCodeUrl(authenticationService, { csrf: false });
+      const stateVerifier = 'stateVerifier';
+      const codeChallenge = 'codeChallenge';
+
+      const req: Request = {
+        query: {
+          stateVerifier,
+          codeChallenge
+        },
+        headers: {
+          origin: 'https://www.fakewebsite.com'
+        }
+      } as unknown as Request;
+
+      await getAuthorizationCodeUrlRouteHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        signInUrl: `https://www.fakeurl.com/authorize?client_id=fake-id&response_type=code&scope=openid&redirect_uri=https://www.fakewebsite.com&state=${stateVerifier}&code_challenge_method=S256&code_challenge=${codeChallenge}`
+      });
     });
   });
 
@@ -852,17 +939,18 @@ describe('authenticationMiddleware integration tests', () => {
       isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService);
     });
 
-    it('should return 200 and set loggedIn to true in the response body when the access_token cookie is present and valid', async () => {
+    it('should return 200 and set the csrfToken and loggedIn to true in the response body when the access_token cookie is present and valid', async () => {
       const req: Request = {
         cookies: {
           access_token: 'validToken'
-        }
-      } as Request;
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
 
       await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ loggedIn: true });
+      expect(res.json).toHaveBeenCalledWith({ loggedIn: true, csrfToken });
     });
 
     it('should return 200 and set loggedIn to false in the response body when the access_token cookie is present and invalid', async () => {
@@ -878,17 +966,18 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.json).toHaveBeenCalledWith({ loggedIn: false });
     });
 
-    it('should return 200, set the access token as a cookie, set the id token in the response body, and set loggedIn to true in the response body when the access_token cookie is missing and the refresh_token cookie is present and valid', async () => {
+    it('should return 200, set the access token as a cookie, and set the id token, csrf token, and set loggedIn to true in the response body when the access_token cookie is missing and the refresh_token cookie is present and valid', async () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
-        }
-      } as Request;
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
 
       await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true, csrfToken });
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...defaultCookieOpts,
         maxAge: tokens.accessToken.expiresIn
@@ -899,8 +988,9 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
-        }
-      } as Request;
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
 
       jest.spyOn(authenticationService, 'refreshAccessToken').mockResolvedValueOnce({
         idToken: {
@@ -914,7 +1004,7 @@ describe('authenticationMiddleware integration tests', () => {
       await isUserLoggedInRouteHandler(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true, csrfToken });
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...defaultCookieOpts
       });
@@ -994,6 +1084,45 @@ describe('authenticationMiddleware integration tests', () => {
       const req: Request = {
         cookies: {
           refresh_token: 'validToken'
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
+
+      await isUserLoggedInRouteHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true, csrfToken });
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        sameSite: 'none',
+        maxAge: tokens.accessToken.expiresIn
+      });
+    });
+
+    it('should return 200, set the access token as a cookie, and set the id token, csrf token, and set loggedIn to true in the response body when the csrf parameter is true', async () => {
+      isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService, { csrf: true });
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
+        },
+        csrfToken: jest.fn(() => csrfToken)
+      } as unknown as Request;
+
+      await isUserLoggedInRouteHandler(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true, csrfToken });
+      expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
+        ...defaultCookieOpts,
+        maxAge: tokens.accessToken.expiresIn
+      });
+    });
+
+    it('should return 200, set the access token as a cookie, and set the id token and set loggedIn to true in the response body when the csrf parameter is false', async () => {
+      isUserLoggedInRouteHandler = isUserLoggedIn(authenticationService, { csrf: false });
+      const req: Request = {
+        cookies: {
+          refresh_token: 'validToken'
         }
       } as Request;
 
@@ -1003,7 +1132,6 @@ describe('authenticationMiddleware integration tests', () => {
       expect(res.json).toHaveBeenCalledWith({ idToken: tokens.idToken.token, loggedIn: true });
       expect(res.cookie).toHaveBeenCalledWith('access_token', tokens.accessToken.token, {
         ...defaultCookieOpts,
-        sameSite: 'none',
         maxAge: tokens.accessToken.expiresIn
       });
     });

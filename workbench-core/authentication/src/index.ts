@@ -34,6 +34,7 @@ export { DecodedJWT } from './decodedJWT';
 export { Tokens } from './tokens';
 export { getTimeInMS, TimeUnits } from './utils';
 export {
+  csurf,
   getAuthorizationCodeUrl,
   getTokensFromAuthorizationCode,
   isUserLoggedIn,

@@ -13,6 +13,7 @@ The provided middleware and route handlers assume that the Express application i
   - [built in express](https://expressjs.com/en/4x/api.html) via `express.json()` for express versions >= 4.16.0
   - [body-parser](https://www.npmjs.com/package/body-parser) for express versions < 4.16.0
 - the `verifyToken` middleware is mounted at the app level with no path, as it should execute every time a request is received
+- the `csurf` middleware is mounted at the app level with no path, as it should execute every time a request is received
 - the `RoutesIgnored` object is imported from the [authorization package](../../authorization/)
 
 #### Example
@@ -22,8 +23,7 @@ const cognitoAuthenticationPluginOptions: CognitoAuthenticationPluginOptions = {
   cognitoDomain: '<Cognito Hosted UI Domain>',
   userPoolId: '<Cognito User Pool ID>',
   clientId: '<Cognito User Pool Client ID>',
-  clientSecret: '<Cognito User Pool Client Secret>',
-  websiteUrl: '<Website URL>'
+  clientSecret: '<Cognito User Pool Client Secret>'
 };
 
 // Create an AuthenticationService instance
@@ -62,6 +62,9 @@ app.use(express.json());
 // Add the verifyToken middleware to the app
 app.use(verifyToken(authenticationService, { ignoredRoutes, loggingService }));
 
+// Add the csurf middleware to the app
+app.use(csurf());
+
 // These routes are public (as defined in the ignoredRoutes object above) 
 app.get('/login', getAuthorizationCodeUrl(authenticationService));
 app.post('/token', getTokensFromAuthorizationCode(authenticationService, { loggingService }));
@@ -78,11 +81,34 @@ app.listen(3001);
 ```
 
 ## Functions
+- [csurf](#csurf)  
 - [getAuthorizationCodeUrl](#getauthorizationcodeurl)  
 - [getTokensFromAuthorizationCode](#gettokensfromauthorizationcode)  
 - [verifyToken](#verifytoken)  
 - [refreshAccessToken](#refreshaccesstoken)  
 - [logoutUser](#logoutuser)
+
+### csurf
+This middleware is used to add csrf protection to an Express app.
+It uses Express's [csurf](http://expressjs.com/en/resources/middleware/csurf.html) library with the cookie implementation.
+
+#### Assumptions
+- the middleware is mounted using `app.use()`
+- the csrf token returned by the `getAuthorizationCodeUrl` or `isUserLoggedIn` route handler is included in all requests in one of the following colations:
+  - req.body._csrf
+  - req.query._csrf
+  - req.headers['csrf-token']
+  - req.headers['xsrf-token']
+  - req.headers['x-csrf-token']
+  - req.headers['x-xsrf-token']
+
+#### Parameters
+- sameSite: (optional) the csrf cookie's `sameSite` value. Defaults to `'strict'` if not included
+
+#### Example
+```ts
+app.use(csurf('strict'));
+```
 
 ### getAuthorizationCodeUrl
 This route handler is used to get the url to the authentication hosted UI.
