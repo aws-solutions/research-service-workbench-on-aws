@@ -6,6 +6,6 @@ on:
 
 jobs:
   test-fail-demo:
-    uses: awslabs/solution-spark-on-aws/.github/workflows/test_worflow_call.yml
+    uses: awslabs/solution-spark-on-aws/.github/workflows/test_worflow_call.yml@feature/slack-notification-fix
     secrets:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
