@@ -375,6 +375,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "license-check-and-add",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "license-checker",
       "allowedCategories": [ "production", "prototypes" ]
     },

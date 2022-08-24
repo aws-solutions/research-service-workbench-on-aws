@@ -13,8 +13,10 @@
     "url": "http://aws.amazon.com"
   },
   "scripts": {
+    "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "next build && rushx lint",
     "build:test": "rushx build && rushx test",
+    "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "dev": "next dev",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
@@ -65,7 +67,8 @@
     "eslint-plugin-testing-library": "5.0.1",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
-    "license-checker": "~25.0.1",
+    "license-check-and-add": "^4.0.5",
+    "license-checker": "^25.0.1",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sass": "^1.49.8",

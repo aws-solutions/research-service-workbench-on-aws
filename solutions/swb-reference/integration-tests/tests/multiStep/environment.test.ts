@@ -178,8 +178,9 @@ describe('multiStep environment test', () => {
     console.log('Environment A Completed');
 
     //Stop Environments A and B
-    console.log('Stopping Environments A and B');
+    console.log(`Stopping Environments A: ${environmentA.id}`);
     await adminSession.resources.environments.environment(environmentA.id).stop();
+    console.log(`Stopping Environments B: ${environmentB.id}`);
     await adminSession.resources.environments.environment(environmentB.id).stop();
 
     //Wait for Environment A to stop
