@@ -113,7 +113,7 @@ Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermission
 
 ## Troubleshooting Guides
 
-Workflows to troubleshoot [workspace lifecycle events](docs/troubleshooting-lifecycle-events.md).
+[Workspace Lifecycle Troubleshooting Guide](docs/WorkspaceLifecycleTroubleshootingGuide.md).
 
 ## Appendix
 ### Cloudwatch Logs
