@@ -1,4 +1,5 @@
-# Troubleshooting workspace lifecycle events
+# Workspace Lifecycle Troubleshooting Guide
+
 
 ## Launching/Terminating a Workspace
 
