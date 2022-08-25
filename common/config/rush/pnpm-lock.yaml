@@ -218,6 +218,7 @@ importers:
       axios: ^0.27.1
       cdk-ssm-document: ^3.1.1
       constructs: ^10.0.0
+      csrf: ^3.1.0
       depcheck: ^1.4.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
@@ -255,6 +256,7 @@ importers:
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
+      csrf: 3.1.0
       express: 4.18.1
       js-yaml: 4.1.0
       lodash: 4.17.21
