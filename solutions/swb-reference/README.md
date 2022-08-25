@@ -111,6 +111,10 @@ Go to `solutions/swb-app` to update `staticRouteConfig.ts` and `staticPermission
 3. Run `STAGE=<STAGE> node generateCognitoTokens.js <userName> '<password>'` with the correct value for `<userName>` and `<password>`. It should be a user that has been created for your SWB deployment. Note, the quotes around `<password>` is necessary for the script to correctly parse passwords that have symbols in it. 
 4. In the console output, use the `accessToken`, `csrfCookie`, and `csrfToken` that are provided to make authenticated API requests.
 
+## Troubleshooting Guides
+
+[Workspace Lifecycle Troubleshooting Guide](docs/WorkspaceLifecycleTroubleshootingGuide.md).
+
 ## Appendix
 ### Cloudwatch Logs
 * `swb-<stage>-<awsRegionShortName>-apiLambda`: Logs for api lambda. This lambda gets executed when user makes a request to SWB APIs. 
