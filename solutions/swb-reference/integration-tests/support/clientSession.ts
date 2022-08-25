@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import Csrf from 'csrf';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
@@ -26,11 +27,16 @@ export default class ClientSession {
     const headers: {
       'Content-Type': string;
       Cookie?: string;
+      'csrf-token'?: string;
     } = { 'Content-Type': 'application/json' };
 
-    // For anonymous sessions, authorization header is not required
+    // For anonymous sessions, access token cookie is not required
     if (!this._isAnonymousSession) {
-      headers.Cookie = `access_token=${accessToken}`;
+      const csrf = new Csrf();
+      const secret = csrf.secretSync();
+      const token = csrf.create(secret);
+      headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
+      headers['csrf-token'] = token;
     }
 
     this._axiosInstance = axios.create({

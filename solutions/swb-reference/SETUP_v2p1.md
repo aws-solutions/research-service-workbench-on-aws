@@ -108,11 +108,11 @@ VpcSubnet
 
 ## Get access token
 
-To get the `access_token` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
+To get the `accessToken`, `csrfCookie`, and `csrfToken` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
 
 ## POSTMAN Setup
 In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have two variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second one `ACCESS_TOKEN` and the value should be the `accessToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
+Your environment should have four variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
 
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
