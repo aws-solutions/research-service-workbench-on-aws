@@ -4,6 +4,7 @@
  */
 
 import {
+  csurf,
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
@@ -51,6 +52,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
+  app.use(csurf('none'));
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,

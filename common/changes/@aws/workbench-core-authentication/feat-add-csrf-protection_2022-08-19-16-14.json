@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Added CSRF middleware, updated other middlware/route handlers to accept a csrf parameter",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
