@@ -27,11 +27,11 @@ const getEnvironmentVariables = (stage: string): any => {
   const _ = require('lodash');
   const apiStackOutputs: any = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(__dirname + `/src/config/${stage}.json`, 'utf8') // nosemgrep
+    fs.readFileSync(`${__dirname}/src/config/${stage}.json`, 'utf8') // nosemgrep
   );
   const yamlConfig: any = yaml.load(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(__dirname + `/end-to-end-tests/config/${stage}.yaml`, 'utf8') // nosemgrep
+    fs.readFileSync(`${__dirname}/end-to-end-tests/config/${stage}.yaml`, 'utf8') // nosemgrep
   );
   const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
   // eslint-disable-next-line security/detect-object-injection
