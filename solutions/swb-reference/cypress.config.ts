@@ -11,6 +11,7 @@ export default defineConfig({
     specPattern: 'end-to-end-tests/cypress/**/*.cy.{js,jsx,ts,tsx}',
     experimentalSessionAndOrigin: true,
     setupNodeEvents(on, config) {
+      //this function is called in a different scope making cypress and cy commands unable to work
       const environment = getEnvironmentVariables(config.env.STAGE);
       environment.AdminPassword = config.env.AdminPassword ?? environment.AdminPassword; //read password from yaml only when password is not set in env variables already
       config.env = { ...config.env, ...environment };
