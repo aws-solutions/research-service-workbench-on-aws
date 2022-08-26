@@ -50,7 +50,6 @@ Cypress.on(
 
 Cypress.Commands.add('login', (role: string) => {
   const login = getLoginInfo(role);
-  console.log(login);
 
   Cypress.config('baseUrl', Cypress.env(BASE_URL_PROPERTY));
   cy.visit('/');
