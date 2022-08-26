@@ -115,10 +115,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws/workbench-core-swb-common-ui",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws/workbench-core-datasets",
       "allowedCategories": [ "production" ]
     },
@@ -137,6 +133,10 @@
     {
       "name": "@aws/workbench-core-logging",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws/workbench-core-swb-common-ui",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@awsui/collection-hooks",
@@ -281,6 +281,10 @@
     {
       "name": "babel-jest",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "babel-loader",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "cdk-nag",
@@ -492,6 +496,10 @@
     },
     {
       "name": "web-vitals",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "webpack",
       "allowedCategories": [ "production" ]
     },
     {

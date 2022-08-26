@@ -54,6 +54,8 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "babel-loader": "^8.2.5",
+    "webpack": "^4.39.3",
     "@cloudscape-design/collection-hooks": "^1.0.3",
     "@cloudscape-design/components": "^3.0.27",
     "@cloudscape-design/design-tokens": "^3.0.1",

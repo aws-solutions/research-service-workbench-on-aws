@@ -4,7 +4,7 @@
  */
 
 import { Alert, AlertProps, Button } from '@cloudscape-design/components';
-import React from 'react';
+import * as React from 'react';
 
 export function TerminateWarning(
   item: string,

@@ -12,7 +12,7 @@
     "name": "Amazon Web Services",
     "url": "http://aws.amazon.com"
   },
-  "main": "lib/index.js",
+  "main": "lib/index.jsx",
   "typings": "lib/index.d.ts",
   "scripts": {
     "build": "heft build --clean && rushx pkg-json-lint",
@@ -24,6 +24,7 @@
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
+    "serve": "node .next/server/webpack-runtime.js",
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
   },
@@ -39,18 +40,13 @@
   },
   "dependencies": {
     "@babel/core": "^7.17.9",
-    "@babel/plugin-syntax-flow": "^7.14.5",
-    "@babel/plugin-transform-react-jsx": "^7.14.9",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@types/node": "^14",
-    "@types/react": "17.0.38",
-    "@types/react-dom": "^18.0.6",
     "date-fns": "^2.28.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-scripts": "5.0.1",
     "typescript": "^4.5.2",
     "axios": "^0.27.1",
     "express": "^4.17.3",

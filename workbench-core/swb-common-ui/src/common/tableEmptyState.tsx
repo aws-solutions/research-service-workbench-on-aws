@@ -4,6 +4,7 @@
  */
 
 import { Box, Button } from '@cloudscape-design/components';
+import * as React from 'react';
 
 /**
  * Displays the empty state of any table

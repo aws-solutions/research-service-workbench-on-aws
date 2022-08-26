@@ -4,6 +4,7 @@
  */
 
 import TopNavigation from '@cloudscape-design/components/top-navigation';
+import * as React from 'react';
 import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';

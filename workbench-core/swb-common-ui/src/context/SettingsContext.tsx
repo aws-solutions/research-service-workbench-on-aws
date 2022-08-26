@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Context, createContext, useContext, useState } from 'react';
+import * as React from 'react';
 import { AppSettings, defaultAppSettings } from '../models/AppSettings';
 
 export interface SettingsProps {
@@ -11,18 +11,18 @@ export interface SettingsProps {
   reload: () => void;
 }
 
-const SettingsContext: Context<SettingsProps> = createContext<SettingsProps>({
+const SettingsContext: React.Context<SettingsProps> = React.createContext<SettingsProps>({
   settings: defaultAppSettings,
   reload: () => {}
 });
 
 export function SettingsProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [settings] = useState<AppSettings>(defaultAppSettings);
+  const [settings] = React.useState<AppSettings>(defaultAppSettings);
   return (
     <SettingsContext.Provider value={{ settings, reload: () => {} }}>{children}</SettingsContext.Provider>
   );
 }
 
 export function useSettings(): SettingsProps {
-  return useContext(SettingsContext);
+  return React.useContext(SettingsContext);
 }

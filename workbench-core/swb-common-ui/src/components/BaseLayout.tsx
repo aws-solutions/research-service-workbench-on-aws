@@ -10,7 +10,7 @@ import AppLayout, { AppLayoutProps } from '@cloudscape-design/components/app-lay
 import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
 import Flashbar from '@cloudscape-design/components/flashbar';
 import Head from 'next/head';
-import React, { useState } from 'react';
+import * as React from 'react';
 import { layoutLabels } from '../common/labels';
 import Navigation from '../components/Navigation';
 import { useNotifications } from '../context/NotificationContext';
@@ -30,7 +30,7 @@ export default function BaseLayout({
   activeHref = '#/'
 }: LayoutProps): JSX.Element {
   // eslint-disable-next-line prefer-const
-  let [navigationOpen, setNavigationOpen] = useState(false);
+  let [navigationOpen, setNavigationOpen] = React.useState(false);
   const { notifications, displayNotification } = useNotifications();
   const id = 'BetaCodeWarning';
   displayNotification(id, {

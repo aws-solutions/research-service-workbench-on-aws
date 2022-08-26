@@ -46,6 +46,5 @@ export {
   AuthenticationProvider, useAuthentication, NotificationsProvider, useNotifications, SettingsProvider, useSettings,
 
   // From '/models' folder
-  defaultAppSettings, researcherUser, adminUser, CreateUserForm, CreateUserFormValidation, UserItem,
-
+  defaultAppSettings, researcherUser, adminUser, CreateUserForm, CreateUserFormValidation, UserItem
 };

@@ -4,6 +4,7 @@
  */
 
 import Button from '@cloudscape-design/components/button';
+import * as React from 'react';
 import { useAuthentication } from '../context/AuthenticationContext';
 
 export default function Login(): JSX.Element {

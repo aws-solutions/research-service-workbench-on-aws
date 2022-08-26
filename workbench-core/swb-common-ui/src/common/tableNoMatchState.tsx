@@ -4,6 +4,7 @@
  */
 
 import { Box } from '@cloudscape-design/components';
+import * as React from 'react';
 
 /**
  * Displays the no match state of any table

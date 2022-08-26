@@ -5,6 +5,7 @@
 
 import Box from '@cloudscape-design/components/box';
 import Grid from '@cloudscape-design/components/grid';
+import * as React from 'react';
 import { useSettings } from '../context/SettingsContext';
 import Login from './Login';
 

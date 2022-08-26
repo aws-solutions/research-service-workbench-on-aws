@@ -4,7 +4,7 @@
  */
 
 import { AppLayoutProps, BarChart, Box, Button, SplitPanelProps } from '@cloudscape-design/components';
-import { useEffect, useState } from 'react';
+import * as React from 'react';
 
 export const splitPaneli18nstrings: SplitPanelProps.I18nStrings = {
   preferencesTitle: 'Split panel preferences',
@@ -114,9 +114,9 @@ export const getPanelContent = (items: any, itemType: string): any => {
 };
 
 export const useSplitPanel = (selectedItems: any): AppLayoutProps => {
-  const [splitPanelSize, setSplitPanelSize] = useState(650);
-  const [splitPanelOpen, setSplitPanelOpen] = useState(false);
-  const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
+  const [splitPanelSize, setSplitPanelSize] = React.useState(650);
+  const [splitPanelOpen, setSplitPanelOpen] = React.useState(false);
+  const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = React.useState(false);
 
   const onSplitPanelResize = ({ detail: { size } }: any): void => {
     setSplitPanelSize(size);
@@ -130,7 +130,7 @@ export const useSplitPanel = (selectedItems: any): AppLayoutProps => {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedItems.length && !hasManuallyClosedOnce) {
       setSplitPanelOpen(true);
     }
