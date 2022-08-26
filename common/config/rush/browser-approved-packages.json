@@ -299,6 +299,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "csrf",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "csurf",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },

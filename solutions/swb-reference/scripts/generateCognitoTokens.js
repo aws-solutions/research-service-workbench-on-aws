@@ -12,6 +12,7 @@ const { join } = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const { CognitoTokenService } = require('@aws/workbench-core-base');
+const Csrf = require('csrf');
 
 const config = yaml.load(
   // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
@@ -39,6 +40,10 @@ const region = config.awsRegion;
 const username = process.argv[2];
 const password = process.argv[3];
 
+const csrf = new Csrf();
+const secret = csrf.secretSync();
+const token = csrf.create(secret);
+
 async function run() {
   try {
     const cognitoTokenService = new CognitoTokenService(region);
@@ -49,7 +54,11 @@ async function run() {
       undefined,
       password
     );
-    console.log(tokens);
+    console.log({
+      ...tokens,
+      csrfCookie: secret,
+      csrfToken: token
+    });
   } catch (e) {
     console.error('Unable to get cognito tokens', e);
   }
