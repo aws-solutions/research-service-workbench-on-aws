@@ -11,7 +11,12 @@ function Login(): JSX.Element {
   const { signIn } = useAuthentication();
 
   return (
-    <Button className={styles.primaryButton} variant="primary" onClick={async () => await signIn()}>
+    <Button
+      data-testid="login"
+      className={styles.primaryButton}
+      variant="primary"
+      onClick={async () => await signIn()}
+    >
       Login
     </Button>
   );

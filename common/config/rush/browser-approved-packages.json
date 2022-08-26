@@ -295,6 +295,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "cypress",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },

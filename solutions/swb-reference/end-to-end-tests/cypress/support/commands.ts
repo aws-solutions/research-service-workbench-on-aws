@@ -1,0 +1,87 @@
+/// <reference types="cypress" />
+
+// ***********************************************
+// This example commands.ts shows you how to
+// create various custom commands and overwrite
+// existing commands.
+//
+// For more comprehensive examples of custom
+// commands please read more here:
+// https://on.cypress.io/custom-commands
+// ***********************************************
+//
+//
+// -- This is a parent command --
+// Cypress.Commands.add('login', (email, password) => { ... })
+//
+//
+// -- This is a child command --
+// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
+//
+//
+// -- This is a dual command --
+// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
+//
+//
+// -- This will overwrite an existing command --
+// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+//
+// declare global {
+//   namespace Cypress {
+//     interface Chainable {
+//       login(email: string, password: string): Chainable<void>
+//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
+//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
+//     }
+//   }
+// }
+import {
+  ADMIN_PASSWORD_PROPERTY,
+  ADMIN_USER_PROPERTY,
+  BASE_URL_PROPERTY,
+  COGNITO_DOMAIN_NAME_PROPERTY
+} from './constants';
+
+Cypress.Commands.add('login', (role: string) => {
+  const login = getLoginInfo(role);
+  console.log(login);
+  cy.session(login.user, () => {
+    Cypress.config('baseUrl', Cypress.env(BASE_URL_PROPERTY));
+    cy.visit('/');
+    cy.get('#header button').contains('Researcher User');
+    cy.get('[data-testid="login"]').should('be.visible');
+    cy.get('[data-testid="login"]').click();
+    cy.origin(
+      Cypress.env(COGNITO_DOMAIN_NAME_PROPERTY),
+      { args: [login.user, login.password] },
+      ([user, password]) => {
+        cy.get('input[name=username]:visible', { timeout: 10000 }).type(user); //wait up to 10 seconds to have the username field displayed
+        cy.get('[name=password]:visible').type(password);
+        cy.get('[name=signInSubmitButton]:visible').click();
+      }
+    );
+
+    cy.wait(5000); //redirection for environments may take time to load
+    cy.url().should('include', '/environments');
+  });
+});
+
+Cypress.Commands.add('logout', (role: string) => {
+  cy.visit('/');
+  cy.get('#header button').click();
+  cy.get('[data-testid=signout]').click();
+  cy.location('pathname').should('eq', '/');
+  cy.wait(3000);
+  cy.get('#header button').contains('Researcher User');
+  cy.get('[data-testid="login"]').should('be.visible');
+});
+
+const getLoginInfo = (role: string): { user: string; password: string } => {
+  switch (role) {
+    case 'ITAdmin':
+      return { user: Cypress.env(ADMIN_USER_PROPERTY), password: Cypress.env(ADMIN_PASSWORD_PROPERTY) };
+    default:
+      return { user: '', password: '' };
+  }
+};
