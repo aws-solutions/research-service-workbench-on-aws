@@ -1,0 +1,1 @@
+This folder is intentionally kept empty for compiling as a React UI package

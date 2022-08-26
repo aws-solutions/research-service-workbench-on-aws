@@ -34,7 +34,7 @@
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "dependencies": {
-    "@aws/workbench-core-common-ui": "workspace:*",
+    "@aws/workbench-core-swb-common-ui": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
     "axios": "^0.27.1",
     "express": "^4.17.3",

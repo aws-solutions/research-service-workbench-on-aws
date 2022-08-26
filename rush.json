@@ -48,10 +48,10 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-common-ui",
-      "projectFolder": "workbench-core/common-ui",
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "projectFolder": "workbench-core/swb-common-ui",
       "reviewCategory": "production",
-      "shouldPublish": true
+      "shouldPublish": false
     },
     {
       "packageName": "@aws/workbench-core-logging",

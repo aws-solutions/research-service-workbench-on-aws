@@ -4,7 +4,6 @@
  */
 
 import SideNavigation, { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
-import React from 'react';
 import { useAuthentication } from '../context/AuthenticationContext';
 import RouteGuard from './RouteGuard';
 

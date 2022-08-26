@@ -12,8 +12,10 @@ import {
   TableEmptyDisplay,
   TableNoMatchDisplay,
   i18nStrings,
-  paginationLables
-} from '@aws/workbench-core-common-ui';
+  paginationLables,
+  useNotifications,
+  BaseLayout
+} from '@aws/workbench-core-swb-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
@@ -36,9 +38,7 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { SetStateAction, useEffect, useState } from 'react';
 import { useEnvironments, terminate, start, stop, connect } from '../../api/environments';
-import BaseLayout from '../../components/BaseLayout';
 import EnvironmentConnectModal from '../../components/EnvironmentConnectModal';
-import { useNotifications } from '../../context/NotificationContext';
 import {
   columnDefinitions,
   searchableColumns

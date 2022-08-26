@@ -12,7 +12,7 @@ interface Props {
  * @param children - Elements to be displayed if user is authenticated.
  * @returns children Elements
  */
-function RouteGuard({ children }: Props): JSX.Element {
+export default function RouteGuard({ children }: Props): JSX.Element {
   // TODO: Once accessToken cookie is properly set, change to check isLoggedIn to drive redirect
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('idToken');
@@ -23,5 +23,3 @@ function RouteGuard({ children }: Props): JSX.Element {
 
   return children;
 }
-
-export default RouteGuard;

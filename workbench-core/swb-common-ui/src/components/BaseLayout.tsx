@@ -3,13 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { layoutLabels } from '@aws/workbench-core-common-ui';
+import '@cloudscape-design/global-styles/index.css';
+import '../styles/globals.scss';
 import { BreadcrumbGroupProps } from '@cloudscape-design/components';
 import AppLayout, { AppLayoutProps } from '@cloudscape-design/components/app-layout';
 import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
 import Flashbar from '@cloudscape-design/components/flashbar';
 import Head from 'next/head';
 import React, { useState } from 'react';
+import { layoutLabels } from '../common/labels';
 import Navigation from '../components/Navigation';
 import { useNotifications } from '../context/NotificationContext';
 import { useSettings } from '../context/SettingsContext';
@@ -21,7 +23,7 @@ export interface LayoutProps {
   activeHref?: string;
 }
 
-export default function Layout({
+export default function BaseLayout({
   navigationHide,
   children,
   breadcrumbs,

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { nameRegex } from '@aws/workbench-core-common-ui';
+import { nameRegex, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -28,7 +28,6 @@ import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
-import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';

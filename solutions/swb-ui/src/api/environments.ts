@@ -4,7 +4,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { convertToRecord } from '@aws/workbench-core-common-ui';
+import { convertToRecord, httpApiGet, httpApiPut, httpApiPost } from '@aws/workbench-core-swb-common-ui';
 import useSWR from 'swr';
 import {
   EnvironmentItem,
@@ -12,7 +12,6 @@ import {
   CreateEnvironmentForm,
   EnvironmentsQueryParams
 } from '../models/Environment';
-import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
 
 const useEnvironments = (params?: EnvironmentsQueryParams): any => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();

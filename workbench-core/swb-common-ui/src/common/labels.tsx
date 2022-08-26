@@ -63,7 +63,7 @@ export const headerLabels = {
   signout: 'Sign out'
 };
 
-export const Navigation = {
+export const NavigationLabels = {
   Administration: 'Administration',
   CreateDashboard: 'Create new dashboard',
   Dashboards: 'Dashboards',

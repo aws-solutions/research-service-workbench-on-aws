@@ -8,7 +8,7 @@ import Grid from '@cloudscape-design/components/grid';
 import { useSettings } from '../context/SettingsContext';
 import Login from './Login';
 
-function Hero(): JSX.Element {
+export default function Hero(): JSX.Element {
   const { settings } = useSettings();
 
   return (
@@ -42,5 +42,3 @@ function Hero(): JSX.Element {
     </div>
   );
 }
-
-export default Hero;

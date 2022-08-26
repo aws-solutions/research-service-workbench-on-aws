@@ -115,7 +115,7 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@aws/workbench-core-common-ui",
+      "name": "@aws/workbench-core-swb-common-ui",
       "allowedCategories": [ "production" ]
     },
     {

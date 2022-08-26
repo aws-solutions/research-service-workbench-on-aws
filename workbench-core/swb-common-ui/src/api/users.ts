@@ -16,6 +16,7 @@ const createUser = async (createUserForm: CreateUserForm): Promise<void> => {
   await httpApiPost(`users`, { ...createUserForm });
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const useUsers = () => {
   const { data, mutate } = useSWR('users', httpApiGet, {});
 

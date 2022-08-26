@@ -3,12 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { headerLabels } from '@aws/workbench-core-common-ui';
 import TopNavigation from '@cloudscape-design/components/top-navigation';
+import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
 import { researcherUser } from '../models/User';
-import styles from '../styles/Header.module.scss';
 
 export default function Header(): JSX.Element {
   const { settings } = useSettings();
@@ -23,7 +22,7 @@ export default function Header(): JSX.Element {
   return (
     <TopNavigation
       id="header"
-      className={styles.header}
+      className="header"
       i18nStrings={headerLabels}
       identity={{
         href: '/',

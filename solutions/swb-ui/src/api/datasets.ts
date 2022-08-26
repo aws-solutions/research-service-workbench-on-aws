@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { httpApiGet } from '@aws/workbench-core-swb-common-ui';
 import useSWR from 'swr';
 import { DatasetItem } from '../models/Dataset';
-import { httpApiGet } from './apiHelper';
 
 const useDatasets = () => {
   const { data, isValidating } = useSWR(() => 'datasets', httpApiGet);

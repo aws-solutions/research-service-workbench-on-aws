@@ -1,0 +1,5 @@
+@use '~@cloudscape-design/design-tokens/index.scss' as cloudscape-design;
+
+body {
+  background: cloudscape-design.$color-background-layout-main;
+}
