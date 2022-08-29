@@ -36,22 +36,15 @@
 //     }
 //   }
 // }
-import {
-  ADMIN_PASSWORD_PROPERTY,
-  ADMIN_USER_PROPERTY,
-  BASE_URL_PROPERTY,
-  COGNITO_DOMAIN_NAME_PROPERTY
-} from './constants';
+import { ADMIN_PASSWORD_PROPERTY, ADMIN_USER_PROPERTY, COGNITO_DOMAIN_NAME_PROPERTY } from './constants';
 
 Cypress.on(
   'uncaught:exception',
-  (err) => !err.message.includes('ResizeObserver loop completed with undelivered notifications') //known issue with cypress
+  (err) => !err.message.includes('ResizeObserver loop completed with undelivered notifications') //known issue with cypress https://github.com/quasarframework/quasar/issues/2233
 );
 
 Cypress.Commands.add('login', (role: string) => {
   const login = getLoginInfo(role);
-
-  Cypress.config('baseUrl', Cypress.env(BASE_URL_PROPERTY));
   cy.visit('/');
   cy.get('#header button').contains('Researcher User');
   cy.get('[data-testid="login"]').should('be.visible');
@@ -61,23 +54,23 @@ Cypress.Commands.add('login', (role: string) => {
     { args: [login.user, login.password] },
     ([user, password]) => {
       cy.get('input[name=username]:visible', { timeout: 10000 }).type(user); //wait up to 10 seconds to have the username field displayed
-      cy.get('[name=password]:visible').type(password);
+      cy.get('input[name=password]:visible').type(password);
       cy.get('[name=signInSubmitButton]:visible').click();
     }
   );
 
-  cy.wait(5000); //redirection for environments may take time to load
+  cy.get('[data-testid="environmentListHeader"]', { timeout: 10000 })
+    .contains('Workspaces')
+    .should('be.visible'); //redirection for environments may take time to load
   cy.location('pathname').should('eq', '/environments');
 });
 
 Cypress.Commands.add('logout', (role: string) => {
-  cy.visit('/');
   cy.get('#header button').click();
   cy.get('[data-testid=signout]').click();
   cy.location('pathname').should('eq', '/');
-  cy.wait(3000);
-  cy.get('#header button').contains('Researcher User');
   cy.get('[data-testid="login"]').should('be.visible');
+  cy.get('#header button').contains('Researcher User').should('be.visible');
 });
 
 const getLoginInfo = (role: string): { user: string; password: string } => {

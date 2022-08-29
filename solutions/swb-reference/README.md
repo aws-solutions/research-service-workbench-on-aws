@@ -138,6 +138,8 @@ Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy t
 #### Prerequisite:
 
 Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
+
+
 1. Go to `swb-reference` directory
 2. Run command `STAGE=<STAGE> rushx e2e-test:open`, a new Cypress window will be displayed
 4. Select E2E Testing in Cypress Window
@@ -145,7 +147,7 @@ Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy t
 6. Click Start E2E Testing Button, this will open a page with all test cases.
 7. Click the link with the test case name to run inside the grid, this will trigger the test case and display a list with all the steps the test case followed
 
-Cypress will normally give a description for erros that happen during the test, for more details open the browser console. 
+Cypress will normally give a description for errors that happen during the test, for more details open the browser console. 
 
 
 ### Writing End To End Tests
@@ -159,7 +161,7 @@ Example of code with login
 
 ```ts
 describe('Page routing', () => {
-  it('Should navigate to /environemtns after login as IT Admin', async () => {
+  it('Should navigate to /environments after login as IT Admin', async () => {
     cy.login('ITAdmin');
     cy.location('pathname').should('eq', '/environments');
   });
