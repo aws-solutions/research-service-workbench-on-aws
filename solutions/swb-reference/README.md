@@ -119,7 +119,7 @@ End to end testing is implemented in Service Workbench by using Cypress framewor
 
 ### Cypress Configuration
 
-In order for end to end tests to run Cypress needs environment variables such as website URL or user and password to login.
+In order for end to end tests to run, Cypress needs environment variables such as website URL or user and password to login.
 All environment variables for end to end testing are retrieved from `swb-reference/end-to-end-tests/config/<STAGE>.yaml` and `swb-reference/src/config/<STAGE>.json`(generated after deploying API) files and set inside `swb-reference/cypress.config.ts`.
 
 
@@ -175,7 +175,7 @@ describe('Redirects IT Admin', () => {
   beforeEach(()=> {
     cy.login('ITAdmin');
   });
-  it('Should navigate to /environemtns after login', async () => {
+  it('Should navigate to /environments after login', async () => {
     cy.location('pathname').should('eq', '/environments');
   });
 
