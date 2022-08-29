@@ -163,6 +163,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/plugin-syntax-dynamic-import",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@babel/plugin-syntax-flow",
       "allowedCategories": [ "production" ]
     },
@@ -175,12 +179,20 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/preset-next",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@babel/preset-react",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@babel/preset-typescript",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@babel/runtime",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@casl/ability",
@@ -284,6 +296,10 @@
     },
     {
       "name": "babel-loader",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "babel-preset-next",
       "allowedCategories": [ "production" ]
     },
     {
