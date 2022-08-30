@@ -295,6 +295,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "cypress",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "csrf",
       "allowedCategories": [ "production" ]
     },
