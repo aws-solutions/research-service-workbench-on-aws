@@ -108,6 +108,7 @@ export function convertToAbsoluteRange(range: any): { start: Date | undefined; e
         case 'year':
           return addYears(now, -range.amount);
       }
+      return new Date();
     })();
     return {
       start: start,

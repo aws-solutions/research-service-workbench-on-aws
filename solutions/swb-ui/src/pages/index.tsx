@@ -9,7 +9,7 @@ import Box from '@cloudscape-design/components/box';
 import type { NextPage } from 'next';
 
 // Login Page
-export const Home: NextPage = () => {
+const Home: NextPage = () => {
   const breadcrumbs: BreadcrumbGroupProps.Item[] = [
     {
       text: 'Service Workbench',
@@ -29,3 +29,5 @@ export const Home: NextPage = () => {
     </BaseLayout>
   );
 };
+
+export default Home;

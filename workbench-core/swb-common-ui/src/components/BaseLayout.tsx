@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import '@cloudscape-design/global-styles/index.css';
-import '../styles/globals.scss';
+// import '@cloudscape-design/global-styles/index.css';
+// import '../styles/globals.scss';
 import { BreadcrumbGroupProps } from '@cloudscape-design/components';
 import AppLayout, { AppLayoutProps } from '@cloudscape-design/components/app-layout';
 import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
