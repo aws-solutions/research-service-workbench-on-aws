@@ -28,8 +28,8 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only && rushx make-badges",
-    "test:only": "heft test --clean --no-build"
+    "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
+    "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -71,6 +71,7 @@
     "@types/node": "^14",
     "@types/react": "17.0.38",
     "@types/uuid": "^8.3.4",
+    "jest": "^27.5.1",
     "@types/jest": "^27.4.1",
     "babel-jest": "27.5.1",
     "eslint": "^8.7.0",
