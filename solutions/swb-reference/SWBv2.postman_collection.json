@@ -16,7 +16,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -44,7 +49,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -75,7 +85,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -103,7 +118,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -136,7 +156,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -162,7 +187,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -190,7 +220,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -216,7 +251,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -242,7 +282,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -268,7 +313,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -344,7 +394,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -375,7 +430,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -403,7 +463,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -437,7 +502,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -456,7 +526,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -487,7 +562,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -522,7 +602,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -562,7 +647,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -593,7 +683,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -636,7 +731,12 @@
             "header": [
               {
                 "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}}",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -657,7 +757,12 @@
         "header": [
           {
             "key": "Cookie",
-            "value": "access_token={{ACCESS_TOKEN}}",
+            "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+            "type": "text"
+          },
+          {
+            "key": "csrf-token",
+            "value": "{{CSRF_TOKEN}}",
             "type": "text"
           }
         ],
