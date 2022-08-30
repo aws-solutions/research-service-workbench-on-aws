@@ -1211,7 +1211,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       express: ^4.17.3
       jwt-decode: ^3.1.2
-      license-checker: ^25.0.1
+      license-check-and-add: ^4.0.5
       next: ^12.1.5
       next-global-css: ^1.2.0
       next-transpile-modules: ^9.0.0
@@ -1257,7 +1257,7 @@ importers:
       eslint: 8.16.0
       eslint-config-next: 12.1.5_5794735a2262de3d29e0baaa885b5942
       eslint-plugin-import: 2.26.0_eslint@8.16.0
-      license-checker: 25.0.1
+      license-check-and-add: 4.0.5
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sass: 1.52.2
