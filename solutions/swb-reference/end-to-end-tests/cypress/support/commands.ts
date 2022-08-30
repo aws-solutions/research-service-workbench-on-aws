@@ -46,7 +46,7 @@ Cypress.on(
 Cypress.Commands.add('login', (role: string) => {
   const login = getLoginInfo(role);
   cy.visit('/');
-  cy.get('#header button').contains('Researcher User');
+  cy.get('#header [data-utility-index=0]').contains('Researcher User').should('be.visible');
   cy.get('[data-testid="login"]').should('be.visible');
   cy.get('[data-testid="login"]').click();
   cy.origin(
@@ -70,7 +70,7 @@ Cypress.Commands.add('logout', (role: string) => {
   cy.get('[data-testid=signout]').click();
   cy.location('pathname').should('eq', '/');
   cy.get('[data-testid="login"]').should('be.visible');
-  cy.get('#header button').contains('Researcher User').should('be.visible');
+  cy.get('#header [data-utility-index=0]').contains('Researcher User').should('be.visible');
 });
 
 const getLoginInfo = (role: string): { user: string; password: string } => {
