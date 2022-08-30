@@ -349,6 +349,7 @@ const Environment: NextPage = () => {
           header={
             <>
               <Header
+                data-testid="environmentListHeader"
                 actions={
                   <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">

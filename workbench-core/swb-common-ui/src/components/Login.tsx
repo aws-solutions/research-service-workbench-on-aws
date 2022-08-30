@@ -13,7 +13,12 @@ export default function Login(): JSX.Element {
   const { signIn } = useAuthentication();
 
   return (
-    <Button className="primaryButton" variant="primary" onClick={async () => await signIn()}>
+    <Button
+      data-testid="login"
+      className="primaryButton"
+      variant="primary"
+      onClick={async () => await signIn()}
+    >
       Login
     </Button>
   );
