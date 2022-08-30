@@ -1,10 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// import '@cloudscape-design/global-styles/index.css';
-// import '../styles/globals.scss';
 import { BreadcrumbGroupProps } from '@cloudscape-design/components';
 import AppLayout, { AppLayoutProps } from '@cloudscape-design/components/app-layout';
 import BreadcrumbGroup from '@cloudscape-design/components/breadcrumb-group';
@@ -23,6 +22,7 @@ export interface LayoutProps {
   activeHref?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function BaseLayout({
   navigationHide,
   children,

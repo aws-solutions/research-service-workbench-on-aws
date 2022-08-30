@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
@@ -10,6 +11,7 @@ import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
 import { researcherUser } from '../models/User';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function Header(): JSX.Element {
   const { settings } = useSettings();
   // eslint-disable-next-line prefer-const
