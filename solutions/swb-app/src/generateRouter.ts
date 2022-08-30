@@ -4,13 +4,14 @@
  */
 
 import {
+  csurf,
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
   CognitoAuthenticationPlugin,
   UserManagementService,
   CognitoUserManagementPlugin
-} from '@amzn/workbench-core-authentication';
+} from '@aws/workbench-core-authentication';
 import {
   withAuth,
   AuthorizationService,
@@ -19,12 +20,11 @@ import {
   RoutesIgnored,
   RoutesMap,
   StaticPermissionsPlugin
-} from '@amzn/workbench-core-authorization';
-import { LoggingService } from '@amzn/workbench-core-logging';
+} from '@aws/workbench-core-authorization';
+import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express = require('express');
-import { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
@@ -46,20 +46,19 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(
     cors({
       origin: apiRouteConfig.allowedOrigins,
-      allowedHeaders: ['Set-Cookie', 'Content-Type'],
       credentials: true
     })
   );
   // parse application/json
   app.use(express.json());
   app.use(cookieParser());
+  app.use(csurf('none'));
 
   const cognitoPluginOptions: CognitoAuthenticationPluginOptions = {
     cognitoDomain: process.env.COGNITO_DOMAIN!,
     userPoolId: process.env.USER_POOL_ID!,
     clientId: process.env.CLIENT_ID!,
-    clientSecret: process.env.CLIENT_SECRET!,
-    websiteUrl: process.env.WEBSITE_URL!
+    clientSecret: process.env.CLIENT_SECRET!
   };
 
   const authenticationService = new AuthenticationService(

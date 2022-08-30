@@ -7,7 +7,7 @@ import {
   CreateEnvironmentTypeConfigSchema,
   EnvironmentTypeConfigService,
   UpdateEnvironmentTypeConfigSchema
-} from '@amzn/workbench-core-environments';
+} from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';

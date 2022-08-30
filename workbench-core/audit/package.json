@@ -1,11 +1,11 @@
 {
-  "name": "@amzn/workbench-core-audit",
-  "version": "0.0.1",
+  "name": "@aws/workbench-core-audit",
+  "version": "0.1.1",
   "description": "Package containing an audit service with reference implementation",
-  "homepage": "https://github.com/awslabs/monorepo-for-service-workbench",
+  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/monorepo-for-service-workbench.git"
+    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -15,9 +15,12 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
+    "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
+    "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
+    "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
@@ -26,11 +29,11 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@amzn/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-authorization": "workspace:*",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@amzn/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^2.5.1",
     "@rushstack/heft": "^0.45.0",
     "@rushstack/heft-jest-plugin": "^0.2.3",
@@ -43,6 +46,8 @@
     "eslint": "^8.7.0",
     "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
+    "license-check-and-add": "^4.0.5",
+    "license-checker": "^25.0.1",
     "npm-package-json-lint": "^6.3.0",
     "npm-package-json-lint-config-default": "^5.0.0",
     "sort-package-json": "^1.57.0",

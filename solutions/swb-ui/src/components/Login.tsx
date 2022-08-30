@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Button from '@awsui/components-react/button';
+import Button from '@cloudscape-design/components/button';
 import { useAuthentication } from '../context/AuthenticationContext';
 import styles from '../styles/Hero.module.scss';
 
@@ -11,7 +11,12 @@ function Login(): JSX.Element {
   const { signIn } = useAuthentication();
 
   return (
-    <Button className={styles.primaryButton} variant="primary" onClick={async () => await signIn()}>
+    <Button
+      data-testid="login"
+      className={styles.primaryButton}
+      variant="primary"
+      onClick={async () => await signIn()}
+    >
       Login
     </Button>
   );

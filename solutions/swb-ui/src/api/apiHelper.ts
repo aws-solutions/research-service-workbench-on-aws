@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'GET',
     url: `${urlBase}${urlPath}`,
@@ -16,7 +16,7 @@ const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
-const httpApiPost = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiPost = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'POST',
     url: `${urlBase}${urlPath}`,
@@ -25,7 +25,7 @@ const httpApiPost = async (urlPath: string, params: any, withCredentials: boolea
   };
   return await fetchData(options);
 };
-const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean = false): Promise<any> => {
+const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'PUT',
     url: `${urlBase}${urlPath}`,
@@ -34,11 +34,7 @@ const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
-const httpApiDelete = async (
-  urlPath: string,
-  params: any,
-  withCredentials: boolean = false
-): Promise<any> => {
+const httpApiDelete = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'DELETE',
     url: `${urlBase}${urlPath}`,
@@ -48,9 +44,12 @@ const httpApiDelete = async (
   return await fetchData(options);
 };
 
-const fetchData = async (options: any): Promise<any> => {
-  // TODO: remove these headers once accessToken is properly set by cookies
-  options.headers = { Authorization: `${localStorage.getItem('accessToken')}` };
+const fetchData = async (options: AxiosRequestConfig): Promise<any> => {
+  // add the CSRF header
+  const csrfToken = localStorage.getItem('csrfToken');
+  if (csrfToken) {
+    options.headers = { 'csrf-token': csrfToken };
+  }
   //TODO add auth token and error handling
   const { data } = await axios(options).catch(function (error) {
     console.log(error);

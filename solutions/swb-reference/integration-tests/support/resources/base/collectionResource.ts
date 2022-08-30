@@ -1,3 +1,7 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';
@@ -51,6 +55,7 @@ export default class CollectionResource {
     return response;
   }
 
+  // List call
   public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.get(this._api, { params: queryParams });
   }

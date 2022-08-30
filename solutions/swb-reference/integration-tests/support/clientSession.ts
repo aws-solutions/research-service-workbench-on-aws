@@ -1,4 +1,9 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import Csrf from 'csrf';
 import _ from 'lodash';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
@@ -13,24 +18,29 @@ export default class ClientSession {
   private _setup: Setup;
   public resources: Resources;
 
-  public constructor(setup: Setup, idToken?: string) {
+  public constructor(setup: Setup, accessToken?: string) {
     this._settings = setup.getSettings();
     this._setup = setup;
-    this._isAnonymousSession = idToken === undefined;
+    this._isAnonymousSession = accessToken === undefined;
     this._cleanupQueue = [];
 
     const headers: {
       'Content-Type': string;
-      Authorization?: string;
+      Cookie?: string;
+      'csrf-token'?: string;
     } = { 'Content-Type': 'application/json' };
 
-    // For anonymous sessions, authorization header is not required
+    // For anonymous sessions, access token cookie is not required
     if (!this._isAnonymousSession) {
-      headers.Authorization = idToken;
+      const csrf = new Csrf();
+      const secret = csrf.secretSync();
+      const token = csrf.create(secret);
+      headers.Cookie = `access_token=${accessToken};_csrf=${secret};`;
+      headers['csrf-token'] = token;
     }
 
     this._axiosInstance = axios.create({
-      baseURL: this._settings.get('apiBaseUrl'),
+      baseURL: this._settings.get('apiUrlOutput'),
       timeout: 30000, // 30 seconds to mimic API gateway timeout
       headers
     });

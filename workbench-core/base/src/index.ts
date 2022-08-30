@@ -7,5 +7,6 @@ import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
+import CognitoTokenService from './cognitoTokenService';
 
-export { AuditLogger, AwsService, QueryParams, buildDynamoDbKey, buildDynamoDBPkSk };
+export { AuditLogger, AwsService, CognitoTokenService, QueryParams, buildDynamoDbKey, buildDynamoDBPkSk };

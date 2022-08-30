@@ -1,3 +1,7 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -14,7 +18,7 @@ describe('environments launch negative tests', () => {
   });
 
   beforeAll(async () => {
-    adminSession = await setup.createAdminSession();
+    adminSession = await setup.getDefaultAdminSession();
   });
 
   afterAll(async () => {

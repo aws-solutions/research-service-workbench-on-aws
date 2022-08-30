@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@amzn/workbench-core-infrastructure';
+import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import {
@@ -54,7 +54,6 @@ export class SWBStack extends Stack {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
-    WEBSITE_URL: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   };
 
@@ -81,7 +80,7 @@ export class SWBStack extends Stack {
       COGNITO_DOMAIN,
       USER_POOL_CLIENT_NAME,
       USER_POOL_NAME,
-      WEBSITE_URL,
+      WEBSITE_URLS,
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
@@ -96,7 +95,7 @@ export class SWBStack extends Stack {
 
     const workbenchCognito = this._createCognitoResources(
       COGNITO_DOMAIN,
-      WEBSITE_URL,
+      WEBSITE_URLS,
       USER_POOL_NAME,
       USER_POOL_CLIENT_NAME
     );
@@ -134,7 +133,6 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      WEBSITE_URL,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
     };
 
@@ -293,6 +291,7 @@ export class SWBStack extends Stack {
           actions: [
             'sagemaker:DescribeNotebookInstance',
             'sagemaker:CreateNotebookInstance',
+            'sagemaker:AddTags',
             'sagemaker:StopNotebookInstance',
             'sagemaker:StopNotebookInstance',
             'sagemaker:DeleteNotebookInstance'
@@ -748,7 +747,7 @@ export class SWBStack extends Stack {
         )
       },
       defaultCorsPreflightOptions: {
-        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key'],
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'CSRF-Token'],
         allowMethods: ['OPTIONS', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         allowCredentials: true,
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
@@ -838,16 +837,17 @@ export class SWBStack extends Stack {
 
   private _createCognitoResources(
     domainPrefix: string,
-    websiteUrl: string,
+    websiteUrls: string[],
     userPoolName: string,
     userPoolClientName: string
   ): WorkbenchCognito {
     const props: WorkbenchCognitoProps = {
       domainPrefix: domainPrefix,
-      websiteUrl: websiteUrl,
+      websiteUrls: websiteUrls,
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
-      oidcIdentityProviders: []
+      oidcIdentityProviders: [],
+      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);

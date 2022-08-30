@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AppLayoutProps, PaginationProps, PropertyFilterProps } from '@awsui/components-react';
+import { AppLayoutProps, PaginationProps, PropertyFilterProps } from '@cloudscape-design/components';
 
 // i18nStrings labels for <PropertyFilter>
 export const i18nStrings: PropertyFilterProps.I18nStrings = {

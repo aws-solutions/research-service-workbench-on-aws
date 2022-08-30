@@ -5,8 +5,8 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { AwsService, buildDynamoDBPkSk } from '@amzn/workbench-core-base';
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AwsService, buildDynamoDBPkSk } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 

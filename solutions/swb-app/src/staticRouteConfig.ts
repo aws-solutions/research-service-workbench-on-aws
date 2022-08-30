@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { RoutesIgnored, RoutesMap } from '@amzn/workbench-core-authorization';
+import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
@@ -211,7 +211,7 @@ export const routesIgnored: RoutesIgnored = {
     POST: true
   },
   '/logout': {
-    GET: true
+    POST: true
   },
   '/refresh': {
     GET: true

@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCollection } from '@awsui/collection-hooks';
-import { Cards, Box, CardsProps } from '@awsui/components-react';
+import { useCollection } from '@cloudscape-design/collection-hooks';
+import { Cards, Box, CardsProps } from '@cloudscape-design/components';
 import React, { useEffect, useState } from 'react';
 import { EnvTypeConfigItem } from '../models/EnvironmentTypeConfig';
 

@@ -11,13 +11,14 @@ on:
   
 jobs:
   readme-commit:
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/readme-commit.yml@develop
+    uses: awslabs/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       passphrase: ${{ secrets.PASSPHRASE }}
       merge-token: ${{ secrets.MERGE_TOKEN }}
       bot-user: ${{ secrets.BOT_USER }}
       bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   pre-deployment-check:
     name: Pre deployment check
@@ -33,21 +34,23 @@ jobs:
 
   deploy-swb-reference:
     needs: [pre-deployment-check]
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   deploy-swb-demo:
     needs: [ deploy-swb-reference]
-    uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-swb-reference-demo.yml@develop
+    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   # deploy-example:
   #   needs: [pre-deployment-check]
-  #   uses: awslabs/monorepo-for-service-workbench/.github/workflows/deploy-integration-example.yml@develop
+  #   uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
   #   secrets:
   #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
   #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -76,7 +79,7 @@ jobs:
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -106,7 +109,13 @@ jobs:
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
-          repo: monorepo-for-service-workbench
+          repo: solution-spark-on-aws
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}

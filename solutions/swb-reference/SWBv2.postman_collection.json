@@ -7,6 +7,146 @@
   },
   "item": [
     {
+      "name": "datasets",
+      "item": [
+        {
+          "name": "Create DataSet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Import DataSet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"existingFolderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/import",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "import"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get DataSet",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/id",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List DataSets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/datasets/",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "environments",
       "item": [
         {
@@ -15,8 +155,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -41,8 +186,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -69,8 +219,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -95,8 +250,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -121,8 +281,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -147,8 +312,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -168,7 +338,12 @@
                   "disabled": true
                 },
                 {
-                  "key": "createdAt",
+                  "key": "createdAtFrom",
+                  "value": "2022-05-13T20:03:54.055Z",
+                  "disabled": true
+                },
+                {
+                  "key": "createdAtTo",
                   "value": "2022-05-13T20:03:54.055Z",
                   "disabled": true
                 },
@@ -218,8 +393,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -249,8 +429,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -277,8 +462,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -311,8 +501,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -330,8 +525,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -361,8 +561,13 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -396,8 +601,13 @@
             "method": "PUT",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -436,8 +646,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -467,8 +682,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -510,8 +730,13 @@
             "method": "GET",
             "header": [
               {
-                "key": "Authorization",
-                "value": "{{ACCESS_TOKEN}}",
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
                 "type": "text"
               }
             ],
@@ -531,8 +756,13 @@
         "method": "POST",
         "header": [
           {
-            "key": "Authorization",
-            "value": "{{ACCESS_TOKEN}}",
+            "key": "Cookie",
+            "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+            "type": "text"
+          },
+          {
+            "key": "csrf-token",
+            "value": "{{CSRF_TOKEN}}",
             "type": "text"
           }
         ],
