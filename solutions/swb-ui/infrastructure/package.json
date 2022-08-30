@@ -32,9 +32,9 @@
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
-    "@rushstack/heft": "^0.45.0",
-    "@rushstack/heft-jest-plugin": "^0.2.3",
-    "@rushstack/heft-node-rig": "^1.7.1",
+    "@rushstack/heft": "^0.47.5",
+    "@rushstack/heft-jest-plugin": "^0.3.28",
+    "@rushstack/heft-node-rig": "^1.10.5",
     "@types/jest": "^27.4.1",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^14",

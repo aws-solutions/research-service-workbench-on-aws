@@ -239,6 +239,14 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@rushstack/heft-web-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-webpack5-plugin",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@rushstack/node-core-library",
       "allowedCategories": [ "production" ]
     },
@@ -327,15 +335,15 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "cypress",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "csrf",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "csurf",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cypress",
       "allowedCategories": [ "production" ]
     },
     {
@@ -508,6 +516,10 @@
     },
     {
       "name": "ts-node",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "tslib",
       "allowedCategories": [ "production" ]
     },
     {

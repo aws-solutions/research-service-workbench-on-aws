@@ -19,6 +19,7 @@ export const splitPaneli18nstrings: SplitPanelProps.I18nStrings = {
   resizeHandleAriaLabel: 'Resize split panel'
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getPanelContent = (items: any, itemType: string): any => {
   if (!items.length) {
     return {
@@ -113,15 +114,18 @@ export const getPanelContent = (items: any, itemType: string): any => {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useSplitPanel = (selectedItems: any): AppLayoutProps => {
   const [splitPanelSize, setSplitPanelSize] = React.useState(650);
   const [splitPanelOpen, setSplitPanelOpen] = React.useState(false);
   const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = React.useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSplitPanelResize = ({ detail: { size } }: any): void => {
     setSplitPanelSize(size);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSplitPanelToggle = ({ detail: { open } }: any): void => {
     setSplitPanelOpen(open);
 

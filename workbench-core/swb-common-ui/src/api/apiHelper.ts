@@ -7,6 +7,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fetchData = async (options: AxiosRequestConfig): Promise<any> => {
   // add the CSRF header
   const csrfToken = localStorage.getItem('csrfToken');
@@ -14,7 +15,7 @@ const fetchData = async (options: AxiosRequestConfig): Promise<any> => {
     options.headers = { 'csrf-token': csrfToken };
   }
   //TODO add auth token and error handling
-  const { data } = await axios(options).catch(function (error: any) {
+  const { data } = await axios(options).catch(function (error: Error) {
     console.log(error);
     //TODO: call logger to capture exception
     throw new Error('there was an error while trying to retrieve data');
@@ -22,6 +23,7 @@ const fetchData = async (options: AxiosRequestConfig): Promise<any> => {
   return data;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'GET',
@@ -31,6 +33,8 @@ const httpApiGet = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const httpApiPost = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'POST',
@@ -40,6 +44,8 @@ const httpApiPost = async (urlPath: string, params: any, withCredentials: boolea
   };
   return await fetchData(options);
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'PUT',
@@ -49,6 +55,8 @@ const httpApiPut = async (urlPath: string, params: any, withCredentials: boolean
   };
   return await fetchData(options);
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const httpApiDelete = async (urlPath: string, params: any, withCredentials: boolean = true): Promise<any> => {
   const options = {
     method: 'DELETE',
@@ -58,7 +66,5 @@ const httpApiDelete = async (urlPath: string, params: any, withCredentials: bool
   };
   return await fetchData(options);
 };
-
-
 
 export { httpApiGet, httpApiPost, httpApiPut, httpApiDelete };
