@@ -18,9 +18,7 @@ export interface NotificationProps {
 
 const NotificationsContext: React.Context<NotificationProps> = React.createContext({
   notifications: {} as Notifications,
-  // @ts-ignore
   displayNotification: (id: string, notification: FlashbarProps.MessageDefinition) => {},
-  // @ts-ignore
   closeNotification: (id: string) => {}
 });
 

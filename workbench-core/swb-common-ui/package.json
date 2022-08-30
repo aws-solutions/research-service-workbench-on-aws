@@ -17,8 +17,8 @@
   "typings": "lib/esm/index.d.ts",
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
-    "build": "next build && rushx lint",
-    "build:test": "rushx build && rushx test",
+    "build": "heft build --clean && tsc && rushx pkg-json-lint",
+    "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
