@@ -8,10 +8,10 @@ import pkceChallenge from 'pkce-challenge';
 import React, { createContext, useContext, useEffect, Context, useState, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 import { login, logout, token } from '../api/auth';
-import { researcherUser, UserItem } from '../models/User';
+import { UserItem } from '../models/User';
 
 export interface AuthenticationProps {
-  user: UserItem;
+  user?: UserItem;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -21,7 +21,7 @@ const AuthenticationContext: Context<AuthenticationProps> = createContext<Authen
 );
 
 export function AuthenticationProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [user, setUser] = useState<UserItem>(researcherUser);
+  const [user, setUser] = useState<UserItem>();
 
   // TODO: Fix API Lambda to store access_token and refresh_token in cookies correctly
   // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value

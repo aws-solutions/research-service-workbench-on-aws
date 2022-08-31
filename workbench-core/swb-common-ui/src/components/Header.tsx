@@ -8,10 +8,13 @@ import * as React from 'react';
 import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
+import { researcherUser } from '../models/User';
 
 export default function Header(): JSX.Element {
   const { settings } = useSettings();
   const { user, signOut } = useAuthentication();
+
+  const displayUser = user ?? researcherUser;
 
   const profileActions = [{ id: 'signout', text: headerLabels.signout }];
   return (
@@ -27,8 +30,8 @@ export default function Header(): JSX.Element {
       utilities={[
         {
           type: 'menu-dropdown',
-          text: `${user.givenName} ${user.familyName}`,
-          description: user.email,
+          text: `${displayUser.givenName} ${displayUser.familyName}`,
+          description: displayUser.email,
           items: profileActions,
           onItemClick: async () => await signOut()
         }
