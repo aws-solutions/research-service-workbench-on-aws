@@ -10,3 +10,5 @@ next-i18next.config.js
 temp
 **/lib
 infrastructure/src/redirectFunction.js
+out
+infrastructure/cdk.out

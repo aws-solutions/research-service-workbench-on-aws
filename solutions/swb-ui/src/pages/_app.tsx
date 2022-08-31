@@ -11,6 +11,7 @@ import '../styles/Hero.module.scss';
 import { AuthenticationProvider, NotificationsProvider, SettingsProvider, Header } from '@aws/workbench-core-swb-common-ui';
 import type { AppProps } from 'next/app';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 function App({ Component, pageProps }: AppProps): JSX.Element {
   return (
     <SettingsProvider>
