@@ -27,8 +27,7 @@ export default function BaseLayout({
   breadcrumbs,
   activeHref = '#/'
 }: LayoutProps): JSX.Element {
-  // eslint-disable-next-line prefer-const
-  let [navigationOpen, setNavigationOpen] = React.useState(false);
+  const [navigationOpen, setNavigationOpen] = React.useState(false);
   const { notifications, displayNotification } = useNotifications();
   const id = 'BetaCodeWarning';
   displayNotification(id, {
@@ -65,7 +64,6 @@ export default function BaseLayout({
         onNavigationChange={({ detail }) => {
           // eslint-disable-next-line security/detect-non-literal-fs-filename
           setNavigationOpen(detail.open);
-          navigationOpen = true;
         }}
       />
     </>

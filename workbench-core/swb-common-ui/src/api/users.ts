@@ -16,6 +16,7 @@ const createUser = async (createUserForm: CreateUserForm): Promise<void> => {
   await httpApiPost(`users`, { ...createUserForm });
 };
 
+// TODO should users type/interface be defined in this package?
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useUsers = (): any => {
   const { data, mutate } = useSWR('users', httpApiGet, {});

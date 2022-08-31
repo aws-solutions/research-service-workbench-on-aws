@@ -8,16 +8,10 @@ import * as React from 'react';
 import { headerLabels } from '../common/labels';
 import { useAuthentication } from '../context/AuthenticationContext';
 import { useSettings } from '../context/SettingsContext';
-import { researcherUser } from '../models/User';
 
 export default function Header(): JSX.Element {
   const { settings } = useSettings();
-  // eslint-disable-next-line prefer-const
-  let { user, signOut } = useAuthentication();
-
-  if (user === undefined) {
-    user = researcherUser;
-  }
+  const { user, signOut } = useAuthentication();
 
   const profileActions = [{ id: 'signout', text: headerLabels.signout }];
   return (
