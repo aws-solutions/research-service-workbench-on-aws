@@ -33,6 +33,7 @@ const lengthInDays = (unit: DateRangePickerProps.TimeUnit, amount: number): numb
   }
 };
 
+// TODO: Remove any and replace with a type
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const isValidRangeFunction = (range: any): DateRangePickerProps.ValidationResult => {
   if (range.type === 'absolute') {
@@ -84,8 +85,7 @@ export const isValidRangeFunction = (range: any): DateRangePickerProps.Validatio
   return { valid: true };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertToAbsoluteRange(range: any): { start: Date | undefined; end: Date } {
+export function convertToAbsoluteRange(range: DateRangePickerProps.RelativeValue | DateRangePickerProps.AbsoluteValue): { start: Date | undefined; end: Date } {
   if (range.type === 'absolute') {
     return {
       start: new Date(range.startDate),
@@ -110,7 +110,6 @@ export function convertToAbsoluteRange(range: any): { start: Date | undefined; e
         case 'year':
           return addYears(now, -range.amount);
       }
-      return new Date();
     })();
     return {
       start: start,

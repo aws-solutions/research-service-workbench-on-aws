@@ -53,8 +53,8 @@ export const paginationLables: PaginationProps.Labels = {
   pageLabel: (pageNumber: number) => `Page ${pageNumber} of all pages`
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const headerLabels: any = {
+// eslint-disable-next-line @rushstack/typedef-var
+export const headerLabels = {
   searchIconAriaLabel: 'Search',
   searchDismissIconAriaLabel: 'Close search',
   overflowMenuTriggerText: 'More',
@@ -64,8 +64,8 @@ export const headerLabels: any = {
   signout: 'Sign out'
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const NavigationLabels: any = {
+// eslint-disable-next-line @rushstack/typedef-var
+export const NavigationLabels = {
   Administration: 'Administration',
   CreateDashboard: 'Create new dashboard',
   Dashboards: 'Dashboards',

@@ -21,7 +21,6 @@ export interface LayoutProps {
   activeHref?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function BaseLayout({
   navigationHide,
   children,

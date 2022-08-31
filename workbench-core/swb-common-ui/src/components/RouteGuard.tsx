@@ -12,7 +12,6 @@ interface Props {
  * @param children - Elements to be displayed if user is authenticated.
  * @returns children Elements
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function RouteGuard({ children }: Props): JSX.Element {
   // TODO: Once accessToken cookie is properly set, change to check isLoggedIn to drive redirect
   if (typeof window !== 'undefined') {

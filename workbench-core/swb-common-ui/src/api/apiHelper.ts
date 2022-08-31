@@ -7,6 +7,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 const urlBase: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// TODO: Use generics instead of using any for methods here
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const fetchData = async (options: AxiosRequestConfig): Promise<any> => {
   // add the CSRF header

@@ -9,7 +9,6 @@ import * as React from 'react';
 import { useSettings } from '../context/SettingsContext';
 import Login from './Login';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function Hero(): JSX.Element {
   const { settings } = useSettings();
 

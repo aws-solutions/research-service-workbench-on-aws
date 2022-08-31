@@ -20,7 +20,7 @@ const createUser = async (createUserForm: CreateUserForm): Promise<void> => {
 const useUsers = (): any => {
   const { data, mutate } = useSWR('users', httpApiGet, {});
 
-  const users = (data && data.users) || [];
+  const users = data?.users ?? [];
   return { users, mutate };
 };
 

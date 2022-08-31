@@ -9,7 +9,7 @@ import { ProjectItem } from '../models/Project';
 
 const useProjects = (): { projects: ProjectItem[], areProjectsLoading: boolean } => {
   const { data, isValidating } = useSWR(() => 'projects', httpApiGet);
-  const projects: ProjectItem[] = (data && data.data) || [];
+  const projects: ProjectItem[] = data?.data ?? [];
   return { projects, areProjectsLoading: isValidating };
 };
 

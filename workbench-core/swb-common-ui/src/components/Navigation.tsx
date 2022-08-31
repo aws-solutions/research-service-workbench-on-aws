@@ -15,7 +15,6 @@ export interface NavigationProps {
   onFollowHandler?: (ev: CustomEvent<SideNavigationProps.FollowDetail>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function Navigation({
   activeHref,
   header,

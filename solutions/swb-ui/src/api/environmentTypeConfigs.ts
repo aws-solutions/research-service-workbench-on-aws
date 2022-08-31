@@ -12,7 +12,7 @@ const useEnvTypeConfigs = (id: string): {envTypeConfigs: EnvTypeConfigItem[], ar
     () => (id ? `environmentTypes/${id}/configurations` : null),
     httpApiGet
   );
-  const envTypeConfigs: EnvTypeConfigItem[] = (data && data.data) || [];
+  const envTypeConfigs: EnvTypeConfigItem[] = data?.data ?? [];
   return { envTypeConfigs, areEnvTypeConfigsLoading: isValidating };
 };
 
