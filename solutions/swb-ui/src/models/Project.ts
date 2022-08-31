@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export type ProjectItem = {
+export interface ProjectItem {
   id: string;
   name: string;
-};
+}

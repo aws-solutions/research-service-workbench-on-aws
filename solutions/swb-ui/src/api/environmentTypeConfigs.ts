@@ -7,7 +7,7 @@ import { httpApiGet } from '@aws/workbench-core-swb-common-ui';
 import useSWR from 'swr';
 import { EnvTypeConfigItem } from '../models/EnvironmentTypeConfig';
 
-const useEnvTypeConfigs = (id: string) => {
+const useEnvTypeConfigs = (id: string): {envTypeConfigs: EnvTypeConfigItem[], areEnvTypeConfigsLoading: boolean} => {
   const { data, isValidating } = useSWR(
     () => (id ? `environmentTypes/${id}/configurations` : null),
     httpApiGet
