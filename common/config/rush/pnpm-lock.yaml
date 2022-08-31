@@ -1193,35 +1193,25 @@ importers:
   ../../workbench-core/swb-common-ui:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@babel/core': ^7.17.9
-      '@babel/preset-env': ^7.16.11
-      '@babel/preset-react': ^7.16.7
-      '@babel/preset-typescript': ^7.16.7
       '@cloudscape-design/components': ^3.0.27
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
       '@rushstack/heft-node-rig': ^1.10.5
       '@types/heft-jest': 1.0.2
-      '@types/jest': ^27.4.1
       '@types/node': ^14
       '@types/react': 17.0.38
       '@types/uuid': ^8.3.4
       axios: ^0.27.1
-      babel-jest: 27.5.1
       date-fns: ^2.28.0
+      depcheck: ^1.4.3
       eslint: ^8.7.0
-      eslint-config-next: 12.1.5
       eslint-plugin-import: ^2.26.0
-      express: ^4.17.3
       istanbul-badges-readme: 1.8.1
-      jest: ^27.5.1
       jwt-decode: ^3.1.2
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       next: ^12.1.5
-      next-global-css: ^1.2.0
-      next-transpile-modules: ^9.0.0
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       pkce-challenge: ^3.0.0
@@ -1235,11 +1225,8 @@ importers:
     dependencies:
       axios: 0.27.2
       date-fns: 2.28.0
-      express: 4.18.1
       jwt-decode: 3.1.2
-      next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
-      next-global-css: 1.3.1
-      next-transpile-modules: 9.0.0
+      next: 12.1.6_757e1cdb914f1581201e1269321c5a94
       pkce-challenge: 3.0.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -1248,26 +1235,19 @@ importers:
       uuid: 8.3.2
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
-      '@babel/core': 7.18.2
-      '@babel/preset-env': 7.18.2_@babel+core@7.18.2
-      '@babel/preset-react': 7.17.12_@babel+core@7.18.2
-      '@babel/preset-typescript': 7.17.12_@babel+core@7.18.2
       '@cloudscape-design/components': 3.0.27_b3482aaf5744fc7c2aeb7941b0e0a78f
       '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.2
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
       '@rushstack/heft-node-rig': 1.10.5_@rushstack+heft@0.47.5
       '@types/heft-jest': 1.0.2
-      '@types/jest': 27.5.2
       '@types/node': 14.18.20
       '@types/react': 17.0.38
       '@types/uuid': 8.3.4
-      babel-jest: 27.5.1_@babel+core@7.18.2
+      depcheck: 1.4.3
       eslint: 8.16.0
-      eslint-config-next: 12.1.5_5794735a2262de3d29e0baaa885b5942
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
-      jest: 27.5.1
       license-check-and-add: 4.0.5
       license-checker: 25.0.1
       npm-package-json-lint: 6.3.0
@@ -7277,7 +7257,7 @@ packages:
   /@vue/compiler-core/3.2.36:
     resolution: {integrity: sha512-bbyZM5hvBicv0PW3KUfVi+x3ylHnfKG7DOn5wM+f2OztTzTjLEyBb/5yrarIYpmnGitVGbjZqDbODyW4iK8hqw==}
     dependencies:
-      '@babel/parser': 7.18.4
+      '@babel/parser': 7.18.13
       '@vue/shared': 3.2.36
       estree-walker: 2.0.2
       source-map: 0.6.1
@@ -7293,7 +7273,7 @@ packages:
   /@vue/compiler-sfc/3.2.36:
     resolution: {integrity: sha512-AvGb4bTj4W8uQ4BqaSxo7UwTEqX5utdRSMyHy58OragWlt8nEACQ9mIeQh3K4di4/SX+41+pJrLIY01lHAOFOA==}
     dependencies:
-      '@babel/parser': 7.18.4
+      '@babel/parser': 7.18.13
       '@vue/compiler-core': 3.2.36
       '@vue/compiler-dom': 3.2.36
       '@vue/compiler-ssr': 3.2.36
@@ -7315,7 +7295,7 @@ packages:
   /@vue/reactivity-transform/3.2.36:
     resolution: {integrity: sha512-Jk5o2BhpODC9XTA7o4EL8hSJ4JyrFWErLtClG3NH8wDS7ri9jBDWxI7/549T7JY9uilKsaNM+4pJASLj5dtRwA==}
     dependencies:
-      '@babel/parser': 7.18.4
+      '@babel/parser': 7.18.13
       '@vue/compiler-core': 3.2.36
       '@vue/shared': 3.2.36
       estree-walker: 2.0.2
@@ -8929,7 +8909,7 @@ packages:
     hasBin: true
     dependencies:
       '@babel/parser': 7.16.4
-      '@babel/traverse': 7.18.2
+      '@babel/traverse': 7.18.13
       '@vue/compiler-sfc': 3.2.36
       camelcase: 6.3.0
       cosmiconfig: 7.0.1
@@ -8946,7 +8926,7 @@ packages:
       query-ast: 1.0.4
       readdirp: 3.6.0
       require-package-name: 2.0.1
-      resolve: 1.22.0
+      resolve: 1.22.1
       sass: 1.52.2
       scss-parser: 1.0.5
       semver: 7.3.7
@@ -12987,6 +12967,49 @@ packages:
       escalade: 3.1.1
     dev: false
 
+  /next/12.1.6_757e1cdb914f1581201e1269321c5a94:
+    resolution: {integrity: sha512-cebwKxL3/DhNKfg9tPZDQmbRKjueqykHHbgaoG4VBRH3AHQJ2HO0dbKFiS1hPhe1/qgc2d/hFeadsbPicmLD+A==}
+    engines: {node: '>=12.22.0'}
+    hasBin: true
+    peerDependencies:
+      fibers: '>= 3.1.0'
+      node-sass: ^6.0.0 || ^7.0.0
+      react: ^17.0.2 || ^18.0.0-0
+      react-dom: ^17.0.2 || ^18.0.0-0
+      sass: ^1.3.0
+    peerDependenciesMeta:
+      fibers:
+        optional: true
+      node-sass:
+        optional: true
+      sass:
+        optional: true
+    dependencies:
+      '@next/env': 12.1.6
+      caniuse-lite: 1.0.30001382
+      postcss: 8.4.5
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      sass: 1.52.2
+      styled-jsx: 5.0.2_react@17.0.2
+    optionalDependencies:
+      '@next/swc-android-arm-eabi': 12.1.6
+      '@next/swc-android-arm64': 12.1.6
+      '@next/swc-darwin-arm64': 12.1.6
+      '@next/swc-darwin-x64': 12.1.6
+      '@next/swc-linux-arm-gnueabihf': 12.1.6
+      '@next/swc-linux-arm64-gnu': 12.1.6
+      '@next/swc-linux-arm64-musl': 12.1.6
+      '@next/swc-linux-x64-gnu': 12.1.6
+      '@next/swc-linux-x64-musl': 12.1.6
+      '@next/swc-win32-arm64-msvc': 12.1.6
+      '@next/swc-win32-ia32-msvc': 12.1.6
+      '@next/swc-win32-x64-msvc': 12.1.6
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+    dev: false
+
   /next/12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc:
     resolution: {integrity: sha512-cebwKxL3/DhNKfg9tPZDQmbRKjueqykHHbgaoG4VBRH3AHQJ2HO0dbKFiS1hPhe1/qgc2d/hFeadsbPicmLD+A==}
     engines: {node: '>=12.22.0'}
@@ -14848,6 +14871,22 @@ packages:
         optional: true
     dependencies:
       '@babel/core': 7.18.2
+      react: 17.0.2
+    dev: false
+
+  /styled-jsx/5.0.2_react@17.0.2:
+    resolution: {integrity: sha512-LqPQrbBh3egD57NBcHET4qcgshPks+yblyhPlH2GY8oaDgKs8SK4C3dBh3oSJjgzJ3G5t1SYEZGHkP+QEpX9EQ==}
+    engines: {node: '>= 12.0.0'}
+    peerDependencies:
+      '@babel/core': '*'
+      babel-plugin-macros: '*'
+      react: '>= 16.8.0 || 17.x.x || ^18.0.0-0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      babel-plugin-macros:
+        optional: true
+    dependencies:
       react: 17.0.2
     dev: false
 
