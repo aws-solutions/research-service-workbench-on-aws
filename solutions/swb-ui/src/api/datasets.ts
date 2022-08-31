@@ -3,13 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { httpApiGet } from '@aws/workbench-core-swb-common-ui';
 import useSWR from 'swr';
 import { DatasetItem } from '../models/Dataset';
-import { httpApiGet } from './apiHelper';
 
-const useDatasets = () => {
+const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean } => {
   const { data, isValidating } = useSWR(() => 'datasets', httpApiGet);
-  const datasets: DatasetItem[] = data || [];
+  const datasets: DatasetItem[] = data?.data ?? [];
   return { datasets, areDatasetsLoading: isValidating };
 };
 

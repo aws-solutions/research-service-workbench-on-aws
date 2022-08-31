@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { nameRegex, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -18,7 +19,7 @@ import {
   Textarea,
   Select,
   Multiselect
-} from '@awsui/components-react';
+} from '@cloudscape-design/components';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -27,8 +28,6 @@ import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
 import { useProjects } from '../../api/projects';
-import { nameRegex } from '../../common/utils';
-import BaseLayout from '../../components/BaseLayout';
 import EnvTypeCards from '../../components/EnvTypeCards';
 import EnvTypeConfigCards from '../../components/EnvTypeConfigCards';
 import { CreateEnvironmentForm, CreateEnvironmentFormValidation } from '../../models/Environment';

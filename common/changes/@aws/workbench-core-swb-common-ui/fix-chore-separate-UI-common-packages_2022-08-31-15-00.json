@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "Updates for separating UI packages",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}

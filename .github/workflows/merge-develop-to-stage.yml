@@ -18,6 +18,7 @@ jobs:
       merge-token: ${{ secrets.MERGE_TOKEN }}
       bot-user: ${{ secrets.BOT_USER }}
       bot-user-email: ${{ secrets.BOT_USER_EMAIL }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   pre-deployment-check:
     name: Pre deployment check
@@ -38,12 +39,14 @@ jobs:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   deploy-swb-demo:
     needs: [ deploy-swb-reference]
     uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   # deploy-example:
   #   needs: [pre-deployment-check]
@@ -110,3 +113,9 @@ jobs:
           branch: stage
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Slack Failure Notification
+        if: failure()
+        uses: ./.github/actions/notification
+        with:
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}

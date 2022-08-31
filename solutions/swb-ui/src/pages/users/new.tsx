@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { emailRegex, nameRegex, addUserToRole, createUser, CreateUserForm, CreateUserFormValidation, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -13,14 +14,10 @@ import {
   FormField,
   Button,
   Container
-} from '@awsui/components-react';
+} from '@cloudscape-design/components';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { addUserToRole, createUser } from '../../api/users';
-import { emailRegex, nameRegex } from '../../common/utils';
-import BaseLayout from '../../components/BaseLayout';
-import { CreateUserForm, CreateUserFormValidation } from '../../models/User';
 
 export interface UserProps {
   locale: string;

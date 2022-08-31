@@ -1,0 +1,19 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Slack Notification
+description: Action to send slack notification on failure
+inputs:
+  slack_webhook_url:
+    description: "Slack WebHook URL"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Slack Notification
+      shell: bash
+      run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"\nSTATUS: \"${{ job.status }}\" \nWORKFLOW_NAME: \"${{ github.workflow }}\" \nJOB: \"${{ github.job }}\" \nJOB_URL: \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\" "}' ${{ inputs.slack_webhook_url }}

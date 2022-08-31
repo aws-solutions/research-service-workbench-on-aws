@@ -230,6 +230,20 @@
       "enableParallelism": true
     },
     {
+      "name": "add-license-header",
+      "commandKind": "bulk",
+      "summary": "Add license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
+      "name": "check-license-header",
+      "commandKind": "bulk",
+      "summary": "Check license header",
+      "safeForSimultaneousRushProcesses": true,
+      "enableParallelism": true
+    },
+    {
       "name": "common-coverage-report",
       "commandKind": "global",
       "summary": "Generates common coverage summary reports for all packages in ./coverage dir",
@@ -290,14 +304,14 @@
       "commandKind": "global",
       "summary": "Run rush install with bypass-policy and perform custom git-hook install",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy && node common/scripts/install-hooks"
+      "shellCommand": "node common/scripts/install-run-rush.js install --bypass-policy --max-install-attempts 1 && node common/scripts/install-hooks"
     },
     {
       "name": "cupdate",
       "commandKind": "global",
       "summary": "Run rush update with bypass-policy and perform custom git-hook install",
       "safeForSimultaneousRushProcesses": true,
-      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy && node common/scripts/install-hooks"
+      "shellCommand": "node common/scripts/install-run-rush.js update --bypass-policy --max-install-attempts 1 && node common/scripts/install-hooks"
     }
   ],
 
