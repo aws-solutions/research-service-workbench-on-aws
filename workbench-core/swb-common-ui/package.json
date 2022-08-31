@@ -22,7 +22,7 @@
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
-    "lint": "eslint --max-warnings 0 && rushx pkg-json-lint",
+    "lint": "eslint . && rushx pkg-json-lint",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",

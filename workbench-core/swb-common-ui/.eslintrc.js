@@ -2,12 +2,13 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution');
 
 module.exports = {
-  extends: ['@aws/eslint-config-workbench-core-eslint-custom'],
+  extends: ['@aws/eslint-config-workbench-core-eslint-custom', 'next/core-web-vitals'],
   parserOptions: { tsconfigRootDir: __dirname },
   rules: {
     'import/default': 0,
     'import/namespace': 0,
     'import/no-named-as-default': 0,
-    'import/no-named-as-default-member': 0
+    'import/no-named-as-default-member': 0,
+    '@next/next/no-html-link-for-pages': 0
   }
 };
