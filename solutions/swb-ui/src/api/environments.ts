@@ -3,17 +3,19 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import useSWR from 'swr';
+import { convertToRecord, httpApiGet, httpApiPut, httpApiPost } from '@aws/workbench-core-swb-common-ui';
+import useSWR, { KeyedMutator } from 'swr';
 import {
   EnvironmentItem,
   EnvironmentConnectResponse,
   CreateEnvironmentForm,
   EnvironmentsQueryParams
 } from '../models/Environment';
-import { httpApiGet, httpApiPut, httpApiPost } from './apiHelper';
-import { convertToRecord } from '../common/utils';
 
-const useEnvironments = (params?: EnvironmentsQueryParams) => {
+const useEnvironments = (params?: EnvironmentsQueryParams):
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+{ environments: {workspaceName: string, workspaceStatus: string, project: string}[], mutate: KeyedMutator<any>, 
+paginationToken: string, areEnvironmentsLoading: boolean } => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();
   queryString = queryString ? `?${queryString}` : '';
   const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);
@@ -21,7 +23,7 @@ const useEnvironments = (params?: EnvironmentsQueryParams) => {
   // `/environments` API returns a JSON in this format
   // { data: [], paginationToken: ''}
   // The paginationToken attribute is only provided if there are more than one page of result
-  const environments = (data && data.data) || [];
+  const environments = data?.data ?? [];
   environments.forEach((item: EnvironmentItem) => {
     item.workspaceName = item.name;
     item.workspaceStatus = item.status;

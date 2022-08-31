@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { TableEmptyDisplay, TableNoMatchDisplay } from '@aws/workbench-core-swb-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   CollectionPreferences,
@@ -14,8 +15,6 @@ import {
   TextContent
 } from '@cloudscape-design/components';
 import { useState } from 'react';
-import { TableEmptyDisplay } from '../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../common/tableNoMatchState';
 import { EnvTypeItem } from '../models/EnvironmentType';
 
 interface OnSelectEnvTypeFunction {
