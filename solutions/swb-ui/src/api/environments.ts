@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
 
 import { convertToRecord, httpApiGet, httpApiPut, httpApiPost } from '@aws/workbench-core-swb-common-ui';
-import useSWR from 'swr';
+import useSWR, { KeyedMutator } from 'swr';
 import {
   EnvironmentItem,
   EnvironmentConnectResponse,
@@ -13,7 +12,10 @@ import {
   EnvironmentsQueryParams
 } from '../models/Environment';
 
-const useEnvironments = (params?: EnvironmentsQueryParams): any => {
+const useEnvironments = (params?: EnvironmentsQueryParams):
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+{ environments: {workspaceName: string, workspaceStatus: string, project: string}[], mutate: KeyedMutator<any>, 
+paginationToken: string, areEnvironmentsLoading: boolean } => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();
   queryString = queryString ? `?${queryString}` : '';
   const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);

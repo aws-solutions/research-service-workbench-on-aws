@@ -9,7 +9,7 @@ import { EnvTypeItem } from '../models/EnvironmentType';
 
 const useEnvironmentType = (): { envTypes: EnvTypeItem[], areEnvTypesLoading: boolean } => {
   const { data, isValidating } = useSWR(`environmentTypes`, httpApiGet);
-  const envTypes: EnvTypeItem[] = ((data && data.data) || []).filter(
+  const envTypes: EnvTypeItem[] = (data?.data ?? []).filter(
     (t: EnvTypeItem) => t.status === 'APPROVED'
   );
   return { envTypes, areEnvTypesLoading: isValidating };

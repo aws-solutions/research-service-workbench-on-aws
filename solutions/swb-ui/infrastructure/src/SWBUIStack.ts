@@ -40,6 +40,7 @@ export class SWBUIStack extends Stack {
     RESPONSE_HEADERS_ARTIFACT_NAME: string;
     RESPONSE_HEADERS_NAME: string;
   };
+  // eslint-disable-next-line @typescript-eslint/explicit-member-accessibility
   constructor(scope: Construct, id: string, props?: StackProps) {
     const {
       STAGE,
@@ -133,6 +134,7 @@ export class SWBUIStack extends Stack {
 
     this._addS3TLSSigV4BucketPolicy(s3Bucket);
 
+    // eslint-disable-next-line no-new
     new CfnOutput(this, outputKey, {
       value: s3Bucket.bucketArn
     });
@@ -140,6 +142,7 @@ export class SWBUIStack extends Stack {
   }
 
   private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
+    // eslint-disable-next-line no-new
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
       sources: [Source.asset(path.resolve(__dirname, '../../out'))],
@@ -177,6 +180,7 @@ export class SWBUIStack extends Stack {
       },
       additionalBehaviors: {}
     });
+    // eslint-disable-next-line no-new
     new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
       value: `https://${distribution.distributionDomainName}`
     });
@@ -187,6 +191,7 @@ export class SWBUIStack extends Stack {
   This function recieves the web routing format URL and transforms it into file path.
   e.g. /environments => /environments/index.html
 */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private _createRedirectFunction(): Function {
     return new Function(this, this.distributionEnvVars.DISTRIBUTION_FUNCTION_ARTIFACT_NAME, {
       code: FunctionCode.fromFile({

@@ -80,7 +80,7 @@ function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; aw
     const outputs = apiStackOutputs[apiStackName];
 
     if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
-      throw `Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`; //validate when API unsuccessfully finished and UI is deployed
+      throw new Error(`Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`); //validate when API unsuccessfully finished and UI is deployed
     }
     return {
       awsRegionShortName: outputs.awsRegionShortName,
@@ -91,7 +91,7 @@ function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; aw
     console.error(
       `No API Stack deployed found for ${process.env.STAGE}.Please deploy application swb-reference and try again.`
     );
-    throw `No API Stack deployed found for ${process.env.STAGE}.`;
+    throw new Error(`No API Stack deployed found for ${process.env.STAGE}.`);
   }
 }
 

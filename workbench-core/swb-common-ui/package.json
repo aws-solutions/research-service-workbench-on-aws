@@ -26,20 +26,9 @@
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
-    "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "testRegex": ".test.ts",
-    "transform": {
-      "\\.(ts)$": "ts-jest"
-    }
   },
   "dependencies": {
     "axios": "^0.27.1",
