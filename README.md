@@ -43,6 +43,7 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/environments](./workbench-core/environments/) | [@aws/workbench-core-environments] | [README](./workbench-core/environments/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/swb-common-ui](./workbench-core/swb-common-ui/) | [@aws/workbench-core-swb-common-ui] | [README](./workbench-core/swb-common-ui/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on
