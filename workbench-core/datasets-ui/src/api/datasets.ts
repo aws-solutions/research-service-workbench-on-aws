@@ -10,6 +10,7 @@ import { DatasetItem } from '../models/Dataset';
 const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean } => {
   const { data, isValidating } = useSWR(() => 'datasets', httpApiGet);
   const datasets: DatasetItem[] = data?.data ?? [];
+  console.log(datasets, isValidating);
   return { datasets, areDatasetsLoading: isValidating };
 };
 

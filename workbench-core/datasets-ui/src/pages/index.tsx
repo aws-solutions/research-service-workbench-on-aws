@@ -67,7 +67,7 @@ export const DatasetsPage: NextPage = () => {
       empty: TableEmptyDisplay(itemType),
       noMatch: TableNoMatchDisplay(itemType),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      filteringFunction: (item: any, filteringText): any => {
+      filteringFunction: (item: any, filteringText): boolean => {
         const filteringTextLowerCase = filteringText.toLowerCase();
 
         return (

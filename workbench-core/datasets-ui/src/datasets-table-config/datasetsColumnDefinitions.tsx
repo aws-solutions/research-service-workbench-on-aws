@@ -44,7 +44,7 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
   },
 ];
 
-export const searchableColumns: string[] = [
+export const searchableColumns: readonly string[] = [
   'datasetName',
   'createdAt',
   'project',
