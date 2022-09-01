@@ -119,6 +119,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-datasets-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-environments",
       "allowedCategories": [ "production" ]
     },

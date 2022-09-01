@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCollection } from '@awsui/collection-hooks';
+import { useDatasets, columnDefinitions, searchableColumns, filteringOptions, filteringProperties } from '@aws/workbench-core-datasets-ui';
+import { i18nStrings, getFilterCounterText, TableEmptyDisplay, TableNoMatchDisplay, useNotifications, BaseLayout } from '@aws/workbench-core-swb-common-ui';
+import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -11,26 +13,11 @@ import {
   PropertyFilter,
   SpaceBetween,
   Table
-} from '@awsui/components-react';
-import { FlashbarProps } from '@awsui/components-react/flashbar';
-
+} from '@cloudscape-design/components';
+import { FlashbarProps } from '@cloudscape-design/components/flashbar';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { useDatasets } from '../../api/datasets';
-import { i18nStrings } from '../../common/labels';
-
-import { getFilterCounterText } from '../../common/tableCounterStrings';
-import { TableEmptyDisplay } from '../../common/tableEmptyState';
-import { TableNoMatchDisplay } from '../../common/tableNoMatchState';
-import BaseLayout from '../../components/BaseLayout';
-import { useNotifications } from '../../context/NotificationContext';
-import {
-  columnDefinitions,
-  searchableColumns
-} from '../../datasets-table-config/datasetsColumnDefinitions';
-import { filteringOptions } from '../../datasets-table-config/datasetsFilteringOptions';
-import { filteringProperties } from '../../datasets-table-config/datasetsFilteringProperties';
 
 const Dataset: NextPage = () => {
   // For functions to return content specific to the table

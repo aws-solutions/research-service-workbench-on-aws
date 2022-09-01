@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { useDatasets } from '@aws/workbench-core-datasets-ui';
 import { nameRegex, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
@@ -23,7 +24,6 @@ import {
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { useDatasets } from '../../api/datasets';
 import { createEnvironment } from '../../api/environments';
 import { useEnvTypeConfigs } from '../../api/environmentTypeConfigs';
 import { useEnvironmentType } from '../../api/environmentTypes';
