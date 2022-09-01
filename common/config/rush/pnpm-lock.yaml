@@ -794,6 +794,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': ^14
       '@types/react': 17.0.38
+      '@types/react-dom': ^18.0.6
       '@types/uuid': ^8.3.4
       axios: ^0.27.1
       date-fns: ^2.28.0
@@ -838,6 +839,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/node': 14.18.20
       '@types/react': 17.0.38
+      '@types/react-dom': 18.0.6
       '@types/uuid': 8.3.4
       depcheck: 1.4.3
       eslint: 8.16.0
@@ -7011,6 +7013,12 @@ packages:
 
   /@types/range-parser/1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
+    dev: true
+
+  /@types/react-dom/18.0.6:
+    resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
+    dependencies:
+      '@types/react': 17.0.38
     dev: true
 
   /@types/react/17.0.38:
