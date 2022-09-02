@@ -13,21 +13,15 @@ export const filteringProperties: readonly PropertyFilterProperty[] = [
     groupValuesLabel: 'Dataset Name Values'
   },
   {
-    key: 'storageName',
+    key: 'category',
     operators: ['=', '!='],
-    propertyLabel: 'Storage Name',
-    groupValuesLabel: 'Storage Name Values'
+    propertyLabel: 'Dataset Category',
+    groupValuesLabel: 'Dataset Category Values'
   },
   {
-    key: 'storageType',
+    key: 'description',
     operators: ['=', '!='],
-    propertyLabel: 'Storage Type',
-    groupValuesLabel: 'Storage Type Values'
-  },
-  {
-    key: 'path',
-    operators: ['=', '!=', ':', '!:'],
-    propertyLabel: 'Path',
-    groupValuesLabel: 'Path Values'
+    propertyLabel: 'Dataset Description',
+    groupValuesLabel: 'Dataset Description Values'
   }
 ];

@@ -7,7 +7,7 @@ import { PropertyFilterProps } from '@cloudscape-design/components/property-filt
 
 export const filteringOptions: readonly PropertyFilterProps.FilteringOption[] = [
   { propertyKey: 'datasetName', value: '' },
-  { propertyKey: 'storageName', value: '' },
-  { propertyKey: 'storageType', value: '' },
-  { propertyKey: 'path', value: '' }
+  { propertyKey: 'category', value: 'Internal' },
+  { propertyKey: 'category', value: 'External' },
+  { propertyKey: 'description', value: '' }
 ];

@@ -9,8 +9,9 @@ import { DatasetItem } from '../models/Dataset';
 
 const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean } => {
   const { data, isValidating } = useSWR(() => 'datasets', httpApiGet);
-  const datasets: DatasetItem[] = data?.data ?? [];
-  console.log(datasets, isValidating);
+  // TODO: Once datasetService methods return Promise<item> instead of the item directly replace the line below with:
+  // const datasets: DatasetItem[] = data?.data ?? [];
+  const datasets: DatasetItem[] = data ?? [];
   return { datasets, areDatasetsLoading: isValidating };
 };
 

@@ -13,43 +13,21 @@ export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] =
     sortingField: 'name'
   },
   {
-    id: 'createdAt',
-    header: 'Created at',
-    cell: (e: { createdAt: string }) => new Date(e.createdAt).toLocaleString(),
-    sortingField: 'createdAt'
+    id: 'category',
+    header: 'Category',
+    cell: () => 'Internal', // TODO: Replace with e.category once implemented
+    sortingField: 'category'
   },
   {
-    id: 'storageName',
-    header: 'Storage name',
-    cell: (e: { storageName: string }) => e.storageName,
-    sortingField: 'storageName'
-  },
-  {
-    id: 'storageType',
-    header: 'Storage type',
-    cell: (e: { storageType: string }) => e.storageType,
-    sortingField: 'storageType'
-  },
-  {
-    id: 'path',
-    header: 'Path',
-    cell: (e: { path: string }) => e.path,
-    sortingField: 'path'
-  },
-  {
-    id: 'awsAccountId',
-    header: 'awsAccountId',
-    cell: (e: { awsAccountId: string }) => e.awsAccountId,
-    sortingField: 'awsAccountId'
+    id: 'description',
+    header: 'Description',
+    cell: () => 'Sample description of this dataset', // TODO: Replace with e.description once implemented
+    sortingField: 'description'
   },
 ];
 
 export const searchableColumns: readonly string[] = [
   'datasetName',
-  'createdAt',
-  'project',
-  'storageName',
-  'storageType',
-  'path',
-  'awsAccountId'
+  'category',
+  'description'
 ];
