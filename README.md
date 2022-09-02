@@ -40,9 +40,11 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/authorization](./workbench-core/authorization/) | [@aws/workbench-core-authorization] | [README](./workbench-core/authorization/README.md)
 | [workbench-core/base](./workbench-core/base/) | [@aws/workbench-core-base] | [README](./workbench-core/base/README.md)
 | [workbench-core/datasets](./workbench-core/datasets/) | [@aws/workbench-core-datasets] | [README](./workbench-core/datasets/README.md)
+| [workbench-core/datasets-ui](./workbench-core/datasets-ui/) | [@aws/workbench-core-datasets-ui] | [README](./workbench-core/datasets-ui/README.md)
 | [workbench-core/environments](./workbench-core/environments/) | [@aws/workbench-core-environments] | [README](./workbench-core/environments/README.md)
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
+| [workbench-core/swb-common-ui](./workbench-core/swb-common-ui/) | [@aws/workbench-core-swb-common-ui] | [README](./workbench-core/swb-common-ui/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on

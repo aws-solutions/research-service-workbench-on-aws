@@ -3,11 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { BaseLayout, Hero } from '@aws/workbench-core-swb-common-ui';
 import { BreadcrumbGroupProps } from '@cloudscape-design/components';
 import Box from '@cloudscape-design/components/box';
 import type { NextPage } from 'next';
-import BaseLayout from '../components/BaseLayout';
-import Hero from '../components/Hero';
 
 // Login Page
 const Home: NextPage = () => {
