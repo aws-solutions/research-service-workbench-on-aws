@@ -3,13 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { i18nStrings, getFilterCounterText, TableEmptyDisplay, TableNoMatchDisplay, useNotifications, BaseLayout } from '@aws/workbench-core-swb-common-ui';
+import { useNotifications, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
   BreadcrumbGroupProps,
   Header,
-  PropertyFilter,
   SpaceBetween,
   Table
 } from '@cloudscape-design/components';
@@ -18,13 +17,10 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useDatasets } from '../api/datasets';
-import { columnDefinitions, searchableColumns } from '../datasets-table-config/datasetsColumnDefinitions';
-import { filteringOptions } from '../datasets-table-config/datasetsFilteringOptions';
-import { filteringProperties } from '../datasets-table-config/datasetsFilteringProperties';
+import { columnDefinitions } from '../datasets-table-config/datasetsColumnDefinitions';
 
 export const DatasetsPage: NextPage = () => {
   // For functions to return content specific to the table
-  const itemType: string = 'dataset';
   // App settings constant
 
   const { datasets, areDatasetsLoading } = useDatasets();
@@ -62,51 +58,15 @@ export const DatasetsPage: NextPage = () => {
   ];
 
   // Property and date filter collections
-  const { items, filteredItemsCount, collectionProps, propertyFilterProps } = useCollection(datasets, {
-    filtering: {
-      empty: TableEmptyDisplay(itemType),
-      noMatch: TableNoMatchDisplay(itemType),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      filteringFunction: (item: any, filteringText): boolean => {
-        const filteringTextLowerCase = filteringText.toLowerCase();
-
-        return (
-          searchableColumns
-            // eslint-disable-next-line security/detect-object-injection
-            .map((key) => item[key])
-            .some(
-              (value) => typeof value === 'string' && value.toLowerCase().indexOf(filteringTextLowerCase) > -1
-            )
-        );
-      }
-    },
-    propertyFiltering: {
-      filteringProperties: filteringProperties,
-      empty: TableEmptyDisplay(itemType),
-      noMatch: TableNoMatchDisplay(itemType)
-    },
-
-    sorting: {},
-    selection: {}
-  });
+  const { items } = useCollection(datasets, {});
 
   const getContent = (): JSX.Element => {
     return (
       <Box>
         <Table
-          {...collectionProps}
           loading={areDatasetsLoading}
           selectionType="multi"
-          selectedItems={collectionProps.selectedItems}
-          ariaLabels={{
-            selectionGroupLabel: 'Items selection',
-            allItemsSelectionLabel: ({ selectedItems }) =>
-              `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`,
-            itemSelectionLabel: ({ selectedItems }, item) => {
-              const isItemSelected = selectedItems.filter((i) => i.dataset === item.dataset).length;
-              return `${item.dataset} is ${isItemSelected ? '' : 'not'} selected`;
-            }
-          }}
+          
           header={
             <>
               <Header
@@ -123,17 +83,7 @@ export const DatasetsPage: NextPage = () => {
           }
           columnDefinitions={columnDefinitions}
           loadingText="Loading datasets"
-          filter={
-            <SpaceBetween direction="vertical" size="xs">
-              <PropertyFilter
-                {...propertyFilterProps}
-                countText={getFilterCounterText(filteredItemsCount)}
-                i18nStrings={i18nStrings}
-                filteringOptions={filteringOptions}
-                expandToViewport={true}
-              />
-            </SpaceBetween>
-          }
+          
           items={items}
         />
       </Box>
