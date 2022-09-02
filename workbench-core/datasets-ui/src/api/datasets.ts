@@ -12,7 +12,6 @@ const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean }
   // TODO: Once datasetService methods return response wrapped in a {data: <response>} body, replace the line below with:
   // const datasets: DatasetItem[] = data?.data ?? [];
   const datasets: DatasetItem[] = data || [];
-  console.log(datasets, isValidating);
   return { datasets, areDatasetsLoading: isValidating };
 };
 
