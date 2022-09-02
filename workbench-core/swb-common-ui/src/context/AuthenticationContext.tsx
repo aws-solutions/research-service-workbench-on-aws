@@ -23,9 +23,6 @@ const AuthenticationContext: Context<AuthenticationProps> = createContext<Authen
 export function AuthenticationProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [user, setUser] = useState<UserItem>();
 
-  // TODO: Fix API Lambda to store access_token and refresh_token in cookies correctly
-  // Once they're stored by the auth middleware, checkIfLoggedIn will return the correct value
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const idToken = localStorage.getItem('idToken');
