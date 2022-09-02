@@ -73,8 +73,8 @@ const httpApiDelete = async (urlPath: string, params: any, withCredentials: bool
 axios.interceptors.response.use(
   (response) => {
     return response;
-    // eslint-disable-next-line @typescript-eslint/typedef
   },
+  // eslint-disable-next-line @typescript-eslint/typedef
   async function (error) {
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
