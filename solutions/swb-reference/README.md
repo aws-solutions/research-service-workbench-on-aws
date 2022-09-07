@@ -76,160 +76,178 @@ Follow instructions [here](./SETUP_v2p1.md##installation) to setup installation 
 To run integration tests
 
 1. In `./integration-tests/config` make a copy of `example.yaml` and name it `<STAGE>.yaml`. Uncomment the attributes and provide the appropriate config value.
+
+
 2. For `envTypeId` and `envType` open Postman Collection and select `List envTypes` inside `envType` folder (If Postman collection is not setup follow instructions [here](./SETUP_v2p1.md##postman-setup))
+
     1. Excecute `List envTypes` request, you should get a json response with the next information
-    ```
-        {
-        "data": [
+        ```
             {
-                "status": "APPROVED",
-                "createdAt": "2022-08-11T15:27:53.895Z",
-                "updatedBy": "########-####-####-####-############",
-                "createdBy": "########-####-####-####-############",
-                "name": "Sagemaker Jupyter Notebook",
-                "allowedRoleIds": [],
-                "resourceType": "envType",
-                "provisioningArtifactId": "<artifact id>",
-                "params": [
-                    {
-                        "DefaultValue": "ml.t3.xlarge",
-                        "IsNoEcho": false,
-                        "ParameterConstraints": {
-                            "AllowedValues": []
+            "data": [
+                {
+                    "status": "APPROVED",
+                    "createdAt": "2022-08-11T15:27:53.895Z",
+                    "updatedBy": "########-####-####-####-############",
+                    "createdBy": "########-####-####-####-############",
+                    "name": "Sagemaker Jupyter Notebook",
+                    "allowedRoleIds": [],
+                    "resourceType": "envType",
+                    "provisioningArtifactId": "<artifact id>",
+                    "params": [
+                        {
+                            "DefaultValue": "ml.t3.xlarge",
+                            "IsNoEcho": false,
+                            "ParameterConstraints": {
+                                "AllowedValues": []
+                            },
+                            "ParameterType": "String",
+                            "Description": "EC2 instance type to launch",
+                            "ParameterKey": "InstanceType"
                         },
-                        "ParameterType": "String",
-                        "Description": "EC2 instance type to launch",
-                        "ParameterKey": "InstanceType"
-                    },
-                    {
-                        "IsNoEcho": false,
-                        "ParameterConstraints": {
-                            "AllowedValues": []
+                        {
+                            "IsNoEcho": false,
+                            "ParameterConstraints": {
+                                "AllowedValues": []
+                            },
+                            "ParameterType": "Number",
+                            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+                            "ParameterKey": "AutoStopIdleTimeInMinutes"
                         },
-                        "ParameterType": "Number",
-                        "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-                        "ParameterKey": "AutoStopIdleTimeInMinutes"
-                    },
-                    {
-                        "IsNoEcho": false,
-                        "ParameterConstraints": {
-                            "AllowedValues": []
+                        {
+                            "IsNoEcho": false,
+                            "ParameterConstraints": {
+                                "AllowedValues": []
+                            },
+                            "ParameterType": "String",
+                            "Description": "The IAM policy to be associated with the launched workstation",
+                            "ParameterKey": "IamPolicyDocument"
                         },
-                        "ParameterType": "String",
-                        "Description": "The IAM policy to be associated with the launched workstation",
-                        "ParameterKey": "IamPolicyDocument"
-                    },
-                    {
-                        "DefaultValue": "1.1.1.1/1",
-                        "IsNoEcho": false,
-                        "ParameterConstraints": {
-                            "AllowedValues": []
-                        },
-                        "ParameterType": "String",
-                        "Description": "CIDR to restrict IPs that can access the environment",
-                        "ParameterKey": "CIDR"
-                    }
-                ],
-                "updatedAt": "2022-08-11T15:27:53.895Z",
-                "sk": "ET#<id number>",
-                "owner": "########-####-####-####-############",
-                "description": "An Amazon SageMaker Jupyter Notebook",
-                "id": "########-####-####-####-############",
-                "pk": "ET#<id number>",
-                "productId": "<product id>",
-                "type": "sagemakerNotebook"
-            }
-        ]
-    }
-    ```
-    If there are no environment types displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type
+                        {
+                            "DefaultValue": "1.1.1.1/1",
+                            "IsNoEcho": false,
+                            "ParameterConstraints": {
+                                "AllowedValues": []
+                            },
+                            "ParameterType": "String",
+                            "Description": "CIDR to restrict IPs that can access the environment",
+                            "ParameterKey": "CIDR"
+                        }
+                    ],
+                    "updatedAt": "2022-08-11T15:27:53.895Z",
+                    "sk": "ET#<id number>",
+                    "owner": "########-####-####-####-############",
+                    "description": "An Amazon SageMaker Jupyter Notebook",
+                    "id": "########-####-####-####-############",
+                    "pk": "ET#<id number>",
+                    "productId": "<product id>",
+                    "type": "sagemakerNotebook"
+                }
+            ]
+        }
+        ```
+        If there are no environment types displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type
+
     2. Choose the Environment Type that integration test will use as default when creating any Environment and copy the values from properties `id` and `type` from request.
+
     3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in <STAGE>.yaml file 
+
+
 3. For `envTypeConfigId` open Postman Collection and select `List envTypeConfigs` inside `envTypeConfig` folder.
+    
     1. Replace `:envTypeId` in the URL request `{{API_URL}}/environmentTypes/:envTypeId/configurations` with value of the environment type id from the previous step.
+
     2. Excecute `List envTypeConfigs` request, you should get a json response with the next information
-    ```
-    {
-        "data": [
-            {
-                "createdAt": "2022-08-11T15:29:15.935Z",
-                "updatedBy": "########-####-####-####-############",
-                "createdBy": "########-####-####-####-############",
-                "name": "Config 1",
-                "allowedRoleIds": [],
-                "resourceType": "envTypeConfig",
-                "provisioningArtifactId": "<artifact id>",
-                "params": [
-                    {
-                        "value": "${iamPolicyDocument}",
-                        "key": "IamPolicyDocument"
-                    },
-                    {
-                        "value": "ml.t3.medium",
-                        "key": "InstanceType"
-                    },
-                    {
-                        "value": "0",
-                        "key": "AutoStopIdleTimeInMinutes"
-                    },
-                    {
-                        "value": "0.0.0.0/0",
-                        "key": "CIDR"
-                    }
-                ],
-                "updatedAt": "2022-08-11T15:29:15.935Z",
-                "sk": "ET#<id number>}",
-                "owner": "########-####-####-####-############",
-                "description": "Description for config 1",
-                "id": "########-####-####-####-############",
-                "pk": "ETC",
-                "productId": "<product id>",
-                "type": "sagemakerNotebook"
-            }
-        ]
-    }
-    ```
-    If there are no environment type configs displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type config.
+        ```
+        {
+            "data": [
+                {
+                    "createdAt": "2022-08-11T15:29:15.935Z",
+                    "updatedBy": "########-####-####-####-############",
+                    "createdBy": "########-####-####-####-############",
+                    "name": "Config 1",
+                    "allowedRoleIds": [],
+                    "resourceType": "envTypeConfig",
+                    "provisioningArtifactId": "<artifact id>",
+                    "params": [
+                        {
+                            "value": "${iamPolicyDocument}",
+                            "key": "IamPolicyDocument"
+                        },
+                        {
+                            "value": "ml.t3.medium",
+                            "key": "InstanceType"
+                        },
+                        {
+                            "value": "0",
+                            "key": "AutoStopIdleTimeInMinutes"
+                        },
+                        {
+                            "value": "0.0.0.0/0",
+                            "key": "CIDR"
+                        }
+                    ],
+                    "updatedAt": "2022-08-11T15:29:15.935Z",
+                    "sk": "ET#<id number>}",
+                    "owner": "########-####-####-####-############",
+                    "description": "Description for config 1",
+                    "id": "########-####-####-####-############",
+                    "pk": "ETC",
+                    "productId": "<product id>",
+                    "type": "sagemakerNotebook"
+                }
+            ]
+        }
+        ```
+        If there are no environment type configs displayed please follow instructions [here](../swb-reference/SETUP_v2p1.md###setup-project-configurations,-environmentType,-and-environmenttypeconfig) to create a new environment type config.
+
     3. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
+
     4. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in <STAGE>.yaml file 
 
+
 4. For `projectId` open Postman Collection and select `List projects` inside `projects` folder.
+
     1. Excecute `List projects` request, you should get a json response with the next information
-    ```
-    {
-        "data": [
-            {
-                "subnetId": "subnet-<subnet id>",
-                "accountId": "<account id>",
-                "awsAccountId": "<Hosting account id>",
-                "environmentInstanceFiles": "s3://swb-dev-va-<bucket id>/environment-files",
-                "createdAt": "2022-01-28T22:42:20.296Z",
-                "updatedBy": "abc",
-                "vpcId": "vpc<vpc id>",
-                "envMgmtRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-env-mgmt",
-                "createdBy": "abc",
-                "name": "Project 1",
-                "encryptionKeyArn": "arn:aws:kms:us-east-1:<hosting account id>:key/########-####-####-####-############",
-                "resourceType": "project",
-                "externalId": "workbench",
-                "updatedAt": "2022-02-02T21:07:30.237Z",
-                "projectAdmins": [],
-                "indexId": "index-123",
-                "sk": "PROJ#<proj id>",
-                "owner": "abc",
-                "description": "Example project 1",
-                "id": "########-####-####-####-############",
-                "pk": "########-####-####-####-############",
-                "hostingAccountHandlerRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-hosting-account-role"
-            }
-        ]
-    }
-    ```
-    3. Choose the Project that integration test will use as default when creating any Environment and copy the `id` value from the request.
-    4. In `./integration-tests/config` directory assign value copied to `projectId` property in <STAGE>.yaml file 
+        ```
+        {
+            "data": [
+                {
+                    "subnetId": "subnet-<subnet id>",
+                    "accountId": "<account id>",
+                    "awsAccountId": "<Hosting account id>",
+                    "environmentInstanceFiles": "s3://swb-dev-va-<bucket id>/environment-files",
+                    "createdAt": "2022-01-28T22:42:20.296Z",
+                    "updatedBy": "abc",
+                    "vpcId": "vpc<vpc id>",
+                    "envMgmtRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-env-mgmt",
+                    "createdBy": "abc",
+                    "name": "Project 1",
+                    "encryptionKeyArn": "arn:aws:kms:us-east-1:<hosting account id>:key/########-####-####-####-############",
+                    "resourceType": "project",
+                    "externalId": "workbench",
+                    "updatedAt": "2022-02-02T21:07:30.237Z",
+                    "projectAdmins": [],
+                    "indexId": "index-123",
+                    "sk": "PROJ#<proj id>",
+                    "owner": "abc",
+                    "description": "Example project 1",
+                    "id": "########-####-####-####-############",
+                    "pk": "########-####-####-####-############",
+                    "hostingAccountHandlerRoleArn": "arn:aws:iam::<hosting account id>:role/swb-dev-va-hosting-account-role"
+                }
+            ]
+        }
+        ```
+
+    2. Choose the Project that integration test will use as default when creating any Environment and copy the `id` value from the request.
+
+    3. In `./integration-tests/config` directory assign value copied to `projectId` property in <STAGE>.yaml file 
+
 
 5. For `terminatedEnvId` we need the id of an environment that has been terminated, Postman collection request `List Environments` does not show terminated environments ,so we need to save the id of a stopped environment before we terminate it.
+
     1. Create an environment by opening Postman Collection and select `Launch Environment` inside `environments` folder
+    
     2. Click on the Body section of the request and fill the next values 
         ```
         {
@@ -243,6 +261,7 @@ To run integration tests
         }
         ```
         We can use the values from previous steps to fill the create request body
+
     3. Execute `Launch Environment` request and copy the id property from the response
         ```
         {
@@ -254,13 +273,20 @@ To run integration tests
             "outputs": [],
             ......
         ```
+
     4. In `./integration-tests/config` directory assign value copied to `terminatedEnvId` property in <STAGE>.yaml file. 
-    5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and excecute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and excecute `List Environments` request again 
-    4. Once environment is completed select `Stop Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id/stop` with the id of the environment created in previous step.
-    5. Excecute `Stop Environment` and wait until environment has status `STOPPED`, use `List Environments` request to monitor status.
-    6. Once environemnt is stopped select `Terminate Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id` with the id of the environment created in previous step.
-    5. Excecute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
+
+    5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and excecute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and excecute `List Environments` request again.
+
+    6. Once environment is completed select `Stop Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id/stop` with the id of the environment created in previous step.
+
+    7. Excecute `Stop Environment` and wait until environment has status `STOPPED`, use `List Environments` request to monitor status.
+
+    8. Once environemnt is stopped select `Terminate Environment` inside `environments` folder and replace the `:id` on the request URL `{{API_URL}}/environments/:id` with the id of the environment created in previous step.
+
+    9. Excecute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
    
+
 5. For `rootUsername`, type the email of the root user that is going to login into the application to run the integration tests, this is configured in <STAGE>.yaml file in `./src/config` directory for the installation step
 
 6. For `rootPasswordParamsStorePath`, go to the AWS console for your Main account, and [create a parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) to store the root user password. 
