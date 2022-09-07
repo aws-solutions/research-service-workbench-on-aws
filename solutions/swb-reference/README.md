@@ -149,7 +149,7 @@ To run integration tests
 
     2. Choose the Environment Type that integration test will use as default when creating any Environment and copy the values from properties `id` and `type` from request.
 
-    3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in <STAGE>.yaml file 
+    3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in `<STAGE>.yaml` file 
 
 
 3. For `envTypeConfigId` open Postman Collection and select `List envTypeConfigs` inside `envTypeConfig` folder.
@@ -202,7 +202,7 @@ To run integration tests
 
     3. Choose the Environment Type Config that integration test will use as default when creating any Environment and copy the `id` value from the request.
 
-    4. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in <STAGE>.yaml file 
+    4. In `./integration-tests/config` directory assign value copied to `envTypeConfigId` property in `<STAGE>.yaml` file 
 
 
 4. For `projectId` open Postman Collection and select `List projects` inside `projects` folder.
@@ -241,7 +241,7 @@ To run integration tests
 
     2. Choose the Project that integration test will use as default when creating any Environment and copy the `id` value from the request.
 
-    3. In `./integration-tests/config` directory assign value copied to `projectId` property in <STAGE>.yaml file 
+    3. In `./integration-tests/config` directory assign value copied to `projectId` property in `<STAGE>.yaml` file 
 
 
 5. For `terminatedEnvId` we need the id of an environment that has been terminated, Postman collection request `List Environments` does not show terminated environments ,so we need to save the id of a stopped environment before we terminate it.
@@ -274,7 +274,7 @@ To run integration tests
             ......
         ```
 
-    4. In `./integration-tests/config` directory assign value copied to `terminatedEnvId` property in <STAGE>.yaml file. 
+    4. In `./integration-tests/config` directory assign value copied to `terminatedEnvId` property in `<STAGE>.yaml` file. 
 
     5. Wait for environment to have status `COMPLETED`, in Postman collection select `List Environments` inside `environments` folder and excecute request, look for environment created and check if the property `status` has value `COMPLETED`, if it has `PENDING` status wait 5 minutes and excecute `List Environments` request again.
 
@@ -287,7 +287,7 @@ To run integration tests
     9. Excecute `Terminate Environment` and wait until environment is terminated, once the environment is terminated it will not be displayed in `List Environments` request anymore.
    
 
-5. For `rootUsername`, type the email of the root user that is going to login into the application to run the integration tests, this is configured in <STAGE>.yaml file in `./src/config` directory for the installation step
+5. For `rootUsername`, type the email of the root user that is going to login into the application to run the integration tests, this is configured in `<STAGE>.yaml` file in `./src/config` directory for the installation step
 
 6. For `rootPasswordParamsStorePath`, go to the AWS console for your Main account, and [create a parameter](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-create-console.html) to store the root user password. 
 The name of the parameter should be  `/swb/<STAGE>/rootUser/password`
