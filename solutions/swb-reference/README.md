@@ -68,6 +68,11 @@ This step is necessary to setup Service Catalog portfolio and products
 
 ## Integration Tests
 
+`swb-reference` package contains integration tests that run API tests against SWB APIs, they can be configured to run automatically as part of a GitHub workflow or CI/CD pipeline.
+
+We recommend to create a non-production environment with a different <STAGE> name for integration test as this process will create resources in the environment they are executed against.
+
+
 ### Prerequisite
 
 Follow instructions [here](./SETUP_v2p1.md##installation) to setup installation of API and Postman collection.
