@@ -79,9 +79,8 @@ Follow instructions [here](./SETUP_v2p1.md##installation) to setup installation 
 
 #### Resources to create through SWB UI:
 
-- **Test Administrator:** Create an internal admin-role user for running integration tests. (**Note the rootUsername and rootPassword**)
+**Test Administrator:** Create an internal admin-role user for running integration tests. (**Note the rootUsername and rootPassword**)
 
-- **Test Project:** Create a default project for running integration tests. (**Note the projectId**)
 
 
 #### Resources for Advanced Tests
