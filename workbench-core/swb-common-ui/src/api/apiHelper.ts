@@ -69,4 +69,22 @@ const httpApiDelete = async (urlPath: string, params: any, withCredentials: bool
   return await fetchData(options);
 };
 
+// Response interceptor for API calls
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  // eslint-disable-next-line @typescript-eslint/typedef
+  async function (error) {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const response = await httpApiGet('refresh', {});
+      localStorage.setItem('idToken', response.idToken);
+      return axios(originalRequest);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export { httpApiGet, httpApiPost, httpApiPut, httpApiDelete };

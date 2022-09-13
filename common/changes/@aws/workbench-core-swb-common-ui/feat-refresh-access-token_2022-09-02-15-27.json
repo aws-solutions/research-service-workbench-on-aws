@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "comment": "use refresh token to refresh expired access token",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-swb-common-ui"
+}
