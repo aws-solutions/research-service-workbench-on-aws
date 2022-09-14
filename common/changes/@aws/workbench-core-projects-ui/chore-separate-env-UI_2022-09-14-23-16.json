@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-projects-ui",
+      "comment": "feat: separate out UI packages",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-projects-ui"
+}
