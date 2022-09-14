@@ -20,8 +20,4 @@
 # awsAccountId: ''
 # envMgmtRoleArn: ''
 # hostingAccountHandlerRoleArn: ''
-# vpcId: ''
-# subnetId: ''
-# cidr: ''
 # encryptionKeyArn: ''
-# externalId: ''
