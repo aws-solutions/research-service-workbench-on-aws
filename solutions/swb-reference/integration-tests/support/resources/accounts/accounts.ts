@@ -4,14 +4,13 @@
  */
 
 import ClientSession from '../../clientSession';
-import { AccountHelper } from '../../complex/accountHelper';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
 import Account from './account';
 
 export default class Accounts extends CollectionResource {
   public constructor(clientSession: ClientSession) {
-    super(clientSession, 'aws-accounts', 'awsAccount');
+    super(clientSession, 'aws-accounts', 'account');
     this._api = 'aws-accounts';
   }
 
@@ -29,13 +28,6 @@ export default class Accounts extends CollectionResource {
       environmentInstanceFiles: resource.environmentInstanceFiles,
       encryptionKeyArn: resource.encryptionKeyArn
     };
-  }
-
-  public async getOnboardedAccount(): Promise<string> {
-    const defAdminSession = await this._setup.getDefaultAdminSession();
-    const accountHelper = new AccountHelper(this._setup.getMainAwsClient(), defAdminSession);
-    const existingAwsAccountId = await accountHelper.getOnboardedAccount();
-    return existingAwsAccountId;
   }
 }
 

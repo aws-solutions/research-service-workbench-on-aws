@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
 import { AccountHelper } from '../../../support/complex/accountHelper';
 import Setup from '../../../support/setup';
@@ -36,10 +37,18 @@ describe('aws-accounts create negative tests', () => {
 
   describe('Account already onboarded', () => {
     test('awsAccountId', async () => {
+      const accountHelper = new AccountHelper(setup.getMainAwsClient());
+      const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+      const existingAccounts = await accountHelper.listOnboardedAccounts();
+
+      if (existingAccounts.length === 0) {
+        console.log('No hosting accounts have been onboarded. Skipping this test.');
+        return;
+      }
+
+      const existingAwsAccountId = _.first(existingAccounts)!.awsAccountId;
+      invalidParam.awsAccountId = existingAwsAccountId;
       try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
-        const existingAwsAccountId = await adminSession.resources.accounts.getOnboardedAccount();
-        invalidParam.awsAccountId = existingAwsAccountId;
         await adminSession.resources.accounts.create(invalidParam, false);
       } catch (e) {
         checkHttpError(
@@ -47,7 +56,7 @@ describe('aws-accounts create negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message: "requires property 'datasetName'"
+            message: 'This AWS Account was found in DDB. Please provide the correct id value in request body'
           })
         );
       }

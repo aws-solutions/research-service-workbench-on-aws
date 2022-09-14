@@ -23,6 +23,5 @@
 # vpcId: ''
 # subnetId: ''
 # cidr: ''
-# environmentInstanceFiles: ''
 # encryptionKeyArn: ''
 # externalId: ''

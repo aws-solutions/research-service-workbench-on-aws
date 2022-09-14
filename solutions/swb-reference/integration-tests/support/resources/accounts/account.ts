@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import { AccountHelper } from '../../complex/accountHelper';
 import Resource from '../base/resource';
@@ -13,11 +14,13 @@ export default class Account extends Resource {
   }
 
   protected async cleanup(): Promise<void> {
-    const defAdminSession = await this._setup.getDefaultAdminSession();
-    const { data: resource } = await defAdminSession.resources.accounts.account(this._id).get();  // TODO: This API doesn't exist, need a helper method
-    const { accountId, awsAccountId } = resource;
+    const accountHelper = new AccountHelper(this._setup.getMainAwsClient());
+    const settings = this._setup.getSettings();
+    const existingAccounts = await accountHelper.listOnboardedAccounts();
+    const resource = _.find(existingAccounts, { awsAccountId: settings.get('hostAwsAccountId') });
+    const { id, awsAccountId } = resource!;
 
-    const accountHelper = new AccountHelper(this._setup.getMainAwsClient(), defAdminSession);
-    await accountHelper.deleteDdbRecords(accountId, awsAccountId);
+    await accountHelper.deOnboardAccount(awsAccountId);
+    await accountHelper.deleteDdbRecords(id, awsAccountId);
   }
 }
