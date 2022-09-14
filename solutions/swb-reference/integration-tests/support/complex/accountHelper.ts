@@ -1,11 +1,18 @@
-// import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
+import { PolicyDocument } from '@aws-cdk/aws-iam';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
-// import { IamHelper } from '@aws/workbench-core-datasets';
+import { IamHelper } from '@aws/workbench-core-datasets';
 import _ from 'lodash';
+import Setup from '../setup';
+import Settings from '../utils/settings';
 
 export class AccountHelper {
   private _awsSdk: AwsService;
+  private _settings: Settings;
   public constructor(awsSdkClient: AwsService) {
+    const setup: Setup = new Setup();
+    const settings: Settings = setup.getSettings();
+    this._settings = settings;
     this._awsSdk = awsSdkClient;
   }
 
@@ -75,97 +82,72 @@ export class AccountHelper {
     await this._awsSdk.clients.eventBridge.putRule(putRuleParams);
   }
 
-  // public async updateArtifactsBucketPolicy(artifactBucketArn: string, awsAccountId: string): Promise<void> {
-  //   const bucketName = artifactBucketArn.split(':').pop() as string;
+  public async updateMainAccountEncryptionKeyPolicy(
+    awsAccountId: string
+  ): Promise<void> {
+    const mainAcctEncryptionArn = this._settings.get('MainAccountEncryptionKeyOutput');
+    const keyId = mainAcctEncryptionArn.split('/').pop()!;
+    const keyPolicyResponse = await this._awsSdk.clients.kms.getKeyPolicy({
+      KeyId: keyId,
+      PolicyName: 'default'
+    });
+    let keyPolicy = PolicyDocument.fromJson(JSON.parse(keyPolicyResponse.Policy!));
 
-  //   let bucketPolicy: PolicyDocument = new PolicyDocument();
-  //   try {
-  //     const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
-  //       Bucket: bucketName
-  //     });
-  //     bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
-  //   } catch (e) {
-  //     // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
-  //     if (e.Code !== 'NoSuchBucketPolicy') {
-  //       throw e;
-  //     }
-  //   }
+    keyPolicy = IamHelper.removePrincipalFromStatement(
+      keyPolicy,
+      'main-key-share-statement',
+      `arn:aws:iam::${awsAccountId}:root`
+    );
 
-  //   // If List statement doesn't exist, create one
-  //   if (!IamHelper.containsStatementId(bucketPolicy, 'List:environment-files')) {
-  //     const listStatement = PolicyStatement.fromJson(
-  //       JSON.parse(`
-  //      {
-  //       "Sid": "List:environment-files",
-  //       "Effect": "Allow",
-  //       "Principal": {
-  //         "AWS":"arn:aws:iam::${awsAccountId}:root"
-  //       },
-  //       "Action": "s3:ListBucket",
-  //       "Resource": ["${artifactBucketArn}"],
-  //       "Condition": {
-  //         "StringLike": {
-  //           "s3:prefix": "environment-files*"
-  //           }
-  //         }
-  //       }`)
-  //     );
-  //     bucketPolicy.addStatements(listStatement);
-  //   } else {
-  //     // If List statement doesn't contain this accountId, add it
-  //     bucketPolicy = IamHelper.addPrincipalToStatement(
-  //       bucketPolicy,
-  //       'List:environment-files',
-  //       `arn:aws:iam::${awsAccountId}:root`
-  //     );
-  //   }
+    const putPolicyParams = {
+      KeyId: keyId,
+      PolicyName: 'default',
+      Policy: JSON.stringify(keyPolicy.toJSON())
+    };
 
-  //   // If Get statement doesn't exist, create one
-  //   if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
-  //     const getStatement = PolicyStatement.fromJson(
-  //       JSON.parse(`
-  //      {
-  //       "Sid": "Get:environment-files",
-  //       "Effect": "Allow",
-  //       "Principal": {
-  //         "AWS":"arn:aws:iam::${awsAccountId}:root"
-  //       },
-  //       "Action": "s3:GetObject",
-  //       "Resource": ["${artifactBucketArn}/environment-files*"]
-  //       }`)
-  //     );
-  //     bucketPolicy.addStatements(getStatement);
-  //   } else {
-  //     // If Get statement doesn't contain this accountId, add it
-  //     bucketPolicy = IamHelper.addPrincipalToStatement(
-  //       bucketPolicy,
-  //       'Get:environment-files',
-  //       `arn:aws:iam::${awsAccountId}:root`
-  //     );
-  //   }
+    // Update key policy
+    await this._awsSdk.clients.kms.putKeyPolicy(putPolicyParams);
+  }
 
-  //   const putPolicyParams: PutBucketPolicyCommandInput = {
-  //     Bucket: bucketName,
-  //     Policy: JSON.stringify(bucketPolicy.toJSON())
-  //   };
+  public async updateArtifactsBucketPolicy(awsAccountId: string): Promise<void> {
+    const bucketName = this._settings.get('S3BucketArtifactsArnOutput').split(':').pop();
+    const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._awsSdk.clients.s3.getBucketPolicy({
+      Bucket: bucketName
+    });
+    let bucketPolicy;
+    bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
 
-  //   // Update bucket policy
-  //   await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
-  // }
+    bucketPolicy = IamHelper.removePrincipalFromStatement(
+      bucketPolicy,
+      'List:environment-files',
+      `arn:aws:iam::${awsAccountId}:root`
+    );
+
+    bucketPolicy = IamHelper.removePrincipalFromStatement(
+      bucketPolicy,
+      'Get:environment-files',
+      `arn:aws:iam::${awsAccountId}:root`
+    );
+
+    const putPolicyParams: PutBucketPolicyCommandInput = {
+      Bucket: bucketName,
+      Policy: JSON.stringify(bucketPolicy.toJSON())
+    };
+
+    // Update bucket policy
+    await this._awsSdk.clients.s3.putBucketPolicy(putPolicyParams);
+  }
 
   public async deOnboardAccount(awsAccountId: string): Promise<void> {
-  // TODO: Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount() and hostingAccountLifecycleService.updateAccount()
+  // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
 
   // Update main account default event bus to remove hosting account state change events
   await this.updateBusPermissions(awsAccountId);
 
   // Remove account to artifactBucket's bucket policy
-  // await this.updateArtifactsBucketPolicy(artifactBucketArn, accountMetadata.awsAccountId);
+  await this.updateArtifactsBucketPolicy(awsAccountId);
 
   // Update main account encryption key policy
-  // await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, accountMetadata.awsAccountId);
-
+  await this.updateMainAccountEncryptionKeyPolicy(awsAccountId);
   }
-
-  
 }

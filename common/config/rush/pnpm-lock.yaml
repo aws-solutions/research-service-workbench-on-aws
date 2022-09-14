@@ -181,6 +181,7 @@ importers:
 
   ../../solutions/swb-reference:
     specifiers:
+      '@aws-cdk/aws-iam': ^1.159.0
       '@aws-sdk/client-cloudformation': ^3.118.1
       '@aws-sdk/client-dynamodb': ^3.118.1
       '@aws-sdk/client-s3': ^3.118.1
@@ -263,6 +264,7 @@ importers:
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
+      '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-sagemaker': 3.130.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.2
@@ -1542,7 +1544,6 @@ packages:
       '@aws-cdk/cx-api': 1.159.0
       '@aws-cdk/region-info': 1.159.0
       constructs: 3.4.25
-    dev: false
 
   /@aws-cdk/aws-kinesis/1.158.0:
     resolution: {integrity: sha512-Wkbtq3lV97MvXw4fhIjh7EVtLtIvgIg+5v8AJoD1GTOw/iHyZi0hXfNBqO+sTkqq51RJnHMDP6naQgcE6M9VxQ==}
@@ -1699,7 +1700,6 @@ packages:
     dependencies:
       jsonschema: 1.4.1
       semver: 7.3.7
-    dev: false
     bundledDependencies:
       - jsonschema
       - semver
@@ -1748,7 +1748,6 @@ packages:
       fs-extra: 9.1.0
       ignore: 5.2.0
       minimatch: 3.1.2
-    dev: false
     bundledDependencies:
       - fs-extra
       - minimatch
@@ -1785,7 +1784,6 @@ packages:
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.159.0
       semver: 7.3.7
-    dev: false
     bundledDependencies:
       - semver
 
@@ -1797,7 +1795,6 @@ packages:
   /@aws-cdk/region-info/1.159.0:
     resolution: {integrity: sha512-RrCXLeMcGPSuCR0LxAMTLrVlk1dG7d+BFfEnTV8BZDz6sxaGm4gs10xUZ2QQW4ebQdN5zn0xUnEiElO1PFR/Qg==}
     engines: {node: '>= 10.13.0 <13 || >=13.7.0'}
-    dev: false
 
   /@aws-crypto/crc32/2.0.0:
     resolution: {integrity: sha512-TvE1r2CUueyXOuHdEigYjIZVesInd9KN+K/TFFNfkkxRThiNxO6i4ZqqAVMoEjAamZZ1AA8WXJkjCz7YShHPQA==}
@@ -8713,7 +8710,6 @@ packages:
   /constructs/3.4.25:
     resolution: {integrity: sha512-Ilp8VFOVHCS9+TQxp0o+kD43s4Q53rqfu26vrI5ubVAFtxTEKsUyCnugeqwjm+rtMHM1iNFGujk0tGVFNhSnxQ==}
     engines: {node: '>= 14.17.0'}
-    dev: false
 
   /content-disposition/0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
