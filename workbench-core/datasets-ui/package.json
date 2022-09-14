@@ -40,8 +40,8 @@
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@cloudscape-design/components": "^3.0.27",
     "@cloudscape-design/collection-hooks": "^1.0.3",
+    "@cloudscape-design/components": "^3.0.27",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",
