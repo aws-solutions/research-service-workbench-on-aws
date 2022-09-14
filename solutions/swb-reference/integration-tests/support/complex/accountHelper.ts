@@ -16,6 +16,7 @@ export class AccountHelper {
     this._awsSdk = awsSdkClient;
   }
 
+  // TODO: Replace with Accounts list API call when it is available
   public async listOnboardedAccounts(): Promise<{[id: string]: string}[]> {
     const queryParams = {
       index: 'getResourceByCreatedAt',
@@ -49,7 +50,7 @@ export class AccountHelper {
     return _.includes(JSON.parse(busRule.EventPattern!).account, awsAccountId);
   }
 
-  public async updateBusPermissions(awsAccountId: string): Promise<void> {
+  public async removeBusPermissions(awsAccountId: string): Promise<void> {
     const busName = 'default';
 
     const params = {
@@ -82,7 +83,7 @@ export class AccountHelper {
     await this._awsSdk.clients.eventBridge.putRule(putRuleParams);
   }
 
-  public async updateMainAccountEncryptionKeyPolicy(
+  public async removeAccountFromKeyPolicy(
     awsAccountId: string
   ): Promise<void> {
     const mainAcctEncryptionArn = this._settings.get('MainAccountEncryptionKeyOutput');
@@ -109,7 +110,7 @@ export class AccountHelper {
     await this._awsSdk.clients.kms.putKeyPolicy(putPolicyParams);
   }
 
-  public async updateArtifactsBucketPolicy(awsAccountId: string): Promise<void> {
+  public async removeAccountFromBucketPolicy(awsAccountId: string): Promise<void> {
     const bucketName = this._settings.get('S3BucketArtifactsArnOutput').split(':').pop();
     const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._awsSdk.clients.s3.getBucketPolicy({
       Bucket: bucketName
@@ -142,12 +143,12 @@ export class AccountHelper {
   // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
 
   // Update main account default event bus to remove hosting account state change events
-  await this.updateBusPermissions(awsAccountId);
+  await this.removeBusPermissions(awsAccountId);
 
   // Remove account to artifactBucket's bucket policy
-  await this.updateArtifactsBucketPolicy(awsAccountId);
+  await this.removeAccountFromBucketPolicy(awsAccountId);
 
   // Update main account encryption key policy
-  await this.updateMainAccountEncryptionKeyPolicy(awsAccountId);
+  await this.removeAccountFromKeyPolicy(awsAccountId);
   }
 }

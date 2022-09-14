@@ -2,13 +2,11 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
 import _ from 'lodash';
-// import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import { AccountHelper } from '../../support/complex/accountHelper';
 import Setup from '../../support/setup';
-// import RandomTextGenerator from '../../support/utils/randomTextGenerator';
-// import { uuidRegExp } from '../../support/utils/regExpressions';
 import Settings, { SettingKey } from '../../support/utils/settings';
 
 describe('multiStep aws-account integration test', () => {

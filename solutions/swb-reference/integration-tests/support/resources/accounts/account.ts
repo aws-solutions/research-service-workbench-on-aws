@@ -18,9 +18,11 @@ export default class Account extends Resource {
     const settings = this._setup.getSettings();
     const existingAccounts = await accountHelper.listOnboardedAccounts();
     const resource = _.find(existingAccounts, { awsAccountId: settings.get('hostAwsAccountId') });
-    const { id, awsAccountId } = resource!;
 
-    await accountHelper.deOnboardAccount(awsAccountId);
-    await accountHelper.deleteDdbRecords(id, awsAccountId);
+    if (resource) {
+      const { id, awsAccountId } = resource;
+      await accountHelper.deOnboardAccount(awsAccountId);
+      await accountHelper.deleteDdbRecords(id, awsAccountId);
+    }
   }
 }
