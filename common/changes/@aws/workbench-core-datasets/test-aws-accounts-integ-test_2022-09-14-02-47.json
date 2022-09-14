@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "chore: add test cleanup logic",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}
