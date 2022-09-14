@@ -5,9 +5,8 @@
 
 import { EnvironmentConnectionLinkPlaceholder } from '@aws/workbench-core-environments';
 import { useNotifications } from '@aws/workbench-core-swb-common-ui';
-import { Modal, SpaceBetween, Link } from '@cloudscape-design/components';
-import Box from '@cloudscape-design/components/box';
-import Button from '@cloudscape-design/components/button';
+import { Modal, SpaceBetween, Link, Box, Button } from '@cloudscape-design/components';
+import React from 'react';
 
 interface EnvironmentConnectModalProps {
   closeModal: () => void;

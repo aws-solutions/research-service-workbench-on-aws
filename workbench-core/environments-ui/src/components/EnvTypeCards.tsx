@@ -14,7 +14,7 @@ import {
   CardsProps,
   TextContent
 } from '@cloudscape-design/components';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { EnvTypeItem } from '../models/EnvironmentType';
 
 interface OnSelectEnvTypeFunction {

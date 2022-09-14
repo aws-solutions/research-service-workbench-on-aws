@@ -3,6 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { NewEnvironmentPage } from '@aws/workbench-core-environments-ui';
+import { useProjects } from './api/projects';
 
-export default NewEnvironmentPage;
+
+export {
+  useProjects
+};

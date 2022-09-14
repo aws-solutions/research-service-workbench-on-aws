@@ -108,6 +108,18 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "projectFolder": "workbench-core/environments-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-projects-ui",
+      "projectFolder": "workbench-core/projects-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@aws/workbench-core-example-express",
       "projectFolder": "workbench-core/example/express",
       "reviewCategory": "prototypes",
