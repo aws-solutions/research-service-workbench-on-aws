@@ -4,7 +4,6 @@
  */
 
 import ClientSession from '../../clientSession';
-import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
 import Account from './account';
 
@@ -19,10 +18,8 @@ export default class Accounts extends CollectionResource {
   }
 
   protected _buildDefaults(resource: AccountCreateRequest): AccountCreateRequest {
-    const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
-    const awsAccountId = randomTextGenerator.getFakeText('test-Acct');
     return {
-      awsAccountId: resource.awsAccountId ?? awsAccountId,
+      awsAccountId: 'sampleAccountId',
       envMgmtRoleArn: resource.envMgmtRoleArn,
       hostingAccountHandlerRoleArn: resource.hostingAccountHandlerRoleArn,
       environmentInstanceFiles: resource.environmentInstanceFiles,
