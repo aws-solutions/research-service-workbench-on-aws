@@ -33,7 +33,7 @@
   "dependencies": {
     "@aws/workbench-core-swb-common-ui": "workspace:*",
     "@aws/workbench-core-datasets-ui": "workspace:*",
-    "@aws/workbench-core-projects-ui": "workspace:*",
+    "@aws/workbench-core-accounts-ui": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
     "next": "^12.1.5",
     "react": "17.0.2",

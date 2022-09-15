@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { useProjects } from '@aws/workbench-core-accounts-ui';
 import { useDatasets } from '@aws/workbench-core-datasets-ui';
-import { useProjects } from '@aws/workbench-core-projects-ui';
 import { nameRegex, BaseLayout } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
@@ -104,7 +104,7 @@ const NewEnvironmentPage: NextPage = () => {
     {
       field: 'description',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      condition: (a: any) => !a || a.length <= 500,
+      condition: (a: any) => a && a.length <= 500,
       message: 'Description cannot be longer than 500 characters'
     },
     {

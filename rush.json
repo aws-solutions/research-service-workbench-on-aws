@@ -114,8 +114,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-projects-ui",
-      "projectFolder": "workbench-core/projects-ui",
+      "packageName": "@aws/workbench-core-accounts-ui",
+      "projectFolder": "workbench-core/accounts-ui",
       "reviewCategory": "production",
       "shouldPublish": true
     },
