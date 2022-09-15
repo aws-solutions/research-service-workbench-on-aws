@@ -120,16 +120,14 @@ export default class AccountService {
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
     // Verify awsAccountId is specified
     if (_.isUndefined(accountMetadata.awsAccountId))
-      throw new Error('Missing AWS Account ID in request body');
+      throw Boom.badRequest('Missing AWS Account ID in request body');
 
     // Check if AWS account ID already exists in DDB
     const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
     const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
     // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
     if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0) {
-      throw new Error(
-        'This AWS Account was found in DDB. Please provide the correct id value in request body'
-      );
+      throw Boom.badRequest('This AWS Account was found in DDB. Please provide the correct id value in request body');
     }
   }
 
@@ -138,7 +136,7 @@ export default class AccountService {
     if (!_.isUndefined(accountMetadata.awsAccountId)) {
       const ddbEntry = await this.getAccount(accountMetadata.id);
       if (ddbEntry.awsAccountId !== accountMetadata.awsAccountId) {
-        throw new Error('The AWS Account mapped to this accountId is different than the one provided');
+        throw Boom.badRequest('The AWS Account mapped to this accountId is different than the one provided');
       }
     }
   }

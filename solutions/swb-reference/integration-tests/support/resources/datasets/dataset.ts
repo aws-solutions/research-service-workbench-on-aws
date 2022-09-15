@@ -23,7 +23,7 @@ export default class Dataset extends Resource {
     const { storageName, path } = resource;
 
     // Delete DDB entries, and path folder from bucket (to prevent test resources polluting a prod env)
-    const datasetHelper = new DatasetHelper(this._setup.getMainAwsClient(), defAdminSession);
+    const datasetHelper = new DatasetHelper();
     await datasetHelper.deleteS3Resources(storageName, path);
     await datasetHelper.deleteDdbRecords(this._id);
   }

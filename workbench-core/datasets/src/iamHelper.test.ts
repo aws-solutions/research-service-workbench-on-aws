@@ -383,6 +383,137 @@ describe('IamHelper', () => {
     });
   });
 
+  describe('removePrincipalFromStatement', () => {
+    it('returns empty doc if source doc is empty', () => {
+      const source = new PolicyDocument();
+      const targetSid = 'StatementToCheck';
+      const newPrincipal = `arn:aws:iam::newAccountId:root`;
+      try {
+        IamHelper.removePrincipalFromStatement(source, targetSid, newPrincipal);
+      } catch (err) {
+        expect(err.message).toBe('Cannot remove principal. Policy document is invalid');
+      }
+    });
+
+    it('removes principal from new array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::newAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const principalToRemove = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.removePrincipalFromStatement(source, targetSid, principalToRemove);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
+    });
+
+    it('removes nothing if principal does not exist on policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::otherAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::otherAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const principalToRemove = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.removePrincipalFromStatement(source, targetSid, principalToRemove);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
+    });
+
+    it('removes principal from existing array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::oldAccountId2:root', 'arn:aws:iam::newAccountId:root']
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      const expected = new PolicyDocument();
+      const updatedStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: [
+            'arn:aws:iam::oldAccountId:root',
+            'arn:aws:iam::oldAccountId2:root'
+          ]
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+      source.addStatements(existingStatement);
+      expected.addStatements(updatedStatement);
+      const targetSid = 'StatementToCheck';
+      const principalToRemove = 'arn:aws:iam::newAccountId:root';
+      const response = IamHelper.removePrincipalFromStatement(source, targetSid, principalToRemove);
+
+      expect(response.toJSON()).toStrictEqual(expected.toJSON());
+    });
+
+    it('removes principal from existing array before returning policy doc', () => {
+      const source = new PolicyDocument();
+      const existingStatement = PolicyStatement.fromJson({
+        Sid: 'StatementToCheck',
+        Principal: {
+          AWS: 'arn:aws:iam::newAccountId:root'
+        },
+        Action: '*',
+        Effect: 'Allow',
+        Resource: ['arn:aws:s3:::someBucket', 'arn:aws:s3:::someBucket/*']
+      });
+
+      source.addStatements(existingStatement);
+      const targetSid = 'StatementToCheck';
+      const principalToRemove = 'arn:aws:iam::newAccountId:root';
+      try{
+        IamHelper.removePrincipalFromStatement(source, targetSid, principalToRemove);
+      } catch(err){
+        expect(err.message).toStrictEqual('Cannot remove principal since only one principal is assigned');
+      }
+    });
+  });
+
   describe('compareStatementResource', () => {
     it('returns false when the source and target resources do not match.', () => {
       const source = PolicyStatement.fromJson(
