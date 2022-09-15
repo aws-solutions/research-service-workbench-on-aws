@@ -37,7 +37,7 @@ describe('aws-accounts create negative tests', () => {
 
   describe('Account already onboarded', () => {
     test('awsAccountId', async () => {
-      const accountHelper = new AccountHelper(setup.getMainAwsClient());
+      const accountHelper = new AccountHelper();
       const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
       const existingAccounts = await accountHelper.listOnboardedAccounts();
 

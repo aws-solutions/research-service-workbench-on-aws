@@ -78,8 +78,9 @@ export default class Settings {
     return value;
   }
 
-  public optional(key: SettingKey, defaultValue: string): string {
+  public optional(key: SettingKey, defaultValue?: string): string | undefined {
     const value = this._content[key];
+    console.log(value);
     if (_.isNil(value) || (_.isString(value) && _.isEmpty(value))) return defaultValue;
 
     return value;

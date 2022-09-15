@@ -9,11 +9,10 @@ import Settings from '../utils/settings';
 export class AccountHelper {
   private _awsSdk: AwsService;
   private _settings: Settings;
-  public constructor(awsSdkClient: AwsService) {
+  public constructor() {
     const setup: Setup = new Setup();
-    const settings: Settings = setup.getSettings();
-    this._settings = settings;
-    this._awsSdk = awsSdkClient;
+    this._settings = setup.getSettings();
+    this._awsSdk = setup.getMainAwsClient();
   }
 
   // TODO: Replace with Accounts list API call when it is available
@@ -39,7 +38,7 @@ export class AccountHelper {
       .delete({ pk: `AWSACC#${awsAccountId}`, sk: `ACC#${accountId}` }).execute();
   }
 
-  public async verifyBusPermitsAccount(awsAccountId: string): Promise<boolean> {
+  public async verifyBusAllowsAccount(awsAccountId: string): Promise<boolean> {
     const busName = 'default';
     const busRuleName = 'RouteHostEvents';
     const describeRuleParams = { Name: busRuleName, EventBusName: busName };

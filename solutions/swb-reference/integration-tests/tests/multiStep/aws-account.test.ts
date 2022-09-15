@@ -29,13 +29,7 @@ describe('multiStep aws-account integration test', () => {
 
     // Check if all configs exist in given config
     return _.every(requiredSettings, setting => {
-      let currConfig;
-      try{
-        currConfig = settings.get(setting as SettingKey);
-      } catch(e){
-        // Nothing to do here.
-      }
-      return currConfig;
+      return settings.optional(setting as SettingKey);
     });
   }
 
@@ -45,7 +39,7 @@ describe('multiStep aws-account integration test', () => {
       return;
     }
 
-    const accountHelper = new AccountHelper(setup.getMainAwsClient());
+    const accountHelper = new AccountHelper();
     const artifactsBucketName = settings.get('S3BucketArtifactsArnOutput').split(':').pop();
     
     // Create account
@@ -57,8 +51,8 @@ describe('multiStep aws-account integration test', () => {
       encryptionKeyArn: settings.get('encryptionKeyArn')
     };
 
-    const {data: account} = await adminSession.resources.accounts.create(accountCreateBody);
+    const {data: account} = await adminSession.resources.accounts.create(accountCreateBody, false);
     expect(account).toMatchObject(accountCreateBody);
-    expect(await accountHelper.verifyBusPermitsAccount(account.awsAccountId)).toBe(true);
+    expect(await accountHelper.verifyBusAllowsAccount(account.awsAccountId)).toBe(true);
   });
 });
