@@ -1,4 +1,5 @@
 *                                                     @awslabs/aws-ma-foundation
+rush.json                                             @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
 common/config/rush/pnpm-lock.yaml
@@ -16,3 +17,11 @@ workbench-core/base                                   @awslabs/aws-ma-swb
 common/changes/@aws/workbench-core-base               @awslabs/aws-ma-swb
 workbench-core/environments                           @awslabs/aws-ma-swb
 common/changes/@aws/workbench-core-environments       @awslabs/aws-ma-swb
+workbench-core/environments-ui                        @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-environments-ui    @awslabs/aws-ma-swb
+workbench-core/accounts-ui                            @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-accounts-ui        @awslabs/aws-ma-swb
+workbench-core/datasets                               @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-datasets           @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
+workbench-core/datasets-ui                            @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
+common/changes/@aws/workbench-core-datasets-ui        @awslabs/aws-ma-foundation @awslabs/aws-ma-swb

@@ -3,6 +3,4 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { NewEnvironmentPage } from '@aws/workbench-core-environments-ui';
-
-export default NewEnvironmentPage;
+// TODO: Placeholder file for projects list page
