@@ -26,13 +26,14 @@ export default function EnvTypeConfigCards(props: EnvTypeConfigsProps): JSX.Elem
   }, [items]);
   return (
     <Cards
+      data-testid="EnvTypeConfigCards"
       onSelectionChange={({ detail }) => {
         setSelectedItems(detail.selectedItems);
         props.onSelect(detail);
       }}
       selectedItems={selectedItems}
       cardDefinition={{
-        header: (e) => e.name,
+        header: (e) => <div data-testid={e.name}>{e.name}</div>,
         sections: [
           {
             id: 'estimatedCost',

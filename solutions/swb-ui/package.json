@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "@aws/workbench-core-datasets-ui": "workspace:*",
-    "@aws/workbench-core-environments-ui": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
+    "@aws/workbench-core-environments-ui": "workspace:*",
     "@aws/workbench-core-swb-common-ui": "workspace:*",
     "next": "^12.1.5",
     "next-global-css": "^1.2.0",

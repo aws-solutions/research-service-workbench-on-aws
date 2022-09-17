@@ -55,6 +55,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
 
   return (
     <Cards
+      data-testid="EnvTypeCards"
       loading={props.isLoading}
       loadingText="Loading Compute Platforms"
       onSelectionChange={({ detail }) => {
@@ -63,7 +64,7 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
       }}
       selectedItems={selectedItems}
       cardDefinition={{
-        header: (e) => e.name,
+        header: (e) => <div data-testid={e.name}>{e.name}</div>,
         sections: [
           {
             id: 'description',
@@ -85,7 +86,13 @@ export default function EnvTypeCards(props: EnvTypesProps): JSX.Element {
           </Box>
         </Box>
       }
-      filter={<TextFilter {...filterProps} filteringPlaceholder="Find Compute Platform" />}
+      filter={
+        <TextFilter
+          {...filterProps}
+          filteringPlaceholder="Find Compute Platform"
+          data-testid="environmentTypeSearch"
+        />
+      }
       pagination={<Pagination {...paginationProps} />}
       preferences={
         <CollectionPreferences

@@ -1,4 +1,5 @@
 import { defineConfig } from 'cypress';
+import { CypressConfig, EnvTypeConfig } from './end-to-end-tests/cypress/support/models';
 
 export default defineConfig({
   e2e: {
@@ -22,14 +23,7 @@ export default defineConfig({
   }
 });
 
-const getEnvironmentVariables = (
-  stage: string
-): {
-  ADMIN_USER: string;
-  ADMIN_PASSWORD: string;
-  BASE_URL: string;
-  COGNITO_DOMAIN_NAME: string;
-} => {
+const getEnvironmentVariables = (stage: string): CypressConfig => {
   const fs = require('fs');
   const yaml = require('js-yaml');
   const _ = require('lodash');
@@ -46,14 +40,21 @@ const getEnvironmentVariables = (
   const outputs = apiStackOutputs[apiStackName];
   const ADMIN_USER = yamlConfig.AdminUser;
   const ADMIN_PASSWORD = yamlConfig.AdminPassword;
+  const ENVIRONMENT_TYPES = yamlConfig.EnvTypes as EnvTypeConfig[];
+  const ENVIRONMENT_PROJECT: string = yamlConfig.EnvProject;
+  const ENVIRONMENT_STUDIES: string[] = yamlConfig.EnvStudies;
+  const CLEAN_UP_ENVIRONMENTS = yamlConfig.CleanEnvironments;
   const BASE_URL = outputs.uiClientURL;
   const COGNITO_DOMAIN_NAME = outputs.cognitoDomainName;
-  debugger;
 
   return {
     ADMIN_USER,
     ADMIN_PASSWORD,
     BASE_URL,
-    COGNITO_DOMAIN_NAME
+    COGNITO_DOMAIN_NAME,
+    ENVIRONMENT_TYPES,
+    ENVIRONMENT_PROJECT,
+    ENVIRONMENT_STUDIES,
+    CLEAN_UP_ENVIRONMENTS
   };
 };

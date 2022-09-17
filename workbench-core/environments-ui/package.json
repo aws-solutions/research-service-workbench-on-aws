@@ -31,10 +31,10 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-swb-common-ui": "workspace:*",
-    "@aws/workbench-core-datasets-ui": "workspace:*",
     "@aws/workbench-core-accounts-ui": "workspace:*",
+    "@aws/workbench-core-datasets-ui": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
+    "@aws/workbench-core-swb-common-ui": "workspace:*",
     "next": "^12.1.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",

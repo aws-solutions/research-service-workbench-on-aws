@@ -186,6 +186,7 @@ const NewEnvironmentPage: NextPage = () => {
                     Cancel
                   </Button>
                   <Button
+                    data-testid="environmentCreateSubmit"
                     variant="primary"
                     disabled={disableSubmit || isSubmitLoading}
                     loading={isSubmitLoading}
@@ -196,7 +197,11 @@ const NewEnvironmentPage: NextPage = () => {
                 </SpaceBetween>
               }
               header={
-                <Header variant="h1" description="Short Description of create workspaces">
+                <Header
+                  data-testid="environmentCreateHeader"
+                  variant="h1"
+                  description="Short Description of create workspaces"
+                >
                   Create Research Workspace
                 </Header>
               }
@@ -238,6 +243,7 @@ const NewEnvironmentPage: NextPage = () => {
                       errorText={formErrors?.nameError}
                     >
                       <Input
+                        data-testid="environmentName"
                         value={formData?.name || ''}
                         onChange={({ detail: { value } }) => {
                           setFormData({ ...formData, name: value });
@@ -247,13 +253,13 @@ const NewEnvironmentPage: NextPage = () => {
                     </FormField>
                     <FormField label="Project ID" errorText={formErrors?.projectIdError}>
                       <Select
+                        data-testid="environmentProject"
                         selectedOption={
                           areProjectsLoading
                             ? null
                             : projects
                                 .map((p) => ({ label: p.name, value: p.id }))
-                                .filter((p) => p.value === formData?.projectId)
-                                [0] || null
+                                .filter((p) => p.value === formData?.projectId)[0] || null
                         }
                         loadingText="Loading Projects"
                         options={projects.map((p) => ({ label: p.name, value: p.id }))}
@@ -270,6 +276,7 @@ const NewEnvironmentPage: NextPage = () => {
                       description="Studies that you would like to mount to your workspace"
                     >
                       <Multiselect
+                        data-testid="environmentStudies"
                         selectedOptions={
                           areDatasetsLoading
                             ? []
@@ -309,6 +316,7 @@ const NewEnvironmentPage: NextPage = () => {
                       errorText={formErrors?.descriptionError}
                     >
                       <Textarea
+                        data-testid="environmentDescription"
                         onChange={({ detail: { value } }) => {
                           setFormData({ ...formData, description: value });
                           validateField('description', value);
