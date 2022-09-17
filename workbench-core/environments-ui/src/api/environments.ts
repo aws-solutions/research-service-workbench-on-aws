@@ -14,9 +14,9 @@ import {
 
 const useEnvironments = (
   params?: EnvironmentsQueryParams
-): // eslint-disable-next-line @typescript-eslint/no-explicit-any
-{
+): {
   environments: { workspaceName: string; workspaceStatus: string; project: string }[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutate: KeyedMutator<any>;
   paginationToken: string;
   areEnvironmentsLoading: boolean;
