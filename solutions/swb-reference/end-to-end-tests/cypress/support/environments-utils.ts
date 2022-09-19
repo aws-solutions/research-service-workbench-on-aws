@@ -107,7 +107,7 @@ export function terminateEnvironment(environmentName: string) {
 }
 
 /*******************************************************************************************************************************************************************
- * This function will try to move all environments one step further to termination
+ * This function will try to move all environments one step closer to termination
  * e.g.
  * COMPLETED EnvironmentA will be STOPPED
  * STOPPED EnvironmentB will be TERMINATED
