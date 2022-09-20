@@ -5,30 +5,23 @@ import {
   selectItemGrid,
   verifyDataGtid
 } from './common-utils';
-import {
-  DEFLAKE_DELAY_IN_MILLISECONDS,
-  ENVIRONMENT_PROJECT_PROPERTY,
-  ENVIRONMENT_STARTNG_MAX_WAITING_MILISECONDS,
-  ENVIRONMENT_STUDIES_PROPERTY
-} from './constants';
-import { EnvTypeConfig } from './models';
+import { DEFLAKE_DELAY_IN_MILLISECONDS, ENVIRONMENT_STARTNG_MAX_WAITING_MILISECONDS } from './constants';
+import { CreateEnvironmentForm } from './models';
 
-export const createEnvironment = (envName: string, envType: EnvTypeConfig): void => {
-  const environmentProject = Cypress.env(ENVIRONMENT_PROJECT_PROPERTY) as string;
-  const environmentStudies = Cypress.env(ENVIRONMENT_STUDIES_PROPERTY) as string[];
+export const createEnvironment = (environmentData: CreateEnvironmentForm): void => {
   navigateToCreateEnvironment();
-  cy.get('[data-testid="environmentTypeSearch"]').type(envType.EnvironmentType);
-  selectItemCard('EnvTypeCards', envType.EnvironmentType);
-  cy.get(`[data-testid="environmentName"] input`).type(envName);
-  selectItemDropDown('environmentProject', [environmentProject]);
-  selectItemDropDown('environmentStudies', environmentStudies);
-  selectItemCard('EnvTypeConfigCards', envType.EnvironmentTypeConfig);
-  cy.get(`[data-testid="environmentDescription"]`).type(envName);
+  cy.get('[data-testid="environmentTypeSearch"]').type(environmentData.EnvironmentType);
+  selectItemCard('EnvTypeCards', environmentData.EnvironmentType);
+  cy.get(`[data-testid="environmentName"] input`).type(environmentData.Name);
+  selectItemDropDown('environmentProject', [environmentData.Project]);
+  if (environmentData.Studies?.length) selectItemDropDown('environmentStudies', environmentData.Studies);
+  selectItemCard('EnvTypeConfigCards', environmentData.EnvironmentTypeConfig);
+  cy.get(`[data-testid="environmentDescription"]`).type(environmentData.Name);
   cy.get('[data-testid="environmentCreateSubmit"]').should('be.enabled');
   cy.get('[data-testid="environmentCreateSubmit"]').click();
   verifyDataGtid(
     'environmentsGrid',
-    envName,
+    environmentData.Name,
     'Workspace status',
     'PENDING',
     ENVIRONMENT_STARTNG_MAX_WAITING_MILISECONDS

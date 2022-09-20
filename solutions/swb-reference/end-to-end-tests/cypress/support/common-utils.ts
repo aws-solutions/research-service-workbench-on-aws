@@ -31,7 +31,7 @@ export function selectItemDropDown(componentTestId: string, itemsToSelect: strin
 
 export function selectItemGrid(componentTestId: string, itemToSelect: string) {
   cy.get(
-    `[data-testid="${componentTestId}"] tr:has(div[data-testid="${itemToSelect}"]) td[class^="awsui_selection-contro"]`
+    `[data-testid="${componentTestId}"] tr:has(div[data-testid="${itemToSelect}"]) td[class^="awsui_selection-contro"]:first`
   ).click();
 }
 

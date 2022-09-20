@@ -11,5 +11,5 @@
 #     }, ## We can keep adding as many Environment Types elements as we need
 # ]
 # EnvProject: 'Project 1' ##default environment project name to be selected when creating an environment
-# EnvStudies: ['study 1', 'study 2'] ##default environment studies to be selected when creating an environment
+# EnvStudies: ['study 1', 'study 2'] ##(OPTIONAL) default environment studies to be selected when creating an environment leave as [] if no studies need to be tested
 # CleanEnvironments: false ##set true if we want all environments to be terminated before e2e tests start

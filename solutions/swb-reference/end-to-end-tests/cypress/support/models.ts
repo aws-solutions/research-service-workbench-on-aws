@@ -13,3 +13,11 @@ export interface EnvTypeConfig {
   EnvironmentType: string;
   EnvironmentTypeConfig: string;
 }
+
+export interface CreateEnvironmentForm {
+  Name: string;
+  EnvironmentType: string;
+  EnvironmentTypeConfig: string;
+  Project: string;
+  Studies: string[];
+}

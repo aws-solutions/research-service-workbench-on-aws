@@ -1,12 +1,14 @@
 import {
   CLEANUP_WAIT_ENVIRONMENTS_GRID_IN_MILISECONDS,
   CLEAN_UP_ENVIRONMENTS,
+  ENVIRONMENT_PROJECT_PROPERTY,
   ENVIRONMENT_START_MAX_WAITING_MILISECONDS,
   ENVIRONMENT_STOP_MAX_WAITING_MILISECONDS,
+  ENVIRONMENT_STUDIES_PROPERTY,
   ENVIRONMENT_TYPES_PROPERTY
 } from '../../support/constants';
 import { getFakeText, verifyDataGtid } from '../../support/common-utils';
-import { EnvTypeConfig } from '../../support/models';
+import { CreateEnvironmentForm, EnvTypeConfig } from '../../support/models';
 import {
   cleanupEnvironments,
   createEnvironment,
@@ -26,11 +28,26 @@ describe('IT Admin Login', () => {
   });
 
   it('Should launch, stop, start, connect and terminate environment of all environment types configured', () => {
+    const environmentProject = Cypress.env(ENVIRONMENT_PROJECT_PROPERTY) as string;
+    const environmentStudies = Cypress.env(ENVIRONMENT_STUDIES_PROPERTY) as string[];
     //create one environment for each environment type configured and check pending status
     environmentTypes.forEach((envType) => {
       const envName = getFakeText(envType.EnvironmentType);
-      createEnvironment(envName, envType);
+      const environment: CreateEnvironmentForm = {
+        Name: envName,
+        EnvironmentType: envType.EnvironmentType,
+        EnvironmentTypeConfig: envType.EnvironmentTypeConfig,
+        Project: environmentProject,
+        Studies: environmentStudies
+      };
+      createEnvironment(environment);
       createdEnvs.push(envName);
+      if (environmentStudies?.length) {
+        //make sure we test environment creation without studies
+        const envNameNoStudies = getFakeText(envType.EnvironmentType);
+        createEnvironment({ ...environment, Studies: [], Name: envNameNoStudies });
+        createdEnvs.push(envNameNoStudies);
+      }
     });
 
     //verify completed status on all envs ***this was separated from create as we want to run actions on environments in parallel to save time***
