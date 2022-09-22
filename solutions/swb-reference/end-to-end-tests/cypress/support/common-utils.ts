@@ -35,14 +35,24 @@ export function selectItemGrid(componentTestId: string, itemToSelect: string) {
   ).click();
 }
 
-export function verifyDataGtid(
+/*******************************************************************************************************************************************************************
+ * This function validates if a polaris table contains a column with specified header name, a row with specified data-testid and column value.
+ * If column with value is not found within timeout it will throw a cypress validation error
+ *
+ * @param {string} componentTestId Data-testId attribute from Table
+ * @param {string} rowTestId Data-testId attribute from row
+ * @param {string} columnToVerify Name of column to validate
+ * @param {string} valueToVerify Value of columnt to validate
+ * @param {number} timeoutInMiliseconds Time limit in miliseconds to find value
+ *******************************************************************************************************************************************************************/
+export function validateTableData(
   componentTestId: string,
   rowTestId: string,
   columnToVerify: string,
   valueToVerify: string,
   timeoutInMiliseconds?: number
 ) {
-  cy.contains('th', new RegExp(`^${columnToVerify}$`))
+  cy.contains(`[data-testId="${componentTestId}"] th`, new RegExp(`^${columnToVerify}$`))
     .invoke('index')
     .then((i) => {
       cy.contains(

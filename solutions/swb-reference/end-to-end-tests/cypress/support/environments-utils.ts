@@ -3,9 +3,13 @@ import {
   selectItemCard,
   selectItemDropDown,
   selectItemGrid,
-  verifyDataGtid
+  validateTableData
 } from './common-utils';
-import { DEFLAKE_DELAY_IN_MILLISECONDS, ENVIRONMENT_STARTNG_MAX_WAITING_MILISECONDS } from './constants';
+import {
+  DEFLAKE_DELAY_IN_MILLISECONDS,
+  ENVIRONMENT_TABLE_DATA_TEST_ID,
+  ENVIRONMENT_STARTNG_MAX_WAITING_MILISECONDS
+} from './constants';
 import { CreateEnvironmentForm } from './models';
 
 export const createEnvironment = (environmentData: CreateEnvironmentForm): void => {
@@ -19,8 +23,8 @@ export const createEnvironment = (environmentData: CreateEnvironmentForm): void 
   cy.get(`[data-testid="environmentDescription"]`).type(environmentData.Name);
   cy.get('[data-testid="environmentCreateSubmit"]').should('be.enabled');
   cy.get('[data-testid="environmentCreateSubmit"]').click();
-  verifyDataGtid(
-    'environmentsGrid',
+  validateTableData(
+    ENVIRONMENT_TABLE_DATA_TEST_ID,
     environmentData.Name,
     'Workspace status',
     'PENDING',
@@ -59,7 +63,7 @@ export function excecuteEnvironmentAction(
 }
 
 export function connectEnvironment(environmentName: string) {
-  selectItemGrid('environmentsGrid', environmentName);
+  selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName);
   cy.get('[data-testid="environmentStart"]').should('be.disabled');
   cy.get('[data-testid="environmentTerminate"]').should('be.disabled');
   cy.get('[data-testid="environmentConnect"]').should('be.enabled');
@@ -71,32 +75,32 @@ export function connectEnvironment(environmentName: string) {
         .should('be.visible')
         .click()
         .then(() => {
-          selectItemGrid('environmentsGrid', environmentName); //deselect
+          selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName); //deselect
         });
     });
 }
 
 export function stopEnvironment(environmentName: string) {
-  selectItemGrid('environmentsGrid', environmentName);
+  selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName);
   cy.get('[data-testid="environmentStop"]').should('be.enabled');
   cy.get('[data-testid="environmentStop"]').click();
-  verifyDataGtid('environmentsGrid', environmentName, 'Workspace status', 'STOPPING');
+  validateTableData(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName, 'Workspace status', 'STOPPING');
 }
 
 export function startEnvironment(environmentName: string) {
-  selectItemGrid('environmentsGrid', environmentName);
+  selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName);
   cy.get('[data-testid="environmentConnect"]').should('be.disabled');
   cy.get('[data-testid="environmentStop"]').should('be.disabled');
   cy.get('[data-testid="environmentStart"]').should('be.enabled');
   cy.get('[data-testid="environmentTerminate"]').should('be.enabled');
   cy.get('[data-testid="environmentStart"]').click();
-  verifyDataGtid('environmentsGrid', environmentName, 'Workspace status', 'STARTING');
+  validateTableData(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName, 'Workspace status', 'STARTING');
 }
 
 export function terminateEnvironment(environmentName: string) {
-  selectItemGrid('environmentsGrid', environmentName);
+  selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName);
   cy.get('[data-testid="environmentTerminate"]').click();
-  verifyDataGtid('environmentsGrid', environmentName, 'Workspace status', 'TERMINATING');
+  validateTableData(ENVIRONMENT_TABLE_DATA_TEST_ID, environmentName, 'Workspace status', 'TERMINATING');
 }
 
 /*******************************************************************************************************************************************************************
@@ -110,13 +114,15 @@ export function terminateEnvironment(environmentName: string) {
  * Environments in PENDING, STARTING, STOPPING and TERMINATING status will be ignored to speed up e2e testing
  *******************************************************************************************************************************************************************/
 export function cleanupEnvironments() {
-  cy.contains('[data-testid="environmentsGrid"] th', new RegExp(`^Workspace name$`))
+  cy.contains(`[data-testid="${ENVIRONMENT_TABLE_DATA_TEST_ID}"] th`, new RegExp(`^Workspace name$`))
     .invoke('index')
     .then((nameIndex: number) => {
-      cy.contains('[data-testid="environmentsGrid"] th', new RegExp(`^Workspace status$`))
+      cy.contains(`[data-testid="${ENVIRONMENT_TABLE_DATA_TEST_ID}"] th`, new RegExp(`^Workspace status$`))
         .invoke('index')
         .then((statusIndex) => {
-          const envNames = Cypress.$(`[data-testid="environmentsGrid"] tr td:nth-child(${nameIndex + 1})`);
+          const envNames = Cypress.$(
+            `[data-testid="${ENVIRONMENT_TABLE_DATA_TEST_ID}"] tr td:nth-child(${nameIndex + 1})`
+          );
           envNames.each((index, item) => {
             cleanupEnvironmentRow(statusIndex + 1, item.textContent);
           });
@@ -127,12 +133,12 @@ export function cleanupEnvironments() {
 function cleanupEnvironmentRow(statusIndex: number, envName: string) {
   cy.wait(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle
   let currentEnv = Cypress.$(
-    `[data-testid="environmentsGrid"] tr:has(div[data-testid="${envName}"]) td[class^="awsui_selection-contro"]`
+    `[data-testid="${ENVIRONMENT_TABLE_DATA_TEST_ID}"] tr:has(div[data-testid="${envName}"]) td[class^="awsui_selection-contro"]`
   ); //make sure row still exists in case is terminating
   if (currentEnv.length === 0) return;
-  selectItemGrid('environmentsGrid', envName);
+  selectItemGrid(ENVIRONMENT_TABLE_DATA_TEST_ID, envName);
   cy.get(
-    `[data-testid="environmentsGrid"] tr:has(div[data-testid="${envName}"]) td:nth-child(${statusIndex})`
+    `[data-testid="${ENVIRONMENT_TABLE_DATA_TEST_ID}"] tr:has(div[data-testid="${envName}"]) td:nth-child(${statusIndex})`
   )
     .invoke('text')
     .then((text: string) => {
@@ -149,6 +155,6 @@ function cleanupEnvironmentRow(statusIndex: number, envName: string) {
           break;
       }
     });
-  clickSelectAllGrid('environmentsGrid'); //reset selection with select all deselect all
-  clickSelectAllGrid('environmentsGrid');
+  clickSelectAllGrid(ENVIRONMENT_TABLE_DATA_TEST_ID); //reset selection with select all deselect all
+  clickSelectAllGrid(ENVIRONMENT_TABLE_DATA_TEST_ID);
 }

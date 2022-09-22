@@ -328,7 +328,7 @@ const EnvironmentsPage: NextPage = () => {
         )}
         {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
         <Table
-          data-testid="environmentsGrid"
+          data-testid="environmentTable"
           {...collectionProps}
           sortingDescending={!!filterParams.descending}
           sortingColumn={{ sortingField: filterParams.descending || filterParams.ascending }}

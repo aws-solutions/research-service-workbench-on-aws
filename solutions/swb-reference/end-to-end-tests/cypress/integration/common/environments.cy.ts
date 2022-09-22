@@ -5,9 +5,10 @@ import {
   ENVIRONMENT_START_MAX_WAITING_MILISECONDS,
   ENVIRONMENT_STOP_MAX_WAITING_MILISECONDS,
   ENVIRONMENT_STUDIES_PROPERTY,
+  ENVIRONMENT_TABLE_DATA_TEST_ID,
   ENVIRONMENT_TYPES_PROPERTY
 } from '../../support/constants';
-import { getFakeText, verifyDataGtid } from '../../support/common-utils';
+import { getFakeText, validateTableData } from '../../support/common-utils';
 import { CreateEnvironmentForm, EnvTypeConfig } from '../../support/models';
 import {
   cleanupEnvironments,
@@ -15,7 +16,7 @@ import {
   excecuteEnvironmentAction
 } from '../../support/environments-utils';
 
-describe('IT Admin Login', () => {
+describe('Environment Operations', () => {
   const environmentTypes = Cypress.env(ENVIRONMENT_TYPES_PROPERTY) as EnvTypeConfig[];
   let createdEnvs: string[] = [];
   before(() => {
@@ -52,8 +53,8 @@ describe('IT Admin Login', () => {
 
     //verify completed status on all envs ***this was separated from create as we want to run actions on environments in parallel to save time***
     createdEnvs.forEach((envName) => {
-      verifyDataGtid(
-        'environmentsGrid',
+      validateTableData(
+        ENVIRONMENT_TABLE_DATA_TEST_ID,
         envName,
         'Workspace status',
         'COMPLETED',
@@ -65,8 +66,8 @@ describe('IT Admin Login', () => {
     createdEnvs.forEach((envName) => excecuteEnvironmentAction(envName, 'STOP'));
     //verify all created environment are stopped
     createdEnvs.forEach((envName) => {
-      verifyDataGtid(
-        'environmentsGrid',
+      validateTableData(
+        ENVIRONMENT_TABLE_DATA_TEST_ID,
         envName,
         'Workspace status',
         'STOPPED',
@@ -77,8 +78,8 @@ describe('IT Admin Login', () => {
     createdEnvs.forEach((envName) => excecuteEnvironmentAction(envName, 'START'));
     //verify all created environment are completed
     createdEnvs.forEach((envName) => {
-      verifyDataGtid(
-        'environmentsGrid',
+      validateTableData(
+        ENVIRONMENT_TABLE_DATA_TEST_ID,
         envName,
         'Workspace status',
         'COMPLETED',
@@ -89,8 +90,8 @@ describe('IT Admin Login', () => {
     createdEnvs.forEach((envName) => excecuteEnvironmentAction(envName, 'STOP'));
     //verify all created environment are stopped
     createdEnvs.forEach((envName) => {
-      verifyDataGtid(
-        'environmentsGrid',
+      validateTableData(
+        ENVIRONMENT_TABLE_DATA_TEST_ID,
         envName,
         'Workspace status',
         'STOPPED',

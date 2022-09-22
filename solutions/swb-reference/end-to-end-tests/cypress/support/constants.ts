@@ -27,3 +27,5 @@ export const DEFLAKE_DELAY_IN_MILLISECONDS: number = 2000;
 
 //Loading environments grid for cleanup as we cannot wait for rows to load
 export const CLEANUP_WAIT_ENVIRONMENTS_GRID_IN_MILISECONDS = 4000;
+
+export const ENVIRONMENT_TABLE_DATA_TEST_ID = 'environmentTable';
