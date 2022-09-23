@@ -15,6 +15,7 @@ export default defineConfig({
       //this function is called in a different scope making cypress and cy commands unable to work
       const environment = getEnvironmentVariables(config.env.STAGE);
       environment.ADMIN_PASSWORD = config.env.AdminPassword ?? environment.ADMIN_PASSWORD; //read password from yaml only when password is not set in env variables already
+      environment.ADMIN_USER = config.env.AdminUser ?? environment.ADMIN_USER; //read user from yaml only when user is not set in env variables already
       config.env = { ...config.env, ...environment };
       config.baseUrl = environment.BASE_URL;
       // implement node event listeners here
