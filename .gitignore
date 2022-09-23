@@ -101,6 +101,7 @@ solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 solutions/swb-reference/end-to-end-tests/config/*.yaml
 !solutions/swb-reference/end-to-end-tests/config/example.yaml
+!solutions/swb-reference/end-to-end-tests/config/testEnv.yaml
 solutions/swb-reference/end-to-end-tests/cypress/screenshots
 solutions/swb-reference/end-to-end-tests/cypress/videos
 solutions/swb-reference/end-to-end-tests/cypress/downloads

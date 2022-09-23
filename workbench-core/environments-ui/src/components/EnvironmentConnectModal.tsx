@@ -74,6 +74,7 @@ export default function EnvironmentConnectModal(props: EnvironmentConnectModalPr
       footer={
         <Box float="right">
           <Button
+            data-testid="environmentConnectClose"
             variant="primary"
             onClick={() => {
               props.closeModal();

@@ -12,13 +12,20 @@ import {
   EnvironmentsQueryParams
 } from '../models/Environment';
 
-const useEnvironments = (params?: EnvironmentsQueryParams):
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-{ environments: {workspaceName: string, workspaceStatus: string, project: string}[], mutate: KeyedMutator<any>, 
-paginationToken: string, areEnvironmentsLoading: boolean } => {
+const useEnvironments = (
+  params?: EnvironmentsQueryParams
+): {
+  environments: { workspaceName: string; workspaceStatus: string; project: string }[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mutate: KeyedMutator<any>;
+  paginationToken: string;
+  areEnvironmentsLoading: boolean;
+} => {
   let queryString = new URLSearchParams(convertToRecord(params)).toString();
   queryString = queryString ? `?${queryString}` : '';
-  const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet);
+  const { data, mutate, isValidating } = useSWR(`environments${queryString}`, httpApiGet, {
+    refreshInterval: 20000
+  });
 
   // `/environments` API returns a JSON in this format
   // { data: [], paginationToken: ''}

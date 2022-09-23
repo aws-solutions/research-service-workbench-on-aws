@@ -328,6 +328,7 @@ const EnvironmentsPage: NextPage = () => {
         )}
         {!!error && <StatusIndicator type="error">{error}</StatusIndicator>}
         <Table
+          data-testid="environmentTable"
           {...collectionProps}
           sortingDescending={!!filterParams.descending}
           sortingColumn={{ sortingField: filterParams.descending || filterParams.ascending }}
@@ -354,6 +355,7 @@ const EnvironmentsPage: NextPage = () => {
                   <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
                       <Button
+                        data-testid="environmentConnect"
                         disabled={
                           !connectButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                           (collectionProps.selectedItems && collectionProps.selectedItems.length > 1)
@@ -364,6 +366,7 @@ const EnvironmentsPage: NextPage = () => {
                         Connect
                       </Button>
                       <Button
+                        data-testid="environmentStart"
                         disabled={
                           !startButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                           startingIds.has(getSelectedId())
@@ -377,6 +380,7 @@ const EnvironmentsPage: NextPage = () => {
                         Start
                       </Button>
                       <Button
+                        data-testid="environmentStop"
                         disabled={
                           !stopButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                           stoppingIds.has(getSelectedId())
@@ -390,6 +394,7 @@ const EnvironmentsPage: NextPage = () => {
                         Stop
                       </Button>
                       <Button
+                        data-testid="environmentTerminate"
                         disabled={
                           !terminateButtonEnableStatuses.includes(getEnvironmentStatus()) ||
                           terminatingIds.has(getSelectedId())
@@ -402,7 +407,7 @@ const EnvironmentsPage: NextPage = () => {
                       >
                         Terminate
                       </Button>
-                      <Button variant="primary" href="/environments/new">
+                      <Button data-testid="environmentCreate" variant="primary" href="/environments/new">
                         Create Workspace
                       </Button>
                     </SpaceBetween>

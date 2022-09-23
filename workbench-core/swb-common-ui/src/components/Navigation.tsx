@@ -48,6 +48,7 @@ export default function Navigation({
   return (
     <RouteGuard>
       <SideNavigation
+        data-testid="sideNavigation"
         activeHref={activeHref}
         header={header ? header : defaultNavHeader}
         items={items ? items : navDisplay}

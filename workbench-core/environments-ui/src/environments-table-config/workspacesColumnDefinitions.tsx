@@ -4,12 +4,13 @@
  */
 
 import { TableProps } from '@cloudscape-design/components';
+import React from 'react';
 
 export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] = [
   {
     id: 'workspaceName',
     header: 'Workspace name',
-    cell: (e: { workspaceName: string }) => e.workspaceName,
+    cell: (e: { workspaceName: string }) => <div data-testid={e.workspaceName}>{e.workspaceName}</div>,
     sortingField: 'name'
   },
   {
