@@ -15,6 +15,10 @@ on:
         required: true
       slack_webhook_url:
         required: true
+      CYPRESS_ADMIN_PASSWORD:
+        required: true
+      CYPRESS_ADMIN_USER:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
