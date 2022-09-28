@@ -32,6 +32,11 @@ jobs:
       #   run: |
       #     cd solutions/swb-ui/infrastructure
       #     node ../../../common/scripts/install-run-rushx.js cdk synth
+      - name: echo GITHUB_WORKSPACE
+        run: echo $GITHUB_WORKSPACE
+
+      - name: echo pwd
+        run: pwd
 
       - name: Run cfn-nag on all cfn templates
         uses: stelligent/cfn_nag@master
