@@ -30,6 +30,7 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
+    "synth-ui-and-api": "bash ./scripts/synth.sh",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
     "test:only": "jest --ci --coverage --passWithNoTests 2>&1"
   },

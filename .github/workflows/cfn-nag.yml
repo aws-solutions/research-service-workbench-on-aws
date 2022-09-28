@@ -36,7 +36,6 @@ jobs:
       - name: Run cfn-nag on all cfn templates
         uses: stelligent/cfn_nag@master
         with:
-          input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
           extra_args: --fail-on-warnings --template-pattern "..*\.template.json|..*\.cfn.yaml" -o json 
 
       # - name: Run cfn-nag on swb-ui cdk.out
