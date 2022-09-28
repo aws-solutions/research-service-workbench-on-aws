@@ -58,7 +58,9 @@ export interface DataSetsStoragePlugin {
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param ownerAccountId - the AWS Account Id where the storage resides.
    * @param externalRoleName - an optional role name which the external environment will assume to
-   * access the DataSet
+   * access the DataSet.
+   * @param kmsKeyArn - an optional ARN of the KMS key used to encrypt the bucket.
+   * @param vpcId - an optional ID of the VPC interacting with the endpoint.
    *
    * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
    */
@@ -67,7 +69,9 @@ export interface DataSetsStoragePlugin {
     path: string,
     externalEndpointName: string,
     ownerAccountId: string,
-    externalRoleName?: string
+    externalRoleName?: string,
+    kmsKeyArn?: string,
+    vpcId?: string
   ): Promise<EndpointConnectionStrings>;
 
   /**

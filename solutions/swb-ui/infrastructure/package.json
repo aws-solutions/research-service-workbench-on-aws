@@ -20,7 +20,7 @@
     "build": "heft build --clean",
     "build:test": "rushx build && rushx test",
     "cdk": "cdk",
-    "cdk-deploy": "rushx build && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
+    "cdk-deploy": "rushx build && cdk deploy --all --require-approval never --outputs-file ./src/config/dev.json",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "sort-package-json": "sort-package-json package.json",
