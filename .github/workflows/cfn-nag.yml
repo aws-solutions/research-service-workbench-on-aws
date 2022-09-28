@@ -32,11 +32,6 @@ jobs:
       #   run: |
       #     cd solutions/swb-ui/infrastructure
       #     node ../../../common/scripts/install-run-rushx.js cdk synth
-      - name: echo GITHUB_WORKSPACE
-        run: echo $GITHUB_WORKSPACE
-
-      - name: echo pwd
-        run: pwd
 
       - name: Run cfn-nag on all .template.json files
         uses: stelligent/cfn_nag@master
@@ -52,21 +47,6 @@ jobs:
           extra_args: --fail-on-warnings --template-pattern .cfn.yaml -g -o json 
           output_path: cfn_nag_yaml.out
 
-      # - name: Run cfn-nag on swb-ui cdk.out
-      #   id: cdk-swb-ui
-      #   uses: stelligent/cfn_nag@master
-      #   with:
-      #     input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
-      #     extra_args: --fail-on-warnings -o json
-      #     output_path: cdk-nag-swb-ui.out
-
-      # - name: Run cfn-nag on onboarding template
-      #   id: template
-      #   uses: stelligent/cfn_nag@master
-      #   with:
-      #     input_path: solutions/swb-reference/src/templates
-      #     extra_args: --fail-on-warnings -o json
-
       - name: Grep cfn-nag for violations
         uses: sergeysova/jq-action@v2
         id: cfn-nag
@@ -75,9 +55,6 @@ jobs:
           cmd: |
             cat cfn_nag_json.out cfn_nag_yaml.out | jq -s 'map(.[])' > cfn_nag.out
             jq '.[].file_results.violations | length' cfn_nag.out | jq -s 'add'
-
-      - name: echo violation count
-        run: echo ${{ steps.cfn-nag.outputs.value }}
 
       - name: Fail if violations detected in cfn-nag
         run: exit ${{ steps.cfn-nag.outputs.value }}
