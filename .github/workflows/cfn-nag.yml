@@ -38,11 +38,19 @@ jobs:
       - name: echo pwd
         run: pwd
 
-      - name: Run cfn-nag on all cfn templates
+      - name: Run cfn-nag on all solutions package
         uses: stelligent/cfn_nag@master
         with:
-          input_path: .
+          input_path: solutions
           extra_args: --fail-on-warnings --template-pattern "..*\.template.json|..*\.cfn.yaml" -o json 
+          output_path: cfn_nag_solutions.out
+      
+      - name: Run cfn-nag on all solutions package
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: workbench-core
+          extra_args: --fail-on-warnings --template-pattern "..*\.template.json|..*\.cfn.yaml" -o json 
+          output_path: cfn_nag_workbench-core.out
 
       # - name: Run cfn-nag on swb-ui cdk.out
       #   id: cdk-swb-ui
@@ -64,7 +72,9 @@ jobs:
         id: cfn-nag
         # No. of violations: warnings + errors
         with:
-          cmd: jq '.[].file_results.violations | length' cfn_nag.out
+          cmd: |
+            jq -s '.[0] * .[1]' cfn_nag_solutions.out cfn_nag_workbench-core.out > cfn_nag.out
+            jq '.[].file_results.violations | length' cfn_nag.out
 
       - name: echo violation count
         run: echo ${{ steps.cfn-nag.outputs.value }}
