@@ -42,14 +42,14 @@ jobs:
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions
-          extra_args: --fail-on-warnings --template-pattern "..*\.template.json|..*\.cfn.yaml" -o json 
+          extra_args: --fail-on-warnings --template-pattern ".template.json|.cfn.yaml" -o json 
           output_path: cfn_nag_solutions.out
       
       - name: Run cfn-nag on all solutions package
         uses: stelligent/cfn_nag@master
         with:
           input_path: workbench-core
-          extra_args: --fail-on-warnings --template-pattern "..*\.template.json|..*\.cfn.yaml" -o json 
+          extra_args: --fail-on-warnings --template-pattern ".template.json|.cfn.yaml" -o json 
           output_path: cfn_nag_workbench-core.out
 
       # - name: Run cfn-nag on swb-ui cdk.out
