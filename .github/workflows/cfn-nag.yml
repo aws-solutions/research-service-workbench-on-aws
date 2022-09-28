@@ -28,10 +28,10 @@ jobs:
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: cdk synth swb-ui
-        run: |
-          cd solutions/swb-ui/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk synth
+      # - name: cdk synth swb-ui
+      #   run: |
+      #     cd solutions/swb-ui/infrastructure
+      #     node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on all cfn templates
         uses: stelligent/cfn_nag@master
