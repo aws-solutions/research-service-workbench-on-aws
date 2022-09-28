@@ -39,12 +39,12 @@ jobs:
           input_path: .
           extra_args: --fail-on-warnings --template-pattern .template.json -g -o json
           output_path: cfn_nag_json.out
-      
+
       - name: Run cfn-nag on all .cfn.yaml files
         uses: stelligent/cfn_nag@master
         with:
           input_path: .
-          extra_args: --fail-on-warnings --template-pattern .cfn.yaml -g -o json 
+          extra_args: --fail-on-warnings --template-pattern .cfn.yaml -g -o json
           output_path: cfn_nag_yaml.out
 
       - name: Grep cfn-nag for violations
