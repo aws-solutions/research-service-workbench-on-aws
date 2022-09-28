@@ -37,6 +37,7 @@ describe('S3DataSetStoragePlugin', () => {
   const accessPointArn: string = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
   const externalRoleArn: string = `arn:aws:iam::123456789012:role/${externalRoleName}`;
   const kmsKeyArn: string = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
+  const vpcId: string = 'vpc-1234567890abcdefg';
   const endPointUrl: string = `s3://${accessPointArn}/`;
 
   let aws: AwsService;
@@ -352,7 +353,12 @@ describe('S3DataSetStoragePlugin', () => {
                     "AWS": "${externalRoleArn}"
                 },
                 "Action": "s3:ListBucket",
-                "Resource": "${accessPointArn}"
+                "Resource": "${accessPointArn}",
+                "Condition": {
+                  "StringLike": {
+                    "s3:prefix": ["${path}", "${path}/*"]
+                  }
+                }
             },
             {
                 "Sid": "Statement2",
@@ -406,7 +412,12 @@ describe('S3DataSetStoragePlugin', () => {
                 "Sid": "Statement1",
                 "Effect": "Allow",
                 "Action": "s3:ListBucket",
-                "Resource": "${accessPointArn}"
+                "Resource": "${accessPointArn}",
+                "Condition": {
+                  "StringLike": {
+                    "s3:prefix": ["${path}", "${path}/*"]
+                  }
+                }
             },
             {
                 "Sid": "Statement2",
@@ -443,7 +454,7 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":["dataset-prefix","dataset-prefix/*"]}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"},{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"}],"Version":"2012-10-17"}'
       );
     });
 
@@ -473,7 +484,12 @@ describe('S3DataSetStoragePlugin', () => {
                   "AWS": "${externalRoleArn}"
                 },
                 "Action": "s3:ListBucket",
-                "Resource": "${accessPointArn}"
+                "Resource": "${accessPointArn}",
+                "Condition": {
+                  "StringLike": {
+                    "s3:prefix": ["${path}", "${path}/*"]
+                  }
+                }
             },
             {
                 "Sid": "Statement2",
@@ -507,8 +523,114 @@ describe('S3DataSetStoragePlugin', () => {
         externalEndpointName
       );
       expect(s3ControlMock.commandCalls(PutAccessPointPolicyCommand)[0].firstArg.input.Policy).toEqual(
-        '{"Statement":[{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"}],"Version":"2012-10-17"}'
+        '{"Statement":[{"Action":["s3:GetObject","s3:PutObject"],"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint/object/dataset-prefix/*","Sid":"Statement2"},{"Action":"s3:ListBucket","Condition":{"StringLike":{"s3:prefix":["dataset-prefix","dataset-prefix/*"]}},"Effect":"Allow","Principal":{"AWS":"arn:aws:iam::123456789012:role/someRole"},"Resource":"arn:aws:s3:us-east-1:123456789012:accesspoint/someAccessPoint","Sid":"Statement1"}],"Version":"2012-10-17"}'
       );
+    });
+
+    it('creates an internet access point if the vpc id is not specified.', async () => {
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn,
+          Alias: mockAccessPointAlias
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+
+      await expect(
+        plugin.addExternalEndpoint(name, path, externalEndpointName, mockAwsAccountId, externalRoleArn)
+      ).resolves.toEqual({
+        endPointUrl: `s3://${accessPointArn}`,
+        endPointAlias: mockAccessPointAlias
+      });
+      expect(
+        s3ControlMock.commandCalls(
+          CreateAccessPointCommand,
+          {
+            Name: externalEndpointName,
+            Bucket: name,
+            AccountId: mockAwsAccountId
+          },
+          true
+        )
+      ).toHaveLength(1);
+      expect(
+        s3ControlMock.commandCalls(
+          CreateAccessPointCommand,
+          {
+            Name: externalEndpointName,
+            Bucket: name,
+            AccountId: mockAwsAccountId,
+            VpcConfiguration: {
+              VpcId: vpcId
+            }
+          },
+          true
+        )
+      ).toHaveLength(0);
+    });
+
+    it('creates a VPC access point if the vpc id is specified.', async () => {
+      const plugin = new S3DataSetStoragePlugin(aws);
+      const s3Mock = mockClient(S3Client);
+      s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
+      const s3ControlMock = mockClient(S3ControlClient);
+      s3ControlMock
+        .on(CreateAccessPointCommand)
+        .resolves({
+          AccessPointArn: accessPointArn,
+          Alias: mockAccessPointAlias
+        })
+        .on(GetAccessPointPolicyCommand)
+        .resolves({})
+        .on(PutAccessPointPolicyCommand)
+        .resolves({});
+
+      await expect(
+        plugin.addExternalEndpoint(
+          name,
+          path,
+          externalEndpointName,
+          mockAwsAccountId,
+          externalRoleArn,
+          undefined,
+          vpcId
+        )
+      ).resolves.toEqual({
+        endPointUrl: `s3://${accessPointArn}`,
+        endPointAlias: mockAccessPointAlias
+      });
+      expect(
+        s3ControlMock.commandCalls(
+          CreateAccessPointCommand,
+          {
+            Name: externalEndpointName,
+            Bucket: name,
+            AccountId: mockAwsAccountId
+          },
+          true
+        )
+      ).toHaveLength(0);
+      expect(
+        s3ControlMock.commandCalls(
+          CreateAccessPointCommand,
+          {
+            Name: externalEndpointName,
+            Bucket: name,
+            AccountId: mockAwsAccountId,
+            VpcConfiguration: {
+              VpcId: vpcId
+            }
+          },
+          true
+        )
+      ).toHaveLength(1);
     });
 
     it("doesn't add a key policy if the key arn is not specified.", async () => {
