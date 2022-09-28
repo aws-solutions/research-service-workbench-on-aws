@@ -64,8 +64,9 @@ export class IamHelper {
     const returnDoc = new PolicyDocument();
     _.forEach(policyObj.Statement, (s) => {
       if (s.Sid === targetSid) {
-        if (!_.isArray(s.Principal.AWS))
+        if (!_.isArray(s.Principal.AWS)) {
           throw new Error('Cannot remove principal since only one principal is assigned');
+        }
         s.Principal.AWS = _.difference(s.Principal.AWS, [awsPrincipal]);
       }
       const statement: PolicyStatement = PolicyStatement.fromJson(s);
