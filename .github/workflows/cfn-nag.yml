@@ -28,32 +28,31 @@ jobs:
           node ../../common/scripts/install-run-rushx.js compile
           STAGE=testEnv node ../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: cdk synth example
+      - name: cdk synth swb-ui
         run: |
-          cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js compile
+          cd solutions/swb-ui/infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
-      - name: Run cfn-nag on swb-reference cdk.out
-        id: cdk-swb-reference
+      - name: Run cfn-nag on all cfn templates
         uses: stelligent/cfn_nag@master
         with:
           input_path: solutions/swb-reference/cdk.out/swb-testEnv-va.template.json
-          extra_args: --fail-on-warnings -o json
+          extra_args: --fail-on-warnings --template "..*\.template.json|..*\.cfn.yaml" -o json 
 
-      - name: Run cfn-nag on example cdk.out
-        id: cdk-example
-        uses: stelligent/cfn_nag@master
-        with:
-          input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
-          extra_args: --fail-on-warnings -o json
+      # - name: Run cfn-nag on swb-ui cdk.out
+      #   id: cdk-swb-ui
+      #   uses: stelligent/cfn_nag@master
+      #   with:
+      #     input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
+      #     extra_args: --fail-on-warnings -o json
+      #     output_path: cdk-nag-swb-ui.out
 
-      - name: Run cfn-nag on onboarding template
-        id: template
-        uses: stelligent/cfn_nag@master
-        with:
-          input_path: solutions/swb-reference/src/templates
-          extra_args: --fail-on-warnings -o json
+      # - name: Run cfn-nag on onboarding template
+      #   id: template
+      #   uses: stelligent/cfn_nag@master
+      #   with:
+      #     input_path: solutions/swb-reference/src/templates
+      #     extra_args: --fail-on-warnings -o json
 
       - name: Grep cfn-nag for violations
         uses: sergeysova/jq-action@v2
@@ -65,5 +64,5 @@ jobs:
       - name: echo violation count
         run: echo ${{ steps.cfn-nag.outputs.value }}
 
-      # - name: Fail if violations detected in cfn-nag
-      #   run: exit ${{ steps.cfn-nag.outputs.value }}
+      - name: Fail if violations detected in cfn-nag
+        run: exit ${{ steps.cfn-nag.outputs.value }}
