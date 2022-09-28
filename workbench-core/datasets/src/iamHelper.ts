@@ -52,6 +52,28 @@ export class IamHelper {
     );
   }
 
+  public static removePrincipalFromStatement(
+    source: PolicyDocument,
+    targetSid: string,
+    awsPrincipal: string
+  ): PolicyDocument {
+    const policyObj = source.toJSON();
+    if (!policyObj || !policyObj.Statement) {
+      throw new Error('Cannot remove principal. Policy document is invalid');
+    }
+    const returnDoc = new PolicyDocument();
+    _.forEach(policyObj.Statement, (s) => {
+      if (s.Sid === targetSid) {
+        if (!_.isArray(s.Principal.AWS))
+          throw new Error('Cannot remove principal since only one principal is assigned');
+        s.Principal.AWS = _.difference(s.Principal.AWS, [awsPrincipal]);
+      }
+      const statement: PolicyStatement = PolicyStatement.fromJson(s);
+      returnDoc.addStatements(statement);
+    });
+    return returnDoc;
+  }
+
   public static addPrincipalToStatement(
     source: PolicyDocument,
     targetSid: string,

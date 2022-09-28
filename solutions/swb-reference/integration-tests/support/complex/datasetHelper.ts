@@ -1,14 +1,13 @@
 import { AccessPoint } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
 import _ from 'lodash';
-import ClientSession from '../clientSession';
+import Setup from '../setup';
 
 export class DatasetHelper {
   private _awsSdk: AwsService;
-  private _adminSession: ClientSession;
-  public constructor(awsSdkClient: AwsService, adminSession: ClientSession) {
-    this._awsSdk = awsSdkClient;
-    this._adminSession = adminSession;
+  public constructor() {
+    const setup = new Setup();
+    this._awsSdk = setup.getMainAwsClient();
   }
 
   public async listAccessPoints(bucket: string, accountId: string): Promise<Array<AccessPoint>> {

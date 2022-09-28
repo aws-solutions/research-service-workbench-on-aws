@@ -654,7 +654,7 @@ export class SWBStack extends Stack {
             sid: 'KMSAccess'
           }),
           new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*'],
+            actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
             resources: ['*'],
             sid: 'EventbridgeAccess'
           }),

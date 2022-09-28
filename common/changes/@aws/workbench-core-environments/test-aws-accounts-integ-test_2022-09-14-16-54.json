@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "test: add accounts integ test",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}

@@ -17,7 +17,7 @@
     "build": "heft build --clean && rushx pkg-json-lint",
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "cdk": "cdk",
-    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/dev.json",
+    "cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
     "cdk-deploy:noBuild": "rushx compile && cdk deploy --all",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "compile": "node scripts/buildLambda.js",
@@ -60,6 +60,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@aws-cdk/aws-iam": "^1.159.0",
     "@aws-sdk/client-cloudformation": "^3.118.1",
     "@aws-sdk/client-s3": "^3.118.1",
     "@aws-sdk/client-sagemaker": "^3.118.1",
@@ -68,6 +69,7 @@
     "@aws-sdk/client-sts": "^3.118.1",
     "@aws-sdk/types": "^3.110.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
+    "@aws/workbench-core-datasets": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",

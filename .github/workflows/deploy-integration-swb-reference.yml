@@ -15,6 +15,10 @@ on:
         required: true
       slack_webhook_url:
         required: true
+      CYPRESS_ADMIN_PASSWORD:
+        required: true
+      CYPRESS_ADMIN_USER:
+        required: true
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -60,6 +64,17 @@ jobs:
         run: |
           cd solutions/swb-reference
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests
+      
+      - name: Run End To End tests
+        # if: steps.changed-swb-files.outputs.any_changed == 'true'
+        run: |
+          cd solutions/swb-reference
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js e2e-test
+        env:
+          # Env parameters for cypress tests need header 'CYPRESS_' or 'cypress_'
+          # Cypress will strip the header and pass it to the tests
+          CYPRESS_AdminPassword: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
+          CYPRESS_AdminUser: ${{ secrets.CYPRESS_ADMIN_USER }}
 
       - name: Slack Failure Notification
         if: failure()
