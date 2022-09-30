@@ -166,9 +166,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/environments/:id",
+              "raw": "{{API_URL}}/environments/:id/terminate",
               "host": ["{{API_URL}}"],
-              "path": ["environments", ":id"],
+              "path": ["environments", ":id", "terminate"],
               "variable": [
                 {
                   "key": "id",
