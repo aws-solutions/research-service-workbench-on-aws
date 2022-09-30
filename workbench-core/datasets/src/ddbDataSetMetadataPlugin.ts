@@ -83,6 +83,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return dataSet;
   }
 
+  public async removeDataSet(dataSetId: string): Promise<void> {
+    await this._removeDataSetFromDdb(dataSetId);
+  }
+
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
@@ -196,5 +200,14 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 
     return dataSet.id!;
+  }
+
+  private async _removeDataSetFromDdb(dataSetId: string): Promise<void> {
+    const dataSetKey = {
+      pk: `${this._dataSetKeyType}#${dataSetId}`,
+      sk: `${this._dataSetKeyType}#${dataSetId}`
+    };
+
+    await this._aws.helpers.ddb.delete(dataSetKey).execute();
   }
 }
