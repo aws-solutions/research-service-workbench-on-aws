@@ -35,7 +35,7 @@ jobs:
           SYNTH_REGION: us-east-1
         run: |
           cd solutions/swb-ui
-          node ../../../common/scripts/install-run-rushx.js export
+          node ../../common/scripts/install-run-rushx.js export
           cd infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
