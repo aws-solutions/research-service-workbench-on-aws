@@ -35,6 +35,7 @@ jobs:
           SYNTH_REGION: us-east-1
         run: |
           cd solutions/swb-ui/infrastructure
+          node ../../../common/scripts/install-run-rushx.js export
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on all .template.json files
