@@ -21,7 +21,6 @@
     "build:test": "rushx build && rushx test",
     "cdk": "cdk",
     "cdk-deploy": "rushx build && cdk deploy --all --require-approval never --outputs-file ./src/config/${STAGE}.json",
-    "cdk-synth": "STAGE=testEnv SYNTH_REGION_SHORTNAME=va SYNTH_REGION=us-east-1 cdk synth",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "sort-package-json": "sort-package-json package.json",
