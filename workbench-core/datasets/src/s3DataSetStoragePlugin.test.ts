@@ -41,11 +41,15 @@ describe('S3DataSetStoragePlugin', () => {
   const endPointUrl: string = `s3://${accessPointArn}/`;
 
   let aws: AwsService;
+  let plugin: S3DataSetStoragePlugin;
+
   beforeEach(() => {
     aws = new AwsService({
       region,
       credentials: awsCreds
     });
+
+    plugin = new S3DataSetStoragePlugin(aws);
   });
   describe('constructor', () => {
     itProp(
@@ -72,8 +76,6 @@ describe('S3DataSetStoragePlugin', () => {
       "Appends '/' to the end of the path when not supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws);
-
         const s3Mock = mockClient(S3Client);
         s3Mock.on(PutObjectCommand).resolves({});
         const pathNoSlash: string = path.replace(/\//g, '_');
@@ -87,8 +89,6 @@ describe('S3DataSetStoragePlugin', () => {
       "Doesn't append '/' to the end of the path when supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws);
-
         const s3Mock = mockClient(S3Client);
         s3Mock.on(PutObjectCommand).resolves({});
         const pathWithSlash: string = `${path}/`;
@@ -103,8 +103,6 @@ describe('S3DataSetStoragePlugin', () => {
       "Appends '/' to the end of the path when not supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws);
-
         const pathNoSlash: string = path.replace(/\//g, '_');
         const nameNoSlash: string = name.replace(/\//g, '_');
         const s3Uri = await plugin.importStorage(nameNoSlash, pathNoSlash);
@@ -116,8 +114,6 @@ describe('S3DataSetStoragePlugin', () => {
       "Doesn't append '/' to the end of the path when supplied",
       [fc.string(), fc.string()],
       async (name, path) => {
-        const plugin = new S3DataSetStoragePlugin(aws);
-
         const pathWithSlash: string = `${path}/`;
         const s3Uri = await plugin.importStorage(name, pathWithSlash);
         expect(s3Uri).toMatch(`s3://${name}/${pathWithSlash}`);
@@ -127,8 +123,6 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('addExternalEndpoint', () => {
     it('does not alter bucket policy if access point delegation already exists.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock
         .on(GetBucketPolicyCommand)
@@ -183,8 +177,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('adds a bucket policy statement when the account ID is different.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock
         .on(GetBucketPolicyCommand)
@@ -246,8 +238,6 @@ describe('S3DataSetStoragePlugin', () => {
       const endPointNameNoColon = externalEndpointName.replace(/\:/g, '_');
       const accessPointArn = `arn:s3:us-east-1:123456789012:accesspoint/${endPointNameNoColon}`;
 
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock
         .on(GetBucketPolicyCommand)
@@ -298,8 +288,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('Creates a bucket policy if none exists.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
 
@@ -328,8 +316,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('Does not create an access policy if one exists.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
 
@@ -390,8 +376,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('updates the list bucket access point policy if the principal is missing', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
 
@@ -459,8 +443,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('updates the get/put bucket access point policy if the prinicpal is missing', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
 
@@ -528,7 +510,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('creates an internet access point if the vpc id is not specified.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -577,7 +558,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('creates a VPC access point if the vpc id is specified.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -634,7 +614,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it("doesn't add a key policy if the key arn is not specified.", async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -669,7 +648,6 @@ describe('S3DataSetStoragePlugin', () => {
       const externalRoleArn = `arn:aws:iam::123456789012:role/${externalRoleName}`;
       const accessPointArn = `arn:aws:s3:us-east-1:123456789012:accesspoint/${externalEndpointName}`;
       const kmsKeyArn = 'arn:aws:kms:us-east-1:123456789012:key/4c3fd651-3841-4000-97f0-11e99f011888';
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -703,7 +681,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('adds a key policy if the key arn is specified, and only a grant policy exists.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -768,7 +745,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('does not add a key policy if the key arn is specified, and both usage and resource grant statements exist.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -844,7 +820,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('adds a key policy if the key arn is specified, and only a usage policy exists.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3Mock = mockClient(S3Client);
       s3Mock.on(GetBucketPolicyCommand).resolves({}).on(PutBucketPolicyCommand).resolves({});
       const s3ControlMock = mockClient(S3ControlClient);
@@ -908,7 +883,6 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('addRoleToEndpoint', () => {
     it('updates KMS key policy if key arn is provided.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3ControlMock = mockClient(S3ControlClient);
       s3ControlMock.on(GetAccessPointPolicyCommand).resolves({}).on(PutAccessPointPolicyCommand).resolves({});
       const kmsMock = mockClient(KMSClient);
@@ -931,7 +905,6 @@ describe('S3DataSetStoragePlugin', () => {
     });
 
     it('does not update KMS if no key is provided.', async () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
       const s3ControlMock = mockClient(S3ControlClient);
       s3ControlMock.on(GetAccessPointPolicyCommand).resolves({}).on(PutAccessPointPolicyCommand).resolves({});
       const kmsMock = mockClient(KMSClient);
@@ -951,8 +924,6 @@ describe('S3DataSetStoragePlugin', () => {
       'throws not implemented error.',
       [fc.string(), fc.string(), fc.string()],
       async (name, externalEndpointName, externalRoleName) => {
-        const plugin = new S3DataSetStoragePlugin(aws);
-
         await expect(
           plugin.removeRoleFromExternalEndpoint(name, externalEndpointName, externalRoleName)
         ).rejects.toEqual(new Error('Method not implemented.'));
@@ -962,8 +933,6 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('createPresignedUploadUrl', () => {
     itProp('throws not implemented error.', [fc.string(), fc.nat()], async (name, ttl) => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       await expect(plugin.createPresignedUploadUrl(name, ttl)).rejects.toEqual(
         new Error('Method not implemented.')
       );
@@ -972,8 +941,6 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('createPresignedMultiPartUploadUrls', () => {
     itProp('throws not implemented error.', [fc.string(), fc.nat(), fc.nat()], async (name, parts, ttl) => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       await expect(plugin.createPresignedMultiPartUploadUrls(name, parts, ttl)).rejects.toEqual(
         new Error('Method not implemented.')
       );
@@ -982,8 +949,6 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('_awsAccountIdFromArn', () => {
     it('throws when the supplied arn contains an empty accountId', () => {
-      const plugin = new S3DataSetStoragePlugin(aws);
-
       // @tsignore
       expect(() => plugin[`_awsAccountIdFromArn`]('arn:aws:s3:us-east-1::accessPoint/someName')).toThrow(
         new Error('Expected an arn with an AWS AccountID however AWS AccountID field is empty.')
