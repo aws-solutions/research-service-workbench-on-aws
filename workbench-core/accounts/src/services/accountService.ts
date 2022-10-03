@@ -8,7 +8,7 @@ import { AwsService } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import accountResourceTypeToKey from '../constants/accountResourceTypeToKey';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
@@ -42,8 +42,8 @@ export default class AccountService {
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
       .get({
-        pk: `${environmentResourceTypeToKey.account}#${accountId}`,
-        sk: `${environmentResourceTypeToKey.account}#${accountId}`
+        pk: `${accountResourceTypeToKey.account}#${accountId}`,
+        sk: `${accountResourceTypeToKey.account}#${accountId}`
       })
       .execute()) as GetItemCommandOutput;
 
@@ -127,7 +127,9 @@ export default class AccountService {
     const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
     // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
     if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0) {
-      throw Boom.badRequest('This AWS Account was found in DDB. Please provide the correct id value in request body');
+      throw Boom.badRequest(
+        'This AWS Account was found in DDB. Please provide the correct id value in request body'
+      );
     }
   }
 
@@ -170,8 +172,8 @@ export default class AccountService {
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
-        pk: `${environmentResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
-        sk: `${environmentResourceTypeToKey.account}#${accountMetadata.id}`
+        pk: `${accountResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
+        sk: `${accountResourceTypeToKey.account}#${accountMetadata.id}`
       };
       const awsAccountParams = {
         item: {

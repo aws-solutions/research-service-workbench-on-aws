@@ -8,12 +8,11 @@ import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
-import IamRoleCloneService from './iamRoleCloneService';
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;

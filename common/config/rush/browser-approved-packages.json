@@ -99,6 +99,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-accounts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-accounts-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-audit",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -141,10 +149,6 @@
     {
       "name": "@aws/workbench-core-logging",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@aws/workbench-core-accounts-ui",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws/workbench-core-swb-common-ui",
