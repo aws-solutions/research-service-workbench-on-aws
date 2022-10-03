@@ -36,7 +36,7 @@ jobs:
         run: |
           cd solutions/swb-ui
           node ../../../common/scripts/install-run-rushx.js export
-          cd solutions/swb-ui/infrastructure
+          cd infrastructure
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
       - name: Run cfn-nag on all .template.json files
