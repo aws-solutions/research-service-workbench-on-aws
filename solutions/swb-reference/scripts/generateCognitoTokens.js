@@ -14,13 +14,6 @@ const fs = require('fs');
 const { CognitoTokenService } = require('@aws/workbench-core-base');
 const Csrf = require('csrf');
 
-const config = yaml.load(
-  // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-  // correct file
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.readFileSync(join(__dirname, `../integration-tests/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-);
-
 let outputs;
 try {
   const apiStackOutputs = JSON.parse(
@@ -36,7 +29,7 @@ try {
 
 const clientId = outputs.cognitoUserPoolClientId;
 const userPoolId = outputs.cognitoUserPoolId;
-const region = config.awsRegion;
+const region = outputs.awsRegion;
 const username = process.argv[2];
 const password = process.argv[3];
 
