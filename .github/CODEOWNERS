@@ -19,6 +19,7 @@ workbench-core/environments                           @awslabs/aws-ma-swb
 common/changes/@aws/workbench-core-environments       @awslabs/aws-ma-swb
 workbench-core/environments-ui                        @awslabs/aws-ma-swb
 common/changes/@aws/workbench-core-environments-ui    @awslabs/aws-ma-swb
+workbench-core/accounts                               @awslabs/aws-ma-swb
 workbench-core/accounts-ui                            @awslabs/aws-ma-swb
 common/changes/@aws/workbench-core-accounts-ui        @awslabs/aws-ma-swb
 workbench-core/datasets                               @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
