@@ -18,3 +18,21 @@ import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Custom command to login by role.
+       * @example cy.login('ITAdmin')
+       * @param role - Name of Role for login.
+       */
+      login(role: string): Chainable<Element>;
+      /**
+       * Custom command to logout.
+       * @example cy.logout()
+       */
+      logout(): Chainable<Element>;
+    }
+  }
+}

@@ -328,6 +328,7 @@ importers:
       '@types/node': ^14
       '@types/react': 17.0.38
       babel-jest: 27.5.1
+      cypress: ^10.6.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-config-next: 12.1.5
@@ -384,6 +385,7 @@ importers:
       '@types/node': 14.18.20
       '@types/react': 17.0.38
       babel-jest: 27.5.1_@babel+core@7.18.2
+      cypress: 10.6.0
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-config-next: 12.1.5_5794735a2262de3d29e0baaa885b5942
@@ -16007,7 +16009,7 @@ packages:
     engines: {node: '>= 0.8'}
 
   /verror/1.10.0:
-    resolution: {integrity: sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=}
+    resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
     dependencies:
       assert-plus: 1.0.0

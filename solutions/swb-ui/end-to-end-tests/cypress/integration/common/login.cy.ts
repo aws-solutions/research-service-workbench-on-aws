@@ -3,3 +3,5 @@ describe('IT Admin Login', () => {
     cy.login('ITAdmin');
   });
 });
+
+export {};
