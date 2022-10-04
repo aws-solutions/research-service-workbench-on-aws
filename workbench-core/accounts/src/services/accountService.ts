@@ -4,11 +4,10 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
@@ -42,8 +41,8 @@ export default class AccountService {
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
       .get({
-        pk: `${environmentResourceTypeToKey.account}#${accountId}`,
-        sk: `${environmentResourceTypeToKey.account}#${accountId}`
+        pk: `${resourceTypeToKey.account}#${accountId}`,
+        sk: `${resourceTypeToKey.account}#${accountId}`
       })
       .execute()) as GetItemCommandOutput;
 
@@ -81,7 +80,7 @@ export default class AccountService {
     const response = await this._aws.helpers.ddb.query(queryParams).execute();
     let accounts: Account[] = [];
     if (response && response.Items) {
-      accounts = response.Items.map((item) => {
+      accounts = response.Items.map((item: unknown) => {
         return item as unknown as Account;
       });
     }
@@ -172,8 +171,8 @@ export default class AccountService {
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
-        pk: `${environmentResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
-        sk: `${environmentResourceTypeToKey.account}#${accountMetadata.id}`
+        pk: `${resourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
+        sk: `${resourceTypeToKey.account}#${accountMetadata.id}`
       };
       const awsAccountParams = {
         item: {
