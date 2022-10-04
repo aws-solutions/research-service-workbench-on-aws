@@ -225,4 +225,52 @@ describe('AccountService', () => {
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
+
+  test('getAccounts returns no Items attribute', async () => {
+    // BUILD
+    const accountService = new AccountService(process.env.STACK_NAME!);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(QueryCommand).resolves({});
+
+    // OPERATE
+    const response = await accountService.getAccounts();
+
+    // CHECK
+    expect(response).toEqual([]);
+  });
+
+  test('getAccounts returns list of onboarded accounts', async () => {
+    // BUILD
+    const accountService = new AccountService(process.env.STACK_NAME!);
+    const accounts = [
+      {
+        awsAccountId: { S: '123456789012' },
+        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
+        portfolioId: { S: 'port-1234' },
+        id: { S: 'sampleAccId' },
+        accountId: { S: 'sampleAccId' }
+      }
+    ];
+    const expectedList = [
+      {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      }
+    ];
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(QueryCommand).resolves({
+      Items: accounts
+    });
+
+    // OPERATE
+    const response = await accountService.getAccounts();
+
+    // CHECK
+    expect(response).toEqual(expectedList);
+  });
 });

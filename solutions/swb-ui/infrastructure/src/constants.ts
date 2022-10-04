@@ -68,6 +68,14 @@ function getConstants(): {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; awsRegion: string } {
   try {
+    if (process.env.SYNTH_REGION_SHORTNAME && process.env.SYNTH_REGION)
+      //allow environment variable override for synth pipeline check
+      return {
+        awsRegionShortName: process.env.SYNTH_REGION_SHORTNAME,
+        apiUrlOutput: '',
+        awsRegion: process.env.SYNTH_REGION
+      };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const apiStackOutputs: any = JSON.parse(
       // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
@@ -80,7 +88,9 @@ function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; aw
     const outputs = apiStackOutputs[apiStackName];
 
     if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
-      throw new Error(`Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`); //validate when API unsuccessfully finished and UI is deployed
+      throw new Error(
+        `Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`
+      ); //validate when API unsuccessfully finished and UI is deployed
     }
     return {
       awsRegionShortName: outputs.awsRegionShortName,

@@ -102,6 +102,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@aws/workbench-core-accounts",
+      "projectFolder": "workbench-core/accounts",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@aws/workbench-core-datasets-ui",
       "projectFolder": "workbench-core/datasets-ui",
       "reviewCategory": "production",
