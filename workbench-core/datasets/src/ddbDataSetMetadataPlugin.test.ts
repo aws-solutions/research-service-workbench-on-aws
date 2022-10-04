@@ -259,6 +259,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       mockDdb.on(DeleteItemCommand).resolves({});
 
       await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(1);
     });
   });
 

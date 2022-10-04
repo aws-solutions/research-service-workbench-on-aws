@@ -83,8 +83,17 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return dataSet;
   }
 
+  /**
+   * Remove a DataSet. Will not throw if the dataset does not exist.
+   * @param dataSetId - the ID of the Dataset to remove.
+   */
   public async removeDataSet(dataSetId: string): Promise<void> {
-    await this._removeDataSetFromDdb(dataSetId);
+    const dataSetKey = {
+      pk: `${this._dataSetKeyType}#${dataSetId}`,
+      sk: `${this._dataSetKeyType}#${dataSetId}`
+    };
+
+    await this._aws.helpers.ddb.delete(dataSetKey).execute();
   }
 
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
@@ -200,14 +209,5 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
 
     return dataSet.id!;
-  }
-
-  private async _removeDataSetFromDdb(dataSetId: string): Promise<void> {
-    const dataSetKey = {
-      pk: `${this._dataSetKeyType}#${dataSetId}`,
-      sk: `${this._dataSetKeyType}#${dataSetId}`
-    };
-
-    await this._aws.helpers.ddb.delete(dataSetKey).execute();
   }
 }
