@@ -7,7 +7,7 @@ import { Readable } from 'stream';
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput } from '@aws-sdk/client-s3';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
 import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import _ from 'lodash';
@@ -106,7 +106,7 @@ export default class HostingAccountLifecycleService {
       bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
     } catch (e) {
       // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
-      if (e.Code !== 'NoSuchBucketPolicy') {
+      if (e instanceof NoSuchBucket) {
         throw e;
       }
     }
@@ -224,8 +224,7 @@ export default class HostingAccountLifecycleService {
       portfolioId as string
     );
 
-    const iamRoleCloneService = new IamRoleCloneService(this._aws, targetAccountAwsService);
-    await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
+    await this.cloneRole(targetAccountAwsService, roleToCopyToTargetAccount);
 
     await this._updateHostingAccountStatus(
       ddbAccountId,
@@ -233,6 +232,11 @@ export default class HostingAccountLifecycleService {
       targetAccountAwsService,
       targetAccountStackName
     );
+  }
+
+  public async cloneRole(targetAws: AwsService, roleToCopyToTargetAccount: string): Promise<void> {
+    const iamRoleCloneService = new IamRoleCloneService(this._aws, targetAws);
+    await iamRoleCloneService.cloneRole(roleToCopyToTargetAccount);
   }
 
   /**

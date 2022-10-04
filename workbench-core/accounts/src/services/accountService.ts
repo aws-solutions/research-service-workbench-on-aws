@@ -81,7 +81,7 @@ export default class AccountService {
     const response = await this._aws.helpers.ddb.query(queryParams).execute();
     let accounts: Account[] = [];
     if (response && response.Items) {
-      accounts = response.Items.map((item) => {
+      accounts = response.Items.map((item: unknown) => {
         return item as unknown as Account;
       });
     }
