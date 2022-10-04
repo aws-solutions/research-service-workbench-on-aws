@@ -6,9 +6,8 @@
 /* eslint-disable security/detect-object-injection */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk } from '@aws/workbench-core-base';
+import { AwsService, buildDynamoDBPkSk, resourceTypeToKey } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import accountResourceTypeToKey from '../constants/accountResourceTypeToKey';
 
 interface Project {
   pk: string;
@@ -53,7 +52,7 @@ export default class ProjectService {
    */
   public async getProject(projectId: string): Promise<Project> {
     const response = await this._aws.helpers.ddb
-      .get(buildDynamoDBPkSk(projectId, accountResourceTypeToKey.project))
+      .get(buildDynamoDBPkSk(projectId, resourceTypeToKey.project))
       .execute();
 
     const item = (response as GetItemCommandOutput).Item;

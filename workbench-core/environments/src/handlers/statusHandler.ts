@@ -3,10 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { isEnvironmentStatus } from '../constants/environmentStatus';
 import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
 import { EnvironmentService } from '../services/environmentService';
@@ -111,9 +110,9 @@ export default class StatusHandler {
     // Create/update instance ID and ARN in DDB
     await envService.addMetadata(
       envId,
-      envResourceTypeToKey.environment,
+      resourceTypeToKey.environment,
       instanceName,
-      envResourceTypeToKey.instance,
+      resourceTypeToKey.instance,
       envInstDetails
     );
 
@@ -126,9 +125,9 @@ export default class StatusHandler {
     // Create/update corresponding instance resource in DDB
     await envService.addMetadata(
       instanceName,
-      envResourceTypeToKey.instance,
+      resourceTypeToKey.instance,
       envId,
-      envResourceTypeToKey.environment,
+      resourceTypeToKey.environment,
       instDetails
     );
   }
@@ -146,7 +145,7 @@ export default class StatusHandler {
       .query({
         key: {
           name: 'pk',
-          value: `${envResourceTypeToKey.instance}#${instanceId}`
+          value: `${resourceTypeToKey.instance}#${instanceId}`
         }
       })
       .execute();
@@ -156,7 +155,7 @@ export default class StatusHandler {
 
     const instance = data.Items![0];
     const instanceSk = instance.sk as unknown as string;
-    return instanceSk.split(`${envResourceTypeToKey.environment}#`)[1];
+    return instanceSk.split(`${resourceTypeToKey.environment}#`)[1];
   }
 
   /** Get environment service instance

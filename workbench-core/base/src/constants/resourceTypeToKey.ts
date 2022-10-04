@@ -3,18 +3,26 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const envKeyNameToKey: {
+const resourceTypeToKey: {
   environment: string;
   project: string;
   envType: string;
   envTypeConfig: string;
   dataset: string;
+  endpoint: string;
+  instance: string;
+  awsAccount: string;
+  account: string;
 } = {
   environment: 'ENV',
   project: 'PROJ',
   envType: 'ET',
   envTypeConfig: 'ETC',
-  dataset: 'DS'
+  dataset: 'DATASET',
+  endpoint: 'ENDPOINT',
+  instance: 'INID',
+  awsAccount: 'AWSACC',
+  account: 'ACC'
 };
 
-export default envKeyNameToKey;
+export default resourceTypeToKey;

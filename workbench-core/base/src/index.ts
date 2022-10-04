@@ -8,6 +8,7 @@ import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
+import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 
 export {
@@ -17,5 +18,6 @@ export {
   QueryParams,
   IamRoleCloneService,
   buildDynamoDbKey,
-  buildDynamoDBPkSk
+  buildDynamoDBPkSk,
+  resourceTypeToKey
 };

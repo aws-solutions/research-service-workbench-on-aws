@@ -15,7 +15,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
-import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 
@@ -59,8 +59,8 @@ describe('environmentTypeService', () => {
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: `${environmentResourceTypeToKey.envType}#${envTypeId}`,
-            sk: `${environmentResourceTypeToKey.envType}#${envTypeId}`
+            pk: `${resourceTypeToKey.envType}#${envTypeId}`,
+            sk: `${resourceTypeToKey.envType}#${envTypeId}`
           })
         })
         .resolves(getItemResponse);
@@ -128,8 +128,8 @@ describe('environmentTypeService', () => {
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: `${environmentResourceTypeToKey.envType}#${envTypeId}`,
-            sk: `${environmentResourceTypeToKey.envType}#${envTypeId}`
+            pk: `${resourceTypeToKey.envType}#${envTypeId}`,
+            sk: `${resourceTypeToKey.envType}#${envTypeId}`
           })
         })
         .resolves(getItemResponse);

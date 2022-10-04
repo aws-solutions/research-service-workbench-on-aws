@@ -4,11 +4,10 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import accountResourceTypeToKey from '../constants/accountResourceTypeToKey';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
@@ -42,8 +41,8 @@ export default class AccountService {
   public async getAccount(accountId: string): Promise<Account> {
     const accountEntry = (await this._aws.helpers.ddb
       .get({
-        pk: `${accountResourceTypeToKey.account}#${accountId}`,
-        sk: `${accountResourceTypeToKey.account}#${accountId}`
+        pk: `${resourceTypeToKey.account}#${accountId}`,
+        sk: `${resourceTypeToKey.account}#${accountId}`
       })
       .execute()) as GetItemCommandOutput;
 
@@ -172,8 +171,8 @@ export default class AccountService {
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
-        pk: `${accountResourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
-        sk: `${accountResourceTypeToKey.account}#${accountMetadata.id}`
+        pk: `${resourceTypeToKey.awsAccount}#${accountMetadata.awsAccountId}`,
+        sk: `${resourceTypeToKey.account}#${accountMetadata.id}`
       };
       const awsAccountParams = {
         item: {
