@@ -55,8 +55,8 @@ describe('HostingAccountLifecycleService', () => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function mockCloudformationOutputs(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cfMock: AwsStub<any, any>,
     stackStatus: string = 'CREATE_COMPLETE'
   ): void {
