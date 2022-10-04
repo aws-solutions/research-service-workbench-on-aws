@@ -43,6 +43,7 @@
     "@aws-sdk/client-sts": "^3.118.1",
     "@aws-sdk/types": "^3.110.0",
     "@aws/swb-app": "workspace:*",
+    "@aws/workbench-core-accounts": "workspace:*",
     "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
