@@ -20,11 +20,11 @@ Parameters:
     Type: String
     Description: A unique ID used to identify this account
 
-  VPC:
+  VpcId:
     Description: The VPC in which the EC2 instance will reside
     Type: AWS::EC2::VPC::Id
     
-  Subnet1:
+  SubnetId:
     Description: The VPC subnet in which the EC2 instance will reside
     Type: AWS::EC2::Subnet::Id
 
@@ -65,8 +65,8 @@ Metadata:
       - Label:
           default: Deployment Configuration
         Parameters:
-          - VPC
-          - Subnet1
+          - VpcId
+          - SubnetId
           - EnableFlowLogs
       - Label:
           default: ARNs
@@ -412,7 +412,7 @@ Resources:
     Type: AWS::EC2::FlowLog
     Condition: enableFlowLogs
     Properties:
-      ResourceId: !Ref VPC
+      ResourceId: !Ref VpcId
       ResourceType: VPC
       TrafficType: ACCEPT
       DeliverLogsPermissionArn: !GetAtt EnvManagementRole.Arn
@@ -424,26 +424,26 @@ Resources:
         - Key: Purpose
           Value: AcceptTraffic
 
-  FlowLogSubnet1:
+  FlowLogSubnetId:
     Type: AWS::EC2::FlowLog
     Condition: enableFlowLogs
     Properties:
-      ResourceId: !Ref Subnet1
+      ResourceId: !Ref SubnetId
       ResourceType: Subnet
       TrafficType: ACCEPT
       DeliverLogsPermissionArn: !GetAtt EnvManagementRole.Arn
-      LogGroupName: Subnet1LogGroup
+      LogGroupName: SubnetIdLogGroup
       LogFormat: '${version} ${vpc-id} ${subnet-id} ${instance-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${tcp-flags} ${type} ${pkt-srcaddr} ${pkt-dstaddr}'
       Tags:
         - Key: Name
-          Value: FlowLogForSubnet1
+          Value: FlowLogForSubnetId
         - Key: Purpose
           Value: AcceptTraffic
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPC
+      VpcId: !Ref VpcId
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public routes
@@ -554,11 +554,11 @@ Outputs:
 
   VPC:
     Description: VPC ID
-    Value: !Ref VPC
+    Value: !Ref VpcId
 
   VpcSubnet:
     Description: A reference to the public subnet in the 1st Availability Zone
-    Value: !Ref Subnet1
+    Value: !Ref SubnetId
 
   EncryptionKeyArn:
     Description: KMS Encryption Key Arn
