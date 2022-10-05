@@ -28,13 +28,13 @@ jobs:
           github_token: ${{github.token}}
           branches: ${{ github.head_ref }}
 
-      - name: Enable branch protection on test/*
-        uses: octokit/request-action@v2.x
-        if: always() # Make sure to enable branch protection even if other steps fail
-        with:
-          route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
-          repo: solution-spark-on-aws
-          branch: ${{ github.head_ref }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      # - name: Enable branch protection on test/*
+      #   uses: octokit/request-action@v2.x
+      #   if: always() # Make sure to enable branch protection even if other steps fail
+      #   with:
+      #     route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+      #     owner: awslabs
+      #     repo: solution-spark-on-aws
+      #     branch: ${{ github.head_ref }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
