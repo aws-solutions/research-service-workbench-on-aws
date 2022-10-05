@@ -4,7 +4,9 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 
+const uuidRegExp: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
     POST: [
@@ -28,7 +30,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/datasets/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExp}`]: {
     GET: [
       {
         action: 'READ',
@@ -66,7 +68,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}`]: {
     GET: [
       {
         action: 'READ',
@@ -74,7 +76,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/connections': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -82,7 +84,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/start': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -90,7 +92,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/stop': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -98,7 +100,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/terminate': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -120,7 +122,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environmentTypes/${uuidRegExp}`]: {
     GET: [
       {
         action: 'READ',
@@ -134,7 +136,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations': {
+  [`/environmentTypes/${uuidRegExp}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -148,7 +150,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+  [`/environmentTypes/${uuidRegExp}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExp}`]:
     {
       GET: [
         {

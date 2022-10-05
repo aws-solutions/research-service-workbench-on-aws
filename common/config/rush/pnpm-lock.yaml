@@ -102,6 +102,7 @@ importers:
       '@aws/workbench-core-accounts': workspace:*
       '@aws/workbench-core-authentication': workspace:*
       '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-environments': workspace:*
       '@aws/workbench-core-logging': workspace:*
@@ -142,6 +143,7 @@ importers:
       '@aws/workbench-core-accounts': link:../../workbench-core/accounts
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
+      '@aws/workbench-core-base': link:../../workbench-core/base
       '@aws/workbench-core-datasets': link:../../workbench-core/datasets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-logging': link:../../workbench-core/logging

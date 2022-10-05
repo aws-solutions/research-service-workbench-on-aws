@@ -124,7 +124,7 @@ export default class EnvironmentTypeConfigService {
         );
       }
     }
-    const envTypeConfigId = uuidv4();
+    const envTypeConfigId = `${resourceTypeToKey.envTypeConfig}-${uuidv4()}`;
     const currentDate = new Date().toISOString();
 
     const newEnvTypeConfig: EnvironmentTypeConfig = {

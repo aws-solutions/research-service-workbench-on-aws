@@ -387,7 +387,7 @@ export class EnvironmentService {
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
-      id: uuidv4(),
+      id: `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`,
       instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,
@@ -411,6 +411,7 @@ export class EnvironmentService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let metadata: any[] = [];
     if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
+      console.log('items', batchGetResult.Responses![this._tableName]);
       throw new Error('Unable to get metadata for all keys defined in environment');
     }
     metadata = batchGetResult.Responses![this._tableName].map((item) => {
