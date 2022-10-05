@@ -130,6 +130,11 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
 
   test.skip('Launch should return mocked id when mounting datasets', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
+    environment.DATASETS = [
+      {
+        id: 'dataset-123'
+      }
+    ];
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
       return {
