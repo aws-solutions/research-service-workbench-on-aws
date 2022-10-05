@@ -14,8 +14,8 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import EnvironmentTypeConfigService from './environmentTypeConfigService';
 
 describe('environmentTypeConfigService', () => {
@@ -40,7 +40,7 @@ describe('environmentTypeConfigService', () => {
     // provisioningArtifactId: 'pa-dewjn123',
     params: [],
     updatedAt: '2022-06-17T21:25:24.333Z',
-    sk: `${environmentResourceTypeToKey.envType}#${envTypeId}${environmentResourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+    sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
     owner: 'owner-123',
     description: 'Example config 1',
     id: envTypeConfigId,
@@ -60,8 +60,8 @@ describe('environmentTypeConfigService', () => {
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: environmentResourceTypeToKey.envTypeConfig,
-            sk: `${environmentResourceTypeToKey.envType}#${envTypeId}${environmentResourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+            pk: resourceTypeToKey.envTypeConfig,
+            sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
           })
         })
         .resolves(getItemResponse);
@@ -156,8 +156,8 @@ describe('environmentTypeConfigService', () => {
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: environmentResourceTypeToKey.envTypeConfig,
-            sk: `${environmentResourceTypeToKey.envType}#${envTypeId}${environmentResourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+            pk: resourceTypeToKey.envTypeConfig,
+            sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
           })
         })
         .resolves(getItemResponse);

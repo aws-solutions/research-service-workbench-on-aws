@@ -1,0 +1,20 @@
+{
+  "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
+  "collectCoverage": true,
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/src/constants/hostingAccountStatus.ts",
+    "<rootDir>/src/handlers/accountHandler.ts",
+    "<rootDir>/src/schemas/createAccount.ts",
+    "<rootDir>/src/services/hostingAccountService.ts",
+    "<rootDir>/src/index.ts"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "branches": 90,
+      "functions": 90,
+      "lines": 90,
+      "statements": 90
+    }
+  },
+  "coverageReporters": ["json-summary", "json", "lcov", "text"]
+}

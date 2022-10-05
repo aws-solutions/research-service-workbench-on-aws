@@ -4,6 +4,7 @@
  */
 
 import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
+import { HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { AwsService, AuditLogger } from '@aws/workbench-core-base';
 import {
@@ -12,11 +13,9 @@ import {
   DdbDataSetMetadataPlugin
 } from '@aws/workbench-core-datasets';
 import {
-  HostingAccountService,
   EnvironmentService,
   EnvironmentTypeService,
-  EnvironmentTypeConfigService,
-  ProjectService
+  EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { Express } from 'express';

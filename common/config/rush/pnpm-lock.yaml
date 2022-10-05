@@ -99,6 +99,7 @@ importers:
   ../../solutions/swb-app:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-accounts': workspace:*
       '@aws/workbench-core-authentication': workspace:*
       '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-datasets': workspace:*
@@ -138,6 +139,7 @@ importers:
       typescript: ^4.5.2
       uuid: ^8.3.2
     dependencies:
+      '@aws/workbench-core-accounts': link:../../workbench-core/accounts
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-datasets': link:../../workbench-core/datasets
@@ -193,6 +195,7 @@ importers:
       '@aws-sdk/types': ^3.110.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/swb-app': workspace:*
+      '@aws/workbench-core-accounts': workspace:*
       '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
@@ -217,7 +220,6 @@ importers:
       aws-lambda: ^1.0.7
       aws-sdk-client-mock: ^0.6.2
       axios: ^0.27.1
-      cdk-ssm-document: ^3.1.1
       constructs: ^10.0.0
       csrf: ^3.1.0
       cypress: ^10.6.0
@@ -250,6 +252,7 @@ importers:
       '@aws-sdk/client-sts': 3.130.0
       '@aws-sdk/types': 3.127.0
       '@aws/swb-app': link:../swb-app
+      '@aws/workbench-core-accounts': link:../../workbench-core/accounts
       '@aws/workbench-core-audit': link:../../workbench-core/audit
       '@aws/workbench-core-base': link:../../workbench-core/base
       '@aws/workbench-core-datasets': link:../../workbench-core/datasets
@@ -283,7 +286,6 @@ importers:
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       aws-lambda: 1.0.7
       axios: 0.27.2
-      cdk-ssm-document: 3.1.1_8d994d7bf27edab84c843ce1928354a1
       constructs: 10.1.25
       cypress: 10.6.0
       depcheck: 1.4.3
@@ -445,6 +447,101 @@ importers:
       ts-jest: 27.1.5_4e623839ecfc1b0242d7f262e6e0b1df
       ts-node: 10.8.0_0c1b05e96b429c05fff7f0589ebca14f
       typescript: 4.7.2
+
+  ../../workbench-core/accounts:
+    specifiers:
+      '@aws-cdk/aws-iam': ^1.159.0
+      '@aws-sdk/client-cloudformation': ^3.118.1
+      '@aws-sdk/client-dynamodb': ^3.118.1
+      '@aws-sdk/client-ec2': ^3.119.0
+      '@aws-sdk/client-eventbridge': ^3.118.1
+      '@aws-sdk/client-kms': ^3.118.1
+      '@aws-sdk/client-s3': ^3.118.1
+      '@aws-sdk/client-s3-control': ^3.118.1
+      '@aws-sdk/client-service-catalog': ^3.118.1
+      '@aws-sdk/client-ssm': ^3.118.1
+      '@aws-sdk/types': ^3.110.0
+      '@aws-sdk/util-dynamodb': ^3.87.0
+      '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
+      '@aws/workbench-core-logging': workspace:*
+      '@hapi/boom': ^10.0.0
+      '@rushstack/eslint-config': ^3.0.0
+      '@rushstack/heft': ^0.47.5
+      '@rushstack/heft-jest-plugin': ^0.3.28
+      '@rushstack/heft-node-rig': ^1.10.5
+      '@types/heft-jest': 1.0.2
+      '@types/lodash': ^4.14.181
+      '@types/node': ^14
+      '@types/triple-beam': ^1.3.2
+      '@types/uuid': ^8.3.4
+      aws-sdk-client-mock: ^0.6.2
+      depcheck: ^1.4.3
+      eslint: ^8.7.0
+      eslint-plugin-import: ^2.26.0
+      fast-check: ^2.24.0
+      istanbul-badges-readme: 1.8.1
+      jest: ^27.5.1
+      jest-fast-check: ^1.0.2
+      jsonschema: ^1.4.1
+      license-check-and-add: ^4.0.5
+      license-checker: ^25.0.1
+      lodash: ^4.17.21
+      npm-package-json-lint: ^6.3.0
+      npm-package-json-lint-config-default: ^5.0.0
+      sort-package-json: ^1.57.0
+      ts-jest: ^27.1.3
+      typescript: ^4.5.2
+      uuid: ^8.3.2
+    dependencies:
+      '@aws-cdk/aws-iam': 1.159.0
+      '@aws-sdk/client-cloudformation': 3.130.0
+      '@aws-sdk/client-dynamodb': 3.130.0
+      '@aws-sdk/client-ec2': 3.130.0
+      '@aws-sdk/client-eventbridge': 3.130.0
+      '@aws-sdk/client-kms': 3.130.0
+      '@aws-sdk/client-s3': 3.130.0
+      '@aws-sdk/client-s3-control': 3.130.0
+      '@aws-sdk/client-service-catalog': 3.130.0
+      '@aws-sdk/client-ssm': 3.130.0
+      '@aws-sdk/types': 3.127.0
+      '@aws-sdk/util-dynamodb': 3.105.0
+      '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-base': link:../base
+      '@aws/workbench-core-datasets': link:../datasets
+      '@aws/workbench-core-logging': link:../logging
+      '@hapi/boom': 10.0.0
+      jsonschema: 1.4.1
+      lodash: 4.17.21
+      uuid: 8.3.2
+    devDependencies:
+      '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.4
+      '@rushstack/heft': 0.47.5
+      '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
+      '@rushstack/heft-node-rig': 1.10.5_@rushstack+heft@0.47.5
+      '@types/heft-jest': 1.0.2
+      '@types/lodash': 4.14.182
+      '@types/node': 14.18.20
+      '@types/triple-beam': 1.3.2
+      '@types/uuid': 8.3.4
+      aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
+      depcheck: 1.4.3
+      eslint: 8.16.0
+      eslint-plugin-import: 2.26.0_eslint@8.16.0
+      fast-check: 2.25.0
+      istanbul-badges-readme: 1.8.1
+      jest: 27.5.1
+      jest-fast-check: 1.0.2_fast-check@2.25.0+jest@27.5.1
+      license-check-and-add: 4.0.5
+      license-checker: 25.0.1
+      npm-package-json-lint: 6.3.0
+      npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
+      sort-package-json: 1.57.0
+      ts-jest: 27.1.5_jest@27.5.1+typescript@4.7.4
+      typescript: 4.7.4
 
   ../../workbench-core/accounts-ui:
     specifiers:
@@ -705,6 +802,7 @@ importers:
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
@@ -738,6 +836,7 @@ importers:
       '@aws-sdk/util-dynamodb': 3.105.0
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-logging': link:../logging
+      aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       lodash: 4.17.21
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -8505,18 +8604,6 @@ packages:
       constructs: 10.1.25
     dev: true
 
-  /cdk-ssm-document/3.1.1_8d994d7bf27edab84c843ce1928354a1:
-    resolution: {integrity: sha512-mvw3M4hqI2UgGwWihUeCxp93UedOd29aU7Qx1QQfdKmO4DOHx5DsTtK51uoT5wlw920C9eRvzIAIPLK3lQr1VA==}
-    peerDependencies:
-      aws-cdk-lib: ^2.0.0
-      constructs: ^10.0.0
-    dependencies:
-      aws-cdk-lib: 2.29.1_constructs@10.1.25
-      constructs: 10.1.25
-    dev: true
-    bundledDependencies:
-      - js-yaml
-
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
     engines: {node: '>=4'}
@@ -15665,6 +15752,39 @@ packages:
       make-error: 1.3.6
       semver: 7.3.7
       typescript: 4.7.2
+      yargs-parser: 20.2.9
+    dev: true
+
+  /ts-jest/27.1.5_jest@27.5.1+typescript@4.7.4:
+    resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
+    engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
+    hasBin: true
+    peerDependencies:
+      '@babel/core': '>=7.0.0-beta.0 <8'
+      '@types/jest': ^27.0.0
+      babel-jest: '>=27.0.0 <28'
+      esbuild: '*'
+      jest: ^27.0.0
+      typescript: '>=3.8 <5.0'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@types/jest':
+        optional: true
+      babel-jest:
+        optional: true
+      esbuild:
+        optional: true
+    dependencies:
+      bs-logger: 0.2.6
+      fast-json-stable-stringify: 2.1.0
+      jest: 27.5.1
+      jest-util: 27.5.1
+      json5: 2.2.1
+      lodash.memoize: 4.1.2
+      make-error: 1.3.6
+      semver: 7.3.7
+      typescript: 4.7.4
       yargs-parser: 20.2.9
     dev: true
 
