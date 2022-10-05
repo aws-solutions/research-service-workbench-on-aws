@@ -222,7 +222,6 @@ importers:
       axios: ^0.27.1
       constructs: ^10.0.0
       csrf: ^3.1.0
-      cypress: ^10.6.0
       depcheck: ^1.4.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
@@ -287,7 +286,6 @@ importers:
       aws-lambda: 1.0.7
       axios: 0.27.2
       constructs: 10.1.25
-      cypress: 10.6.0
       depcheck: 1.4.3
       esbuild: 0.14.42
       eslint: 8.16.0
@@ -340,6 +338,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      js-yaml: ^4.1.0
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       next: ^12.1.5
@@ -360,6 +359,7 @@ importers:
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-environments-ui': link:../../workbench-core/environments-ui
       '@aws/workbench-core-swb-common-ui': link:../../workbench-core/swb-common-ui
+      js-yaml: 4.1.0
       next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
       next-global-css: 1.3.1
       next-transpile-modules: 9.0.0
