@@ -39,6 +39,8 @@ export class SWBUIStack extends Stack {
     DISTRIBUTION_FUNCTION_NAME: string;
     RESPONSE_HEADERS_ARTIFACT_NAME: string;
     RESPONSE_HEADERS_NAME: string;
+    COGNITO_DOMAIN_NAME_OUTPUT_KEY: string;
+    COGNITO_DOMAIN_NAME: string;
   };
   // eslint-disable-next-line @typescript-eslint/explicit-member-accessibility
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -56,7 +58,9 @@ export class SWBUIStack extends Stack {
       DISTRIBUTION_FUNCTION_ARTIFACT_NAME,
       DISTRIBUTION_FUNCTION_NAME,
       RESPONSE_HEADERS_ARTIFACT_NAME,
-      RESPONSE_HEADERS_NAME
+      RESPONSE_HEADERS_NAME,
+      COGNITO_DOMAIN_NAME_OUTPUT_KEY,
+      COGNITO_DOMAIN_NAME
     } = getConstants();
     super(scope, STACK_NAME, {
       env: {
@@ -78,11 +82,14 @@ export class SWBUIStack extends Stack {
       DISTRIBUTION_FUNCTION_ARTIFACT_NAME,
       DISTRIBUTION_FUNCTION_NAME,
       RESPONSE_HEADERS_ARTIFACT_NAME,
-      RESPONSE_HEADERS_NAME
+      RESPONSE_HEADERS_NAME,
+      COGNITO_DOMAIN_NAME_OUTPUT_KEY,
+      COGNITO_DOMAIN_NAME
     };
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    this._addCognitoURLOutput();
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -227,5 +234,12 @@ export class SWBUIStack extends Stack {
   }
   private _getContentSecurityPolicy(apiBaseUrl: string): string {
     return `default-src 'none'; connect-src ${apiBaseUrl}; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inline' 'strict-dynamic' 'self'; font-src 'self' data:`;
+  }
+
+  private _addCognitoURLOutput(): void {
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, this.distributionEnvVars.COGNITO_DOMAIN_NAME_OUTPUT_KEY, {
+      value: this.distributionEnvVars.COGNITO_DOMAIN_NAME
+    });
   }
 }

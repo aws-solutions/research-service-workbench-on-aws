@@ -5,7 +5,7 @@
 
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger } from '@aws/workbench-core-base';
+import { AwsService, AuditLogger, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
@@ -13,7 +13,6 @@ import {
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
-import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { Environment, EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
@@ -201,9 +200,9 @@ export default class EnvironmentLifecycleHelper {
 
         await this.environmentService.addMetadata(
           envId,
-          envResourceTypeToKey.environment,
+          resourceTypeToKey.environment,
           mountObject.endpointId,
-          envResourceTypeToKey.endpoint,
+          resourceTypeToKey.endpoint,
           endpointObj
         );
 
