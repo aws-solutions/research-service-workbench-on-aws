@@ -1,7 +1,7 @@
 import Permission from '../permission';
 
 /**
- * Request values for DynamicPermissionsPlugin's createGroup
+ * Request object for DynamicPermissionsPlugin's createGroup
  */
 export interface CreateGroupRequest {
   /**
@@ -196,11 +196,11 @@ export interface RemoveUserFromGroupResponse {
   removed: boolean;
 }
 /**
- * Request object for DynamicPermissionsPlugin's getIdentityPermissionsForSubject
+ * Request object for DynamicPermissionsPlugin's getIdentityPermissionsBySubject
  */
-export interface GetIdentityPermissionsForSubjectRequest {
+export interface GetIdentityPermissionsBySubjectRequest {
   /**
-   * Subject associated to the identity permissions
+   * Subject associated to the {@link IdentityPermission}s
    */
   subject: string;
 
@@ -216,11 +216,30 @@ export interface GetIdentityPermissionsForSubjectRequest {
 }
 
 /**
- * Response object for DynamicPermissionsPlugin's getIdentityPermissionsForSubject
+ * Response object for DynamicPermissionsPlugin's getIdentityPermissionsBySubject
  */
-export interface GetIdentityPermissionsForSubjectResponse {
+export interface GetIdentityPermissionsBySubjectResponse {
   /**
    * an array of {@link IdentityPermission} associated to the subject
+   */
+  identityPermissions: IdentityPermission[];
+}
+/**
+ * Request object for DynamicPermissionsPlugin's getIdentityPermissionsByUser
+ */
+export interface GetIdentityPermissionsByUserRequest {
+  /**
+   * User id asssociated to the {@link IdentityPermission}s
+   */
+  userId: string;
+}
+
+/**
+ * Response object for DynamicPermissionsPlugin's getIdentityPermissionsByuser
+ */
+export interface GetIdentityPermissionsByUserResponse {
+  /**
+   * an array of {@link IdentityPermission} associated to the user
    */
   identityPermissions: IdentityPermission[];
 }

@@ -11,8 +11,10 @@ import {
   DeleteIdentityPermissionsResponse,
   DeleteSubjectPermissionsRequest,
   DeleteSubjectPermissionsResponse,
-  GetIdentityPermissionsForSubjectRequest,
-  GetIdentityPermissionsForSubjectResponse,
+  GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectResponse,
+  GetIdentityPermissionsByUserRequest,
+  GetIdentityPermissionsByUserResponse,
   GetUserGroupsRequest,
   GetUserGroupsResponse,
   RemoveUserFromGroupRequest,
@@ -98,12 +100,22 @@ export interface DynamicPermissionsPlugin {
   ): Promise<RemoveUserFromGroupResponse>;
 
   /**
-   * Get all identity permissions associated to the subject
-   * @param getIdentityPermissionsForSubjectRequset - {@link GetIdentityPermissionsForSubjectRequest}
+   * Get all {@link IdentityPermission}s associated to the subject
+   * @param getIdentityPermissionsBySubjectRequset - {@link GetIdentityPermissionsBySubjectRequest}
    *
-   * @returns - {@link GetIdentityPermissionsForSubjectResponse}
+   * @returns - {@link GetIdentityPermissionsBySubjectResponse}
    */
-  getIdentityPermissionsForSubject(
-    getIdentityPermissionsForSubjectRequset: GetIdentityPermissionsForSubjectRequest
-  ): Promise<GetIdentityPermissionsForSubjectResponse>;
+  getIdentityPermissionsBySubject(
+    getIdentityPermissionsBySubjectRequset: GetIdentityPermissionsBySubjectRequest
+  ): Promise<GetIdentityPermissionsBySubjectResponse>;
+
+  /**
+   * Get all {@link IdentityPermission}s associated to the user
+   * @param getIdentityPermissionsByUserRequest - {@link GetIdentityPermissionsByUserRequest}
+   *
+   * @returns - {@link GetIdentityPermissionsByUserResponse}
+   */
+  getIdentityPermissionsByUser(
+    getIdentityPermissionsByUserRequest: GetIdentityPermissionsByUserRequest
+  ): Promise<GetIdentityPermissionsByUserResponse>;
 }

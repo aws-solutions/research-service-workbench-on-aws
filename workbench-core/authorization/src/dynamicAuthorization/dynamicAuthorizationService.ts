@@ -18,10 +18,16 @@ import {
 } from './dynamicPermissionsPluginInputs';
 
 /**
- * Request object for
+ * Request object for DynamicAuthorizationService's isAuthorizedOnSubjectRequest
  */
 export interface IsAuthorizedOnSubjectRequest {
+  /**
+   * {@link Operation} being performed
+   */
   operation: Operation;
+  /**
+   * subject id associated to the subject being operated on
+   */
   subjectId: string;
 }
 
@@ -99,6 +105,8 @@ export class DynamicAuthorizationService {
    * Delete all permissions associated to the subject
    * @param user - {@link AuthenticatedUser}
    * @param deleteSubjectPermissionsRequest - {@link DeleteSubjectPermissionsRequest}
+   *
+   * @returns - {@link DeleteSubjectPermissionsResponse}
    */
   public async deleteSubjectPermissions(
     user: AuthenticatedUser,
@@ -110,6 +118,8 @@ export class DynamicAuthorizationService {
    * Assign a user to an authorization group
    * @param user - {@link AuthenticatedUser}
    * @param assignUserToGroupRequest - {@link AssignUserToGroupRequest}
+   *
+   * @returns - {@link AssignUserToGroupResponse}
    */
   public async assignUserToGroup(
     user: AuthenticatedUser,
@@ -121,6 +131,8 @@ export class DynamicAuthorizationService {
    * Remove a user from an authorization group
    * @param user - {@link AuthenticatedUser}
    * @param removeUserFromGroupRequest - {@link RemoveUserFromGroupRequest}
+   *
+   * @returns - {@link RemoveUserFromGroupResponse}
    */
   public async removeUserFromGroup(
     user: AuthenticatedUser,
