@@ -9,7 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
-import { ExternalStorage } from './storageSource';
+import { StorageLocation } from './storageLocation';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -281,8 +281,8 @@ export class DataSetService {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
-  public async listExtorageStorageLocations(): Promise<ExternalStorage[]> {
-    return await this._dbProvider.listExtorageStorageLocations();
+  public async listStorageLocations(): Promise<StorageLocation[]> {
+    return await this._dbProvider.listStorageLocations();
   }
 
   private _generateMountObject(

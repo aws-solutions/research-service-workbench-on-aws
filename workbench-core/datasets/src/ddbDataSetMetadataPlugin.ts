@@ -9,7 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
-import { ExternalStorage } from './storageSource';
+import { StorageLocation } from './storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
@@ -112,10 +112,10 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endPointParam;
   }
 
-  public async listExtorageStorageLocations(): Promise<ExternalStorage[]> {
+  public async listStorageLocations(): Promise<StorageLocation[]> {
     const datasets = await this.listDataSets();
 
-    const map = new Map<string, ExternalStorage>();
+    const map = new Map<string, StorageLocation>();
     datasets.forEach((dataset) =>
       map.set(dataset.storageName, {
         name: dataset.storageName,
