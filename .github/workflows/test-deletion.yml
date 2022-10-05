@@ -17,11 +17,12 @@ jobs:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: solution-spark-on-aws
-          branch: test/*
+          branch: ${{ github.head_ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Delete test/* branch after merge
+        if: always()
         run: |
           echo ${{github.event.pull_request.number}}
           echo ${{ github.head_ref }}
@@ -34,6 +35,6 @@ jobs:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
           owner: awslabs
           repo: solution-spark-on-aws
-          branch: test/*
+          branch: ${{ github.head_ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
