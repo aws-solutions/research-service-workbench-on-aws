@@ -1039,7 +1039,6 @@ describe('EnvironmentService', () => {
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,
-        type: envTypeConfigItem.sk,
         provisionedProductId: '',
         error: undefined,
         datasetIds: undefined
