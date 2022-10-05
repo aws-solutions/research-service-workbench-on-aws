@@ -130,7 +130,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
 
   test('Launch should return mocked id when mounting datasets', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
-    environment.datasetIds = ['exampleDS'];
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
       return {
@@ -148,6 +147,8 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const sm = new SagemakerNotebookEnvironmentLifecycleService();
     sm.helper = envHelper;
     const response = await sm.launch(environment);
+
+    // This does not appear to be testing what the name claims it is and should be reviewed
     expect(response).toEqual({ ...environment, status: 'PENDING' });
   });
 
