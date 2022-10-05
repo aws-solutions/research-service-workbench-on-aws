@@ -9,6 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
+import { ExternalStorage } from './storageSource';
 
 const notImplementedText: string = 'Not yet implemented.';
 
@@ -48,14 +49,16 @@ export class DataSetService {
     storageName: string,
     path: string,
     awsAccountId: string,
+    region: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
     await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
-      storageName: storageName,
-      path: path,
-      awsAccountId: awsAccountId,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -78,14 +81,16 @@ export class DataSetService {
     storageName: string,
     path: string,
     awsAccountId: string,
+    region: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
     await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
-      storageName: storageName,
-      path: path,
-      awsAccountId: awsAccountId,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -274,6 +279,10 @@ export class DataSetService {
    */
   public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
+  }
+
+  public async listExtorageStorageLocations(): Promise<ExternalStorage[]> {
+    return await this._dbProvider.listExtorageStorageLocations();
   }
 
   private _generateMountObject(

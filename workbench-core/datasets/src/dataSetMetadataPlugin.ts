@@ -4,6 +4,7 @@
  */
 
 import { DataSet, ExternalEndpoint } from '.';
+import { ExternalStorage } from './storageSource';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -93,4 +94,6 @@ export interface DataSetMetadataPlugin {
    * @returns the updated details of the Endpoint.
    */
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  listExtorageStorageLocations(): Promise<ExternalStorage[]>;
 }

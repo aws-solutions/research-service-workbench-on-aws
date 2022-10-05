@@ -43,4 +43,6 @@ export interface DataSet {
    * Storage Type of the DataSet
    */
   storageType?: string;
+
+  region?: string;
 }

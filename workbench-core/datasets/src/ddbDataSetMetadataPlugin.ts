@@ -9,6 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
+import { ExternalStorage } from './storageSource';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
@@ -111,6 +112,21 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endPointParam;
   }
 
+  public async listExtorageStorageLocations(): Promise<ExternalStorage[]> {
+    const datasets = await this.listDataSets();
+
+    const map = new Map<string, ExternalStorage>();
+    datasets.forEach((dataset) =>
+      map.set(dataset.storageName, {
+        name: dataset.storageName,
+        awsAccountId: dataset.awsAccountId,
+        type: dataset.storageType,
+        region: dataset.region
+      })
+    );
+    return Array.from(map.values());
+  }
+
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
     const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
@@ -186,6 +202,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         storageName: dataSet.storageName,
         path: dataSet.path,
         awsAccountId: dataSet.awsAccountId!,
+        region: dataSet.region!,
         storageType: dataSet.storageType!,
         resourceType: 'dataset'
       }
