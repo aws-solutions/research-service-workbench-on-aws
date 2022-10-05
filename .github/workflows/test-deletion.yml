@@ -23,10 +23,10 @@ jobs:
 
       - name: Delete test/* branch after merge
         if: always()
-        run: |
-          echo ${{github.event.pull_request.number}}
-          echo ${{ github.head_ref }}
-          echo ${{ github.ref_name }}
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{github.token}}
+          branches: ${{ github.head_ref }}
 
       - name: Enable branch protection on test/*
         uses: octokit/request-action@v2.x
