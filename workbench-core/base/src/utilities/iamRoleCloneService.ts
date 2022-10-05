@@ -11,9 +11,9 @@ import {
   ListRolePoliciesCommandOutput,
   Role
 } from '@aws-sdk/client-iam';
-import { AwsService } from '@aws/workbench-core-base';
+import AwsService from '../aws/awsService';
 
-export default class IamRoleCloneService {
+export class IamRoleCloneService {
   private _sourceAccount: AwsService;
   private _targetAccount: AwsService;
 

@@ -107,5 +107,25 @@ describe('ProjectService', () => {
       // CHECK
       expect(actualResponse).toEqual(getItemResponse.Item);
     });
+
+    test('getting no object', async () => {
+      // BUILD
+      const getItemResponse: GetItemCommandOutput = {
+        Item: undefined,
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: 'exampleDDBTable',
+          Key: marshall({
+            pk: 'PROJ#proj-123',
+            sk: 'PROJ#proj-123'
+          })
+        })
+        .resolves(getItemResponse);
+
+      // OPERATE & CHECk
+      await expect(projService.getProject('proj-123')).rejects.toThrow('Could not find project proj-123');
+    });
   });
 });
