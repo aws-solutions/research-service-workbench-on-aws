@@ -35,6 +35,7 @@ export default interface PermissionsPlugin {
    * Checks if a route is being ignored for Authorization.
    * @param route - The path the user is requesting access to.
    * @param method - {@link HTTPMethod}.
+   *
    * @returns boolean stating if the route is ignored.
    */
   isRouteIgnored(route: string, method: HTTPMethod): Promise<boolean>;
