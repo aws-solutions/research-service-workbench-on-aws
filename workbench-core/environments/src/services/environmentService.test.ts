@@ -34,7 +34,6 @@ describe('EnvironmentService', () => {
   const env = {
     pk: `ENV#${envId}`,
     sk: `ENV#${envId}`,
-    datasetIds: ['dataset-123'],
     id: envId,
     cidr: '0.0.0.0/0',
     createdAt: '2022-05-13T20:03:54.055Z',
@@ -1038,7 +1037,8 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...env,
         provisionedProductId: '',
-        error: undefined
+        error: undefined,
+        datasetIds: undefined
       });
     });
   });

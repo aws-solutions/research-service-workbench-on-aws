@@ -39,7 +39,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
       name: 'sagemaker',
       outputs: [],
       projectId: 'proj-123',
-      datasetIds: [],
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah',

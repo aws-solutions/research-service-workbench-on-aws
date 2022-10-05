@@ -24,7 +24,6 @@ export interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
-  datasetIds: string[];
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
@@ -57,7 +56,6 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
-  datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
   updatedBy: '',
@@ -396,7 +394,6 @@ export class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-      datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       updatedBy: user.id,

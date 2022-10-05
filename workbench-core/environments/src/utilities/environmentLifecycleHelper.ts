@@ -142,13 +142,13 @@ export default class EnvironmentLifecycleHelper {
 
   /**
    * Delete the access points for all datasets attached to a given workspace.
-   * @param envMetadata - the environment for which access point(s) were created
+   * @param environment - the environment for which access point(s) were created
    */
-  public async removeAccessPoints(envMetadata: Environment): Promise<void> {
-    if (_.isEmpty(envMetadata.datasetIds)) return;
+  public async removeAccessPoints(environment: Environment): Promise<void> {
+    if (_.isEmpty(environment.DATASETS)) return;
 
     await Promise.all(
-      _.map(envMetadata.ENDPOINTS, async (endpoint) => {
+      _.map(environment.ENDPOINTS, async (endpoint) => {
         await this.dataSetService.removeDataSetExternalEndpoint(
           endpoint.dataSetId,
           endpoint.id,
