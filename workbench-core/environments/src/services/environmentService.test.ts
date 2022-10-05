@@ -31,6 +31,31 @@ describe('EnvironmentService', () => {
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
   const TABLE_NAME = 'exampleDDBTable';
   const envService = new EnvironmentService({ TABLE_NAME });
+
+  const envTypeConfigItem = {
+    provisioningArtifactId: 'pa-3cwcuxmksf2xy',
+    params: [
+      {
+        value: '${iamPolicyDocument}',
+        key: 'IamPolicyDocument'
+      },
+      {
+        value: 'ml.t3.medium',
+        key: 'InstanceType'
+      },
+      {
+        value: '0',
+        key: 'AutoStopIdleTimeInMinutes'
+      }
+    ],
+    updatedAt: '2022-05-18T20:33:42.608Z',
+    createdAt: '2022-05-18T20:33:42.608Z',
+    sk: 'ETC#envTypeConfig-123',
+    pk: `ENV#${envId}`,
+    id: 'envTypeConfig-123',
+    productId: 'prod-t5q2vqlgvd76o'
+  };
+
   const env = {
     pk: `ENV#${envId}`,
     sk: `ENV#${envId}`,
@@ -48,7 +73,7 @@ describe('EnvironmentService', () => {
     projectId: 'proj-123',
     status: 'PENDING',
     studyIds: ['study-123'],
-    type: 'envType-123',
+    type: envTypeConfigItem.sk,
     updatedAt: '2022-05-13T20:03:54.055Z',
     resourceType: 'environment',
     instanceId: 'instance-123',
@@ -81,29 +106,7 @@ describe('EnvironmentService', () => {
     endPointUrl: `s3://arn:aws:s3:someRegion:123456789012:accesspoint/${envId}`,
     path: 'samplePath'
   };
-  const envTypeConfigItem = {
-    provisioningArtifactId: 'pa-3cwcuxmksf2xy',
-    params: [
-      {
-        value: '${iamPolicyDocument}',
-        key: 'IamPolicyDocument'
-      },
-      {
-        value: 'ml.t3.medium',
-        key: 'InstanceType'
-      },
-      {
-        value: '0',
-        key: 'AutoStopIdleTimeInMinutes'
-      }
-    ],
-    updatedAt: '2022-05-18T20:33:42.608Z',
-    createdAt: '2022-05-18T20:33:42.608Z',
-    sk: 'ETC#envTypeConfig-123',
-    pk: `ENV#${envId}`,
-    id: 'envTypeConfig-123',
-    productId: 'prod-t5q2vqlgvd76o'
-  };
+
   const projItem = {
     subnetId: 'subnet-07f475d83291a3603',
     hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-cross-account-role',
@@ -1036,6 +1039,7 @@ describe('EnvironmentService', () => {
         ETC: envTypeConfigItem,
         PROJ: projItem,
         ...env,
+        type: envTypeConfigItem.sk,
         provisionedProductId: '',
         error: undefined,
         datasetIds: undefined

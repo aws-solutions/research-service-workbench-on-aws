@@ -401,7 +401,7 @@ export class EnvironmentService {
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
-      type: params.envTypeId,
+      type: '',
       dependency: params.projectId
     };
     // GET metadata
@@ -430,6 +430,7 @@ export class EnvironmentService {
     const envTypeConfig = metadata.find((item) => {
       return item.resourceType === 'envTypeConfig';
     });
+    newEnv.type = envTypeConfig.sk;
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
