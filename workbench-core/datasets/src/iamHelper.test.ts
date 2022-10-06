@@ -462,7 +462,11 @@ describe('IamHelper', () => {
       const existingStatement = PolicyStatement.fromJson({
         Sid: 'StatementToCheck',
         Principal: {
-          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::oldAccountId2:root', 'arn:aws:iam::newAccountId:root']
+          AWS: [
+            'arn:aws:iam::oldAccountId:root',
+            'arn:aws:iam::oldAccountId2:root',
+            'arn:aws:iam::newAccountId:root'
+          ]
         },
         Action: '*',
         Effect: 'Allow',
@@ -473,10 +477,7 @@ describe('IamHelper', () => {
       const updatedStatement = PolicyStatement.fromJson({
         Sid: 'StatementToCheck',
         Principal: {
-          AWS: [
-            'arn:aws:iam::oldAccountId:root',
-            'arn:aws:iam::oldAccountId2:root'
-          ]
+          AWS: ['arn:aws:iam::oldAccountId:root', 'arn:aws:iam::oldAccountId2:root']
         },
         Action: '*',
         Effect: 'Allow',
@@ -506,9 +507,9 @@ describe('IamHelper', () => {
       source.addStatements(existingStatement);
       const targetSid = 'StatementToCheck';
       const principalToRemove = 'arn:aws:iam::newAccountId:root';
-      try{
+      try {
         IamHelper.removePrincipalFromStatement(source, targetSid, principalToRemove);
-      } catch(err){
+      } catch (err) {
         expect(err.message).toStrictEqual('Cannot remove principal since only one principal is assigned');
       }
     });
