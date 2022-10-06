@@ -9,6 +9,29 @@ jobs:
     if: contains(${{ github.head_ref }}, 'test/')
     runs-on: ubuntu-latest
     steps:
+      - name: 'Construct Github Environment create / update request'
+        id: pr_review
+        run: |
+          required_pr_reviews_json="$(cat <<EOF
+          { "required_approving_review_count": 1 }
+          EOF
+          )"
+          echo "::set-output name=required_pr_reviews::${required_pr_reviews_json}"
+
+      - name: 'Construct Github Environment create / update request'
+        id: status_check
+        run: |
+          require_status_check_json="$(cat <<EOF
+          {
+            strict: true,
+            contexts: [
+              'Validate PR title'
+            ]
+          }
+          EOF
+          )"
+          echo "::set-output name=require_status_check::${require_status_check_json}"
+
       - name: Enable branch protection on test/*
         uses: octokit/request-action@v2.x
         with:
@@ -21,11 +44,8 @@ jobs:
           require_code_owner_reviews: true
           required_approving_review_count: 1
           required_conversation_resolution: false
+          required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
+          required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
+          restrictions: ${{ null }}
         env:
-          REQUEST_BODY: |
-            enforce_admins: true,
-            dismiss_stale_reviews: true,
-            require_code_owner_reviews: true,
-            required_approving_review_count: 1,
-            required_conversation_resolution: false,
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
