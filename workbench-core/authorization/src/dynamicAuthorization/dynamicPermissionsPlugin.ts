@@ -101,12 +101,12 @@ export interface DynamicPermissionsPlugin {
 
   /**
    * Get all {@link IdentityPermission}s associated to the subject
-   * @param getIdentityPermissionsBySubjectRequset - {@link GetIdentityPermissionsBySubjectRequest}
+   * @param getIdentityPermissionsBySubjectRequest - {@link GetIdentityPermissionsBySubjectRequest}
    *
    * @returns - {@link GetIdentityPermissionsBySubjectResponse}
    */
   getIdentityPermissionsBySubject(
-    getIdentityPermissionsBySubjectRequset: GetIdentityPermissionsBySubjectRequest
+    getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse>;
 
   /**
