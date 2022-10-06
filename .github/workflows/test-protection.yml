@@ -50,6 +50,6 @@ jobs:
           required_conversation_resolution: false
           required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
           required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
-          restrictions: '${{ steps.gh_restrictions.outputs.restrictions }}'
+          restrictions: JSONObject.NULL
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
