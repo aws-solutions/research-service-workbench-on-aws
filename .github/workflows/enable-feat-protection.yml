@@ -13,6 +13,8 @@ jobs:
     if: contains(${{ github.ref_name }}, 'feat/')
     runs-on: ubuntu-latest
     steps:
+      - name: echo github.ref_name
+        run: echo ${{ github.ref_name }}
       - name: 'Construct required_pull_request_reviews object'
         id: pr_review
         run: |
@@ -40,7 +42,7 @@ jobs:
           )"
           echo "::set-output name=restrictions::${restrictions_json}"
 
-      - name: Enable branch protection on test/*
+      - name: Enable branch protection on feat/*
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
