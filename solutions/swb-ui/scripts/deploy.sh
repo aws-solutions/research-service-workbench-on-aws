@@ -5,11 +5,11 @@ then
     echo Configuration with STAGE='"'${STAGE}'"' not found, make sure to deploy API with STAGE=${STAGE} and try again.
     exit 1
 else
-    (rushx build && NEXT_PUBLIC_API_BASE_URL=$apiURL rushx export) && 
+    (rush build && NEXT_PUBLIC_API_BASE_URL=$apiURL rushx build) && ##rushx build is necessary as rush build does not take in count NEXT_PUBLIC_API_BASE_URL env variable for swb-ui build
     (
         cd infrastructure 
         rushx cdk bootstrap && rushx cdk-deploy
-    ) &&
+    ) && 
     (
         cd ../swb-reference/ 
         rushx cdk-deploy

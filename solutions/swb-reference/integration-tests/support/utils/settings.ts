@@ -39,11 +39,17 @@ interface Setting {
   dynamoDBTableOutput: string;
   StatusHandlerLambdaRoleOutput: string;
 
+  // Configs for AWS Account onboard test
+  hostAwsAccountId: string;
+  envMgmtRoleArn: string;
+  hostingAccountHandlerRoleArn: string;
+  encryptionKeyArn: string;
+
   // Derived
   mainAccountId: string;
 }
 
-type SettingKey = keyof Setting;
+export type SettingKey = keyof Setting;
 /**
  * All settings used during the tests are stored here. The main advantage of having to use get/set methods
  * when accessing settings values is so that we can print an informative message when keys are missing.
@@ -72,7 +78,7 @@ export default class Settings {
     return value;
   }
 
-  public optional(key: SettingKey, defaultValue: string): string {
+  public optional(key: SettingKey, defaultValue?: string): string | undefined {
     const value = this._content[key];
     if (_.isNil(value) || (_.isString(value) && _.isEmpty(value))) return defaultValue;
 

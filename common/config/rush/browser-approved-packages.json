@@ -99,6 +99,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-accounts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-accounts-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-audit",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -127,6 +135,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-environments-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-example-express",
       "allowedCategories": [ "prototypes" ]
     },
@@ -140,6 +152,10 @@
     },
     {
       "name": "@aws/workbench-core-swb-common-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-swb-datasets-ui",
       "allowedCategories": [ "production" ]
     },
     {

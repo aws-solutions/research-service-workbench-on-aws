@@ -23,12 +23,16 @@ function getConstants(): {
   DISTRIBUTION_FUNCTION_NAME: string;
   RESPONSE_HEADERS_ARTIFACT_NAME: string;
   RESPONSE_HEADERS_NAME: string;
+  COGNITO_DOMAIN_NAME_OUTPUT_KEY: string;
+  COGNITO_DOMAIN_NAME: string;
 } {
   const config = getAPIOutputs();
   const STAGE = process.env.STAGE || '';
   const namePrefix = `swb-ui-${process.env.STAGE}-${config.awsRegionShortName}`;
   const API_BASE_URL = config.apiUrlOutput?.replace('/dev/', '') || '';
   const AWS_REGION = config.awsRegion;
+  const COGNITO_DOMAIN_NAME_OUTPUT_KEY = 'CognitoURL';
+  const COGNITO_DOMAIN_NAME = config.cognitoDomainName;
   const STACK_NAME = namePrefix;
   const S3_ARTIFACT_BUCKET_NAME = `${namePrefix}-bucket`;
   const S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME = `${namePrefix}-deployment-bucket`;
@@ -62,12 +66,28 @@ function getConstants(): {
     DISTRIBUTION_FUNCTION_ARTIFACT_NAME,
     DISTRIBUTION_FUNCTION_NAME,
     RESPONSE_HEADERS_ARTIFACT_NAME,
-    RESPONSE_HEADERS_NAME
+    RESPONSE_HEADERS_NAME,
+    COGNITO_DOMAIN_NAME_OUTPUT_KEY,
+    COGNITO_DOMAIN_NAME
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; awsRegion: string } {
+function getAPIOutputs(): {
+  awsRegionShortName: string;
+  apiUrlOutput: string;
+  awsRegion: string;
+  cognitoDomainName: string;
+} {
   try {
+    if (process.env.SYNTH_REGION_SHORTNAME && process.env.SYNTH_REGION)
+      //allow environment variable override for synth pipeline check
+      return {
+        awsRegionShortName: process.env.SYNTH_REGION_SHORTNAME,
+        apiUrlOutput: '',
+        awsRegion: process.env.SYNTH_REGION,
+        cognitoDomainName: ''
+      };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const apiStackOutputs: any = JSON.parse(
       // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
@@ -80,12 +100,15 @@ function getAPIOutputs(): { awsRegionShortName: string; apiUrlOutput: string; aw
     const outputs = apiStackOutputs[apiStackName];
 
     if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
-      throw new Error(`Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`); //validate when API unsuccessfully finished and UI is deployed
+      throw new Error(
+        `Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`
+      ); //validate when API unsuccessfully finished and UI is deployed
     }
     return {
       awsRegionShortName: outputs.awsRegionShortName,
       apiUrlOutput: outputs.apiUrlOutput,
-      awsRegion: outputs.awsRegion
+      awsRegion: outputs.awsRegion,
+      cognitoDomainName: outputs.cognitoDomainName
     };
   } catch {
     console.error(
