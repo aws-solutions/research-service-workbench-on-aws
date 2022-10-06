@@ -95,7 +95,7 @@ export default class AccountService {
    */
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
-    const id = `${resourceTypeToKey.account}-${uuidv4()}`;
+    const id = `${resourceTypeToKey.account.toLowerCase()}-${uuidv4()}`;
 
     await this._storeToDdb({ id, ...accountMetadata });
 

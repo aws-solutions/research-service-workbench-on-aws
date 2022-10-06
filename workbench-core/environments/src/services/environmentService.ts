@@ -411,7 +411,6 @@ export class EnvironmentService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let metadata: any[] = [];
     if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
-      console.log('items', batchGetResult.Responses![this._tableName]);
       throw new Error('Unable to get metadata for all keys defined in environment');
     }
     metadata = batchGetResult.Responses![this._tableName].map((item) => {

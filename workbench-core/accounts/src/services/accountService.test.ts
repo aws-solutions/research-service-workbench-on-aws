@@ -6,9 +6,11 @@
 jest.mock('uuid', () => ({
   v4: jest.fn()
 }));
+
 const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
 
 import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import AccountService from './accountService';
 
@@ -53,7 +55,10 @@ describe('AccountService', () => {
     const response = await accountService.createOrUpdate(accountMetadata);
 
     // CHECK
-    expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
+    expect(response).toEqual({
+      ...accountMetadata,
+      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`
+    });
   });
 
   test('createOrUpdate follows update account path as expected', async () => {
