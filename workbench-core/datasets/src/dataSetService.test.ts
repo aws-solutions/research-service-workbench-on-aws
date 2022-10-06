@@ -19,7 +19,6 @@ describe('DataSetService', () => {
   let audit: AuditService;
   let log: LoggingService;
   let aws: AwsService;
-  const notImplementedText: string = 'Not yet implemented.';
   let metaPlugin: DdbDataSetMetadataPlugin;
 
   const mockDataSetId = 'sampleDataSetId';
@@ -36,6 +35,7 @@ describe('DataSetService', () => {
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
+  const mockDataSetObject = 'datasetObjectId';
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -65,27 +65,6 @@ describe('DataSetService', () => {
         }
       ];
     });
-    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet').mockImplementation(async () => {
-      return {
-        id: mockDataSetId,
-        name: mockDataSetName,
-        path: mockDataSetPath,
-        awsAccountId: mockAwsAccountId,
-        storageType: mockDataSetStorageType,
-        storageName: mockDataSetStorageName
-      };
-    });
-    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateDataSet').mockImplementation(async () => {
-      return {
-        id: mockDataSetId,
-        name: mockDataSetName,
-        path: mockDataSetPath,
-        awsAccountId: mockAwsAccountId,
-        storageType: mockDataSetStorageType,
-        storageName: mockDataSetStorageName,
-        externalEndpoints: [mockAccessPointName]
-      };
-    });
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetMetadata')
       .mockImplementation(async (id: string): Promise<DataSet> => {
@@ -109,6 +88,43 @@ describe('DataSetService', () => {
           storageName: mockDataSetStorageName
         };
       });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSetObjects').mockImplementation(async () => {
+      return [mockDataSetObject];
+    });
+    jest
+      .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetObjectMetadata')
+      .mockImplementation(async () => {
+        return {
+          id: mockDataSetId,
+          name: mockDataSetName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          storageType: mockDataSetStorageType,
+          storageName: mockDataSetStorageName
+        };
+      });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'addDataSet').mockImplementation(async () => {
+      return {
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName
+      };
+    });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateDataSet').mockImplementation(async () => {
+      return {
+        id: mockDataSetId,
+        name: mockDataSetName,
+        path: mockDataSetPath,
+        awsAccountId: mockAwsAccountId,
+        storageType: mockDataSetStorageType,
+        storageName: mockDataSetStorageName,
+        externalEndpoints: [mockAccessPointName]
+      };
+    });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'removeDataSet').mockImplementation(async () => {});
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
       .mockImplementation(async () => {
@@ -123,7 +139,6 @@ describe('DataSetService', () => {
           allowedRoles: [mockRoleArn]
         };
       });
-
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'addExternalEndpoint').mockImplementation(async () => {
       return {
         id: mockExistingEndpointId,
@@ -135,6 +150,20 @@ describe('DataSetService', () => {
         endPointAlias: mockAccessPointAlias,
         allowedRoles: [mockRoleArn]
       };
+    });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listEndpointsForDataSet').mockImplementation(async () => {
+      return [
+        {
+          id: mockExistingEndpointId,
+          name: mockExistingEndpointName,
+          dataSetId: mockDataSetId,
+          dataSetName: mockDataSetName,
+          path: mockDataSetPath,
+          endPointUrl: mockEndPointUrl,
+          endPointAlias: mockAccessPointAlias,
+          allowedRoles: [mockRoleArn]
+        }
+      ];
     });
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'updateExternalEndpoint').mockImplementation(async () => {
       return {
@@ -149,7 +178,13 @@ describe('DataSetService', () => {
       };
     });
 
+    jest.spyOn(S3DataSetStoragePlugin.prototype, 'getStorageType').mockImplementation(() => {
+      return mockDataSetStorageType;
+    });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'createStorage').mockImplementation(async () => {
+      return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
+    });
+    jest.spyOn(S3DataSetStoragePlugin.prototype, 'importStorage').mockImplementation(async () => {
       return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
     });
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'addExternalEndpoint').mockImplementation(async () => {
@@ -158,11 +193,12 @@ describe('DataSetService', () => {
         endPointAlias: mockAccessPointAlias
       };
     });
-    jest.spyOn(S3DataSetStoragePlugin.prototype, 'importStorage').mockImplementation(async () => {
-      return `s3://${mockDataSetStorageName}/${mockDataSetPath}/`;
-    });
+    jest.spyOn(S3DataSetStoragePlugin.prototype, 'removeExternalEndpoint').mockImplementation(async () => {});
     jest
       .spyOn(S3DataSetStoragePlugin.prototype, 'addRoleToExternalEndpoint')
+      .mockImplementation(async () => {});
+    jest
+      .spyOn(S3DataSetStoragePlugin.prototype, 'removeRoleFromExternalEndpoint')
       .mockImplementation(async () => {});
   });
 
@@ -238,8 +274,8 @@ describe('DataSetService', () => {
       service = new DataSetService(audit, log, metaPlugin);
     });
 
-    it('throws not implemented when called', async () => {
-      await expect(service.removeDataSet('name')).rejects.toThrow(new Error(notImplementedText));
+    it('returns nothing when the dataset is removed', async () => {
+      await expect(service.removeDataSet(mockDataSetId)).resolves.not.toThrow();
     });
   });
 
