@@ -10,11 +10,9 @@ on:
 
 jobs:
   enable-feat-branch-protection:
-    if: contains(${{ github.ref_name }}, 'feat/')
+    if: contains(github.ref_name, 'feat/')
     runs-on: ubuntu-latest
     steps:
-      - name: echo github.ref_name
-        run: echo ${{ github.ref_name }}
       - name: 'Construct required_pull_request_reviews object'
         id: pr_review
         run: |
