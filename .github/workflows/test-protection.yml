@@ -22,12 +22,7 @@ jobs:
         id: status_check
         run: |
           require_status_check_json="$(cat <<EOF
-          {
-            strict: true,
-            contexts: [
-              'Validate PR title'
-            ]
-          }
+          { "strict": true, "contexts": ['Validate PR title'] }
           EOF
           )"
           echo "::set-output name=require_status_check::${require_status_check_json}"
