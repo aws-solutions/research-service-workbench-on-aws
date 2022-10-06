@@ -4,13 +4,13 @@
 #
 
 # Enable feat/* branch protection when a PR with br
-name: feat-protection
+name: "enable feat protection"
 on:
   create
 
 jobs:
   enable-feat-branch-protection:
-    if: contains(${{ github.head_ref }}, 'feat/')
+    if: contains(${{ github.ref_name }}, 'feat/')
     runs-on: ubuntu-latest
     steps:
       - name: 'Construct required_pull_request_reviews object'
@@ -26,7 +26,7 @@ jobs:
         id: status_check
         run: |
           require_status_check_json="$(cat <<EOF
-          { "strict": true, "contexts": ['Only create PR against develop branch, not main branch', 'Only create PR against develop branch, not stage branch', 'Scan for secrets', 'Run cfn-nag scan', 'Validate PR title', 'check-license-header', 'build-and-test', 'license-checker', 'run-rush-change-verify'] }
+          { "strict": true, "contexts": ['Only create PR against develop branch, not main branch', 'Only create PR against develop branch, not stage branch', 'Scan for secrets', 'Run cfn-nag scan', 'Validate PR title', 'build-and-test', 'license-checker'] }
           EOF
           )"
           echo "::set-output name=require_status_check::${require_status_check_json}"
@@ -46,7 +46,7 @@ jobs:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
           owner: awslabs
           repo: solution-spark-on-aws
-          branch: ${{ github.head_ref }}
+          branch: ${{ github.ref_name }}
           enforce_admins: true
           required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
           required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
