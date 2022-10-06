@@ -31,7 +31,7 @@ jobs:
         id: gh_restrictions
         run: |
           restrictions_json="$(cat <<EOF
-          { "users": [], "teams": []}
+          null
           EOF
           )"
           echo "::set-output name=restrictions::${restrictions_json}"
