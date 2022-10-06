@@ -15,17 +15,17 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Temporarily disable branch protection on test/*
+      - name: Delete test/* branch protection after merge to develop
         uses: octokit/request-action@v2.x
         with:
-          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection
           owner: awslabs
           repo: solution-spark-on-aws
           branch: ${{ github.head_ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
-      - name: Delete test/* branch after merge
+      - name: Delete test/* branch after merge to develop
         if: always()
         uses: dawidd6/action-delete-branch@v3
         with:
