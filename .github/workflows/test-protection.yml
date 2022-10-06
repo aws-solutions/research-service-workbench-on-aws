@@ -5,7 +5,7 @@ on:
 
 jobs:
   enable-test-branch-protection:
-    if: contains(${{ github.head_ref }}, 'test/')
+    if: contains(${{ github.ref_name }}, 'test/')
     runs-on: ubuntu-latest
     steps:
 
