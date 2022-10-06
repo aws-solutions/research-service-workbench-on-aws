@@ -26,7 +26,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Delete test/* branch after merge to develop
-        if: always()
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{github.token}}
