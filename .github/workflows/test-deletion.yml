@@ -1,4 +1,8 @@
-# test branch deletion
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
 name: "test branch deletion"
 
 on:
@@ -7,7 +11,7 @@ on:
     branches: [testDevelop]
 
 jobs:
-  if_merged:
+  delete-test-branch-on-merge:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
