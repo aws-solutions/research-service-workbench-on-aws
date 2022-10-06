@@ -262,7 +262,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
       "Resource": "${accessPointArn}",
       "Condition": {
         "StringLike": {
-          "s3:prefix": ["${dataSetPrefix}", "${dataSetPrefix}/*"]
+          "s3:prefix": "${dataSetPrefix}/*"
         }
       }
     }
