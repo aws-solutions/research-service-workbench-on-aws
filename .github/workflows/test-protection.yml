@@ -1,8 +1,7 @@
 name: test-protection
 
 on:
-  pull_request:
-    types: [opened, synchronize, edited, reopened]
+  create:
 
 jobs:
   enable-test-branch-protection:
