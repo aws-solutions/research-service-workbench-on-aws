@@ -31,7 +31,7 @@ jobs:
         id: gh_restrictions
         run: |
           restrictions_json="$(cat <<EOF
-          {}
+          { "users": [], "teams": []}
           EOF
           )"
           echo "::set-output name=restrictions::${restrictions_json}"
@@ -50,6 +50,6 @@ jobs:
           required_conversation_resolution: false
           required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
           required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
-          restrictions: JSONObject.NULL
+          restrictions: '${{ steps.gh_restrictions.outputs.restrictions }}'
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
