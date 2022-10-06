@@ -12,9 +12,15 @@ on:
 
 jobs:
   delete-test-branch-on-merge:
-    if: github.event.pull_request.merged == true && github.ref_protected == true && contains(github.head_ref, 'test/')
+    if: github.event.pull_request.merged == true && contains(github.head_ref, 'test/')
     runs-on: ubuntu-latest
     steps:
+      - name: echo branch protection
+        run: |
+          echo ${{ github.ref_protected }}
+          echo ${{ github.head_ref }}
+          echo ${{ github.ref_name }}
+
       - name: Delete test/* branch protection after merge to develop
         uses: octokit/request-action@v2.x
         with:
