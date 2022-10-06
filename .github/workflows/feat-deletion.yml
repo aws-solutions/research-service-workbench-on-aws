@@ -12,7 +12,7 @@ on:
 
 jobs:
   delete-feat-branch-on-merge:
-    if: github.event.pull_request.merged == true && contains(${{ github.head_ref }}, 'feat/')
+    if: github.event.pull_request.merged == true && contains(github.head_ref, 'feat/')
     runs-on: ubuntu-latest
     steps:
       - name: Delete feat/* branch protection after merge to develop
@@ -28,5 +28,5 @@ jobs:
       - name: Delete feat/* branch after merge to develop
         uses: dawidd6/action-delete-branch@v3
         with:
-          github_token: ${{github.token}}
+          github_token: ${{ github.token }}
           branches: ${{ github.head_ref }}
