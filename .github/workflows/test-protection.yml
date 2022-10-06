@@ -16,7 +16,11 @@ jobs:
           owner: awslabs
           repo: solution-spark-on-aws
           branch: ${{ github.head_ref }}
-          body: ${{ toJSON(env.REQUEST_BODY) }}
+          enforce_admins: true
+          dismiss_stale_reviews: true
+          require_code_owner_reviews: true
+          required_approving_review_count: 1
+          required_conversation_resolution: false
         env:
           REQUEST_BODY: |
             enforce_admins: true,
