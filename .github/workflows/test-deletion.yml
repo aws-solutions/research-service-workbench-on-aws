@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: echo branch protection
         run: |
+          echo ${{ github }}
           echo ${{ github.ref_protected }}
           echo ${{ github.head_ref }}
           echo ${{ github.ref_name }}
