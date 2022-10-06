@@ -1,14 +1,14 @@
 name: test-protection
 
 on:
-  pull_request:
-    types: [opened, synchronize, edited, reopened]
+  create:
 
 jobs:
   enable-test-branch-protection:
-    if: contains(${{ github.head_ref }}, 'test/')
+    if: contains(${{ github.ref_name }}, 'test/')
     runs-on: ubuntu-latest
     steps:
+
       - name: 'Construct required_pull_request_reviews object'
         id: pr_review
         run: |
@@ -42,7 +42,7 @@ jobs:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
           owner: awslabs
           repo: solution-spark-on-aws
-          branch: ${{ github.head_ref }}
+          branch: ${{ github.ref_name }}
           enforce_admins: true
           required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
           required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
