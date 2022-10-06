@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
-# Enable feat/* branch protection when a PR with br
+# This workflow enables branch protection when a branch name containing 'feat/' is created
 name: "enable feat protection"
 on:
   create
