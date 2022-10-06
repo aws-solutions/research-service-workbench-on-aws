@@ -89,6 +89,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
    * @param ownerAccountId - the owning AWS account for the bucket.
    * @param externalRoleName - an optional role which will be given access to the files under the prefix.
    * @param kmsKeyArn - an optional arn to a KMS key (recommended) which handles encryption on the files in the bucket.
+   * @param vpcId - an optional ID of the VPC interacting with the endpoint.
    * @returns the S3 URL and the alias which can be used to access the endpoint.
    */
   public async addExternalEndpoint(
@@ -97,12 +98,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     externalEndpointName: string,
     ownerAccountId: string,
     externalRoleName?: string,
-    kmsKeyArn?: string
+    kmsKeyArn?: string,
+    vpcId?: string
   ): Promise<EndpointConnectionStrings> {
     const response: { endPointArn: string; endPointAlias?: string } = await this._createAccessPoint(
       name,
       externalEndpointName,
-      ownerAccountId
+      ownerAccountId,
+      vpcId
     );
     await this._configureBucketPolicy(name, response.endPointArn);
 
@@ -171,13 +174,17 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private async _createAccessPoint(
     name: string,
     externalEndpointName: string,
-    bucketAccount: string
+    bucketAccount: string,
+    vpcId?: string
   ): Promise<{ endPointArn: string; endPointAlias?: string }> {
     const accessPointConfig: CreateAccessPointCommandInput = {
       Name: externalEndpointName,
       Bucket: name,
       AccountId: bucketAccount
     };
+    if (vpcId) {
+      accessPointConfig.VpcConfiguration = { VpcId: vpcId };
+    }
     const response: CreateAccessPointCommandOutput = await this._aws.clients.s3Control.createAccessPoint(
       accessPointConfig
     );
@@ -252,7 +259,12 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
         "AWS":"${externalRoleArn}"
       },
       "Action": "s3:ListBucket",
-      "Resource": "${accessPointArn}"
+      "Resource": "${accessPointArn}",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": "${dataSetPrefix}/*"
+        }
+      }
     }
     `)
     );
