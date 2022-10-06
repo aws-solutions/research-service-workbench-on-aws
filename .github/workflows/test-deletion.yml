@@ -20,7 +20,7 @@ jobs:
           echo ${{ github.ref_protected }}
           echo ${{ github.head_ref }}
           echo ${{ github.ref_name }}
-          
+
       - name: Delete test/* branch protection after merge to develop
         uses: octokit/request-action@v2.x
         with:
