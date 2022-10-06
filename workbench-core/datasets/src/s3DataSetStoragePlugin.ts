@@ -73,8 +73,6 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
 
   /**
    * Deletes an external endpoint (accesspoint) to the S3 Bucket
-   * @param name - the name of the S3 bucket where the storage resides.
-   * @param path - the S3 bucket prefix which identifies the root of the DataSet.
    * @param externalEndpointName - the name of the access pont to create.
    * @param ownerAccountId - the owning AWS account for the bucket.
    */

@@ -77,7 +77,6 @@ export interface DataSetsStoragePlugin {
   /**
    * Removes an existing dataset connection which was used for access by an external environment
    *
-   * @param name - the name of the storage destination
    * @param externalEndpointName - a name to uniquely identify the endpoint.
    * @param ownerAccountId - the owning AWS account for the storage destination.
    */

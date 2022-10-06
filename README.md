@@ -14,7 +14,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-87.27%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-85.37%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-88.59%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-87.76%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-90.13%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.44%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-91.04%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.6%25-brightgreen.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -35,6 +35,7 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | Folder | Package | README |
 | ------ | ------- | ------ |
 | [solutions/swb-app](./solutions/swb-app/) | [@aws/swb-app] | [README](./solutions/swb-app/README.md)
+| [workbench-core/accounts](./workbench-core/accounts/) | [@aws/workbench-core-accounts] | [README](./workbench-core/accounts/README.md)
 | [workbench-core/accounts-ui](./workbench-core/accounts-ui/) | [@aws/workbench-core-accounts-ui] | [README](./workbench-core/accounts-ui/README.md)
 | [workbench-core/audit](./workbench-core/audit/) | [@aws/workbench-core-audit] | [README](./workbench-core/audit/README.md)
 | [workbench-core/authentication](./workbench-core/authentication/) | [@aws/workbench-core-authentication] | [README](./workbench-core/authentication/README.md)

@@ -10,8 +10,6 @@ import _ from 'lodash';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
 
-const notImplementedText: string = 'Not yet implemented.';
-
 export class DataSetService {
   private _audit: AuditService;
   private _log: LoggingService;
@@ -97,7 +95,7 @@ export class DataSetService {
    * @param dataSetId - the ID of the DataSet to remove.
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
-    throw new Error(notImplementedText);
+    await this._dbProvider.removeDataSet(dataSetId);
   }
 
   /**

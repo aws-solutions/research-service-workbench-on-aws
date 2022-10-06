@@ -10,6 +10,7 @@ jest.mock('uuid', () => ({
 }));
 
 import {
+  DeleteItemCommand,
   DynamoDBClient,
   GetItemCommand,
   QueryCommand,
@@ -220,7 +221,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     });
   });
 
-  describe('udpateDataSet', () => {
+  describe('updateDataSet', () => {
     it('Returns the updated DataSet when complete.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
 
@@ -250,6 +251,15 @@ describe('DdbDataSetMetadataPlugin', () => {
       };
 
       await expect(plugin.updateDataSet(exampleDS)).resolves.toEqual(exampleDS);
+    });
+  });
+
+  describe('removeDataSet', () => {
+    it('returns nothing when the dataset is removed.', async () => {
+      mockDdb.on(DeleteItemCommand).resolves({});
+
+      await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(1);
     });
   });
 
