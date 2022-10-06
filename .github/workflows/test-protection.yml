@@ -9,25 +9,25 @@ jobs:
     if: contains(${{ github.head_ref }}, 'test/')
     runs-on: ubuntu-latest
     steps:
-      - name: 'Construct Github Environment create / update request'
+      - name: 'Construct required_pull_request_reviews object'
         id: pr_review
         run: |
           required_pr_reviews_json="$(cat <<EOF
-          { "required_approving_review_count": 1 }
+          { "require_code_owner_reviews": true, "dismiss_stale_reviews": true, "required_approving_review_count": 1 }
           EOF
           )"
           echo "::set-output name=required_pr_reviews::${required_pr_reviews_json}"
 
-      - name: 'Construct Github Environment create / update request'
+      - name: 'Construct required_status_checks object'
         id: status_check
         run: |
           require_status_check_json="$(cat <<EOF
-          { "strict": true, "contexts": ['Validate PR title'] }
+          { "strict": true, "contexts": ['Validate PR title', 'Only create PR against develop branch, not main branch', 'Only create PR against develop branch, not stage branch', 'Scan for secrets', 'check-license-header', 'license-checker', 'run-rush-change-verify'] }
           EOF
           )"
           echo "::set-output name=require_status_check::${require_status_check_json}"
 
-      - name: 'Construct Github Environment create / update request'
+      - name: 'Construct restrictions object'
         id: gh_restrictions
         run: |
           restrictions_json="$(cat <<EOF
@@ -44,10 +44,6 @@ jobs:
           repo: solution-spark-on-aws
           branch: ${{ github.head_ref }}
           enforce_admins: true
-          dismiss_stale_reviews: true
-          require_code_owner_reviews: true
-          required_approving_review_count: 1
-          required_conversation_resolution: false
           required_pull_request_reviews: '${{ steps.pr_review.outputs.required_pr_reviews }}'
           required_status_checks: '${{ steps.status_check.outputs.require_status_check }}'
           restrictions: '${{ steps.gh_restrictions.outputs.restrictions }}'
