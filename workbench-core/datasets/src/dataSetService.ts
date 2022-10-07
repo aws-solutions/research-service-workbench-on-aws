@@ -7,8 +7,10 @@ import { AuditService } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
+import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
 export class DataSetService {

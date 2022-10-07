@@ -3,7 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
 export interface DataSetMetadataPlugin {

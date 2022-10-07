@@ -8,7 +8,9 @@ import { AwsService, QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
