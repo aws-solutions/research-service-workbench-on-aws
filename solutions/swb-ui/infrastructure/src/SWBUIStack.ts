@@ -17,7 +17,19 @@ import {
   ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Dashboard, GraphWidget } from 'aws-cdk-lib/aws-cloudwatch';
+import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
+import { Cluster, ContainerImage, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
+import {
+  AnyPrincipal,
+  Effect,
+  PolicyStatement,
+  ManagedPolicy,
+  Role,
+  ServicePrincipal
+} from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
@@ -83,6 +95,82 @@ export class SWBUIStack extends Stack {
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    this._createECSCluster();
+  }
+
+  private _createECSCluster(vpcId: string = ''): void {
+    // Create VPC, or use config-entered VPC
+    const vpc = vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
+
+    // Create an ECS cluster
+    const cluster = new Cluster(this, 'Cluster', {
+      vpc,
+      capacity: { instanceType: new InstanceType('t2.xlarge') }
+    });
+
+    const taskDefinition = new FargateTaskDefinition(this, 'TaskDefinition', {
+      cpu: 512,
+      memoryLimitMiB: 1024,
+      family: 'AutoScalingServiceTask',
+      executionRole: new Role(this, 'EcsExecutionRole', {
+        assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
+        roleName: `${this.stackName}-ExecutionRole`,
+        description: 'A role needed by ECS',
+        managedPolicies: [
+          ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonECSTaskExecutionRolePolicy')
+        ]
+      })
+    });
+
+    // Container image
+    const ecrRepository = new Repository(this, 'EcrRepository', {
+      repositoryName: this.distributionEnvVars.STACK_NAME
+    });
+
+    taskDefinition.addContainer('HostContainer', {
+      image: ContainerImage.fromEcrRepository(ecrRepository),
+      memoryLimitMiB: 1024,
+      portMappings: [{ containerPort: 3000 }]
+    });
+
+    // TODO: Create security group
+
+    // Creating ALB resources just so ECS provisioning could complete,
+    // and dashboard to help us during future performance testing
+    const dashboard = new Dashboard(this, 'Dashboard', {
+      dashboardName: 'AutoScaleDashboard'
+    });
+
+    const albService = new ApplicationLoadBalancedFargateService(this, 'AutoScalingService', {
+      cluster: cluster,
+      taskDefinition,
+      // This may need to be adjusted if the container takes a while to start up
+      healthCheckGracePeriod: Duration.seconds(30)
+    });
+
+    const scalableTaskCount = albService.service.autoScaleTaskCount({
+      minCapacity: 2,
+      maxCapacity: 10
+    });
+
+    scalableTaskCount.scaleOnCpuUtilization('CpuUtilizationScaling', {
+      targetUtilizationPercent: 50,
+      scaleInCooldown: Duration.seconds(60),
+      scaleOutCooldown: Duration.seconds(60)
+    });
+
+    const cpuUtilizationMetric = albService.service.metricCpuUtilization({
+      period: Duration.minutes(1),
+      label: 'CPU Utilization'
+    });
+
+    dashboard.addWidgets(
+      new GraphWidget({
+        left: [cpuUtilizationMetric],
+        width: 12,
+        title: 'CPU Utilization'
+      })
+    );
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {

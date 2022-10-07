@@ -15,29 +15,13 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import {
-  PredefinedMetric,
-  ScalableTarget,
-  ServiceNamespace,
-  TargetTrackingScalingPolicy
-} from 'aws-cdk-lib/aws-applicationautoscaling';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import {
-  Cluster,
-  TaskDefinition,
-  ContainerImage,
-  Ec2Service,
-  Compatibility,
-  NetworkMode
-} from 'aws-cdk-lib/aws-ecs';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
   AccountPrincipal,
   AnyPrincipal,
   Effect,
-  ManagedPolicy,
   Policy,
   PolicyDocument,
   PolicyStatement,
@@ -170,84 +154,8 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
-
-    this._createECSCluster();
-
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
-  }
-
-  // TODO: Should this be moved to UI stack?
-  private _createECSCluster(vpcId: string = ''): void {
-    // Create VPC, or use config-entered VPC
-    const vpc = _.isEmpty(vpcId) ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
-
-    // Create an ECS cluster
-    const cluster = new Cluster(this, 'Cluster', {
-      vpc
-    });
-
-    // Add capacity to it
-    cluster.addCapacity('DefaultAutoScalingGroupCapacity', {
-      instanceType: new InstanceType('t2.xlarge'),
-      desiredCapacity: 3
-    });
-
-    const taskDefinition = new TaskDefinition(this, 'TaskDef', {
-      cpu: '512',
-      memoryMiB: '1024',
-      compatibility: Compatibility.FARGATE,
-      networkMode: NetworkMode.AWS_VPC,
-      executionRole: new Role(this, 'EcsExecutionRole', {
-        assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
-        roleName: `${this.stackName}-ExecutionRole`,
-        description: 'A role needed by ECS',
-        managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('AmazonECSTaskExecutionRolePolicy')]
-      })
-    });
-
-    taskDefinition.addContainer('DefaultContainer', {
-      image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
-      memoryLimitMiB: 1024,
-      portMappings: [{ containerPort: 3000 }]
-    });
-
-    const autoScalingRole = new Role(this, 'EcsAutoScalingRole', {
-      assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
-      roleName: `${this.stackName}-AutoScalingRole`,
-      description: 'A role needed for auto-scaling',
-      managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerServiceAutoscaleRole')]
-    });
-
-    const autoScalingTarget = new ScalableTarget(this, 'ClusterScaleTarget', {
-      minCapacity: 2,
-      maxCapacity: 10,
-      scalableDimension: 'ecs:service:DesiredCount',
-      resourceId: `${this.stackName}-ClusterScaleTarget`,
-      serviceNamespace: ServiceNamespace.ECS,
-      role: autoScalingRole
-    });
-
-    new TargetTrackingScalingPolicy(this, 'ClusterScalePolicy', {
-      scalingTarget: autoScalingTarget,
-      targetValue: 50, // Keep things at or lower than 50% CPU utilization, for example
-      scaleInCooldown: Duration.seconds(10),
-      scaleOutCooldown: Duration.seconds(10),
-      predefinedMetric: PredefinedMetric.ECS_SERVICE_AVERAGE_CPU_UTILIZATION
-    });
-
-    // TODO:
-    // 1. Create log group
-    // 2. Create security group
-    // 3. Auto-scale policy and resources
-
-    // Instantiate an Amazon ECS Service
-    new Ec2Service(this, 'Service', {
-      cluster,
-      taskDefinition,
-      desiredCount: 2,
-      healthCheckGracePeriod: Duration.seconds(30) // This may need to be adjusted if the container takes a while to start up
-    });
   }
 
   private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
