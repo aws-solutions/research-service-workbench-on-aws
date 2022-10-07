@@ -33,7 +33,6 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
-import { LoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancing';
 
 export class SWBUIStack extends Stack {
   public distributionEnvVars: {
