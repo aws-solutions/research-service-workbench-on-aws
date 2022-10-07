@@ -18,8 +18,7 @@ import {
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Dashboard, GraphWidget } from 'aws-cdk-lib/aws-cloudwatch';
-import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { Repository } from 'aws-cdk-lib/aws-ecr';
+import { InstanceType, SecurityGroup, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Cluster, ContainerImage, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
 import { ApplicationLoadBalancedFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import {
@@ -34,6 +33,7 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
+import { LoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancing';
 
 export class SWBUIStack extends Stack {
   public distributionEnvVars: {
@@ -122,18 +122,11 @@ export class SWBUIStack extends Stack {
       })
     });
 
-    // Container image
-    const ecrRepository = new Repository(this, 'EcrRepository', {
-      repositoryName: this.distributionEnvVars.STACK_NAME
-    });
-
     taskDefinition.addContainer('HostContainer', {
-      image: ContainerImage.fromEcrRepository(ecrRepository),
+      image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
       memoryLimitMiB: 1024,
-      portMappings: [{ containerPort: 3000 }]
+      portMappings: [{ containerPort: 80 }]
     });
-
-    // TODO: Create security group
 
     // Creating ALB resources just so ECS provisioning could complete,
     // and dashboard to help us during future performance testing
@@ -144,6 +137,8 @@ export class SWBUIStack extends Stack {
     const albService = new ApplicationLoadBalancedFargateService(this, 'AutoScalingService', {
       cluster: cluster,
       taskDefinition,
+      desiredCount: 2,
+      securityGroups: [new SecurityGroup(this, 'ContainerSecurityGroup', { vpc })],
       // This may need to be adjusted if the container takes a while to start up
       healthCheckGracePeriod: Duration.seconds(30)
     });
