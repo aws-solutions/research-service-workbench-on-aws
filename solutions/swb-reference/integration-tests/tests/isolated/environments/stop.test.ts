@@ -2,6 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -23,7 +25,7 @@ describe('environment stop negative tests', () => {
     await setup.cleanup();
   });
   test('environment does not exist', async () => {
-    const fakeEnvId = '927ff6bd-9d0e-44d0-b754-47ee50e68edb';
+    const fakeEnvId = `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`;
     try {
       await adminSession.resources.environments.environment(fakeEnvId).stop();
     } catch (e) {

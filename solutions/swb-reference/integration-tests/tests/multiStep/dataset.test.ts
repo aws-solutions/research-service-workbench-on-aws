@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
@@ -45,7 +46,7 @@ describe('multiStep dataset integration test', () => {
       envTypeConfigId: settings.get('envTypeConfigId'),
       envType: settings.get('envType'),
       datasetIds: [dataSet.id],
-      name: uuidv4(),
+      name: `${resourceTypeToKey.dataset.toLowerCase()}${uuidv4()}`,
       projectId: settings.get('projectId'),
       description: 'Temporary DataSet for integration test'
     };
@@ -55,7 +56,7 @@ describe('multiStep dataset integration test', () => {
     const { data: envDetails } = await adminSession.resources.environments.environment(env.id).get();
     const awsRegion = settings.get('awsRegion');
     const mainAccountId = settings.get('mainAccountId');
-    const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 13)}`;
+    const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 12)}`;
     expect(envDetails).toMatchObject({
       datasetIds: [dataSet.id],
       ENDPOINTS: expect.arrayContaining([

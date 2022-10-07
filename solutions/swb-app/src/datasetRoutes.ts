@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
@@ -57,7 +58,8 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
+      //TODO fix this, should be dataset-uuid
+      if (!uuidValidate(stripDatasetPrefix(req.params.id))) {
         throw Boom.badRequest('id request parameter must be a valid uuid.');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
@@ -75,7 +77,7 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
+      if (!uuidValidate(stripDatasetPrefix(req.params.id))) {
         throw Boom.badRequest('id request parameter must be a valid uuid.');
       }
       const ds = await dataSetService.getDataSet(req.params.id);
@@ -91,4 +93,8 @@ export function setUpDSRoutes(
       res.send(response);
     })
   );
+
+  function stripDatasetPrefix(id: string): string {
+    return id.replace(`${resourceTypeToKey.dataset.toLowerCase()}-`, '');
+  }
 }
