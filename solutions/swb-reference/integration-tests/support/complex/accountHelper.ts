@@ -16,26 +16,24 @@ export class AccountHelper {
   }
 
   // TODO: Replace with Accounts list API call when it is available
-  public async listOnboardedAccounts(): Promise<{[id: string]: string}[]> {
+  public async listOnboardedAccounts(): Promise<{ [id: string]: string }[]> {
     const queryParams = {
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     };
     const response = await this._awsSdk.helpers.ddb.query(queryParams).execute();
-    let accounts: {[id: string]: string}[] = [];
+    let accounts: { [id: string]: string }[] = [];
     if (response && response.Items) {
       accounts = response.Items.map((item) => {
-        return item as unknown as {[id: string]: string};
+        return item as unknown as { [id: string]: string };
       });
     }
     return accounts;
   }
 
   public async deleteDdbRecords(accountId: string, awsAccountId: string): Promise<void> {
-    await this._awsSdk.helpers.ddb
-      .delete({ pk: `ACC#${accountId}`, sk: `ACC#${accountId}` }).execute();
-    await this._awsSdk.helpers.ddb
-      .delete({ pk: `AWSACC#${awsAccountId}`, sk: `ACC#${accountId}` }).execute();
+    await this._awsSdk.helpers.ddb.delete({ pk: `ACC#${accountId}`, sk: `ACC#${accountId}` }).execute();
+    await this._awsSdk.helpers.ddb.delete({ pk: `AWSACC#${awsAccountId}`, sk: `ACC#${accountId}` }).execute();
   }
 
   public async verifyBusAllowsAccount(awsAccountId: string): Promise<boolean> {
@@ -82,9 +80,7 @@ export class AccountHelper {
     await this._awsSdk.clients.eventBridge.putRule(putRuleParams);
   }
 
-  public async removeAccountFromKeyPolicy(
-    awsAccountId: string
-  ): Promise<void> {
+  public async removeAccountFromKeyPolicy(awsAccountId: string): Promise<void> {
     const mainAcctEncryptionArn = this._settings.get('MainAccountEncryptionKeyOutput');
     const keyId = mainAcctEncryptionArn.split('/').pop()!;
     const keyPolicyResponse = await this._awsSdk.clients.kms.getKeyPolicy({
@@ -139,15 +135,15 @@ export class AccountHelper {
   }
 
   public async deOnboardAccount(awsAccountId: string): Promise<void> {
-  // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
+    // Undo all operations that happen in: hostingAccountLifecycleService.initializeAccount()
 
-  // Update main account default event bus to remove hosting account state change events
-  await this.removeBusPermissions(awsAccountId);
+    // Update main account default event bus to remove hosting account state change events
+    await this.removeBusPermissions(awsAccountId);
 
-  // Remove account to artifactBucket's bucket policy
-  await this.removeAccountFromBucketPolicy(awsAccountId);
+    // Remove account to artifactBucket's bucket policy
+    await this.removeAccountFromBucketPolicy(awsAccountId);
 
-  // Update main account encryption key policy
-  await this.removeAccountFromKeyPolicy(awsAccountId);
+    // Update main account encryption key policy
+    await this.removeAccountFromKeyPolicy(awsAccountId);
   }
 }
