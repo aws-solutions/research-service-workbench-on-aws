@@ -106,7 +106,7 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
 
-  test('Launch should return mocked id', async () => {
+  test('Launch happy path returns environment with PENDING status ', async () => {
     const envHelper = new EnvironmentLifecycleHelper();
     envHelper.launch = jest.fn();
     envHelper.getCfnOutputs = jest.fn(async () => {
@@ -125,35 +125,6 @@ describe('SagemakerNotebookEnvironmentLifecycleService', () => {
     const sm = new SagemakerNotebookEnvironmentLifecycleService();
     sm.helper = envHelper;
     const response = await sm.launch(environment);
-    expect(response).toEqual({ ...environment, status: 'PENDING' });
-  });
-
-  test.skip('Launch should return mocked id when mounting datasets', async () => {
-    const envHelper = new EnvironmentLifecycleHelper();
-    environment.DATASETS = [
-      {
-        id: 'dataset-123'
-      }
-    ];
-    envHelper.launch = jest.fn();
-    envHelper.getCfnOutputs = jest.fn(async () => {
-      return {
-        datasetsBucketArn: MOCK_DATASETS_BUCKET_ARN,
-        mainAccountRegion: 'us-east-1',
-        mainAccountId: '123456789012'
-      };
-    });
-    envHelper.getDatasetsToMount = jest.fn(async () => {
-      return { s3Mounts: '[exampleDs]', iamPolicyDocument: '{exampleDs}' };
-    });
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
-    jest.spyOn(envService, 'getEnvironment').mockImplementation(async () => environment);
-
-    const sm = new SagemakerNotebookEnvironmentLifecycleService();
-    sm.helper = envHelper;
-    const response = await sm.launch(environment);
-
-    // This does not appear to be testing what the name claims it is and should be reviewed
     expect(response).toEqual({ ...environment, status: 'PENDING' });
   });
 
