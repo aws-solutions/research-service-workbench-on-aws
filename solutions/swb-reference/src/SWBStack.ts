@@ -154,7 +154,6 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
-
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
   }
@@ -846,7 +845,7 @@ export class SWBStack extends Stack {
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the 'main' client access token expiration time can be return to 15 minutes
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);

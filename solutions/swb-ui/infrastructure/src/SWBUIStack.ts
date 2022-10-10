@@ -22,6 +22,7 @@ import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
+import { createECSCluster } from './hosting-infra/ecs-cluster';
 
 export class SWBUIStack extends Stack {
   public distributionEnvVars: {
@@ -83,6 +84,7 @@ export class SWBUIStack extends Stack {
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    createECSCluster(this);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
