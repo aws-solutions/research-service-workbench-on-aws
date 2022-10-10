@@ -18,6 +18,9 @@ export interface FileUploadProps {
    * Because a given file type may be identified in more than one manner,
    * it's useful to provide a thorough set of type specifiers when you need
    * files of a given format.
+   * Examples:
+   * ".docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+   * "image/*"
    */
   accept?: string;
   /**
@@ -78,6 +81,7 @@ export interface FileUploadProps {
    * Not cancellable.
    */
   onChange?: (event: CustomEvent<ChangeDetail>) => void;
+
   /**
    * Specifies the currently selected file(s).
    */
@@ -105,7 +109,7 @@ const FileUploadComponent = (
 ): JSX.Element => {
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const handleButtonClick = (): void | null => fileInput.current && fileInput.current.click();
+  const handleButtonClick = (): void => fileInput.current?.click();
 
   const handleChange = useCallback(
     ({ target }: ChangeEvent<HTMLInputElement>) => {
@@ -167,6 +171,7 @@ const FileUploadComponent = (
         description={description}
         errorText={errorText}
         constraintText={constraintText}
+        data-testid={`fileUpload${id}`}
       >
         <Button ref={ref} iconName="upload" formAction="none" disabled={disabled} onClick={handleButtonClick}>
           <input
