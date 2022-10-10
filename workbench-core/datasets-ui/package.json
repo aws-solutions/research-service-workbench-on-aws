@@ -40,7 +40,6 @@
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
-    "@aws/workbench-core-accounts-ui": "workspace:*",
     "@cloudscape-design/collection-hooks": "^1.0.3",
     "@cloudscape-design/components": "^3.0.27",
     "@rushstack/eslint-config": "^3.0.0",
