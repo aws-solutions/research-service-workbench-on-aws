@@ -368,11 +368,12 @@ export class EnvironmentService {
     },
     user: AuthenticatedUser
   ): Promise<Environment> {
+    const environmentTypeConfigSK = `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`;
     const itemsToGet = [
       // ETC
       {
         pk: resourceTypeToKey.envTypeConfig,
-        sk: `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
+        sk: environmentTypeConfigSK
       },
       // PROJ
       this._buildPkSk(params.projectId, resourceTypeToKey.project),
@@ -401,7 +402,7 @@ export class EnvironmentService {
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
-      type: '',
+      type: environmentTypeConfigSK,
       dependency: params.projectId
     };
     // GET metadata
@@ -430,7 +431,6 @@ export class EnvironmentService {
     const envTypeConfig = metadata.find((item) => {
       return item.resourceType === 'envTypeConfig';
     });
-    newEnv.type = envTypeConfig.sk;
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
