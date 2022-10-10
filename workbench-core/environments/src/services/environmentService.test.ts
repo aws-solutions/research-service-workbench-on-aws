@@ -1040,8 +1040,7 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...env,
         provisionedProductId: '',
-        error: undefined,
-        datasetIds: undefined
+        error: undefined
       });
     });
   });
