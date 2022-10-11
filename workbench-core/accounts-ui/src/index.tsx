@@ -5,7 +5,4 @@
 
 import { useProjects } from './api/projects';
 
-
-export {
-  useProjects
-};
+export { useProjects };
