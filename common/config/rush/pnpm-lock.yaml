@@ -606,6 +606,7 @@ importers:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
@@ -627,6 +628,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -791,7 +793,6 @@ importers:
       '@aws-sdk/types': ^3.110.0
       '@aws-sdk/util-dynamodb': ^3.87.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -834,7 +835,6 @@ importers:
       '@aws-sdk/client-sts': 3.130.0
       '@aws-sdk/types': 3.127.0
       '@aws-sdk/util-dynamodb': 3.105.0
-      '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-logging': link:../logging
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       lodash: 4.17.21

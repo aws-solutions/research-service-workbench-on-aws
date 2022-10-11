@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
@@ -12,7 +11,6 @@ import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 
 export {
-  AuditLogger,
   AwsService,
   CognitoTokenService,
   QueryParams,

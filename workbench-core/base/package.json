@@ -57,7 +57,6 @@
     "@aws-sdk/client-sts": "^3.118.1",
     "@aws-sdk/types": "^3.110.0",
     "@aws-sdk/util-dynamodb": "^3.87.0",
-    "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-sdk-client-mock": "^0.6.2",
     "lodash": "^4.17.21"

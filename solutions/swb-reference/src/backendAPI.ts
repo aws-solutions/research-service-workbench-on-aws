@@ -5,8 +5,8 @@
 
 import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
 import { HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger } from '@aws/workbench-core-base';
+import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
+import { AwsService } from '@aws/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
