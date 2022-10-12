@@ -11,3 +11,17 @@ export interface DatasetItem {
   name: string;
   storageName: string;
 }
+
+export interface CreateDatasetForm {
+  name?: string;
+  description?: string;
+  projectId?: string;
+  file?: File | File[];
+}
+
+export interface CreateDatasetFormValidation {
+  nameError?: string;
+  descriptionError?: string;
+  projectIdError?: string;
+  fileError?: string;
+}

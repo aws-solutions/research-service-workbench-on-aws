@@ -3,13 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface ValidationRule {
-  field: string;
-  condition: (value: unknown) => boolean;
+export interface ValidationRule<TValue> {
+  condition: (value: TValue) => boolean;
   message: string;
 }
 
-export const nameRegex: RegExp = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-\\s]*$');
+export const nameRegex: RegExp = new RegExp('^[A-Za-z]{1}[A-Za-z0-9-]*$');
 
 /* eslint-disable security/detect-unsafe-regex */
 export const cidrRegex: RegExp = new RegExp(
@@ -33,13 +32,13 @@ export const convertToRecord = (queryObject: any): Record<string, string> => {
   return result;
 };
 
-export const validateField = <TForm, TFormState>(
+export const validateField = <TValue, TForm, TFormState>(
   field: keyof TForm,
   updateFormErrors: (value: React.SetStateAction<TFormState>) => void,
-  validationRules: ValidationRule[],
-  value: unknown
+  validationRules: ValidationRule<TValue>[],
+  value: TValue
 ): boolean => {
-  for (const rule of validationRules.filter((f) => f.field === field)) {
+  for (const rule of validationRules) {
     // eslint-disable-next-line security/detect-object-injection
     if (!rule.condition(value)) {
       updateFormErrors((prevState: TFormState) => ({
