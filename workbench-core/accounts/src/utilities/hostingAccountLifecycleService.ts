@@ -14,6 +14,18 @@ import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
 
+export class InvalidArtifactBucketArnError extends Error {
+  public readonly statusCode: number = 422;
+
+  public constructor(artifactBucketArn: string) {
+    super(`Cannot calculate artifact bucket name from S3 ARN ${artifactBucketArn}`);
+  }
+
+  public getErrorMessage(): string {
+    return `InvalidArtifactBucketArnError: ${this.message}`;
+  }
+}
+
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
@@ -44,6 +56,8 @@ export default class HostingAccountLifecycleService {
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
       process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
+
+    accountMetadata.environmentInstanceFiles = this._getEnvironmentFilesPathForArn(artifactBucketArn);
 
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
@@ -477,6 +491,17 @@ export default class HostingAccountLifecycleService {
       throw new Error(`Cannot find output name: ${params.outputName}`);
     }
     return currOutputVal;
+  }
+
+  private _getEnvironmentFilesPathForArn(artifactBucketArn: string): string {
+    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    const bucketName = parsedBucketArn[0];
+
+    if (_.isEmpty(bucketName) || bucketName.length === 0) {
+      throw new InvalidArtifactBucketArnError(artifactBucketArn);
+    }
+
+    return `s3://${bucketName}/environment-files`;
   }
 
   private async _getSSMDocuments(stackName: string, ssmDocNameSuffix: string): Promise<string[]> {
