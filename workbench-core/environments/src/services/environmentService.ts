@@ -7,10 +7,14 @@
 
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { AwsService, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -386,7 +390,7 @@ export class EnvironmentService {
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
-      id: `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`,
+      id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,

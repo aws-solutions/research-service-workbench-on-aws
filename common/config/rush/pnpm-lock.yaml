@@ -808,6 +808,7 @@ importers:
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/uuid': ^8.3.4
       aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -822,6 +823,7 @@ importers:
       sort-package-json: ^1.57.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@aws-cdk/aws-dynamodb': 1.158.0
       '@aws-sdk/client-cloudformation': 3.130.0
@@ -844,6 +846,7 @@ importers:
       '@aws/workbench-core-logging': link:../logging
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       lodash: 4.17.21
+      uuid: 8.3.2
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.2
@@ -855,6 +858,7 @@ importers:
       '@types/js-yaml': 4.0.5
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      '@types/uuid': 8.3.4
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
