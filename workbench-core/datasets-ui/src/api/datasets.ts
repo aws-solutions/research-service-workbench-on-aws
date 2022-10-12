@@ -16,7 +16,9 @@ const useDatasets = (): { datasets: DatasetItem[]; areDatasetsLoading: boolean }
 };
 
 const createDataset = async (dataset: CreateDatasetForm): Promise<void> => {
-  await httpApiPost('datasets', { ...dataset });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { file: _, ...rest } = dataset;
+  await httpApiPost('datasets', rest);
 };
 
 export { useDatasets, createDataset };

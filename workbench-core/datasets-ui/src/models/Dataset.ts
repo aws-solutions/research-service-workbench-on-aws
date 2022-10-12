@@ -20,8 +20,8 @@ export interface CreateDatasetForm {
 }
 
 export interface CreateDatasetFormValidation {
-  nameError?: string;
-  descriptionError?: string;
-  projectIdError?: string;
-  fileError?: string;
+  nameError: string;
+  descriptionError: string;
+  projectIdError: string;
+  fileError: string;
 }

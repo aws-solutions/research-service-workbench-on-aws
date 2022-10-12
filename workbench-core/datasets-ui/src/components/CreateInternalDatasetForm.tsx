@@ -43,7 +43,12 @@ export const NewDatasetForm = ({
   const [disableSubmit, setDisableSubmit] = useState(true);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<CreateDatasetForm>({});
-  const [formErrors, setFormErrors] = useState<CreateDatasetFormValidation>({});
+  const [formErrors, setFormErrors] = useState<CreateDatasetFormValidation>({
+    descriptionError: '',
+    fileError: '',
+    nameError: '',
+    projectIdError: ''
+  });
 
   const validateAll = (): boolean => {
     let isValid = validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
@@ -156,7 +161,7 @@ export const NewDatasetForm = ({
             // TODO: add href
             info={<Link>Info</Link>}
             description="The Project administrators on the selected project will be able to manage access to the dataset. This cannot be changed later."
-            errorText={formErrors?.projectIdError}
+            errorText={formErrors.projectIdError}
           >
             <Select
               data-testid="datasetProject"

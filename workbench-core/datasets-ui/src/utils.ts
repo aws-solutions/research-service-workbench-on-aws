@@ -7,30 +7,30 @@ import { nameRegex, ValidationRule } from '@aws/workbench-core-swb-common-ui';
 
 export const datasetNameValidationRules: ValidationRule<string | undefined>[] = [
   {
-    condition: (a: string | undefined) => !!a,
+    condition: (datasetName: string | undefined) => !!datasetName,
     message: 'Dataset Name is Required'
   },
   {
-    condition: (a: string | undefined) => !!a && nameRegex.test(a),
+    condition: (datasetName: string | undefined) => !!datasetName && nameRegex.test(datasetName),
     message:
       'Dataset Name must start with an alphabetic character and can only contain alphanumeric characters (case sensitive) and hyphens.'
   },
   {
-    condition: (a: string | undefined) => !!a && a.length <= 100,
+    condition: (datasetName: string | undefined) => !!datasetName && datasetName.length <= 100,
     message: 'Dataset Name cannot be longer than 100 characters'
   }
 ];
 
 export const datasetDescriptionValidationRules: ValidationRule<string | undefined>[] = [
   {
-    condition: (a: string | undefined) => !a || a.length <= 500,
+    condition: (description: string | undefined) => !description || description.length <= 500,
     message: 'Description cannot be longer than 500 characters'
   }
 ];
 
 export const datasetProjectIdValidationRules: ValidationRule<string | undefined>[] = [
   {
-    condition: (a: string | undefined) => !!a,
+    condition: (projectId: string | undefined) => !!projectId,
     message: 'Project ID is Required'
   }
 ];
