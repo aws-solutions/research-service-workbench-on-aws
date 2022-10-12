@@ -1,5 +1,3 @@
-import { App } from '@aws-cdk/core';
-
 export interface GenerateBaseDatasetsRoleRequest {
   roleName: string;
   awsAccountId: string;
