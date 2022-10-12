@@ -2,12 +2,10 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import RandomTextGenerator from '../../support/utils/randomTextGenerator';
-import { uuidRegExp } from '../../support/utils/regExpressions';
+import { dsUuidRegExp } from '../../support/utils/regExpressions';
 import Settings from '../../support/utils/settings';
 
 describe('multiStep dataset integration test', () => {
@@ -37,7 +35,7 @@ describe('multiStep dataset integration test', () => {
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);
     expect(dataSet).toMatchObject({
-      id: expect.stringMatching(uuidRegExp)
+      id: expect.stringMatching(dsUuidRegExp)
     });
 
     // Provision environment with dataset
@@ -46,7 +44,7 @@ describe('multiStep dataset integration test', () => {
       envTypeConfigId: settings.get('envTypeConfigId'),
       envType: settings.get('envType'),
       datasetIds: [dataSet.id],
-      name: `${resourceTypeToKey.dataset.toLowerCase()}${uuidv4()}`,
+      name: randomTextGenerator.getFakeText('dataset-name'),
       projectId: settings.get('projectId'),
       description: 'Temporary DataSet for integration test'
     };

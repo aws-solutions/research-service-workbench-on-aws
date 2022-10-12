@@ -177,8 +177,8 @@ export default class AccountService {
       const awsAccountParams = {
         item: {
           id: accountMetadata.awsAccountId,
-          accountId: accountMetadata.id, // can we delete this attribute?
-          awsAccountId: accountMetadata.awsAccountId, // can we delete this attribute?
+          accountId: accountMetadata.id,
+          awsAccountId: accountMetadata.awsAccountId,
           resourceType: 'awsAccount'
         }
       };

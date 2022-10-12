@@ -178,12 +178,10 @@ export default class EnvironmentLifecycleHelper {
 
     const envId = envMetadata.id!;
     const endpointsCreated: { [key: string]: string }[] = [];
-    console.log('datasetIds', datasetIds);
 
     const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
         const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
-        console.log('datasetEndPointName', datasetEndPointName);
         const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
           datasetId,
           datasetEndPointName,

@@ -58,7 +58,6 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
-      //TODO fix this, should be dataset-uuid
       if (!uuidValidate(stripDatasetPrefix(req.params.id))) {
         throw Boom.badRequest('id request parameter must be a valid uuid.');
       }

@@ -5,12 +5,6 @@
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
 
-// jest.mock('uuid', () => ({
-//   v4: jest.fn()
-// }));
-//
-// const mockUuid = require('uuid') as { v4: jest.Mock<string, []> };
-
 import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -24,7 +18,6 @@ describe('AccountService', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.AWS_REGION = 'us-east-1';
     process.env.STACK_NAME = 'swb-swbv2-va';
-    // mockUuid.v4.mockImplementationOnce(() => 'sampleAccId');
     accountMetadata = {
       envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
       accountHandlerRoleArn: 'sampleAccountHandlerRoleArn',
@@ -41,6 +34,8 @@ describe('AccountService', () => {
   afterAll(() => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
+
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
   test('createOrUpdate follows create account path as expected', async () => {
     // BUILD
@@ -59,7 +54,7 @@ describe('AccountService', () => {
     // CHECK
     expect(response).toEqual({
       ...accountMetadata,
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`
+      id: accountId
     });
   });
 
@@ -204,7 +199,7 @@ describe('AccountService', () => {
     // CHECK
     expect(response).toEqual({
       ...accountMetadata,
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`
+      id: accountId
     });
   });
 

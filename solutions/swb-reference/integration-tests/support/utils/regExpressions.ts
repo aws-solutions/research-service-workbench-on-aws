@@ -4,9 +4,11 @@
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 
-export const uuidRegExp: RegExp = /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/;
-
+const uuidRegExpAsString: string = '-\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}';
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 export const envUuidRegExp: RegExp = new RegExp(
-  resourceTypeToKey.environment.toLowerCase() + '-\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}'
+  resourceTypeToKey.environment.toLowerCase() + uuidRegExpAsString
 );
+
+// eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+export const dsUuidRegExp: RegExp = new RegExp(resourceTypeToKey.dataset.toLowerCase() + uuidRegExpAsString);

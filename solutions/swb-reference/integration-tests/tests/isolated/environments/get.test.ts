@@ -3,12 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('get environment negative tests', () => {
   const setup: Setup = new Setup();
@@ -27,7 +25,7 @@ describe('get environment negative tests', () => {
   });
 
   test('environment does not exist', async () => {
-    const fakeEnvId = `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`;
+    const fakeEnvId = getFakeEnvId();
     try {
       await adminSession.resources.environments.environment(fakeEnvId).get();
     } catch (e) {
