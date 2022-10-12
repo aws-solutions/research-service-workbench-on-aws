@@ -145,7 +145,7 @@ export default class EnvironmentLifecycleHelper {
    * @param envMetadata - the environment for which access point(s) were created
    */
   public async removeAccessPoints(envMetadata: Environment): Promise<void> {
-    if (_.isEmpty(envMetadata.datasetIds)) return;
+    if (_.isEmpty(envMetadata.DATASETS)) return;
 
     await Promise.all(
       _.map(envMetadata.ENDPOINTS, async (endpoint) => {

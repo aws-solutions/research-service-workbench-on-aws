@@ -58,7 +58,6 @@ describe('multiStep dataset integration test', () => {
     const mainAccountId = settings.get('mainAccountId');
     const accessPointName = `${dataSet.id.slice(0, 13)}-mounted-on-${env.id.slice(0, 12)}`;
     expect(envDetails).toMatchObject({
-      datasetIds: [dataSet.id],
       ENDPOINTS: expect.arrayContaining([
         expect.objectContaining({
           endPointUrl: `s3://arn:aws:s3:${awsRegion}:${mainAccountId}:accesspoint/${accessPointName}`,
