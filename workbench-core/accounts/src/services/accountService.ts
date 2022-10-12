@@ -150,6 +150,7 @@ export default class AccountService {
     const accountParams: { item: { [key: string]: string } } = {
       item: {
         id: accountMetadata.id,
+        name: accountMetadata.name,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
