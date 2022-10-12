@@ -57,7 +57,6 @@ describe('StatusHandler', () => {
       outputs: [],
       projectId: '123',
       PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
-      datasetIds: [],
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah',

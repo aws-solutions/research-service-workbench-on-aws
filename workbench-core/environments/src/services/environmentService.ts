@@ -24,7 +24,6 @@ export interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
-  datasetIds: string[];
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
@@ -57,7 +56,6 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
-  datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
   updatedBy: '',
@@ -370,11 +368,12 @@ export class EnvironmentService {
     },
     user: AuthenticatedUser
   ): Promise<Environment> {
+    const environmentTypeConfigSK = `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`;
     const itemsToGet = [
       // ETC
       {
         pk: resourceTypeToKey.envTypeConfig,
-        sk: `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
+        sk: environmentTypeConfigSK
       },
       // PROJ
       this._buildPkSk(params.projectId, resourceTypeToKey.project),
@@ -396,7 +395,6 @@ export class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-      datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       updatedBy: user.id,
@@ -404,7 +402,7 @@ export class EnvironmentService {
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
-      type: params.envTypeId,
+      type: environmentTypeConfigSK,
       dependency: params.projectId
     };
     // GET metadata
