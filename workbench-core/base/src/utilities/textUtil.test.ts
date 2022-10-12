@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
 jest.mock('uuid', () => ({ v4: () => randomUuid }));
 
