@@ -4,9 +4,8 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
 
-const uuidRegExp: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
     POST: [
@@ -30,7 +29,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExp}`]: {
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -68,7 +67,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}`]: {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -76,7 +75,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/connections`]: {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -84,7 +83,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/start`]: {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -92,7 +91,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/stop`]: {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -100,7 +99,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExp}/terminate`]: {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -122,7 +121,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExp}`]: {
+  [`/environmentTypes/${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -136,7 +135,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExp}/configurations`]: {
+  [`/environmentTypes/${uuidRegExpAsString}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -150,7 +149,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExp}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExp}`]:
+  [`/environmentTypes/${uuidRegExpAsString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
