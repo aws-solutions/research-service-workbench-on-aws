@@ -26,7 +26,7 @@ import {
 import { AwsService } from '@aws/workbench-core-base';
 import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { IamHelper, InsertStatementResult } from './iamHelper';
-import { DataSetsStoragePlugin } from '.';
+import { DataSet, DataSetsStoragePlugin } from '.';
 
 /**
  * An implementation of the {@link DataSetStoragePlugin} to support DataSets stored in an S3 Bucket.
@@ -148,17 +148,14 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  public async createPresignedUploadUrl(
-    dataSetName: string,
-    timeToLiveMilliseconds: number
-  ): Promise<string> {
+  public async createPresignedUploadUrl(dataset: DataSet, timeToLiveSeconds: number): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
   public async createPresignedMultiPartUploadUrls(
     dataSetName: string,
     numberOfParts: number,
-    timeToLiveMilliseconds: number
+    timeToLiveSeconds: number
   ): Promise<string[]> {
     throw new Error('Method not implemented.');
   }

@@ -933,9 +933,9 @@ describe('S3DataSetStoragePlugin', () => {
 
   describe('createPresignedUploadUrl', () => {
     itProp('throws not implemented error.', [fc.string(), fc.nat()], async (name, ttl) => {
-      await expect(plugin.createPresignedUploadUrl(name, ttl)).rejects.toEqual(
-        new Error('Method not implemented.')
-      );
+      await expect(
+        plugin.createPresignedUploadUrl({ name: '', storageName: '', path: '' }, ttl)
+      ).rejects.toEqual(new Error('Method not implemented.'));
     });
   });
 

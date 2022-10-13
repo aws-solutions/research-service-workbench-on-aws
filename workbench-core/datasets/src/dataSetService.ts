@@ -280,6 +280,16 @@ export class DataSetService {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
+  public async getSinglePartPresignedUrl(
+    datasetId: string,
+    timeToLiveSeconds: number,
+    storageProvider: DataSetsStoragePlugin
+  ): Promise<string> {
+    const dataset = await this.getDataSet(datasetId);
+
+    return await storageProvider.createPresignedUploadUrl(dataset, timeToLiveSeconds);
+  }
+
   private _generateMountObject(
     dataSetName: string,
     endPointURL: string,
