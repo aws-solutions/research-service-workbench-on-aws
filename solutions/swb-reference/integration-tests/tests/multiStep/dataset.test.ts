@@ -30,7 +30,8 @@ describe('multiStep dataset integration test', () => {
       storageName: settings.get('DataSetsBucketName'),
       awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
-      datasetName
+      datasetName,
+      region: settings.get('awsRegion')
     };
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);
