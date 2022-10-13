@@ -4,7 +4,11 @@
  */
 
 // AWS Account management
-import { CreateAccountSchema, HostingAccountService } from '@aws/workbench-core-accounts';
+import {
+  CreateAccountSchema,
+  UpdateAccountSchema,
+  HostingAccountService
+} from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
@@ -24,7 +28,7 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
   router.patch(
     '/aws-accounts/:awsAccountId',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateAccountSchema));
+      processValidatorResult(validate(req.body, UpdateAccountSchema));
       const response = await account.update(req.body);
       res.send(response);
     })
