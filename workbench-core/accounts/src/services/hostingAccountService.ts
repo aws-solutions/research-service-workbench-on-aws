@@ -17,4 +17,16 @@ export default class HostingAccountService {
 
     return lifecycleService.initializeAccount(accountMetadata);
   }
+
+  /**
+   * Update hosting account record in DDB
+   * @param accountMetadata - the attributes of the given hosting account
+   *
+   * @returns account record in DDB
+   */
+  public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
+    const lifecycleService = new HostingAccountLifecycleService();
+
+    return lifecycleService.initializeAccount(accountMetadata);
+  }
 }
