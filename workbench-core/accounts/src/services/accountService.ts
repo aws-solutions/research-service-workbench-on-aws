@@ -125,7 +125,7 @@ export default class AccountService {
     const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
     const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
     // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
-    if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0) {
+    if (ddbEntries && ddbEntries.Count && ddbEntries.Count > 0) {
       throw Boom.badRequest(
         'This AWS Account was found in DDB. Please provide the correct id value in request body'
       );

@@ -10,7 +10,7 @@ import {
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
-import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import {
   EventBridgeClient,
@@ -95,7 +95,7 @@ describe('HostingAccountLifecycleService', () => {
     });
   }
 
-  test('initializeAccount does not return an error', async () => {
+  test('initializeAccount does not return an error when UPDATING an account', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
@@ -117,10 +117,37 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.initializeAccount({
         id: 'abc-xyz',
-        accountId: 'abc-xyz',
+        name: 'someName',
         awsAccountId: '123456789012',
         envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
-        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
+        externalId: 'someExternalId'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('initializeAccount does not return an error when CREATING an account', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    hostingAccountLifecycleService.updateBusPermissions = jest.fn();
+    hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
+    const cfnMock = mockClient(CloudFormationClient);
+    mockCloudformationOutputs(cfnMock);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(QueryCommand).resolves({
+      Count: 0,
+      Items: []
+    });
+
+    await expect(
+      hostingAccountLifecycleService.initializeAccount({
+        name: 'someName',
+        awsAccountId: '123456789012',
+        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
+        externalId: 'someExternalId'
       })
     ).resolves.not.toThrowError();
   });
