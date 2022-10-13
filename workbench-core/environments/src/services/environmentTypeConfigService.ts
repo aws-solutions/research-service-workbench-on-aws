@@ -4,9 +4,13 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import { v4 as uuidv4 } from 'uuid';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import EnvironmentTypeService from './environmentTypeService';
 
@@ -124,7 +128,7 @@ export default class EnvironmentTypeConfigService {
         );
       }
     }
-    const envTypeConfigId = uuidv4();
+    const envTypeConfigId = uuidWithLowercasePrefix(resourceTypeToKey.envTypeConfig);
     const currentDate = new Date().toISOString();
 
     const newEnvTypeConfig: EnvironmentTypeConfig = {

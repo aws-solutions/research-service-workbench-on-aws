@@ -4,10 +4,10 @@
  */
 
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, QueryParams } from '@aws/workbench-core-base';
+import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { ExternalEndpoint } from './externalEndpoint';
@@ -74,7 +74,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addDataSet(dataSet: DataSet): Promise<DataSet> {
     const dataSetParam: DataSet = dataSet;
     await this._validateCreateDataSet(dataSet);
-    dataSetParam.id = uuidv4();
+    dataSetParam.id = uuidWithLowercasePrefix(this._dataSetKeyType);
     if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
     await this._storeDataSetToDdb(dataSetParam);
 
@@ -102,7 +102,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
-    endPointParam.id = uuidv4();
+    endPointParam.id = uuidWithLowercasePrefix(this._endPointKeyType);
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;

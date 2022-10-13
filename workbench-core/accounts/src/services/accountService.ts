@@ -4,10 +4,9 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
@@ -95,7 +94,7 @@ export default class AccountService {
    */
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     await this._validateCreate(accountMetadata);
-    const id = uuidv4();
+    const id = uuidWithLowercasePrefix(resourceTypeToKey.account);
 
     await this._storeToDdb({ id, ...accountMetadata });
 
