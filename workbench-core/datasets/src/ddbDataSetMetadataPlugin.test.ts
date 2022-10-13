@@ -33,6 +33,7 @@ describe('DdbDataSetMetadataPlugin', () => {
   const mockDataSetName = 'Sample-DataSet';
   const mockDataSetPath = 'sample-s3-prefix';
   const mockAwsAccountId = 'Sample-AWS-Account';
+  const mockAwsBucketRegion = 'Sample-AWS-Bucket-Region';
   const mockDataSetStorageType = 'S3';
   const mockDataSetStorageName = 'S3-Bucket';
   const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
@@ -413,6 +414,36 @@ describe('DdbDataSetMetadataPlugin', () => {
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole]
       });
+    });
+  });
+
+  describe('listStorageLocations', () => {
+    it('returns a list of all StorageLocations stored in the Database', async () => {
+      mockDdb.on(QueryCommand).resolves({
+        Items: [
+          {
+            id: { S: mockDataSetId },
+            name: { S: mockDataSetName },
+            path: { S: mockDataSetPath },
+            awsAccountId: { S: mockAwsAccountId },
+            storageType: { S: mockDataSetStorageType },
+            storageName: { S: mockDataSetStorageName },
+            region: { S: mockAwsBucketRegion }
+          }
+        ]
+      });
+
+      const response = await plugin.listStorageLocations();
+      expect(response).toBeDefined();
+      expect(response).toHaveLength(1);
+      expect(response).toEqual([
+        {
+          name: mockDataSetStorageName,
+          awsAccountId: mockAwsAccountId,
+          type: mockDataSetStorageType,
+          region: mockAwsBucketRegion
+        }
+      ]);
     });
   });
 });

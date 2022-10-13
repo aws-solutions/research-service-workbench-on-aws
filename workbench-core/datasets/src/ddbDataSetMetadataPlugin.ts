@@ -7,7 +7,11 @@ import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamo
 import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
+
+import { DataSet } from './dataSet';
+import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { ExternalEndpoint } from './externalEndpoint';
+import { StorageLocation } from './storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
@@ -123,6 +127,21 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     return endPointParam;
   }
 
+  public async listStorageLocations(): Promise<StorageLocation[]> {
+    const datasets = await this.listDataSets();
+
+    const map = new Map<string, StorageLocation>();
+    datasets.forEach((dataset) =>
+      map.set(dataset.storageName, {
+        name: dataset.storageName,
+        awsAccountId: dataset.awsAccountId,
+        type: dataset.storageType,
+        region: dataset.region
+      })
+    );
+    return Array.from(map.values());
+  }
+
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
     if (!_.isUndefined(endPoint.id)) throw new Error("Cannot create the Endpoint. 'Id' already exists.");
     const targetDS: DataSet = await this.getDataSetMetadata(endPoint.dataSetId);
@@ -190,15 +209,16 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       pk: `${this._dataSetKeyType}#${dataSet.id}`,
       sk: `${this._dataSetKeyType}#${dataSet.id}`
     };
-    const dataSetParams: { item: { [key: string]: string | string[] } } = {
+    const dataSetParams: { item: { [key: string]: string | string[] | undefined } } = {
       item: {
         id: dataSet.id!,
         name: dataSet.name,
         createdAt: dataSet.createdAt!,
         storageName: dataSet.storageName,
         path: dataSet.path,
-        awsAccountId: dataSet.awsAccountId!,
-        storageType: dataSet.storageType!,
+        awsAccountId: dataSet.awsAccountId,
+        region: dataSet.region,
+        storageType: dataSet.storageType,
         resourceType: 'dataset'
       }
     };

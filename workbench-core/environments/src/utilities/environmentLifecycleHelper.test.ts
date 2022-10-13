@@ -132,6 +132,7 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
         storageName: 'sampleStorageName',
+        storageType: 'sampleStorageType',
         path: 'sampleBucketPath',
         name: 'sampleDataset',
         externalEndpoints: []
