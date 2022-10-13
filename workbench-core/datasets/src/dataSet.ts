@@ -25,6 +25,11 @@ export interface DataSet {
   storageName: string;
 
   /**
+   * Storage Type of the DataSet
+   */
+  storageType: string;
+
+  /**
    * the storage path where the DataSet files can be found at the location.
    */
   path: string;
@@ -40,9 +45,7 @@ export interface DataSet {
   awsAccountId?: string;
 
   /**
-   * Storage Type of the DataSet
+   * AWS region of the dataset storage
    */
-  storageType?: string;
-
   region?: string;
 }

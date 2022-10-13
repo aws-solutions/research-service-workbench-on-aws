@@ -209,16 +209,16 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       pk: `${this._dataSetKeyType}#${dataSet.id}`,
       sk: `${this._dataSetKeyType}#${dataSet.id}`
     };
-    const dataSetParams: { item: { [key: string]: string | string[] } } = {
+    const dataSetParams: { item: { [key: string]: string | string[] | undefined } } = {
       item: {
         id: dataSet.id!,
         name: dataSet.name,
         createdAt: dataSet.createdAt!,
         storageName: dataSet.storageName,
         path: dataSet.path,
-        awsAccountId: dataSet.awsAccountId!,
-        region: dataSet.region!,
-        storageType: dataSet.storageType!,
+        awsAccountId: dataSet.awsAccountId,
+        region: dataSet.region,
+        storageType: dataSet.storageType,
         resourceType: 'dataset'
       }
     };
