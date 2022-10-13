@@ -31,6 +31,7 @@ export function setUpDSRoutes(
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
+        req.body.region,
         dataSetStoragePlugin
       );
       res.status(201).send(dataSet);
@@ -47,6 +48,7 @@ export function setUpDSRoutes(
         req.body.storageName,
         req.body.path,
         req.body.awsAccountId,
+        req.body.region,
         dataSetStoragePlugin
       );
       res.status(201).send(dataSet);

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "updated create/import dataset routes to reflect datasets package changes",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

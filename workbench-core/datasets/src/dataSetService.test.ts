@@ -25,6 +25,7 @@ describe('DataSetService', () => {
   const mockDataSetName = 'Sample-DataSet';
   const mockDataSetPath = 'sample-s3-prefix';
   const mockAwsAccountId = 'Sample-AWS-Account';
+  const mockAwsBucketRegion = 'Sample-AWS-Bucket-Region';
   const mockDataSetStorageType = 'S3';
   const mockDataSetStorageName = 'S3-Bucket';
   const mockAccessPointName = 'Sample-Access-Point';
@@ -177,6 +178,16 @@ describe('DataSetService', () => {
         allowedRoles: [mockRoleArn, mockAlternateRoleArn]
       };
     });
+    jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listStorageLocations').mockImplementation(async () => {
+      return [
+        {
+          name: mockDataSetStorageName,
+          awsAccountId: mockAwsAccountId,
+          type: mockDataSetStorageType,
+          region: mockAwsBucketRegion
+        }
+      ];
+    });
 
     jest.spyOn(S3DataSetStoragePlugin.prototype, 'getStorageType').mockImplementation(() => {
       return mockDataSetStorageType;
@@ -227,6 +238,7 @@ describe('DataSetService', () => {
           mockDataSetStorageName,
           mockDataSetPath,
           mockAwsAccountId,
+          mockAwsBucketRegion,
           plugin
         )
       ).resolves.toEqual({
@@ -253,7 +265,7 @@ describe('DataSetService', () => {
 
     it('calls importStorage and addDataSet ', async () => {
       await expect(
-        service.importDataSet('name', 'storageName', 'path', 'accountId', plugin)
+        service.importDataSet('name', 'storageName', 'path', 'accountId', 'bucketRegion', plugin)
       ).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
@@ -554,6 +566,25 @@ describe('DataSetService', () => {
       await expect(
         service.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockAlternateRoleArn, plugin)
       ).resolves.toBeUndefined();
+    });
+  });
+
+  describe('listStorageLocations', () => {
+    let service: DataSetService;
+
+    beforeEach(() => {
+      service = new DataSetService(audit, log, metaPlugin);
+    });
+
+    it('returns an array of known StorageLocations.', async () => {
+      await expect(service.listStorageLocations()).resolves.toEqual([
+        {
+          name: mockDataSetStorageName,
+          awsAccountId: mockAwsAccountId,
+          type: mockDataSetStorageType,
+          region: mockAwsBucketRegion
+        }
+      ]);
     });
   });
 });
