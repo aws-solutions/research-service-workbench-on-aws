@@ -17,7 +17,7 @@ const CreateAccountSchema: Schema = {
     externalId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['awsAccountId', 'envMgmtRoleArn', 'hostingAccountHandlerRoleArn']
+  required: ['awsAccountId', 'envMgmtRoleArn', 'hostingAccountHandlerRoleArn', 'name']
 };
 
 export default CreateAccountSchema;
