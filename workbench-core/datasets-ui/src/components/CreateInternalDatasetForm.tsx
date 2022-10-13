@@ -211,7 +211,7 @@ export const NewDatasetForm = ({
             <FileUpload
               data-testid="datasetFile"
               value={formData?.file}
-              constraintText="All file type accepted. 5GB max file size."
+              constraintText="All file types accepted. 5GB max file size."
               accept=""
               onChange={({ detail: { value } }) => {
                 setFormData({ ...formData, file: value });
