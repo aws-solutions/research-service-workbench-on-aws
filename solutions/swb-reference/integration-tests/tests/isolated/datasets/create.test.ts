@@ -27,9 +27,7 @@ describe('datasets create negative tests', () => {
 
   const validLaunchParameters = {
     datasetName: randomTextGenerator.getFakeText('fakeName'),
-    storageName: randomTextGenerator.getFakeText('fakeBucket'),
-    path: randomTextGenerator.getFakeText('fakePath'),
-    awsAccountId: randomTextGenerator.getFakeText('fakeAccount')
+    path: randomTextGenerator.getFakeText('fakePath')
   };
 
   describe('missing parameters', () => {
@@ -67,40 +65,6 @@ describe('datasets create negative tests', () => {
       }
     });
 
-    test('storageName', async () => {
-      try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
-        delete invalidParam.storageName;
-        await adminSession.resources.datasets.create(invalidParam, false);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(400, {
-            statusCode: 400,
-            error: 'Bad Request',
-            message: "requires property 'storageName'"
-          })
-        );
-      }
-    });
-
-    test('awsAccountId', async () => {
-      try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
-        delete invalidParam.awsAccountId;
-        await adminSession.resources.datasets.create(invalidParam, false);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(400, {
-            statusCode: 400,
-            error: 'Bad Request',
-            message: "requires property 'awsAccountId'"
-          })
-        );
-      }
-    });
-
     test('all parameters', async () => {
       try {
         await adminSession.resources.datasets.create({}, false);
@@ -110,8 +74,7 @@ describe('datasets create negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message:
-              "requires property 'datasetName'. requires property 'storageName'. requires property 'path'. requires property 'awsAccountId'"
+            message: "requires property 'datasetName'. requires property 'path'"
           })
         );
       }

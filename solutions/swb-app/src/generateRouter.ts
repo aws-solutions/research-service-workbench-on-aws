@@ -102,7 +102,13 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   );
 
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
-  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
+  setUpDSRoutes(
+    router,
+    apiRouteConfig.dataSetService,
+    apiRouteConfig.dataSetsStoragePlugin,
+    process.env.S3_DATASET_BUCKET_NAME!,
+    process.env.MAIN_ACCOUNT_ID!
+  );
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, userManagementService);
