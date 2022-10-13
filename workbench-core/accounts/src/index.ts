@@ -5,6 +5,7 @@
 
 import AccountHandler from './handlers/accountHandler';
 import CreateAccountSchema from './schemas/createAccount';
+import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
@@ -16,5 +17,6 @@ export {
   AccountHandler,
   AccountService,
   ProjectService,
-  CreateAccountSchema
+  CreateAccountSchema,
+  UpdateAccountSchema
 };
