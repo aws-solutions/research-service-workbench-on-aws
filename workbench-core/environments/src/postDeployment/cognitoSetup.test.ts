@@ -89,7 +89,7 @@ describe('CognitoSetup', () => {
       const responseMetadata = { httpStatusCode: 500 };
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new UsernameExistsException({
-          $metadata: ResponseMetadata,
+          $metadata: responseMetadata,
           message: ''
         })
       );
