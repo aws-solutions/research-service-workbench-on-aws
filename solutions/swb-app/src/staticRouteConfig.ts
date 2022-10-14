@@ -15,6 +15,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/aws-accounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'Account'
+      }
+    ]
+  },
   '/datasets': {
     GET: [
       {

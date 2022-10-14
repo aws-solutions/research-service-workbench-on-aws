@@ -20,10 +20,6 @@ export class InvalidArtifactBucketArnError extends Error {
   public constructor(artifactBucketArn: string) {
     super(`Cannot calculate artifact bucket name from S3 ARN ${artifactBucketArn}`);
   }
-
-  public getErrorMessage(): string {
-    return `InvalidArtifactBucketArnError: ${this.message}`;
-  }
 }
 
 export default class HostingAccountLifecycleService {

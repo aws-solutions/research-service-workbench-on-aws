@@ -19,8 +19,8 @@ export default class HostingAccountService {
     try {
       return await lifecycleService.initializeAccount(accountMetadata);
     } catch (e) {
-      Boom.badRequest(e.getErrorMessage());
-      return Promise.reject(e.getErrorMessage());
+      Boom.badRequest(e.message);
+      return Promise.reject(e.message);
     }
   }
 
@@ -36,8 +36,8 @@ export default class HostingAccountService {
     try {
       return await lifecycleService.initializeAccount(accountMetadata);
     } catch (e) {
-      Boom.badRequest(e.getErrorMessage());
-      return Promise.reject(e.getErrorMessage());
+      Boom.badRequest(e.message);
+      return Promise.reject(e.message);
     }
   }
 }
