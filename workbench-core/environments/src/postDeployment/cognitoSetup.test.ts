@@ -86,10 +86,10 @@ describe('CognitoSetup', () => {
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
 
-      const ResponseMetadata = { httpStatusCode: 500 };
+      const responseMetadata = { httpStatusCode: 500 };
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new UsernameExistsException({
-          $metadata: ResponseMetadata,
+          $metadata: responseMetadata,
           message: ''
         })
       );
