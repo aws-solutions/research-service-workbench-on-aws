@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "update routes to allow resource id with resource prefixes",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

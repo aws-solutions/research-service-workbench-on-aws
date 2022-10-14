@@ -27,7 +27,8 @@ describe('datasets create negative tests', () => {
 
   const validLaunchParameters = {
     datasetName: randomTextGenerator.getFakeText('fakeName'),
-    path: randomTextGenerator.getFakeText('fakePath')
+    path: randomTextGenerator.getFakeText('fakePath'),
+    region: randomTextGenerator.getFakeText('fakeRegion')
   };
 
   describe('missing parameters', () => {
@@ -65,6 +66,23 @@ describe('datasets create negative tests', () => {
       }
     });
 
+    test('region', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.region;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'region'"
+          })
+        );
+      }
+    });
+
     test('all parameters', async () => {
       try {
         await adminSession.resources.datasets.create({}, false);
@@ -74,7 +92,7 @@ describe('datasets create negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message: "requires property 'datasetName'. requires property 'path'"
+            message: "requires property 'datasetName'. requires property 'path'. requires property 'region'"
           })
         );
       }

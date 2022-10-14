@@ -169,7 +169,7 @@ export default class EnvironmentTypeService {
       status: EnvironmentTypeStatus;
     }
   ): Promise<EnvironmentType> {
-    const id = uuidv4();
+    const id = uuidv4(); // TODO: id format will be updated as a part of GALI-1839
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
