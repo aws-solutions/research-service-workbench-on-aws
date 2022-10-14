@@ -287,6 +287,11 @@ export class DataSetService {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
+  /**
+   * Gets a list of {@link StorageLocation}s being used by existing datasets.
+   *
+   * @returns - a list of {@link StorageLocation}s
+   */
   public async listStorageLocations(): Promise<StorageLocation[]> {
     return await this._dbProvider.listStorageLocations();
   }
