@@ -34,6 +34,7 @@ export interface AddDatasetPermissionsToRoleResponse {
  * Add a policy to an existing IAM role with permissions to modify the defined dataset
  * @param request - {@link AddDatasetPermissionsToRoleRequest}
  * @returns - {@link AddDatasetPermissionsToRoleResponse}
+ * @throws {@link InvalidIamRoleError}
  */
 export function addDatasetPermissionsToRole(
   request: AddDatasetPermissionsToRoleRequest
