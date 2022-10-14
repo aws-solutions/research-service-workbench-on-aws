@@ -9,18 +9,19 @@ import { filteringOptions } from './datasets-table-config/datasetsFilteringOptio
 import { filteringProperties } from './datasets-table-config/datasetsFilteringProperties';
 import { type DatasetItem } from './models/Dataset';
 import { DatasetsPage } from './pages/index';
-
+import { NewDatasetPage } from './pages/new';
 
 export {
   // From '/api' folder
   useDatasets,
-
   // From '/datasets-table-config' folder
-  columnDefinitions, searchableColumns, filteringOptions, filteringProperties,
-
+  columnDefinitions,
+  searchableColumns,
+  filteringOptions,
+  filteringProperties,
   // From '/models' folder
   DatasetItem,
-
   // From 'pages' folder
-  DatasetsPage
+  DatasetsPage,
+  NewDatasetPage
 };
