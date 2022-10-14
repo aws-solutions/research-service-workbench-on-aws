@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const envId = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
-jest.mock('uuid', () => ({ v4: () => envId }));
+const rndUuid = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
+const envId = `env-${rndUuid}`;
+jest.mock('uuid', () => ({ v4: () => rndUuid }));
 import {
   BatchGetItemCommand,
   DynamoDBClient,
@@ -167,14 +168,14 @@ describe('EnvironmentService', () => {
           },
           ExpressionAttributeValues: {
             ':pk': {
-              S: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+              S: `ENV#${envId}`
             }
           }
         })
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.getEnvironment('44fd3490-2cdb-43fb-8459-4f08b3e6cd00', true);
+      const actualResponse = await envService.getEnvironment(envId, true);
 
       // CHECK
       expect(actualResponse).toEqual({
@@ -204,15 +205,15 @@ describe('EnvironmentService', () => {
           },
           ExpressionAttributeValues: {
             ':pk': {
-              S: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+              S: `ENV#${envId}`
             }
           }
         })
         .resolves(queryItemResponse);
 
       // OPERATE n CHECK
-      await expect(envService.getEnvironment('44fd3490-2cdb-43fb-8459-4f08b3e6cd00', true)).rejects.toThrow(
-        'Could not find environment 44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+      await expect(envService.getEnvironment(envId, true)).rejects.toThrow(
+        `Could not find environment ${envId}`
       );
     });
 
@@ -233,16 +234,14 @@ describe('EnvironmentService', () => {
         .resolves(getItemResponse);
 
       // OPERATE n CHECK
-      await expect(envService.getEnvironment('44fd3490-2cdb-43fb-8459-4f08b3e6cd00')).rejects.toThrow(
-        'Could not find environment 44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
-      );
+      await expect(envService.getEnvironment(envId)).rejects.toThrow(`Could not find environment ${envId}`);
     });
   });
 
   describe('getEnvironments', () => {
     test('admin with filter by status', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -282,7 +281,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by name', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -322,7 +321,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by createdAt', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -367,7 +366,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by project', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -407,7 +406,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by owner', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -447,7 +446,7 @@ describe('EnvironmentService', () => {
 
     test('admin with filter by type', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -497,7 +496,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by status', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -537,7 +536,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by name', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -577,7 +576,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by name descending', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -617,7 +616,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by createdAt', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -657,7 +656,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by project', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -697,7 +696,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by owner', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -737,7 +736,7 @@ describe('EnvironmentService', () => {
 
     test('admin with sort by type', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -787,7 +786,7 @@ describe('EnvironmentService', () => {
 
     test('admin with no filter', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -857,7 +856,7 @@ describe('EnvironmentService', () => {
 
     test('admin with pagination token', async () => {
       // BUILD
-      const items = [env, { ...env, id: '5d79a3a1-60b3-4825-a092-806a029c83f3' }];
+      const items = [env, { ...env, id: 'env-5d79a3a1-60b3-4825-a092-806a029c83f3' }];
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -954,10 +953,10 @@ describe('EnvironmentService', () => {
         TableName: 'exampleDDBTable',
         Key: {
           pk: {
-            S: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+            S: `ENV#${envId}`
           },
           sk: {
-            S: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00'
+            S: `ENV#${envId}`
           }
         },
         ReturnValues: 'ALL_NEW',

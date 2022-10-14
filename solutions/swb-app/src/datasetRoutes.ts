@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
@@ -12,7 +13,6 @@ import {
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { validate as uuidValidate } from 'uuid';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
@@ -59,8 +59,8 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
-        throw Boom.badRequest('id request parameter must be a valid uuid.');
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('id request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
       await dataSetService.addDataSetExternalEndpoint(
@@ -77,8 +77,8 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
-        throw Boom.badRequest('id request parameter must be a valid uuid.');
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('id request parameter is invalid');
       }
       const ds = await dataSetService.getDataSet(req.params.id);
       res.send(ds);
