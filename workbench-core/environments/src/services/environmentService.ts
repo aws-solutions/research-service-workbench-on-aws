@@ -431,27 +431,26 @@ export class EnvironmentService {
     const envTypeConfig = metadata.find((item) => {
       return item.resourceType === 'envTypeConfig';
     });
+    // ETC
     if (envTypeConfig === undefined) {
       throw Boom.badRequest(
         `envTypeId ${params.envTypeId} with envTypeConfigId ${params.envTypeConfigId} does not exist`
       );
     }
+    // PROJ
     const project = metadata.find((item) => {
       return item.resourceType === 'project';
     });
     if (project === undefined) {
       throw Boom.badRequest(`projectId ${params.projectId} does not exist`);
     }
+    // DATASET
     const datasets = metadata.filter((item) => {
       return item.resourceType === 'dataset';
     });
     const validDatasetIds = datasets.map((dataset) => {
       return dataset.id;
     });
-    const invalidDatasetIds = params.datasetIds.filter((ds) => !validDatasetIds.includes(ds));
-    if (invalidDatasetIds.length > 0) {
-      throw Boom.badRequest(`These datasetIds do not exist ${invalidDatasetIds}`);
-    }
 
     if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
       console.log('items', batchGetResult.Responses![this._tableName]);
@@ -470,7 +469,6 @@ export class EnvironmentService {
       return { pk, sk };
     };
 
-
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
@@ -479,7 +477,6 @@ export class EnvironmentService {
       type: envTypeConfig.type,
       params: envTypeConfig.params
     });
-
 
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.project, newEnv.projectId),
@@ -494,7 +491,6 @@ export class EnvironmentService {
       environmentInstanceFiles: project.environmentInstanceFiles,
       awsAccountId: project.awsAccountId
     });
-
 
     datasets.forEach((dataset) => {
       items.push({
