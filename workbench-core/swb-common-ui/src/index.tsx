@@ -13,8 +13,9 @@ import { i18nStrings, layoutLabels, paginationLables, headerLabels, NavigationLa
 import { getFilterCounterText } from './common/tableCounterStrings';
 import { TableEmptyDisplay } from './common/tableEmptyState';
 import { TableNoMatchDisplay } from './common/tableNoMatchState';
-import { nameRegex, cidrRegex, emailRegex, convertToRecord } from './common/utils';
+import { nameRegex, cidrRegex, emailRegex, convertToRecord, validateField } from './common/utils';
 import BaseLayout from './components/BaseLayout';
+import FileUpload from './components/FileUpload/FileUploadComponent';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Login from './components/Login';
@@ -24,26 +25,66 @@ import { AuthenticationProvider, useAuthentication } from './context/Authenticat
 import { NotificationsProvider, useNotifications } from './context/NotificationContext';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { defaultAppSettings } from './models/AppSettings';
-import { researcherUser, adminUser, type CreateUserForm, type CreateUserFormValidation, type UserItem } from './models/User';
+import {
+  researcherUser,
+  adminUser,
+  type CreateUserForm,
+  type CreateUserFormValidation,
+  type UserItem
+} from './models/User';
 
-export { 
+export {
   // From '/api' folder
-  httpApiGet, httpApiPost, httpApiPut, httpApiDelete,
-  login, logout, token, checkIfLoggedIn,
-  addUserToRole, createUser, useUsers,
-
+  httpApiGet,
+  httpApiPost,
+  httpApiPut,
+  httpApiDelete,
+  login,
+  logout,
+  token,
+  checkIfLoggedIn,
+  addUserToRole,
+  createUser,
+  useUsers,
   // From '/common' folder:
-  TerminateWarning, isValidRangeFunction, convertToAbsoluteRange,
-  getFilterCounterText, TableEmptyDisplay, TableNoMatchDisplay,  convertToRecord,
-  relativeOptions, datei18nStrings, i18nStrings, layoutLabels, paginationLables, 
-  headerLabels, NavigationLabels, nameRegex, cidrRegex, emailRegex,
-
+  TerminateWarning,
+  isValidRangeFunction,
+  convertToAbsoluteRange,
+  getFilterCounterText,
+  TableEmptyDisplay,
+  TableNoMatchDisplay,
+  convertToRecord,
+  relativeOptions,
+  datei18nStrings,
+  i18nStrings,
+  layoutLabels,
+  paginationLables,
+  headerLabels,
+  NavigationLabels,
+  nameRegex,
+  cidrRegex,
+  emailRegex,
+  validateField,
   // From '/components' folder
-  BaseLayout, Header, Hero, Navigation, Login, RouteGuard,
-
+  BaseLayout,
+  Header,
+  Hero,
+  Navigation,
+  Login,
+  RouteGuard,
+  FileUpload,
   // From '/context' folder
-  AuthenticationProvider, useAuthentication, NotificationsProvider, useNotifications, SettingsProvider, useSettings,
-
+  AuthenticationProvider,
+  useAuthentication,
+  NotificationsProvider,
+  useNotifications,
+  SettingsProvider,
+  useSettings,
   // From '/models' folder
-  defaultAppSettings, researcherUser, adminUser, CreateUserForm, CreateUserFormValidation, UserItem
+  defaultAppSettings,
+  researcherUser,
+  adminUser,
+  CreateUserForm,
+  CreateUserFormValidation,
+  UserItem
 };
