@@ -86,6 +86,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
+      - name: enable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: awslabs
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
       - name: Merge to stage
         run: |
           echo "Set the COMMIT_ID to merge to stage, to current workflow commit id, if no readme commit was made"
@@ -104,6 +114,16 @@ jobs:
           echo
           git merge $COMMIT_ID --ff-only --no-edit
           git push origin stage
+
+      - name: disable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: awslabs
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
           
       - name: Enable branch protection on stage
         uses: octokit/request-action@v2.x

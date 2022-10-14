@@ -9,7 +9,7 @@ on:
 
 jobs:
   create-release-branch-pr-to-main:
-    if: contains(github.ref_name, 'gh-workflow')
+    if: contains(github.ref_name, 'release/')
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
@@ -20,10 +20,9 @@ jobs:
     - name: create-pull-request
       uses: repo-sync/pull-request@v2
       with:
-        destination_branch: "testDevelop"
+        destination_branch: "main"
         pr_title: ${{ inputs.title }}
         pr_template: ".github/PULL_REQUEST_TEMPLATE.md"
         pr_label: "auto-release-pr"
         pr_allow_empty: false
         github_token: ${{ secrets.MERGE_TOKEN }}
-
