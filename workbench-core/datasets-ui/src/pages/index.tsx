@@ -8,6 +8,7 @@ import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
   BreadcrumbGroupProps,
+  Button,
   Header,
   SpaceBetween,
   Table
@@ -52,7 +53,7 @@ export const DatasetsPage: NextPage = () => {
       href: '/'
     },
     {
-      text: 'Datasets',
+      text: 'Organizational Datasets',
       href: '/datasets'
     }
   ];
@@ -66,24 +67,25 @@ export const DatasetsPage: NextPage = () => {
         <Table
           loading={areDatasetsLoading}
           selectionType="multi"
-          
           header={
             <>
               <Header
                 actions={
                   <Box float="right">
                     <SpaceBetween direction="horizontal" size="xs">
+                      <Button data-testid="internalDatasetCreate" variant="primary" href="/datasets/new">
+                        Create New Dataset
+                      </Button>
                     </SpaceBetween>
                   </Box>
                 }
               >
-                Datasets
+                Organizational Datasets
               </Header>
             </>
           }
           columnDefinitions={columnDefinitions}
           loadingText="Loading datasets"
-          
           items={items}
         />
       </Box>

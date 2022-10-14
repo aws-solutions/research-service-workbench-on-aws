@@ -83,6 +83,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws-sdk/s3-request-presigner",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws-sdk/types",
       "allowedCategories": [ "production" ]
     },
@@ -501,6 +505,10 @@
     {
       "name": "react-dom",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "react-jss",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "react-scripts",
