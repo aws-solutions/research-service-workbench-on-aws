@@ -7,7 +7,6 @@ import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamo
 import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { ExternalEndpoint } from './externalEndpoint';
