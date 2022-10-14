@@ -12,7 +12,7 @@ parameters:
   EnvId:
     type: String
     description: 'The ID of the environment resource stored in DDB'
-    allowedPattern: ^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
+    allowedPattern: ^env-[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$
 mainSteps:
   - name: Terminate
     action: 'aws:executeAwsApi'

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "comment": "add eslint config",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments-ui"
+}

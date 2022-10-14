@@ -17,3 +17,4 @@ export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 export { CreateDataSetSchema, CreateExternalEndpointSchema };
+export { StorageLocation } from './storageLocation';

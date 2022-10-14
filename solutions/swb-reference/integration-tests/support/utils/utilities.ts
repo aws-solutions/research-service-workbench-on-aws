@@ -2,6 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_POLLING_INTERVAL_SECONDS, DEFAULT_POLLING_MAX_WAITING_SECONDS } from './constants';
 import HttpError from './HttpError';
 
@@ -21,6 +23,10 @@ async function sleep(ms: number): Promise<void> {
 function checkHttpError(actualError: Error, expectedError: HttpError): void {
   expect(actualError instanceof HttpError).toBeTruthy();
   expect(expectedError.isEqual(actualError)).toBeTruthy();
+}
+
+function getFakeEnvId(): string {
+  return `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`;
 }
 
 async function poll<T>(
@@ -53,4 +59,4 @@ async function poll<T>(
   }
 }
 
-export { sleep, checkHttpError, poll };
+export { sleep, checkHttpError, poll, getFakeEnvId };
