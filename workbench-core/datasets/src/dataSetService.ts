@@ -7,10 +7,11 @@ import { AuditService } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { DataSet, DataSetMetadataPlugin, DataSetsStoragePlugin, ExternalEndpoint } from '.';
-
-const notImplementedText: string = 'Not yet implemented.';
+import { DataSet } from './dataSet';
+import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
+import { ExternalEndpoint } from './externalEndpoint';
+import { StorageLocation } from './storageLocation';
 
 export class DataSetService {
   private _audit: AuditService;
@@ -48,14 +49,16 @@ export class DataSetService {
     storageName: string,
     path: string,
     awsAccountId: string,
+    region: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
     await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
       name: datasetName,
-      storageName: storageName,
-      path: path,
-      awsAccountId: awsAccountId,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -78,14 +81,16 @@ export class DataSetService {
     storageName: string,
     path: string,
     awsAccountId: string,
+    region: string,
     storageProvider: DataSetsStoragePlugin
   ): Promise<DataSet> {
     await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
       name: datasetName,
-      storageName: storageName,
-      path: path,
-      awsAccountId: awsAccountId,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -97,7 +102,7 @@ export class DataSetService {
    * @param dataSetId - the ID of the DataSet to remove.
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
-    throw new Error(notImplementedText);
+    await this._dbProvider.removeDataSet(dataSetId);
   }
 
   /**
@@ -182,13 +187,17 @@ export class DataSetService {
    * @param externalRoleName - a role which will interact with the endpoint.
    * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
    * to modify the target DataSet's underlying storage.
+   * @param kmsKeyArn - an optional ARN of the KMS key used to encrypt the bucket.
+   * @param vpcId - an optional ID of the VPC interacting with the endpoint.
    * @returns a JSON object which contains an alias to mount the storage, the DataSet's name, endpoint ID and the storage path.
    */
   public async addDataSetExternalEndpoint(
     dataSetId: string,
     externalEndpointName: string,
     storageProvider: DataSetsStoragePlugin,
-    externalRoleName?: string
+    externalRoleName?: string,
+    kmsKeyArn?: string,
+    vpcId?: string
   ): Promise<{ [key: string]: string }> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
 
@@ -200,7 +209,9 @@ export class DataSetService {
       targetDS.path,
       externalEndpointName,
       targetDS.awsAccountId!,
-      externalRoleName
+      externalRoleName,
+      kmsKeyArn,
+      vpcId
     );
 
     const endPointParam: ExternalEndpoint = {
@@ -274,6 +285,15 @@ export class DataSetService {
    */
   public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
+  }
+
+  /**
+   * Gets a list of {@link StorageLocation}s being used by existing datasets.
+   *
+   * @returns - a list of {@link StorageLocation}s
+   */
+  public async listStorageLocations(): Promise<StorageLocation[]> {
+    return await this._dbProvider.listStorageLocations();
   }
 
   private _generateMountObject(

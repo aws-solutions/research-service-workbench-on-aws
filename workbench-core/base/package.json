@@ -60,7 +60,8 @@
     "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-sdk-client-mock": "^0.6.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -73,6 +74,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
+    "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "eslint-plugin-import": "^2.26.0",
