@@ -10,7 +10,6 @@ import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
 import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
-import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
@@ -58,12 +57,7 @@ export default class HostingAccountLifecycleService {
       process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
-    try {
-      accountMetadata.environmentInstanceFiles = this._getEnvironmentFilesPathForArn(artifactBucketArn);
-    } catch (e) {
-      console.error(e.getErrorMessage());
-      Boom.badRequest(e.getErrorMessage());
-    }
+    accountMetadata.environmentInstanceFiles = this._getEnvironmentFilesPathForArn(artifactBucketArn);
 
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
