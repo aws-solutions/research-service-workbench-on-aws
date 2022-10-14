@@ -5,7 +5,7 @@
 
 import { Readable } from 'stream';
 
-import {PolicyDocument} from "@aws-cdk/aws-iam";
+import { PolicyDocument } from '@aws-cdk/aws-iam';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -236,7 +236,7 @@ describe('HostingAccountLifecycleService', () => {
     ebMock.on(PutPermissionCommand).resolves({});
     ebMock.on(PutRuleCommand).resolves({});
     ebMock.on(PutTargetsCommand).resolves({});
-    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateBusPermissions('sampleStatusHandlerArn', '123456789012')
@@ -476,11 +476,11 @@ describe('HostingAccountLifecycleService', () => {
     // Mock S3 calls
     const s3Mock = mockClient(S3Client);
     s3Mock.on(PutBucketPolicyCommand).resolves({});
-    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {} }));
+    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, '123456789012')
-    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {} }));
+    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {}, message: '' }));
   });
 
   test('updateArtifactsBucketPolicy update works when bucket policy does not contain account ID', async () => {
@@ -615,13 +615,14 @@ describe('HostingAccountLifecycleService', () => {
   test('updatePolicyDocumentWithAllStatements works when adding new statements', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const sampleBucketName = 'randomBucketName';
-    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`
-    const sampleAccountId = '123456789012'
+    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`;
+    const sampleAccountId = '123456789012';
 
     // Mock S3 calls
     const s3Mock = mockClient(S3Client);
     s3Mock.on(PutBucketPolicyCommand).resolves({});
-    const basePolicy = PolicyDocument.fromJson(JSON.parse(`{
+    const basePolicy = PolicyDocument.fromJson(
+      JSON.parse(`{
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -639,9 +640,11 @@ describe('HostingAccountLifecycleService', () => {
                 }
             }
         ]
-    }`));
+    }`)
+    );
 
-    const expectedPolicy = PolicyDocument.fromJson( JSON.parse(`
+    const expectedPolicy = PolicyDocument.fromJson(
+      JSON.parse(`
       {
         "Version": "2012-10-17",
         "Statement": [
@@ -692,17 +695,23 @@ describe('HostingAccountLifecycleService', () => {
               "Resource": ["${sampleBucketArn}/onboard-account.cfn.yaml"]
             }
         ]
-    }`));
+    }`)
+    );
 
-    const postUpdatedPolicy = hostingAccountLifecycleService.updateBucketPolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy);
+    const postUpdatedPolicy = hostingAccountLifecycleService.updateBucketPolicyDocumentWithAllStatements(
+      sampleBucketArn,
+      sampleAccountId,
+      basePolicy
+    );
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
-  test('TODO: getTemplateURLForAccount basic unit test', async() => {
+  test('TODO: getTemplateURLForAccount basic unit test', async () => {
     const service = new HostingAccountLifecycleService();
-    const sampleAccountId = '123456789012'
-    const sampleExternalId = 'sample'
-    expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId));
+    const sampleAccountId = '123456789012';
+    const sampleExternalId = 'sample';
+    expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
+      service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)
+    );
   });
-
-  });
+});
