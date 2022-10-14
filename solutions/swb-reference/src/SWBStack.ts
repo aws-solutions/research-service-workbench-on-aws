@@ -35,6 +35,8 @@ import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3'
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
+import { SWBApplicationLoadBalancer } from './infra/SWBApplicationLoadBalancer';
+import { SWBVpc } from './infra/SWBVpc';
 
 export class SWBStack extends Stack {
   // We extract a subset of constants required to be set on Lambda
@@ -84,7 +86,9 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      VPC_ID,
+      SUBNET_IDS
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -154,9 +158,19 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
-
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
+
+    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+      vpcId: VPC_ID,
+      subnetIds: SUBNET_IDS
+    });
+
+    new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
+      vpc: swbVpc.vpc,
+      subnets: swbVpc.subnetSelection,
+      internetFacing: true // TODO: See if this is required if we are directly passing in subnets
+    });
   }
 
   private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
@@ -846,7 +860,7 @@ export class SWBStack extends Stack {
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the 'main' client access token expiration time can be return to 15 minutes
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);

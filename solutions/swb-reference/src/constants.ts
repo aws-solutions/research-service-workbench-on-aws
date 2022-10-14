@@ -34,6 +34,8 @@ function getConstants(): {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  VPC_ID: string;
+  SUBNET_IDS: string[];
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -61,6 +63,8 @@ function getConstants(): {
   const USER_POOL_ID = config.userPoolId;
   const CLIENT_ID = config.clientId;
   const CLIENT_SECRET = config.clientSecret;
+  const VPC_ID = config.vpcId;
+  const SUBNET_IDS = config.subnetIds;
 
   const AMI_IDS: string[] = [];
 
@@ -99,7 +103,9 @@ function getConstants(): {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    VPC_ID,
+    SUBNET_IDS
   };
 }
 
