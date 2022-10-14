@@ -4,7 +4,7 @@
  */
 
 import { ProjectItem } from '@aws/workbench-core-accounts-ui/lib/esm/models/Project';
-import { validateField, FileUpload } from '@aws/workbench-core-swb-common-ui';
+import { validateField } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   SpaceBetween,
@@ -45,33 +45,32 @@ export const NewDatasetForm = ({
   const [formData, setFormData] = useState<CreateDatasetForm>({});
   const [formErrors, setFormErrors] = useState<CreateDatasetFormValidation>({
     descriptionError: '',
-    fileError: '',
     nameError: '',
     projectIdError: ''
   });
 
   const validateAll = (): boolean => {
-    let isValid = validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-      'name',
+    let isValid = validateField<string | undefined, CreateDatasetFormValidation>(
+      'nameError',
       setFormErrors,
       datasetNameValidationRules,
       formData.name
     );
 
     isValid =
-      validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-        'description',
+      validateField<string | undefined, CreateDatasetFormValidation>(
+        'descriptionError',
         setFormErrors,
         datasetDescriptionValidationRules,
         formData.description
       ) && isValid;
 
     isValid =
-      validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-        'projectId',
+      validateField<string | undefined, CreateDatasetFormValidation>(
+        'projectIdError',
         setFormErrors,
         datasetProjectIdValidationRules,
-        formData.projectId
+        formData.metadata?.owningProjectId
       ) && isValid;
 
     return isValid;
@@ -123,8 +122,8 @@ export const NewDatasetForm = ({
               value={formData?.name || ''}
               onChange={({ detail: { value } }) => {
                 setFormData({ ...formData, name: value });
-                validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-                  'name',
+                validateField<string | undefined, CreateDatasetFormValidation>(
+                  'nameError',
                   setFormErrors,
                   datasetNameValidationRules,
                   value
@@ -145,8 +144,8 @@ export const NewDatasetForm = ({
               data-testid="datasetDescription"
               onChange={({ detail: { value } }) => {
                 setFormData({ ...formData, description: value });
-                validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-                  'description',
+                validateField<string | undefined, CreateDatasetFormValidation>(
+                  'descriptionError',
                   setFormErrors,
                   datasetDescriptionValidationRules,
                   value
@@ -170,52 +169,21 @@ export const NewDatasetForm = ({
                   ? null
                   : projects
                       .map((p) => ({ label: p.name, value: p.id }))
-                      .filter((p) => p.value === formData?.projectId)[0] || null
+                      .filter((p) => p.value === formData?.metadata?.owningProjectId)[0] || null
               }
               loadingText="Loading Projects"
               options={projects.map((p) => ({ label: p.name, value: p.id }))}
-              selectedAriaLabel={formData?.projectId}
+              selectedAriaLabel={formData?.metadata?.owningProjectId}
               onChange={({ detail: { selectedOption } }) => {
-                setFormData({ ...formData, projectId: selectedOption.value });
-                validateField<string | undefined, CreateDatasetForm, CreateDatasetFormValidation>(
-                  'projectId',
+                setFormData({ ...formData, metadata: { owningProjectId: selectedOption.value } });
+                validateField<string | undefined, CreateDatasetFormValidation>(
+                  'projectIdError',
                   setFormErrors,
                   datasetProjectIdValidationRules,
                   selectedOption.value
                 );
               }}
               statusType={areProjectsLoading ? 'loading' : 'finished'}
-            />
-          </FormField>
-        </SpaceBetween>
-      </ExpandableSection>
-    );
-  };
-
-  const getFileUploadSection = (): JSX.Element => {
-    return (
-      <ExpandableSection
-        defaultExpanded
-        variant="container"
-        header={
-          <Header
-            variant="h2"
-            description="Upload a file or folder associated with the Dataset being created or imported.  You can also add files from the Dashboard."
-          >
-            Upload files/folder - <i>optional</i>
-          </Header>
-        }
-      >
-        <SpaceBetween direction="vertical" size="l">
-          <FormField label="Upload files/folder" errorText={formErrors?.fileError}>
-            <FileUpload
-              data-testid="datasetFile"
-              value={formData?.file}
-              constraintText="All file types accepted. 5GB max file size."
-              accept=""
-              onChange={({ detail: { value } }) => {
-                setFormData({ ...formData, file: value });
-              }}
             />
           </FormField>
         </SpaceBetween>
@@ -276,7 +244,6 @@ export const NewDatasetForm = ({
           >
             <SpaceBetween direction="vertical" size="l">
               {getBasicDetailsSection()}
-              {getFileUploadSection()}
               {getSharedProjectsSection()}
             </SpaceBetween>
           </Form>

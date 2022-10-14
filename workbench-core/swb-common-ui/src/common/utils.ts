@@ -32,8 +32,8 @@ export const convertToRecord = (queryObject: any): Record<string, string> => {
   return result;
 };
 
-export const validateField = <TValue, TForm, TFormState>(
-  field: keyof TForm,
+export const validateField = <TValue, TFormState>(
+  field: keyof TFormState,
   updateFormErrors: (value: React.SetStateAction<TFormState>) => void,
   validationRules: ValidationRule<TValue>[],
   value: TValue
@@ -43,11 +43,11 @@ export const validateField = <TValue, TForm, TFormState>(
     if (!rule.condition(value)) {
       updateFormErrors((prevState: TFormState) => ({
         ...prevState,
-        [`${String(field)}Error`]: rule.message
+        [`${String(field)}`]: rule.message
       }));
       return false;
     }
   }
-  updateFormErrors((prevState: TFormState) => ({ ...prevState, [`${String(field)}Error`]: '' }));
+  updateFormErrors((prevState: TFormState) => ({ ...prevState, [`${String(field)}`]: '' }));
   return true;
 };

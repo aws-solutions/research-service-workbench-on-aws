@@ -12,16 +12,18 @@ export interface DatasetItem {
   storageName: string;
 }
 
+interface DatasetMetadata {
+  owningProjectId?: string;
+}
+
 export interface CreateDatasetForm {
   name?: string;
   description?: string;
-  projectId?: string;
-  file?: File | File[];
+  metadata?: DatasetMetadata;
 }
 
 export interface CreateDatasetFormValidation {
   nameError: string;
   descriptionError: string;
   projectIdError: string;
-  fileError: string;
 }
