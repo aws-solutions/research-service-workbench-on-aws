@@ -176,6 +176,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.initializeAccount({
         id: 'abc-xyz',
+        name: 'fakeName',
         accountId: 'abc-xyz',
         awsAccountId: '123456789012',
         envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
