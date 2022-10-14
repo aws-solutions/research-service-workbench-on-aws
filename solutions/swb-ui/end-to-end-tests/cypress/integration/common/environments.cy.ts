@@ -1,3 +1,4 @@
+import { getFakeText, validateTableData } from '../../support/common-utils';
 import {
   CLEANUP_WAIT_ENVIRONMENTS_GRID_IN_MILISECONDS,
   CLEAN_UP_ENVIRONMENTS,
@@ -8,17 +9,16 @@ import {
   ENVIRONMENT_TABLE_DATA_TEST_ID,
   ENVIRONMENT_TYPES_PROPERTY
 } from '../../support/constants';
-import { getFakeText, validateTableData } from '../../support/common-utils';
-import { CreateEnvironmentForm, EnvTypeConfig } from '../../support/models';
 import {
   cleanupEnvironments,
   createEnvironment,
   excecuteEnvironmentAction
 } from '../../support/environments-utils';
+import { CreateEnvironmentForm, EnvTypeConfig } from '../../support/models';
 
 describe('Environment Operations', () => {
   const environmentTypes = Cypress.env(ENVIRONMENT_TYPES_PROPERTY) as EnvTypeConfig[];
-  let createdEnvs: string[] = [];
+  const createdEnvs: string[] = [];
   before(() => {
     cy.login('ITAdmin');
     if (Cypress.env(CLEAN_UP_ENVIRONMENTS) as boolean) {

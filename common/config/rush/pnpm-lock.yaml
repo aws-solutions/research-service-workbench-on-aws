@@ -224,7 +224,6 @@ importers:
       axios: ^0.27.1
       constructs: ^10.0.0
       csrf: ^3.1.0
-      cypress: ^10.6.0
       depcheck: ^1.4.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
@@ -289,7 +288,6 @@ importers:
       aws-lambda: 1.0.7
       axios: 0.27.2
       constructs: 10.1.25
-      cypress: 10.6.0
       depcheck: 1.4.3
       esbuild: 0.14.42
       eslint: 8.16.0
@@ -334,6 +332,7 @@ importers:
       '@types/node': ^14
       '@types/react': 17.0.38
       babel-jest: 27.5.1
+      cypress: ^10.6.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-config-next: 12.1.5
@@ -341,6 +340,7 @@ importers:
       eslint-plugin-testing-library: 5.0.1
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      js-yaml: ^4.1.0
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       next: ^12.1.5
@@ -361,6 +361,7 @@ importers:
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-environments-ui': link:../../workbench-core/environments-ui
       '@aws/workbench-core-swb-common-ui': link:../../workbench-core/swb-common-ui
+      js-yaml: 4.1.0
       next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
       next-global-css: 1.3.1
       next-transpile-modules: 9.0.0
@@ -390,6 +391,7 @@ importers:
       '@types/node': 14.18.20
       '@types/react': 17.0.38
       babel-jest: 27.5.1_@babel+core@7.18.2
+      cypress: 10.6.0
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-config-next: 12.1.5_5794735a2262de3d29e0baaa885b5942
@@ -561,6 +563,7 @@ importers:
       '@types/react-dom': ^18.0.6
       depcheck: ^1.4.3
       eslint: ^8.7.0
+      eslint-config-next: 12.1.5
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: ^4.0.5
@@ -595,6 +598,7 @@ importers:
       '@types/react-dom': 18.0.6
       depcheck: 1.4.3
       eslint: 8.16.0
+      eslint-config-next: 12.1.5_613ce9cf4c3b1789789bd001816c16e7
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: 4.0.5
@@ -804,6 +808,7 @@ importers:
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/uuid': ^8.3.4
       aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -818,6 +823,7 @@ importers:
       sort-package-json: ^1.57.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@aws-cdk/aws-dynamodb': 1.158.0
       '@aws-sdk/client-cloudformation': 3.130.0
@@ -840,6 +846,7 @@ importers:
       '@aws/workbench-core-logging': link:../logging
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       lodash: 4.17.21
+      uuid: 8.3.2
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.2
@@ -851,6 +858,7 @@ importers:
       '@types/js-yaml': 4.0.5
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      '@types/uuid': 8.3.4
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
@@ -961,6 +969,7 @@ importers:
       '@types/react-dom': ^18.0.6
       depcheck: ^1.4.3
       eslint: ^8.7.0
+      eslint-config-next: 12.1.5
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: ^4.0.5
@@ -995,6 +1004,7 @@ importers:
       '@types/react-dom': 18.0.6
       depcheck: 1.4.3
       eslint: 8.16.0
+      eslint-config-next: 12.1.5_613ce9cf4c3b1789789bd001816c16e7
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: 4.0.5
@@ -1124,6 +1134,7 @@ importers:
       '@types/react-dom': ^18.0.6
       depcheck: ^1.4.3
       eslint: ^8.7.0
+      eslint-config-next: 12.1.5
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: ^4.0.5
@@ -1161,6 +1172,7 @@ importers:
       '@types/react-dom': 18.0.6
       depcheck: 1.4.3
       eslint: 8.16.0
+      eslint-config-next: 12.1.5_613ce9cf4c3b1789789bd001816c16e7
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: 4.0.5
@@ -1496,6 +1508,7 @@ importers:
       date-fns: ^2.28.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
+      eslint-config-next: 12.1.5
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jwt-decode: ^3.1.2
@@ -1536,6 +1549,7 @@ importers:
       '@types/uuid': 8.3.4
       depcheck: 1.4.3
       eslint: 8.16.0
+      eslint-config-next: 12.1.5_5794735a2262de3d29e0baaa885b5942
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       istanbul-badges-readme: 1.8.1
       license-check-and-add: 4.0.5
@@ -7425,6 +7439,26 @@ packages:
       - supports-color
     dev: true
 
+  /@typescript-eslint/parser/5.10.1_eslint@8.16.0+typescript@4.7.4:
+    resolution: {integrity: sha512-GReo3tjNBwR5RnRO0K2wDIDN31cM3MmDtgyQ85oAxAmC5K3j/g85IjP+cDfcqDsDDBf1HNKQAD0WqOYL8jXqUA==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@typescript-eslint/scope-manager': 5.10.1
+      '@typescript-eslint/types': 5.10.1
+      '@typescript-eslint/typescript-estree': 5.10.1_typescript@4.7.4
+      debug: 4.3.4
+      eslint: 8.16.0
+      typescript: 4.7.4
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /@typescript-eslint/parser/5.30.7_eslint@8.16.0+typescript@4.7.2:
     resolution: {integrity: sha512-Rg5xwznHWWSy7v2o0cdho6n+xLhK2gntImp0rJroVVFkcYFYQ8C8UJTSuTw/3CnExBmPjycjmUJkxVmjXsld6A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -7555,6 +7589,27 @@ packages:
       semver: 7.3.7
       tsutils: 3.21.0_typescript@4.7.2
       typescript: 4.7.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@typescript-eslint/typescript-estree/5.10.1_typescript@4.7.4:
+    resolution: {integrity: sha512-PwIGnH7jIueXv4opcwEbVGDATjGPO1dx9RkUl5LlHDSe+FXxPwFL5W/qYd5/NHr7f6lo/vvTrAzd0KlQtRusJQ==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      typescript: '*'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@typescript-eslint/types': 5.10.1
+      '@typescript-eslint/visitor-keys': 5.10.1
+      debug: 4.3.4
+      globby: 11.1.0
+      is-glob: 4.0.3
+      semver: 7.3.7
+      tsutils: 3.21.0_typescript@4.7.4
+      typescript: 4.7.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8896,7 +8951,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concurrently/7.2.1:
     resolution: {integrity: sha512-7cab/QyqipqghrVr9qZmoWbidu0nHsmxrpNqQ7r/67vfl1DWJElexehQnTH1p+87tDkihaAjM79xTZyBQh7HLw==}
@@ -9871,6 +9926,32 @@ packages:
       eslint-plugin-react-hooks: 4.3.0_eslint@8.16.0
       next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
       typescript: 4.7.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /eslint-config-next/12.1.5_613ce9cf4c3b1789789bd001816c16e7:
+    resolution: {integrity: sha512-P+DCt5ti63KhC0qNLzrAmPcwRGq8pYqgcf/NNr1E+WjCrMkWdCAXkIANTquo+kcO1adR2k1lTo5GCrNUtKy4hQ==}
+    peerDependencies:
+      eslint: ^7.23.0 || ^8.0.0
+      next: '>=10.2.0'
+      typescript: '>=3.3.1'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      '@next/eslint-plugin-next': 12.1.5
+      '@rushstack/eslint-patch': 1.0.8
+      '@typescript-eslint/parser': 5.10.1_eslint@8.16.0+typescript@4.7.4
+      eslint: 8.16.0
+      eslint-import-resolver-node: 0.3.4
+      eslint-import-resolver-typescript: 2.4.0_ec640624cf8bc291366aa0299377ad0c
+      eslint-plugin-import: 2.25.2_eslint@8.16.0
+      eslint-plugin-jsx-a11y: 6.5.1_eslint@8.16.0
+      eslint-plugin-react: 7.29.1_eslint@8.16.0
+      eslint-plugin-react-hooks: 4.3.0_eslint@8.16.0
+      next: 12.1.6_757e1cdb914f1581201e1269321c5a94
+      typescript: 4.7.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -16143,7 +16224,7 @@ packages:
     engines: {node: '>= 0.8'}
 
   /verror/1.10.0:
-    resolution: {integrity: sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=}
+    resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
     dependencies:
       assert-plus: 1.0.0

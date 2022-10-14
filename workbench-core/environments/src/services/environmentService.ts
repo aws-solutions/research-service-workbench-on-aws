@@ -7,10 +7,15 @@
 
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { AwsService, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+
 import { EnvironmentStatus } from '../constants/environmentStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -24,7 +29,7 @@ export interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
-  datasetIds: string[];
+
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
@@ -57,7 +62,7 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
-  datasetIds: [],
+
   envTypeConfigId: '',
   updatedAt: '',
   updatedBy: '',
@@ -370,11 +375,12 @@ export class EnvironmentService {
     },
     user: AuthenticatedUser
   ): Promise<Environment> {
+    const environmentTypeConfigSK = `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`;
     const itemsToGet = [
       // ETC
       {
         pk: resourceTypeToKey.envTypeConfig,
-        sk: `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
+        sk: environmentTypeConfigSK
       },
       // PROJ
       this._buildPkSk(params.projectId, resourceTypeToKey.project),
@@ -387,7 +393,7 @@ export class EnvironmentService {
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
-      id: `${resourceTypeToKey.environment.toLowerCase()}-${uuidv4()}`,
+      id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,
@@ -396,7 +402,7 @@ export class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-      datasetIds: params.datasetIds,
+
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       updatedBy: user.id,
@@ -404,7 +410,7 @@ export class EnvironmentService {
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
-      type: params.envTypeId,
+      type: environmentTypeConfigSK,
       dependency: params.projectId
     };
     // GET metadata
@@ -464,6 +470,7 @@ export class EnvironmentService {
       return { pk, sk };
     };
 
+
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
@@ -472,6 +479,7 @@ export class EnvironmentService {
       type: envTypeConfig.type,
       params: envTypeConfig.params
     });
+
 
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.project, newEnv.projectId),
@@ -486,6 +494,7 @@ export class EnvironmentService {
       environmentInstanceFiles: project.environmentInstanceFiles,
       awsAccountId: project.awsAccountId
     });
+
 
     datasets.forEach((dataset) => {
       items.push({

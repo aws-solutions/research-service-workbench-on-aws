@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { ExternalEndpoint } from './externalEndpoint';
+import { StorageLocation } from './storageLocation';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -59,6 +61,12 @@ export interface DataSetMetadataPlugin {
   updateDataSet(dataSet: DataSet): Promise<DataSet>;
 
   /**
+   * Remove a DataSet
+   * @param dataSetId - the ID of the Dataset to remove.
+   */
+  removeDataSet(dataSetId: string): Promise<void>;
+
+  /**
    * Return the details on a specific DataSet endpoint.
    *
    * @param dataSetId - the Id of the DataSet for which the endpoint data is to be returned.
@@ -93,4 +101,11 @@ export interface DataSetMetadataPlugin {
    * @returns the updated details of the Endpoint.
    */
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  /**
+   * Lists the {@link StorageLocation}s being used by existing datasets.
+   *
+   * @returns - a list of {@link StorageLocation}s
+   */
+  listStorageLocations(): Promise<StorageLocation[]>;
 }

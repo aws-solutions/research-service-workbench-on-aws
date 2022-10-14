@@ -24,24 +24,29 @@ describe('multiStep aws-account integration test', () => {
 
   function canTestAccountsApi(): boolean {
     const settings = setup.getSettings();
-    const requiredSettings = ['hostAwsAccountId', 'envMgmtRoleArn', 'hostingAccountHandlerRoleArn', 
-    'encryptionKeyArn', 'S3BucketArtifactsArnOutput'];
+    const requiredSettings = [
+      'hostAwsAccountId',
+      'envMgmtRoleArn',
+      'hostingAccountHandlerRoleArn',
+      'encryptionKeyArn',
+      'S3BucketArtifactsArnOutput'
+    ];
 
     // Check if all configs exist in given config
-    return _.every(requiredSettings, setting => {
+    return _.every(requiredSettings, (setting) => {
       return settings.optional(setting as SettingKey);
     });
   }
 
   test('Onboarding new hosting account', async () => {
     if (!canTestAccountsApi()) {
-      console.log('Config settings needed to test AWS Account onboarding are missing. Skipping this test')
+      console.log('Config settings needed to test AWS Account onboarding are missing. Skipping this test');
       return;
     }
 
     const accountHelper = new AccountHelper();
     const artifactsBucketName = settings.get('S3BucketArtifactsArnOutput').split(':').pop();
-    
+
     // Create account
     const accountCreateBody = {
       awsAccountId: settings.get('hostAwsAccountId'),
@@ -51,7 +56,7 @@ describe('multiStep aws-account integration test', () => {
       encryptionKeyArn: settings.get('encryptionKeyArn')
     };
 
-    const {data: account} = await adminSession.resources.accounts.create(accountCreateBody, false);
+    const { data: account } = await adminSession.resources.accounts.create(accountCreateBody, false);
     expect(account).toMatchObject(accountCreateBody);
     expect(await accountHelper.verifyBusAllowsAccount(account.awsAccountId)).toBe(true);
   });
