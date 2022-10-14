@@ -3,23 +3,67 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface GenerateBaseDatasetsRoleRequest {
+export interface CreateRegisterExternalBucketRoleRequest {
+  /**
+   * The name of the IAM role
+   */
   roleName: string;
+
+  /**
+   * The AWS Account ID the role will be created in
+   */
   awsAccountId: string;
+
+  /**
+   * The AWS region of the S3 bucket the role will modify
+   */
   awsBucketRegion: string;
+
+  /**
+   * The ARN of the S3 bucket the role will modify
+   */
   s3BucketArn: string;
+
+  /**
+   * The AWS Account ID of the account that will have permission to assume the role
+   */
   assumingAwsAccountId: string;
+
+  /**
+   * An ID the assuming AWS account must provide to be able to assume the role
+   */
+  externalId: string;
+
+  /**
+   * (optional) The ARN of the KMS key the role will modify
+   */
   kmsKeyArn?: string;
 }
 
-export interface GenerateBaseDatasetsRoleResponse {
+export interface CreateRegisterExternalBucketRoleResponse {
+  /**
+   * The created JSON.stringified IAM role
+   */
   iamRoleString: string;
 }
 
-export function generateBaseDatasetsRole(
-  request: GenerateBaseDatasetsRoleRequest
-): GenerateBaseDatasetsRoleResponse {
-  const { roleName, awsAccountId, awsBucketRegion, s3BucketArn, assumingAwsAccountId, kmsKeyArn } = request;
+/**
+ * Create an IAM role with permissions to register an external bucket
+ * @param request - {@link CreateRegisterExternalBucketRoleRequest}
+ * @returns - {@link CreateRegisterExternalBucketRoleResponse}
+ */
+export function createRegisterExternalBucketRole(
+  request: CreateRegisterExternalBucketRoleRequest
+): CreateRegisterExternalBucketRoleResponse {
+  const {
+    roleName,
+    awsAccountId,
+    awsBucketRegion,
+    s3BucketArn,
+    assumingAwsAccountId,
+    externalId,
+    kmsKeyArn
+  } = request;
 
   const iamRole = {
     Type: 'AWS::IAM::Role',
@@ -33,7 +77,12 @@ export function generateBaseDatasetsRole(
             Principal: {
               AWS: assumingAwsAccountId
             },
-            Action: ['sts:AssumeRole']
+            Action: ['sts:AssumeRole'],
+            Condition: {
+              StringEquals: {
+                'sts:ExternalId': externalId
+              }
+            }
           }
         ]
       },
@@ -82,7 +131,7 @@ export function generateBaseDatasetsRole(
 
   if (kmsKeyArn) {
     iamRole.Properties.Policies[0].PolicyDocument.Statement.push({
-      Sid: 'TODO',
+      Sid: 'UpdateKmsKeyPolicy',
       Effect: 'Allow',
       Action: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
       Resource: [kmsKeyArn]

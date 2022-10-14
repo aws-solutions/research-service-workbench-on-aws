@@ -4,20 +4,40 @@
  */
 
 import _ from 'lodash';
+import { InvalidIamRoleError } from '../errors/invalidIamRoleError';
 
-export interface GenerateDatasetPermissionsRequest {
+export interface AddDatasetPermissionsToRoleRequest {
+  /**
+   * A JSON.stringified IAM role
+   */
   roleString: string;
+
+  /**
+   * The ARN of the access point used to access the dataset
+   */
   accessPointArn: string;
+
+  /**
+   * the S3 prefix defining the dataset
+   */
   datasetPrefix: string;
 }
 
-export interface GenerateDatasetPermissionsResponse {
+export interface AddDatasetPermissionsToRoleResponse {
+  /**
+   * The updated JSON.stringified IAM role
+   */
   iamRoleString: string;
 }
 
+/**
+ * Add a policy to an existing IAM role with permissions to modify the defined dataset
+ * @param request - {@link AddDatasetPermissionsToRoleRequest}
+ * @returns - {@link AddDatasetPermissionsToRoleResponse}
+ */
 export function addDatasetPermissionsToRole(
-  request: GenerateDatasetPermissionsRequest
-): GenerateDatasetPermissionsResponse {
+  request: AddDatasetPermissionsToRoleRequest
+): AddDatasetPermissionsToRoleResponse {
   const { roleString, accessPointArn, datasetPrefix } = request;
 
   const policy = {
@@ -53,7 +73,6 @@ export function addDatasetPermissionsToRole(
 
     return { iamRoleString: JSON.stringify(role) };
   } catch (e) {
-    throw new Error();
-    // TODO throw new "not valid IAM role string" error
+    throw new InvalidIamRoleError();
   }
 }
