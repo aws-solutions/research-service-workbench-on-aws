@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { httpApiGet } from '@aws/workbench-core-swb-common-ui';
+import { httpApiGet, httpApiPost } from '@aws/workbench-core-swb-common-ui';
 import useSWR from 'swr';
-import { DatasetItem } from '../models/Dataset';
+import { CreateDatasetForm, DatasetItem } from '../models/Dataset';
 
-const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean } => {
+const useDatasets = (): { datasets: DatasetItem[]; areDatasetsLoading: boolean } => {
   const { data, isValidating } = useSWR(() => 'datasets', httpApiGet);
   // TODO: Once datasetService methods return response wrapped in a {data: <response>} body, replace the line below with:
   // const datasets: DatasetItem[] = data?.data ?? [];
@@ -15,4 +15,8 @@ const useDatasets = (): { datasets: DatasetItem[], areDatasetsLoading: boolean }
   return { datasets, areDatasetsLoading: isValidating };
 };
 
-export { useDatasets };
+const createDataset = async (dataset: CreateDatasetForm): Promise<void> => {
+  await httpApiPost('datasets', { ...dataset });
+};
+
+export { useDatasets, createDataset };

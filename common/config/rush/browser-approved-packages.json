@@ -507,6 +507,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "react-jss",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react-scripts",
       "allowedCategories": [ "production" ]
     },
