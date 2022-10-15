@@ -120,7 +120,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  '/environmentTypes/et-prod-[0-9a-zA-Z]{13},pa-[0-9a-zA-Z]{13}': {
     GET: [
       {
         action: 'READ',
@@ -134,7 +134,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations': {
+  '/environmentTypes/et-prod-[0-9a-zA-Z]{13},pa-[0-9a-zA-Z]{13}/configurations': {
     GET: [
       {
         action: 'READ',
@@ -148,7 +148,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+  '/environmentTypes/et-prod-[0-9a-zA-Z]{13},pa-[0-9a-zA-Z]{13}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
     {
       GET: [
         {

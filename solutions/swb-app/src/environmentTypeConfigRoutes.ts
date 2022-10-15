@@ -23,9 +23,6 @@ export function setUpEnvTypeConfigRoutes(
   router.post(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
       processValidatorResult(validate(req.body, CreateEnvironmentTypeConfigSchema));
       const user = res.locals.user;
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
@@ -41,10 +38,6 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-
       if (!uuidValidate(req.params.envTypeConfigId)) {
         throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
       }
@@ -60,9 +53,6 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
       const { paginationToken, pageSize } = req.query;
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         res
@@ -83,10 +73,6 @@ export function setUpEnvTypeConfigRoutes(
   router.put(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-
       if (!uuidValidate(req.params.envTypeConfigId)) {
         throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
       }

@@ -177,7 +177,7 @@ describe('environmentTypeService', () => {
       status: 'APPROVED',
       name: 'Jupyter Notebook',
       provisioningArtifactId: 'pa-dqwijdnwq12',
-      params: [],
+      params: {},
       description: 'An Amazon SageMaker Jupyter Notebook',
       productId: 'prod-dwqdqdqdwq',
       type: 'sagemaker'
@@ -189,7 +189,7 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE
-      const actualResponse = await envTypeService.createNewEnvironmentType('owner-123', createParams);
+      const actualResponse = await envTypeService.createNewEnvironmentType(createParams);
 
       // CHECK
       expect(actualResponse).toEqual(envType);
@@ -202,7 +202,7 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE & CHECK
-      await expect(envTypeService.createNewEnvironmentType('owner-123', createParams)).rejects.toThrow(
+      await expect(envTypeService.createNewEnvironmentType(createParams)).rejects.toThrow(
         `Unable to create environment type with params: ${JSON.stringify(createParams)}`
       );
     });

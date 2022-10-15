@@ -7,7 +7,6 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
-import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -19,24 +18,19 @@ interface EnvironmentType {
   provisioningArtifactId: string;
   description: string;
   name: string;
-  owner: string;
   type: string;
   params: {
-    DefaultValue?: string;
-    Description: string;
-    IsNoEcho: boolean;
-    ParameterKey: string;
-    ParameterType: string;
-    ParameterConstraints: {
-      AllowedValues: string[];
+    [key: string]: {
+      Type: string;
+      Default?: string;
+      AllowedValues?: string[];
+      Description: string;
     };
-  }[];
+  };
   resourceType: string;
   status: EnvironmentTypeStatus;
   createdAt: string;
-  createdBy: string;
   updatedAt: string;
-  updatedBy: string;
 }
 
 export default class EnvironmentTypeService {
@@ -148,37 +142,29 @@ export default class EnvironmentTypeService {
    *
    * @returns environment type object
    */
-  public async createNewEnvironmentType(
-    ownerId: string,
+  public async createNewEnvironmentType(params: {
+    productId: string;
+    provisioningArtifactId: string;
+    description: string;
+    name: string;
+    type: string;
     params: {
-      productId: string;
-      provisioningArtifactId: string;
-      description: string;
-      name: string;
-      type: string;
-      params: {
-        DefaultValue?: string;
+      [key: string]: {
+        Type: string;
+        Default?: string;
+        AllowedValues?: string[];
         Description: string;
-        IsNoEcho: boolean;
-        ParameterKey: string;
-        ParameterType: string;
-        ParameterConstraints: {
-          AllowedValues: string[];
-        };
-      }[];
-      status: EnvironmentTypeStatus;
-    }
-  ): Promise<EnvironmentType> {
-    const id = uuidv4();
+      };
+    };
+    status: EnvironmentTypeStatus;
+  }): Promise<EnvironmentType> {
+    const id = `et-${params.productId},${params.provisioningArtifactId}`;
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
       ...buildDynamoDBPkSk(id, resourceTypeToKey.envType),
-      owner: ownerId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      createdBy: ownerId,
-      updatedBy: ownerId,
       resourceType: this._resourceType,
       ...params
     };

@@ -13,7 +13,6 @@ import {
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { validate as uuidValidate } from 'uuid';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
@@ -30,8 +29,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
           `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
         );
       }
-      const user = res.locals.user;
-      const envType = await environmentTypeService.createNewEnvironmentType(user.id, {
+      const envType = await environmentTypeService.createNewEnvironmentType({
         ...req.body
       });
       res.status(201).send(envType);
@@ -42,9 +40,6 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
-        throw Boom.badRequest('id request parameter must be a valid uuid.');
-      }
       const envType = await environmentTypeService.getEnvironmentType(req.params.id);
       res.send(envType);
     })
@@ -73,9 +68,6 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.put(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.id)) {
-        throw Boom.badRequest('id request parameter must be a valid uuid.');
-      }
       processValidatorResult(validate(req.body, UpdateEnvironmentTypeSchema));
       const user = res.locals.user;
       const { status } = req.body;
