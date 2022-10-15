@@ -36,8 +36,9 @@ describe('EnvironmentTypeHandler', () => {
     const environmentTypeHandler = new EnvironmentTypeHandler(awsService);
 
     environmentTypeHandler['_getExistingEnvironmentType'] = jest.fn().mockResolvedValue(undefined);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const saveMethod = jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .spyOn(EnvironmentTypeHandler.prototype as any, '_saveEnvironmentType')
       .mockImplementation(() => {});
 
@@ -70,8 +71,8 @@ describe('EnvironmentTypeHandler', () => {
       productId: 'test',
       provisioningArtifactId: 'test'
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const saveMethod = jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .spyOn(EnvironmentTypeHandler.prototype as any, '_saveEnvironmentType')
       .mockImplementation(() => {});
 

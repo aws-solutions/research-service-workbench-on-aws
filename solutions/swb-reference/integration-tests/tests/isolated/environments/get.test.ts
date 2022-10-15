@@ -6,7 +6,7 @@
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, getFakeEnvId } from '../../../support/utils/utilities';
 
 describe('get environment negative tests', () => {
   const setup: Setup = new Setup();
@@ -25,7 +25,7 @@ describe('get environment negative tests', () => {
   });
 
   test('environment does not exist', async () => {
-    const fakeEnvId = '927ff6bd-9d0e-44d0-b754-47ee50e68edb';
+    const fakeEnvId = getFakeEnvId();
     try {
       await adminSession.resources.environments.environment(fakeEnvId).get();
     } catch (e) {

@@ -10,6 +10,13 @@ import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
+import {
+  uuidWithLowercasePrefix,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExp,
+  uuidRegExpAsString,
+  envTypeIdRegExpString
+} from './utilities/textUtil';
 
 export {
   AuditLogger,
@@ -19,5 +26,10 @@ export {
   IamRoleCloneService,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
-  resourceTypeToKey
+  resourceTypeToKey,
+  uuidWithLowercasePrefix,
+  uuidRegExp,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExpAsString,
+  envTypeIdRegExpString
 };
