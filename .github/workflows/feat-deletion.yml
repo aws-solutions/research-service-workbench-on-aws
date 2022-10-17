@@ -12,7 +12,7 @@ on:
 
 jobs:
   delete-feat-branch-on-merge:
-    if: github.event.pull_request.merged == true && contains(github.head_ref, 'feat/')
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'feat/')
     runs-on: ubuntu-latest
     steps:
       - name: Delete feat/* branch protection after merge to develop

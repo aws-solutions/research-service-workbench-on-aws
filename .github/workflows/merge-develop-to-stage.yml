@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - 'develop'
-  
+
 jobs:
   readme-commit:
     uses: awslabs/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
@@ -65,7 +65,7 @@ jobs:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
     needs: [readme-commit, deploy-swb-reference]
-    env: 
+    env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
@@ -124,7 +124,7 @@ jobs:
           allow_merge_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-          
+
       - name: Enable branch protection on stage
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail

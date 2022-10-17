@@ -1,4 +1,9 @@
-name: create release branch pr to main
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Create-release-branch-pr-to-main
 
 on:
   workflow_dispatch:
@@ -9,7 +14,7 @@ on:
 
 jobs:
   create-release-branch-pr-to-main:
-    if: contains(github.ref_name, 'release/')
+    if: startsWith(github.ref_name, 'release/')
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3

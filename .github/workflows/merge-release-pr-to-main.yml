@@ -1,4 +1,9 @@
-name: merge-release-pr-to-main
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-release-pr-to-main
 
 on:
   workflow_dispatch:
@@ -9,6 +14,7 @@ on:
 
 jobs:
   merge-release-pr-to-main:
+    if: startsWith(github.ref_name, 'release/')
     runs-on: ubuntu-20.04
     steps:
       - name: enable merge commits
