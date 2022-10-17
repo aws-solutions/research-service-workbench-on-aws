@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "update parameters from ui",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
