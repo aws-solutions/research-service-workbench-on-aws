@@ -4,7 +4,7 @@
  */
 
 import { ProductViewSummary, ProvisioningArtifactDetail } from '@aws-sdk/client-service-catalog';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import EnvironmentTypeService from '../services/environmentTypeService';
 
 interface ProvisionArtifactParams {
@@ -54,7 +54,9 @@ export default class EnvironmentTypeHandler {
                 currentProductId,
                 provisionArtifact.Id || ''
               );
-            const envTypeId = `et-${product.ProductId},${provisionArtifact.Id}`;
+            const envTypeId = `${resourceTypeToKey.envType.toLowerCase()}-${product.ProductId},${
+              provisionArtifact.Id
+            }`;
             const existingEnvType = await this._getExistingEnvironmentType(envTypeId);
             if (!existingEnvType && !!details?.Info?.TemplateUrl) {
               console.log(`Creating environment type: ${envTypeId}.`);
@@ -80,6 +82,11 @@ export default class EnvironmentTypeHandler {
     provisionArtifact: ProvisioningArtifactDetail,
     provisionParams: ProvisionArtifactParams
   ): Promise<void> {
+    if (!product?.Id || !provisionArtifact?.Id) {
+      throw new Error(
+        `An error ocurred while saving an Environment Type, Product and Artifact Must not be empty, { Product: '${product?.Id}', Provision Artifact: '${provisionArtifact.Id}'}`
+      );
+    }
     const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
     await envTypeService.createNewEnvironmentType({
       productId: product.ProductId || '',
@@ -87,7 +94,7 @@ export default class EnvironmentTypeHandler {
       description: provisionArtifact.Description || '',
       name: `${product.Name}-${provisionArtifact.Name}`,
       type: product.Name || '',
-      params: provisionParams.Parameters,
+      params: provisionParams?.Parameters ?? {},
       status: 'NOT_APPROVED'
     });
   }

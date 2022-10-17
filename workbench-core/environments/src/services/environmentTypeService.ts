@@ -158,7 +158,9 @@ export default class EnvironmentTypeService {
     };
     status: EnvironmentTypeStatus;
   }): Promise<EnvironmentType> {
-    const id = `et-${params.productId},${params.provisioningArtifactId}`;
+    const id = `${resourceTypeToKey.envType.toLowerCase()}-${params.productId},${
+      params.provisioningArtifactId
+    }`;
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
