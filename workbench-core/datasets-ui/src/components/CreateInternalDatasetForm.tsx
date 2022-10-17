@@ -54,7 +54,7 @@ export const NewDatasetForm = ({
       'nameError',
       setFormErrors,
       datasetNameValidationRules,
-      formData.name
+      formData.datasetName
     );
 
     isValid =
@@ -70,7 +70,7 @@ export const NewDatasetForm = ({
         'projectIdError',
         setFormErrors,
         datasetProjectIdValidationRules,
-        formData.metadata?.owningProjectId
+        formData.customMetadata?.owningProjectId
       ) && isValid;
 
     return isValid;
@@ -119,9 +119,9 @@ export const NewDatasetForm = ({
           >
             <Input
               data-testid="datasetName"
-              value={formData?.name || ''}
+              value={formData?.datasetName || ''}
               onChange={({ detail: { value } }) => {
-                setFormData({ ...formData, name: value });
+                setFormData({ ...formData, datasetName: value });
                 validateField<string | undefined, CreateDatasetFormValidation>(
                   'nameError',
                   setFormErrors,
@@ -169,13 +169,13 @@ export const NewDatasetForm = ({
                   ? null
                   : projects
                       .map((p) => ({ label: p.name, value: p.id }))
-                      .filter((p) => p.value === formData?.metadata?.owningProjectId)[0] || null
+                      .filter((p) => p.value === formData?.customMetadata?.owningProjectId)[0] || null
               }
               loadingText="Loading Projects"
               options={projects.map((p) => ({ label: p.name, value: p.id }))}
-              selectedAriaLabel={formData?.metadata?.owningProjectId}
+              selectedAriaLabel={formData?.customMetadata?.owningProjectId}
               onChange={({ detail: { selectedOption } }) => {
-                setFormData({ ...formData, metadata: { owningProjectId: selectedOption.value } });
+                setFormData({ ...formData, customMetadata: { owningProjectId: selectedOption.value } });
                 validateField<string | undefined, CreateDatasetFormValidation>(
                   'projectIdError',
                   setFormErrors,

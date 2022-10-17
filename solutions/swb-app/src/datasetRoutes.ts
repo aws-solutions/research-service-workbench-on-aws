@@ -21,7 +21,8 @@ export function setUpDSRoutes(
   dataSetService: DataSetService,
   dataSetStoragePlugin: DataSetsStoragePlugin,
   datasetStorageAccount: string,
-  mainAccountId: string
+  mainAccountId: string,
+  region: string
 ): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
@@ -33,11 +34,17 @@ export function setUpDSRoutes(
         datasetStorageAccount,
         req.body.path,
         mainAccountId,
-        req.body.region,
+        region,
         dataSetStoragePlugin
       );
 
-      res.status(201).send(dataSet);
+      const responseDataset = {
+        ...dataSet,
+        description: req.body.description,
+        customMetadata: req.body.customMetadata
+      };
+
+      res.status(201).send(responseDataset);
     })
   );
 
@@ -51,7 +58,7 @@ export function setUpDSRoutes(
         datasetStorageAccount,
         req.body.path,
         mainAccountId,
-        req.body.region,
+        region,
         dataSetStoragePlugin
       );
       res.status(201).send(dataSet);

@@ -16,7 +16,7 @@ const useDatasets = (): { datasets: DatasetItem[]; areDatasetsLoading: boolean }
 };
 
 const createDataset = async (dataset: CreateDatasetForm): Promise<void> => {
-  await httpApiPost('datasets', { ...dataset });
+  await httpApiPost('datasets', { ...dataset, path: dataset.datasetName });
 };
 
 export { useDatasets, createDataset };

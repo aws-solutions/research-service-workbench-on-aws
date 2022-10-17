@@ -37,7 +37,7 @@ export const NewDatasetPage: NextPage = () => {
     await router.push({
       pathname: '/datasets',
       query: {
-        message: `Internal dataset [${formData.name}] has been created successfully. You can now upload files to the dataset.`,
+        message: `Internal dataset [${formData.datasetName}] has been created successfully. You can now upload files to the dataset.`,
         notificationType: 'success'
       }
     });

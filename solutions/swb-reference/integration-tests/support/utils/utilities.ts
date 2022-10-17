@@ -8,6 +8,14 @@ import { DEFAULT_POLLING_INTERVAL_SECONDS, DEFAULT_POLLING_MAX_WAITING_SECONDS }
 import HttpError from './HttpError';
 
 /**
+ * Marks all properties (including nested) as Partial.
+ * https://stackoverflow.com/questions/47914536/use-partial-in-nested-property-with-typescript
+ */
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
+/**
  * Returns a promise that will be resolved in the requested time, ms.
  * Example: await sleep(200);
  * https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep/39914235#39914235
@@ -59,4 +67,4 @@ async function poll<T>(
   }
 }
 
-export { sleep, checkHttpError, poll, getFakeEnvId };
+export { sleep, checkHttpError, poll, getFakeEnvId, RecursivePartial };

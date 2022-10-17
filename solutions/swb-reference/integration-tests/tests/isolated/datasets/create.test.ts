@@ -6,7 +6,7 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError } from '../../../support/utils/utilities';
+import { checkHttpError, RecursivePartial } from '../../../support/utils/utilities';
 
 describe('datasets create negative tests', () => {
   const setup: Setup = new Setup();
@@ -28,13 +28,15 @@ describe('datasets create negative tests', () => {
   const validLaunchParameters = {
     datasetName: randomTextGenerator.getFakeText('fakeName'),
     path: randomTextGenerator.getFakeText('fakePath'),
-    region: randomTextGenerator.getFakeText('fakeRegion')
+    customMetadata: {
+      owningProjectId: randomTextGenerator.getFakeText('fakeOwningProjectId')
+    }
   };
 
   describe('missing parameters', () => {
     test('datasetName', async () => {
       try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        const invalidParam: Partial<typeof validLaunchParameters> = { ...validLaunchParameters };
         delete invalidParam.datasetName;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {
@@ -51,7 +53,7 @@ describe('datasets create negative tests', () => {
 
     test('path', async () => {
       try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        const invalidParam: Partial<typeof validLaunchParameters> = { ...validLaunchParameters };
         delete invalidParam.path;
         await adminSession.resources.datasets.create(invalidParam, false);
       } catch (e) {
@@ -66,21 +68,41 @@ describe('datasets create negative tests', () => {
       }
     });
 
-    test('region', async () => {
-      try {
-        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
-        delete invalidParam.region;
-        await adminSession.resources.datasets.create(invalidParam, false);
-      } catch (e) {
-        checkHttpError(
-          e,
-          new HttpError(400, {
-            statusCode: 400,
-            error: 'Bad Request',
-            message: "requires property 'region'"
-          })
-        );
-      }
+    describe('customMetadata', () => {
+      test('customMetadata', async () => {
+        try {
+          const invalidParam: Partial<typeof validLaunchParameters> = { ...validLaunchParameters };
+          delete invalidParam.customMetadata;
+          await adminSession.resources.datasets.create(invalidParam, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              statusCode: 400,
+              error: 'Bad Request',
+              message: "requires property 'customMetadata'"
+            })
+          );
+        }
+      });
+
+      test('customMetadata.owningProjectId', async () => {
+        try {
+          const invalidParam: RecursivePartial<typeof validLaunchParameters> = { ...validLaunchParameters };
+          delete invalidParam.customMetadata?.owningProjectId;
+
+          await adminSession.resources.datasets.create(invalidParam, false);
+        } catch (e) {
+          checkHttpError(
+            e,
+            new HttpError(400, {
+              statusCode: 400,
+              error: 'Bad Request',
+              message: "customMetadata requires property 'owningProjectId'"
+            })
+          );
+        }
+      });
     });
 
     test('all parameters', async () => {
@@ -92,7 +114,8 @@ describe('datasets create negative tests', () => {
           new HttpError(400, {
             statusCode: 400,
             error: 'Bad Request',
-            message: "requires property 'datasetName'. requires property 'path'. requires property 'region'"
+            message:
+              "requires property 'datasetName'. requires property 'path'. requires property 'customMetadata'"
           })
         );
       }

@@ -29,7 +29,10 @@ describe('multiStep dataset integration test', () => {
     const dataSetBody = {
       path: datasetName, // using same name to help potential troubleshooting
       datasetName,
-      region: settings.get('awsRegion')
+      description: datasetName,
+      customMetadata: {
+        owningProjectId: datasetName
+      }
     };
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);
