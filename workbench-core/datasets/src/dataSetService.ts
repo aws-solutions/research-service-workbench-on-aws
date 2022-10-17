@@ -287,6 +287,13 @@ export class DataSetService {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
   }
 
+  /**
+   * Create a presigned URL for a signle-part file upload
+   * @param datasetId - the ID of the Dataset.
+   * @param timeToLiveSeconds - lenght of time (in seconds) the link is valid for.
+   * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
+   * @returns the presigned URL
+   */
   public async getSinglePartPresignedUrl(
     datasetId: string,
     timeToLiveSeconds: number,
