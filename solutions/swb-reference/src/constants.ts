@@ -34,6 +34,7 @@ function getConstants(): {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_OUTPUT_KEY: string;
   VPC_ID: string;
   SUBNET_IDS: string[];
 } {
@@ -76,6 +77,7 @@ function getConstants(): {
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
+  const MAIN_ACCT_ALB_OUTPUT_KEY = 'MainAccountLoadBalancerArnKeyOutput';
 
   return {
     STAGE: config.stage,
@@ -104,6 +106,7 @@ function getConstants(): {
     CLIENT_ID,
     CLIENT_SECRET,
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    MAIN_ACCT_ALB_OUTPUT_KEY,
     VPC_ID,
     SUBNET_IDS
   };

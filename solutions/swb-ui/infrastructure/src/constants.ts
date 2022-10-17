@@ -13,6 +13,7 @@ function getConstants(): {
   STACK_NAME: string;
   S3_ACCESS_LOGS_BUCKET_PREFIX: string;
   S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_OUTPUT_KEY: string;
   S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
   S3_ARTIFACT_BUCKET_NAME: string;
   S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
@@ -49,6 +50,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   // The output name below must match the value in swb-reference
   const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
+  const MAIN_ACCT_ALB_OUTPUT_KEY = 'MainAccountLoadBalancerArnKeyOutput';
 
   return {
     STAGE,
@@ -57,6 +59,7 @@ function getConstants(): {
     STACK_NAME,
     S3_ACCESS_LOGS_BUCKET_PREFIX,
     S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
+    MAIN_ACCT_ALB_OUTPUT_KEY,
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
     S3_ARTIFACT_BUCKET_NAME,
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
