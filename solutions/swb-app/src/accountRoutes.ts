@@ -26,10 +26,13 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
   );
 
   router.patch(
-    '/aws-accounts/:awsAccountId',
+    '/aws-accounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
-      const response = await account.update(req.body);
+      const response = await account.update({
+        id: req.params.id,
+        ...req.body
+      });
       res.send(response);
     })
   );

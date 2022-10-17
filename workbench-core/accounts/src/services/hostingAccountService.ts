@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Boom from '@hapi/boom';
-import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
+import HostingAccountLifecycleService, {
+  UpdateAccountMetadata
+} from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
   /**
@@ -14,14 +15,7 @@ export default class HostingAccountService {
    * @returns account record in DDB
    */
   public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
-    const lifecycleService = new HostingAccountLifecycleService();
-
-    try {
-      return await lifecycleService.initializeAccount(accountMetadata);
-    } catch (e) {
-      Boom.badRequest(e.message);
-      return Promise.reject(e.message);
-    }
+    return await new HostingAccountLifecycleService().createAccount(accountMetadata);
   }
 
   /**
@@ -30,14 +24,7 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
-    const lifecycleService = new HostingAccountLifecycleService();
-
-    try {
-      return await lifecycleService.initializeAccount(accountMetadata);
-    } catch (e) {
-      Boom.badRequest(e.message);
-      return Promise.reject(e.message);
-    }
+  public async update(accountMetadata: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
+    return await new HostingAccountLifecycleService().updateAccount(accountMetadata);
   }
 }

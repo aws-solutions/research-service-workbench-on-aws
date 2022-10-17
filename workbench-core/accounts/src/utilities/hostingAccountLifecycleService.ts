@@ -10,16 +10,21 @@ import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
 import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
 
-export class InvalidArtifactBucketArnError extends Error {
-  public readonly statusCode: number = 422;
+export interface CreateAccountMetadata {
+  name: string;
+  awsAccountId: string;
+  envMgmtRoleArn: string;
+  hostingAccountHandlerRoleArn: string;
+  externalId: string;
+}
 
-  public constructor(artifactBucketArn: string) {
-    super(`Cannot calculate artifact bucket name from S3 ARN ${artifactBucketArn}`);
-  }
+export interface UpdateAccountMetadata extends CreateAccountMetadata {
+  id: string;
 }
 
 export default class HostingAccountLifecycleService {
@@ -39,9 +44,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async initializeAccount(accountMetadata: {
-    [key: string]: string;
-  }): Promise<{ [key: string]: string }> {
+  public async createAccount(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
     const cfService = this._aws.helpers.cloudformation;
     const {
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
@@ -65,7 +68,11 @@ export default class HostingAccountLifecycleService {
     await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, accountMetadata.awsAccountId);
 
     // Finally store the new/updated account details in DDB
-    return this._accountService.createOrUpdate(accountMetadata);
+    return this._accountService.create(accountMetadata);
+  }
+
+  public async updateAccount(data: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
+    return this._accountService.update(data as unknown as { [key: string]: string });
   }
 
   /**
@@ -150,7 +157,7 @@ export default class HostingAccountLifecycleService {
       );
     }
 
-    // If Get statement doesn't exist, create one
+    // If the Get statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
       const getStatement = PolicyStatement.fromJson(
         JSON.parse(`
@@ -166,7 +173,7 @@ export default class HostingAccountLifecycleService {
       );
       bucketPolicy.addStatements(getStatement);
     } else {
-      // If Get statement doesn't contain this accountId, add it
+      // If the Get statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
         'Get:environment-files',
@@ -196,7 +203,7 @@ export default class HostingAccountLifecycleService {
    * roleToCopyToTargetAccount - IAM role that should be copied from main account to target account.
    * s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
    */
-  public async updateAccount(params: {
+  public async updateHostingAccountData(params: {
     ddbAccountId: string;
     targetAccountId: string;
     targetAccountAwsService: AwsService;
@@ -494,7 +501,7 @@ export default class HostingAccountLifecycleService {
     const bucketName = parsedBucketArn[0];
 
     if (_.isEmpty(bucketName) || bucketName.length === 0) {
-      throw new InvalidArtifactBucketArnError(artifactBucketArn);
+      Boom.badRequest(`Could not identify bucket name in S3 ARN ${artifactBucketArn}`);
     }
 
     return `s3://${bucketName}/environment-files`;
