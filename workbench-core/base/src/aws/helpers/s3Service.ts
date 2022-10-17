@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { PutObjectCommand, S3, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export default class S3Service {
@@ -82,7 +82,7 @@ export default class S3Service {
     prefix: string,
     timeToLiveSeconds: number
   ): Promise<string> {
-    const config = {
+    const config: S3ClientConfig = {
       credentials: await this._s3.config.credentials(),
       region: this._s3.config.region
     };

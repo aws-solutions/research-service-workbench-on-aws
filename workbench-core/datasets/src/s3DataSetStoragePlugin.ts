@@ -149,7 +149,11 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   }
 
   public async createPresignedUploadUrl(dataset: DataSet, timeToLiveSeconds: number): Promise<string> {
-    throw new Error('Method not implemented.');
+    return await this._aws.helpers.s3.createPresignedUploadUrl(
+      dataset.storageName,
+      dataset.name,
+      timeToLiveSeconds
+    );
   }
 
   public async createPresignedMultiPartUploadUrls(
