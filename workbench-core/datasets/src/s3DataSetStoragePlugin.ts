@@ -24,9 +24,9 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
-import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { IamHelper, InsertStatementResult } from './iamHelper';
-import { DataSet, DataSetsStoragePlugin } from '.';
+import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
+import { DataSet } from './dataSet';
+import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 
 /**
  * An implementation of the {@link DataSetStoragePlugin} to support DataSets stored in an S3 Bucket.
