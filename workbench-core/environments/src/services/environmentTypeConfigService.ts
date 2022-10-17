@@ -4,10 +4,13 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, QueryParams } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import { v4 as uuidv4 } from 'uuid';
-import environmentResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import EnvironmentTypeService from './environmentTypeService';
 
@@ -78,9 +81,9 @@ export default class EnvironmentTypeConfigService {
     paginationToken?: string
   ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }> {
     let queryParams: QueryParams = {
-      key: { name: 'pk', value: environmentResourceTypeToKey.envTypeConfig },
+      key: { name: 'pk', value: resourceTypeToKey.envTypeConfig },
       sortKey: 'sk',
-      begins: { S: `${environmentResourceTypeToKey.envType}#${envTypeId}` },
+      begins: { S: `${resourceTypeToKey.envType}#${envTypeId}` },
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
     queryParams = addPaginationToken(paginationToken, queryParams);
@@ -125,7 +128,7 @@ export default class EnvironmentTypeConfigService {
         );
       }
     }
-    const envTypeConfigId = uuidv4();
+    const envTypeConfigId = uuidWithLowercasePrefix(resourceTypeToKey.envTypeConfig);
     const currentDate = new Date().toISOString();
 
     const newEnvTypeConfig: EnvironmentTypeConfig = {
@@ -208,8 +211,8 @@ export default class EnvironmentTypeConfigService {
 
   private _buildEnvTypeConfigPkSk(envTypeId: string, envTypeConfigId: string): { pk: string; sk: string } {
     return {
-      pk: environmentResourceTypeToKey.envTypeConfig,
-      sk: `${environmentResourceTypeToKey.envType}#${envTypeId}${environmentResourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+      pk: resourceTypeToKey.envTypeConfig,
+      sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
     };
   }
 }

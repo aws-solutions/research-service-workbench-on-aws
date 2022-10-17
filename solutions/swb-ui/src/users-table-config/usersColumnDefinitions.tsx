@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { TableProps } from '@awsui/components-react';
+import { TableProps } from '@cloudscape-design/components';
 
 export const columnDefinitions: readonly TableProps.ColumnDefinition<object>[] = [
   {

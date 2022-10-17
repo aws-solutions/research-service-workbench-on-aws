@@ -4,11 +4,10 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, QueryParams } from '@aws/workbench-core-base';
+import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
-import envKeyNameToKey from '../constants/environmentKeyNameToKey';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -57,7 +56,7 @@ export default class EnvironmentTypeService {
    */
   public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
     const response = await this._aws.helpers.ddb
-      .get(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType))
+      .get(buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType))
       .execute();
     const item = (response as GetItemCommandOutput).Item;
     if (item === undefined) {
@@ -133,7 +132,7 @@ export default class EnvironmentTypeService {
     };
 
     const response = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(envTypeId, envKeyNameToKey.envType), { item: updatedEnvType })
+      .update(buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType), { item: updatedEnvType })
       .execute();
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentType;
@@ -170,11 +169,11 @@ export default class EnvironmentTypeService {
       status: EnvironmentTypeStatus;
     }
   ): Promise<EnvironmentType> {
-    const id = uuidv4();
+    const id = uuidv4(); // TODO: id format will be updated as a part of GALI-1839
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
-      ...buildDynamoDBPkSk(id, envKeyNameToKey.envType),
+      ...buildDynamoDBPkSk(id, resourceTypeToKey.envType),
       owner: ownerId,
       createdAt: currentDate,
       updatedAt: currentDate,
@@ -185,7 +184,7 @@ export default class EnvironmentTypeService {
     };
     const item = newEnvType as unknown as { [key: string]: unknown };
     const response = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(id, envKeyNameToKey.envType), { item })
+      .update(buildDynamoDBPkSk(id, resourceTypeToKey.envType), { item })
       .execute();
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentType;

@@ -3,8 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { TimeUnitsType } from '@aws-sdk/client-cognito-identity-provider';
+export enum TimeUnits {
+  DAYS = 'days',
+  HOURS = 'hours',
+  MINUTES = 'minutes',
+  SECONDS = 'seconds'
+}
 
-export function getTimeInSeconds(length: number, units: TimeUnitsType): number {
+export function getTimeInMS(length: number, units: TimeUnits): number {
   return 1;
 }

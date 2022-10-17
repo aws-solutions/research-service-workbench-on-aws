@@ -5,11 +5,12 @@
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => {
-    return 'sampleDataSetId';
+    return 'sampleId';
   })
 }));
 
 import {
+  DeleteItemCommand,
   DynamoDBClient,
   GetItemCommand,
   QueryCommand,
@@ -25,14 +26,18 @@ import { DataSet, DdbDataSetMetadataPlugin, ExternalEndpoint } from '.';
 
 describe('DdbDataSetMetadataPlugin', () => {
   const ORIGINAL_ENV = process.env;
+  const datasetKeyTypeId = 'DS';
+  const endpointKeyTypeId = 'EP';
 
-  const mockDataSetId = 'sampleDataSetId';
+  const mockDataSetId = `${datasetKeyTypeId.toLowerCase()}-sampleId`;
   const mockDataSetName = 'Sample-DataSet';
   const mockDataSetPath = 'sample-s3-prefix';
   const mockAwsAccountId = 'Sample-AWS-Account';
+  const mockAwsBucketRegion = 'Sample-AWS-Bucket-Region';
   const mockDataSetStorageType = 'S3';
   const mockDataSetStorageName = 'S3-Bucket';
-  const mockEndPointName = 'Sample-Access-Point';
+  const mockEndpointId = `${endpointKeyTypeId.toLowerCase()}-sampleId`;
+  const mockEndPointName = `${endpointKeyTypeId}-Sample-Access-Point`;
   const mockEndPointRole = 'Sample-Role';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockEndPointName}/${mockDataSetPath}/`;
 
@@ -45,7 +50,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     aws = new AwsService({ region: 'us-east-1', ddbTableName: 'DataSetsTable' });
-    plugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
+    plugin = new DdbDataSetMetadataPlugin(aws, datasetKeyTypeId, endpointKeyTypeId);
     mockDdb = mockClient(DynamoDBClient);
   });
 
@@ -220,7 +225,7 @@ describe('DdbDataSetMetadataPlugin', () => {
     });
   });
 
-  describe('udpateDataSet', () => {
+  describe('updateDataSet', () => {
     it('Returns the updated DataSet when complete.', async () => {
       mockDdb.on(UpdateItemCommand).resolves({});
 
@@ -253,6 +258,15 @@ describe('DdbDataSetMetadataPlugin', () => {
     });
   });
 
+  describe('removeDataSet', () => {
+    it('returns nothing when the dataset is removed.', async () => {
+      mockDdb.on(DeleteItemCommand).resolves({});
+
+      await expect(plugin.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      expect(mockDdb.commandCalls(DeleteItemCommand)).toHaveLength(1);
+    });
+  });
+
   describe('addExternalEndpoint', () => {
     it("succeeds when endpoint doesn't exist and no id is provided.", async () => {
       const mockCreatedDate = new Date().toISOString();
@@ -280,7 +294,7 @@ describe('DdbDataSetMetadataPlugin', () => {
       };
 
       await expect(plugin.addExternalEndpoint(exampleEndpoint)).resolves.toEqual({
-        id: mockDataSetId,
+        id: mockEndpointId,
         dataSetId: mockDataSetId,
         dataSetName: mockDataSetName,
         endPointUrl: mockEndPointUrl,
@@ -400,6 +414,36 @@ describe('DdbDataSetMetadataPlugin', () => {
         endPointUrl: mockEndPointUrl,
         allowedRoles: [mockEndPointRole]
       });
+    });
+  });
+
+  describe('listStorageLocations', () => {
+    it('returns a list of all StorageLocations stored in the Database', async () => {
+      mockDdb.on(QueryCommand).resolves({
+        Items: [
+          {
+            id: { S: mockDataSetId },
+            name: { S: mockDataSetName },
+            path: { S: mockDataSetPath },
+            awsAccountId: { S: mockAwsAccountId },
+            storageType: { S: mockDataSetStorageType },
+            storageName: { S: mockDataSetStorageName },
+            region: { S: mockAwsBucketRegion }
+          }
+        ]
+      });
+
+      const response = await plugin.listStorageLocations();
+      expect(response).toBeDefined();
+      expect(response).toHaveLength(1);
+      expect(response).toEqual([
+        {
+          name: mockDataSetStorageName,
+          awsAccountId: mockAwsAccountId,
+          type: mockDataSetStorageType,
+          region: mockAwsBucketRegion
+        }
+      ]);
     });
   });
 });

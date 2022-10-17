@@ -99,6 +99,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-accounts",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-accounts-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-audit",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -119,7 +127,15 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-datasets-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@aws/workbench-core-environments",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-environments-ui",
       "allowedCategories": [ "production" ]
     },
     {
@@ -133,6 +149,14 @@
     {
       "name": "@aws/workbench-core-logging",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws/workbench-core-swb-common-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-swb-datasets-ui",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@awsui/collection-hooks",
@@ -159,8 +183,24 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/plugin-syntax-dynamic-import",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-flow",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/plugin-transform-react-jsx",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@babel/preset-env",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-next",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@babel/preset-react",
@@ -171,7 +211,27 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/runtime",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@casl/ability",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/collection-hooks",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/components",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/design-tokens",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@cloudscape-design/global-styles",
       "allowedCategories": [ "production" ]
     },
     {
@@ -197,6 +257,14 @@
     {
       "name": "@rushstack/heft-node-rig",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft-web-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-webpack5-plugin",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/node-core-library",
@@ -255,6 +323,14 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "babel-loader",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "babel-preset-next",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "cdk-nag",
       "allowedCategories": [ "prototypes" ]
     },
@@ -276,6 +352,18 @@
     },
     {
       "name": "cors",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "csrf",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "csurf",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "cypress",
       "allowedCategories": [ "production" ]
     },
     {
@@ -355,6 +443,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "license-check-and-add",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "license-checker",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "lodash",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -365,6 +461,10 @@
     {
       "name": "next",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "next-compose-plugins",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "next-global-css",
@@ -403,6 +503,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "react-scripts",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "sass",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -435,11 +539,23 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "tslib",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "typescript",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "uuid",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "web-vitals",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "webpack",
       "allowedCategories": [ "production" ]
     },
     {

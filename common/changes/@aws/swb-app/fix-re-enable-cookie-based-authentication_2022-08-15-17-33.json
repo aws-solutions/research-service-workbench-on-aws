@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Changed logout route to POST, removed unnecessary CORS allowed headers, added samesSite: 'none' cookie setting to authN routes",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

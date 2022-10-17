@@ -94,10 +94,13 @@ solutions/swb-reference/temp
 solutions/swb-reference/src/config/*.yaml
 solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/example.yaml
+!solutions/swb-reference/integration-tests/config/testEnv.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
-solutions/swb-reference/src/config/*.js
+solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
+
+
 
 # local environment variables
 .env*.local
@@ -110,6 +113,13 @@ solutions/swb-ui/out
 
 #swb-ui cdk-infrastructure
 solutions/swb-ui/infrastructure/src/config/*.yaml
-solutions/swb-ui/infrastructure/src/config/*.js
+solutions/swb-ui/infrastructure/src/config/*.json
 !solutions/swb-ui/infrastructure/src/config/example.yaml
 
+#swb-ui end to end tests
+solutions/swb-ui/end-to-end-tests/config/*.yaml
+!solutions/swb-ui/end-to-end-tests/config/example.yaml
+!solutions/swb-ui/end-to-end-tests/config/testEnv.yaml
+solutions/swb-ui/end-to-end-tests/cypress/screenshots
+solutions/swb-ui/end-to-end-tests/cypress/videos
+solutions/swb-ui/end-to-end-tests/cypress/downloads

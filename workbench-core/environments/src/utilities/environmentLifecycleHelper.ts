@@ -5,7 +5,7 @@
 
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger } from '@aws/workbench-core-base';
+import { AwsService, AuditLogger, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
@@ -13,7 +13,6 @@ import {
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
-import envResourceTypeToKey from '../constants/environmentResourceTypeToKey';
 import { Environment, EnvironmentService } from '../services/environmentService';
 
 export type Operation = 'Launch' | 'Terminate';
@@ -146,7 +145,7 @@ export default class EnvironmentLifecycleHelper {
    * @param envMetadata - the environment for which access point(s) were created
    */
   public async removeAccessPoints(envMetadata: Environment): Promise<void> {
-    if (_.isEmpty(envMetadata.datasetIds)) return;
+    if (_.isEmpty(envMetadata.DATASETS)) return;
 
     await Promise.all(
       _.map(envMetadata.ENDPOINTS, async (endpoint) => {
@@ -182,7 +181,7 @@ export default class EnvironmentLifecycleHelper {
 
     const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
+        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
         const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
           datasetId,
           datasetEndPointName,
@@ -201,9 +200,9 @@ export default class EnvironmentLifecycleHelper {
 
         await this.environmentService.addMetadata(
           envId,
-          envResourceTypeToKey.environment,
+          resourceTypeToKey.environment,
           mountObject.endpointId,
-          envResourceTypeToKey.endpoint,
+          resourceTypeToKey.endpoint,
           endpointObj
         );
 

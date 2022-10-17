@@ -8,5 +8,26 @@ import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
+import resourceTypeToKey from './constants/resourceTypeToKey';
+import { IamRoleCloneService } from './utilities/iamRoleCloneService';
+import {
+  uuidWithLowercasePrefix,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExp,
+  uuidRegExpAsString
+} from './utilities/textUtil';
 
-export { AuditLogger, AwsService, QueryParams, buildDynamoDbKey, buildDynamoDBPkSk, CognitoTokenService };
+export {
+  AuditLogger,
+  AwsService,
+  CognitoTokenService,
+  QueryParams,
+  IamRoleCloneService,
+  buildDynamoDbKey,
+  buildDynamoDBPkSk,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix,
+  uuidRegExp,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExpAsString
+};

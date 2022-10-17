@@ -28,7 +28,6 @@ These manual steps will not be required in the final implementation of SWBv2.
 1. Open your new `<STAGE>.yaml` file and uncomment `awsRegion` and `awsRegionShortName`. `aws-region` value can be one of the values on this [table](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html#Concepts.RegionsAndAvailabilityZones.Regions), under the `Region` column. `awsRegionName` can be a two or three letter abbreviation for that region, of your own choosing. The `awsRegion` value will determine which region SWBv2 is deployed in.
 1. Uncomment `rootUserEmail` and provide the main account user's email address
 1. Uncomment `cognitoDomain` and provide a unique string that will be used for the cognito domain. This should be an alphanumeric string (hyphens allowed) that does not conflict with any other existing cognito domains.
-1. Uncomment `websiteUrl` and set it to the website url that will be used for the SWB UI.
 1. If running your Lambda locally, `userPoolId`, `clientId`, and `clientSecret` will need to be set after the first execution of `cdk-deploy` as seen below under "Deploy the code". You will then need to re-run `STAGE=<STAGE> rushx cdk-deploy`.
 1. Run `chmod 777 <STAGE>.yaml` to allow local script to read the file
 
@@ -107,13 +106,13 @@ VPC
 VpcSubnet
 ```
 
-## Setup UI and Get access token
+## Get access token
 
-To get the `access_token` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
+To get the `accessToken`, `csrfCookie`, and `csrfToken` for making authenticated API requests please refer [here](README.md#obtain-access-token-for-making-authenticated-api-requests).  
 
 ## POSTMAN Setup
 In POSTMAN create an environment using the instructions [here](https://learning.postman.com/docs/sending-requests/managing-environments/#creating-environments).
-Your environment should have two variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second one `ACCESS_TOKEN` and the value should be the `accessToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
+Your environment should have four variables. Name the first one `API_URL` and the value should be the `APIGatewayAPIEndpoint` value that you got when deploying the `Main Account`. Name the second, third and fourth ones `ACCESS_TOKEN`, `CSRF_COOKIE`, and `CSRF_TOKEN` and their values should be the `accessToken`, `csrfCookie`, and `csrfToken` you got from [Setup UI and Get Access Token](#setup-ui-and-get-access-token)
 
 Import [SWBv2 Postman Collection](./SWBv2.postman_collection.json). Instructions for how to import a collection is [here](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman)
 
@@ -272,7 +271,7 @@ POST `{{API_URL}}/aws-accounts`
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
-## Setup UI and Get access token
+## Setup UI 
 
 Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
 

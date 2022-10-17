@@ -19,7 +19,7 @@
   },
   "repository": {
     "url": "https://github.com/awslabs/solution-spark-on-aws.git",
-    "defaultBranch": "main"
+    "defaultBranch": "develop"
   },
   "eventHooks": {
     "preRushInstall": [],
@@ -44,6 +44,12 @@
     {
       "packageName": "@aws/workbench-core-environments",
       "projectFolder": "workbench-core/environments",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-swb-common-ui",
+      "projectFolder": "workbench-core/swb-common-ui",
       "reviewCategory": "production",
       "shouldPublish": true
     },
@@ -92,6 +98,30 @@
     {
       "packageName": "@aws/workbench-core-datasets",
       "projectFolder": "workbench-core/datasets",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "projectFolder": "workbench-core/accounts",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "projectFolder": "workbench-core/datasets-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-environments-ui",
+      "projectFolder": "workbench-core/environments-ui",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@aws/workbench-core-accounts-ui",
+      "projectFolder": "workbench-core/accounts-ui",
       "reviewCategory": "production",
       "shouldPublish": true
     },

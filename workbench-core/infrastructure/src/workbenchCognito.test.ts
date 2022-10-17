@@ -16,7 +16,7 @@ describe('WorkbenchCognito tests', () => {
   it('has the correct user pool properties', () => {
     const workbenchCognitoProps: WorkbenchCognitoProps = {
       domainPrefix: 'test-domain',
-      websiteUrl: 'https://www.example.com',
+      websiteUrls: ['https://www.example.com'],
       userPoolName: 'test-user-pool'
     };
     const stack = new Stack();
@@ -66,7 +66,7 @@ describe('WorkbenchCognito tests', () => {
   it('has the correct user pool domain properties', () => {
     const workbenchCognitoProps: WorkbenchCognitoProps = {
       domainPrefix: 'test-domain',
-      websiteUrl: 'https://www.example.com'
+      websiteUrls: ['https://www.example.com']
     };
     const stack = new Stack();
     new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
@@ -81,7 +81,7 @@ describe('WorkbenchCognito tests', () => {
   it('has the correct user pool client properties', () => {
     const workbenchCognitoProps: WorkbenchCognitoProps = {
       domainPrefix: 'test-domain',
-      websiteUrl: 'https://www.example.com',
+      websiteUrls: ['https://www.example.com'],
       userPoolClientName: 'test-user-pool-client'
     };
     const stack = new Stack();
@@ -93,11 +93,25 @@ describe('WorkbenchCognito tests', () => {
       AllowedOAuthFlows: ['code'],
       AllowedOAuthFlowsUserPoolClient: true,
       AllowedOAuthScopes: ['openid'],
-      CallbackURLs: [workbenchCognitoProps.websiteUrl],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
       EnableTokenRevocation: true,
       GenerateSecret: true,
-      LogoutURLs: [workbenchCognitoProps.websiteUrl],
-      PreventUserExistenceErrors: 'ENABLED'
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
+      RefreshTokenValidity: 43200,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
     });
   });
 
@@ -126,7 +140,7 @@ describe('WorkbenchCognito tests', () => {
     };
     const workbenchCognitoProps: WorkbenchCognitoProps = {
       domainPrefix: 'test-domain',
-      websiteUrl: 'https://www.example.com',
+      websiteUrls: ['https://www.example.com'],
       oidcIdentityProviders: [oidcProvider1, oidcProvider2]
     };
     const stack = new Stack();

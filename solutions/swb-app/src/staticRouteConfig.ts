@@ -4,6 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
@@ -28,7 +29,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/datasets/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -66,7 +67,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -74,7 +75,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/connections': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -82,7 +83,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/start': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -90,7 +91,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/stop': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -98,7 +99,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/terminate': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -120,7 +121,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environmentTypes/${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -134,7 +135,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations': {
+  [`/environmentTypes/${uuidRegExpAsString}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -148,7 +149,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+  [`/environmentTypes/${uuidRegExpAsString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
@@ -211,7 +212,7 @@ export const routesIgnored: RoutesIgnored = {
     POST: true
   },
   '/logout': {
-    GET: true
+    POST: true
   },
   '/refresh': {
     GET: true

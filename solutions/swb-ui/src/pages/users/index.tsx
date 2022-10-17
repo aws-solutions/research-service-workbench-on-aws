@@ -4,6 +4,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useUsers, BaseLayout, useSettings } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
@@ -12,13 +13,9 @@ import {
   SpaceBetween,
   Table,
   StatusIndicator
-} from '@awsui/components-react';
+} from '@cloudscape-design/components';
 import type { NextPage } from 'next';
-import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
-import { useUsers } from '../../api/users';
-import BaseLayout from '../../components/BaseLayout';
-import { useSettings } from '../../context/SettingsContext';
+import React, { useState } from 'react';
 import { columnDefinitions } from '../../users-table-config/usersColumnDefinitions';
 
 export interface UserProps {
