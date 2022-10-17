@@ -28,17 +28,17 @@ export default class Datasets extends CollectionResource {
     return {
       datasetName: resource.datasetName ?? dataSetName,
       path: resource.path ?? dataSetName,
-      storageName: resource.storageName,
-      awsAccountId: resource.awsAccountId,
-      region: resource.region
+      description: resource.description,
+      customMetadata: resource.customMetadata
     };
   }
 }
 
 interface DataSetCreateRequest {
   datasetName: string;
-  storageName: string;
   path: string;
-  awsAccountId: string;
-  region: string;
+  description?: string;
+  customMetadata: {
+    owningProjectId: string;
+  };
 }

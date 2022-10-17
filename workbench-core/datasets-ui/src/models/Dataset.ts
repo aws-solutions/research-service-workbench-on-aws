@@ -17,9 +17,9 @@ interface DatasetMetadata {
 }
 
 export interface CreateDatasetForm {
-  name?: string;
+  datasetName?: string;
   description?: string;
-  metadata?: DatasetMetadata;
+  customMetadata?: DatasetMetadata;
 }
 
 export interface CreateDatasetFormValidation {

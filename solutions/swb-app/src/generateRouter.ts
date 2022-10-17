@@ -107,7 +107,8 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     apiRouteConfig.dataSetService,
     apiRouteConfig.dataSetsStoragePlugin,
     process.env.S3_DATASET_BUCKET_NAME!,
-    process.env.MAIN_ACCOUNT_ID!
+    process.env.MAIN_ACCOUNT_ID!,
+    process.env.AWS_REGION!
   );
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
