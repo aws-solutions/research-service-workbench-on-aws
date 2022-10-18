@@ -279,18 +279,14 @@ Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy t
 
 **Create new DataSet**
 
-In POSTMAN this is the `Create DataSet` API
-
-During SWB deployment an S3 bucket for DataSets was created in your main account. Grab the name of that bucket from the CFN stack output (key named `DataSetsBucketName`) in the main account and construct the following API call
+In POSTMAN this is the `Create DataSet` API.
 
 POST `{{API_URL}}/datasets`
 
 ```json
 {
     "datasetName": "<Enter a unique DataSet name>",
-    "storageName": "<Enter the main account DataSets bucket name>",
-    "path": "<Folder name to be created for this in the bucket>",
-    "awsAccountId": "<Main account ID>"
+    "path": "<Folder name to be created for this in the bucket>"
 }
 ```
 

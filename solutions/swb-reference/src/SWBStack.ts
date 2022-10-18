@@ -47,6 +47,7 @@ export class SWBStack extends Stack {
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    S3_DATASET_BUCKET_NAME: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
@@ -55,6 +56,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    MAIN_ACCOUNT_ID: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -133,7 +135,10 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      // dataset bucket name will be populated after bucket creation
+      S3_DATASET_BUCKET_NAME: '',
+      MAIN_ACCOUNT_ID: ''
     };
 
     this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
@@ -144,13 +149,19 @@ export class SWBStack extends Stack {
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
       mainAcctEncryptionKey
     );
+
+    this.lambdaEnvVars.S3_DATASET_BUCKET_NAME = datasetBucket.bucketName;
     const artifactS3Bucket = this._createS3ArtifactsBuckets(
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       mainAcctEncryptionKey
     );
+
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
+
+    this.lambdaEnvVars.MAIN_ACCOUNT_ID = statusHandler.role!.principalAccount ?? '';
+
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);

@@ -27,8 +27,6 @@ describe('multiStep dataset integration test', () => {
 
     // Create dataset
     const dataSetBody = {
-      storageName: settings.get('DataSetsBucketName'),
-      awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
       datasetName,
       region: settings.get('awsRegion')
