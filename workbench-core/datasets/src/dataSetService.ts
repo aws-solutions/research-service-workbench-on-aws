@@ -14,6 +14,54 @@ import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
+export interface CreateProvisionDatasetRequest {
+  /**
+   * the name of a DataSet
+   */
+  name: string;
+
+  /**
+   * (optional) a description of the dataset
+   */
+  description?: string;
+
+  /**
+   * (optional) the owner of the dataset
+   */
+  owner?: string;
+
+  /**
+   * (optional) the type of the dataset
+   */
+  type?: string;
+
+  /**
+   * a string which identifies the storage specific location such the URL to an S3 bucket.
+   */
+  storageName: string;
+
+  /**
+   * the storage path where the DataSet files can be found at the location.
+   */
+  path: string;
+
+  /**
+   * AWS Account ID of DataSet
+   */
+  awsAccountId?: string;
+
+  /**
+   * AWS region of the dataset storage
+   */
+  region?: string;
+
+  /**
+   * an instance of {@link DataSetsStoragePlugin} to provide the storage implementation
+   * for a particular platform, account, etc.
+   */
+  storageProvider: DataSetsStoragePlugin;
+}
+
 export class DataSetService {
   private _audit: AuditService;
   private _log: LoggingService;
@@ -36,30 +84,17 @@ export class DataSetService {
 
   /**
    * Adds a new DataSet to the provided storage.
-   * @param datasetName - the name of the DataSet to provision.
-   * @param storageName - the name of the storage, for instance, the name of an S3 bucket.
-   * @param path - the path to the DataSet within the storage.
-   * @param awsAccountId - the AWS account where the DataSet resides.
-   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
-   * for a particular platform, account, etc.
+   * @param request - {@link CreateProvisionDatasetRequest}
    *
    * @returns the DataSet object which is stored in the backing datastore.
    */
-  public async provisionDataSet(
-    datasetName: string,
-    storageName: string,
-    path: string,
-    awsAccountId: string,
-    region: string,
-    storageProvider: DataSetsStoragePlugin
-  ): Promise<DataSet> {
-    await storageProvider.createStorage(storageName, path);
+  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const { storageProvider, ...dataSet } = request;
+
+    await storageProvider.createStorage(dataSet.storageName, dataSet.path);
+
     const provisioned: DataSet = {
-      name: datasetName,
-      storageName,
-      path,
-      awsAccountId,
-      region,
+      ...dataSet,
       storageType: storageProvider.getStorageType()
     };
 
@@ -68,30 +103,17 @@ export class DataSetService {
 
   /**
    * Imports an existing storage location into the solution as a DataSet.
-   * @param datasetName - the name of the DataSet to import
-   * @param storageName - the name of the storage, for instance, the name of an S3 bucket.
-   * @param path - the path to the data within the storage, for instance, an S3 prefix.
-   * @param awsAccountId - the 12 digit Id of the AWS account where the dataSet resides.
-   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
-   * for a particular platform, account, etc.
+   * @param request - {@link CreateProvisionDatasetRequest}
    *
    * @returns the DataSet object which is stored in teh backing datastore.
    */
-  public async importDataSet(
-    datasetName: string,
-    storageName: string,
-    path: string,
-    awsAccountId: string,
-    region: string,
-    storageProvider: DataSetsStoragePlugin
-  ): Promise<DataSet> {
-    await storageProvider.importStorage(storageName, path);
+  public async importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const { storageProvider, ...dataSet } = request;
+
+    await storageProvider.importStorage(dataSet.storageName, dataSet.path);
+
     const imported: DataSet = {
-      name: datasetName,
-      storageName,
-      path,
-      awsAccountId,
-      region,
+      ...dataSet,
       storageType: storageProvider.getStorageType()
     };
 
