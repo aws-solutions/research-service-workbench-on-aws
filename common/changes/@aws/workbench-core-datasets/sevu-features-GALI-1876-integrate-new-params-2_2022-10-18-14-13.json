@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "create dataset schema updates",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}
