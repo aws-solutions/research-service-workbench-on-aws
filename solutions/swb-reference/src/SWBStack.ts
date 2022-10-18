@@ -5,6 +5,7 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
+
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
 
@@ -16,6 +17,7 @@ import {
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
@@ -57,6 +59,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ALB_OUTPUT_KEY: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -87,6 +90,7 @@ export class SWBStack extends Stack {
       CLIENT_ID,
       CLIENT_SECRET,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_OUTPUT_KEY,
       VPC_ID,
       SUBNET_IDS
     } = getConstants();
@@ -137,7 +141,8 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_OUTPUT_KEY
     };
 
     this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
@@ -157,7 +162,7 @@ export class SWBStack extends Stack {
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
-    this._createRestApi(apiLambda);
+    const apiGwUrl = this._createRestApi(apiLambda);
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
@@ -166,10 +171,37 @@ export class SWBStack extends Stack {
       subnetIds: SUBNET_IDS
     });
 
-    new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
+    this._createLoadBalancer(swbVpc, apiGwUrl);
+  }
+
+  private _createLoadBalancer(swbVpc: SWBVpc, apiGwUrl: string): void {
+    const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
       subnets: swbVpc.subnetSelection,
       internetFacing: true // TODO: See if this is required if we are directly passing in subnets
+    });
+
+    const proxyLambda = new Function(this, 'LambdaProxy', {
+      handler: 'proxyHandlerLambda.handler',
+      code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
+      runtime: Runtime.NODEJS_16_X,
+      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
+      timeout: Duration.seconds(60),
+      memorySize: 256
+    });
+
+    // Add a listener for HTTP calls
+    const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
+      port: 80
+    });
+
+    httpListener.addTargets('proxyLambda', {
+      targets: [new LambdaTarget(proxyLambda)],
+      healthCheck: { enabled: true }
+    });
+
+    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_OUTPUT_KEY, {
+      value: alb.applicationLoadBalancer.loadBalancerArn
     });
   }
 
@@ -736,7 +768,7 @@ export class SWBStack extends Stack {
   }
 
   // API Gateway
-  private _createRestApi(apiLambda: Function): void {
+  private _createRestApi(apiLambda: Function): string {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: 'Backend API Name',
@@ -788,6 +820,8 @@ export class SWBStack extends Stack {
         defaultIntegration: new LambdaIntegration(alias)
       });
     }
+
+    return API.url;
   }
 
   // DynamoDB Table

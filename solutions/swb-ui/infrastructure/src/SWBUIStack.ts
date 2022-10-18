@@ -31,6 +31,7 @@ export class SWBUIStack extends Stack {
     API_BASE_URL: string;
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ALB_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_NAME: string;
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
     ACCESS_IDENTITY_ARTIFACT_NAME: string;
@@ -51,6 +52,7 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -75,6 +77,7 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -91,7 +94,7 @@ export class SWBUIStack extends Stack {
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     this._addCognitoURLOutput();
-    createECSCluster(this);
+    createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_OUTPUT_KEY);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
