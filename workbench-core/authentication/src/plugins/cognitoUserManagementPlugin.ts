@@ -224,6 +224,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
     }
   }
 
+  /**
+   * Activates a deactive user.
+   *
+   * @param uid - the id of the user to activate
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dones't have permission to activate a user
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
   public async activateUser(uid: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminEnableUser({
@@ -231,10 +241,32 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         Username: uid
       });
     } catch (error) {
-      // TODO
+      if (error.name === 'InternalErrorException') {
+        throw new IdpUnavailableError('Cognito encountered an internal error');
+      }
+      if (error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
+      }
+      if (error.name === 'ResourceNotFoundException') {
+        throw new PluginConfigurationError('Invalid user pool id');
+      }
+      if (error.name === 'UserNotFoundException') {
+        throw new UserNotFoundError('User does not exist');
+      }
+      throw error;
     }
   }
 
+  /**
+   * Deactivates an active user.
+   *
+   * @param uid - the id of the user to deactivate
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dones't have permission to deactivate a user
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
   public async deactivateUser(uid: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminDisableUser({
@@ -242,7 +274,19 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         Username: uid
       });
     } catch (error) {
-      // TODO
+      if (error.name === 'InternalErrorException') {
+        throw new IdpUnavailableError('Cognito encountered an internal error');
+      }
+      if (error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
+      }
+      if (error.name === 'ResourceNotFoundException') {
+        throw new PluginConfigurationError('Invalid user pool id');
+      }
+      if (error.name === 'UserNotFoundException') {
+        throw new UserNotFoundError('User does not exist');
+      }
+      throw error;
     }
   }
 
