@@ -12,5 +12,5 @@ envType: 'sagemakerNotebook'
 terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environment that has already been terminated
 
 #Cognito Integ Test Client
-rootUsername: 'aws-chamonix-dev+testenvroot@amazon.com'
+rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
