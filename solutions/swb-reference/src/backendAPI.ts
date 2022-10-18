@@ -29,6 +29,7 @@ const aws: AwsService = new AwsService({
 });
 
 const apiRouteConfig: ApiRouteConfig = {
+  awsService: aws,
   routes: [
     {
       path: '/foo',

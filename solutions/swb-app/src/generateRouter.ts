@@ -98,7 +98,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   });
 
   const userManagementService: UserManagementService = new UserManagementService(
-    new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)
+    new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId, apiRouteConfig.awsService)
   );
 
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);

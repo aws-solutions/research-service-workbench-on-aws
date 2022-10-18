@@ -25,20 +25,24 @@ import {
   UsernameExistsException,
   UserNotFoundException
 } from '@aws-sdk/client-cognito-identity-provider';
+import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import {
-  CognitoUserManagementPlugin,
-  IdpUnavailableError,
-  InvalidParameterError,
-  PluginConfigurationError,
-  RoleAlreadyExistsError,
-  RoleNotFoundError,
-  User,
-  UserAlreadyExistsError,
-  UserNotFoundError
-} from '..';
+import { IdpUnavailableError } from '../errors/idpUnavailableError';
+import { InvalidParameterError } from '../errors/invalidParameterError';
+import { PluginConfigurationError } from '../errors/pluginConfigurationError';
+import { RoleAlreadyExistsError } from '../errors/roleAlreadyExistsError';
+import { RoleNotFoundError } from '../errors/roleNotFoundError';
+import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
+import { UserNotFoundError } from '../errors/userNotFoundError';
+import { User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
+import { CognitoUserManagementPlugin } from './cognitoUserManagementPlugin';
 
+const region: string = 'us-east-1';
+const awsCreds = {
+  accessKeyId: 'fakeKey',
+  secretAccessKey: 'fakeSecret'
+} as const;
 const userInfo: Omit<User, 'roles'> = {
   uid: '123',
   firstName: 'John',
@@ -49,21 +53,18 @@ const userInfo: Omit<User, 'roles'> = {
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
 
 describe('CognitoUserManagementPlugin tests', () => {
+  let aws: AwsService;
   let plugin: UserManagementPlugin;
   let roles: string[];
 
   beforeEach(() => {
     cognitoMock.reset();
-    plugin = new CognitoUserManagementPlugin('us-west-2_fakeId');
-    roles = ['Role1', 'Role2'];
-  });
-
-  describe('constructor tests', () => {
-    it('should throw PluginConfigurationError when the userPoolId is invalid', async () => {
-      expect(() => {
-        new CognitoUserManagementPlugin('bad-user-pool-id');
-      }).toThrow(PluginConfigurationError);
+    aws = new AwsService({
+      region,
+      credentials: awsCreds
     });
+    plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+    roles = ['Role1', 'Role2'];
   });
 
   describe('getUser tests', () => {
