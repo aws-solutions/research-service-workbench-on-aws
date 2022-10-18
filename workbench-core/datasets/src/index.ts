@@ -29,3 +29,5 @@ export {
   CreateRegisterExternalBucketRoleRequest,
   CreateRegisterExternalBucketRoleResponse
 } from './awsUtilities/createRegisterExternalBucketRole';
+
+export { DataSetType } from './models/dataSetType';

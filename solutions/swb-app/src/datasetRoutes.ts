@@ -8,7 +8,8 @@ import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
   DataSetService,
-  DataSetsStoragePlugin
+  DataSetsStoragePlugin,
+  DataSetType
 } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -35,16 +36,13 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: mainAccountId,
         region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetStoragePlugin,
+        description: req.body.description,
+        type: DataSetType.internal,
+        owner: req.body.customMetadata.owningProjectId
       });
 
-      const responseDataset = {
-        ...dataSet,
-        description: req.body.description,
-        customMetadata: req.body.customMetadata
-      };
-
-      res.status(201).send(responseDataset);
+      res.status(201).send(dataSet);
     })
   );
 
@@ -59,7 +57,10 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: mainAccountId,
         region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetStoragePlugin,
+        description: req.body.description,
+        type: DataSetType.internal,
+        owner: req.body.customMetadata.owningProjectId
       });
       res.status(201).send(dataSet);
     })
