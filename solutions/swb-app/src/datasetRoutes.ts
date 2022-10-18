@@ -28,14 +28,14 @@ export function setUpDSRoutes(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
-      const dataSet = await dataSetService.provisionDataSet(
-        req.body.datasetName,
-        datasetStorageAccount,
-        req.body.path,
-        mainAccountId,
-        req.body.region,
-        dataSetStoragePlugin
-      );
+      const dataSet = await dataSetService.provisionDataSet({
+        name: req.body.datasetName,
+        storageName: datasetStorageAccount,
+        path: req.body.path,
+        awsAccountId: mainAccountId,
+        region: req.body.region,
+        storageProvider: dataSetStoragePlugin
+      });
 
       res.status(201).send(dataSet);
     })
@@ -46,14 +46,14 @@ export function setUpDSRoutes(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
-      const dataSet = await dataSetService.importDataSet(
-        req.body.datasetName,
-        datasetStorageAccount,
-        req.body.path,
-        mainAccountId,
-        req.body.region,
-        dataSetStoragePlugin
-      );
+      const dataSet = await dataSetService.importDataSet({
+        name: req.body.datasetName,
+        storageName: datasetStorageAccount,
+        path: req.body.path,
+        awsAccountId: mainAccountId,
+        region: req.body.region,
+        storageProvider: dataSetStoragePlugin
+      });
       res.status(201).send(dataSet);
     })
   );
