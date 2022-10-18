@@ -93,7 +93,7 @@ describe('HostingAccountLifecycleService', () => {
     });
   }
 
-  test('initializeAccount does not return an error when UPDATING an account', async () => {
+  test('updateAccount does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
@@ -124,7 +124,7 @@ describe('HostingAccountLifecycleService', () => {
     ).resolves.not.toThrowError();
   });
 
-  test('initializeAccount does not return an error when CREATING an account', async () => {
+  test('createAccount does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
@@ -143,45 +143,12 @@ describe('HostingAccountLifecycleService', () => {
       hostingAccountLifecycleService.createAccount({
         name: 'someName',
         awsAccountId: '123456789012',
-        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
         hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
         externalId: 'someExternalId'
       })
     ).resolves.not.toThrowError();
   });
-
-  // test('initializeAccount throws an error when artifactBucketArn has no bucket name', async () => {
-  //   const hostingAccountLifecycleService = new HostingAccountLifecycleService();
-  //   hostingAccountLifecycleService.updateBusPermissions = jest.fn();
-  //   hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
-  //   hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
-  //
-  //   const cfnMock = mockClient(CloudFormationClient);
-  //   const missingBucketNameArn = 'arn:aws:s3::::';
-  //   mockCloudformationOutputs(cfnMock, 'CREATE_COMPLETE', missingBucketNameArn);
-  //
-  //   const mockDDB = mockClient(DynamoDBClient);
-  //   mockDDB.on(UpdateItemCommand).resolves({});
-  //   mockDDB.on(GetItemCommand).resolves({
-  //     Item: {
-  //       awsAccountId: { S: '123456789012' },
-  //       targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-  //       portfolioId: { S: 'port-1234' },
-  //       accountId: { S: 'abc-xyz' }
-  //     }
-  //   });
-  //
-  //   await expect(
-  //     hostingAccountLifecycleService.createAccount({
-  //       id: 'abc-xyz',
-  //       name: 'fakeName',
-  //       accountId: 'abc-xyz',
-  //       awsAccountId: '123456789012',
-  //       envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
-  //       hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
-  //     })
-  //   ).rejects.toThrowError(InvalidArtifactBucketArnError);
-  // });
 
   test('updateBusPermissions triggered for adding account to bus rule', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();

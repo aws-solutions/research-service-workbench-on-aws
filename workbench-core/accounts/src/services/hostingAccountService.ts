@@ -4,6 +4,7 @@
  */
 
 import HostingAccountLifecycleService, {
+  CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
 
@@ -14,7 +15,7 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
+  public async create(accountMetadata: CreateAccountMetadata): Promise<{ [key: string]: string }> {
     return await new HostingAccountLifecycleService().createAccount(accountMetadata);
   }
 
