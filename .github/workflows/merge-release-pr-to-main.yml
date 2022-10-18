@@ -28,8 +28,8 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: GET /repos/{owner}/{repo}/pulls/{pull_number}
-          owner: insignias
-          repo: React
+          owner: aws-solutions
+          repo: solution-spark-on-aws
           pull_number: ${{ inputs.pr_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
@@ -39,7 +39,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: true
         env:
@@ -50,7 +50,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           pull_number: ${{ inputs.pr_number }}
           merge_method: 'merge'
@@ -62,7 +62,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: false
         env:

@@ -44,7 +44,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: ${{ github.ref_name }}
           enforce_admins: true

@@ -71,7 +71,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: develop
         env:
@@ -87,7 +87,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: true
         env:
@@ -109,7 +109,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: false
         env:
@@ -120,7 +120,7 @@ jobs:
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: develop
         env:

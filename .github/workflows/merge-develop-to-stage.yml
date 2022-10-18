@@ -11,7 +11,7 @@ on:
 
 jobs:
   readme-commit:
-    uses: awslabs/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       passphrase: ${{ secrets.PASSPHRASE }}
@@ -34,7 +34,7 @@ jobs:
 
   deploy-swb-reference:
     needs: [pre-deployment-check]
-    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -45,14 +45,14 @@ jobs:
 
   deploy-swb-demo:
     needs: [ deploy-swb-reference]
-    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   # deploy-example:
   #   needs: [pre-deployment-check]
-  #   uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
+  #   uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
   #   secrets:
   #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
   #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -80,7 +80,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: stage
         env:
@@ -90,7 +90,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: true
         env:
@@ -119,7 +119,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           allow_merge_commit: false
         env:
@@ -130,7 +130,7 @@ jobs:
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: stage
         env:

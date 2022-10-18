@@ -19,7 +19,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: ${{ github.head_ref }}
         env:
