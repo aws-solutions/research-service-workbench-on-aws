@@ -19,7 +19,9 @@ import { processValidatorResult } from './validatorHelper';
 export function setUpDSRoutes(
   router: Router,
   dataSetService: DataSetService,
-  dataSetStoragePlugin: DataSetsStoragePlugin
+  dataSetStoragePlugin: DataSetsStoragePlugin,
+  datasetStorageAccount: string,
+  mainAccountId: string
 ): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
@@ -28,12 +30,13 @@ export function setUpDSRoutes(
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.provisionDataSet(
         req.body.datasetName,
-        req.body.storageName,
+        datasetStorageAccount,
         req.body.path,
-        req.body.awsAccountId,
+        mainAccountId,
         req.body.region,
         dataSetStoragePlugin
       );
+
       res.status(201).send(dataSet);
     })
   );
@@ -45,9 +48,9 @@ export function setUpDSRoutes(
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.importDataSet(
         req.body.datasetName,
-        req.body.storageName,
+        datasetStorageAccount,
         req.body.path,
-        req.body.awsAccountId,
+        mainAccountId,
         req.body.region,
         dataSetStoragePlugin
       );
