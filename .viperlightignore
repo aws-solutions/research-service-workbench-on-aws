@@ -1,0 +1,8 @@
+# This file is used by Viperlight utility to override findings (false alarm)
+'**/NOTICE'
+#workbench-core/datasets-ui/NOTICE
+#solutions/swb-app/NOTICE
+#solutions/swb-reference/NOTICE
+#solutions/swb-ui/NOTICE
+#workbench-core/accounts/NOTICE
+#workbench-core/authentication/NOTICE
