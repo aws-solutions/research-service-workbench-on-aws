@@ -58,9 +58,9 @@ function getConstants(): Constants {
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URLS = allowedOrigins;
-  const USER_POOL_ID = config.userPoolId;
-  const CLIENT_ID = config.clientId;
-  const CLIENT_SECRET = config.clientSecret;
+  const USER_POOL_ID = config.userPoolId || '';
+  const CLIENT_ID = config.clientId || '';
+  const CLIENT_SECRET = config.clientSecret || '';
 
   const AMI_IDS: string[] = [];
 
@@ -112,15 +112,27 @@ async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
   return { ...getConstants(), ROOT_USER_EMAIL };
 }
 
+interface Config {
+  stage: string;
+  awsRegion: string;
+  awsRegionShortName: string;
+  rootUserEmailParamStorePath: string;
+  allowedOrigins: string[];
+  cognitoDomain: string;
+  userPoolId?: string;
+  clientId?: string;
+  clientSecret?: string;
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getConfig(): any {
+function getConfig(): Config {
   return yaml.load(
     // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
     // correct file
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-  );
+  ) as unknown as Config;
 }
+
 async function getSSMParamValue(awsService: AwsService, ssmParamName: string): Promise<string> {
   const response = await awsService.clients.ssm.getParameter({
     Name: ssmParamName,
