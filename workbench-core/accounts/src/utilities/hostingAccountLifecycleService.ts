@@ -29,8 +29,13 @@ export interface CreateAccountMetadata {
   externalId: string;
 }
 
-export interface UpdateAccountMetadata extends CreateAccountMetadata {
+export interface UpdateAccountMetadata {
   id: string;
+  name?: string;
+  awsAccountId?: string;
+  envMgmtRoleArn?: string;
+  hostingAccountHandlerRoleArn?: string;
+  externalId?: string;
 }
 
 export default class HostingAccountLifecycleService {

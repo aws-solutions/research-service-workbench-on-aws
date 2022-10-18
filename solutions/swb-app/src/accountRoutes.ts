@@ -15,6 +15,7 @@ import {
 } from '@aws/workbench-core-accounts/lib/utilities/hostingAccountLifecycleService';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { escape } from 'lodash';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
@@ -24,9 +25,15 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateAccountSchema));
+      const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
       const createAccountMetadata: CreateAccountMetadata = {
-        ...req.body
+        name: escape(name),
+        awsAccountId: escape(awsAccountId),
+        envMgmtRoleArn: escape(envMgmtRoleArn),
+        hostingAccountHandlerRoleArn: escape(hostingAccountHandlerRoleArn),
+        externalId: escape(externalId)
       };
+
       const createdAccount = await account.create(createAccountMetadata);
       res.send(createdAccount);
     })
@@ -36,10 +43,18 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     '/aws-accounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
+      const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
       const updateAccountMetadata: UpdateAccountMetadata = {
-        id: req.params.id,
-        ...req.body
+        id: escape(req.params.id),
+        name: name!! ? escape(name) : undefined,
+        awsAccountId: awsAccountId!! ? escape(awsAccountId) : undefined,
+        envMgmtRoleArn: envMgmtRoleArn!! ? escape(envMgmtRoleArn) : undefined,
+        hostingAccountHandlerRoleArn: hostingAccountHandlerRoleArn!!
+          ? escape(hostingAccountHandlerRoleArn)
+          : undefined,
+        externalId: externalId!! ? escape(externalId) : undefined
       };
+
       const updatedAccount = await account.update(updateAccountMetadata);
       res.send(updatedAccount);
     })
