@@ -5,3 +5,14 @@ solutions/swb-reference/NOTICE
 solutions/swb-ui/NOTICE
 workbench-core/accounts/NOTICE
 workbench-core/authentication/NOTICE
+workbench-core/environments/NOTICE
+workbench-core/environments-ui/NOTICE
+workbench-core/example/infrastructure/NOTICE
+workbench-core/repo-scripts/repo-toolbox/NOTICE
+workbench-core/swb-common-ui/NOTICE
+solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:168
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:228
+workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:271
+solutions/example-ui-app/src/models/User.ts:19
+solutions/swb-ui/end-to-end-tests/cypress/fixtures/example.json:3
