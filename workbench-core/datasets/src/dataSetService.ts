@@ -294,7 +294,7 @@ export class DataSetService {
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
    * @returns the presigned URL
    */
-  public async getSinglePartPresignedUrl(
+  public async getPresignedSinglePartUploadUrl(
     datasetId: string,
     timeToLiveSeconds: number,
     storageProvider: DataSetsStoragePlugin
