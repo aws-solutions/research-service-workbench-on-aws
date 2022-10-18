@@ -16,7 +16,9 @@ import {
   uuidWithLowercasePrefixRegExp,
   uuidRegExp,
   uuidRegExpAsString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  productIdRegExpString,
+  provisionArtifactIdRegExpString
 } from './utilities/textUtil';
 
 export {
@@ -32,6 +34,8 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
+  productIdRegExpString,
+  provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
   CFNTemplateParameters,
   CFNTemplate

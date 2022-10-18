@@ -9,7 +9,9 @@ import {
   buildDynamoDBPkSk,
   QueryParams,
   resourceTypeToKey,
-  CFNTemplateParameters
+  CFNTemplateParameters,
+  provisionArtifactIdRegExpString,
+  productIdRegExpString
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
@@ -135,6 +137,14 @@ export default class EnvironmentTypeService {
     params: CFNTemplateParameters;
     status: EnvironmentTypeStatus;
   }): Promise<EnvironmentType> {
+    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+    if (!params.productId.match(new RegExp(productIdRegExpString))) {
+      throw Boom.badRequest('productId request parameter is invalid');
+    }
+    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+    if (!params.provisioningArtifactId.match(new RegExp(provisionArtifactIdRegExpString))) {
+      throw Boom.badRequest('provisionArtiactId request parameter is invalid');
+    }
     const id = `${resourceTypeToKey.envType.toLowerCase()}-${params.productId},${
       params.provisioningArtifactId
     }`;
