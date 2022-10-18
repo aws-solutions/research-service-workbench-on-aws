@@ -43,7 +43,7 @@ require('esbuild')
     entryPoints: [path.join(__dirname, '/../src/proxyHandlerLambda.ts')],
     bundle: true,
     platform: 'node',
-    target: 'node14',
+    target: 'node16',
     external: ['aws-sdk'],
     outfile: path.join(__dirname, '../build/proxyHandler/proxyHandlerLambda.js')
   })
