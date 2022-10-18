@@ -9,6 +9,10 @@ import {
   UpdateAccountSchema,
   HostingAccountService
 } from '@aws/workbench-core-accounts';
+import {
+  CreateAccountMetadata,
+  UpdateAccountMetadata
+} from '@aws/workbench-core-accounts/lib/utilities/hostingAccountLifecycleService';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
@@ -20,8 +24,11 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateAccountSchema));
-      const response = await account.create(req.body);
-      res.send(response);
+      const createAccountMetadata: CreateAccountMetadata = {
+        ...req.body
+      };
+      const createdAccount = await account.create(createAccountMetadata);
+      res.send(createdAccount);
     })
   );
 
@@ -29,11 +36,12 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     '/aws-accounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
-      const response = await account.update({
+      const updateAccountMetadata: UpdateAccountMetadata = {
         id: req.params.id,
         ...req.body
-      });
-      res.send(response);
+      };
+      const updatedAccount = await account.update(updateAccountMetadata);
+      res.send(updatedAccount);
     })
   );
 }
