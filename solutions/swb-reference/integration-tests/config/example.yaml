@@ -12,7 +12,7 @@
 #terminatedEnvId: ''   # id of an environment that has already been terminated
 
 ## Cognito Integ Test Client
-#rootUsername: ''
+#rootUserNameParamStorePath: ''
 #rootPasswordParamStorePath: ''
 
 ## Pre-requisite for running aws-accounts integration test
