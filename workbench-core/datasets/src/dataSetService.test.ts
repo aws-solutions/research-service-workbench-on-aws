@@ -239,14 +239,14 @@ describe('DataSetService', () => {
 
     it('calls createStorage and addDataSet', async () => {
       await expect(
-        service.provisionDataSet(
-          mockDataSetName,
-          mockDataSetStorageName,
-          mockDataSetPath,
-          mockAwsAccountId,
-          mockAwsBucketRegion,
-          plugin
-        )
+        service.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: plugin
+        })
       ).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
@@ -271,7 +271,14 @@ describe('DataSetService', () => {
 
     it('calls importStorage and addDataSet ', async () => {
       await expect(
-        service.importDataSet('name', 'storageName', 'path', 'accountId', 'bucketRegion', plugin)
+        service.importDataSet({
+          name: 'name',
+          storageName: 'storageName',
+          path: 'path',
+          awsAccountId: 'accountId',
+          region: 'bucketRegion',
+          storageProvider: plugin
+        })
       ).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
