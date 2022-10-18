@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "c7f31b8c-0e10-4a2c-90f6-38fe38bfe8ed",
+    "_postman_id": "a2b89313-33d5-4f5d-842f-c5ec56431c31",
     "name": "SWBv2 Official",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "4320586"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -27,7 +26,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"path\": \"folderName\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -60,7 +59,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"existingFolderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"path\": \"existingFolderName\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -127,15 +126,6 @@
                 "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "{{API_URL}}/datasets/",
               "host": ["{{API_URL}}"],
@@ -776,7 +766,7 @@
           }
         },
         "url": {
-          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
+          "raw": "{{API_URL}}/aws-accounts",
           "host": ["{{API_URL}}"],
           "path": ["aws-accounts"]
         }
