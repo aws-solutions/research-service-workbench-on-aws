@@ -184,18 +184,18 @@ export class SWBStack extends Stack {
     const proxyLambda = new Function(this, 'LambdaProxy', {
       handler: 'proxyHandlerLambda.handler',
       code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
-      runtime: Runtime.NODEJS_14_X,
-      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl.replace('//', '/') },
+      runtime: Runtime.NODEJS_16_X,
+      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
       timeout: Duration.seconds(60),
       memorySize: 256
     });
 
-    // Add a listener on port 80 for and use the certificate for HTTP
-    const httpsListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
+    // Add a listener for HTTP calls
+    const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
       port: 80
     });
 
-    httpsListener.addTargets('proxyLambda', {
+    httpListener.addTargets('proxyLambda', {
       targets: [new LambdaTarget(proxyLambda)],
       healthCheck: { enabled: true }
     });
