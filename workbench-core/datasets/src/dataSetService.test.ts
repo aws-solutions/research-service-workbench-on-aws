@@ -11,8 +11,10 @@ import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit
 import { AwsService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
+import { DataSet } from './dataSet';
+import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
+import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -37,6 +39,7 @@ describe('DataSetService', () => {
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
   const mockDataSetObject = 'datasetObjectId';
+  const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -211,6 +214,9 @@ describe('DataSetService', () => {
     jest
       .spyOn(S3DataSetStoragePlugin.prototype, 'removeRoleFromExternalEndpoint')
       .mockImplementation(async () => {});
+    jest
+      .spyOn(S3DataSetStoragePlugin.prototype, 'createPresignedUploadUrl')
+      .mockImplementation(async () => mockPresignedSinglePartUploadURL);
   });
 
   describe('constructor', () => {
@@ -585,6 +591,24 @@ describe('DataSetService', () => {
           region: mockAwsBucketRegion
         }
       ]);
+    });
+  });
+
+  describe('getSinglePartPresignedUrl', () => {
+    let service: DataSetService;
+    let plugin: S3DataSetStoragePlugin;
+
+    beforeEach(() => {
+      service = new DataSetService(audit, log, metaPlugin);
+      plugin = new S3DataSetStoragePlugin(aws);
+    });
+
+    it('returns a presigned URL.', async () => {
+      const ttlSeconds = 3600;
+
+      await expect(
+        service.getPresignedSinglePartUploadUrl(mockDataSetId, ttlSeconds, plugin)
+      ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
   });
 });
