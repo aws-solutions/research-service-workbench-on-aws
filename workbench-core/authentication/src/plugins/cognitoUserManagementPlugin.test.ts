@@ -48,7 +48,7 @@ const userInfo: Omit<User, 'roles'> = {
   uid: '123',
   firstName: 'John',
   lastName: 'Doe',
-  email: 'john@doe.com'
+  email: 'Sample-email-address'
 } as const;
 
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
