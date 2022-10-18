@@ -9,6 +9,7 @@ import { Readable } from 'stream';
 import { S3 } from '@aws-sdk/client-s3';
 import yaml from 'js-yaml';
 import { schema } from 'yaml-cfn';
+import { CFNTemplate } from './cloudFormationTemplate';
 
 export default class S3Service {
   private _s3: S3;
@@ -84,16 +85,7 @@ export default class S3Service {
    * @param s3BucketURL - URL of provision artifact template
    * @returns json object containing yaml file configuration
    */
-  public async getTemplateByURL(s3BucketURL: string): Promise<{
-    Parameters: {
-      [key: string]: {
-        Type: string;
-        Default?: string;
-        AllowedValues?: string[];
-        Description: string;
-      };
-    };
-  }> {
+  public async getTemplateByURL(s3BucketURL: string): Promise<CFNTemplate> {
     const s3BucketParams = s3BucketURL.split('.s3.amazonaws.com/');
     if (s3BucketParams.length !== 2) throw new Error(`Invalid S3 URL format ${s3BucketURL}`);
     const s3Bucket = s3BucketParams[0].replace('https://', '');
@@ -101,16 +93,7 @@ export default class S3Service {
     const stream = await this._s3.getObject({ Bucket: s3Bucket, Key: key });
     const streamString = await this._streamToString(stream.Body! as Readable);
     const yamlFile = await yaml.load(streamString, { schema: schema });
-    return yamlFile as {
-      Parameters: {
-        [key: string]: {
-          Type: string;
-          Default?: string;
-          AllowedValues?: string[];
-          Description: string;
-        };
-      };
-    };
+    return yamlFile as CFNTemplate;
   }
 
   /**

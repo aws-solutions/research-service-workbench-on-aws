@@ -4,34 +4,18 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  buildDynamoDBPkSk,
+  QueryParams,
+  resourceTypeToKey,
+  CFNTemplateParameters
+} from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
+import { EnvironmentType } from '../interfaces/environmentType';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
-
-interface EnvironmentType {
-  pk: string;
-  sk: string;
-  id: string;
-  productId: string;
-  provisioningArtifactId: string;
-  description: string;
-  name: string;
-  type: string;
-  params: {
-    [key: string]: {
-      Type: string;
-      Default?: string;
-      AllowedValues?: string[];
-      Description: string;
-    };
-  };
-  resourceType: string;
-  status: EnvironmentTypeStatus;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export default class EnvironmentTypeService {
   private _aws: AwsService;
@@ -148,14 +132,7 @@ export default class EnvironmentTypeService {
     description: string;
     name: string;
     type: string;
-    params: {
-      [key: string]: {
-        Type: string;
-        Default?: string;
-        AllowedValues?: string[];
-        Description: string;
-      };
-    };
+    params: CFNTemplateParameters;
     status: EnvironmentTypeStatus;
   }): Promise<EnvironmentType> {
     const id = `${resourceTypeToKey.envType.toLowerCase()}-${params.productId},${

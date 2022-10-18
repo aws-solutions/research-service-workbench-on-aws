@@ -5,6 +5,7 @@
 
 import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
+import { CFNTemplate, CFNTemplateParameters } from './aws/helpers/cloudFormationTemplate';
 import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
@@ -31,5 +32,7 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  CFNTemplateParameters,
+  CFNTemplate
 };

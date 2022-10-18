@@ -4,19 +4,9 @@
  */
 
 import { ProductViewSummary, ProvisioningArtifactDetail } from '@aws-sdk/client-service-catalog';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey, CFNTemplateParameters } from '@aws/workbench-core-base';
+import { EnvironmentType } from '../interfaces/environmentType';
 import EnvironmentTypeService from '../services/environmentTypeService';
-
-interface ProvisionArtifactParams {
-  Parameters: {
-    [key: string]: {
-      Type: string;
-      Default?: string;
-      AllowedValues?: string[];
-      Description: string;
-    };
-  };
-}
 
 export default class EnvironmentTypeHandler {
   private _mainAccountAwsService: AwsService;
@@ -63,7 +53,7 @@ export default class EnvironmentTypeHandler {
               const params = await this._mainAccountAwsService.helpers.s3.getTemplateByURL(
                 details.Info.TemplateUrl
               );
-              await this._saveEnvironmentType(product, provisionArtifact, params as ProvisionArtifactParams);
+              await this._saveEnvironmentType(product, provisionArtifact, params?.Parameters);
             }
           } catch (e) {
             console.log(
@@ -80,11 +70,13 @@ export default class EnvironmentTypeHandler {
   private async _saveEnvironmentType(
     product: ProductViewSummary,
     provisionArtifact: ProvisioningArtifactDetail,
-    provisionParams: ProvisionArtifactParams
+    provisionParams?: CFNTemplateParameters
   ): Promise<void> {
-    if (!product?.Id || !provisionArtifact?.Id) {
+    if (!product?.ProductId || !provisionArtifact?.Id) {
       throw new Error(
-        `An error ocurred while saving an Environment Type, Product and Artifact Must not be empty, { Product: '${product?.Id}', Provision Artifact: '${provisionArtifact.Id}'}`
+        `An error ocurred while saving an Environment Type, Product and Artifact Must not be empty, { Product: '${
+          product?.ProductId ?? ''
+        }', Provision Artifact: '${provisionArtifact?.Id ?? ''}'}`
       );
     }
     const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
@@ -94,38 +86,18 @@ export default class EnvironmentTypeHandler {
       description: provisionArtifact.Description || '',
       name: `${product.Name}-${provisionArtifact.Name}`,
       type: product.Name || '',
-      params: provisionParams?.Parameters ?? {},
+      params: provisionParams ?? {},
       status: 'NOT_APPROVED'
     });
   }
 
-  private async _getExistingEnvironmentType(envTypeId: string): Promise<
-    | {
-        id: string;
-        productId: string;
-        provisioningArtifactId: string;
-      }
-    | undefined
-  > {
-    let environmentType:
-      | {
-          id: string;
-          productId: string;
-          provisioningArtifactId: string;
-        }
-      | undefined = undefined;
+  private async _getExistingEnvironmentType(envTypeId: string): Promise<EnvironmentType | undefined> {
     const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
-
     try {
       console.log(`Searching for environment type: ${envTypeId}`);
       const envType = await envTypeService.getEnvironmentType(envTypeId);
-      environmentType = {
-        id: envType.id,
-        productId: envType.productId,
-        provisioningArtifactId: envType.provisioningArtifactId
-      };
       console.log(`Environment type: ${envTypeId} found.`);
-      return environmentType;
+      return envType;
     } catch {
       console.log(`Environment type: ${envTypeId} not found.`);
       return undefined;
