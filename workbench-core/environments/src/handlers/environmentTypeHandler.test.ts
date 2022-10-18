@@ -70,7 +70,7 @@ describe('EnvironmentTypeHandler', () => {
     );
   });
 
-  test('Save new Environment type when there is a new provision artifact ', async () => {
+  test('Run successfully when there is a new provision artifact', async () => {
     // BUILD
     const awsService = new AwsService({ region: 'us-east-1' });
     awsService.helpers.serviceCatalog.getPortfolioId = jest.fn().mockResolvedValue('portfolioTest');
@@ -89,16 +89,8 @@ describe('EnvironmentTypeHandler', () => {
 
     environmentTypeHandler['_getExistingEnvironmentType'] = jest.fn().mockResolvedValueOnce(undefined);
 
-    const saveMethod = jest
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .spyOn(EnvironmentTypeHandler.prototype as any, '_saveEnvironmentType')
-      .mockResolvedValueOnce(() => {});
-
     // OPERATE
     await expect(environmentTypeHandler.execute({})).resolves.not.toThrowError();
-
-    // CHECK
-    expect(saveMethod).toBeCalledTimes(1);
   });
 
   test('Do not save Environment Type when there is not a new provision artifact', async () => {
