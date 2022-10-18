@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
+import { resourceTypeToKey, uuidRegExpAsString, envTypeIdRegExpString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
@@ -121,7 +121,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}`]: {
+  [`/environmentTypes/${envTypeIdRegExpString}`]: {
     GET: [
       {
         action: 'READ',
@@ -135,7 +135,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}/configurations`]: {
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -149,7 +149,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environmentTypes/${uuidRegExpAsString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {

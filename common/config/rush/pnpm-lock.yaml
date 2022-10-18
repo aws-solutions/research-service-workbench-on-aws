@@ -815,6 +815,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      js-yaml: ^4.1.0
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
@@ -823,6 +824,7 @@ importers:
       sort-package-json: ^1.57.0
       ts-jest: ^27.1.3
       typescript: ^4.5.2
+      yaml-cfn: ^0.3.1
       uuid: ^8.3.2
     dependencies:
       '@aws-cdk/aws-dynamodb': 1.158.0
@@ -845,6 +847,7 @@ importers:
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-logging': link:../logging
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
+      js-yaml: 4.1.0
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
@@ -871,6 +874,7 @@ importers:
       sort-package-json: 1.57.0
       ts-jest: 27.1.5_4e623839ecfc1b0242d7f262e6e0b1df
       typescript: 4.7.2
+      yaml-cfn: 0.3.1
 
   ../../workbench-core/datasets:
     specifiers:
@@ -16477,6 +16481,13 @@ packages:
 
   /yallist/4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
+
+  /yaml-cfn/0.3.1:
+    resolution: {integrity: sha512-8uEuOFPZFI06cQA+E37oRd9zHEPZVpkVjrBjXxWSt0Hy8hil/KnCcskpR7jwx6ejzfejIi5uzaoQgHTl6qzaNw==}
+    hasBin: true
+    dependencies:
+      js-yaml: 4.1.0
+    dev: true
 
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}

@@ -565,6 +565,10 @@
     {
       "name": "winston-transport",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "yaml-cfn",
+      "allowedCategories": [ "production" ]
     }
   ]
 }

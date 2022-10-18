@@ -37,7 +37,7 @@ describe('environmentTypeService', () => {
     createdBy: 'owner-123',
     name: 'Jupyter Notebook',
     resourceType: 'envType',
-    provisioningArtifactId: 'pa-dqwijdnwq12',
+    provisioningArtifactId: 'pa-dqwijdnwq12w2',
     params: [],
     updatedAt: '2022-06-20T18:36:14.358Z',
     sk: `ET#${envTypeId}`,
@@ -45,7 +45,7 @@ describe('environmentTypeService', () => {
     description: 'An Amazon SageMaker Jupyter Notebook',
     id: envTypeId,
     pk: `ET#${envTypeId}`,
-    productId: 'prod-dwqdqdqdwq',
+    productId: 'prod-dwqdqdqdwq2e3',
     type: 'sagemaker'
   };
   describe('getEnvironmentType', () => {
@@ -165,8 +165,8 @@ describe('environmentTypeService', () => {
       // BUILD & OPERATE & CHECK
       await expect(
         envTypeService.updateEnvironmentType('owner-123', envTypeId, {
-          productId: 'abc',
-          provisioningArtifactId: 'xyz'
+          productId: 'prod-abcasdewedg42',
+          provisioningArtifactId: 'pa-ehksiu2735sha'
         })
       ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
     });
@@ -176,10 +176,10 @@ describe('environmentTypeService', () => {
     const createParams = {
       status: 'APPROVED',
       name: 'Jupyter Notebook',
-      provisioningArtifactId: 'pa-dqwijdnwq12',
-      params: [],
+      provisioningArtifactId: 'pa-ehksiu2735sha',
+      params: {},
       description: 'An Amazon SageMaker Jupyter Notebook',
-      productId: 'prod-dwqdqdqdwq',
+      productId: 'prod-abcasdewedg42',
       type: 'sagemaker'
     };
     test('successfully create envType', async () => {
@@ -189,7 +189,7 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE
-      const actualResponse = await envTypeService.createNewEnvironmentType('owner-123', createParams);
+      const actualResponse = await envTypeService.createNewEnvironmentType(createParams);
 
       // CHECK
       expect(actualResponse).toEqual(envType);
@@ -202,7 +202,7 @@ describe('environmentTypeService', () => {
       });
 
       // OPERATE & CHECK
-      await expect(envTypeService.createNewEnvironmentType('owner-123', createParams)).rejects.toThrow(
+      await expect(envTypeService.createNewEnvironmentType(createParams)).rejects.toThrow(
         `Unable to create environment type with params: ${JSON.stringify(createParams)}`
       );
     });

@@ -10,6 +10,7 @@ import {
   ENVIRONMENT_TYPE_STATUS
 } from './constants/environmentTypeStatus';
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
+import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
 import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
@@ -51,5 +52,6 @@ export {
   UpdateEnvironmentTypeConfigSchema,
   CreateEnvironmentTypeSchema,
   UpdateEnvironmentTypeSchema,
-  EnvironmentConnectionLinkPlaceholder
+  EnvironmentConnectionLinkPlaceholder,
+  EnvironmentTypeHandler
 };

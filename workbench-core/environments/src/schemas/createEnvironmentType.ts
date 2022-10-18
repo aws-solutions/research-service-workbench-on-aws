@@ -12,24 +12,17 @@ const CreateEnvironmentTypeSchema: Schema = {
   properties: {
     productId: { type: 'string' },
     provisioningArtifactId: { type: 'string' },
-    allowedRoleIds: {
-      type: 'array',
-      items: { type: 'string' }
-    },
     type: { type: 'string' },
     description: { type: 'string' },
     name: { type: 'string' },
     params: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: true
-      }
+      type: 'object',
+      additionalProperties: true
     },
     status: { enum: ['APPROVED', 'NOT_APPROVED'] }
   },
   additionalProperties: false,
-  required: ['allowedRoleIds', 'type', 'description', 'name', 'params', 'status']
+  required: ['type', 'description', 'name', 'params', 'status']
 };
 
 export default CreateEnvironmentTypeSchema;

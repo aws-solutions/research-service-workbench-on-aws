@@ -4,40 +4,20 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  buildDynamoDBPkSk,
+  QueryParams,
+  resourceTypeToKey,
+  CFNTemplateParameters,
+  provisionArtifactIdRegExpString,
+  productIdRegExpString
+} from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
-import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
+import { EnvironmentType } from '../interfaces/environmentType';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
-
-interface EnvironmentType {
-  pk: string;
-  sk: string;
-  id: string;
-  productId: string;
-  provisioningArtifactId: string;
-  description: string;
-  name: string;
-  owner: string;
-  type: string;
-  params: {
-    DefaultValue?: string;
-    Description: string;
-    IsNoEcho: boolean;
-    ParameterKey: string;
-    ParameterType: string;
-    ParameterConstraints: {
-      AllowedValues: string[];
-    };
-  }[];
-  resourceType: string;
-  status: EnvironmentTypeStatus;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  updatedBy: string;
-}
 
 export default class EnvironmentTypeService {
   private _aws: AwsService;
@@ -148,37 +128,32 @@ export default class EnvironmentTypeService {
    *
    * @returns environment type object
    */
-  public async createNewEnvironmentType(
-    ownerId: string,
-    params: {
-      productId: string;
-      provisioningArtifactId: string;
-      description: string;
-      name: string;
-      type: string;
-      params: {
-        DefaultValue?: string;
-        Description: string;
-        IsNoEcho: boolean;
-        ParameterKey: string;
-        ParameterType: string;
-        ParameterConstraints: {
-          AllowedValues: string[];
-        };
-      }[];
-      status: EnvironmentTypeStatus;
+  public async createNewEnvironmentType(params: {
+    productId: string;
+    provisioningArtifactId: string;
+    description: string;
+    name: string;
+    type: string;
+    params: CFNTemplateParameters;
+    status: EnvironmentTypeStatus;
+  }): Promise<EnvironmentType> {
+    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+    if (!params.productId.match(new RegExp(productIdRegExpString))) {
+      throw Boom.badRequest('productId request parameter is invalid');
     }
-  ): Promise<EnvironmentType> {
-    const id = uuidv4(); // TODO: id format will be updated as a part of GALI-1839
+    // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
+    if (!params.provisioningArtifactId.match(new RegExp(provisionArtifactIdRegExpString))) {
+      throw Boom.badRequest('provisionArtiactId request parameter is invalid');
+    }
+    const id = `${resourceTypeToKey.envType.toLowerCase()}-${params.productId},${
+      params.provisioningArtifactId
+    }`;
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = {
       id,
       ...buildDynamoDBPkSk(id, resourceTypeToKey.envType),
-      owner: ownerId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      createdBy: ownerId,
-      updatedBy: ownerId,
       resourceType: this._resourceType,
       ...params
     };
