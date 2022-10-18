@@ -81,8 +81,8 @@ export default class EnvironmentTypeHandler {
     }
     const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
     await envTypeService.createNewEnvironmentType({
-      productId: product.ProductId || '',
-      provisioningArtifactId: provisionArtifact.Id || '',
+      productId: product.ProductId,
+      provisioningArtifactId: provisionArtifact.Id,
       description: provisionArtifact.Description || '',
       name: `${product.Name}-${provisionArtifact.Name}`,
       type: product.Name || '',
