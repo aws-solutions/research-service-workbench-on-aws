@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Added activate/deactive user functionality to UserManagementService.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
