@@ -53,7 +53,7 @@ export default class AccountHandler {
       }
 
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
-      await hostingAccountLifecycleService.updateAccount({
+      await hostingAccountLifecycleService.updateHostingAccountData({
         ddbAccountId: hostingAccount.id,
         targetAccountId: hostingAccountId,
         targetAccountAwsService: hostingAccountAwsService,

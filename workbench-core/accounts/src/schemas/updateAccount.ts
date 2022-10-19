@@ -6,8 +6,8 @@
 // Schema for createAccount API
 import { Schema } from 'jsonschema';
 
-const CreateAccountSchema: Schema = {
-  id: '/createAccount',
+const UpdateAccountSchema: Schema = {
+  id: '/updateAccount',
   type: 'object',
   properties: {
     name: { type: 'string' },
@@ -17,7 +17,7 @@ const CreateAccountSchema: Schema = {
     externalId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['awsAccountId', 'envMgmtRoleArn', 'hostingAccountHandlerRoleArn', 'name']
+  required: []
 };
 
-export default CreateAccountSchema;
+export default UpdateAccountSchema;

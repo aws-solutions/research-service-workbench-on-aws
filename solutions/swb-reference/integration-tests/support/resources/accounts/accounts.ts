@@ -22,8 +22,8 @@ export default class Accounts extends CollectionResource {
       awsAccountId: 'sampleAccountId',
       envMgmtRoleArn: resource.envMgmtRoleArn,
       hostingAccountHandlerRoleArn: resource.hostingAccountHandlerRoleArn,
-      environmentInstanceFiles: resource.environmentInstanceFiles,
-      encryptionKeyArn: resource.encryptionKeyArn
+      name: resource.name,
+      externalId: resource.externalId
     };
   }
 }
@@ -32,6 +32,6 @@ interface AccountCreateRequest {
   awsAccountId: string;
   envMgmtRoleArn: string;
   hostingAccountHandlerRoleArn: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
+  name: string;
+  externalId: string;
 }

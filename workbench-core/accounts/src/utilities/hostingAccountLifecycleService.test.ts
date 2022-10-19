@@ -10,7 +10,7 @@ import {
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
-import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import {
   EventBridgeClient,
@@ -36,6 +36,7 @@ import {
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { AwsService } from '@aws/workbench-core-base';
+import Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 
@@ -58,7 +59,8 @@ describe('HostingAccountLifecycleService', () => {
   function mockCloudformationOutputs(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cfMock: AwsStub<any, any>,
-    stackStatus: string = 'CREATE_COMPLETE'
+    stackStatus: string = 'CREATE_COMPLETE',
+    artifactBucketArn: string = 'arn:aws:s3:::sampleArtifactsBucketName'
   ): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
@@ -77,7 +79,7 @@ describe('HostingAccountLifecycleService', () => {
             },
             {
               OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-              OutputValue: 'arn:aws:s3:::sampleArtifactsBucketName'
+              OutputValue: artifactBucketArn
             },
             {
               OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
@@ -92,7 +94,7 @@ describe('HostingAccountLifecycleService', () => {
     });
   }
 
-  test('initializeAccount does not return an error', async () => {
+  test('updateAccount does not return an error', async () => {
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     hostingAccountLifecycleService.updateBusPermissions = jest.fn();
     hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
@@ -112,14 +114,73 @@ describe('HostingAccountLifecycleService', () => {
     });
 
     await expect(
-      hostingAccountLifecycleService.initializeAccount({
+      hostingAccountLifecycleService.updateAccount({
         id: 'abc-xyz',
-        accountId: 'abc-xyz',
+        name: 'someName',
         awsAccountId: '123456789012',
-        envManagementRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
-        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
+        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
+        externalId: 'someExternalId'
       })
     ).resolves.not.toThrowError();
+  });
+
+  test('createAccount does not return an error', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    hostingAccountLifecycleService.updateBusPermissions = jest.fn();
+    hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
+    const cfnMock = mockClient(CloudFormationClient);
+    mockCloudformationOutputs(cfnMock);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(QueryCommand).resolves({
+      Count: 0,
+      Items: []
+    });
+
+    await expect(
+      hostingAccountLifecycleService.createAccount({
+        name: 'someName',
+        awsAccountId: '123456789012',
+        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
+        externalId: 'someExternalId'
+      })
+    ).resolves.not.toThrowError();
+  });
+
+  test('initializeAccount throws an error when artifactBucketArn has no bucket name', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    hostingAccountLifecycleService.updateBusPermissions = jest.fn();
+    hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
+
+    const cfnMock = mockClient(CloudFormationClient);
+    const missingBucketNameArn = 'arn:aws:s3::::';
+    mockCloudformationOutputs(cfnMock, 'CREATE_COMPLETE', missingBucketNameArn);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        awsAccountId: { S: '123456789012' },
+        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
+        portfolioId: { S: 'port-1234' },
+        accountId: { S: 'abc-xyz' }
+      }
+    });
+
+    await expect(
+      hostingAccountLifecycleService.createAccount({
+        name: 'fakeName',
+        externalId: 'abc-xyz',
+        awsAccountId: '123456789012',
+        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
+      })
+    ).rejects.toThrowError(Boom.internal(`Could not identify bucket name in S3 artifact bucket.`));
   });
 
   test('updateBusPermissions triggered for adding account to bus rule', async () => {
@@ -189,7 +250,7 @@ describe('HostingAccountLifecycleService', () => {
     ).rejects.toThrowError(new Error(someRandomError));
   });
 
-  test('updateAccount happy path', async () => {
+  test('updateHostingAccountData happy path', async () => {
     process.env.AMI_IDS_TO_SHARE = JSON.stringify(['ami-1234']);
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const cfnMock = mockClient(CloudFormationClient);
@@ -236,7 +297,7 @@ describe('HostingAccountLifecycleService', () => {
     hostingAccountLifecycleService.cloneRole = jest.fn();
 
     await expect(
-      hostingAccountLifecycleService.updateAccount({
+      hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
         targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
@@ -259,7 +320,7 @@ describe('HostingAccountLifecycleService', () => {
     });
   });
 
-  test('updateAccount failed stack', async () => {
+  test('updateHostingAccountData failed stack', async () => {
     process.env.AMI_IDS_TO_SHARE = JSON.stringify(['ami-1234']);
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const cfnMock = mockClient(CloudFormationClient);
@@ -306,7 +367,7 @@ describe('HostingAccountLifecycleService', () => {
     hostingAccountLifecycleService.cloneRole = jest.fn();
 
     await expect(
-      hostingAccountLifecycleService.updateAccount({
+      hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
         targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
@@ -326,7 +387,7 @@ describe('HostingAccountLifecycleService', () => {
     });
   });
 
-  test('updateAccount template updated', async () => {
+  test('updateHostingAccountData template updated', async () => {
     process.env.AMI_IDS_TO_SHARE = JSON.stringify(['ami-1234']);
     const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const cfnMock = mockClient(CloudFormationClient);
@@ -373,7 +434,7 @@ describe('HostingAccountLifecycleService', () => {
     hostingAccountLifecycleService.cloneRole = jest.fn();
 
     await expect(
-      hostingAccountLifecycleService.updateAccount({
+      hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
         targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
