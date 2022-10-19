@@ -180,9 +180,7 @@ describe('HostingAccountLifecycleService', () => {
         envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
         hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
       })
-    ).rejects.toThrowError(
-      Boom.internal(`Could not identify bucket name in S3 artifact bucket ARN ${missingBucketNameArn}`)
-    );
+    ).rejects.toThrowError(Boom.internal(`Could not identify bucket name in S3 artifact bucket.`));
   });
 
   test('updateBusPermissions triggered for adding account to bus rule', async () => {

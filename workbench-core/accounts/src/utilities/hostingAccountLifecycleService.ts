@@ -510,7 +510,8 @@ export default class HostingAccountLifecycleService {
     const bucketName = parsedBucketArn[0];
 
     if (_.isEmpty(bucketName) || bucketName.length === 0) {
-      throw Boom.internal(`Could not identify bucket name in S3 artifact bucket ARN ${artifactBucketArn}`);
+      console.error(`Could not identify bucket name in S3 artifact bucket ARN ${artifactBucketArn}`);
+      throw Boom.internal(`Could not identify bucket name in S3 artifact bucket.`);
     }
 
     return `s3://${bucketName}/environment-files`;
