@@ -196,8 +196,7 @@ export class SWBStack extends Stack {
     });
 
     httpListener.addTargets('proxyLambda', {
-      targets: [new LambdaTarget(proxyLambda)],
-      healthCheck: { enabled: true }
+      targets: [new LambdaTarget(proxyLambda)]
     });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_OUTPUT_KEY, {

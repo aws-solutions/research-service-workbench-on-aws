@@ -41,6 +41,7 @@ export async function handler(event: any) {
     headers['csrf-token'] = event.headers['csrf-token'];
     headers['x-forwarded-for'] = event.headers['x-forwarded-for'];
     headers.connection = event.headers.connection;
+    headers['Access-Control-Allow-Credentials'] = 'true';
   }
 
   if (event.body && event.body!.length !== 0) body = JSON.parse(event.body);
@@ -51,32 +52,32 @@ export async function handler(event: any) {
     const { data, status, statusText } = await axios.get(targetPath, { headers, params });
     response.statusCode = status;
     response.statusDescription = statusText;
-    response.body = data;
+    response.body = JSON.stringify(data);
   }
 
   if (HTTP_METHOD === 'POST') {
     const { data, status, statusText } = await axios.post(targetPath, { headers, params, body });
     response.statusCode = status;
     response.statusDescription = statusText;
-    response.body = data;
+    response.body = JSON.stringify(data);
   }
 
   if (HTTP_METHOD === 'PUT') {
     const { data, status, statusText } = await axios.put(targetPath, { headers, params, body });
     response.statusCode = status;
     response.statusDescription = statusText;
-    response.body = data;
+    response.body = JSON.stringify(data);
   }
 
   if (HTTP_METHOD === 'DELETE') {
     const { data, status, statusText } = await axios.delete(targetPath, { headers, params });
     response.statusCode = status;
     response.statusDescription = statusText;
-    response.body = data;
+    response.body = JSON.stringify(data);
   }
 
   // Logging what we returned for the given API call
   console.log(`Responding with: ${JSON.stringify(response)}`);
 
-  return JSON.stringify(response);
+  return response;
 }
