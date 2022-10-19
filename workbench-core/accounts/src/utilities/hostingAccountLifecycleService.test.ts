@@ -36,6 +36,7 @@ import {
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { AwsService } from '@aws/workbench-core-base';
+import Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
 
@@ -148,6 +149,40 @@ describe('HostingAccountLifecycleService', () => {
         externalId: 'someExternalId'
       })
     ).resolves.not.toThrowError();
+  });
+
+  test('initializeAccount throws an error when artifactBucketArn has no bucket name', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    hostingAccountLifecycleService.updateBusPermissions = jest.fn();
+    hostingAccountLifecycleService.updateArtifactsBucketPolicy = jest.fn();
+    hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
+
+    const cfnMock = mockClient(CloudFormationClient);
+    const missingBucketNameArn = 'arn:aws:s3::::';
+    mockCloudformationOutputs(cfnMock, 'CREATE_COMPLETE', missingBucketNameArn);
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(GetItemCommand).resolves({
+      Item: {
+        awsAccountId: { S: '123456789012' },
+        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
+        portfolioId: { S: 'port-1234' },
+        accountId: { S: 'abc-xyz' }
+      }
+    });
+
+    await expect(
+      hostingAccountLifecycleService.createAccount({
+        name: 'fakeName',
+        externalId: 'abc-xyz',
+        awsAccountId: '123456789012',
+        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
+        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role'
+      })
+    ).rejects.toThrowError(
+      Boom.internal(`Could not identify bucket name in S3 artifact bucket ARN ${missingBucketNameArn}`)
+    );
   });
 
   test('updateBusPermissions triggered for adding account to bus rule', async () => {
