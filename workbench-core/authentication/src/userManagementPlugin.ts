@@ -57,12 +57,12 @@ export interface UserManagementPlugin {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array containing all the user ids
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
-  listUsers(): Promise<string[]>;
+  listUsers(): Promise<User[]>;
 
   /**
    * List the user IDs assoicated with a given role.
