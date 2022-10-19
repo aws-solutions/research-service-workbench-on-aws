@@ -28,8 +28,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      
-    steps:        
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -43,7 +43,7 @@ jobs:
           aws-region: ${{ secrets.aws-dev-region }}
           role-to-assume: ${{ secrets.role-to-assume }}
           role-session-name: OIDCSessionName
-      
+
       - name: Deploy SWB-Reference
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
@@ -64,7 +64,7 @@ jobs:
         run: |
           cd solutions/swb-reference
           STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests
-      
+
       - name: Run End To End tests
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
