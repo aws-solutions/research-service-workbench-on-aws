@@ -37,13 +37,15 @@ import {
   UserAlreadyExistsError,
   UserNotFoundError
 } from '..';
+import { Status } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 
 const userInfo: Omit<User, 'roles'> = {
   uid: '123',
   firstName: 'John',
   lastName: 'Doe',
-  email: 'john@doe.com'
+  email: 'john@doe.com',
+  status: Status.ACTIVE
 } as const;
 
 const cognitoMock = mockClient(CognitoIdentityProviderClient);
@@ -73,7 +75,8 @@ describe('CognitoUserManagementPlugin tests', () => {
           { Name: 'given_name', Value: userInfo.firstName },
           { Name: 'family_name', Value: userInfo.lastName },
           { Name: 'email', Value: userInfo.email }
-        ]
+        ],
+        Enabled: true
       });
       cognitoMock
         .on(AdminListGroupsForUserCommand)
@@ -92,7 +95,8 @@ describe('CognitoUserManagementPlugin tests', () => {
         UserAttributes: [
           { Name: 'family_name', Value: userInfo.lastName },
           { Name: 'email', Value: userInfo.email }
-        ]
+        ],
+        Enabled: true
       });
       cognitoMock
         .on(AdminListGroupsForUserCommand)
@@ -112,7 +116,8 @@ describe('CognitoUserManagementPlugin tests', () => {
         UserAttributes: [
           { Name: 'given_name', Value: userInfo.firstName },
           { Name: 'email', Value: userInfo.email }
-        ]
+        ],
+        Enabled: true
       });
       cognitoMock
         .on(AdminListGroupsForUserCommand)
@@ -132,7 +137,8 @@ describe('CognitoUserManagementPlugin tests', () => {
         UserAttributes: [
           { Name: 'given_name', Value: userInfo.firstName },
           { Name: 'family_name', Value: userInfo.lastName }
-        ]
+        ],
+        Enabled: true
       });
       cognitoMock
         .on(AdminListGroupsForUserCommand)
@@ -147,13 +153,57 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
     });
 
-    it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
+    it('should return Status.INACTIVE for the Users status when the user is disabled', async () => {
+      cognitoMock.on(AdminGetUserCommand).resolves({
+        UserAttributes: [
+          { Name: 'given_name', Value: userInfo.firstName },
+          { Name: 'family_name', Value: userInfo.lastName },
+          { Name: 'email', Value: userInfo.email }
+        ],
+        Enabled: false
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const user = await plugin.getUser(userInfo.uid);
+
+      expect(user).toMatchObject<User>({
+        ...userInfo,
+        status: Status.INACTIVE,
+        roles
+      });
+    });
+
+    it('should return Status.INACTIVE for the Users status when it is not set', async () => {
       cognitoMock.on(AdminGetUserCommand).resolves({
         UserAttributes: [
           { Name: 'given_name', Value: userInfo.firstName },
           { Name: 'family_name', Value: userInfo.lastName },
           { Name: 'email', Value: userInfo.email }
         ]
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const user = await plugin.getUser(userInfo.uid);
+
+      expect(user).toMatchObject<User>({
+        ...userInfo,
+        status: Status.INACTIVE,
+        roles
+      });
+    });
+
+    it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
+      cognitoMock.on(AdminGetUserCommand).resolves({
+        UserAttributes: [
+          { Name: 'given_name', Value: userInfo.firstName },
+          { Name: 'family_name', Value: userInfo.lastName },
+          { Name: 'email', Value: userInfo.email }
+        ],
+        Enabled: true
       });
       cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
 
@@ -166,7 +216,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should return an empty string for the Users first name, last name, and email when the user doesnt have an attributes field', async () => {
-      cognitoMock.on(AdminGetUserCommand).resolves({});
+      cognitoMock.on(AdminGetUserCommand).resolves({ Enabled: true });
       cognitoMock
         .on(AdminListGroupsForUserCommand)
         .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
@@ -188,7 +238,8 @@ describe('CognitoUserManagementPlugin tests', () => {
           { Name: 'given_name', Value: userInfo.firstName },
           { Name: 'family_name', Value: userInfo.lastName },
           { Name: 'email', Value: userInfo.email }
-        ]
+        ],
+        Enabled: true
       });
       cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: roles.map(() => ({})) });
 
@@ -243,7 +294,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should create the requested User when all params are valid', async () => {
       const createMock = cognitoMock.on(AdminCreateUserCommand).resolves({});
 
-      await plugin.createUser({ ...userInfo, roles });
+      await plugin.createUser(userInfo);
 
       expect(createMock.calls().length).toBe(1);
     });
@@ -251,7 +302,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new InternalErrorException({ $metadata: {} }));
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(
         new IdpUnavailableError('Cognito encountered an internal error')
       );
     });
@@ -259,7 +310,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(
         new PluginConfigurationError('Plugin is not authorized to create a user')
       );
     });
@@ -267,7 +318,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(
         new PluginConfigurationError('Invalid user pool id')
       );
     });
@@ -275,7 +326,7 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw UserAlreadyExistsError when a user with the user id already exists', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new UsernameExistsException({ $metadata: {} }));
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(
         new UserAlreadyExistsError('A user with this user ID already exists')
       );
     });
@@ -285,7 +336,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects({ name: 'UsernameExistsException', message: 'An account with the email already exists.' });
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(
         new UserAlreadyExistsError('A user with this email already exists')
       );
     });
@@ -293,15 +344,13 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw InvalidParameterError the email provided is not in the proper format', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new InvalidParameterException({ $metadata: {} }));
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(
-        new InvalidParameterError('Invalid email')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(new InvalidParameterError('Invalid email'));
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new Error());
 
-      await expect(plugin.createUser({ ...userInfo, roles })).rejects.toThrow(Error);
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(Error);
     });
   });
 
