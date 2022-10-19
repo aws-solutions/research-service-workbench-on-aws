@@ -455,9 +455,9 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public subnet 1
-    Metadata:
+    Metadata: 
       cfn_nag:
-        rules_to_supress:
+        rules_to_suppress:
           - id: W33
             reason: We pass this VPC back to the main account, where it is used to set up a environments that anyone can access
             # TODO THIS IS VERY BAD ... INSECURE BY DEFAULT
