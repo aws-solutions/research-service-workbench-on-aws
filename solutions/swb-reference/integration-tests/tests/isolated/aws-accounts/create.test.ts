@@ -31,8 +31,8 @@ describe('aws-accounts create negative tests', () => {
     awsAccountId: randomTextGenerator.getFakeText('fakeAccount'),
     envMgmtRoleArn: randomTextGenerator.getFakeText('fakeEnvMgmtRoleArn'),
     hostingAccountHandlerRoleArn: randomTextGenerator.getFakeText('fakeHostingAccountHandlerRoleArn'),
-    environmentInstanceFiles: randomTextGenerator.getFakeText('fakeEnvironmentInstanceFiles'),
-    encryptionKeyArn: randomTextGenerator.getFakeText('fakeEncryptionKeyArn')
+    name: randomTextGenerator.getFakeText('fakeName'),
+    externalId: randomTextGenerator.getFakeText('fakeExternalId')
   };
 
   describe('Account already onboarded', () => {
@@ -48,6 +48,7 @@ describe('aws-accounts create negative tests', () => {
 
       const existingAwsAccountId = _.first(existingAccounts)!.awsAccountId;
       invalidParam.awsAccountId = existingAwsAccountId;
+
       try {
         await adminSession.resources.accounts.create(invalidParam, false);
       } catch (e) {

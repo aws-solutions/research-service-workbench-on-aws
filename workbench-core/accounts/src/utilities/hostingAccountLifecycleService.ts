@@ -10,9 +10,33 @@ import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
 import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import AccountService from '../services/accountService';
+
+interface Arns {
+  statusHandlerArn: string;
+  artifactBucketArn: string;
+  mainAcctEncryptionArn: string;
+}
+
+export interface CreateAccountMetadata {
+  name: string;
+  awsAccountId: string;
+  envMgmtRoleArn: string;
+  hostingAccountHandlerRoleArn: string;
+  externalId: string;
+}
+
+export interface UpdateAccountMetadata {
+  id: string;
+  name?: string;
+  awsAccountId?: string;
+  envMgmtRoleArn?: string;
+  hostingAccountHandlerRoleArn?: string;
+  externalId?: string;
+}
 
 export default class HostingAccountLifecycleService {
   private _aws: AwsService;
@@ -31,31 +55,33 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async initializeAccount(accountMetadata: {
-    [key: string]: string;
-  }): Promise<{ [key: string]: string }> {
-    const cfService = this._aws.helpers.cloudformation;
-    const {
-      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
-    } = await cfService.getCfnOutput(this._stackName, [
-      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
-    ]);
+  public async createAccount(accountMetadata: CreateAccountMetadata): Promise<{ [key: string]: string }> {
+    const arns = await this._getArns();
 
-    // Update main account default event bus to accept hosting account state change events
-    await this.updateBusPermissions(statusHandlerArn, accountMetadata.awsAccountId);
+    await this._attachAwsAccount({
+      awsAccountId: accountMetadata.awsAccountId,
+      arns: arns
+    });
 
-    // Add account to artifactBucket's bucket policy
-    await this.updateArtifactsBucketPolicy(artifactBucketArn, accountMetadata.awsAccountId);
+    const environmentInstanceFiles = this._getEnvironmentFilesPathForArn(arns.artifactBucketArn);
 
-    // Update main account encryption key policy
-    await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, accountMetadata.awsAccountId);
+    return this._accountService.create({
+      ...accountMetadata,
+      environmentInstanceFiles
+    });
+  }
 
-    // Finally store the new/updated account details in DDB
-    return this._accountService.createOrUpdate(accountMetadata);
+  public async updateAccount(accountMetadata: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
+    if (accountMetadata.awsAccountId) {
+      await this._attachAwsAccount({
+        awsAccountId: accountMetadata.awsAccountId,
+        arns: await this._getArns()
+      });
+    }
+
+    return this._accountService.update({
+      ...accountMetadata
+    });
   }
 
   /**
@@ -140,7 +166,7 @@ export default class HostingAccountLifecycleService {
       );
     }
 
-    // If Get statement doesn't exist, create one
+    // If the Get statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
       const getStatement = PolicyStatement.fromJson(
         JSON.parse(`
@@ -156,7 +182,7 @@ export default class HostingAccountLifecycleService {
       );
       bucketPolicy.addStatements(getStatement);
     } else {
-      // If Get statement doesn't contain this accountId, add it
+      // If the Get statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
         'Get:environment-files',
@@ -186,7 +212,7 @@ export default class HostingAccountLifecycleService {
    * roleToCopyToTargetAccount - IAM role that should be copied from main account to target account.
    * s3ArtifactBucketName - S3 bucket that contains CFN Template for hosting account
    */
-  public async updateAccount(params: {
+  public async updateHostingAccountData(params: {
     ddbAccountId: string;
     targetAccountId: string;
     targetAccountAwsService: AwsService;
@@ -479,6 +505,18 @@ export default class HostingAccountLifecycleService {
     return currOutputVal;
   }
 
+  private _getEnvironmentFilesPathForArn(artifactBucketArn: string): string {
+    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    const bucketName = parsedBucketArn[0];
+
+    if (_.isEmpty(bucketName) || bucketName.length === 0) {
+      console.error(`Could not identify bucket name in S3 artifact bucket ARN ${artifactBucketArn}`);
+      throw Boom.internal(`Could not identify bucket name in S3 artifact bucket.`);
+    }
+
+    return `s3://${bucketName}/environment-files`;
+  }
+
   private async _getSSMDocuments(stackName: string, ssmDocNameSuffix: string): Promise<string[]> {
     const describeStackParam = {
       StackName: stackName
@@ -493,5 +531,43 @@ export default class HostingAccountLifecycleService {
     return ssmDocOutputs.map((output: Output) => {
       return this._getNameFromArn({ output, outputName: output.OutputKey });
     });
+  }
+
+  private async _getArns(): Promise<Arns> {
+    const cfService = this._aws.helpers.cloudformation;
+    const {
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
+    } = await cfService.getCfnOutput(this._stackName, [
+      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
+    ]);
+
+    return {
+      statusHandlerArn,
+      artifactBucketArn,
+      mainAcctEncryptionArn
+    };
+  }
+
+  private async _attachAwsAccount({
+    awsAccountId,
+    arns
+  }: {
+    awsAccountId: string;
+    arns: Arns;
+  }): Promise<void> {
+    const { statusHandlerArn, artifactBucketArn, mainAcctEncryptionArn } = arns;
+
+    // Update main account default event bus to accept hosting account state change events
+    await this.updateBusPermissions(statusHandlerArn, awsAccountId);
+
+    // Add account to artifactBucket's bucket policy
+    await this.updateArtifactsBucketPolicy(artifactBucketArn, awsAccountId);
+
+    // Update main account encryption key policy
+    await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, awsAccountId);
   }
 }

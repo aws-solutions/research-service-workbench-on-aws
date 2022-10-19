@@ -53,20 +53,6 @@ export default class AccountService {
   }
 
   /**
-   * Create or update hosting account record in DDB
-   * @param accountMetadata - Attributes of account to create/update
-   *
-   * @returns Account entry in DDB
-   */
-  public async createOrUpdate(accountMetadata: {
-    [key: string]: string;
-  }): Promise<{ [key: string]: string }> {
-    if (_.isUndefined(accountMetadata.id)) return this.create(accountMetadata);
-
-    return this.update(accountMetadata);
-  }
-
-  /**
    * Get all account entries from DDB
    *
    * @returns Account entries in DDB
@@ -112,7 +98,7 @@ export default class AccountService {
 
     const id = await this._storeToDdb(accountMetadata);
 
-    return { id, ...accountMetadata };
+    return { ...accountMetadata, id };
   }
 
   public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
@@ -123,8 +109,8 @@ export default class AccountService {
     // Check if AWS account ID already exists in DDB
     const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
     const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
-    // When trying to onboard a new account, its AWS accound ID shouldn't be present in DDB
-    if (ddbEntries && ddbEntries!.Count && ddbEntries.Count > 0) {
+    // When trying to onboard a new account, its AWS account ID shouldn't be present in DDB
+    if (ddbEntries && ddbEntries.Count && ddbEntries.Count > 0) {
       throw Boom.badRequest(
         'This AWS Account was found in DDB. Please provide the correct id value in request body'
       );
@@ -149,6 +135,7 @@ export default class AccountService {
     const accountParams: { item: { [key: string]: string } } = {
       item: {
         id: accountMetadata.id,
+        name: accountMetadata.name,
         awsAccountId: accountMetadata.awsAccountId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
         hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,

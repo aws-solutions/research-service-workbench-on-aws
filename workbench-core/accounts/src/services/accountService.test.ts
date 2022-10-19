@@ -37,7 +37,7 @@ describe('AccountService', () => {
 
   const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
-  test('createOrUpdate follows create account path as expected', async () => {
+  test('create follows create account path as expected', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -49,7 +49,7 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.create(accountMetadata);
 
     // CHECK
     expect(response).toEqual({
@@ -58,7 +58,7 @@ describe('AccountService', () => {
     });
   });
 
-  test('createOrUpdate follows update account path as expected', async () => {
+  test('update follows update account path as expected', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -80,13 +80,13 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('createOrUpdate follows update account path as expected without awsAccountId or externalId', async () => {
+  test('update follows update account path as expected without awsAccountId or externalId', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -106,13 +106,13 @@ describe('AccountService', () => {
     accountMetadata.accountId = 'sampleAccId';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('createOrUpdate throws error when update process finds account with different aws account id', async () => {
+  test('update throws error when update process finds account with different aws account id', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -134,12 +134,12 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.update(accountMetadata)).rejects.toThrow(
       'The AWS Account mapped to this accountId is different than the one provided'
     );
   });
 
-  test('createOrUpdate throws error when update process cannot find account', async () => {
+  test('update throws error when update process cannot find account', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -152,12 +152,12 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.update(accountMetadata)).rejects.toThrow(
       `Could not find account ${accountMetadata.accountId}`
     );
   });
 
-  test('createOrUpdate throws error when create process finds a duplicate entry', async () => {
+  test('create throws error when create process finds a duplicate entry', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -168,22 +168,22 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.create(accountMetadata)).rejects.toThrow(
       'This AWS Account was found in DDB. Please provide the correct id value in request body'
     );
   });
 
-  test('createOrUpdate throws error when create has missing aws account ID', async () => {
+  test('create throws error when create has missing aws account ID', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.create(accountMetadata)).rejects.toThrow(
       'Missing AWS Account ID in request body'
     );
   });
 
-  test('createOrUpdate follows create account path as expected', async () => {
+  test('create follows create account path as expected', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -194,7 +194,7 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.create(accountMetadata);
 
     // CHECK
     expect(response).toEqual({
@@ -203,7 +203,7 @@ describe('AccountService', () => {
     });
   });
 
-  test('createOrUpdate follows update account path as expected when aws account not provided in metadata', async () => {
+  test('update follows update account path as expected when aws account not provided in metadata', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
 
@@ -225,7 +225,7 @@ describe('AccountService', () => {
     };
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
