@@ -206,7 +206,6 @@ export class CognitoAuthenticationPlugin implements AuthenticationPlugin {
    * @throws {@link InvalidJWTError} if the token doesnt contain the user's roles
    */
   public getUserRolesFromToken(decodedToken: CognitoAccessTokenPayload): string[] {
-    console.log(JSON.stringify(decodedToken));
     const roles = decodedToken['cognito:groups'];
     if (!roles) {
       // jwt does not have a cognito:roles claim
