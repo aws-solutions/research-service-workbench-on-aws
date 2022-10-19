@@ -645,7 +645,7 @@ export class SWBStack extends Stack {
           }),
           new PolicyStatement({
             actions: ['sts:AssumeRole'],
-            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
+            resources: ['arn:aws:iam::*:role/*EnvManagementRole*', 'arn:aws:iam::*:role/*hosting-account-role'],
             sid: 'AssumeRole'
           }),
           new PolicyStatement({
