@@ -45,4 +45,4 @@ mkdir -p .tools && {
 }
 
 echo "Starting content scanning `date` in `pwd`"
-.tools/viperlight/bin/viperlight scan -m files-contents -m files-aws -m files-binary -m files-entropy -m files-secrets && (echo "Completed scanning `date`"% && deleteViperlightDir) || (echo "Viperlight scanning failed" && deleteViperlightDir && exit 1)
+.tools/viperlight/bin/viperlight scan -m files-contents -m files-aws -m files-binary -m files-entropy -m files-secrets && (echo "Completed content scanning `date`" && deleteViperlightDir) || (echo "Viperlight scanning failed" && deleteViperlightDir && exit 1)
