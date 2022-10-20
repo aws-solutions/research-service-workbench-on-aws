@@ -41,6 +41,10 @@ const userPoolDefaults: UserPoolProps = {
     email: {
       required: true
     }
+  },
+  mfaSecondFactor: {
+    sms: false,
+    otp: true
   }
 };
 
