@@ -30,9 +30,7 @@ describe('multiStep dataset integration test', () => {
       path: datasetName, // using same name to help potential troubleshooting
       datasetName,
       description: datasetName,
-      customMetadata: {
-        owningProjectId: datasetName
-      }
+      owningProjectId: datasetName
     };
 
     const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);

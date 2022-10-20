@@ -12,14 +12,10 @@ export interface DatasetItem {
   storageName: string;
 }
 
-interface DatasetMetadata {
-  owningProjectId?: string;
-}
-
 export interface CreateDatasetForm {
   datasetName?: string;
   description?: string;
-  customMetadata?: DatasetMetadata;
+  owningProjectId?: string;
 }
 
 export interface CreateDatasetFormValidation {

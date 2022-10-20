@@ -6,7 +6,7 @@ import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
 import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
-import { checkHttpError, RecursivePartial } from '../../../support/utils/utilities';
+import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets create negative tests', () => {
   const setup: Setup = new Setup();
@@ -28,9 +28,7 @@ describe('datasets create negative tests', () => {
   const validLaunchParameters = {
     datasetName: randomTextGenerator.getFakeText('fakeName'),
     path: randomTextGenerator.getFakeText('fakePath'),
-    customMetadata: {
-      owningProjectId: randomTextGenerator.getFakeText('fakeOwningProjectId')
-    }
+    owningProjectId: randomTextGenerator.getFakeText('fakeOwningProjectId')
   };
 
   describe('missing parameters', () => {
@@ -68,41 +66,22 @@ describe('datasets create negative tests', () => {
       }
     });
 
-    describe('customMetadata', () => {
-      test('customMetadata', async () => {
-        try {
-          const invalidParam: Partial<typeof validLaunchParameters> = { ...validLaunchParameters };
-          delete invalidParam.customMetadata;
-          await adminSession.resources.datasets.create(invalidParam, false);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              statusCode: 400,
-              error: 'Bad Request',
-              message: "requires property 'customMetadata'"
-            })
-          );
-        }
-      });
+    test('owningProjectId', async () => {
+      try {
+        const invalidParam: Partial<typeof validLaunchParameters> = { ...validLaunchParameters };
+        delete invalidParam.owningProjectId;
 
-      test('customMetadata.owningProjectId', async () => {
-        try {
-          const invalidParam: RecursivePartial<typeof validLaunchParameters> = { ...validLaunchParameters };
-          delete invalidParam.customMetadata?.owningProjectId;
-
-          await adminSession.resources.datasets.create(invalidParam, false);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              statusCode: 400,
-              error: 'Bad Request',
-              message: "customMetadata requires property 'owningProjectId'"
-            })
-          );
-        }
-      });
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'owningProjectId'"
+          })
+        );
+      }
     });
 
     test('all parameters', async () => {
@@ -115,7 +94,7 @@ describe('datasets create negative tests', () => {
             statusCode: 400,
             error: 'Bad Request',
             message:
-              "requires property 'datasetName'. requires property 'path'. requires property 'customMetadata'"
+              "requires property 'datasetName'. requires property 'path'. requires property 'owningProjectId'"
           })
         );
       }

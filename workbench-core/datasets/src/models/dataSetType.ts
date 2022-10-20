@@ -4,6 +4,6 @@
  */
 
 export enum DataSetType {
-  internal = 'internal',
-  external = 'external'
+  INTERNAL = 'internal',
+  EXTERNAL = 'external'
 }

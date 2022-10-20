@@ -70,7 +70,7 @@ export const NewDatasetForm = ({
         'projectIdError',
         setFormErrors,
         datasetProjectIdValidationRules,
-        formData.customMetadata?.owningProjectId
+        formData.owningProjectId
       ) && isValid;
 
     return isValid;
@@ -169,13 +169,13 @@ export const NewDatasetForm = ({
                   ? null
                   : projects
                       .map((p) => ({ label: p.name, value: p.id }))
-                      .filter((p) => p.value === formData?.customMetadata?.owningProjectId)[0] || null
+                      .filter((p) => p.value === formData.owningProjectId)[0] || null
               }
               loadingText="Loading Projects"
               options={projects.map((p) => ({ label: p.name, value: p.id }))}
-              selectedAriaLabel={formData?.customMetadata?.owningProjectId}
+              selectedAriaLabel={formData?.owningProjectId}
               onChange={({ detail: { selectedOption } }) => {
-                setFormData({ ...formData, customMetadata: { owningProjectId: selectedOption.value } });
+                setFormData({ ...formData, owningProjectId: selectedOption.value });
                 validateField<string | undefined, CreateDatasetFormValidation>(
                   'projectIdError',
                   setFormErrors,

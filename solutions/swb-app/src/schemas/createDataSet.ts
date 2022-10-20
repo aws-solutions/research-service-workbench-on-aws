@@ -13,17 +13,10 @@ const CreateDataSetSchema: Schema = {
     datasetName: { type: 'string' },
     path: { type: 'string' },
     description: { type: 'string' },
-    customMetadata: {
-      type: 'object',
-      properties: {
-        owningProjectId: { type: 'string' }
-      },
-      additionalProperties: false,
-      required: ['owningProjectId']
-    }
+    owningProjectId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['datasetName', 'path', 'customMetadata']
+  required: ['datasetName', 'path', 'owningProjectId']
 };
 
 export default CreateDataSetSchema;

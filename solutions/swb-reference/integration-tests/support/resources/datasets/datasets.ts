@@ -29,7 +29,7 @@ export default class Datasets extends CollectionResource {
       datasetName: resource.datasetName ?? dataSetName,
       path: resource.path ?? dataSetName,
       description: resource.description,
-      customMetadata: resource.customMetadata
+      owningProjectId: resource.owningProjectId
     };
   }
 }
@@ -38,7 +38,5 @@ interface DataSetCreateRequest {
   datasetName: string;
   path: string;
   description?: string;
-  customMetadata: {
-    owningProjectId: string;
-  };
+  owningProjectId: string;
 }
