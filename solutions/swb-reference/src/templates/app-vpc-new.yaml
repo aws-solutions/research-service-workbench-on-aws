@@ -1,0 +1,941 @@
+# © 2022 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.
+
+# This AWS Content is provided subject to the terms of the AWS Customer Agreement
+# available at http://aws.amazon.com/agreement or other written agreement between
+# Customer and either Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  This template creates a 4-AZ, 2 or 3 subnets per AZ based on VPC type infrastructure 
+  option to create TGW attachments and enables VPC Flow logs
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Availability Zone Configuration
+        Parameters:
+          - AvailabilityZones
+          - NumberofAZs
+      - Label:
+          default: VPC Network Configuration
+        Parameters:
+          - VPCCIDR
+          - VPCName
+          - IsPublicVPC
+          - GLBEndpointServiceName
+          - PrivateSubnet1CIDR
+          - PrivateSubnet2CIDR
+          - PrivateSubnet3CIDR
+          - PrivateSubnet4CIDR
+          - GLBSubnet1CIDR
+          - GLBSubnet2CIDR
+          - GLBSubnet3CIDR
+          - GLBSubnet4CIDR
+          - PublicSubnet1CIDR
+          - PublicSubnet2CIDR
+          - PublicSubnet3CIDR
+          - PublicSubnet4CIDR
+      - Label:
+          default: Flow log configuration
+        Parameters:
+          - LogsRetentionInDays
+      - Label:
+          default: TGW configuration
+        Parameters:
+          - TransitGatewayID
+      - Label:
+          default: Tags for resources created
+        Parameters:
+          - Namespace
+          - BaselineTag1Name
+          - BaselineTag1Value
+    ParameterLabels:
+      AvailabilityZones:
+        default: Availability Zones
+      VPCName:
+        default: VPC Name
+      PrivateSubnet1CIDR:
+        default: Private subnet 1 CIDR
+      PrivateSubnet2CIDR:
+        default: Private subnet 2 CIDR
+      PrivateSubnet3CIDR:
+        default: Private subnet 3 CIDR
+      PrivateSubnet4CIDR:
+        default: Private subnet 4 CIDR
+      PublicSubnet1CIDR:
+        default: Public subnet 1 CIDR
+      PublicSubnet2CIDR:
+        default: Public subnet 2 CIDR
+      PublicSubnet3CIDR:
+        default: Public subnet 3 CIDR
+      PublicSubnet4CIDR:
+        default: Public subnet 4 CIDR
+      GLBSubnet1CIDR:
+        default: GLB subnet 1 CIDR
+      GLBSubnet2CIDR:
+        default: GLB subnet 2 CIDR
+      GLBSubnet3CIDR:
+        default: GLB subnet 3 CIDR
+      GLBSubnet4CIDR:
+        default: GLB subnet 4 CIDR
+      VPCCIDR:
+        default: VPC CIDR
+      LogsRetentionInDays:
+        default: Flow Logs Retention In Days
+      GLBEndpointServiceName:
+        default: GLB Endpoint Service Name
+      NumberofAZs:
+        default: Number of Availability Zones
+      IsPublicVPC:
+        default: Public VPC
+
+Parameters:
+  AvailabilityZones:
+    Description: "List of Availability Zones to use for the subnets in the VPC."
+    Type: CommaDelimitedList
+    Default: "us-east-1a,us-east-1b,us-east-1c,us-east-1d"
+  NumberofAZs:
+    AllowedValues:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+    Default: "2"
+    Description: Number of Availability Zones to use in the VPC. This must match your selections in the list of Availability Zones parameter.
+    Type: String
+  Namespace:
+    Type: String
+    Description: Prefix for naming resources
+    Default: "App1"  
+  IsPublicVPC:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "true"
+    Description: Set to true if this is a Public VPC. Public Subnets (GWLB and LB subnets will be created).
+    Type: String
+  GLBEndpointServiceName:
+    Type: String
+    Description: Name of the GLB Endpoint service created in the Network Account
+    Default: ""
+  VPCName:
+    Default: "primary"
+    Description: Unique Name for the VPC.
+    Type: String
+  VPCCIDR:
+    Default: 172.28.0.0/19
+    Description: CIDR block for the VPC
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PrivateSubnet1CIDR:
+    Default: 172.28.8.0/23
+    Description: CIDR block for private subnet 1 located in Availability Zone 1
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PrivateSubnet2CIDR:
+    Default: 172.28.10.0/23
+    Description: CIDR block for private subnet 2 located in Availability Zone 2
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PrivateSubnet3CIDR:
+    Default: 172.28.12.0/23
+    Description: CIDR block for private subnet 3 located in Availability Zone 3
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PrivateSubnet4CIDR:
+    Default: 172.28.14.0/23
+    Description: CIDR block for private subnet 4 located in Availability Zone 4
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PublicSubnet1CIDR:
+    Default: 172.28.1.0/24
+    Description: CIDR block for the public DMZ subnet 1 located in Availability Zone 1
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PublicSubnet2CIDR:
+    Default: 172.28.2.0/24
+    Description: CIDR block for the public DMZ subnet 2 located in Availability Zone 2
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PublicSubnet3CIDR:
+    Default: 172.28.3.0/24
+    Description: CIDR block for the public DMZ subnet 3 located in Availability Zone 3
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  PublicSubnet4CIDR:
+    Default: 172.28.4.0/24
+    Description: CIDR block for the public DMZ subnet 4 located in Availability Zone 4
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  GLBSubnet1CIDR:
+    Default: 172.28.0.0/28
+    Description: CIDR block for the gateway load balancer subnet 1 located in Availability Zone 1
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  GLBSubnet2CIDR:
+    Default: 172.28.0.16/28
+    Description: CIDR block for the gateway load balancer subnet 2 located in Availability Zone 2
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  GLBSubnet3CIDR:
+    Default: 172.28.0.32/28
+    Description: CIDR block for the gateway load balancer subnet 3 located in Availability Zone 3
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  GLBSubnet4CIDR:
+    Default: 172.28.0.48/28
+    Description: CIDR block for the gateway load balancer subnet 4 located in Availability Zone 4
+    Type: String
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+  TransitGatewayID:
+    Description: Id of Transit Gateway in Network Account
+    Type: String
+    Default: ""
+  LogsRetentionInDays:
+    Description: "Specifies the number of days you want to retain log events in the specified log group."
+    Type: Number
+    Default: 14
+    AllowedValues:
+      [
+        7,
+        14,
+        30,
+        90,
+        180,
+        365,
+      ]
+  # Tags
+  BaselineTag1Name:
+    Type: String
+    Description: Name of a required tag for VPC usecase
+    Default: "ApplicationName"
+  BaselineTag1Value:
+    Type: String
+    Description: Value of a required tag for VPC usecase
+    Default: ""
+
+Conditions:
+
+  AZ1:
+    !Or [
+      !Equals [!Ref "NumberofAZs", "1"],
+      !Equals [!Ref "NumberofAZs", "2"],
+      !Equals [!Ref "NumberofAZs", "3"],
+      !Equals [!Ref "NumberofAZs", "4"],
+    ]
+  AZ2:
+    !Or [
+      !Equals [!Ref "NumberofAZs", "2"],
+      !Equals [!Ref "NumberofAZs", "3"],
+      !Equals [!Ref "NumberofAZs", "4"],
+    ]
+  AZ3:
+    !Or [
+      !Equals [!Ref "NumberofAZs", "3"],
+      !Equals [!Ref "NumberofAZs", "4"],
+    ]
+  AZ4:  !Equals [!Ref "NumberofAZs", "4"]
+
+  PublicVPC: !Equals [!Ref "IsPublicVPC", "true"]
+
+  GWLB1: !And [!Condition "AZ1", !Condition "PublicVPC"]
+  GWLB2: !And [!Condition "AZ2", !Condition "PublicVPC"]
+  GWLB3: !And [!Condition "AZ3", !Condition "PublicVPC"]
+  GWLB4: !And [!Condition "AZ4", !Condition "PublicVPC"]
+
+  PubSub1: !And [!Condition "AZ1", !Condition "PublicVPC"]
+  PubSub2: !And [!Condition "AZ2", !Condition "PublicVPC"]
+  PubSub3: !And [!Condition "AZ3", !Condition "PublicVPC"]
+  PubSub4: !And [!Condition "AZ4", !Condition "PublicVPC"]
+
+  TGWA1: !Equals [!Ref "NumberofAZs", "1"]
+  TGWA2: !Equals [!Ref "NumberofAZs", "2"]
+  TGWA3: !Equals [!Ref "NumberofAZs", "3"]
+  TGWA4: !Equals [!Ref "NumberofAZs", "4"]
+
+Resources:
+  ################### Lambda wait function to wait for the TGW attachment to be available ###################
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: "lambda-logs"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - "arn:aws:logs:*:*:*"
+
+  DelayFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Handler: "index.handler"
+      Timeout: 600
+      Role: !GetAtt 'LambdaRole.Arn'
+      Runtime: python3.7
+      Code:
+        ZipFile: |
+          import json
+          import cfnresponse
+          import time
+          def handler(event, context):
+            time_to_wait = int(event['ResourceProperties']['TimeToWait'])
+            print('wait started')
+            time.sleep(time_to_wait)
+            responseData = {}
+            responseData['Data'] = "wait complete"
+            print("wait completed")
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+
+  ################### VPC, DHCP and Internet gateway ###################
+  DHCPOptions:
+    Type: AWS::EC2::DHCPOptions
+    Properties:
+      DomainNameServers:
+        - AmazonProvidedDNS
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-dhcp-${VPCName}"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref "VPCCIDR"
+      EnableDnsSupport: True
+      EnableDnsHostnames: True
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCName}"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  VPCDHCPOptionsAssociation:
+    Type: AWS::EC2::VPCDHCPOptionsAssociation
+    Properties:
+      VpcId: !Ref "VPC"
+      DhcpOptionsId: !Ref "DHCPOptions"
+
+  InternetGateway:
+    Condition: PublicVPC
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-igw"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  VPCGatewayAttachment:
+    Condition: PublicVPC
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref "VPC"
+      InternetGatewayId: !Ref "InternetGateway"
+
+  ######################### Private Subnets ############################
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PrivateSubnet1CIDR"
+      AvailabilityZone: !Select ["0", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-private-az1"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: private
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Condition: AZ2
+    DependsOn: PrivateSubnet1
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PrivateSubnet2CIDR"
+      AvailabilityZone: !Select ["1", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-private-az2"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: private
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: AZ3
+    DependsOn: PrivateSubnet2
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PrivateSubnet3CIDR"
+      AvailabilityZone: !Select ["2", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-private-az3"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: private
+
+  PrivateSubnet4:
+    Type: AWS::EC2::Subnet
+    Condition: AZ4
+    DependsOn: PrivateSubnet3
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PrivateSubnet4CIDR"
+      AvailabilityZone: !Select ["3", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-private-az4"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: private
+
+################### Transit Gateway Attachment for VPC and All Private Subnets ###################
+  TransitGatewayAttachment1:
+    Condition: TGWA1
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - !Ref PrivateSubnet1
+      TransitGatewayId: !Ref TransitGatewayID
+      VpcId: !Ref "VPC"
+  TransitGatewayAttachment2:
+    Condition: TGWA2
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      TransitGatewayId: !Ref TransitGatewayID
+      VpcId: !Ref "VPC"
+  TransitGatewayAttachment3:
+    Condition: TGWA3
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+      TransitGatewayId: !Ref TransitGatewayID
+      VpcId: !Ref "VPC"
+  TransitGatewayAttachment4:
+    Condition: TGWA4
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+        - !Ref PrivateSubnet4
+      TransitGatewayId: !Ref TransitGatewayID
+      VpcId: !Ref "VPC"
+      
+  ################### Gateway Load Balancer Subnets, Endpoints and Route Table ###################
+  GatewayLoadBalancerSubnet1:
+    Condition: GWLB1
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "GLBSubnet1CIDR"
+      AvailabilityZone: !Select ["0", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-GLB-subnet-az1"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+
+  GatewayLoadBalancerSubnet2:
+    Condition: GWLB2
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "GLBSubnet2CIDR"
+      AvailabilityZone: !Select ["1", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-GLB-subnet-az2"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+
+  GatewayLoadBalancerSubnet3:
+    Condition: GWLB3
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "GLBSubnet3CIDR"
+      AvailabilityZone: !Select ["2", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-GLB-subnet-az3"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+
+  GatewayLoadBalancerSubnet4:
+    Condition: GWLB4
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "GLBSubnet4CIDR"
+      AvailabilityZone: !Select ["3", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-GLB-subnet-az4"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+
+  GLBEndpoint1:
+    Condition: GWLB1
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Ref GLBEndpointServiceName
+      SubnetIds:
+        - !Ref GatewayLoadBalancerSubnet1
+      VpcEndpointType: GatewayLoadBalancer
+      VpcId: !Ref VPC
+
+  GLBEndpoint2:
+    Condition: GWLB2
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Ref GLBEndpointServiceName
+      SubnetIds:
+        - !Ref GatewayLoadBalancerSubnet2
+      VpcEndpointType: GatewayLoadBalancer
+      VpcId: !Ref VPC
+
+  GLBEndpoint3:
+    Condition: GWLB3
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Ref GLBEndpointServiceName
+      SubnetIds:
+        - !Ref GatewayLoadBalancerSubnet3
+      VpcEndpointType: GatewayLoadBalancer
+      VpcId: !Ref VPC
+
+  GLBEndpoint4:
+    Condition: GWLB4
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Ref GLBEndpointServiceName
+      SubnetIds:
+        - !Ref GatewayLoadBalancerSubnet4
+      VpcEndpointType: GatewayLoadBalancer
+      VpcId: !Ref VPC
+
+  GatewayLoadBalancerSubnetRouteTable:
+    Condition: PublicVPC
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-GLB-subnets"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  GatewayLoadBalancerSubnetRoute:
+    Condition: PublicVPC
+    DependsOn: VPCGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "GatewayLoadBalancerSubnetRouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref "InternetGateway"
+
+  GLBSubnet1RouteTableAssociation:
+    Condition: GWLB1
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "GatewayLoadBalancerSubnet1"
+      RouteTableId: !Ref "GatewayLoadBalancerSubnetRouteTable"
+
+  GLBSubnet2RouteTableAssociation:
+    Condition: GWLB2
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "GatewayLoadBalancerSubnet2"
+      RouteTableId: !Ref "GatewayLoadBalancerSubnetRouteTable"
+
+  GLBSubnet3RouteTableAssociation:
+    Condition: GWLB3
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "GatewayLoadBalancerSubnet3"
+      RouteTableId: !Ref "GatewayLoadBalancerSubnetRouteTable"
+
+  GLBSubnet4RouteTableAssociation:
+    Condition: GWLB4
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "GatewayLoadBalancerSubnet4"
+      RouteTableId: !Ref "GatewayLoadBalancerSubnetRouteTable"
+
+  ############################ Public Subnets #################################################
+  PublicSubnet1:
+    Condition: PubSub1
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PublicSubnet1CIDR"
+      AvailabilityZone: !Select ["0", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-public-az1"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet2:
+    Condition: PubSub2
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PublicSubnet2CIDR"
+      AvailabilityZone: !Select ["1", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-public-az2"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet3:
+    Condition: PubSub3
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PublicSubnet3CIDR"
+      AvailabilityZone: !Select ["2", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-public-az3"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet4:
+    Condition: PubSub4
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref "VPC"
+      CidrBlock: !Ref "PublicSubnet4CIDR"
+      AvailabilityZone: !Select ["3", !Ref "AvailabilityZones"]
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-subnet-public-az4"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+        - Key: subnet-type
+          Value: public
+      MapPublicIpOnLaunch: true
+
+  PublicSubnet1RouteTable:
+    Condition: PubSub1
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-public-az1"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  PublicSubnet1Route:
+    Condition: PubSub1
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "PublicSubnet1RouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      VpcEndpointId: !Ref "GLBEndpoint1" ##### outbound traffic from public subnet goes to GLB endpoint in the AZ
+
+  PublicSubnet1RouteTableAssociation:
+    Condition: PubSub1
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PublicSubnet1"
+      RouteTableId: !Ref "PublicSubnet1RouteTable"
+
+  PublicSubnet2RouteTable:
+    Condition: PubSub2
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-public-subnet-az2"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  PublicSubnet2Route:
+    Condition: PubSub2
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "PublicSubnet2RouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      VpcEndpointId: !Ref "GLBEndpoint2"
+
+  PublicSubnet2RouteTableAssociation:
+    Condition: PubSub2
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PublicSubnet2"
+      RouteTableId: !Ref "PublicSubnet2RouteTable"
+
+  PublicSubnet3RouteTable:
+    Condition: PubSub3
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-public-az3"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  PublicSubnet3Route:
+    Condition: PubSub3
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "PublicSubnet3RouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      VpcEndpointId: !Ref "GLBEndpoint3"
+
+  PublicSubnet3RouteTableAssociation:
+    Condition: PubSub3
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PublicSubnet3"
+      RouteTableId: !Ref "PublicSubnet3RouteTable"
+
+  PublicSubnet4RouteTable:
+    Condition: PubSub4
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-public-az4"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  PublicSubnet4Route:
+    Condition: PubSub4
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "PublicSubnet4RouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      VpcEndpointId: !Ref "GLBEndpoint4"
+
+  PublicSubnet4RouteTableAssociation:
+    Condition: PubSub4
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PublicSubnet4"
+      RouteTableId: !Ref "PublicSubnet4RouteTable"
+
+  ################# Internet Gateway Route Table and Routes #########################
+  InternetGatewayRouteTable:
+    Condition: PublicVPC
+    DependsOn: VPCGatewayAttachment
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-internet-gateway"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  InternetGatewayRTAssociation:
+    Condition: PublicVPC
+    Type: AWS::EC2::GatewayRouteTableAssociation
+    Properties:
+      GatewayId: !Ref "InternetGateway"
+      RouteTableId: !Ref "InternetGatewayRouteTable"
+
+  InternetGatewayRoute1:
+    Condition: PubSub1
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "InternetGatewayRouteTable"
+      DestinationCidrBlock: !Ref "PublicSubnet1CIDR"
+      VpcEndpointId: !Ref "GLBEndpoint1"
+
+  InternetGatewayRoute2:
+    Condition:  PubSub2
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "InternetGatewayRouteTable"
+      DestinationCidrBlock: !Ref "PublicSubnet2CIDR"
+      VpcEndpointId: !Ref "GLBEndpoint2"
+
+  InternetGatewayRoute3:
+    Condition: PubSub3
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "InternetGatewayRouteTable"
+      DestinationCidrBlock: !Ref "PublicSubnet3CIDR"
+      VpcEndpointId: !Ref "GLBEndpoint3"
+
+  InternetGatewayRoute4:
+    Condition: PubSub4
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref "InternetGatewayRouteTable"
+      DestinationCidrBlock: !Ref "PublicSubnet4CIDR"
+      VpcEndpointId: !Ref "GLBEndpoint4"
+
+  ################# VPC Flow Logs Cloudwatch Log Group #########################
+
+  VPCFlowLogsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "${Namespace}-vpcflowlogs-${VPC}-loggroup"
+      RetentionInDays: !Ref LogsRetentionInDays
+
+  VPCFlowLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - vpc-flow-logs.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: LogRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Resource: "*"
+      RoleName: !Sub "${Namespace}-${VPCName}-flowlogs-role-${AWS::Region}"
+      Tags:
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  VPCFlowLog:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt "VPCFlowLogsRole.Arn"
+      LogGroupName: !Ref "VPCFlowLogsLogGroup"
+      ResourceId: !Ref "VPC"
+      ResourceType: VPC
+      TrafficType: ALL
+
+  # Containment Security Group
+  ContainmentSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${Namespace}-sg-isolated"
+      GroupDescription: !Sub "${Namespace} Isolation Security Group"
+      SecurityGroupEgress:
+        - Description: Limit outbound traffic to only localhost, removes the default outbound rule
+          CidrIp: 127.0.0.1/32
+          IpProtocol: "-1"
+      Tags:
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+      VpcId:
+        Ref: "VPC"
+
+  #################### Include Wait time for TGW Attachment #################
+  Delay:
+    Type: 'Custom::Delay'
+    Properties:
+      ServiceToken: !GetAtt DelayFunction.Arn
+      TimeToWait: 300
+  #################### End of Delay #####################    
+  ############################ Private Subnets Routables and association #################################################
+  PrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref "VPC"
+      Tags:
+        - Key: Name
+          Value: !Sub "${Namespace}-${VPCName}-routetable-private"
+        - Key: !Ref BaselineTag1Name
+          Value: !Ref BaselineTag1Value
+
+  PrivateSubnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: Delay
+    Properties:
+      RouteTableId: !Ref "PrivateSubnetRouteTable"
+      DestinationCidrBlock: 0.0.0.0/0
+      TransitGatewayId: !Ref "TransitGatewayID"
+  
+  PrivateSubnet1RouteTableAssociation:
+    Condition: AZ1
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PrivateSubnet1"
+      RouteTableId: !Ref "PrivateSubnetRouteTable"
+
+  PrivateSubnet2RouteTableAssociation:
+    Condition: AZ2
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PrivateSubnet2"
+      RouteTableId: !Ref "PrivateSubnetRouteTable"
+
+  PrivateSubnet3RouteTableAssociation:
+    Condition: AZ3
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PrivateSubnet3"
+      RouteTableId: !Ref "PrivateSubnetRouteTable"
+
+  PrivateSubnet4RouteTableAssociation:
+    Condition: AZ4
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref "PrivateSubnet4"
+      RouteTableId: !Ref "PrivateSubnetRouteTable"
