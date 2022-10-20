@@ -326,7 +326,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         })
       );
 
-      return users;
+      return users.filter((user) => user.uid);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError('Cognito encountered an internal error');
