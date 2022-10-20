@@ -76,7 +76,7 @@ Resources:
           - id: W5
             reason: 'TODO: Ask kevin and tim about why can everyone do this'
           - id: W36
-            reason: 'There is clearly a description provided. Not sure why CFN nag isn't picking it up from properties.'
+            reason: 'There is clearly a description provided. Not sure why CFN nag is not picking it up from properties.'
 
   InstanceRolePermissionBoundary:
     Type: AWS::IAM::ManagedPolicy
@@ -161,7 +161,7 @@ Resources:
               - sagemaker:DescribeNotebookInstance
               - sagemaker:StopNotebookInstance
             Resource: '*'
-    Metadata:
+    Metadata: 
       cfn_nag:
         rules_to_suppress:
           - id: W13
