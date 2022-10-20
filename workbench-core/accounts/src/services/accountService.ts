@@ -191,7 +191,7 @@ export default class AccountService {
   }
 
   private async _getAccountWithMetadata(accountId: string): Promise<Account> {
-    const pk = `ACC#${accountId}`;
+    const pk = `${resourceTypeToKey.account}#${accountId}`;
 
     const data = await this._aws.helpers.ddb.query({ key: { name: 'pk', value: pk } }).execute();
 
@@ -225,7 +225,7 @@ export default class AccountService {
 
       const associationPrefix = sk.split('#')[0];
 
-      if (associationPrefix === 'CC') {
+      if (associationPrefix === resourceTypeToKey.costCenter) {
         account.CC = item as unknown as CostCenter;
       }
     }
