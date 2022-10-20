@@ -1,0 +1,15 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "Added activate/deactive user functionality to UserManagementService.",
+      "type": "minor"
+    },
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "BREAKING CHANGE: An instance of AwsService is required in the CognitoUserManagementPlugin constructor.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}
