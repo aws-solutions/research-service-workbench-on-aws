@@ -70,6 +70,12 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref AccessFromCIDRBlock
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W5
+            reason: 'TODO: Ask kevin and tim about why can everyone do this'
+          
 
   InstanceRolePermissionBoundary:
     Type: AWS::IAM::ManagedPolicy
