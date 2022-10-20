@@ -24,6 +24,8 @@ describe('User Management Service', () => {
     createUser: jest.fn().mockImplementation(() => {}),
     updateUser: jest.fn().mockImplementation(() => {}),
     deleteUser: jest.fn().mockImplementation(() => {}),
+    activateUser: jest.fn().mockImplementation(() => {}),
+    deactivateUser: jest.fn().mockImplementation(() => {}),
     listUsers: jest.fn().mockImplementation(() => [mockUid]),
     listUsersForRole: jest.fn().mockImplementation(() => [mockUid]),
     listRoles: jest.fn().mockImplementation(() => [mockRole]),
@@ -53,6 +55,18 @@ describe('User Management Service', () => {
 
   test('deleteUser', async () => {
     await expect(userManagementService.deleteUser(mockUid)).resolves.not.toThrow();
+  });
+
+  test('activateUser', async () => {
+    await userManagementService.activateUser(mockUid);
+    expect(mockUserManagementPlugin.activateUser).toBeCalledTimes(1);
+    expect(mockUserManagementPlugin.activateUser).toBeCalledWith(mockUid);
+  });
+
+  test('deactivateUser', async () => {
+    await userManagementService.deactivateUser(mockUid);
+    expect(mockUserManagementPlugin.deactivateUser).toBeCalledTimes(1);
+    expect(mockUserManagementPlugin.deactivateUser).toBeCalledWith(mockUid);
   });
 
   test('listUsers', async () => {
