@@ -20,7 +20,13 @@ import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, account: HostingAccountService): void {
-  // Provision
+  router.get(
+    '/aws-accounts/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      res.send(await account.get(req.params.id));
+    })
+  );
+
   router.post(
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {

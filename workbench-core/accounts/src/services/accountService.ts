@@ -9,20 +9,28 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
-interface Account {
-  id: string | undefined;
+export interface CostCenter {
+  pk: string;
+  sk: string;
+  id: string;
+  name?: string;
+}
+
+export interface Account {
+  id?: string;
+  name: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
-  error: { type: string; value: string } | undefined;
+  error?: { type: string; value: string };
   hostingAccountHandlerRoleArn: string;
   vpcId: string;
   subnetId: string;
-  cidr: string;
   environmentInstanceFiles: string;
   encryptionKeyArn: string;
   externalId?: string;
   stackName: string;
   status: HostingAccountStatus;
+  CC?: CostCenter;
 }
 export default class AccountService {
   private _aws: AwsService;
@@ -35,21 +43,15 @@ export default class AccountService {
    * Get account from DDB
    * @param accountId - ID of account to retrieve
    *
+   * @param includeMetadata - Controls inclusion of metadata associated with the account
    * @returns Account entry in DDB
    */
-  public async getAccount(accountId: string): Promise<Account> {
-    const accountEntry = (await this._aws.helpers.ddb
-      .get({
-        pk: `${resourceTypeToKey.account}#${accountId}`,
-        sk: `${resourceTypeToKey.account}#${accountId}`
-      })
-      .execute()) as GetItemCommandOutput;
-
-    if (accountEntry.Item) {
-      return accountEntry.Item! as unknown as Account;
-    } else {
-      throw Boom.notFound(`Could not find account ${accountId}`);
+  public async getAccount(accountId: string, includeMetadata: boolean = false): Promise<Account> {
+    if (includeMetadata) {
+      return this._getAccountWithMetadata(accountId);
     }
+
+    return this._getAccountWithoutMetadata(accountId);
   }
 
   /**
@@ -174,5 +176,59 @@ export default class AccountService {
     }
 
     return accountMetadata.id;
+  }
+
+  private async _getAccountWithoutMetadata(accountId: string): Promise<Account> {
+    const accountEntry = (await this._aws.helpers.ddb
+      .get({ pk: `${resourceTypeToKey.account}#${accountId}` })
+      .execute()) as GetItemCommandOutput;
+
+    if (!accountEntry.Item) {
+      throw Boom.notFound(`Could not find account ${accountId}`);
+    }
+
+    return accountEntry.Item! as unknown as Account;
+  }
+
+  private async _getAccountWithMetadata(accountId: string): Promise<Account> {
+    const pk = `${resourceTypeToKey.account}#${accountId}`;
+
+    const data = await this._aws.helpers.ddb.query({ key: { name: 'pk', value: pk } }).execute();
+
+    if (data.Count === 0) {
+      throw Boom.notFound(`Could not find account ${accountId}`);
+    }
+
+    const items = data.Items!.map((item) => {
+      return item;
+    });
+    let account: Account = {
+      name: '',
+      awsAccountId: '',
+      encryptionKeyArn: '',
+      envMgmtRoleArn: '',
+      environmentInstanceFiles: '',
+      hostingAccountHandlerRoleArn: '',
+      stackName: '',
+      status: '',
+      subnetId: '',
+      vpcId: ''
+    };
+    for (const item of items) {
+      // parent environment item
+      const sk = item.sk as unknown as string;
+
+      if (sk === pk) {
+        account = { ...account, ...item };
+        continue;
+      }
+
+      const associationPrefix = sk.split('#')[0];
+
+      if (associationPrefix === resourceTypeToKey.costCenter) {
+        account.CC = item as unknown as CostCenter;
+      }
+    }
+    return account;
   }
 }

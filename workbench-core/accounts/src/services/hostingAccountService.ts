@@ -7,8 +7,13 @@ import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
+import { Account } from './accountService';
 
 export default class HostingAccountService {
+  public async get(accountId: string): Promise<Account> {
+    return await new HostingAccountLifecycleService().getAccount(accountId, true);
+  }
+
   /**
    * Create hosting account record in DDB
    * @param accountMetadata - the attributes of the given hosting account

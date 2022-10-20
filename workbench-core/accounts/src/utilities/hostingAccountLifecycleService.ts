@@ -13,7 +13,7 @@ import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
-import AccountService from '../services/accountService';
+import AccountService, { Account } from '../services/accountService';
 
 interface Arns {
   statusHandlerArn: string;
@@ -47,6 +47,10 @@ export default class HostingAccountLifecycleService {
     const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
     this._accountService = new AccountService(ddbTableName);
+  }
+
+  public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {
+    return this._accountService.getAccount(accountId, includeMetadata);
   }
 
   /**
