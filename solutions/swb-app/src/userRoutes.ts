@@ -30,12 +30,8 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const userIds = await user.listUsers();
-      const users: Array<object> = [];
-      userIds.forEach((userId: string) => {
-        users.push({ id: userId });
-      });
-      res.status(200).json({ users: users });
+      const users = await user.listUsers();
+      res.status(200).json({ users });
     })
   );
 
