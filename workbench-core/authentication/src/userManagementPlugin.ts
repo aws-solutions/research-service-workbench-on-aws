@@ -56,6 +56,28 @@ export interface UserManagementPlugin {
   deleteUser(uid: string): Promise<void>;
 
   /**
+   * Activates a deactive user.
+   *
+   * @param uid - the id of the user to activate
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   */
+  activateUser(uid: string): Promise<void>;
+
+  /**
+   * Deactivates an active user.
+   *
+   * @param uid - the id of the user to deactivate
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   */
+  deactivateUser(uid: string): Promise<void>;
+
+  /**
    * Get all user IDs from the user/role data store.
    * @returns an array containing all the user ids
    *
