@@ -6,6 +6,7 @@
 import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
 import { HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
 import { AwsService, AuditLogger } from '@aws/workbench-core-base';
 import {
   DataSetService,
@@ -68,7 +69,10 @@ const apiRouteConfig: ApiRouteConfig = {
   }),
   projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
-  })
+  }),
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  )
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);
