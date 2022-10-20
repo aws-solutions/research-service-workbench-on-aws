@@ -12,7 +12,7 @@ import { RoleAlreadyExistsError } from '../errors/roleAlreadyExistsError';
 import { RoleNotFoundError } from '../errors/roleNotFoundError';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
-import { User } from '../user';
+import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 
 /**
@@ -46,10 +46,11 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async getUser(uid: string): Promise<User> {
     try {
-      const { UserAttributes: userAttributes } = await this._aws.clients.cognito.adminGetUser({
-        UserPoolId: this._userPoolId,
-        Username: uid
-      });
+      const { UserAttributes: userAttributes, Enabled: enabled } =
+        await this._aws.clients.cognito.adminGetUser({
+          UserPoolId: this._userPoolId,
+          Username: uid
+        });
 
       const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
         UserPoolId: this._userPoolId,
@@ -61,6 +62,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         firstName: userAttributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
         lastName: userAttributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
         email: userAttributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
+        status: enabled ? Status.ACTIVE : Status.INACTIVE,
         roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
       };
     } catch (error) {
@@ -91,7 +93,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    */
-  public async createUser(user: Omit<User, 'roles'>): Promise<void> {
+  public async createUser(user: CreateUser): Promise<void> {
     try {
       await this._aws.clients.cognito.adminCreateUser({
         UserPoolId: this._userPoolId,
@@ -151,7 +153,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    */
-  public async updateUser(uid: string, user: Omit<User, 'uid' | 'roles'>): Promise<void> {
+  public async updateUser(uid: string, user: User): Promise<void> {
     try {
       await this._aws.clients.cognito.adminUpdateUserAttributes({
         UserPoolId: this._userPoolId,

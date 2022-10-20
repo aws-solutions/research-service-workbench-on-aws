@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { User } from './user';
+import { CreateUser, User } from './user';
 
 /**
  * Implement the `UserManagementPlugin` interface to connect the UserRoleService
@@ -31,7 +31,7 @@ export interface UserManagementPlugin {
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  createUser(user: User): Promise<void>;
+  createUser(user: CreateUser): Promise<void>;
 
   /**
    * Update a user with new details.
