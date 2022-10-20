@@ -3,27 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { User } from './user';
+import { Status, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 import { UserManagementService } from './userManagementService';
 
 describe('User Management Service', () => {
-  const mockUserManagementPlugin: UserManagementPlugin = {
-    getUser: jest.fn(),
-    createUser: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
-    activateUser: jest.fn(),
-    deactivateUser: jest.fn(),
-    listUsers: jest.fn(),
-    listUsersForRole: jest.fn(),
-    listRoles: jest.fn(),
-    addUserToRole: jest.fn(),
-    removeUserFromRole: jest.fn(),
-    createRole: jest.fn(),
-    deleteRole: jest.fn()
-  };
-  const userManagementService: UserManagementService = new UserManagementService(mockUserManagementPlugin);
   const mockUid: string = 'sampleUid';
   const mockRole: string = 'sampleRole';
   const mockUser: User = {
@@ -31,35 +15,46 @@ describe('User Management Service', () => {
     firstName: 'sampleFirstName',
     lastName: 'sampleLastName',
     email: 'sampleEmail',
+    status: Status.ACTIVE,
     roles: [mockRole]
   };
+
+  const mockUserManagementPlugin: UserManagementPlugin = {
+    getUser: jest.fn().mockImplementation(() => mockUser),
+    createUser: jest.fn().mockImplementation(() => {}),
+    updateUser: jest.fn().mockImplementation(() => {}),
+    deleteUser: jest.fn().mockImplementation(() => {}),
+    activateUser: jest.fn().mockImplementation(() => {}),
+    deactivateUser: jest.fn().mockImplementation(() => {}),
+    listUsers: jest.fn().mockImplementation(() => [mockUid]),
+    listUsersForRole: jest.fn().mockImplementation(() => [mockUid]),
+    listRoles: jest.fn().mockImplementation(() => [mockRole]),
+    addUserToRole: jest.fn().mockImplementation(() => {}),
+    removeUserFromRole: jest.fn().mockImplementation(() => {}),
+    createRole: jest.fn().mockImplementation(() => {}),
+    deleteRole: jest.fn().mockImplementation(() => {})
+  };
+  const userManagementService: UserManagementService = new UserManagementService(mockUserManagementPlugin);
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('getUser', async () => {
-    await userManagementService.getUser(mockUid);
-    expect(mockUserManagementPlugin.getUser).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.getUser).toBeCalledWith(mockUid);
+    const user = await userManagementService.getUser(mockUid);
+    expect(user).toEqual(mockUser);
   });
 
   test('createUser', async () => {
-    await userManagementService.createUser(mockUser);
-    expect(mockUserManagementPlugin.createUser).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.createUser).toBeCalledWith(mockUser);
+    await expect(userManagementService.createUser(mockUser)).resolves.not.toThrow();
   });
 
   test('updateUser', async () => {
-    await userManagementService.updateUser(mockUid, mockUser);
-    expect(mockUserManagementPlugin.updateUser).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.updateUser).toBeCalledWith(mockUid, mockUser);
+    await expect(userManagementService.updateUser(mockUid, mockUser)).resolves.not.toThrow();
   });
 
   test('deleteUser', async () => {
-    await userManagementService.deleteUser(mockUid);
-    expect(mockUserManagementPlugin.deleteUser).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.deleteUser).toBeCalledWith(mockUid);
+    await expect(userManagementService.deleteUser(mockUid)).resolves.not.toThrow();
   });
 
   test('activateUser', async () => {
@@ -75,42 +70,33 @@ describe('User Management Service', () => {
   });
 
   test('listUsers', async () => {
-    await userManagementService.listUsers();
-    expect(mockUserManagementPlugin.listUsers).toBeCalledTimes(1);
+    const users = await userManagementService.listUsers();
+    expect(users).toEqual([mockUid]);
   });
 
   test('listUsersForRole', async () => {
-    await userManagementService.listUsersForRole(mockRole);
-    expect(mockUserManagementPlugin.listUsersForRole).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.listUsersForRole).toBeCalledWith(mockRole);
+    const users = await userManagementService.listUsersForRole(mockRole);
+    expect(users).toEqual([mockUid]);
   });
 
   test('listRoles', async () => {
-    await userManagementService.listRoles();
-    expect(mockUserManagementPlugin.listRoles).toBeCalledTimes(1);
+    const roles = await userManagementService.listRoles();
+    expect(roles).toEqual([mockRole]);
   });
 
   test('addUserToRole', async () => {
-    await userManagementService.addUserToRole(mockUid, mockRole);
-    expect(mockUserManagementPlugin.addUserToRole).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith(mockUid, mockRole);
+    await expect(userManagementService.addUserToRole(mockUid, mockRole)).resolves.not.toThrow();
   });
 
   test('removeUserFromRole', async () => {
-    await userManagementService.removeUserFromRole(mockUid, mockRole);
-    expect(mockUserManagementPlugin.removeUserFromRole).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.removeUserFromRole).toBeCalledWith(mockUid, mockRole);
+    await expect(userManagementService.removeUserFromRole(mockUid, mockRole)).resolves.not.toThrow();
   });
 
   test('createRole', async () => {
-    await userManagementService.createRole(mockRole);
-    expect(mockUserManagementPlugin.createRole).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.createRole).toBeCalledWith(mockRole);
+    await expect(userManagementService.createRole(mockRole)).resolves.not.toThrow();
   });
 
   test('deleteRole', async () => {
-    await userManagementService.deleteRole(mockRole);
-    expect(mockUserManagementPlugin.deleteRole).toBeCalledTimes(1);
-    expect(mockUserManagementPlugin.deleteRole).toBeCalledWith(mockRole);
+    await expect(userManagementService.deleteRole(mockRole)).resolves.not.toThrow();
   });
 });

@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { User } from './user';
+import { CreateUser, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 /**
  *
@@ -36,7 +36,7 @@ export class UserManagementService {
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  public async createUser(user: User): Promise<void> {
+  public async createUser(user: CreateUser): Promise<void> {
     await this._userManagementPlugin.createUser(user);
   }
   /**
