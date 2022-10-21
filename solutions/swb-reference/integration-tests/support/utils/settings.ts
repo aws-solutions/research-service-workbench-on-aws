@@ -23,8 +23,8 @@ interface Setting {
   awsRegion: string;
   DataSetsBucketName: string;
   apiUrlOutput: string;
-  mainAccountLoadBalancerArnOutput: string;
-  mainAccountLoadBalancerDnsNameOutput: string;
+  MainAccountLoadBalancerArnOutput: string;
+  MainAccountLoadBalancerDnsNameOutput: string;
   S3BucketArtifactsArnOutput: string;
   uiClientURL: string;
   LaunchConstraintIamRoleNameOutput: string;
