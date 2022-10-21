@@ -296,12 +296,22 @@ describe('CognitoUserManagementPlugin tests', () => {
   });
 
   describe('createUser tests', () => {
-    it('should create the requested User when all params are valid', async () => {
-      const createMock = cognitoMock.on(AdminCreateUserCommand).resolves({});
+    it('should return the requested User when all params are valid', async () => {
+      cognitoMock.on(AdminCreateUserCommand).resolves({
+        User: {
+          Username: userInfo.uid,
+          Attributes: [
+            { Name: 'given_name', Value: userInfo.firstName },
+            { Name: 'family_name', Value: userInfo.lastName },
+            { Name: 'email', Value: userInfo.email }
+          ],
+          Enabled: true
+        }
+      });
 
-      await plugin.createUser(userInfo);
+      const user = await plugin.createUser(userInfo);
 
-      expect(createMock.calls().length).toBe(1);
+      expect(user).toMatchObject({ ...userInfo, roles: [] });
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
