@@ -17,13 +17,12 @@ import {
   ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-// import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
-// import { ECRDeployment, DockerImageName } from 'cdk-ecr-deployment';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
+import { createECSCluster } from './hosting-infra/ecs-cluster';
 
 export class SWBUIStack extends Stack {
   public distributionEnvVars: {
@@ -32,6 +31,7 @@ export class SWBUIStack extends Stack {
     API_BASE_URL: string;
     AWS_REGION: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_NAME: string;
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
     ACCESS_IDENTITY_ARTIFACT_NAME: string;
@@ -52,6 +52,7 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -76,6 +77,7 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -92,6 +94,7 @@ export class SWBUIStack extends Stack {
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     this._addCognitoURLOutput();
+    createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_ARN_OUTPUT_KEY);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {

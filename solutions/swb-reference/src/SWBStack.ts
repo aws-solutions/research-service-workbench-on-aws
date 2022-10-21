@@ -59,7 +59,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
-    MAIN_ACCT_ALB_OUTPUT_KEY: string;
+    MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -90,7 +90,7 @@ export class SWBStack extends Stack {
       CLIENT_ID,
       CLIENT_SECRET,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
-      MAIN_ACCT_ALB_OUTPUT_KEY,
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       VPC_ID,
       SUBNET_IDS
     } = getConstants();
@@ -142,7 +142,7 @@ export class SWBStack extends Stack {
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
-      MAIN_ACCT_ALB_OUTPUT_KEY
+      MAIN_ACCT_ALB_ARN_OUTPUT_KEY
     };
 
     this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
@@ -199,7 +199,7 @@ export class SWBStack extends Stack {
       targets: [new LambdaTarget(proxyLambda)]
     });
 
-    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_OUTPUT_KEY, {
+    new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {
       value: alb.applicationLoadBalancer.loadBalancerArn
     });
   }
