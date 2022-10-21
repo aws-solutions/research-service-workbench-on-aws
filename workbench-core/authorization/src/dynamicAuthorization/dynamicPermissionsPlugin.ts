@@ -11,12 +11,14 @@ import {
   DeleteIdentityPermissionsResponse,
   DeleteSubjectPermissionsRequest,
   DeleteSubjectPermissionsResponse,
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityResponse,
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse,
-  GetIdentityPermissionsByUserRequest,
-  GetIdentityPermissionsByUserResponse,
   GetUserGroupsRequest,
   GetUserGroupsResponse,
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupResponse,
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicPermissionsPluginInputs';
@@ -48,6 +50,13 @@ export interface DynamicPermissionsPlugin {
    */
   getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse>;
 
+  /**
+   * Get all users associated to the group
+   * @param getUsersFromGroupRequest - {@link GetUserGroupsRequest}
+   *
+   * @returns - {@link GetUsersFromGroupResponse}
+   */
+  getUsersFromGroup(getUsersFromGroupRequest: GetUsersFromGroupRequest): Promise<GetUsersFromGroupResponse>;
   /**
    * Create an identity permission.
    * An Identity permissions associates a user/group to a {@link Permission} and subjectId
@@ -110,12 +119,12 @@ export interface DynamicPermissionsPlugin {
   ): Promise<GetIdentityPermissionsBySubjectResponse>;
 
   /**
-   * Get all {@link IdentityPermission}s associated to the user
-   * @param getIdentityPermissionsByUserRequest - {@link GetIdentityPermissionsByUserRequest}
+   * Get {@link IdentityPermission}s associated to the identity
+   * @param getIdentityPermissionsByIdentityRequest - {@link GetIdentityPermissionsByIdentityRequest}
    *
-   * @returns - {@link GetIdentityPermissionsByUserResponse}
+   * @returns - {@link GetIdentityPermissionsByIdentityResponse}
    */
-  getIdentityPermissionsByUser(
-    getIdentityPermissionsByUserRequest: GetIdentityPermissionsByUserRequest
-  ): Promise<GetIdentityPermissionsByUserResponse>;
+  getIdentityPermissionsByIdentity(
+    getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
+  ): Promise<GetIdentityPermissionsByIdentityResponse>;
 }

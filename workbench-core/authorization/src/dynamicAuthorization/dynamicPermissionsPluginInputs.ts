@@ -1,4 +1,5 @@
-import Permission from '../permission';
+import { Action } from '../action';
+import { Effect } from '../permission';
 
 /**
  * Request object for DynamicPermissionsPlugin's createGroup
@@ -9,6 +10,7 @@ export interface CreateGroupRequest {
    * GroupID must be unique
    */
   groupId: string;
+
   /**
    * Description of group
    */
@@ -67,12 +69,26 @@ export interface GetUserGroupsResponse {
   groupIds: string[];
 }
 
+export interface GetUsersFromGroupRequest {
+  /**
+   * Group id required for retrieval of users
+   */
+  groupId: string;
+}
+
+export interface GetUsersFromGroupResponse {
+  /**
+   * A list of user ids associated to the group
+   */
+  userIds: string[];
+}
+
 /**
  * Represents an Identity Permission
  */
 export interface IdentityPermission {
   /**
-   * {@link Identity}
+   * {@link IdentityType}
    */
   identityType: IdentityType;
   /**
@@ -80,13 +96,52 @@ export interface IdentityPermission {
    */
   identityId: string;
   /**
-   * The {@link Permission} being created
+   * The {@link Effect} of a Permission.
    */
-  permission: Permission;
+  effect: Effect;
+  /**
+   * {@link Action}.
+   */
+  action: Action;
+  /**
+   * The subject that the {@link Action} acts on.
+   */
+  subjectType: string;
   /**
    * The id associated to the subject
    */
   subjectId: string;
+  /**
+   * Used to restrict a {@link User}'s action on the subject
+   * to a specific field/child subject.
+   *
+   * @example
+   * Allows GROUP CREATE access to a child subject.
+   * Allows a group associated with groupId CREATE access to a subject
+   * Article associated to articleId for child subject Comment
+   * ```
+   *
+   * const identityPermission: IdentityPermission = {
+   *  identityType: 'GROUP',
+   *  identityId: 'groupId',
+   *  effect: 'ALLOW',
+   *  action: Action.CREATE,
+   *  subject: 'Article',
+   *  subjectId: 'articleId',
+   *  fields: ['Comment']
+   * };
+   * ```
+   */
+  fields?: string[];
+  /**
+   * Used to conditionally restrict a {@link User}'s action
+   */
+  conditions?: { [key: string]: unknown };
+
+  /**
+   * Reason for why this is forbidden.
+   */
+  reason?: string;
 }
 /**
  * Request object for DynamicPermissionsPlugin's createIdentityPermissions
@@ -106,7 +161,12 @@ export interface CreateIdentityPermissionsResponse {
    * States whether the {@link IdentityPermission}s were successfully created
    */
   created: boolean;
+  /**
+   * Unprocessed {@link IdentityPermission}s
+   */
+  unprocessedIdentityPermissions?: IdentityPermission[];
 }
+
 /**
  * Request object for DynamicPermissionsPlugin's deleteIdentityPermissions
  */
@@ -132,9 +192,9 @@ export interface DeleteIdentityPermissionsResponse {
  */
 export interface DeleteSubjectPermissionsRequest {
   /**
-   * The subject to be deleted
+   * The subject type to be deleted
    */
-  subject: string;
+  subjectType: string;
 
   /**
    * The subject id associated to the subject to be deleted
@@ -195,24 +255,27 @@ export interface RemoveUserFromGroupResponse {
    */
   removed: boolean;
 }
+
 /**
  * Request object for DynamicPermissionsPlugin's getIdentityPermissionsBySubject
  */
 export interface GetIdentityPermissionsBySubjectRequest {
   /**
-   * Subject associated to the {@link IdentityPermission}s
+   * SubjectType associated to the {@link IdentityPermission}s
    */
-  subject: string;
-
+  subjectType: string;
   /**
    * Subject id associated to the subject
    */
   subjectId: string;
-
   /**
-   * Filter the permissions associated to the user
+   * Filter by {@link Action}
    */
-  userId?: string;
+  action?: Action;
+  /**
+   * Filter by identities
+   */
+  identities?: { identityType: IdentityType; identityId: string }[];
 }
 
 /**
@@ -220,26 +283,25 @@ export interface GetIdentityPermissionsBySubjectRequest {
  */
 export interface GetIdentityPermissionsBySubjectResponse {
   /**
-   * an array of {@link IdentityPermission} associated to the subject
+   * An array of {@link IdentityPermission} associated to the subject
    */
   identityPermissions: IdentityPermission[];
 }
-/**
- * Request object for DynamicPermissionsPlugin's getIdentityPermissionsByUser
- */
-export interface GetIdentityPermissionsByUserRequest {
+
+export interface GetIdentityPermissionsByIdentityRequest {
   /**
-   * User id asssociated to the {@link IdentityPermission}s
+   * {@link IdentityType}
    */
-  userId: string;
+  identityType: IdentityType;
+  /**
+   * Identity id associated to the {@link IdentityPermission}s
+   */
+  identityId: string;
 }
 
-/**
- * Response object for DynamicPermissionsPlugin's getIdentityPermissionsByuser
- */
-export interface GetIdentityPermissionsByUserResponse {
+export interface GetIdentityPermissionsByIdentityResponse {
   /**
-   * an array of {@link IdentityPermission} associated to the user
+   * An array of {@link IdentityPermission} associated to the identity
    */
   identityPermissions: IdentityPermission[];
 }

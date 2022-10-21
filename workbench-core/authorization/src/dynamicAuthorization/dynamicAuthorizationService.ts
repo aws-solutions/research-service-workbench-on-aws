@@ -1,5 +1,5 @@
+import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
-import Operation from '../operation';
 import {
   AssignUserToGroupRequest,
   AssignUserToGroupResponse,
@@ -13,6 +13,10 @@ import {
   DeleteIdentityPermissionsResponse,
   DeleteSubjectPermissionsRequest,
   DeleteSubjectPermissionsResponse,
+  GetUserGroupsRequest,
+  GetUserGroupsResponse,
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupResponse,
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicPermissionsPluginInputs';
@@ -22,13 +26,25 @@ import {
  */
 export interface IsAuthorizedOnSubjectRequest {
   /**
-   * {@link Operation} being performed
+   * The {@link Action} a {@link User} wants to perform.
    */
-  operation: Operation;
+  action: Action;
+  /**
+   * The subject that the {@link Action} acts on.
+   */
+  subject: string;
   /**
    * subject id associated to the subject being operated on
    */
   subjectId: string;
+  /**
+   * The field a {@link User} wants access to.
+   */
+  field?: string;
+  /**
+   * Attributes associated to the subject
+   */
+  subjectAttributes?: { [key: string]: unknown };
 }
 
 export class DynamicAuthorizationService {
@@ -58,6 +74,9 @@ export class DynamicAuthorizationService {
     user: AuthenticatedUser,
     createGroupRequest: CreateGroupRequest
   ): Promise<CreateGroupResponse> {
+    //Create Group
+
+    //Create permissions associated
     throw new Error('NotImplemented');
   }
   /**
@@ -138,6 +157,32 @@ export class DynamicAuthorizationService {
     user: AuthenticatedUser,
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
+    throw new Error('NotImplemented');
+  }
+  /**
+   * Get all users associated to the group
+   * @param user - {@link AuthenticatedUser}
+   * @param getUsersFromGroupRequest - {@link GetUserGroupsRequest}
+   *
+   * @returns - {@link GetUsersFromGroupResponse}
+   */
+  public async getUsersFromGroup(
+    user: AuthenticatedUser,
+    getUsersFromGroupRequest: GetUsersFromGroupRequest
+  ): Promise<GetUsersFromGroupResponse> {
+    throw new Error('NotImplemented');
+  }
+  /**
+   * Get all groups associated to the user
+   * @param user - {@link AuthenticatedUser}
+   * @param getUserGroupsRequest - {@link GetUserGroupsRequest}
+   *
+   * @returns - {@link GetUserGroupsResponse}
+   */
+  public async getUserGroups(
+    user: AuthenticatedUser,
+    getUserGroupsRequest: GetUserGroupsRequest
+  ): Promise<GetUserGroupsResponse> {
     throw new Error('NotImplemented');
   }
 }
