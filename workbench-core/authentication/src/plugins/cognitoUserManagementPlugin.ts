@@ -323,6 +323,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
             firstName: user.Attributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
             lastName: user.Attributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
             email: user.Attributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
+            status: user.Enabled ? Status.ACTIVE : Status.INACTIVE,
             roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
           };
         })

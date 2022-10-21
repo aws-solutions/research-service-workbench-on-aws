@@ -573,7 +573,8 @@ describe('CognitoUserManagementPlugin tests', () => {
               { Name: 'given_name', Value: userInfo.firstName },
               { Name: 'family_name', Value: userInfo.lastName },
               { Name: 'email', Value: userInfo.email }
-            ]
+            ],
+            Enabled: true
           }
         ]
       });
@@ -596,7 +597,8 @@ describe('CognitoUserManagementPlugin tests', () => {
               { Name: 'given_name', Value: userInfo.firstName },
               { Name: 'family_name', Value: userInfo.lastName },
               { Name: 'email', Value: userInfo.email }
-            ]
+            ],
+            Enabled: true
           }
         ]
       });
@@ -647,7 +649,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       expect(users.length).toBe(1);
       expect(users).toMatchObject<User[]>([
-        { uid: userInfo.uid, firstName: '', lastName: '', email: '', roles: [] }
+        { uid: userInfo.uid, firstName: '', lastName: '', email: '', status: Status.INACTIVE, roles: [] }
       ]);
     });
 
