@@ -78,8 +78,8 @@ function getConstants(): {
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
-  const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
-  const MAIN_ACCT_ALB_DNS_OUTPUT_KEY = 'MainAccountLoadBalancerDnsNameOutput';
+  const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'mainAccountLoadBalancerArnOutput';
+  const MAIN_ACCT_ALB_DNS_OUTPUT_KEY = 'mainAccountLoadBalancerDnsNameOutput';
 
   return {
     STAGE: config.stage,

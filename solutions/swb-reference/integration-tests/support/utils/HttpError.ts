@@ -6,14 +6,12 @@ import _ from 'lodash';
 
 export default class HttpError extends Error {
   public statusCode: number;
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public body: any;
+  public body: unknown;
   public statusDescription: string;
   public isBase64Encoded?: boolean;
   public headers?: { 'Content-Type': string };
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public constructor(statusCode: number, body: any, description?: string) {
+  public constructor(statusCode: number, body: unknown, description?: string) {
     super(`HttpError with statusCode ${statusCode}`);
     this.statusCode = statusCode;
     this.body = body;

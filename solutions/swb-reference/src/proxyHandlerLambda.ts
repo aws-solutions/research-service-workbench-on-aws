@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import HttpError from '../integration-tests/support/utils/HttpError';
 
 /* eslint-disable-next-line */
@@ -78,6 +78,11 @@ export async function handler(event: any) {
       response.body = JSON.stringify(data);
     }
   } catch (err) {
+    if (!(err instanceof AxiosError) || !err.response) {
+      console.error(`Unsupported error encountered: ${JSON.stringify(err)}`);
+      throw err;
+    }
+
     const error = new HttpError(
       err.response!.status,
       JSON.stringify({
@@ -91,9 +96,9 @@ export async function handler(event: any) {
     error.isBase64Encoded = false;
     error.headers = { 'Content-Type': 'application/json' };
 
-    console.log(`Error seen: ${JSON.stringify(error)}`);
+    console.error(`Application error encountered: ${JSON.stringify(error)}`);
 
-    // The error object has to be returned like this to ensure integration tests are backwards compatible
+    // The error object has to be returned like this for integration tests' backwards compatibility
     return error;
   }
 
