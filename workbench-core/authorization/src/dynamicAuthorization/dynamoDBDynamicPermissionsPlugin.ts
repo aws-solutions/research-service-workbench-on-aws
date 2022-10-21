@@ -35,12 +35,26 @@ import { BadConfigurationError } from './errors/badConfigurationError';
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from './errors/groupNotFoundError';
 
+/**
+ * Request object for DynamoDBDynamicPermissionsPlugin's Init
+ */
 export interface InitRequest {
+  /**
+   * Optional groups to create at initialization
+   */
   groupsToBeCreated?: { groupIds: string[] };
+  /**
+   * Optional {@link IdentityPermission}s to be created
+   */
   identityPermissionsToBeCreated?: IdentityPermission[];
 }
-
+/**
+ * Response object for DynamoDBDynamicPermissionsPlugin's Init
+ */
 export interface InitResponse {
+  /**
+   * Determines if initialization was successful
+   */
   success: boolean;
 }
 
@@ -177,20 +191,17 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       value: this._composeIdentityKey(this._assignedGroupPrefix, 'USER', getUserGroupsRequest.userId)
     };
 
-    const groupIds: string[] = [];
-
     const response: QueryCommandOutput = await this._awsService.helpers.ddb
       .query({
         key
       })
       .execute();
-
-    if (response && response.Items) {
-      response.Items.forEach((item) => {
+    const groupIds: string[] =
+      response?.Items?.map((item) => {
         const sk = _.get(item as { [key: string]: unknown }, 'sk') as string;
-        groupIds.push(this._decomposeKey(sk).id);
-      });
-    }
+        return this._decomposeKey(sk).id;
+      }) ?? [];
+
     return {
       groupIds
     };
@@ -211,13 +222,12 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
         key
       })
       .execute();
-    const userIds: string[] = [];
-    if (response && response.Items) {
-      response.Items.forEach((item) => {
+    const userIds: string[] =
+      response?.Items?.map((item) => {
         const pk = _.get(item as { [key: string]: unknown }, 'pk') as string;
-        userIds.push(this._decomposeKey(pk).id);
-      });
-    }
+        return this._decomposeKey(pk).id;
+      }) ?? [];
+
     return {
       userIds
     };
@@ -380,12 +390,10 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     }
 
     const response = await query.execute();
-    const identityPermissions: IdentityPermission[] = [];
-    if (response && response.Items) {
-      response.Items.forEach((unmarshalledItem) => {
-        identityPermissions.push(this._processItemToIdentityPermission(unmarshalledItem));
-      });
-    }
+    const identityPermissions: IdentityPermission[] =
+      response?.Items?.map((item) => {
+        return this._processItemToIdentityPermission(item);
+      }) ?? [];
     return { identityPermissions };
   }
 
@@ -408,13 +416,10 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       })
       .execute();
 
-    const identityPermissions: IdentityPermission[] = [];
-
-    if (identityPermissionsResponse && identityPermissionsResponse.Items) {
-      identityPermissionsResponse.Items.forEach((item) => {
-        identityPermissions.push(this._processItemToIdentityPermission(item));
-      });
-    }
+    const identityPermissions: IdentityPermission[] =
+      identityPermissionsResponse?.Items?.map((item) => {
+        return this._processItemToIdentityPermission(item);
+      }) ?? [];
 
     return { identityPermissions };
   }
