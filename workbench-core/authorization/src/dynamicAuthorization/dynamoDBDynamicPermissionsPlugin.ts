@@ -58,6 +58,13 @@ export interface InitResponse {
   success: boolean;
 }
 
+/**
+ * Item returned by DynamoDB helper client
+ */
+interface Item {
+  [key: string]: unknown;
+}
+
 export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugin {
   private _awsService: AwsService;
   private _initializationPromise: boolean;
@@ -198,7 +205,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       .execute();
     const groupIds: string[] =
       response?.Items?.map((item) => {
-        const sk = _.get(item as { [key: string]: unknown }, 'sk') as string;
+        const sk = _.get(item as Item, 'sk') as string;
         return this._decomposeKey(sk).id;
       }) ?? [];
 
@@ -224,7 +231,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       .execute();
     const userIds: string[] =
       response?.Items?.map((item) => {
-        const pk = _.get(item as { [key: string]: unknown }, 'pk') as string;
+        const pk = _.get(item as Item, 'pk') as string;
         return this._decomposeKey(pk).id;
       }) ?? [];
 
@@ -447,9 +454,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     };
   }
 
-  private _createItemFromIdentityPermission(identityPermission: IdentityPermission): {
-    [key: string]: unknown;
-  } {
+  private _createItemFromIdentityPermission(identityPermission: IdentityPermission): Item {
     const action = `${identityPermission.action}`;
     const effect = `${identityPermission.effect}`;
     const pk = this._composeKey(
@@ -480,7 +485,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     };
   }
 
-  private _processItemToIdentityPermission(item: { [key: string]: unknown }): IdentityPermission {
+  private _processItemToIdentityPermission(item: Item): IdentityPermission {
     const { type, id } = this._decomposeKey(item.identity as string);
     return {
       identityId: id,
