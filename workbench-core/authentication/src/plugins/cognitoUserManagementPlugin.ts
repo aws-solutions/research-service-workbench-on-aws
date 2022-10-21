@@ -86,6 +86,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * Creates a new user with the given details. Roles need to be added with `addUserToRole()`.
    *
    * @param user - the user to create
+   * @returns the created {@link User}
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to add a user to a user pool
@@ -93,9 +94,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    */
-  public async createUser(user: CreateUser): Promise<void> {
+  public async createUser(user: CreateUser): Promise<User> {
     try {
-      await this._aws.clients.cognito.adminCreateUser({
+      const { User: createdUser } = await this._aws.clients.cognito.adminCreateUser({
         UserPoolId: this._userPoolId,
         Username: user.email,
         UserAttributes: [
@@ -118,6 +119,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         ],
         DesiredDeliveryMediums: [DeliveryMediumType.EMAIL]
       });
+
+      // if the above call is successful all of the below values will be set
+      return {
+        uid: createdUser!.Username!,
+        firstName: createdUser!.Attributes!.find((attr) => attr.Name === 'given_name')!.Value!,
+        lastName: createdUser!.Attributes!.find((attr) => attr.Name === 'family_name')!.Value!,
+        email: createdUser!.Attributes!.find((attr) => attr.Name === 'email')!.Value!,
+        status: Status.ACTIVE,
+        roles: []
+      };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError('Cognito encountered an internal error');

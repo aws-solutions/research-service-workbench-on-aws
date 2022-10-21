@@ -3,6 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// disabling because the tsdoc links need the imports to work
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { IdpUnavailableError } from './errors/idpUnavailableError';
+import { InvalidParameterError } from './errors/invalidParameterError';
+import { PluginConfigurationError } from './errors/pluginConfigurationError';
+import { RoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
+import { RoleNotFoundError } from './errors/roleNotFoundError';
+import { UserAlreadyExistsError } from './errors/userAlreadyExistsError';
+import { UserNotFoundError } from './errors/userNotFoundError';
+/* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
 
 /**
@@ -25,13 +35,14 @@ export interface UserManagementPlugin {
   /**
    * Create a new user with the given details.
    * @param user - the details of the user to create.
+   * @returns the created {@link User}
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  createUser(user: CreateUser): Promise<void>;
+  createUser(user: CreateUser): Promise<User>;
 
   /**
    * Update a user with new details.
