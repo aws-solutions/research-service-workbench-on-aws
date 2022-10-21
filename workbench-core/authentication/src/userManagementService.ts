@@ -93,12 +93,12 @@ export class UserManagementService {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array containing all the user ids
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
-  public async listUsers(): Promise<string[]> {
+  public async listUsers(): Promise<User[]> {
     return this._userManagementPlugin.listUsers();
   }
 

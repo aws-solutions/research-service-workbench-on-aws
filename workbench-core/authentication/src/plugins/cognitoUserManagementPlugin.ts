@@ -293,21 +293,43 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   }
 
   /**
-   * Lists the user ids within the user pool.
+   * Lists the users within the user pool.
    *
-   * @returns an array containing the user ids within the user pool
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    */
-  public async listUsers(): Promise<string[]> {
+  public async listUsers(): Promise<User[]> {
     try {
-      const { Users: users } = await this._aws.clients.cognito.listUsers({
+      const response = await this._aws.clients.cognito.listUsers({
         UserPoolId: this._userPoolId
       });
 
-      return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
+      if (!response.Users) {
+        return [];
+      }
+
+      const users = await Promise.all(
+        response.Users.map(async (user) => {
+          const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
+            UserPoolId: this._userPoolId,
+            Username: user.Username
+          });
+
+          return {
+            uid: user.Username ?? '',
+            firstName: user.Attributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
+            lastName: user.Attributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
+            email: user.Attributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
+            status: user.Enabled ? Status.ACTIVE : Status.INACTIVE,
+            roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
+          };
+        })
+      );
+
+      return users.filter((user) => user.uid);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError('Cognito encountered an internal error');
