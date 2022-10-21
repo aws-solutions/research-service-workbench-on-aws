@@ -8,12 +8,16 @@ export default class HttpError extends Error {
   public statusCode: number;
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public body: any;
+  public statusDescription: string;
+  public isBase64Encoded?: boolean;
+  public headers?: { 'Content-Type': string };
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public constructor(statusCode: number, body: any) {
+  public constructor(statusCode: number, body: any, description?: string) {
     super(`HttpError with statusCode ${statusCode}`);
     this.statusCode = statusCode;
     this.body = body;
+    this.statusDescription = description || '';
   }
 
   public isEqual(error: Error): boolean {

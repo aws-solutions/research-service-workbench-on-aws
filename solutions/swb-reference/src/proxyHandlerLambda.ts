@@ -4,6 +4,7 @@
  */
 
 import axios from 'axios';
+import HttpError from '../integration-tests/support/utils/HttpError';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
@@ -48,32 +49,52 @@ export async function handler(event: any) {
   if (event.queryStringParameters) params = event.queryStringParameters;
   if (event.httpMethod) HTTP_METHOD = event.httpMethod;
 
-  if (HTTP_METHOD === 'GET') {
-    const { data, status, statusText } = await axios.get(targetPath, { headers, params });
-    response.statusCode = status;
-    response.statusDescription = statusText;
-    response.body = JSON.stringify(data);
-  }
+  try {
+    if (HTTP_METHOD === 'GET') {
+      const { data, status, statusText } = await axios.get(targetPath, { headers, params });
+      response.statusCode = status;
+      response.statusDescription = statusText;
+      response.body = JSON.stringify(data);
+    }
 
-  if (HTTP_METHOD === 'POST') {
-    const { data, status, statusText } = await axios.post(targetPath, { headers, params, body });
-    response.statusCode = status;
-    response.statusDescription = statusText;
-    response.body = JSON.stringify(data);
-  }
+    if (HTTP_METHOD === 'POST') {
+      const { data, status, statusText } = await axios.post(targetPath, body, { headers, params });
+      response.statusCode = status;
+      response.statusDescription = statusText;
+      response.body = JSON.stringify(data);
+    }
 
-  if (HTTP_METHOD === 'PUT') {
-    const { data, status, statusText } = await axios.put(targetPath, { headers, params, body });
-    response.statusCode = status;
-    response.statusDescription = statusText;
-    response.body = JSON.stringify(data);
-  }
+    if (HTTP_METHOD === 'PUT') {
+      const { data, status, statusText } = await axios.put(targetPath, body, { headers, params });
+      response.statusCode = status;
+      response.statusDescription = statusText;
+      response.body = JSON.stringify(data);
+    }
 
-  if (HTTP_METHOD === 'DELETE') {
-    const { data, status, statusText } = await axios.delete(targetPath, { headers, params });
-    response.statusCode = status;
-    response.statusDescription = statusText;
-    response.body = JSON.stringify(data);
+    if (HTTP_METHOD === 'DELETE') {
+      const { data, status, statusText } = await axios.delete(targetPath, { headers, params });
+      response.statusCode = status;
+      response.statusDescription = statusText;
+      response.body = JSON.stringify(data);
+    }
+  } catch (err) {
+    const error = new HttpError(
+      err.response!.status,
+      JSON.stringify({
+        statusCode: err.response!.status,
+        error: err.response!.data.error,
+        message: err.response!.data.message
+      }),
+      err.response!.statusText
+    );
+
+    error.isBase64Encoded = false;
+    error.headers = { 'Content-Type': 'application/json' };
+
+    console.log(`Error seen: ${JSON.stringify(error)}`);
+
+    // The error object has to be returned like this to ensure integration tests are backwards compatible
+    return error;
   }
 
   // Logging what we returned for the given API call
