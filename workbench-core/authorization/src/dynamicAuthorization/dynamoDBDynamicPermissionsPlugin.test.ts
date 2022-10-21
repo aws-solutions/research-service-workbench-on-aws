@@ -18,6 +18,7 @@ import { DynamoDBDynamicPermissionsPlugin } from './dynamoDBDynamicPermissionsPl
 import { BadConfigurationError } from './errors/badConfigurationError';
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from './errors/groupNotFoundError';
+import { ThroughPutExceededError } from './errors/throughputExceededError';
 
 describe('DynamoDB Permissions Plugin', () => {
   const region = 'us-east-1';
@@ -638,6 +639,22 @@ describe('DynamoDB Permissions Plugin', () => {
             subjectType: sampleSubjectType
           });
           expect(response.identityPermissions).toStrictEqual([]);
+        });
+
+        test('Exceeding 100 identities should throw ThroughputExceededError', async () => {
+          const identitiesMultiple = Array(101).fill({ identityId: sampleGroupId, identityType: 'GROUP' });
+
+          try {
+            await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
+              subjectId: sampleSubjectId,
+              subjectType: sampleSubjectType,
+              identities: identitiesMultiple
+            });
+            expect.hasAssertions();
+          } catch (err) {
+            expect(err).toBeInstanceOf(ThroughPutExceededError);
+            expect(err.message).toBe('Number of identities exceed 100');
+          }
         });
       });
 

@@ -34,6 +34,7 @@ import {
 import { BadConfigurationError } from './errors/badConfigurationError';
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from './errors/groupNotFoundError';
+import { ThroughPutExceededError } from './errors/throughputExceededError';
 
 /**
  * Request object for DynamoDBDynamicPermissionsPlugin's Init
@@ -204,7 +205,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       })
       .execute();
     const groupIds: string[] =
-      response?.Items?.map((item) => {
+      response.Items?.map((item) => {
         const sk = _.get(item as Item, 'sk') as string;
         return this._decomposeKey(sk).id;
       }) ?? [];
@@ -230,7 +231,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       })
       .execute();
     const userIds: string[] =
-      response?.Items?.map((item) => {
+      response.Items?.map((item) => {
         const pk = _.get(item as Item, 'pk') as string;
         return this._decomposeKey(pk).id;
       }) ?? [];
@@ -379,6 +380,8 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     }
     //IN operator maxed out at 100
     if (getIdentityPermissionsBySubjectRequest.identities) {
+      if (getIdentityPermissionsBySubjectRequest.identities.length > 100)
+        throw new ThroughPutExceededError('Number of identities exceed 100');
       const attributesValues: { [key: string]: string } = {};
       for (let i = 0; i < getIdentityPermissionsBySubjectRequest.identities.length; i++) {
         // eslint-disable-next-line security/detect-object-injection
@@ -398,7 +401,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
 
     const response = await query.execute();
     const identityPermissions: IdentityPermission[] =
-      response?.Items?.map((item) => {
+      response.Items?.map((item) => {
         return this._processItemToIdentityPermission(item);
       }) ?? [];
     return { identityPermissions };
@@ -424,7 +427,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       .execute();
 
     const identityPermissions: IdentityPermission[] =
-      identityPermissionsResponse?.Items?.map((item) => {
+      identityPermissionsResponse.Items?.map((item) => {
         return this._processItemToIdentityPermission(item);
       }) ?? [];
 
