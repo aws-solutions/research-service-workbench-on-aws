@@ -15,6 +15,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/costCenters': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
   '/datasets': {
     GET: [
       {
