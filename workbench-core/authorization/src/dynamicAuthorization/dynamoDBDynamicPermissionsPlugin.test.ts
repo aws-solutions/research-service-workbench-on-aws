@@ -155,7 +155,7 @@ describe('DynamoDB Permissions Plugin', () => {
       identityType: 'GROUP',
       conditions: sampleConditions,
       fields: sampleFields
-    };
+    } as const;
 
     describe('Before init unsuccessful', () => {
       test('createGroup', async () => {
