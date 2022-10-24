@@ -423,9 +423,11 @@ export class EnvironmentService {
       [key: string]: string;
     }
     let metadata: MetaData[] = [];
+    console.log(batchGetResult, batchGetResult.Responses![this._tableName]);
     metadata = batchGetResult.Responses![this._tableName].map((item) => {
       return item as unknown as MetaData;
     });
+    console.log('metadata', metadata);
 
     // Check all expected metadata exist
     const envTypeConfig = metadata.find((item) => {
@@ -451,10 +453,11 @@ export class EnvironmentService {
     const validDatasetIds = datasets.map((dataset) => {
       return dataset.id;
     });
-
-    if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
-      console.log('items', batchGetResult.Responses![this._tableName]);
-      throw Error('Unable to get metadata for all keys defined in environment');
+    const dsIdsNotFound = params.datasetIds.filter((id) => {
+      return !validDatasetIds.includes(id);
+    });
+    if (dsIdsNotFound.length > 0) {
+      throw Boom.badRequest(`datasetIds ${dsIdsNotFound} do not exist`);
     }
 
     // WRITE metadata to DDB

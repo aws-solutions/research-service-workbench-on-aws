@@ -985,7 +985,21 @@ describe('EnvironmentService', () => {
   });
 
   describe('createEnvironment', () => {
-    test('create environment', async () => {
+    const createEnvReq = {
+      instanceId: 'instance-123',
+      cidr: '0.0.0.0/0',
+      description: 'test 123',
+      name: 'testEnv',
+      outputs: [],
+      envTypeId: 'envType-123',
+      envTypeConfigId: 'envTypeConfig-123',
+      projectId: 'proj-123',
+      datasetIds: ['dataset-123'],
+      status: 'PENDING'
+    };
+    const authenticateUser = { roles: ['Admin'], id: 'owner-123' };
+
+    test('create environment successfully', async () => {
       // BUILD
       // Get env metadata
       const batchItems = {
@@ -1015,21 +1029,7 @@ describe('EnvironmentService', () => {
       ddbMock.on(QueryCommand).resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await envService.createEnvironment(
-        {
-          instanceId: 'instance-123',
-          cidr: '0.0.0.0/0',
-          description: 'test 123',
-          name: 'testEnv',
-          outputs: [],
-          envTypeId: 'envType-123',
-          envTypeConfigId: 'envTypeConfig-123',
-          projectId: 'proj-123',
-          datasetIds: ['dataset-123'],
-          status: 'PENDING'
-        },
-        { roles: ['Admin'], id: 'owner-123' }
-      );
+      const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
 
       // CHECK
       expect(actualResponse).toEqual({
@@ -1041,6 +1041,105 @@ describe('EnvironmentService', () => {
         provisionedProductId: '',
         error: undefined
       });
+    });
+    test('fail to create environment because ETC does not exist', async () => {
+      // BUILD
+      // Get env metadata
+      const batchItems = {
+        Responses: {
+          [TABLE_NAME]: [
+            marshall({ ...projItem, resourceType: 'project' }),
+            marshall({ ...datasetItem, resourceType: 'dataset' })
+          ] // Order is important
+        }
+      };
+      // @ts-ignore
+      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+
+      // Write data to DDB
+      ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+      // Get environment from DDB
+      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const envWithMetadata = [env, ...metaData];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: envWithMetadata.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        'envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist'
+      );
+    });
+    test('fail to create environment because Project does not exist', async () => {
+      // BUILD
+      // Get env metadata
+      const batchItems = {
+        Responses: {
+          [TABLE_NAME]: [
+            marshall({ ...envTypeConfigItem, resourceType: 'envTypeConfig' }),
+            marshall({ ...datasetItem, resourceType: 'dataset' })
+          ] // Order is important
+        }
+      };
+      // @ts-ignore
+      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+
+      // Write data to DDB
+      ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+      // Get environment from DDB
+      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const envWithMetadata = [env, ...metaData];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: envWithMetadata.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        'projectId proj-123 does not exist'
+      );
+    });
+    test('fail to create environment because dataset does not exist', async () => {
+      // BUILD
+      // Get env metadata
+      const batchItems = {
+        Responses: {
+          [TABLE_NAME]: [
+            marshall({ ...envTypeConfigItem, resourceType: 'envTypeConfig' }),
+            marshall({ ...projItem, resourceType: 'project' })
+          ] // Order is important
+        }
+      };
+      // @ts-ignore
+      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+
+      // Write data to DDB
+      ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+      // Get environment from DDB
+      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const envWithMetadata = [env, ...metaData];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: envWithMetadata.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        'datasetIds dataset-123 do not exist'
+      );
     });
   });
 });
