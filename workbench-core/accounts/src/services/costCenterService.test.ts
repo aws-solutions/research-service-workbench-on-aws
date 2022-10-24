@@ -19,6 +19,7 @@ describe('CostCenterService', () => {
   let accountMetadata: Account;
   const costCenterService = new CostCenterService({ TABLE_NAME: 'tableName' });
   const accountId = 'acc-someId';
+  const mockDynamo = mockClient(DynamoDBClient);
 
   beforeEach(() => {
     jest.resetModules();
@@ -47,9 +48,61 @@ describe('CostCenterService', () => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
 
-  describe('create', () => {
-    const mockDynamo = mockClient(DynamoDBClient);
+  describe('getCostCenter', () => {
+    describe('when a cost center has an id', () => {
+      let costCenterId: string;
+      let expectedCostCenter: CostCenter | undefined;
 
+      beforeEach(() => {
+        costCenterId = 'cc-someId';
+
+        expectedCostCenter = {
+          awsAccountId: accountMetadata.awsAccountId,
+          encryptionKeyArn: accountMetadata.encryptionKeyArn,
+          envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+          environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+          externalId: accountMetadata.externalId,
+          hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+          subnetId: accountMetadata.subnetId,
+          vpcId: accountMetadata.vpcId,
+          name: 'a name',
+          dependency: accountId,
+          description: 'a description',
+          id: costCenterId
+        };
+      });
+
+      describe('and the cost center has been saved', () => {
+        beforeEach(() => {
+          mockDynamo.on(GetItemCommand).resolves({
+            Item: marshall(expectedCostCenter, {
+              removeUndefinedValues: true
+            })
+          });
+        });
+
+        test('it returns the correct cost center', async () => {
+          await expect(costCenterService.getCostCenter(costCenterId)).resolves.toEqual(expectedCostCenter);
+        });
+      });
+
+      describe('and the cost center has NOT been saved', () => {
+        beforeEach(() => {
+          mockDynamo.on(GetItemCommand).resolves({
+            Item: undefined
+          });
+        });
+
+        test('it throws an error', async () => {
+          await expect(costCenterService.getCostCenter(costCenterId)).rejects.toThrow(
+            `Could not find cost center ${costCenterId}`
+          );
+        });
+      });
+    });
+  });
+
+  describe('create', () => {
     describe('with a valid CreateCostCenter object', () => {
       const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
       const createCostCenter: CreateCostCenter = {

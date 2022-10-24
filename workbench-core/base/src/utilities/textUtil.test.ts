@@ -6,7 +6,13 @@
 const randomUuid = '6d4e4f5b-8121-4bfb-b2c1-68b133177bbb';
 jest.mock('uuid', () => ({ v4: () => randomUuid }));
 
-import { uuidRegExp, uuidWithLowercasePrefix, uuidWithLowercasePrefixRegExp } from './textUtil';
+import {
+  buildKey,
+  buildPkSk,
+  uuidRegExp,
+  uuidWithLowercasePrefix,
+  uuidWithLowercasePrefixRegExp
+} from './textUtil';
 
 describe('textUtil', () => {
   describe('uuidWithLowercasePrefix', () => {
@@ -36,6 +42,25 @@ describe('textUtil', () => {
     test('invalid uuid with prefix', () => {
       const prefix = 'ABC';
       expect(`${prefix}-${randomUuid}`.match(uuidWithLowercasePrefixRegExp(prefix))).toEqual(null);
+    });
+  });
+
+  describe('buildKey', () => {
+    test('it builds the expected key pattern', () => {
+      const id = 'id';
+      const type = 'type';
+      expect(buildKey(id, type)).toEqual('type#id');
+    });
+  });
+
+  describe('buildPkSk', () => {
+    test('it uses the same key for PK and SK', () => {
+      const id = 'id';
+      const type = 'type';
+      expect(buildPkSk(id, type)).toEqual({
+        pk: 'type#id',
+        sk: 'type#id'
+      });
     });
   });
 });
