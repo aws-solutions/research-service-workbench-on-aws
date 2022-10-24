@@ -31,6 +31,7 @@ import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
 } from './dynamicPermissionsPluginInputs';
+import { DynamoDBIdentityPermissionItem } from './dynamoDbIdentityItem';
 import { BadConfigurationError } from './errors/badConfigurationError';
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from './errors/groupNotFoundError';
@@ -57,13 +58,6 @@ export interface InitResponse {
    * Determines if initialization was successful
    */
   success: boolean;
-}
-
-/**
- * Item returned by DynamoDB helper client
- */
-interface Item {
-  [key: string]: unknown;
 }
 
 export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugin {
@@ -206,7 +200,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       .execute();
     const groupIds: string[] =
       response.Items?.map((item) => {
-        const sk = _.get(item as Item, 'sk') as string;
+        const sk = _.get(item as unknown as DynamoDBIdentityPermissionItem, 'sk');
         return this._decomposeKey(sk).id;
       }) ?? [];
 
@@ -232,7 +226,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       .execute();
     const userIds: string[] =
       response.Items?.map((item) => {
-        const pk = _.get(item as Item, 'pk') as string;
+        const pk = _.get(item as unknown as DynamoDBIdentityPermissionItem, 'pk');
         return this._decomposeKey(pk).id;
       }) ?? [];
 
@@ -251,19 +245,16 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     const batchCreateRequestPromises = identityPermissions.map(async (identityPermission) => {
       const condition = 'attribute_not_exists(pk)';
       const item = this._createItemFromIdentityPermission(identityPermission);
+      const key = {
+        pk: item.pk,
+        sk: item.sk
+      };
+      const params = {
+        item,
+        condition
+      };
       try {
-        await this._awsService.helpers.ddb
-          .update(
-            {
-              pk: item.pk,
-              sk: item.sk
-            },
-            {
-              item,
-              condition
-            }
-          )
-          .execute();
+        await this._awsService.helpers.ddb.update(key, params).execute();
       } catch (err) {
         //Track identity permission if unprocesssed
         unprocessedIdentityPermissions.push(identityPermission);
@@ -287,8 +278,8 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
       const deleteKeys: { pk: string; sk: string }[] = identityPermissions.map((identityPermission) => {
         const item = this._createItemFromIdentityPermission(identityPermission);
         return {
-          pk: item.pk as string,
-          sk: item.sk as string
+          pk: item.pk,
+          sk: item.sk
         };
       });
       return this._awsService.helpers.ddb
@@ -402,7 +393,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     const response = await query.execute();
     const identityPermissions: IdentityPermission[] =
       response.Items?.map((item) => {
-        return this._processItemToIdentityPermission(item);
+        return this._processItemToIdentityPermission(item as unknown as DynamoDBIdentityPermissionItem);
       }) ?? [];
     return { identityPermissions };
   }
@@ -428,7 +419,7 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
 
     const identityPermissions: IdentityPermission[] =
       identityPermissionsResponse.Items?.map((item) => {
-        return this._processItemToIdentityPermission(item);
+        return this._processItemToIdentityPermission(item as unknown as DynamoDBIdentityPermissionItem);
       }) ?? [];
 
     return { identityPermissions };
@@ -457,9 +448,11 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     };
   }
 
-  private _createItemFromIdentityPermission(identityPermission: IdentityPermission): Item {
-    const action = `${identityPermission.action}`;
-    const effect = `${identityPermission.effect}`;
+  private _createItemFromIdentityPermission(
+    identityPermission: IdentityPermission
+  ): DynamoDBIdentityPermissionItem {
+    const action = identityPermission.action as Action;
+    const effect = identityPermission.effect as Effect;
     const pk = this._composeKey(
       this._identityPermissionsPrefix,
       identityPermission.subjectType,
@@ -488,17 +481,17 @@ export class DynamoDBDynamicPermissionsPlugin implements DynamicPermissionsPlugi
     };
   }
 
-  private _processItemToIdentityPermission(item: Item): IdentityPermission {
+  private _processItemToIdentityPermission(item: DynamoDBIdentityPermissionItem): IdentityPermission {
     const { type, id } = this._decomposeKey(item.identity as string);
     return {
       identityId: id,
       identityType: type as IdentityType,
-      action: item.action as Action,
-      effect: item.effect as Effect,
-      subjectType: item.subjectType as string,
-      subjectId: item.subjectId as string,
-      conditions: item.conditions as { [key: string]: unknown },
-      fields: item.fields as string[]
+      action: item.action,
+      effect: item.effect,
+      subjectType: item.subjectType,
+      subjectId: item.subjectId,
+      conditions: item.conditions,
+      fields: item.fields
     };
   }
 }
