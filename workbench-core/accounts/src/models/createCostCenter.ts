@@ -5,7 +5,7 @@
 
 interface CreateCostCenter {
   name: string;
-  dependency: string;
+  accountId: string;
   description: string;
 }
 

@@ -38,13 +38,16 @@ export default class CostCenterService {
   public async create(createCostCenter: CreateCostCenter): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
 
-    const account = await this._getAccount(createCostCenter.dependency);
+    const account = await this._getAccount(createCostCenter.accountId);
+
+    const createdAt = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
+      createdAt: createdAt,
+      updatedAt: createdAt,
       id: id,
-      resourceType: 'costCenter',
       awsAccountId: account.awsAccountId,
-      dependency: createCostCenter.dependency,
+      accountId: createCostCenter.accountId,
       description: createCostCenter.description,
       encryptionKeyArn: account.encryptionKeyArn,
       envMgmtRoleArn: account.envMgmtRoleArn,
@@ -63,12 +66,12 @@ export default class CostCenterService {
           sk: id
         },
         {
-          item: costCenter as unknown as { [key: string]: string }
+          item: { ...costCenter, resourceType: 'cost center' }
         }
       )
       .execute();
 
-    return { ...costCenter, id };
+    return costCenter;
   }
 
   private async _getAccount(accountId: string): Promise<Account> {

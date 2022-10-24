@@ -18,4 +18,11 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
       res.send(await costCenterService.create({ ...req.body }));
     })
   );
+
+  router.get(
+    '/costCenters',
+    wrapAsync(async (req: Request, res: Response) => {
+      res.send(await costCenterService.getCostCenter(req.params.id));
+    })
+  );
 }

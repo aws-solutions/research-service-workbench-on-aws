@@ -11,11 +11,11 @@ const CreateCostCenterSchema: Schema = {
   type: 'object',
   properties: {
     name: { type: 'string' },
-    dependency: { type: 'string' },
+    accountId: { type: 'string' },
     description: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['name', 'dependency', 'description']
+  required: ['name', 'accountId', 'description']
 };
 
 export default CreateCostCenterSchema;

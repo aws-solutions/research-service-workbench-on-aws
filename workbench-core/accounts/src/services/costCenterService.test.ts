@@ -20,12 +20,17 @@ describe('CostCenterService', () => {
   const costCenterService = new CostCenterService({ TABLE_NAME: 'tableName' });
   const accountId = 'acc-someId';
   const ddbMock = mockClient(DynamoDBClient);
+  const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
 
   beforeEach(() => {
     jest.resetModules();
     process.env = { ...ORIGINAL_ENV };
     process.env.AWS_REGION = 'us-east-1';
     process.env.STACK_NAME = 'swb-swbv2-va';
+
+    jest.clearAllMocks();
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
     accountMetadata = {
       error: undefined,
@@ -57,7 +62,8 @@ describe('CostCenterService', () => {
         costCenterId = 'cc-someId';
 
         expectedCostCenter = {
-          resourceType: 'costCenter',
+          createdAt: mockDateObject.toISOString(),
+          updatedAt: mockDateObject.toISOString(),
           awsAccountId: accountMetadata.awsAccountId,
           encryptionKeyArn: accountMetadata.encryptionKeyArn,
           envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
@@ -67,7 +73,7 @@ describe('CostCenterService', () => {
           subnetId: accountMetadata.subnetId,
           vpcId: accountMetadata.vpcId,
           name: 'a name',
-          dependency: accountId,
+          accountId: accountId,
           description: 'a description',
           id: costCenterId
         };
@@ -109,7 +115,7 @@ describe('CostCenterService', () => {
       const createCostCenter: CreateCostCenter = {
         name: 'the name',
         description: 'the description',
-        dependency: accountId
+        accountId: accountId
       };
 
       describe('`dependency` is the id of a saved Account', () => {
@@ -125,7 +131,8 @@ describe('CostCenterService', () => {
 
         test('it returns a CostCenter object with the associated Account metadata', async () => {
           const expectedCostCenter: CostCenter = {
-            resourceType: 'costCenter',
+            createdAt: mockDateObject.toISOString(),
+            updatedAt: mockDateObject.toISOString(),
             awsAccountId: accountMetadata.awsAccountId,
             encryptionKeyArn: accountMetadata.encryptionKeyArn,
             envMgmtRoleArn: accountMetadata.envMgmtRoleArn,

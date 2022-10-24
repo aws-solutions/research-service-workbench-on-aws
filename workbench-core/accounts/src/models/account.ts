@@ -3,16 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-/*
- *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *  SPDX-License-Identifier: Apache-2.0
-
- */
-
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
-  id?: string;
+  id: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
   error?: { type: string; value: string };
@@ -22,7 +16,7 @@ interface Account {
   cidr: string;
   environmentInstanceFiles: string;
   encryptionKeyArn: string;
-  externalId?: string;
+  externalId: string;
   stackName: string;
   status: HostingAccountStatus;
 }
