@@ -31,7 +31,6 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-accounts": "workspace:*",
     "@aws/workbench-core-authentication": "workspace:*",
     "@aws/workbench-core-authorization": "workspace:*",
