@@ -21,7 +21,7 @@ describe('User Management Service', () => {
 
   const mockUserManagementPlugin: UserManagementPlugin = {
     getUser: jest.fn().mockImplementation(() => mockUser),
-    createUser: jest.fn().mockImplementation(() => {}),
+    createUser: jest.fn().mockImplementation(() => mockUser),
     updateUser: jest.fn().mockImplementation(() => {}),
     deleteUser: jest.fn().mockImplementation(() => {}),
     activateUser: jest.fn().mockImplementation(() => {}),
@@ -46,7 +46,8 @@ describe('User Management Service', () => {
   });
 
   test('createUser', async () => {
-    await expect(userManagementService.createUser(mockUser)).resolves.not.toThrow();
+    const user = await userManagementService.createUser(mockUser);
+    expect(user).toEqual(mockUser);
   });
 
   test('updateUser', async () => {
