@@ -42,6 +42,7 @@ export default class CostCenterService {
 
     const costCenter: CostCenter = {
       id: id,
+      resourceType: 'costCenter',
       awsAccountId: account.awsAccountId,
       dependency: createCostCenter.dependency,
       description: createCostCenter.description,
