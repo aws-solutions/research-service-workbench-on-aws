@@ -7,10 +7,10 @@
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
 interface Account {
-  id: string | undefined;
+  id?: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
-  error: { type: string; value: string } | undefined;
+  error?: { type: string; value: string };
   hostingAccountHandlerRoleArn: string;
   vpcId: string;
   subnetId: string;

@@ -13,7 +13,7 @@ import AccountService from './accountService';
 
 export default class CostCenterService {
   private _aws: AwsService;
-  private _tableName: string;
+  private readonly _tableName: string;
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
@@ -27,23 +27,12 @@ export default class CostCenterService {
       .get(buildPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
-    const item = (response as GetItemCommandOutput).Item;
-
-    if (item === undefined) {
+    if (response.Item === undefined) {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
-    } else {
-      const costCenter = item as unknown as CostCenter;
-      return Promise.resolve(costCenter);
     }
-  }
+    const costCenter = response.Item as unknown as CostCenter;
 
-  public async isCostCenterValid(costCenterId: string): Promise<boolean> {
-    try {
-      await this.getCostCenter(costCenterId);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    return Promise.resolve(costCenter);
   }
 
   public async create(createCostCenter: CreateCostCenter): Promise<CostCenter> {
