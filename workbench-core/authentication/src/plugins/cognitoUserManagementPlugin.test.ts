@@ -296,12 +296,22 @@ describe('CognitoUserManagementPlugin tests', () => {
   });
 
   describe('createUser tests', () => {
-    it('should create the requested User when all params are valid', async () => {
-      const createMock = cognitoMock.on(AdminCreateUserCommand).resolves({});
+    it('should return the requested User when all params are valid', async () => {
+      cognitoMock.on(AdminCreateUserCommand).resolves({
+        User: {
+          Username: userInfo.uid,
+          Attributes: [
+            { Name: 'given_name', Value: userInfo.firstName },
+            { Name: 'family_name', Value: userInfo.lastName },
+            { Name: 'email', Value: userInfo.email }
+          ],
+          Enabled: true
+        }
+      });
 
-      await plugin.createUser(userInfo);
+      const user = await plugin.createUser(userInfo);
 
-      expect(createMock.calls().length).toBe(1);
+      expect(user).toMatchObject({ ...userInfo, roles: [] });
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
@@ -565,12 +575,49 @@ describe('CognitoUserManagementPlugin tests', () => {
 
   describe('listUsers tests', () => {
     it('should return a list of Users in the user pool', async () => {
-      cognitoMock.on(ListUsersCommand).resolves({ Users: [{ Username: userInfo.uid }] });
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Username: userInfo.uid,
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ],
+            Enabled: true
+          }
+        ]
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
 
       const users = await plugin.listUsers();
 
       expect(users.length).toBe(1);
-      expect(users).toMatchObject<string[]>([userInfo.uid]);
+      expect(users).toMatchObject([{ ...userInfo, roles }]);
+    });
+
+    it('should return an empty array for user.role for users with no groups', async () => {
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Username: userInfo.uid,
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ],
+            Enabled: true
+          }
+        ]
+      });
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+
+      const users = await plugin.listUsers();
+
+      expect(users.length).toBe(1);
+      expect(users).toMatchObject([{ ...userInfo, roles: [] }]);
     });
 
     it('should return an empty array when no users are in the user pool', async () => {
@@ -583,12 +630,37 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should return an empty array when the users dont have user ids', async () => {
-      cognitoMock.on(ListUsersCommand).resolves({ Users: [{}] });
+      cognitoMock.on(ListUsersCommand).resolves({
+        Users: [
+          {
+            Attributes: [
+              { Name: 'given_name', Value: userInfo.firstName },
+              { Name: 'family_name', Value: userInfo.lastName },
+              { Name: 'email', Value: userInfo.email }
+            ]
+          }
+        ]
+      });
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
 
       const users = await plugin.listUsers();
 
       expect(users.length).toBe(0);
-      expect(users).toMatchObject<string[]>([]);
+      expect(users).toMatchObject([]);
+    });
+
+    it('should populate missing values with empty strings', async () => {
+      cognitoMock.on(ListUsersCommand).resolves({ Users: [{ Username: userInfo.uid }] });
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({ Groups: roles.map(() => ({})) });
+
+      const users = await plugin.listUsers();
+
+      expect(users.length).toBe(1);
+      expect(users).toMatchObject<User[]>([
+        { uid: userInfo.uid, firstName: '', lastName: '', email: '', status: Status.INACTIVE, roles: [] }
+      ]);
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {

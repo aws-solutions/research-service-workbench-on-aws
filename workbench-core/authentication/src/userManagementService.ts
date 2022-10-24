@@ -3,6 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// disabling because the tsdoc links need the imports to work
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { IdpUnavailableError } from './errors/idpUnavailableError';
+import { InvalidParameterError } from './errors/invalidParameterError';
+import { PluginConfigurationError } from './errors/pluginConfigurationError';
+import { RoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
+import { RoleNotFoundError } from './errors/roleNotFoundError';
+import { UserAlreadyExistsError } from './errors/userAlreadyExistsError';
+import { UserNotFoundError } from './errors/userNotFoundError';
+/* eslint-enable @typescript-eslint/no-unused-vars */
 import { CreateUser, User } from './user';
 import { UserManagementPlugin } from './userManagementPlugin';
 /**
@@ -30,14 +40,15 @@ export class UserManagementService {
   /**
    * Create a new user with the given details.
    * @param user - the details of the user to create.
+   * @returns the created {@link User}
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  public async createUser(user: CreateUser): Promise<void> {
-    await this._userManagementPlugin.createUser(user);
+  public async createUser(user: CreateUser): Promise<User> {
+    return await this._userManagementPlugin.createUser(user);
   }
   /**
    * Update a user with new details.
@@ -93,12 +104,12 @@ export class UserManagementService {
 
   /**
    * Get all user IDs from the user/role data store.
-   * @returns an array containing all the user ids
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    */
-  public async listUsers(): Promise<string[]> {
+  public async listUsers(): Promise<User[]> {
     return this._userManagementPlugin.listUsers();
   }
 
