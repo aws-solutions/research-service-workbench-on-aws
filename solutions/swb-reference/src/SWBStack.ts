@@ -16,6 +16,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
+import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
@@ -33,6 +34,8 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { LoadBalancerTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import _ from 'lodash';
 import { getConstants } from './constants';
@@ -92,7 +95,10 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       VPC_ID,
-      SUBNET_IDS
+      SUBNET_IDS,
+      HOST_ZONE_ID,
+      CERTIFICATE_ID,
+      DOMAIN_NAME
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -171,14 +177,31 @@ export class SWBStack extends Stack {
       subnetIds: SUBNET_IDS
     });
 
-    this._createLoadBalancer(swbVpc, apiGwUrl);
+    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
   }
 
-  private _createLoadBalancer(swbVpc: SWBVpc, apiGwUrl: string): void {
+  private _createLoadBalancer(
+    swbVpc: SWBVpc,
+    apiGwUrl: string,
+    domainName: string,
+    hostZoneId: string,
+    certificateId: string
+  ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
       subnets: swbVpc.subnetSelection,
       internetFacing: true // TODO: See if this is required if we are directly passing in subnets
+    });
+
+    const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+      zoneName: domainName,
+      hostedZoneId: hostZoneId
+    });
+
+    // Add a Route 53 alias with the Load Balancer as the target
+    new ARecord(this, 'AliasRecord', {
+      zone,
+      target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
     });
 
     const proxyLambda = new Function(this, 'LambdaProxy', {
@@ -197,6 +220,18 @@ export class SWBStack extends Stack {
 
     httpListener.addTargets('proxyLambda', {
       targets: [new LambdaTarget(proxyLambda)]
+    });
+
+    // Add a listener on port 443 for and use the certificate for HTTPS
+    const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
+    const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
+      port: 443,
+      certificates: [certificate]
+    });
+
+    httpsListener.addTargets('proxyLambda', {
+      targets: [new LambdaTarget(proxyLambda)],
+      healthCheck: { enabled: true }
     });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {

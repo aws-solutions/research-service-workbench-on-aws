@@ -14,3 +14,7 @@
 # Please provide the following values if you have a custom network for SWB to use
 #vpcId: ''
 #subnetIds: []
+
+#hostZoneId: ''
+#domainName: ''
+#tlsCertificateId: ''
