@@ -425,7 +425,7 @@ class Updater {
    * @example Set the condition to update if an attribute does not exist
    * ```ts
    * # Usage
-   * Udpater.condition('attribute_not_exists(newAttribute)');
+   * Updater.condition('attribute_not_exists(newAttribute)');
    * ```
    */
   public condition(str: string, separator: string = 'AND'): Updater {

@@ -280,7 +280,7 @@ export default class DynamoDBService {
    *
    * @example Only use this method to set up the Updater in an external file
    * ```ts
-   * const updater = dynamoDBService.update({'pk': {S: 'pk'}, 'sk': {S: 'sk}}, {item: {'newAttribute': {S: 'newValue'}}});
+   * const updater = dynamoDBService.update({'pk': {S: 'pk'}, 'sk': {S: 'sk'}}, {item: {'newAttribute': {S: 'newValue'}}});
    * const dataFromUpdate = await updater.execute();
    * ```
    *
@@ -305,6 +305,7 @@ export default class DynamoDBService {
       return?: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW';
       metrics?: 'NONE' | 'SIZE';
       capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+      condition?: string;
     }
   ): Updater {
     let updater = new Updater({ region: this._awsRegion }, this._tableName, marshall(key));
@@ -344,6 +345,9 @@ export default class DynamoDBService {
       }
       if (params.capacity) {
         updater = updater.capacity(params.capacity);
+      }
+      if (params.condition) {
+        updater = updater.condition(params.condition);
       }
     }
     return updater;
