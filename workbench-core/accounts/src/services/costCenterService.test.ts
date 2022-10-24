@@ -19,7 +19,7 @@ describe('CostCenterService', () => {
   let accountMetadata: Account;
   const costCenterService = new CostCenterService({ TABLE_NAME: 'tableName' });
   const accountId = 'acc-someId';
-  const mockDynamo = mockClient(DynamoDBClient);
+  const ddbMock = mockClient(DynamoDBClient);
 
   beforeEach(() => {
     jest.resetModules();
@@ -57,6 +57,7 @@ describe('CostCenterService', () => {
         costCenterId = 'cc-someId';
 
         expectedCostCenter = {
+          resourceType: 'costCenter',
           awsAccountId: accountMetadata.awsAccountId,
           encryptionKeyArn: accountMetadata.encryptionKeyArn,
           envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
@@ -74,7 +75,7 @@ describe('CostCenterService', () => {
 
       describe('and the cost center has been saved', () => {
         beforeEach(() => {
-          mockDynamo.on(GetItemCommand).resolves({
+          ddbMock.on(GetItemCommand).resolves({
             Item: marshall(expectedCostCenter, {
               removeUndefinedValues: true
             })
@@ -88,7 +89,7 @@ describe('CostCenterService', () => {
 
       describe('and the cost center has NOT been saved', () => {
         beforeEach(() => {
-          mockDynamo.on(GetItemCommand).resolves({
+          ddbMock.on(GetItemCommand).resolves({
             Item: undefined
           });
         });
@@ -113,17 +114,18 @@ describe('CostCenterService', () => {
 
       describe('`dependency` is the id of a saved Account', () => {
         beforeEach(() => {
-          mockDynamo.on(GetItemCommand).resolves({
+          ddbMock.on(GetItemCommand).resolves({
             Item: marshall(accountMetadata, {
               removeUndefinedValues: true
             })
           });
 
-          mockDynamo.on(UpdateItemCommand).resolves({});
+          ddbMock.on(UpdateItemCommand).resolves({});
         });
 
         test('it returns a CostCenter object with the associated Account metadata', async () => {
           const expectedCostCenter: CostCenter = {
+            resourceType: 'costCenter',
             awsAccountId: accountMetadata.awsAccountId,
             encryptionKeyArn: accountMetadata.encryptionKeyArn,
             envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
@@ -142,7 +144,7 @@ describe('CostCenterService', () => {
 
       describe('`dependency` is not the id of a saved Account', () => {
         beforeEach(() => {
-          mockDynamo.on(GetItemCommand).rejects({});
+          ddbMock.on(GetItemCommand).rejects({});
         });
 
         test('returns an error', async () => {

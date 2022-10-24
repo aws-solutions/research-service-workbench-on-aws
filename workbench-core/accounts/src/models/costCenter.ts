@@ -24,6 +24,7 @@ interface CostCenter {
   environmentInstanceFiles: string;
   hostingAccountHandlerRoleArn: string;
   awsAccountId: string;
+  resourceType: 'costCenter';
 }
 
 export default CostCenter;

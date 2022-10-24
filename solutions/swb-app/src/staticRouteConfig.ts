@@ -16,6 +16,12 @@ export const routesMap: RoutesMap = {
     ]
   },
   '/costCenters': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
+    ],
     POST: [
       {
         action: 'CREATE',
