@@ -199,6 +199,7 @@ importers:
       '@aws/swb-app': workspace:*
       '@aws/workbench-core-accounts': workspace:*
       '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-authentication': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-environments': workspace:*
@@ -255,6 +256,7 @@ importers:
       '@aws/swb-app': link:../swb-app
       '@aws/workbench-core-accounts': link:../../workbench-core/accounts
       '@aws/workbench-core-audit': link:../../workbench-core/audit
+      '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-base': link:../../workbench-core/base
       '@aws/workbench-core-datasets': link:../../workbench-core/datasets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
@@ -662,6 +664,7 @@ importers:
       '@aws-sdk/types': ^3.110.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -689,8 +692,8 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@aws-sdk/client-cognito-identity-provider': 3.130.0
       '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
@@ -698,6 +701,7 @@ importers:
       jsonschema: 1.4.1
       lodash: 4.17.21
     devDependencies:
+      '@aws-sdk/client-cognito-identity-provider': 3.130.0
       '@aws-sdk/client-s3': 3.130.0
       '@aws-sdk/types': 3.127.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -2209,7 +2213,6 @@ packages:
       tslib: 2.4.0
     transitivePeerDependencies:
       - aws-crt
-    dev: false
 
   /@aws-sdk/client-dynamodb/3.130.0:
     resolution: {integrity: sha512-jyM7G0oEoJRVgSuVUSGM8G74j+pc/bCpUifpMzT+vIv5aNVGjtdLeTD1fpKFrEfriBHBl3/N/jDcgtRM6pdrsw==}
