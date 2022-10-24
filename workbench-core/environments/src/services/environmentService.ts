@@ -15,7 +15,6 @@ import {
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-
 import { EnvironmentStatus } from '../constants/environmentStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -29,7 +28,6 @@ export interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
-
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
@@ -62,7 +60,6 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
-
   envTypeConfigId: '',
   updatedAt: '',
   updatedBy: '',
@@ -402,7 +399,6 @@ export class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       updatedBy: user.id,
@@ -423,11 +419,9 @@ export class EnvironmentService {
       [key: string]: string;
     }
     let metadata: MetaData[] = [];
-    console.log(batchGetResult, batchGetResult.Responses![this._tableName]);
     metadata = batchGetResult.Responses![this._tableName].map((item) => {
       return item as unknown as MetaData;
     });
-    console.log('metadata', metadata);
 
     // Check all expected metadata exist
     const envTypeConfig = metadata.find((item) => {
