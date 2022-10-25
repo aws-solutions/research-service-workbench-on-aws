@@ -7,6 +7,7 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   AwsService,
   buildDynamoDBPkSk,
+  removeDynamoDbKeys,
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
@@ -36,12 +37,9 @@ export default class CostCenterService {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    delete response.Item.pk;
-    delete response.Item.sk;
     response.Item.accountId = response.Item.dependency;
-    delete response.Item.dependency;
 
-    const costCenter = response.Item as unknown as CostCenter;
+    const costCenter = removeDynamoDbKeys(response.Item as { [key: string]: never }) as unknown as CostCenter;
 
     return Promise.resolve(costCenter);
   }
