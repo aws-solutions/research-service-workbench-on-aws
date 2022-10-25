@@ -10,7 +10,7 @@ on:
 
 jobs:
   enable-feat-branch-protection:
-    if: contains(github.ref_name, 'feat/')
+    if: startsWith(github.ref_name, 'feat/')
     runs-on: ubuntu-latest
     steps:
       - name: 'Construct required_pull_request_reviews object'
@@ -44,7 +44,7 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/branches/{branch}/protection
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: ${{ github.ref_name }}
           enforce_admins: true

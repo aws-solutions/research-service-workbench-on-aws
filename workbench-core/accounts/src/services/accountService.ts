@@ -7,23 +7,8 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import Account from '../models/account';
 
-interface Account {
-  id: string | undefined;
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  error: { type: string; value: string } | undefined;
-  hostingAccountHandlerRoleArn: string;
-  vpcId: string;
-  subnetId: string;
-  cidr: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
-  externalId?: string;
-  stackName: string;
-  status: HostingAccountStatus;
-}
 export default class AccountService {
   private _aws: AwsService;
 
