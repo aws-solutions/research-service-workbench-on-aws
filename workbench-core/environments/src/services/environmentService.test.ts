@@ -999,7 +999,7 @@ describe('EnvironmentService', () => {
     };
     const authenticateUser = { roles: ['Admin'], id: 'owner-123' };
 
-    test('create environment successfully', async () => {
+    test('successfully', async () => {
       // BUILD
       // Get env metadata
       const batchItems = {
@@ -1042,7 +1042,7 @@ describe('EnvironmentService', () => {
         error: undefined
       });
     });
-    test('fail to create environment because ETC does not exist', async () => {
+    test('failed because ETC does not exist', async () => {
       // BUILD
       // Get env metadata
       const batchItems = {
@@ -1075,7 +1075,7 @@ describe('EnvironmentService', () => {
         'envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist'
       );
     });
-    test('fail to create environment because Project does not exist', async () => {
+    test('failed because Project does not exist', async () => {
       // BUILD
       // Get env metadata
       const batchItems = {
@@ -1108,7 +1108,7 @@ describe('EnvironmentService', () => {
         'projectId proj-123 does not exist'
       );
     });
-    test('fail to create environment because dataset does not exist', async () => {
+    test('failed because Dataset does not exist', async () => {
       // BUILD
       // Get env metadata
       const batchItems = {
