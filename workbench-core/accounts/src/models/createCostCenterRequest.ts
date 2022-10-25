@@ -3,10 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-interface CreateCostCenter {
+interface CreateCostCenterRequest {
   name: string;
   accountId: string;
   description: string;
 }
 
-export default CreateCostCenter;
+export default CreateCostCenterRequest;

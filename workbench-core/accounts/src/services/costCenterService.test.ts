@@ -11,7 +11,7 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
 import Account from '../models/account';
 import CostCenter from '../models/costCenter';
-import CreateCostCenter from '../models/createCostCenter';
+import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
 
 describe('CostCenterService', () => {
