@@ -10,35 +10,15 @@ import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
   buildDynamoDBPkSk,
-  buildPkSk,
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
-// import CostCenter from '../models/costCenter';
+import CostCenter from '../models/costCenter';
 import CreateProjectReqeust from '../models/createProjectRequest';
 import Project from '../models/project';
 import CostCenterService from './costCenterService';
-
-// interface Project {
-//   id: string;
-//   createdAt: string;
-//   dependency: string;
-//   description: string;
-//   name: string;
-//   updatedAt: string;
-//   // Acc Metadata
-//   subnetId: string;
-//   vpcId: string;
-//   envMgmtRoleArn: string;
-//   externalId: string;
-//   encryptionKeyArn: string;
-//   environmentInstanceFiles: string;
-//   hostingAccountHandlerRoleArn: string;
-//   awsAccountId: string;
-//   accountId: string;
-// }
 
 export default class ProjectService {
   private _aws: AwsService;
@@ -92,6 +72,13 @@ export default class ProjectService {
     return Promise.resolve({ data: projectsResponse.Items as unknown as Project[] });
   }
 
+  /**
+   * Creates a new project
+   *
+   * @param params - the required fields to create a new project
+   * @param user - authenticated user creating the project
+   * @returns Project object of new project
+   */
   public async createProject(params: CreateProjectReqeust, user: AuthenticatedUser): Promise<Project> {
     // Verify caller is an IT Admin--TODO implement after dynamic AuthZ
     // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(user.id);
@@ -160,11 +147,11 @@ export default class ProjectService {
       environmentInstanceFiles: costCenter.environmentInstanceFiles,
       hostingAccountHandlerRoleArn: costCenter.hostingAccountHandlerRoleArn,
       awsAccountId: costCenter.awsAccountId,
-      accountId: costCenter.dependency
+      accountId: costCenter.accountId
     };
     try {
       await this._aws.helpers.ddb
-        .update(buildPkSk(projectId, resourceTypeToKey.project), {
+        .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
           item: { ...newProject, resourceType: 'project' }
         })
         .execute();
@@ -173,8 +160,7 @@ export default class ProjectService {
       throw Boom.internal('Failed to create project');
     }
 
-    // Verify project is in DDB and return item created
-    return this.getProject(newProject.id);
+    return newProject;
   }
 
   private async _isProjectNameInUse(projectName: string): Promise<boolean> {
