@@ -39,9 +39,10 @@ export default class CostCenterService {
 
     response.Item.accountId = response.Item.dependency;
 
-    const costCenter = removeDynamoDbKeys(response.Item as { [key: string]: never }) as unknown as CostCenter;
+    let costCenter = response.Item as { [key: string]: never };
+    costCenter = removeDynamoDbKeys(costCenter);
 
-    return Promise.resolve(costCenter);
+    return costCenter as unknown as CostCenter;
   }
 
   public async create(createCostCenter: CreateCostCenterRequest): Promise<CostCenter> {
