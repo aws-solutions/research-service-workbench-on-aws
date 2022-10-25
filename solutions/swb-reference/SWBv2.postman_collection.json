@@ -840,7 +840,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\",\n}",
+              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
