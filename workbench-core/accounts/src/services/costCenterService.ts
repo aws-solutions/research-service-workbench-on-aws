@@ -4,7 +4,12 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildPkSk, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  buildDynamoDBPkSk,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import Account from '../models/account';
 import CostCenter from '../models/costCenter';
@@ -24,7 +29,7 @@ export default class CostCenterService {
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     // Get by id
     const response = (await this._aws.helpers.ddb
-      .get(buildPkSk(costCenterId, resourceTypeToKey.costCenter))
+      .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
@@ -74,7 +79,7 @@ export default class CostCenterService {
 
     delete dynamoItem.accountId;
 
-    const key = buildPkSk(id, resourceTypeToKey.costCenter);
+    const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
     await this._aws.helpers.ddb
       .update(key, {
