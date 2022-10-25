@@ -17,5 +17,20 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
   return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
 }
+function buildPkSk(id: string, type: string): { [key: string]: string } {
+  const key = buildKey(id, type);
+  return { pk: key, sk: key };
+}
 
-export { uuidWithLowercasePrefix, uuidRegExp, uuidWithLowercasePrefixRegExp, uuidRegExpAsString };
+function buildKey(id: string, type: string): string {
+  return `${type}#${id}`;
+}
+
+export {
+  uuidWithLowercasePrefix,
+  uuidRegExp,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExpAsString,
+  buildPkSk,
+  buildKey
+};

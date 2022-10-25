@@ -14,7 +14,9 @@ import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   uuidRegExp,
-  uuidRegExpAsString
+  uuidRegExpAsString,
+  buildPkSk,
+  buildKey
 } from './utilities/textUtil';
 
 export {
@@ -30,5 +32,7 @@ export {
   uuidWithLowercasePrefix,
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
-  uuidRegExpAsString
+  uuidRegExpAsString,
+  buildPkSk,
+  buildKey
 };
