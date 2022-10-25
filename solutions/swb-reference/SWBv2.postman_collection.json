@@ -27,7 +27,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"cost center name\",\n    \"accountId\": \"id of the Account object\",\n    \"description\": \"a description of the cost center\"\n}",
+              "raw": "{\n    \"name\": \"cost center name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
