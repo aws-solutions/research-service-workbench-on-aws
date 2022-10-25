@@ -170,6 +170,12 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'Project'
       }
+    ],
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'Project'
+      }
     ]
   },
   '/roles': {
