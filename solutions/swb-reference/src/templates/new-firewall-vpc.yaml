@@ -1287,10 +1287,10 @@ Resources:
 # ======================================================================================================================
 
 Outputs:
-
-  GWLBServiceId:
-    Description: GWLB Service ID for use for additional GWLB Endpoints
-    Value: !GetAtt GWLBESerivceName.Data
   TGWID:
     Description: Transit Gateway ID on this account
     Value: !If [NoExistingTGW, !Ref TransitGateway, !Ref TGWID]
+  GWLBServiceId:
+    Description: GWLB Service ID for use for additional GWLB Endpoints
+    Value: !GetAtt GWLBESerivceName.Data
+  
