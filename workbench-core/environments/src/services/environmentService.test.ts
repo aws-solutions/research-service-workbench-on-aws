@@ -3,11 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import Boom from '@hapi/boom';
+
 const rndUuid = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 const envId = `env-${rndUuid}`;
 jest.mock('uuid', () => ({ v4: () => rndUuid }));
 import {
   BatchGetItemCommand,
+  BatchGetItemCommandOutput,
   DynamoDBClient,
   GetItemCommand,
   GetItemCommandOutput,
@@ -999,20 +1002,31 @@ describe('EnvironmentService', () => {
     };
     const authenticateUser = { roles: ['Admin'], id: 'owner-123' };
 
+    function getBatchItemsWith(resourceTypes: string[]): Partial<BatchGetItemCommandOutput> {
+      const resources = [
+        { ...envTypeConfigItem, resourceType: 'envTypeConfig' },
+        { ...projItem, resourceType: 'project' },
+        { ...datasetItem, resourceType: 'dataset' }
+      ];
+      const batchResponses = resources
+        .filter((resource) => {
+          return resourceTypes.includes(resource.resourceType);
+        })
+        .map((resource) => {
+          return marshall(resource);
+        });
+      return {
+        Responses: {
+          [TABLE_NAME]: batchResponses // Order is important
+        }
+      };
+    }
+
     test('successfully', async () => {
       // BUILD
       // Get env metadata
-      const batchItems = {
-        Responses: {
-          [TABLE_NAME]: [
-            marshall({ ...envTypeConfigItem, resourceType: 'envTypeConfig' }),
-            marshall({ ...projItem, resourceType: 'project' }),
-            marshall({ ...datasetItem, resourceType: 'dataset' })
-          ] // Order is important
-        }
-      };
-      // @ts-ignore
-      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project', 'dataset']);
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
       // Write data to DDB
       ddbMock.on(TransactWriteItemsCommand).resolves({});
@@ -1044,17 +1058,8 @@ describe('EnvironmentService', () => {
     });
     test('failed because ETC does not exist', async () => {
       // BUILD
-      // Get env metadata
-      const batchItems = {
-        Responses: {
-          [TABLE_NAME]: [
-            marshall({ ...projItem, resourceType: 'project' }),
-            marshall({ ...datasetItem, resourceType: 'dataset' })
-          ] // Order is important
-        }
-      };
-      // @ts-ignore
-      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+      const filteredBatchItems = getBatchItemsWith(['project', 'dataset']);
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
       // Write data to DDB
       ddbMock.on(TransactWriteItemsCommand).resolves({});
@@ -1072,22 +1077,15 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        'envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist'
+        Boom.badRequest('envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist')
       );
     });
+
     test('failed because Project does not exist', async () => {
       // BUILD
-      // Get env metadata
-      const batchItems = {
-        Responses: {
-          [TABLE_NAME]: [
-            marshall({ ...envTypeConfigItem, resourceType: 'envTypeConfig' }),
-            marshall({ ...datasetItem, resourceType: 'dataset' })
-          ] // Order is important
-        }
-      };
+      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'dataset']);
       // @ts-ignore
-      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
       // Write data to DDB
       ddbMock.on(TransactWriteItemsCommand).resolves({});
@@ -1105,22 +1103,13 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        'projectId proj-123 does not exist'
+        Boom.badRequest('projectId proj-123 does not exist')
       );
     });
     test('failed because Dataset does not exist', async () => {
       // BUILD
-      // Get env metadata
-      const batchItems = {
-        Responses: {
-          [TABLE_NAME]: [
-            marshall({ ...envTypeConfigItem, resourceType: 'envTypeConfig' }),
-            marshall({ ...projItem, resourceType: 'project' })
-          ] // Order is important
-        }
-      };
-      // @ts-ignore
-      ddbMock.on(BatchGetItemCommand).resolves(batchItems);
+      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project']);
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
       // Write data to DDB
       ddbMock.on(TransactWriteItemsCommand).resolves({});
@@ -1138,7 +1127,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        'datasetIds dataset-123 do not exist'
+        Boom.badRequest('datasetIds dataset-123 do not exist')
       );
     });
   });
