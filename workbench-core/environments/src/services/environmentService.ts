@@ -12,8 +12,8 @@ import {
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
-  buildPkSk,
-  buildKey
+  buildDynamoDBPkSk,
+  buildDynamoDbKey
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -91,7 +91,7 @@ export class EnvironmentService {
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
     if (includeMetadata) {
       const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: buildKey(envId, resourceTypeToKey.environment) } })
+        .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
         .execute();
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find environment ${envId}`);
@@ -105,7 +105,7 @@ export class EnvironmentService {
       for (const item of items) {
         // parent environment item
         const sk = item.sk as unknown as string;
-        if (sk === buildKey(envId, resourceTypeToKey.environment)) {
+        if (sk === buildDynamoDbKey(envId, resourceTypeToKey.environment)) {
           envWithMetadata = { ...envWithMetadata, ...item };
         } else {
           const envKey = sk.split('#')[0];
@@ -123,7 +123,7 @@ export class EnvironmentService {
       return envWithMetadata;
     } else {
       const data = (await this._aws.helpers.ddb
-        .get(buildPkSk(envId, resourceTypeToKey.environment))
+        .get(buildDynamoDBPkSk(envId, resourceTypeToKey.environment))
         .execute()) as GetItemCommandOutput;
       if (data.Item) {
         return data.Item! as unknown as Environment;
@@ -336,20 +336,11 @@ export class EnvironmentService {
     }
 
     const updateResponse = await this._aws.helpers.ddb
-      .update(buildPkSk(envId, resourceTypeToKey.environment), { item: updatedValues })
+      .update(buildDynamoDBPkSk(envId, resourceTypeToKey.environment), { item: updatedValues })
       .execute();
 
     return updateResponse.Attributes! as unknown as Environment;
   }
-
-  // private _buildPkSk(id: string, type: string): { [key: string]: string } {
-  //   const key = this._buildKey(id, type);
-  //   return { pk: key, sk: key };
-  // }
-
-  // private _buildKey(id: string, type: string): string {
-  //   return `${type}#${id}`;
-  // }
 
   /**
    * Create new environment
@@ -382,10 +373,10 @@ export class EnvironmentService {
         sk: environmentTypeConfigSK
       },
       // PROJ
-      buildPkSk(params.projectId, resourceTypeToKey.project),
+      buildDynamoDBPkSk(params.projectId, resourceTypeToKey.project),
       // DATASETS
       ..._.map(params.datasetIds, (dsId) => {
-        return buildPkSk(dsId, resourceTypeToKey.dataset);
+        return buildDynamoDBPkSk(dsId, resourceTypeToKey.dataset);
       })
     ];
     const batchGetResult = (await this._aws.helpers.ddb
@@ -480,8 +471,8 @@ export class EnvironmentService {
     // Add environment item
     items.push({
       ...newEnv,
-      pk: buildKey(newEnv.id!, resourceTypeToKey.environment),
-      sk: buildKey(newEnv.id!, resourceTypeToKey.environment),
+      pk: buildDynamoDbKey(newEnv.id!, resourceTypeToKey.environment),
+      sk: buildDynamoDbKey(newEnv.id!, resourceTypeToKey.environment),
       resourceType: 'environment'
     });
 
@@ -512,7 +503,7 @@ export class EnvironmentService {
     metaType: string,
     data: { [key: string]: string }
   ): Promise<void> {
-    const key = { pk: buildKey(pkId, pkType), sk: buildKey(metaId, metaType) };
+    const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
     await this._aws.helpers.ddb.update(key, { item: data }).execute();
   }

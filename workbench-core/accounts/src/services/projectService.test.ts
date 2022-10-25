@@ -16,8 +16,9 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-// import { uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
+import _ from 'lodash';
+import Project from '../models/project';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
@@ -31,15 +32,13 @@ describe('ProjectService', () => {
   const TABLE_NAME = 'exampleDDBTable';
   const projService = new ProjectService({ TABLE_NAME });
 
-  const projItem = {
-    pk: `PROJ#${projId}`,
-    sk: `PROJ#${projId}`,
+  const proj: Project = {
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     accountId: 'acc-123',
     awsAccountId: '123456789012',
     createdAt: '2022-05-18T20:33:42.608Z',
-    desc: 'Example project',
-    dependency: 'cc-123',
+    description: 'Example project',
+    costCenterId: 'cc-123',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
     envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-dev-va-env-mgmt',
@@ -48,7 +47,14 @@ describe('ProjectService', () => {
     name: 'Example project',
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: '2022-05-18T20:33:42.608Z',
-    vpcId: 'vpc-0b0bc7ae01d82e7b3'
+    vpcId: 'vpc-0b0bc7ae01d82e7b3',
+    status: 'AVAILABLE'
+  };
+
+  const projItem = {
+    ...proj,
+    pk: `PROJ#${projId}`,
+    sk: `PROJ#${projId}`
   };
 
   const costCenterItem = {
@@ -156,8 +162,8 @@ describe('ProjectService', () => {
       // BUILD
       const params = {
         name: projItem.name,
-        description: projItem.desc,
-        costCenterId: projItem.dependency
+        description: projItem.description,
+        costCenterId: projItem.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -226,15 +232,17 @@ describe('ProjectService', () => {
       const actualResponse = await projService.createProject(params, user);
 
       // CHECK
-      expect(actualResponse).toEqual(projItem);
+      expect(_.omit(actualResponse, ['updatedAt', 'createdAt'])).toEqual(
+        _.omit(proj, ['updatedAt', 'createdAt'])
+      );
     });
 
     test('fail on create a project with name already in use', async () => {
       // BUILD
       const params = {
         name: projItem.name,
-        description: projItem.desc,
-        costCenterId: projItem.dependency
+        description: projItem.description,
+        costCenterId: projItem.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -292,8 +300,8 @@ describe('ProjectService', () => {
       // BUILD
       const params = {
         name: projItem.name,
-        description: projItem.desc,
-        costCenterId: projItem.dependency
+        description: projItem.description,
+        costCenterId: projItem.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -339,78 +347,6 @@ describe('ProjectService', () => {
       // OPERATE n CHECK
       await expect(projService.createProject(params, user)).rejects.toThrow(
         'Could not find cost center cc-123'
-      );
-    });
-
-    test('fail if ddb fails for some reason', async () => {
-      // BUILD
-      const params = {
-        name: projItem.name,
-        description: projItem.desc,
-        costCenterId: projItem.dependency
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
-
-      // mock isProjectNameInUse call
-      const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
-        Count: 0,
-        $metadata: {}
-      };
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByName',
-          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
-          ExpressionAttributeNames: {
-            '#resourceType': 'resourceType',
-            '#name': 'name'
-          },
-          ExpressionAttributeValues: {
-            ':resourceType': {
-              S: 'project'
-            },
-            ':name': {
-              S: 'Example project'
-            }
-          }
-        })
-        .resolves(isProjectNameValidQueryItemResponse);
-
-      // mock getCostCenter call
-      const getCostCenterGetItemResponse: GetItemCommandOutput = {
-        Item: marshall(costCenterItem),
-        $metadata: {}
-      };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: 'CC#cc-123',
-            sk: 'CC#cc-123'
-          })
-        })
-        .resolves(getCostCenterGetItemResponse);
-
-      // mock ddb update item
-      ddbMock.on(UpdateItemCommand).resolves({});
-
-      // mock final get Project after failure
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: `PROJ#${projId}`,
-            sk: `PROJ#${projId}`
-          })
-        })
-        .resolves({});
-
-      // OPERATE n CHECK
-      await expect(projService.createProject(params, user)).rejects.toThrow(
-        'Could not find project proj-123'
       );
     });
   });
