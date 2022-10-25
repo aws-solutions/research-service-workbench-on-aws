@@ -3,7 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Operation, Permission, AuthorizationPlugin } from '..';
+import { Operation, Permission, AuthorizationPlugin, DynamicOperation } from '..';
+import { IdentityPermission } from '../dynamicAuthorization/dynamicPermissionsPluginInputs';
 import {
   mockAdminPermissions,
   mockGetOperations,
@@ -12,6 +13,13 @@ import {
 } from './mockPermissions';
 
 export class MockAuthorizationPlugin implements AuthorizationPlugin {
+  public async isAuthorizedOnDynamicOperations(
+    identityPermissions: IdentityPermission[],
+    dynamicOperations: DynamicOperation[]
+  ): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   public async isAuthorized(userPermissions: Permission[], operations: Operation[]): Promise<void> {
     if (operations === mockPutOperations && userPermissions === mockAdminPermissions) {
       return;
