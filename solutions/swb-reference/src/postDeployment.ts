@@ -11,7 +11,7 @@ import { promisify } from 'util';
 import { AwsService } from '@aws/workbench-core-base';
 import { CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
 import Axios from 'axios';
-import { getConstants } from './constants';
+import { getConstants, getConstantsWithSecrets } from './constants';
 
 async function run(): Promise<void> {
   const {
@@ -23,7 +23,7 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME
-  } = getConstants();
+  } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,

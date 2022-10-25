@@ -2,19 +2,19 @@
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 # Workflow Status
-[![Build Status](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
-[![Merge-develop-to-stage](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
-[![Publish-and-merge-to-develop](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
-[![Cfn-nag-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
-[![Secret-scan](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
-[![Lint-PR](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/awslabs/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
+[![Build Status](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Build-and-test/badge.svg)
+[![Merge-develop-to-stage](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Merge-develop-to-stage/badge.svg)
+[![Publish-and-merge-to-develop](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Publish-and-merge-to-develop/badge.svg)
+[![Cfn-nag-scan](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Cfn-nag-scan/badge.svg)
+[![Secret-scan](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Secret-scan/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Secret-scan/badge.svg)
+[![Lint-PR](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)](https://github.com/aws-solutions/solution-spark-on-aws/workflows/Lint-pr/badge.svg)
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-89.97%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.43%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-90.14%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.42%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-90.11%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.29%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-90.67%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.55%25-brightgreen.svg?style=flat) |
 
 # Contributing Guidelines
 
