@@ -3,8 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Boom from '@hapi/boom';
-
 const rndUuid = '44fd3490-2cdb-43fb-8459-4f08b3e6cd00';
 const envId = `env-${rndUuid}`;
 jest.mock('uuid', () => ({ v4: () => rndUuid }));
@@ -20,6 +18,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { EnvironmentService } from './environmentService';
 
