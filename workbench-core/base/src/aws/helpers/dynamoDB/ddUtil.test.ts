@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildDynamoDbKey, buildDynamoDBPkSk } from './ddbUtil';
+import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './ddbUtil';
 
 describe('ddbUtil', () => {
   describe('buildDynamoDbKey', () => {
@@ -22,6 +22,24 @@ describe('ddbUtil', () => {
         pk: 'type#id',
         sk: 'type#id'
       });
+    });
+  });
+
+  describe('removeDynamoDbKeys', () => {
+    let entry: { [key: string]: string };
+
+    beforeEach(() => {
+      entry = {
+        pk: 'pk',
+        sk: 'sk',
+        dependency: 'dependency',
+        keepThis: 'keepThis'
+      };
+    });
+
+    test('it removes the pk, sk, and dependency', () => {
+      const dynamoItem = entry as { [key: string]: never };
+      expect(removeDynamoDbKeys(dynamoItem)).toEqual({ keepThis: 'keepThis' });
     });
   });
 });
