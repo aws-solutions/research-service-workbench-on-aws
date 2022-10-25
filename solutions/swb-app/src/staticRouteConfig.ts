@@ -16,15 +16,17 @@ export const routesMap: RoutesMap = {
     ]
   },
   '/costCenters': {
-    GET: [
-      {
-        action: 'READ',
-        subject: 'CostCenter'
-      }
-    ],
     POST: [
       {
         action: 'CREATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
         subject: 'CostCenter'
       }
     ]

@@ -4,7 +4,7 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, resourceTypeToKey, buildPkSk, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import Account from '../models/account';
 import CostCenter from '../models/costCenter';
@@ -24,12 +24,25 @@ export default class CostCenterService {
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     // Get by id
     const response = (await this._aws.helpers.ddb
-      .get(buildPkSk(costCenterId, resourceTypeToKey.costCenter))
+      .get({
+        pk: costCenterId,
+        sk: costCenterId
+      })
       .execute()) as GetItemCommandOutput;
 
     if (response.Item === undefined) {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
+
+    console.log(`before ${JSON.stringify(response.Item)}`);
+
+    delete response.Item.pk;
+    delete response.Item.sk;
+    response.Item.accountId = response.Item.dependency;
+    delete response.Item.dependency;
+
+    console.log(`after ${JSON.stringify(response.Item)}`);
+
     const costCenter = response.Item as unknown as CostCenter;
 
     return Promise.resolve(costCenter);
@@ -49,15 +62,26 @@ export default class CostCenterService {
       awsAccountId: account.awsAccountId,
       accountId: createCostCenter.accountId,
       description: createCostCenter.description,
+      name: createCostCenter.name,
+      // Account data
       encryptionKeyArn: account.encryptionKeyArn,
       envMgmtRoleArn: account.envMgmtRoleArn,
       environmentInstanceFiles: account.environmentInstanceFiles,
       externalId: account.externalId,
       hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
-      name: createCostCenter.name,
       subnetId: account.subnetId,
       vpcId: account.vpcId
     };
+
+    const dynamoItem: { [key: string]: string } = {
+      ...costCenter,
+      resourceType: 'cost center',
+      dependency: createCostCenter.accountId
+    };
+
+    delete dynamoItem.accountId;
+
+    console.log(`dynamoItem ${JSON.stringify(dynamoItem)}`);
 
     await this._aws.helpers.ddb
       .update(
@@ -66,7 +90,7 @@ export default class CostCenterService {
           sk: id
         },
         {
-          item: { ...costCenter, resourceType: 'cost center' }
+          item: dynamoItem
         }
       )
       .execute();

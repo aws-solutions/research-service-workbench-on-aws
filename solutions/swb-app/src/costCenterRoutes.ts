@@ -20,7 +20,7 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
   );
 
   router.get(
-    '/costCenters',
+    '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
       res.send(await costCenterService.getCostCenter(req.params.id));
     })

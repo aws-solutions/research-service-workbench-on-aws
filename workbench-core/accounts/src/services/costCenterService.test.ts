@@ -82,9 +82,15 @@ describe('CostCenterService', () => {
       describe('and the cost center has been saved', () => {
         beforeEach(() => {
           ddbMock.on(GetItemCommand).resolves({
-            Item: marshall(expectedCostCenter, {
-              removeUndefinedValues: true
-            })
+            Item: marshall(
+              {
+                ...expectedCostCenter,
+                dependency: accountId
+              },
+              {
+                removeUndefinedValues: true
+              }
+            )
           });
         });
 

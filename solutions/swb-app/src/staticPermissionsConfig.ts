@@ -144,7 +144,6 @@ const researcherPermissions: Permission[] = [
     action: 'UPDATE',
     subject: 'Environment'
   },
-
   {
     effect: 'ALLOW',
     action: 'READ',
