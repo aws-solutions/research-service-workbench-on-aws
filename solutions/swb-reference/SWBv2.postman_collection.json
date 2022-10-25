@@ -7,6 +7,80 @@
   },
   "item": [
     {
+      "name": "costCenters",
+      "item": [
+        {
+          "name": "Create Cost Center",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"cost center name\",\n    \"accountId\": \"acc-123\",\n    \"description\": \"a description of the cost center\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cost Centers",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/id",
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", "id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "datasets",
       "item": [
         {
