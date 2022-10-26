@@ -5,7 +5,7 @@
 
 import { AuthenticatedUser } from './authenticatedUser';
 import AuthorizationPlugin from './authorizationPlugin';
-import Operation from './operation';
+import { Operation } from './operation';
 import Permission from './permission';
 import PermissionsPlugin from './permissionsPlugin';
 import { HTTPMethod } from './routesMap';

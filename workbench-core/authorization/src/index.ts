@@ -4,7 +4,7 @@
  */
 
 export { default as PermissionsPlugin } from './permissionsPlugin';
-export { default as Operation } from './operation';
+export { Operation, DynamicOperation } from './operation';
 export { default as AuthorizationPlugin } from './authorizationPlugin';
 export { default as StaticPermissionsPlugin } from './staticPermissionsPlugin';
 export { default as CASLAuthorizationPlugin } from './caslAuthorizationPlugin';

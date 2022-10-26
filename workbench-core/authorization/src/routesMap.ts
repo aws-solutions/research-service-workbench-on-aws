@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Operation from './operation';
+import { Operation } from './operation';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const HTTPMethods = [

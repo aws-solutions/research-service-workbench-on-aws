@@ -109,6 +109,7 @@ export interface IdentityPermission {
   subjectType: string;
   /**
    * The id associated to the subject
+   * Capable of using a wildcard '*' to represent all ids
    */
   subjectId: string;
   /**

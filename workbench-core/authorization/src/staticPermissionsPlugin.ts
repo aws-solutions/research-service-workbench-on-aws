@@ -7,7 +7,7 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import _ from 'lodash';
 import { AuthenticatedUser } from './authenticatedUser';
 import { RouteNotSecuredError } from './errors/routeNotSecuredError';
-import Operation from './operation';
+import { Operation } from './operation';
 import Permission, { PermissionsMap } from './permission';
 import PermissionsPlugin from './permissionsPlugin';
 import RoutesMap, { HTTPMethod, RoutesIgnored } from './routesMap';

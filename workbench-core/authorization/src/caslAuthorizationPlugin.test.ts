@@ -4,15 +4,16 @@
  */
 
 import { fc, itProp } from 'jest-fast-check';
-import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError } from '.';
+import { IdentityPermission } from './dynamicAuthorization/dynamicPermissionsPluginInputs';
+import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError, DynamicOperation } from '.';
 
 describe('CASL Authorization Plugin', () => {
   let caslAuthorizationPlugin: CASLAuthorizationPlugin;
-  let mockAdminPermissions: Permission[];
-  let mockGuestPermissions: Permission[];
-  let mockOperations: Operation[];
 
   describe('isAuthorized', () => {
+    let mockAdminPermissions: Permission[];
+    let mockGuestPermissions: Permission[];
+    let mockOperations: Operation[];
     beforeEach(() => {
       mockAdminPermissions = [
         {
@@ -153,5 +154,95 @@ describe('CASL Authorization Plugin', () => {
         }
       }
     );
+  });
+
+  describe('isAuthorizedOnDynamicOperations', () => {
+    let mockIdentityPermissions: IdentityPermission[];
+    beforeEach(() => {
+      mockIdentityPermissions = [
+        {
+          effect: 'ALLOW',
+          action: 'CREATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '*',
+          conditions: { env: { $eq: 'SampleEnv' } }
+        },
+        {
+          effect: 'ALLOW',
+          action: 'UPDATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        },
+        {
+          effect: 'DENY',
+          action: 'UPDATE',
+          identityType: 'GROUP',
+          identityId: 'SampleGroup',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        }
+      ];
+      caslAuthorizationPlugin = new CASLAuthorizationPlugin();
+    });
+    test('Check for valid dynamic operations with valid conditions', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'CREATE',
+          subjectType: 'SampleSubject',
+          subjectId: '1',
+          subjectAttributes: {
+            env: 'SampleEnv'
+          }
+        }
+      ];
+      const response = await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+        mockIdentityPermissions,
+        mockDynamicOperations
+      );
+      expect(response).toBeUndefined();
+    });
+
+    test('Check for a invalid dynamic operations due invalid conditions', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'CREATE',
+          subjectType: 'SampleSubject',
+          subjectId: '1'
+        }
+      ];
+      try {
+        await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        );
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect(err.message).toBe('Cannot execute "CREATE" on "SampleSubject"');
+      }
+    });
+    test('Ensure DENY takes precedence', async () => {
+      const mockDynamicOperations: DynamicOperation[] = [
+        {
+          action: 'UPDATE',
+          subjectType: 'SampleSubject',
+          subjectId: '1234'
+        }
+      ];
+      try {
+        await caslAuthorizationPlugin.isAuthorizedOnDynamicOperations(
+          mockIdentityPermissions,
+          mockDynamicOperations
+        );
+        expect.hasAssertions();
+      } catch (err) {
+        expect(err).toBeInstanceOf(ForbiddenError);
+        expect(err.message).toBe('Cannot execute "UPDATE" on "SampleSubject"');
+      }
+    });
   });
 });

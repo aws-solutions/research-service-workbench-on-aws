@@ -4,7 +4,7 @@
  */
 
 import { AuthenticatedUser } from './authenticatedUser';
-import Operation from './operation';
+import { Operation } from './operation';
 import Permission from './permission';
 import { HTTPMethod } from './routesMap';
 

@@ -1,5 +1,5 @@
-import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
+import { DynamicOperation } from '../operation';
 import {
   AssignUserToGroupRequest,
   AssignUserToGroupResponse,
@@ -26,25 +26,9 @@ import {
  */
 export interface IsAuthorizedOnSubjectRequest {
   /**
-   * The {@link Action} a {@link User} wants to perform.
+   * {@link DynamicOperation}
    */
-  action: Action;
-  /**
-   * The subject that the {@link Action} acts on.
-   */
-  subject: string;
-  /**
-   * subject id associated to the subject being operated on
-   */
-  subjectId: string;
-  /**
-   * The field a {@link User} wants access to.
-   */
-  field?: string;
-  /**
-   * Attributes associated to the subject
-   */
-  subjectAttributes?: { [key: string]: unknown };
+  operation: DynamicOperation;
 }
 
 export class DynamicAuthorizationService {
@@ -74,9 +58,6 @@ export class DynamicAuthorizationService {
     user: AuthenticatedUser,
     createGroupRequest: CreateGroupRequest
   ): Promise<CreateGroupResponse> {
-    //Create Group
-
-    //Create permissions associated
     throw new Error('NotImplemented');
   }
   /**

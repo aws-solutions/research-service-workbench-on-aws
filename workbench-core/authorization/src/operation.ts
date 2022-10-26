@@ -7,7 +7,7 @@ import { Action } from './action';
 /**
  * The operation a {@link User} wants to perform.
  */
-export default interface Operation {
+export interface Operation {
   /**
    * The {@link Action} a {@link User} wants to perform.
    */
@@ -22,4 +22,30 @@ export default interface Operation {
    * The field a {@link User} wants access to.
    */
   field?: string;
+}
+
+/**
+ * The dynamic operation a {@link User} wants to perform
+ */
+export interface DynamicOperation {
+  /**
+   * The {@link Action} a {@link User} wants to perform.
+   */
+  action: Action;
+  /**
+   * The subject type that the {@link Action} acts on.
+   */
+  subjectType: string;
+  /**
+   * subject id associated to the subject being operated on
+   */
+  subjectId: string;
+  /**
+   * The field a {@link User} wants access to.
+   */
+  field?: string;
+  /**
+   * Attributes associated to the subject
+   */
+  subjectAttributes?: { [key: string]: unknown };
 }
