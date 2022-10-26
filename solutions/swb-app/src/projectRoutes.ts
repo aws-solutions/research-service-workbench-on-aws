@@ -5,10 +5,10 @@
 
 import { ProjectService } from '@aws/workbench-core-accounts';
 import CreateProjectRequest from '@aws/workbench-core-accounts/lib/models/createProjectRequest';
-import CreateProjectSchema from '@aws/workbench-core-accounts/lib/schemas/createProjectSchema';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
+import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectRoutes(router: Router, projectService: ProjectService): void {
