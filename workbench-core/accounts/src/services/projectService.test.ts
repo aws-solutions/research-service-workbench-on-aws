@@ -2,9 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-const rndUuid = '123';
-const projId = `proj-${rndUuid}`;
-jest.mock('uuid', () => ({ v4: () => rndUuid }));
+const expectedUuid = '123';
+const projId = `proj-${expectedUuid}`;
+jest.mock('uuid', () => ({ v4: () => expectedUuid }));
 
 import {
   DynamoDBClient,
@@ -17,26 +17,30 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { mockClient } from 'aws-sdk-client-mock';
-import _ from 'lodash';
 import Project from '../models/project';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
+  const ddbMock = mockClient(DynamoDBClient);
+  const TABLE_NAME = 'exampleDDBTable';
+  const projService = new ProjectService({ TABLE_NAME });
+  const timestamp = '2022-05-18T20:33:42.608Z';
+  const mockDateObject = new Date(timestamp);
+
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
   });
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
   });
-  const ddbMock = mockClient(DynamoDBClient);
-  const TABLE_NAME = 'exampleDDBTable';
-  const projService = new ProjectService({ TABLE_NAME });
 
+  // Project object
   const proj: Project = {
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     accountId: 'acc-123',
     awsAccountId: '123456789012',
-    createdAt: '2022-05-18T20:33:42.608Z',
+    createdAt: timestamp,
     description: 'Example project',
     costCenterId: 'cc-123',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
@@ -46,24 +50,26 @@ describe('ProjectService', () => {
     id: `${projId}`,
     name: 'Example project',
     subnetId: 'subnet-07f475d83291a3603',
-    updatedAt: '2022-05-18T20:33:42.608Z',
+    updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3',
     status: 'AVAILABLE'
   };
 
-  const projItem = {
+  // DDB object for project item
+  const projItem: { [key: string]: string } = {
     ...proj,
     pk: `PROJ#${projId}`,
     sk: `PROJ#${projId}`
   };
+  delete projItem.accountId;
 
+  // DDB object for cost item
   const costCenterItem = {
     pk: 'CC#cc-123',
     sk: 'CC#cc-123',
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
-    accountId: 'acc-123',
     awsAccountId: '123456789012',
-    createdAt: '2022-05-18T20:33:42.608Z',
+    createdAt: timestamp,
     desc: 'Example cost center',
     dependency: 'acc-123',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
@@ -73,7 +79,7 @@ describe('ProjectService', () => {
     id: 'cc-123',
     name: 'Example cost center',
     subnetId: 'subnet-07f475d83291a3603',
-    updatedAt: '2022-05-18T20:33:42.608Z',
+    updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3'
   };
 
@@ -232,9 +238,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.createProject(params, user);
 
       // CHECK
-      expect(_.omit(actualResponse, ['updatedAt', 'createdAt'])).toEqual(
-        _.omit(proj, ['updatedAt', 'createdAt'])
-      );
+      expect(actualResponse).toEqual(proj);
     });
 
     test('fail on create a project with name already in use', async () => {

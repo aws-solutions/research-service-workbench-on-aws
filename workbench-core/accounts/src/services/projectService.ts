@@ -124,7 +124,7 @@ export default class ProjectService {
     // }
 
     // Create Proj in DDB
-    const currentTime = new Date().toISOString();
+    const currentTime = new Date(Date.now()).toISOString();
 
     const newProject: Project = {
       id: projectId,
