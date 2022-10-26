@@ -16,7 +16,7 @@ import {
 
 import Boom from '@hapi/boom';
 import CostCenter from '../models/costCenter';
-import CreateProjectReqeust from '../models/createProjectRequest';
+import CreateProjectRequest from '../models/createProjectRequest';
 import Project from '../models/project';
 import CostCenterService from './costCenterService';
 
@@ -79,7 +79,7 @@ export default class ProjectService {
    * @param user - authenticated user creating the project
    * @returns Project object of new project
    */
-  public async createProject(params: CreateProjectReqeust, user: AuthenticatedUser): Promise<Project> {
+  public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
     // Verify caller is an IT Admin--TODO implement after dynamic AuthZ
     // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(user.id);
     // if(userGroupsForCurrentUser.length !== 1 || userGroupsForCurrentUser[0] !== 'ITAdmin') {
@@ -124,13 +124,15 @@ export default class ProjectService {
     // }
 
     // Create Proj in DDB
+    const currentTime = new Date().toISOString();
+
     const newProject: Project = {
       id: projectId,
-      createdAt: new Date().toISOString(),
+      createdAt: currentTime,
       costCenterId: params.costCenterId,
       description: params.description,
       name: params.name,
-      updatedAt: new Date().toISOString(),
+      updatedAt: currentTime,
       status: 'AVAILABLE',
       // Acc Metadata (get from cost center)
       subnetId: costCenter.subnetId,
@@ -146,7 +148,7 @@ export default class ProjectService {
     try {
       await this._aws.helpers.ddb
         .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
-          item: { ...newProject, resourceType: 'project' }
+          item: this._formatForDDB(newProject)
         })
         .execute();
     } catch (e) {
@@ -155,6 +157,18 @@ export default class ProjectService {
     }
 
     return newProject;
+  }
+
+  private _formatForDDB(project: Project): { [key: string]: string } {
+    const dynamoItem: { [key: string]: string } = {
+      ...project,
+      resourceType: 'project',
+      depdency: project.accountId
+    };
+
+    delete dynamoItem.accountId;
+
+    return dynamoItem;
   }
 
   private async _isProjectNameInUse(projectName: string): Promise<void> {
