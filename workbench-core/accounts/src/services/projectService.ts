@@ -32,7 +32,7 @@ export default class ProjectService {
     this._tableName = TABLE_NAME;
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
     // TODO implement after dynamic AuthZ
-    // this._dynamiAuthorizationService = new DynamicAuthorizationService();
+    // this._dynamicAuthorizationService = new DynamicAuthorizationService();
   }
 
   /**
@@ -87,17 +87,11 @@ export default class ProjectService {
     // }
 
     // Verify project name is unique and cost center exists
-    const [isProjectNameInUse, costCenter] = await Promise.all([
+    const checkResults = await Promise.all([
       this._isProjectNameInUse(params.name),
       this._getCostCenter(params.costCenterId)
     ]);
-    if (isProjectNameInUse) {
-      throw Boom.badRequest('Project Name is in use by a non deleted project. Please use another name.');
-    }
-    // cost center service should boom error--this double protection
-    if (costCenter === undefined) {
-      throw Boom.badRequest('Cost Center is invalid. Please try another cost center.');
-    }
+    const costCenter: CostCenter = checkResults[1];
 
     // Generate Project ID
     const projectId = uuidWithLowercasePrefix(resourceTypeToKey.project);
@@ -163,7 +157,7 @@ export default class ProjectService {
     return newProject;
   }
 
-  private async _isProjectNameInUse(projectName: string): Promise<boolean> {
+  private async _isProjectNameInUse(projectName: string): Promise<void> {
     // query by name
     const response = await this._aws.helpers.ddb
       .query({
@@ -174,13 +168,12 @@ export default class ProjectService {
       })
       .execute();
 
-    // If anything is responded, name is in use
+    // If anything is responded, name is in use so error
     if (response.Count !== 0) {
-      return true;
+      throw Boom.badRequest('Project Name is in use by a non deleted project. Please use another name.');
     }
 
-    // Else return false, name is not in use
-    return false;
+    // no error so do not do anything
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {

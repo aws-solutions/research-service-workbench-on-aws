@@ -4,6 +4,7 @@
  */
 
 import { ProjectService } from '@aws/workbench-core-accounts';
+import CreateProjectRequest from '@aws/workbench-core-accounts/lib/models/createProjectRequest';
 import CreateProjectSchema from '@aws/workbench-core-accounts/lib/schemas/createProjectSchema';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -25,7 +26,12 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateProjectSchema));
-      res.send(await projectService.createProject({ ...req.body }, res.locals.user));
+      const request: CreateProjectRequest = {
+        name: req.body.name,
+        description: req.body.description,
+        costCenterId: req.body.costCenterId
+      };
+      res.send(await projectService.createProject(request, res.locals.user));
     })
   );
 }
