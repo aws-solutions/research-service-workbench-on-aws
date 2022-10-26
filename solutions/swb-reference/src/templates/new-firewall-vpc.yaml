@@ -367,7 +367,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCNATGWSubnetCIDRAZ1
-      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1a"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'NATGW-AZ1']]
@@ -377,7 +377,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCNATGWSubnetCIDRAZ2
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1b"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'NATGW-AZ2']]
@@ -390,7 +390,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCTGWSubnetCIDRAZ1
-      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1a"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'TGW-AZ1']]
@@ -400,7 +400,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCTGWSubnetCIDRAZ2
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1b"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'TGW-AZ2']]
@@ -413,7 +413,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCGWLBESubnetCIDRAZ1
-      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1a"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'GWLBE-AZ1']]
@@ -423,7 +423,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCGWLBESubnetCIDRAZ2
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1b"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'GWLBE-AZ2']]
@@ -436,7 +436,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ1
-      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1a"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ1']]
@@ -446,7 +446,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ2
-      AvailabilityZone: !Select [ 1, !GetAZs  '' ]
+      AvailabilityZone: "us-east-1b"
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ2']]
@@ -931,6 +931,14 @@ Resources:
     Properties:
       ServiceToken: !GetAtt DescribeGWLBEService.Arn
       Input: !Ref GWLBEService
+
+  GWLBServicePermissions:
+    Type: AWS::EC2::VPCEndpointServicePermissions
+      Properties: 
+        AllowedPrincipals: 
+          - "*"
+        ServiceId: !GetAtt GWLBESerivceName.Data
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Security VPC - Gateway Load Balancer Endpoint
