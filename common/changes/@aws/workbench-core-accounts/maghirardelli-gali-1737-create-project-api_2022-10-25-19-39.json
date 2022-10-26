@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Add CREATE Project API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}
