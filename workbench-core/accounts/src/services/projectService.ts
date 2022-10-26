@@ -87,11 +87,11 @@ export default class ProjectService {
     // }
 
     // Verify project name is unique and cost center exists
-    const checkResults = await Promise.all([
+    const resultsFromValidityChecks = await Promise.all([
       this._isProjectNameInUse(params.name),
       this._getCostCenter(params.costCenterId)
     ]);
-    const costCenter: CostCenter = checkResults[1];
+    const costCenter: CostCenter = resultsFromValidityChecks[1];
 
     // Generate Project ID
     const projectId = uuidWithLowercasePrefix(resourceTypeToKey.project);
@@ -170,7 +170,9 @@ export default class ProjectService {
 
     // If anything is responded, name is in use so error
     if (response.Count !== 0) {
-      throw Boom.badRequest('Project Name is in use by a non deleted project. Please use another name.');
+      throw Boom.badRequest(
+        `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
+      );
     }
 
     // no error so do not do anything

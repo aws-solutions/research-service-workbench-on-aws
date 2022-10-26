@@ -292,7 +292,7 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(projService.createProject(params, user)).rejects.toThrow(
-        'Project Name is in use by a non deleted project. Please use another name.'
+        'Project name "Example project" is in use by a non deleted project. Please use another name.'
       );
     });
 
