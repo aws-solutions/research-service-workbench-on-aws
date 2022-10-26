@@ -7,11 +7,11 @@
 // This file is structured this way so we can verify whether a user input is of type `ProjectStatus`
 export const PROJECT_STATUS: string[] = ['AVAILABLE', 'SUSPENDED', 'DELETED'];
 
-// Convert HOSTING_ACCOUNT_STATUS array to string literals
+// Convert PROJECT_STATUS array to string literals
 // More info here: https://stackoverflow.com/a/59541566
 export type ProjectStatus = typeof PROJECT_STATUS[number];
 
-// This allows us to verify that user input is an EnvironmentStatus
+// This allows us to verify that user input is an ProjectStatus
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isProjectStatus(status: any): status is ProjectStatus {
   if (typeof status !== 'string') {
