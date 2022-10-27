@@ -38,6 +38,9 @@ function getConstants(): {
   MAIN_ACCT_ALB_DNS_OUTPUT_KEY: string;
   VPC_ID: string;
   SUBNET_IDS: string[];
+  HOST_ZONE_ID: string;
+  DOMAIN_NAME: string;
+  CERTIFICATE_ID: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -67,6 +70,10 @@ function getConstants(): {
   const CLIENT_SECRET = config.clientSecret;
   const VPC_ID = config.vpcId;
   const SUBNET_IDS = config.subnetIds;
+
+  const HOST_ZONE_ID = config.hostZoneId;
+  const DOMAIN_NAME = config.domainName;
+  const CERTIFICATE_ID = config.tlsCertificateId;
 
   const AMI_IDS: string[] = [];
 
@@ -111,7 +118,10 @@ function getConstants(): {
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
     VPC_ID,
-    SUBNET_IDS
+    SUBNET_IDS,
+    HOST_ZONE_ID,
+    DOMAIN_NAME,
+    CERTIFICATE_ID
   };
 }
 
