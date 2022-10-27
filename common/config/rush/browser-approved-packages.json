@@ -356,7 +356,7 @@
     },
     {
       "name": "cors",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "csrf",

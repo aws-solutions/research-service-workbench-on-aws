@@ -24,7 +24,6 @@ interface Setting {
   ExampleCognitoUserPoolId: string;
   ExampleLambdaRoleOutput: string;
 
-  // Configs for AWS Account onboard te
   // Derived
   mainAccountId: string;
 }

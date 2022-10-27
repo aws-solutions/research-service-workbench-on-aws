@@ -1,25 +1,28 @@
-'use strict';
-var __importDefault =
-  (this && this.__importDefault) ||
-  function (mod) {
-    return mod && mod.__esModule ? mod : { default: mod };
-  };
-Object.defineProperty(exports, '__esModule', { value: true });
-const setup_1 = __importDefault(require('../../../support/setup'));
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+import ClientSession from '../../support/clientSession';
+import Setup from '../../support/setup';
 // import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
+
 describe('datasets create negative tests', () => {
-  const setup = new setup_1.default();
-  let adminSession;
+  const setup: Setup = new Setup();
+  let adminSession: ClientSession;
   // const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+
   beforeEach(() => {
     expect.hasAssertions();
   });
+
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
   });
+
   afterAll(async () => {
     await setup.cleanup();
   });
+
   describe('IntegrationTest', () => {
     test('should return DataSets entry', async () => {
       const response = await adminSession.resources.datasets.get({});
@@ -31,4 +34,3 @@ describe('datasets create negative tests', () => {
     });
   });
 });
-//# sourceMappingURL=create.test.js.map

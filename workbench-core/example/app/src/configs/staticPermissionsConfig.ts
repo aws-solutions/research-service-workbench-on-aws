@@ -8,6 +8,11 @@ import { Permission, PermissionsMap } from '@aws/workbench-core-authorization';
 const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Example'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Dataset'
   },

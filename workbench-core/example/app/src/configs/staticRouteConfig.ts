@@ -4,9 +4,16 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
+  '/hello-world': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Example'
+      }
+    ]
+  },
   '/datasets': {
     GET: [
       {
@@ -17,14 +24,6 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
-        subject: 'Dataset'
-      }
-    ]
-  },
-  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}`]: {
-    GET: [
-      {
-        action: 'READ',
         subject: 'Dataset'
       }
     ]

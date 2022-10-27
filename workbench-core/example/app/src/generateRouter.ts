@@ -4,31 +4,24 @@
  */
 
 import { csurf, verifyToken } from '@aws/workbench-core-authentication';
-import {
-  withAuth,
-  AuthorizationService,
-  CASLAuthorizationPlugin,
-  PermissionsMap,
-  RoutesIgnored,
-  RoutesMap,
-  StaticPermissionsPlugin
-} from '@aws/workbench-core-authorization';
-import { LoggingService } from '@aws/workbench-core-logging';
+import { withAuth } from '@aws/workbench-core-authorization';
+
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express } from 'express';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
-import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
-import * as StaticPermissionsConfig from './configs/staticPermissionsConfig';
-import * as StaticRoutesConfig from './staticRouteConfig';
+import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
 import { setUpUserRoutes } from './routes/userRoutes';
 import {
   userManagementService,
   dataSetService,
   dataSetsStoragePlugin,
-  authenticationService
+  authenticationService,
+  logger
 } from './services';
+import { authorizationService, staticRoutesIgnored } from './services/authorizationService';
+import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
 
 export function generateRouter(): Express {
   const app: Express = express();
@@ -46,26 +39,10 @@ export function generateRouter(): Express {
   app.use(cookieParser());
   app.use(csurf('none'));
 
-  // Create Authorization Service
-  const staticPermissionsMap: PermissionsMap = StaticPermissionsConfig.permissionsMap;
-  const staticRoutesMap: RoutesMap = StaticRoutesConfig.routesMap;
-  const staticRoutesIgnored: RoutesIgnored = StaticRoutesConfig.routesIgnored;
-  const logger: LoggingService = new LoggingService();
-  const staticPermissionsPlugin: StaticPermissionsPlugin = new StaticPermissionsPlugin(
-    staticPermissionsMap,
-    staticRoutesMap,
-    staticRoutesIgnored,
-    logger
-  );
-  const caslAuthorizationsPlugin: CASLAuthorizationPlugin = new CASLAuthorizationPlugin();
-  const authorizationService: AuthorizationService = new AuthorizationService(
-    caslAuthorizationsPlugin,
-    staticPermissionsPlugin
-  );
-
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
   app.use(withAuth(authorizationService, { logger: logger }));
 
+  setupHelloWorldRoutes(router);
   setUpDSRoutes(router, dataSetService, dataSetsStoragePlugin);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, userManagementService);
