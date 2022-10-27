@@ -6,8 +6,8 @@
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import Metadata from '@aws/workbench-core-audit/lib/metadata';
 import { Request, Response, Router } from 'express';
-import AuditLogger from '../auditLogger';
-import { logger } from '../loggingService';
+import AuditLogger from '../services/auditLogger';
+import { logger } from '../services/loggingService';
 
 const writer: Writer = new AuditLogger(logger);
 const baseAuditPlugin: BaseAuditPlugin = new BaseAuditPlugin(writer);

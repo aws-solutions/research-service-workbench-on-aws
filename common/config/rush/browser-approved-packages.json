@@ -24,11 +24,11 @@
     },
     {
       "name": "@aws-cdk/aws-iam",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-cloudformation",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-cognito-identity-provider",
@@ -60,31 +60,31 @@
     },
     {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-sagemaker",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-service-catalog",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-ssm",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-sts",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -112,19 +112,19 @@
     },
     {
       "name": "@aws/workbench-core-authentication",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-authorization",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-base",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-datasets",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-datasets-ui",
@@ -132,11 +132,15 @@
     },
     {
       "name": "@aws/workbench-core-environments",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-environments-ui",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-example-app",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-example-express",
@@ -144,7 +148,7 @@
     },
     {
       "name": "@aws/workbench-core-infrastructure",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-logging",
@@ -236,7 +240,7 @@
     },
     {
       "name": "@hapi/boom",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@microsoft/rush-lib",
@@ -348,7 +352,7 @@
     },
     {
       "name": "cookie-parser",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cors",
@@ -356,7 +360,7 @@
     },
     {
       "name": "csrf",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "csurf",
@@ -432,11 +436,11 @@
     },
     {
       "name": "js-yaml",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jsonschema",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jwt-decode",
@@ -548,7 +552,7 @@
     },
     {
       "name": "uuid",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "web-vitals",
