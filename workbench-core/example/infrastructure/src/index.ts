@@ -9,7 +9,6 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { App, Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
-// import { InfrastructureStack } from './infrastructure-stack';
 import { ExampleStack } from './example-stack';
 
 const app: App = new cdk.App();
