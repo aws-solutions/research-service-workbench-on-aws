@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "fix incorrect exception change",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}
