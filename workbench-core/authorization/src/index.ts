@@ -21,3 +21,54 @@ export {
 } from './errors/authenticatedUserNotFoundError';
 export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors/permissionNotGrantedError';
 export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';
+
+export {
+  BadConfigurationError,
+  isBadConfigurationError
+} from './dynamicAuthorization/errors/badConfigurationError';
+export {
+  GroupAlreadyExistsError,
+  isGroupAlreadyExistsError
+} from './dynamicAuthorization/errors/groupAlreadyExistsError';
+export { GroupNotFoundError, isGroupNotFoundError } from './dynamicAuthorization/errors/groupNotFoundError';
+export {
+  ThroughPutExceededError,
+  isThroughPutExceededError
+} from './dynamicAuthorization/errors/throughputExceededError';
+
+export {
+  DynamicAuthorizationService,
+  IsAuthorizedOnSubjectRequest
+} from './dynamicAuthorization/dynamicAuthorizationService';
+export { DynamicPermissionsPlugin } from './dynamicAuthorization/dynamicPermissionsPlugin';
+export {
+  CreateGroupRequest,
+  CreateGroupResponse,
+  DeleteGroupRequest,
+  DeleteGroupResponse,
+  IdentityType,
+  GetUserGroupsRequest,
+  GetUserGroupsResponse,
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupResponse,
+  IdentityPermission,
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsResponse,
+  DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsResponse,
+  DeleteSubjectPermissionsRequest,
+  DeleteSubjectPermissionsResponse,
+  AssignUserToGroupRequest,
+  AssignUserToGroupResponse,
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupResponse,
+  GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectResponse,
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs';
+export {
+  DynamoDBDynamicPermissionsPlugin,
+  InitRequest,
+  InitResponse
+} from './dynamicAuthorization/dynamoDBDynamicPermissionsPlugin';

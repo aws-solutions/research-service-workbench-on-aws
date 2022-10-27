@@ -32,7 +32,7 @@ export interface IsAuthorizedOnSubjectRequest {
   /**
    * {@link DynamicOperation}
    */
-  operation: DynamicOperation;
+  dynamicOperation: DynamicOperation;
 }
 
 export class DynamicAuthorizationService {
@@ -59,7 +59,7 @@ export class DynamicAuthorizationService {
     isAuthorizedOnSubjectRequest: IsAuthorizedOnSubjectRequest
   ): Promise<void> {
     const { id, roles } = user;
-    const { subjectId, subjectType, action } = isAuthorizedOnSubjectRequest.operation;
+    const { subjectId, subjectType, action } = isAuthorizedOnSubjectRequest.dynamicOperation;
     const { groupIds } = await this._dynamicPermissisonsPlugin.getUserGroups({
       userId: id
     });
@@ -102,7 +102,7 @@ export class DynamicAuthorizationService {
     ];
 
     await this._authorizationPlugin.isAuthorizedOnDynamicOperations(allUserPermissions, [
-      isAuthorizedOnSubjectRequest.operation
+      isAuthorizedOnSubjectRequest.dynamicOperation
     ]);
   }
   /**

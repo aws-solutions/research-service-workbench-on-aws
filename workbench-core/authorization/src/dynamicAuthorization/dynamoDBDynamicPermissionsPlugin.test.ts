@@ -11,14 +11,16 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { AwsService } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
-import { Action } from '../action';
-import { Effect } from '../permission';
-import { IdentityPermission } from './dynamicPermissionsPluginInputs';
-import { DynamoDBDynamicPermissionsPlugin } from './dynamoDBDynamicPermissionsPlugin';
-import { BadConfigurationError } from './errors/badConfigurationError';
-import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
-import { GroupNotFoundError } from './errors/groupNotFoundError';
-import { ThroughPutExceededError } from './errors/throughputExceededError';
+import {
+  Action,
+  Effect,
+  IdentityPermission,
+  DynamoDBDynamicPermissionsPlugin,
+  BadConfigurationError,
+  ThroughPutExceededError,
+  GroupAlreadyExistsError,
+  GroupNotFoundError
+} from '../';
 
 describe('DynamoDB Permissions Plugin', () => {
   const region = 'us-east-1';
