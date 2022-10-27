@@ -13,18 +13,14 @@ import {
   provisionArtifactIdRegExpString,
   productIdRegExpString,
   validateSingleSortAndFilter,
-  parseQueryParamFilter,
-  parseQueryParamSort
+  getSortQueryParams,
+  getFilterQueryParams
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { EnvironmentType } from '../interfaces/environmentType';
-import {
-  EnvironmentTypeFilter,
-  EnvironmentTypeSort,
-  ListEnvironmentTypeRequest
-} from '../interfaces/listEnvironmentTypeRequest';
+import { ListEnvironmentTypeRequest } from '../interfaces/listEnvironmentTypeRequest';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export default class EnvironmentTypeService {
@@ -71,29 +67,10 @@ export default class EnvironmentTypeService {
       index: 'getResourceByCreatedAt',
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
-    const gsiPropertyNames = ['Name', 'Status'];
-    if (filter) {
-      const filterProperty = Object.keys(filter)[0] as keyof EnvironmentTypeFilter;
-      const gsiFilterProperty = gsiPropertyNames.filter((prop) => prop.toLowerCase() === filterProperty)[0];
-      //eslint-disable-next-line security/detect-object-injection
-      const queryParamsFilter = parseQueryParamFilter(
-        filter[filterProperty],
-        filterProperty,
-        `getResourceBy${gsiFilterProperty}`
-      );
-      queryParams = { ...queryParams, ...queryParamsFilter };
-    }
-    if (sort) {
-      const sortProperty = Object.keys(sort)[0] as keyof EnvironmentTypeSort;
-      const gsiSortProperty = gsiPropertyNames.filter((prop) => prop.toLowerCase() === sortProperty)[0];
-      //eslint-disable-next-line security/detect-object-injection
-      const queryParamsSort = parseQueryParamSort(
-        sort[sortProperty],
-        sortProperty,
-        `getResourceBy${gsiSortProperty}`
-      );
-      queryParams = { ...queryParams, ...queryParamsSort };
-    }
+    const gsiNames = ['getResourceByName', 'getResourceByStatus'];
+    const filterQuery = getFilterQueryParams(filter, gsiNames);
+    const sortQuery = getSortQueryParams(sort, gsiNames);
+    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();

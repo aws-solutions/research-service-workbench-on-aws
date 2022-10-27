@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryParameterFilter } from '@aws/workbench-core-base';
+import { QueryParameterFilter, FilterRequest, SortRequest } from '@aws/workbench-core-base';
 
 export interface ListEnvironmentTypeRequest {
   paginationToken?: string;
@@ -12,12 +12,12 @@ export interface ListEnvironmentTypeRequest {
   sort?: EnvironmentTypeSort;
 }
 
-export interface EnvironmentTypeFilter {
+export interface EnvironmentTypeFilter extends FilterRequest {
   status?: QueryParameterFilter<string>;
   name?: QueryParameterFilter<string>;
 }
 
-export interface EnvironmentTypeSort {
+export interface EnvironmentTypeSort extends SortRequest {
   status?: 'desc' | 'asc';
   name?: 'desc' | 'asc';
 }

@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import {
-  parseQueryParamFilter,
-  parseQueryParamSort,
+  getFilterQueryParams,
+  getSortQueryParams,
   validateSingleSortAndFilter
 } from './queryParamsFiltersUtils';
 
@@ -37,84 +37,70 @@ describe('Query params filters utils', () => {
     });
   });
 
-  describe('parseQueryParamFilter', () => {
+  describe('getFilterQueryParams', () => {
     test('should return undefined when filter is not defined', () => {
-      expect(parseQueryParamFilter(undefined, 'sortTest', 'sortGSI')).toEqual(undefined);
+      expect(getFilterQueryParams(undefined, [])).toEqual({});
     });
 
     test('should parse successfuly a between queryParam', () => {
       const inputQueryParam = {
-        between: {
-          value1: 1,
-          value2: 10
+        age: {
+          between: {
+            value1: 1,
+            value2: 10
+          }
         }
       };
       const expectedResult = {
-        index: 'testGSI',
-        sortKey: 'testProp',
-        between: { value1: { N: 1 }, value2: { N: 10 } }
+        index: 'getResourceByAge',
+        sortKey: 'age',
+        between: {
+          value1: { N: '1' },
+          value2: { N: '10' }
+        }
       };
-      expect(parseQueryParamFilter(inputQueryParam, expectedResult.sortKey, expectedResult.index)).toEqual(
-        expectedResult
-      );
+      expect(getFilterQueryParams(inputQueryParam, ['getResourceByAge'])).toEqual(expectedResult);
     });
 
-    test('should parse successfuly a eq queryParam', () => {
-      const inputQueryParam = {
-        eq: 'Sauron'
-      };
-      const expectedResult = {
-        index: 'testGSI',
-        sortKey: 'testProp',
-        eq: { S: 'Sauron' }
-      };
-      expect(parseQueryParamFilter(inputQueryParam, expectedResult.sortKey, expectedResult.index)).toEqual(
-        expectedResult
-      );
-    });
     test.each(['eq', 'lt', 'lte', 'gt', 'gte', 'begins'])(
       'should parse successfully a %p query param',
       (a) => {
         const inputQueryParam = {
-          [a]: 'Sauron'
+          name: {
+            [a]: 'Sauron'
+          }
         };
         const expectedResult = {
-          index: 'testGSI',
-          sortKey: 'testProp',
+          index: 'getResourceByName',
+          sortKey: 'name',
           [a]: { S: 'Sauron' }
         };
-        expect(parseQueryParamFilter(inputQueryParam, expectedResult.sortKey, expectedResult.index)).toEqual(
-          expectedResult
-        );
+        expect(getFilterQueryParams(inputQueryParam, ['getResourceByName'])).toEqual(expectedResult);
       }
     );
   });
 
-  describe('parseQueryParamSort', () => {
+  describe('getSortQueryParams', () => {
     test('should return undefined when sort is not defined', () => {
-      expect(parseQueryParamSort(undefined, 'sortTest', 'sortGSI')).toEqual(undefined);
+      expect(getSortQueryParams(undefined, [])).toEqual({});
     });
 
     test('should parse successfuly an ascending sort', () => {
       const expectedResult = {
-        index: 'testGSI',
-        sortKey: 'testProp',
+        index: 'getResourceByName',
+        sortKey: 'name',
         forward: true
       };
-      expect(parseQueryParamSort('asc', expectedResult.sortKey, expectedResult.index)).toEqual(
-        expectedResult
-      );
+      expect(getSortQueryParams({ name: 'asc' }, ['getResourceByName'])).toEqual(expectedResult);
     });
 
     test('should parse successfuly a descending sort', () => {
       const expectedResult = {
-        index: 'testGSI',
-        sortKey: 'testProp',
+        index: 'getResourceByName',
+        sortKey: 'name',
         forward: false
       };
-      expect(parseQueryParamSort('desc', expectedResult.sortKey, expectedResult.index)).toEqual(
-        expectedResult
-      );
+      expect(getSortQueryParams({ name: 'desc' }, ['getResourceByName'])).toEqual(expectedResult);
     });
   });
 });

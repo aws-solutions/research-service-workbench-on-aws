@@ -19,7 +19,8 @@ const QueryParameterFilterSchema: Schema = {
       properties: {
         value1: { type: 'string' },
         value2: { type: 'string' }
-      }
+      },
+      required: ['value1', 'value2']
     },
     begins: { type: 'string' }
   },

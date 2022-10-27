@@ -2,112 +2,109 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import Boom from '@hapi/boom';
 import { QueryParams } from '../aws/helpers/dynamoDB/dynamoDBService';
-import { QueryParameterFilter } from '../interfaces/queryParameterFilter';
+import { FilterRequest } from '../interfaces/FilterRequest';
+import { SortRequest } from '../interfaces/SortRequest';
 
 /************************************************************
  * Validates only one sorting or filter in list requests
  * @param filter - filter request object
  * @param sort - sorting request object
  ************************************************************/
-export function validateSingleSortAndFilter(filter?: {}, sort?: {}): void {
-  if (filter && sort) {
-    throw Boom.badRequest('Cannot apply a filter and sort at the same time');
-  }
+export function validateSingleSortAndFilter(filter?: FilterRequest, sort?: SortRequest): void {
   const filterAttributesLength = filter ? Object.keys(filter).length : 0;
+  const sortAttributesLength = sort ? Object.keys(sort).length : 0;
   // Check that at most one filter is defined because we not support more than one filter
   if (filterAttributesLength > 1) {
     throw Boom.badRequest('Cannot apply more than one filter.');
   }
   // Check that at most one sort attribute is defined because we not support sorting by more than one attribute
-  if (sort && Object.keys(sort).length > 1) {
+  if (sortAttributesLength > 1) {
     throw Boom.badRequest('Cannot sort by more than one attribute.');
   }
+  const hasSameProperty =
+    filterAttributesLength === 1 &&
+    sortAttributesLength === 1 &&
+    Object.keys(filter ?? {})[0] === Object.keys(sort ?? {})[0];
+  if (filter && sort && !hasSameProperty) {
+    throw Boom.badRequest('Cannot apply a filter and sort at the same time');
+  }
 }
 
 /************************************************************
- * Parses Object with format \{ field: \{ operator: value \} \} into QueryParam object consumed by dynamoDB
+ * Parses FilterRequest into QueryParam object consumed by dynamoDB
  *
- * @param filter - filter request object field
- * @param sortKey - field name in dynamoDB
- * @param gsi - gsi to use for filter
+ * @param filter - filter request object
+ * @param gsiPropertyNames - field names on pascal case format to retrieve gsi name
  *
  * @returns QueryParams object
  ************************************************************/
-export function parseQueryParamFilter<T>(
-  filter: QueryParameterFilter<T> | undefined,
-  sortKey: string,
-  gsi: string
-): QueryParams | undefined {
-  if (!filter || Object.keys(filter).length === 0 || Object.keys(filter).length > 1) {
-    return undefined;
+export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames: string[]): QueryParams {
+  let queryParams: QueryParams = {};
+  //validate filter request doesnt have more than one filter or no filters
+  if (!filter || Object.keys(filter).length === 0) {
+    return queryParams;
   }
-  if (filter?.between && filter.between.value1 && filter.between.value2) {
-    const filterProperty = getFilterPropertyByType(filter.between.value1);
-    const value1 = { [filterProperty]: filter.between.value1 } as unknown as AttributeValue;
-    const value2 = { [filterProperty]: filter.between.value2 } as unknown as AttributeValue;
-    return {
-      index: gsi,
-      sortKey: sortKey,
-      between: { value1, value2 }
-    };
+  if (Object.keys(filter).length > 1) {
+    throw Boom.badRequest('Cannot filter by more than one attribute.');
   }
-  const filterOperator: keyof QueryParameterFilter<T> = Object.keys(
-    filter
-  )[0] as keyof QueryParameterFilter<T>;
-  //eslint-disable-next-line security/detect-object-injection
-  if (filterOperator && filter[filterOperator]) {
-    //eslint-disable-next-line security/detect-object-injection
-    const propertyType = getFilterPropertyByType(filter[filterOperator]);
-    //eslint-disable-next-line security/detect-object-injection
-    const value = { [propertyType]: filter[filterOperator] } as unknown as AttributeValue;
-    return {
-      index: gsi,
-      sortKey: sortKey,
-      [filterOperator]: { ...value }
-    };
-  }
+  //only one entry will exist due to validation above
+  Object.entries(filter).forEach(([key, value]) => {
+    //transform { operator: value } into { operator { type: value } }
+    const filterQueryParam = (
+      value?.between ? { between: marshall(value.between) } : marshall(value)
+    ) as QueryParams;
+    //get GSI from gsi list in params
+    const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+    const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
+    //only return when format is correct
+    if (filterQueryParam && Object.keys(filterQueryParam).length > 0 && gsi) {
+      const currentQueryParams: QueryParams = {
+        index: gsi,
+        sortKey: key,
+        ...filterQueryParam
+      };
+      queryParams = { ...queryParams, ...currentQueryParams };
+    } else {
+      throw Boom.badRequest('Filter contains invalid format.');
+    }
+  });
+  return queryParams;
 }
 
 /************************************************************
- * Creates a sort object into a QueryParam object to be consumed by dynamoDB
- * @param sort - type of sorting
- * @param sortKey - field name in dynamoDB
- * @param gsi - gsi to use for sort
- *
+ * Creates a sort request object into a QueryParam object to be consumed by dynamoDB
+ * @param sort - sort request property object
+ * @param gsiPropertyNames - field names on pascal case format to retrieve gsi name
  * @returns QueryParams object
  ************************************************************/
-export function parseQueryParamSort(
-  sort: 'asc' | 'desc' | undefined,
-  sortKey: string,
-  gsi: string
-): QueryParams | undefined {
-  if (!sort) {
-    return undefined;
+export function getSortQueryParams(sort: SortRequest | undefined, gsiNames: string[]): QueryParams {
+  let queryParams: QueryParams = {};
+  if (!sort || Object.keys(sort).length === 0) {
+    return queryParams;
   }
-  const forward: boolean = sort !== 'desc';
-  return {
-    index: gsi,
-    sortKey: sortKey,
-    forward
-  };
-}
-
-/************************************************************
- * Get Dynamo field type property based on a T type
- * @param value - value with type T
- *
- * @returns dynamo field type property name
- ************************************************************/
-function getFilterPropertyByType<T>(value: T): keyof AttributeValue {
-  switch (typeof value) {
-    case 'string':
-      return 'S';
-    case 'number':
-      return 'N';
-    default:
-      return 'S';
+  if (Object.keys(sort).length > 1) {
+    throw Boom.badRequest('Cannot sort by more than one attribute.');
   }
+  //only one entry will exist due to validation above
+  Object.entries(sort).forEach(([key, value]) => {
+    //get GSI from gsi list in params
+    const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+    const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
+    const forward = value === 'asc';
+    //only return when format is correct
+    if (gsiMatches && gsi) {
+      const sortQueryParams = {
+        index: gsi,
+        sortKey: key,
+        forward
+      };
+      queryParams = { ...queryParams, ...sortQueryParams };
+    } else {
+      throw Boom.badRequest('Sort contains invalid format.');
+    }
+  });
+  return queryParams;
 }
