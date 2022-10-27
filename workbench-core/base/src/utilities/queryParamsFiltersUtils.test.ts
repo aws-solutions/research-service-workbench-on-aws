@@ -28,7 +28,7 @@ describe('Query params filters utils', () => {
       );
     });
 
-    test('sohuld not throw exception when there is only one filter', () => {
+    test('should not throw exception when there is only one filter', () => {
       expect(() => validateSingleSortAndFilter({ name: { eq: 'Sauron' } }, undefined)).not.toThrow();
     });
 
