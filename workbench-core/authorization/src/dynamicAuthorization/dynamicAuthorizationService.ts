@@ -19,8 +19,8 @@ import {
   GetUserGroupsResponse,
   GetUsersFromGroupRequest,
   GetUsersFromGroupResponse,
+  Identity,
   IdentityPermission,
-  IdentityType,
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicPermissionsPluginInputs';
@@ -64,21 +64,18 @@ export class DynamicAuthorizationService {
       userId: id
     });
     const groupIdIdentities = Array.from(new Set<string>([...groupIds, ...roles])).map(
-      (groupId): { identityType: IdentityType; identityId: string } => {
+      (groupId): Identity => {
         return {
           identityType: 'GROUP',
           identityId: groupId
         };
       }
     );
-    const userIdentity: { identityType: IdentityType; identityId: string } = {
+    const userIdentity: Identity = {
       identityType: 'USER',
       identityId: id
     };
-    const identities: { identityType: IdentityType; identityId: string }[] = [
-      userIdentity,
-      ...groupIdIdentities
-    ];
+    const identities: Identity[] = [userIdentity, ...groupIdIdentities];
     //Check for subject id permissions
     const { identityPermissions } = await this._dynamicPermissisonsPlugin.getIdentityPermissionsBySubject({
       subjectType,
@@ -87,19 +84,15 @@ export class DynamicAuthorizationService {
       identities
     });
     //Check for wildcard permissions
-    const wildCardPermissionsResponse = await this._dynamicPermissisonsPlugin.getIdentityPermissionsBySubject(
-      {
+    const { identityPermissions: wildCardIdentityPermissions } =
+      await this._dynamicPermissisonsPlugin.getIdentityPermissionsBySubject({
         subjectType,
         subjectId: '*',
         action,
         identities
-      }
-    );
+      });
 
-    const allUserPermissions: IdentityPermission[] = [
-      ...identityPermissions,
-      ...wildCardPermissionsResponse.identityPermissions
-    ];
+    const allUserPermissions: IdentityPermission[] = [...identityPermissions, ...wildCardIdentityPermissions];
 
     await this._authorizationPlugin.isAuthorizedOnDynamicOperations(allUserPermissions, [
       isAuthorizedOnSubjectRequest.dynamicOperation
