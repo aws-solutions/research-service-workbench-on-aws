@@ -1,5 +1,5 @@
 {
-  "app": "lib/src/index.js",
+  "app": "npx ts-node --prefer-ts-exts src/index.ts",
   "context": {
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
     "@aws-cdk/core:stackRelativeExports": true,

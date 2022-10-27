@@ -7,8 +7,8 @@
 
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { App } from 'aws-cdk-lib';
-// import { AwsSolutionsChecks } from 'cdk-nag';
+import { App, Aspects } from 'aws-cdk-lib';
+import { AwsSolutionsChecks } from 'cdk-nag';
 // import { InfrastructureStack } from './infrastructure-stack';
 import { ExampleStack } from './example-stack';
 
@@ -22,4 +22,4 @@ new ExampleStack(app, 'ExampleStack', {
   }
 });
 
-// Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

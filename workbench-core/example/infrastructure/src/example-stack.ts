@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
-import { Aws, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, aws_cognito, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -15,6 +14,7 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { EncryptionKeyWithRotation } from './constructs/encryotionKeyWithRotation';
 import { SecureS3Bucket } from './constructs/secureS3Bucket';
@@ -76,6 +76,67 @@ export class ExampleStack extends Stack {
     new CfnOutput(this, 'AwsRegion', {
       value: Aws.REGION
     });
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource',
+      [
+        {
+          id: 'AwsSolutions-IAM4',
+          reason:
+            'I am OK with this, this is part of the Custom resource defined in the @aws/workbench-core-infrastructure package',
+          appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/Resource',
+      [{ id: 'AwsSolutions-L1', reason: 'Should be fixed in the @aws/workbench-core-infrastructure package' }]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/ExampleStack/ExampleLambdaService/ServiceRole/DefaultPolicy/Resource',
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'I am OK with using wildcard here'
+        }
+      ]
+    );
+
+    NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
+      {
+        id: 'AwsSolutions-DDB3',
+        reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB'
+      }
+    ]);
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/ExampleStack/ExampleRestApi/CloudWatchRole/Resource',
+      [
+        {
+          id: 'AwsSolutions-IAM4',
+          reason: 'I am OK with using managed Policy here',
+          appliesTo: [
+            'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+          ]
+        }
+      ]
+    );
+
+    NagSuppressions.addStackSuppressions(this, [
+      { id: 'AwsSolutions-APIG3', reason: 'I am ok with not using WAFv2, this is an example App' },
+      {
+        id: 'AwsSolutions-APIG6',
+        reason: 'I am ok with not enabling Cloudwatch logging at stage level, this is an example App'
+      },
+      { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authentication implemented' },
+      { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authentication implemented' }
+    ]);
   }
 
   // DynamoDB Table
@@ -149,7 +210,8 @@ export class ExampleStack extends Stack {
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
     const s3Bucket = new Bucket(this, 'ExampleS3AccessLogs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      enforceSSL: true
     });
 
     s3Bucket.addToResourcePolicy(
@@ -170,6 +232,13 @@ export class ExampleStack extends Stack {
       value: s3Bucket.bucketName,
       exportName: bucketNameOutput
     });
+
+    NagSuppressions.addResourceSuppressions(s3Bucket, [
+      {
+        id: 'AwsSolutions-S1',
+        reason: 'I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket'
+      }
+    ]);
 
     return s3Bucket;
   }
@@ -219,101 +288,158 @@ export class ExampleStack extends Stack {
     API.root.addProxy({
       defaultIntegration: new LambdaIntegration(alias)
     });
+
+    NagSuppressions.addResourceSuppressions(
+      API,
+      [
+        {
+          id: 'AwsSolutions-APIG2',
+          reason: 'I am OK with not enabling request validation for Rest API, this is an example App'
+        }
+      ],
+      true
+    );
+
+    NagSuppressions.addResourceSuppressions(
+      API,
+      [
+        {
+          id: 'AwsSolutions-APIG2',
+          reason: 'I am OK with not enabling request validation for Rest API, this is an example App',
+          appliesTo: [
+            'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
+          ]
+        }
+      ],
+      true
+    );
   }
 
   private _createLambda(datasetBucket: Bucket): Function {
     const exampleLambda: Function = new Function(this, 'ExampleLambdaService', {
       runtime: Runtime.NODEJS_16_X,
       handler: 'buildLambda.handler',
-      code: Code.fromAsset(join(__dirname, '../../build')),
+      code: Code.fromAsset('build'),
       functionName: 'ExampleLambda',
       environment: this._exampleLambdaEnvVars,
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
       memorySize: 832
     });
 
-    exampleLambda.role?.attachInlinePolicy(
-      new Policy(this, 'ExampleLambdaPolicy', {
-        statements: [
-          new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*'],
-            resources: [`arn:aws:events:${Aws.REGION}:${this.account}:event-bus/default`],
-            sid: 'EventBridgeAccess'
-          }),
-          new PolicyStatement({
-            actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-            resources: [`arn:aws:cloudformation:${Aws.REGION}:*:stack/${this.stackName}*`],
-            sid: 'CfnAccess'
-          }),
-          new PolicyStatement({
-            actions: ['cognito-idp:DescribeUserPoolClient'],
-            resources: [`arn:aws:cognito-idp:${Aws.REGION}:${this.account}:userpool/*`],
-            sid: 'CognitoAccess'
-          }),
-          new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
-            resources: [`arn:aws:kms:${Aws.REGION}:${this.account}:key/*`],
-            sid: 'KMSAccess'
-          }),
-          new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
-            resources: ['*'],
-            sid: 'EventbridgeAccess'
-          }),
-          new PolicyStatement({
-            actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-            resources: ['*']
-          }),
-          new PolicyStatement({
-            sid: 'datasetS3Access',
-            actions: [
-              's3:GetObject',
-              's3:GetObjectVersion',
-              's3:GetObjectTagging',
-              's3:AbortMultipartUpload',
-              's3:ListMultipartUploadParts',
-              's3:GetBucketPolicy',
-              's3:PutBucketPolicy',
-              's3:PutObject',
-              's3:PutObjectAcl',
-              's3:PutObjectTagging',
-              's3:ListBucket',
-              's3:PutAccessPointPolicy',
-              's3:GetAccessPointPolicy',
-              's3:CreateAccessPoint',
-              's3:DeleteAccessPoint'
-            ],
-            resources: [
-              datasetBucket.bucketArn,
-              `${datasetBucket.bucketArn}/*`,
-              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
-            ]
-          }),
-          new PolicyStatement({
-            sid: 'cognitoAccess',
-            actions: [
-              'cognito-idp:AdminAddUserToGroup',
-              'cognito-idp:AdminCreateUser',
-              'cognito-idp:AdminDeleteUser',
-              'cognito-idp:AdminGetUser',
-              'cognito-idp:AdminListGroupsForUser',
-              'cognito-idp:AdminRemoveUserFromGroup',
-              'cognito-idp:AdminUpdateUserAttributes',
-              'cognito-idp:CreateGroup',
-              'cognito-idp:DeleteGroup',
-              'cognito-idp:ListGroups',
-              'cognito-idp:ListUsers',
-              'cognito-idp:ListUsersInGroup'
-            ],
-            resources: ['*']
-          })
-        ]
-      })
+    const exampleLambdaPolicy: Policy = new Policy(this, 'ExampleLambdaPolicy', {
+      statements: [
+        new PolicyStatement({
+          actions: ['events:DescribeRule', 'events:Put*'],
+          resources: [`arn:aws:events:${Aws.REGION}:${this.account}:event-bus/default`],
+          sid: 'EventBridgeAccess'
+        }),
+        new PolicyStatement({
+          actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
+          resources: [`arn:aws:cloudformation:${Aws.REGION}:*:stack/${this.stackName}*`],
+          sid: 'CfnAccess'
+        }),
+        new PolicyStatement({
+          actions: ['cognito-idp:DescribeUserPoolClient'],
+          resources: [`arn:aws:cognito-idp:${Aws.REGION}:${this.account}:userpool/*`],
+          sid: 'CognitoAccess'
+        }),
+        new PolicyStatement({
+          actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
+          resources: [`arn:aws:kms:${Aws.REGION}:${this.account}:key/*`],
+          sid: 'KMSAccess'
+        }),
+        new PolicyStatement({
+          actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
+          resources: ['*'],
+          sid: 'EventbridgeAccess'
+        }),
+        new PolicyStatement({
+          actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          sid: 'datasetS3Access',
+          actions: [
+            's3:GetObject',
+            's3:GetObjectVersion',
+            's3:GetObjectTagging',
+            's3:AbortMultipartUpload',
+            's3:ListMultipartUploadParts',
+            's3:GetBucketPolicy',
+            's3:PutBucketPolicy',
+            's3:PutObject',
+            's3:PutObjectAcl',
+            's3:PutObjectTagging',
+            's3:ListBucket',
+            's3:PutAccessPointPolicy',
+            's3:GetAccessPointPolicy',
+            's3:CreateAccessPoint',
+            's3:DeleteAccessPoint'
+          ],
+          resources: [
+            datasetBucket.bucketArn,
+            `${datasetBucket.bucketArn}/*`,
+            `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+          ]
+        }),
+        new PolicyStatement({
+          sid: 'cognitoAccess',
+          actions: [
+            'cognito-idp:AdminAddUserToGroup',
+            'cognito-idp:AdminCreateUser',
+            'cognito-idp:AdminDeleteUser',
+            'cognito-idp:AdminGetUser',
+            'cognito-idp:AdminListGroupsForUser',
+            'cognito-idp:AdminRemoveUserFromGroup',
+            'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:CreateGroup',
+            'cognito-idp:DeleteGroup',
+            'cognito-idp:ListGroups',
+            'cognito-idp:ListUsers',
+            'cognito-idp:ListUsersInGroup'
+          ],
+          resources: ['*']
+        })
+      ]
+    });
+
+    NagSuppressions.addResourceSuppressions(
+      exampleLambdaPolicy,
+      [
+        {
+          id: 'AwsSolutions-IAM5',
+          reason: 'I am OK with using wildcard here',
+          appliesTo: [
+            'Action::events:Put*',
+            'Resource::arn:aws:cloudformation:<AWS::Region>:*:stack/ExampleStack*',
+            'Resource::arn:aws:cognito-idp:<AWS::Region>:570848053562:userpool/*',
+            'Resource::arn:aws:kms:<AWS::Region>:570848053562:key/*',
+            'Resource::*',
+            'Resource::<ExampleS3Bucketexamples3datasets657A5691.Arn>/*',
+            'Resource::arn:aws:s3:us-east-1:570848053562:accesspoint/*'
+          ]
+        }
+      ],
+      true
     );
+
+    exampleLambda.role!.attachInlinePolicy(exampleLambdaPolicy);
 
     new CfnOutput(this, 'ExampleLambdaRoleOutput', {
       value: exampleLambda.role!.roleArn
     });
+
+    NagSuppressions.addResourceSuppressions(
+      exampleLambda,
+      [
+        {
+          id: 'AwsSolutions-IAM4',
+          reason: 'I am OK with using AWSLambdaBasicExecutionRole here',
+          appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole']
+        }
+      ],
+      true
+    );
 
     return exampleLambda;
   }
@@ -334,6 +460,11 @@ export class ExampleStack extends Stack {
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ExampleServiceWorkbenchCognito', props);
+    const cfnUserPool: aws_cognito.CfnUserPool = workbenchCognito.userPool!.node
+      .defaultChild as aws_cognito.CfnUserPool;
+    cfnUserPool.userPoolAddOns = {
+      advancedSecurityMode: 'ENFORCED'
+    };
 
     new CfnOutput(this, 'ExampleCognitoUserPoolId', {
       value: workbenchCognito.userPoolId,
@@ -349,6 +480,18 @@ export class ExampleStack extends Stack {
       value: workbenchCognito.cognitoDomain,
       exportName: 'ExampleCognitoDomain'
     });
+
+    NagSuppressions.addResourceSuppressionsByPath(
+      this,
+      '/ExampleStack/ExampleServiceWorkbenchCognito/WorkbenchUserPool/Resource',
+      [
+        { id: 'AwsSolutions-COG1', reason: 'Should be fixed in @aws/workbench-core-infrastructure package' },
+        {
+          id: 'AwsSolutions-COG2',
+          reason: 'This is an example package for integration test, selecting default MFA Optional'
+        }
+      ]
+    );
 
     return workbenchCognito;
   }

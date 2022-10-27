@@ -93,4 +93,16 @@ export function setUpDSRoutes(
       res.send(response);
     })
   );
+
+  // Delete dataset
+  router.delete(
+    '/datasets/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+        throw Boom.badRequest('id request parameter is invalid');
+      }
+      await dataSetService.removeDataSet(req.params.id);
+      res.status(204).send();
+    })
+  );
 }
