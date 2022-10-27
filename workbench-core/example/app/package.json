@@ -1,5 +1,5 @@
 {
-  "name": "@aws/workbench-core-example-express",
+  "name": "@aws/workbench-core-example-app",
   "version": "0.0.1",
   "description": "Example Express App",
   "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",

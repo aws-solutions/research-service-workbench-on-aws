@@ -2,10 +2,12 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
   "compilerOptions": {
+    "outDir": "lib",
     "types": ["heft-jest", "node"],
     "lib": ["es2017", "dom"],
-    "rootDir": "src"
+    "rootDirs": ["src", "integration-tests"],
+    "rootDir": ""
   },
-  "include": ["src/*", "src/*/*"],
-  "exclude": ["./node_modules", "./lib", "./cdk.out"]
+  "include": ["src/**/*.ts", "integration-tests/**/*.ts"],
+  "exclude": ["node_modules", "lib", "cdk.out"]
 }

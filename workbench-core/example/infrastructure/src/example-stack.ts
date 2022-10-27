@@ -72,6 +72,10 @@ export class ExampleStack extends Stack {
     this._createDDBTable(exampleLambda);
 
     this._createRestApi(exampleLambda);
+
+    new CfnOutput(this, 'AwsRegion', {
+      value: Aws.REGION
+    });
   }
 
   // DynamoDB Table
@@ -122,7 +126,7 @@ export class ExampleStack extends Stack {
     });
     // Grant the Lambda Functions read access to the DynamoDB table
     table.grantReadWriteData(exampleLambda);
-    new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
+    new CfnOutput(this, 'ExampleDynamoDBTableOutput', { value: table.tableArn });
     return table;
   }
 
@@ -143,7 +147,7 @@ export class ExampleStack extends Stack {
   }
 
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
-    const s3Bucket = new Bucket(this, 's3-access-logs', {
+    const s3Bucket = new Bucket(this, 'ExampleS3AccessLogs', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED
     });
@@ -202,7 +206,7 @@ export class ExampleStack extends Stack {
       }
     });
 
-    new CfnOutput(this, 'exampleAPIEndpoint', {
+    new CfnOutput(this, 'ExampleAPIEndpoint', {
       value: API.url
     });
 
@@ -218,10 +222,10 @@ export class ExampleStack extends Stack {
   }
 
   private _createLambda(datasetBucket: Bucket): Function {
-    const exampleLambda: Function = new Function(this, 'LambdaService', {
+    const exampleLambda: Function = new Function(this, 'ExampleLambdaService', {
       runtime: Runtime.NODEJS_16_X,
       handler: 'buildLambda.handler',
-      code: Code.fromAsset(join(__dirname, '../build')),
+      code: Code.fromAsset(join(__dirname, '../../build')),
       functionName: 'ExampleLambda',
       environment: this._exampleLambdaEnvVars,
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
@@ -229,7 +233,7 @@ export class ExampleStack extends Stack {
     });
 
     exampleLambda.role?.attachInlinePolicy(
-      new Policy(this, 'exampleLambdaPolicy', {
+      new Policy(this, 'ExampleLambdaPolicy', {
         statements: [
           new PolicyStatement({
             actions: ['events:DescribeRule', 'events:Put*'],
@@ -285,11 +289,6 @@ export class ExampleStack extends Stack {
               `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
             ]
           }),
-          // new PolicyStatement({
-          //   sid: 'environmentBootstrapS3Access',
-          //   actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
-          //   resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
-          // }),
           new PolicyStatement({
             sid: 'cognitoAccess',
             actions: [
@@ -312,7 +311,7 @@ export class ExampleStack extends Stack {
       })
     );
 
-    new CfnOutput(this, 'exampleLambdaRoleOutput', {
+    new CfnOutput(this, 'ExampleLambdaRoleOutput', {
       value: exampleLambda.role!.roleArn
     });
 
@@ -334,19 +333,19 @@ export class ExampleStack extends Stack {
       accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
     };
 
-    const workbenchCognito = new WorkbenchCognito(this, 'ServiceWorkbenchCognito', props);
+    const workbenchCognito = new WorkbenchCognito(this, 'ExampleServiceWorkbenchCognito', props);
 
-    new CfnOutput(this, 'cognitoUserPoolId', {
+    new CfnOutput(this, 'ExampleCognitoUserPoolId', {
       value: workbenchCognito.userPoolId,
       exportName: 'ExampleUserPoolId'
     });
 
-    new CfnOutput(this, 'cognitoUserPoolClientId', {
+    new CfnOutput(this, 'ExampleCognitoUserPoolClientId', {
       value: workbenchCognito.userPoolClientId,
       exportName: 'ExampleCognitoUserPoolClientId'
     });
 
-    new CfnOutput(this, 'cognitoDomainName', {
+    new CfnOutput(this, 'ExampleCognitoDomainName', {
       value: workbenchCognito.cognitoDomain,
       exportName: 'ExampleCognitoDomain'
     });
