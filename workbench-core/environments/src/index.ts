@@ -16,11 +16,13 @@ import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnec
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
+import { EnvironmentTypeFilter, ListEnvironmentTypeRequest } from './interfaces/listEnvironmentTypeRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
 import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
+import ListEnvironmentTypeSchema from './schemas/listEnvironmentType';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
 import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import { EnvironmentService, Environment } from './services/environmentService';
@@ -53,5 +55,8 @@ export {
   CreateEnvironmentTypeSchema,
   UpdateEnvironmentTypeSchema,
   EnvironmentConnectionLinkPlaceholder,
-  EnvironmentTypeHandler
+  EnvironmentTypeHandler,
+  EnvironmentTypeFilter,
+  ListEnvironmentTypeSchema,
+  ListEnvironmentTypeRequest
 };

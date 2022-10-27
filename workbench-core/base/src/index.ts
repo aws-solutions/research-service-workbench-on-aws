@@ -10,7 +10,14 @@ import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbU
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
+import { QueryParameterFilter } from './interfaces/queryParameterFilter';
+import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
+import {
+  parseQueryParamFilter,
+  parseQueryParamSort,
+  validateSingleSortAndFilter
+} from './utilities/queryParamsFiltersUtils';
 import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
@@ -38,5 +45,10 @@ export {
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
   CFNTemplateParameters,
-  CFNTemplate
+  CFNTemplate,
+  QueryParameterFilter,
+  validateSingleSortAndFilter,
+  parseQueryParamFilter,
+  parseQueryParamSort,
+  QueryParameterFilterSchema
 };
