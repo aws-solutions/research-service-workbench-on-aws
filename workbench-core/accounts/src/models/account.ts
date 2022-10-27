@@ -4,9 +4,11 @@
  */
 
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import CostCenter from './costCenter';
 
 interface Account {
   id: string;
+  name: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
   error?: { type: string; value: string };
@@ -19,6 +21,7 @@ interface Account {
   externalId: string;
   stackName: string;
   status: HostingAccountStatus;
+  CC?: CostCenter;
 }
 
 export default Account;

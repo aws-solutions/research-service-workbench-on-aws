@@ -8,6 +8,7 @@ import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/wor
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
+import CostCenter from '../models/costCenter';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -180,12 +181,15 @@ export default class AccountService {
       return item;
     });
     let account: Account = {
-      name: '',
       awsAccountId: '',
+      cidr: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
       environmentInstanceFiles: '',
+      externalId: '',
       hostingAccountHandlerRoleArn: '',
+      id: '',
+      name: '',
       stackName: '',
       status: '',
       subnetId: '',

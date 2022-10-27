@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import Account from '../models/account';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
-import { Account } from './accountService';
 
 export default class HostingAccountService {
   public async get(accountId: string): Promise<Account> {

@@ -33,6 +33,7 @@ describe('CostCenterService', () => {
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
     accountMetadata = {
+      name: '',
       error: undefined,
       id: accountId,
       cidr: '',
