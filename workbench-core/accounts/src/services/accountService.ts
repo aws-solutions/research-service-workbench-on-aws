@@ -7,31 +7,9 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import Account from '../models/account';
+import CostCenter from '../models/costCenter';
 
-export interface CostCenter {
-  pk: string;
-  sk: string;
-  id: string;
-  name?: string;
-}
-
-export interface Account {
-  id?: string;
-  name: string;
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  error?: { type: string; value: string };
-  hostingAccountHandlerRoleArn: string;
-  vpcId: string;
-  subnetId: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
-  externalId?: string;
-  stackName: string;
-  status: HostingAccountStatus;
-  CC?: CostCenter;
-}
 export default class AccountService {
   private _aws: AwsService;
 
@@ -203,12 +181,15 @@ export default class AccountService {
       return item;
     });
     let account: Account = {
-      name: '',
       awsAccountId: '',
+      cidr: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
       environmentInstanceFiles: '',
+      externalId: '',
       hostingAccountHandlerRoleArn: '',
+      id: '',
+      name: '',
       stackName: '',
       status: '',
       subnetId: '',

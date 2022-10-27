@@ -7,6 +7,7 @@ import AccountHandler from './handlers/accountHandler';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
+import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
 import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
@@ -16,6 +17,7 @@ export {
   HostingAccountLifecycleService,
   AccountHandler,
   AccountService,
+  CostCenterService,
   ProjectService,
   CreateAccountSchema,
   UpdateAccountSchema

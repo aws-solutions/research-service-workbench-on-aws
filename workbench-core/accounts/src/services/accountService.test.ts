@@ -16,7 +16,9 @@ import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import AccountService, { Account, CostCenter } from './accountService';
+import Account from '../models/account';
+import CostCenter from '../models/costCenter';
+import AccountService from './accountService';
 
 describe('AccountService', () => {
   const ORIGINAL_ENV = process.env;
@@ -329,7 +331,7 @@ describe('AccountService', () => {
       });
 
       describe('and metadata is requested', () => {
-        let costCenter: CostCenter;
+        let costCenter: CostCenter | { pk: string; sk: string };
         let costCenterPK: string;
         let expectedCCId: string;
 
