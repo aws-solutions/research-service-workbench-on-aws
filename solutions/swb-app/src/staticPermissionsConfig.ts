@@ -18,6 +18,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Account'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Environment'
   },

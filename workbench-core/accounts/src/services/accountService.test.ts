@@ -5,10 +5,18 @@
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
 
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  QueryCommand,
+  QueryCommandOutput,
+  UpdateItemCommand
+} from '@aws-sdk/client-dynamodb';
+import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { mockClient } from 'aws-sdk-client-mock';
-import AccountService from './accountService';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import AccountService, { Account, CostCenter } from './accountService';
 
 describe('AccountService', () => {
   const ORIGINAL_ENV = process.env;
@@ -277,5 +285,94 @@ describe('AccountService', () => {
 
     // CHECK
     expect(response).toEqual(expectedList);
+  });
+
+  describe('getAccount', () => {
+    let dynamoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
+    let accountService: AccountService;
+
+    beforeEach(() => {
+      dynamoMock = mockClient(DynamoDBClient);
+      accountService = new AccountService(process.env.STACK_NAME!);
+    });
+
+    describe('when there is a matching accountId', () => {
+      let expectedAccountId: string;
+      let account: Account | { sk: string };
+
+      beforeEach(() => {
+        expectedAccountId = 'expectedAccountId';
+        account = {
+          id: expectedAccountId,
+          sk: `ACC#${expectedAccountId}`,
+          awsAccountId: '',
+          encryptionKeyArn: '',
+          envMgmtRoleArn: '',
+          environmentInstanceFiles: '',
+          hostingAccountHandlerRoleArn: '',
+          stackName: '',
+          status: '',
+          subnetId: '',
+          vpcId: ''
+        };
+      });
+
+      describe('and metadata is NOT requested', () => {
+        test('returns the matching account', async () => {
+          dynamoMock.on(GetItemCommand).resolves({
+            Item: marshall(account)
+          });
+
+          const actualAccount = await accountService.getAccount(expectedAccountId, false);
+          expect(actualAccount.id).toEqual(expectedAccountId);
+        });
+      });
+
+      describe('and metadata is requested', () => {
+        let costCenter: CostCenter;
+        let costCenterPK: string;
+        let expectedCCId: string;
+
+        beforeEach(() => {
+          expectedCCId = 'cc-12345';
+          costCenterPK = `CC#${expectedCCId}`;
+
+          costCenter = {
+            pk: costCenterPK,
+            sk: costCenterPK,
+            id: expectedCCId,
+            name: 'cost center 1'
+          };
+        });
+
+        test('returns the matching account and its metadata', async () => {
+          const items = [account, costCenter];
+
+          const queryCommandOutput: QueryCommandOutput = {
+            Items: items.map((item) => {
+              return marshall(item);
+            }),
+            $metadata: {}
+          };
+          dynamoMock.on(QueryCommand).resolves(queryCommandOutput);
+
+          const actualAccount = await accountService.getAccount(expectedAccountId, true);
+          expect(actualAccount.id).toEqual(expectedAccountId);
+          expect(actualAccount.CC!.id).toEqual(expectedCCId);
+        });
+      });
+    });
+
+    describe('when there is no matching accountId', () => {
+      test('throws an error when there is no Item associated with the accountId', async () => {
+        dynamoMock.on(GetItemCommand).resolves({
+          Item: undefined
+        });
+        const noMatchId = 'noMatchId';
+        await expect(accountService.getAccount(noMatchId)).rejects.toThrowError(
+          `Could not find account ${noMatchId}`
+        );
+      });
+    });
   });
 });
