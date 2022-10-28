@@ -11,12 +11,16 @@ import {
   resourceTypeToKey,
   CFNTemplateParameters,
   provisionArtifactIdRegExpString,
-  productIdRegExpString
+  productIdRegExpString,
+  validateSingleSortAndFilter,
+  getSortQueryParams,
+  getFilterQueryParams
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { EnvironmentType } from '../interfaces/environmentType';
+import { ListEnvironmentTypesRequest } from '../interfaces/listEnvironmentTypesRequest';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export default class EnvironmentTypeService {
@@ -49,20 +53,24 @@ export default class EnvironmentTypeService {
 
   /**
    * List environment type objects from DDB
-   * @param pageSize - the number of environment type objects to get (optional)
-   * @param paginationToken - the token from the previous page for continuation (optional)
+   * @param request - pagination, filter and sorting parameters
    *
    * @returns environment type objects
    */
   public async listEnvironmentTypes(
-    pageSize?: number,
-    paginationToken?: string
-  ): Promise<{ data: EnvironmentType[]; paginationToken: string | undefined }> {
+    request: ListEnvironmentTypesRequest
+  ): Promise<{ data: EnvironmentType[]; paginationToken?: string }> {
+    const { filter, sort, pageSize, paginationToken } = request;
+    validateSingleSortAndFilter(filter, sort);
     let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByCreatedAt',
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
+    const gsiNames = ['getResourceByName', 'getResourceByStatus'];
+    const filterQuery = getFilterQueryParams(filter, gsiNames);
+    const sortQuery = getSortQueryParams(sort, gsiNames);
+    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
     const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();

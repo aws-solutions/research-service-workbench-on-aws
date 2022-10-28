@@ -97,23 +97,173 @@ describe('environmentTypeService', () => {
       ddbMock
         .on(QueryCommand, {
           TableName: TABLE_NAME,
-          KeyConditionExpression: '#resourceType = :resourceType'
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'envType'
+            }
+          }
         })
         .resolves(queryItemResponse);
       const validPaginationToken =
         'eyJzayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInJlc291cmNlVHlwZSI6ImVudlR5cGUiLCJwayI6IkVUIzZjNzMyZTExLTg3ZmItNDBlNy1hZTNiLTI1NTE2NThkNzhmMCIsInVwZGF0ZWRBdCI6IjIwMjItMDYtMTZUMjI6NDE6MDUuOTYyWiJ9';
 
       // OPERATE
-      const actualResponse = await envTypeService.listEnvironmentTypes(1, validPaginationToken);
+      const actualResponse = await envTypeService.listEnvironmentTypes({
+        pageSize: 1,
+        paginationToken: validPaginationToken
+      });
 
       // CHECK
       expect(actualResponse).toEqual({ data: [envType] });
     });
+
     test('invalidPaginationToken', async () => {
       // BUILD & OPERATE & CHECK
-      await expect(envTypeService.listEnvironmentTypes(1, 'invalidPaginationToken')).rejects.toThrow(
-        'Invalid paginationToken'
-      );
+      await expect(
+        envTypeService.listEnvironmentTypes({ pageSize: 1, paginationToken: 'invalidPaginationToken' })
+      ).rejects.toThrow('Invalid paginationToken');
+    });
+
+    test('filters by name successfully with an eq function ', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [marshall(envType)],
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: TABLE_NAME,
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#name': 'name'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'envType'
+            },
+            ':name': {
+              S: 'Jupyter Notebook'
+            }
+          }
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await envTypeService.listEnvironmentTypes({
+        pageSize: 1,
+        filter: { name: { eq: 'Jupyter Notebook' } }
+      });
+
+      // CHECK
+      expect(actualResponse).toEqual({ data: [envType] });
+    });
+
+    test('filters by status successfully with gte function ', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [marshall(envType)],
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: TABLE_NAME,
+          IndexName: 'getResourceByStatus',
+          KeyConditionExpression: '#resourceType = :resourceType AND #status >= :status',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#status': 'status'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'envType'
+            },
+            ':status': {
+              S: 'A'
+            }
+          }
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await envTypeService.listEnvironmentTypes({
+        pageSize: 1,
+        filter: { status: { gte: 'A' } }
+      });
+
+      // CHECK
+      expect(actualResponse).toEqual({ data: [envType] });
+    });
+
+    test('sort by asc status successfully', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [marshall(envType)],
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: TABLE_NAME,
+          IndexName: 'getResourceByStatus',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'envType'
+            }
+          },
+          ScanIndexForward: true
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await envTypeService.listEnvironmentTypes({
+        pageSize: 1,
+        sort: { status: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse).toEqual({ data: [envType] });
+    });
+
+    test('sort by desc name successfully', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        Items: [marshall(envType)],
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: TABLE_NAME,
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'envType'
+            }
+          },
+          ScanIndexForward: false
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await envTypeService.listEnvironmentTypes({
+        pageSize: 1,
+        sort: { name: 'desc' }
+      });
+
+      // CHECK
+      expect(actualResponse).toEqual({ data: [envType] });
     });
   });
 

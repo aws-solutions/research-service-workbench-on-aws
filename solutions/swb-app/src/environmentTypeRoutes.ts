@@ -5,10 +5,12 @@
 
 import {
   CreateEnvironmentTypeSchema,
+  ListEnvironmentTypesSchema,
   EnvironmentTypeService,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
-  UpdateEnvironmentTypeSchema
+  UpdateEnvironmentTypeSchema,
+  ListEnvironmentTypesRequest
 } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -49,16 +51,15 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes',
     wrapAsync(async (req: Request, res: Response) => {
+      processValidatorResult(validate(req.query, ListEnvironmentTypesSchema));
       const { paginationToken, pageSize } = req.query;
+      const request: ListEnvironmentTypesRequest = req.query as ListEnvironmentTypesRequest;
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         res
           .status(400)
           .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
       } else {
-        const envType = await environmentTypeService.listEnvironmentTypes(
-          pageSize ? Number(pageSize) : undefined,
-          paginationToken
-        );
+        const envType = await environmentTypeService.listEnvironmentTypes(request);
         res.send(envType);
       }
     })
