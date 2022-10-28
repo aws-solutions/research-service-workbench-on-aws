@@ -6,11 +6,28 @@
 /* eslint-disable no-new */
 import * as cdk from 'aws-cdk-lib';
 import { Aspects } from 'aws-cdk-lib';
-import { AwsSolutionsChecks } from 'cdk-nag';
+import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-new SWBStack(app);
+const stack = new SWBStack(app);
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+NagSuppressions.addStackSuppressions(stack, [
+  {
+    id: 'AwsSolutions-COG1',
+    reason:
+      "By design. Users are encouraged to change the cognito password requirements to what best suits their organization's needs"
+  },
+  {
+    id: 'AwsSolutions-COG2',
+    reason:
+      "By design. Users are encouraged to change the cognito MFA to what best suits their organization's needs"
+  },
+  {
+    id: 'AwsSolutions-COG3',
+    reason:
+      "By design. Users are encouraged to change the Security Mode to what best suits their organization's needs"
+  }
+]);
 
 app.synth();
