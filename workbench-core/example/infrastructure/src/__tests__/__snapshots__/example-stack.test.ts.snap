@@ -252,7 +252,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2Bbbd13520973dc7521e33e95968d6882f",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B59fe6a27349d170e8a2afda07ecfdbfd",
             "Version",
           ],
         },
@@ -313,15 +313,6 @@ Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
             Object {
-              "applies_to": Array [
-                "Action::events:Put*",
-                "Resource::arn:aws:cloudformation:<AWS::Region>:*:stack/ExampleStack*",
-                "Resource::arn:aws:cognito-idp:<AWS::Region>:570848053562:userpool/*",
-                "Resource::arn:aws:kms:<AWS::Region>:570848053562:key/*",
-                "Resource::*",
-                "Resource::<ExampleS3Bucketexamples3datasets657A5691.Arn>/*",
-                "Resource::arn:aws:s3:us-east-1:570848053562:accesspoint/*",
-              ],
               "id": "AwsSolutions-IAM5",
               "reason": "I am OK with using wildcard here",
             },
@@ -553,7 +544,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "6defe24c23457e0251960575d551b383d05d328e48c827b9e339b421be88ffba.zip",
+          "S3Key": "c36201afe970eedbed406c47556e37f42d500e41844710b5acb3d9ce0a7b8130.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -604,7 +595,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2Bbbd13520973dc7521e33e95968d6882f": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B59fe6a27349d170e8a2afda07ecfdbfd": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
