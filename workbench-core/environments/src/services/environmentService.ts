@@ -411,13 +411,48 @@ export class EnvironmentService {
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let metadata: any[] = [];
-    if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
-      throw new Error('Unable to get metadata for all keys defined in environment');
+    interface MetaData {
+      id: string;
+      pk: string;
+      sk: string;
+      resourceType: string;
+      [key: string]: string;
     }
+    let metadata: MetaData[] = [];
     metadata = batchGetResult.Responses![this._tableName].map((item) => {
-      return item;
+      return item as unknown as MetaData;
     });
+
+    // Check all expected metadata exist
+    const envTypeConfig = metadata.find((item) => {
+      return item.resourceType === 'envTypeConfig';
+    });
+    // ETC
+    if (envTypeConfig === undefined) {
+      throw Boom.badRequest(
+        `envTypeId ${params.envTypeId} with envTypeConfigId ${params.envTypeConfigId} does not exist`
+      );
+    }
+    // PROJ
+    const project = metadata.find((item) => {
+      return item.resourceType === 'project';
+    });
+    if (project === undefined) {
+      throw Boom.badRequest(`projectId ${params.projectId} does not exist`);
+    }
+    // DATASET
+    const datasets = metadata.filter((item) => {
+      return item.resourceType === 'dataset';
+    });
+    const validDatasetIds = datasets.map((dataset) => {
+      return dataset.id;
+    });
+    const dsIdsNotFound = params.datasetIds.filter((id) => {
+      return !validDatasetIds.includes(id);
+    });
+    if (dsIdsNotFound.length > 0) {
+      throw Boom.badRequest(`datasetIds ${dsIdsNotFound} do not exist`);
+    }
 
     // WRITE metadata to DDB
     const items: { [key: string]: unknown }[] = [];
@@ -431,10 +466,6 @@ export class EnvironmentService {
       return { pk, sk };
     };
 
-    //add envTypeConfig
-    const envTypeConfig = metadata.find((item) => {
-      return item.resourceType === 'envTypeConfig';
-    });
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
@@ -444,10 +475,6 @@ export class EnvironmentService {
       params: envTypeConfig.params
     });
 
-    //add project
-    const project = metadata.find((item) => {
-      return item.resourceType === 'project';
-    });
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.project, newEnv.projectId),
       id: newEnv.projectId,
@@ -462,10 +489,6 @@ export class EnvironmentService {
       awsAccountId: project.awsAccountId
     });
 
-    //add dataset
-    const datasets = metadata.filter((item) => {
-      return item.resourceType === 'dataset';
-    });
     datasets.forEach((dataset) => {
       items.push({
         ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.dataset, dataset.id),
