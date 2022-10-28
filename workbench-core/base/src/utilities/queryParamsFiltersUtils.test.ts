@@ -12,7 +12,7 @@ describe('Query params filters utils', () => {
   describe('validateSingleSortAndFilter', () => {
     test('should throw exception when request has filter and sorting', () => {
       expect(() => validateSingleSortAndFilter({ name: { eq: 'Sauron' } }, { status: 'desc' })).toThrow(
-        'Cannot apply a filter and sort at the same time'
+        'Cannot apply a filter and sort to different properties at the same time'
       );
     });
 

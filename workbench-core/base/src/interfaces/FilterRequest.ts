@@ -7,5 +7,5 @@ import { QueryParameterFilter } from './queryParameterFilter';
 
 export interface FilterRequest {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: QueryParameterFilter<any> | undefined;
+  [key: string]: QueryParameterFilter<unknown> | undefined;
 }

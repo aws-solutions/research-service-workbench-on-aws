@@ -29,7 +29,7 @@ export function validateSingleSortAndFilter(filter?: FilterRequest, sort?: SortR
     sortAttributesLength === 1 &&
     Object.keys(filter ?? {})[0] === Object.keys(sort ?? {})[0];
   if (filter && sort && !hasSameProperty) {
-    throw Boom.badRequest('Cannot apply a filter and sort at the same time');
+    throw Boom.badRequest('Cannot apply a filter and sort to different properties at the same time');
   }
 }
 
@@ -51,26 +51,27 @@ export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames
     throw Boom.badRequest('Cannot filter by more than one attribute.');
   }
   //only one entry will exist due to validation above
-  Object.entries(filter).forEach(([key, value]) => {
-    //transform { operator: value } into { operator { type: value } }
-    const filterQueryParam = (
-      value?.between ? { between: marshall(value.between) } : marshall(value)
-    ) as QueryParams;
-    //get GSI from gsi list in params
-    const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
-    const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
-    //only return when format is correct
-    if (filterQueryParam && Object.keys(filterQueryParam).length > 0 && gsi) {
-      const currentQueryParams: QueryParams = {
-        index: gsi,
-        sortKey: key,
-        ...filterQueryParam
-      };
-      queryParams = { ...queryParams, ...currentQueryParams };
-    } else {
-      throw Boom.badRequest('Filter contains invalid format.');
-    }
-  });
+  const { key, value } = Object.entries(filter).map(([key, value]) => {
+    return { key, value };
+  })[0];
+  //transform { operator: value } into { operator { type: value } }
+  const filterQueryParam = (
+    value?.between ? { between: marshall(value.between) } : marshall(value)
+  ) as QueryParams;
+  //get GSI from gsi list in params
+  const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+  const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
+  //only return when format is correct
+  if (filterQueryParam && Object.keys(filterQueryParam).length > 0 && gsi) {
+    const currentQueryParams: QueryParams = {
+      index: gsi,
+      sortKey: key,
+      ...filterQueryParam
+    };
+    queryParams = { ...queryParams, ...currentQueryParams };
+  } else {
+    throw Boom.badRequest('Filter contains invalid format.');
+  }
   return queryParams;
 }
 
@@ -89,22 +90,24 @@ export function getSortQueryParams(sort: SortRequest | undefined, gsiNames: stri
     throw Boom.badRequest('Cannot sort by more than one attribute.');
   }
   //only one entry will exist due to validation above
-  Object.entries(sort).forEach(([key, value]) => {
-    //get GSI from gsi list in params
-    const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
-    const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
-    const forward = value === 'asc';
-    //only return when format is correct
-    if (gsiMatches && gsi) {
-      const sortQueryParams = {
-        index: gsi,
-        sortKey: key,
-        forward
-      };
-      queryParams = { ...queryParams, ...sortQueryParams };
-    } else {
-      throw Boom.badRequest('Sort contains invalid format.');
-    }
-  });
+  const { key, value } = Object.entries(sort).map(([key, value]) => {
+    return { key, value };
+  })[0];
+
+  //get GSI from gsi list in params
+  const gsiMatches = gsiNames.filter((prop) => prop.replace('getResourceBy', '').toLowerCase() === key);
+  const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
+  const forward = value === 'asc';
+  //only return when format is correct
+  if (gsiMatches && gsi) {
+    const sortQueryParams = {
+      index: gsi,
+      sortKey: key,
+      forward
+    };
+    queryParams = { ...queryParams, ...sortQueryParams };
+  } else {
+    throw Boom.badRequest('Sort contains invalid format.');
+  }
   return queryParams;
 }

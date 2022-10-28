@@ -7,8 +7,8 @@
 import { QueryParameterFilterSchema } from '@aws/workbench-core-base';
 import { Schema } from 'jsonschema';
 
-const ListEnvironmentTypeSchema: Schema = {
-  id: '/listEnvironmentType',
+const ListEnvironmentTypesSchema: Schema = {
+  id: '/listEnvironmentTypes',
   type: 'object',
   properties: {
     paginationToken: { type: 'string' },
@@ -33,4 +33,4 @@ const ListEnvironmentTypeSchema: Schema = {
   additionalProperties: false
 };
 
-export default ListEnvironmentTypeSchema;
+export default ListEnvironmentTypesSchema;

@@ -16,13 +16,13 @@ import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnec
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
-import { EnvironmentTypeFilter, ListEnvironmentTypeRequest } from './interfaces/listEnvironmentTypeRequest';
+import { EnvironmentTypeFilter, ListEnvironmentTypesRequest } from './interfaces/listEnvironmentTypesRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
 import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
-import ListEnvironmentTypeSchema from './schemas/listEnvironmentType';
+import ListEnvironmentTypesSchema from './schemas/listEnvironmentTypes';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
 import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import { EnvironmentService, Environment } from './services/environmentService';
@@ -57,6 +57,6 @@ export {
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeHandler,
   EnvironmentTypeFilter,
-  ListEnvironmentTypeSchema,
-  ListEnvironmentTypeRequest
+  ListEnvironmentTypesSchema,
+  ListEnvironmentTypesRequest
 };

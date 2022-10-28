@@ -20,7 +20,7 @@ import {
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { EnvironmentType } from '../interfaces/environmentType';
-import { ListEnvironmentTypeRequest } from '../interfaces/listEnvironmentTypeRequest';
+import { ListEnvironmentTypesRequest } from '../interfaces/listEnvironmentTypesRequest';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export default class EnvironmentTypeService {
@@ -58,7 +58,7 @@ export default class EnvironmentTypeService {
    * @returns environment type objects
    */
   public async listEnvironmentTypes(
-    request: ListEnvironmentTypeRequest
+    request: ListEnvironmentTypesRequest
   ): Promise<{ data: EnvironmentType[]; paginationToken?: string }> {
     const { filter, sort, pageSize, paginationToken } = request;
     validateSingleSortAndFilter(filter, sort);

@@ -5,7 +5,7 @@
 
 import { QueryParameterFilter, FilterRequest, SortRequest } from '@aws/workbench-core-base';
 
-export interface ListEnvironmentTypeRequest {
+export interface ListEnvironmentTypesRequest {
   paginationToken?: string;
   pageSize?: number;
   filter?: EnvironmentTypeFilter;
