@@ -411,6 +411,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "express-rate-limit",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "fast-check",
       "allowedCategories": [ "production" ]
     },

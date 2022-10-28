@@ -408,16 +408,7 @@ export class ExampleStack extends Stack {
       [
         {
           id: 'AwsSolutions-IAM5',
-          reason: 'I am OK with using wildcard here',
-          appliesTo: [
-            'Action::events:Put*',
-            'Resource::arn:aws:cloudformation:<AWS::Region>:*:stack/ExampleStack*',
-            'Resource::arn:aws:cognito-idp:<AWS::Region>:570848053562:userpool/*',
-            'Resource::arn:aws:kms:<AWS::Region>:570848053562:key/*',
-            'Resource::*',
-            'Resource::<ExampleS3Bucketexamples3datasets657A5691.Arn>/*',
-            'Resource::arn:aws:s3:us-east-1:570848053562:accesspoint/*'
-          ]
+          reason: 'I am OK with using wildcard here'
         }
       ],
       true

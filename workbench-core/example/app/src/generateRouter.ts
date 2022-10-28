@@ -9,6 +9,7 @@ import { withAuth } from '@aws/workbench-core-authorization';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
 import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
@@ -27,6 +28,16 @@ export function generateRouter(): Express {
   const app: Express = express();
   app.disable('x-powered-by');
   const router: Router = express.Router();
+
+  //Adding rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false // Disable the `X-RateLimit-*` headers
+  });
+
+  app.use(limiter);
 
   app.use(
     cors({
