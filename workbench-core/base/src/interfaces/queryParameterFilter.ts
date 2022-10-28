@@ -5,7 +5,7 @@
 
 /************
  *
- * Only one operator can be defined by property, if multiple operators are dfined, dynamo service will throw an exception.
+ * Only one operator can be defined by property, if multiple operators are defined, dynamo service will throw an exception.
  *
  ************/
 export interface QueryParameterFilter<T> {

@@ -42,10 +42,9 @@ export function validateSingleSortAndFilter(filter?: FilterRequest, sort?: SortR
  * @returns QueryParams object
  ************************************************************/
 export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames: string[]): QueryParams {
-  let queryParams: QueryParams = {};
   //validate filter request doesnt have more than one filter or no filters
   if (!filter || Object.keys(filter).length === 0) {
-    return queryParams;
+    return {};
   }
   if (Object.keys(filter).length > 1) {
     throw Boom.badRequest('Cannot filter by more than one attribute.');
@@ -63,16 +62,14 @@ export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames
   const gsi = gsiMatches && gsiMatches.length > 0 ? gsiMatches[0] : '';
   //only return when format is correct
   if (filterQueryParam && Object.keys(filterQueryParam).length > 0 && gsi) {
-    const currentQueryParams: QueryParams = {
+    return {
       index: gsi,
       sortKey: key,
       ...filterQueryParam
     };
-    queryParams = { ...queryParams, ...currentQueryParams };
   } else {
     throw Boom.badRequest('Filter contains invalid format.');
   }
-  return queryParams;
 }
 
 /************************************************************
@@ -82,9 +79,8 @@ export function getFilterQueryParams(filter: FilterRequest | undefined, gsiNames
  * @returns QueryParams object
  ************************************************************/
 export function getSortQueryParams(sort: SortRequest | undefined, gsiNames: string[]): QueryParams {
-  let queryParams: QueryParams = {};
   if (!sort || Object.keys(sort).length === 0) {
-    return queryParams;
+    return {};
   }
   if (Object.keys(sort).length > 1) {
     throw Boom.badRequest('Cannot sort by more than one attribute.');
@@ -100,14 +96,12 @@ export function getSortQueryParams(sort: SortRequest | undefined, gsiNames: stri
   const forward = value === 'asc';
   //only return when format is correct
   if (gsiMatches && gsi) {
-    const sortQueryParams = {
+    return {
       index: gsi,
       sortKey: key,
       forward
     };
-    queryParams = { ...queryParams, ...sortQueryParams };
   } else {
     throw Boom.badRequest('Sort contains invalid format.');
   }
-  return queryParams;
 }
