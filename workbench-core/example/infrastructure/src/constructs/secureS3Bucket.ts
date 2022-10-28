@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CfnOutput } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';

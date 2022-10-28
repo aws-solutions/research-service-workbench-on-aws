@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /* eslint-disable no-new */
 import { Aws, CfnOutput } from 'aws-cdk-lib';
 import { AccountPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
