@@ -10,8 +10,12 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
+import {
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE
+} from '@aws/workbench-core-base/src/utilities/paginationHelper';
 import Boom from '@hapi/boom';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {

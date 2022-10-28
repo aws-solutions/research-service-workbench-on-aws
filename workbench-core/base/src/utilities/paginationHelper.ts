@@ -4,8 +4,8 @@
  */
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import { QueryParams } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
+import QueryParams from '../constants/queryParams';
 
 export function addPaginationToken(
   paginationToken: string | undefined,
@@ -22,6 +22,7 @@ export function addPaginationToken(
     }
   }
 
+  console.log(params);
   return params;
 }
 

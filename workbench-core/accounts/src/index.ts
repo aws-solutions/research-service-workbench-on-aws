@@ -4,6 +4,8 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import CreateProjectRequest from './models/createProjectRequest';
+import ListProjectsRequest from './models/listProjectsRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -18,5 +20,7 @@ export {
   AccountService,
   CostCenterService,
   ProjectService,
-  CreateAccountSchema
+  CreateAccountSchema,
+  CreateProjectRequest,
+  ListProjectsRequest
 };

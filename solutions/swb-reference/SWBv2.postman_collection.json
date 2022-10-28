@@ -817,7 +817,19 @@
             "url": {
               "raw": "{{API_URL}}/projects",
               "host": ["{{API_URL}}"],
-              "path": ["projects"]
+              "path": ["projects"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "eyJwayI6IkVUQyIsInNrIjoiRVQjNmM3MzJlMTEtODdmYi00MGU3LWFlM2ItMjU1MTY1OGQ3OGYwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
