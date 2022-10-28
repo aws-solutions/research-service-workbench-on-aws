@@ -74,7 +74,7 @@ Resources:
       cfn_nag:
         rules_to_suppress:
           - id: W5
-            reason: 'TODO: Ask kevin and tim about why can everyone do this'
+            reason: 'At this point, this is by design. Customers should only be using this with test data.'
           - id: W36
             reason: 'There is clearly a description provided. Not sure why CFN nag is not picking it up from properties.'
 
@@ -161,14 +161,13 @@ Resources:
               - sagemaker:DescribeNotebookInstance
               - sagemaker:StopNotebookInstance
             Resource: '*'
-    Metadata: 
+    Metadata:
       cfn_nag:
         rules_to_suppress:
           - id: W13
             reason: 'We allow the wildcard resource for sagemaker permissions since we do not know the sagemaker notebook instance identifier at the time of creation of this permisison boundary'
           - id: W28
             reason: We need the name to set the name so that we correctly create it on the main account
-
 
   IAMRole:
     Type: 'AWS::IAM::Role'
@@ -233,11 +232,11 @@ Resources:
               Resource:
                 - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/sagemaker/*
       PermissionsBoundary: !Ref InstanceRolePermissionBoundary
-    Metadata: 
-        cfn_nag:
-          rules_to_suppress:
-            - id: W28
-              reason: We need the name to set the name so that we correctly create it on the main account
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: We need the name to set the name so that we correctly create it on the main account
 
   # This policy is attached to the role after the instance is created
   # so that the instance can be referenced in the resource section
