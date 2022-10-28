@@ -934,10 +934,10 @@ Resources:
 
   GWLBServicePermissions:
     Type: AWS::EC2::VPCEndpointServicePermissions
-      Properties: 
-        AllowedPrincipals: 
-          - "*"
-        ServiceId: !GetAtt GWLBESerivceName.Data
+    Properties: 
+      AllowedPrincipals: 
+        - "*"
+      ServiceId: !Ref GWLBEService
 
 
 # ----------------------------------------------------------------------------------------------------------------------
