@@ -21,7 +21,7 @@ import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { EncryptionKeyWithRotation } from './constructs/encryotionKeyWithRotation';
+import { EncryptionKeyWithRotation } from './constructs/encryptionKeyWithRotation';
 import { SecureS3Bucket } from './constructs/secureS3Bucket';
 
 export class ExampleStack extends Stack {

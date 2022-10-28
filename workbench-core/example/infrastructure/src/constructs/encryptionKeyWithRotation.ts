@@ -9,14 +9,14 @@ import { AccountPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/a
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
-export interface EncriptionKeyWithRotationProps {
+export interface EncryptionKeyWithRotationProps {
   encryptionKeyOutputName: string;
 }
 
 export class EncryptionKeyWithRotation extends Construct {
   public key: Key;
 
-  public constructor(scope: Construct, id: string, props?: EncriptionKeyWithRotationProps) {
+  public constructor(scope: Construct, id: string, props?: EncryptionKeyWithRotationProps) {
     super(scope, id);
 
     const mainKeyPolicy = new PolicyDocument({
