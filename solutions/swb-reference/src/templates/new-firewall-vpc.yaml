@@ -367,7 +367,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCNATGWSubnetCIDRAZ1
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'NATGW-AZ1']]
@@ -390,7 +390,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCTGWSubnetCIDRAZ1
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'TGW-AZ1']]
@@ -413,7 +413,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCGWLBESubnetCIDRAZ1
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'GWLBE-AZ1']]
@@ -436,7 +436,7 @@ Resources:
     Properties:
       VpcId: !Ref SecurityVPC
       CidrBlock: !Ref SecurityVPCVMSeriesDataSubnetCIDRAZ1
-      AvailabilityZone: "us-east-1a"
+      AvailabilityZone: !Select [ 0, !GetAZs  '' ]
       Tags:
         - Key: Name
           Value: !Join ['-' , [!Ref "AWS::StackName", 'VMSeries-Data-AZ1']]
