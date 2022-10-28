@@ -12,7 +12,6 @@ A template to help a Network account set up VPCs, a firewall, and a Transit Gate
 
 This template was originally designed for use with Palo Alto Networks' VM Series firewall offering on AWS Marketplace. However, the template can be modified to leverage any firewall offering on AWS Marektplace that has an AMI.
 
-
 ### onboard-account-tgw.cfn.yaml
 A template to help hosting/member accounts integrate with the Network account. 
 
