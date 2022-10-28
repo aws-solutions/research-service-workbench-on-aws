@@ -7,3 +7,7 @@ allowedOrigins: ['http://localhost:3000']
 cognitoDomain: 'chamonix-dev-demo-domain'
 vpcId: ''
 subnetIds: []
+# TODO: once this branch in dev, provide appropriate values
+#hostZoneId: ''
+#domainName: ''
+#tlsCertificateId: ''
