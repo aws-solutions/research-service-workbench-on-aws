@@ -13,7 +13,7 @@ interface Setting {
   envType: string;
   runId: string;
   terminatedEnvId: string;
-  rootUsername: string;
+  rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
 
   // Main CFN template outputs
