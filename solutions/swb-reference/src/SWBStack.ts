@@ -18,6 +18,7 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -178,6 +179,13 @@ export class SWBStack extends Stack {
     });
 
     this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
+    const repository = new Repository(this, 'Repository', {
+      imageScanOnPush: true
+    });
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ECRRepositoryName', {
+      value: repository.repositoryName
+    });
   }
 
   private _createLoadBalancer(

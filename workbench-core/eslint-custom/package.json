@@ -35,7 +35,7 @@
     "eslint-plugin-security": "^1.4.0"
   },
   "devDependencies": {
-    "@rushstack/heft": "^0.48.7",
+    "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",
     "@rushstack/heft-node-rig": "^1.10.5",
     "@types/heft-jest": "1.0.2",

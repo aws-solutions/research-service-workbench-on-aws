@@ -26,6 +26,7 @@ function getConstants(): {
   RESPONSE_HEADERS_NAME: string;
   COGNITO_DOMAIN_NAME_OUTPUT_KEY: string;
   COGNITO_DOMAIN_NAME: string;
+  USE_CLOUD_FRONT: boolean;
 } {
   const config = getAPIOutputs();
   const STAGE = process.env.STAGE || '';
@@ -52,6 +53,8 @@ function getConstants(): {
   const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
 
+  const USE_CLOUD_FRONT = Boolean(config.useCloudFront);
+
   return {
     STAGE,
     API_BASE_URL,
@@ -71,7 +74,8 @@ function getConstants(): {
     RESPONSE_HEADERS_ARTIFACT_NAME,
     RESPONSE_HEADERS_NAME,
     COGNITO_DOMAIN_NAME_OUTPUT_KEY,
-    COGNITO_DOMAIN_NAME
+    COGNITO_DOMAIN_NAME,
+    USE_CLOUD_FRONT
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,6 +84,7 @@ function getAPIOutputs(): {
   apiUrlOutput: string;
   awsRegion: string;
   cognitoDomainName: string;
+  useCloudFront: boolean;
 } {
   try {
     if (process.env.SYNTH_REGION_SHORTNAME && process.env.SYNTH_REGION)
@@ -88,7 +93,8 @@ function getAPIOutputs(): {
         awsRegionShortName: process.env.SYNTH_REGION_SHORTNAME,
         apiUrlOutput: '',
         awsRegion: process.env.SYNTH_REGION,
-        cognitoDomainName: ''
+        cognitoDomainName: '',
+        useCloudFront: true
       };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,7 +117,8 @@ function getAPIOutputs(): {
       awsRegionShortName: outputs.awsRegionShortName,
       apiUrlOutput: outputs.apiUrlOutput,
       awsRegion: outputs.awsRegion,
-      cognitoDomainName: outputs.cognitoDomainName
+      cognitoDomainName: outputs.cognitoDomainName,
+      useCloudFront: Boolean(outputs.useCloudFront)
     };
   } catch {
     console.error(

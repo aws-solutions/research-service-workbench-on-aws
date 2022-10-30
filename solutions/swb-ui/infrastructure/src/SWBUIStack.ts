@@ -17,6 +17,8 @@ import {
   ViewerProtocolPolicy
 } from 'aws-cdk-lib/aws-cloudfront';
 import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+// import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
+// import { ECRDeployment, DockerImageName } from 'cdk-ecr-deployment';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
@@ -63,7 +65,8 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_ARTIFACT_NAME,
       RESPONSE_HEADERS_NAME,
       COGNITO_DOMAIN_NAME_OUTPUT_KEY,
-      COGNITO_DOMAIN_NAME
+      COGNITO_DOMAIN_NAME,
+      USE_CLOUD_FRONT
     } = getConstants();
     super(scope, STACK_NAME, {
       env: {
@@ -91,10 +94,13 @@ export class SWBUIStack extends Stack {
       COGNITO_DOMAIN_NAME
     };
     const bucket = this._createS3Bucket(S3_ARTIFACT_BUCKET_NAME, S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY);
-    const distribution = this._createDistribution(bucket);
-    this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    if (USE_CLOUD_FRONT) {
+      const distribution = this._createDistribution(bucket);
+      this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
+    } else {
+      createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_ARN_OUTPUT_KEY);
+    }
     this._addCognitoURLOutput();
-    createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_ARN_OUTPUT_KEY);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {

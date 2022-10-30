@@ -71,7 +71,7 @@
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
-    "@rushstack/heft": "^0.48.7",
+    "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",
     "@rushstack/heft-node-rig": "^1.10.5",
     "@types/aws-lambda": "^8.10.92",
