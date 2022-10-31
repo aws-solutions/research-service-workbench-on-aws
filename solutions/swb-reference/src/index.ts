@@ -10,7 +10,7 @@ import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { SWBStack } from './SWBStack';
 
 const app: cdk.App = new cdk.App();
-const stack = new SWBStack(app);
+const stack : SWBStack = new SWBStack(app);
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
 NagSuppressions.addStackSuppressions(stack, [
   {
