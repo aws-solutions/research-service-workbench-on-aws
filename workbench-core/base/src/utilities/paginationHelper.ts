@@ -22,7 +22,6 @@ export function addPaginationToken(
     }
   }
 
-  console.log(params);
   return params;
 }
 

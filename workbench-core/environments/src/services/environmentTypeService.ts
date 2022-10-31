@@ -4,13 +4,16 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
-
 import {
+  AwsService,
+  buildDynamoDBPkSk,
+  QueryParams,
+  resourceTypeToKey,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
   getPaginationToken
-} from '@aws/workbench-core-base/src/utilities/paginationHelper';
+} from '@aws/workbench-core-base';
+
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
