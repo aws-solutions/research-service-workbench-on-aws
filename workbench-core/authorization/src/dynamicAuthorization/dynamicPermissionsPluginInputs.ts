@@ -144,6 +144,11 @@ export interface IdentityPermission {
    */
   reason?: string;
 }
+
+export interface Identity {
+  identityType: IdentityType;
+  identityId: string;
+}
 /**
  * Request object for DynamicPermissionsPlugin's createIdentityPermissions
  */
@@ -276,7 +281,7 @@ export interface GetIdentityPermissionsBySubjectRequest {
   /**
    * Filter by identities
    */
-  identities?: { identityType: IdentityType; identityId: string }[];
+  identities?: Identity[];
 }
 
 /**

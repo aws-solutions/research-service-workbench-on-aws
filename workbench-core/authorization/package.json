@@ -28,7 +28,20 @@
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
   },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
+  },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.118.1",
+    "@aws-sdk/client-s3": "^3.118.1",
+    "@aws-sdk/types": "^3.110.0",
     "@aws-sdk/util-dynamodb": "^3.87.0",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
@@ -36,9 +49,6 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.118.1",
-    "@aws-sdk/client-s3": "^3.118.1",
-    "@aws-sdk/types": "^3.110.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
