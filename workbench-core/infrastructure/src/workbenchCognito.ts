@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Duration, SecretValue, Stack } from 'aws-cdk-lib';
+import { CfnResource, Duration, SecretValue, Stack } from 'aws-cdk-lib';
 import {
   AccountRecovery,
   Mfa,
@@ -110,6 +110,13 @@ export class WorkbenchCognito extends Construct {
     const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);
 
     this.userPool = new UserPool(this, 'WorkbenchUserPool', userPoolProps);
+    const metadatanode = this.userPool.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      /* eslint-disable-next-line @typescript-eslint/naming-convention */
+      rules_to_suppress: [{
+          id: 'F78',
+          reason: 'By design. MFA is unecessary for this test environment. However, we encourage users to update this to best suit their organization\'s needs.'
+      }]});
 
     this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
       userPool: this.userPool,
