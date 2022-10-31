@@ -2,11 +2,11 @@
 
 ## Prerequisites for development
 
-Code for [solution-spark-on-aws](https://github.com/awslabs/solution-spark-on-aws) is written in TypeScript. It is highly recommended you configure your IDE to render TypeScript errors and warnings. To make sure your IDE displays TS properly, see this [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
+Code for [solution-spark-on-aws](https://github.com/aws-solutions/solution-spark-on-aws) is written in TypeScript. It is highly recommended you configure your IDE to render TypeScript errors and warnings. To make sure your IDE displays TS properly, see this [guide to help](https://medium.com/@netczuk/even-faster-code-formatting-using-eslint-22b80d061461)
 
 This repository uses [Rush](https://rushjs.io/pages/intro/welcome/) as the monorepo manager and [pnpm](https://rushjs.io/pages/maintainer/package_managers/) as it's package manager. Please go through the [Developer tutorial](https://rushjs.io/pages/developer/new_developer/) for Rush usage details
 
-1. Clone the repo: `git clone https://github.com/awslabs/solution-spark-on-aws.git`
+1. Clone the repo: `git clone https://github.com/aws-solutions/solution-spark-on-aws.git`
 2. Move to the correct directory: `cd solution-spark-on-aws`
 3. Install rush: `npm install -g @microsoft/rush`
 4. Run [`rush update`](https://rushjs.io/pages/commands/rush_update/) - This ensures rush is set-up and ready to go, which includes installing NPM packages as defined in package.json files

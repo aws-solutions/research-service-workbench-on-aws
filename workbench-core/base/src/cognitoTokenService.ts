@@ -13,17 +13,26 @@ export default class CognitoTokenService {
     this._aws = new AwsService({ region: awsRegion });
   }
 
-  public async generateCognitoToken(
-    userPoolId: string,
-    clientId: string,
-    rootUsername: string,
-    rootPasswordParamStorePath?: string,
-    rootPassword?: string
-  ): Promise<{
+  public async generateCognitoToken(params: {
+    userPoolId: string;
+    clientId: string;
+    rootUserName?: string;
+    rootPassword?: string;
+    rootUserNameParamStorePath?: string;
+    rootPasswordParamStorePath?: string;
+  }): Promise<{
     accessToken: string;
     idToken: string;
     refreshToken: string;
   }> {
+    const {
+      userPoolId,
+      clientId,
+      rootUserName,
+      rootPassword,
+      rootUserNameParamStorePath,
+      rootPasswordParamStorePath
+    } = params;
     let password: string = rootPassword || '';
     if (rootPasswordParamStorePath && rootPassword) {
       throw new Error(
@@ -34,11 +43,21 @@ export default class CognitoTokenService {
     } else if (rootPasswordParamStorePath) {
       password = await this._getSSMParamValue(rootPasswordParamStorePath);
     }
+    let userName: string = rootUserName || '';
+    if (rootUserNameParamStorePath && rootUserName) {
+      throw new Error(
+        'Both "rootUserNameParamStorePath" and "rootUserName" are defined. Please pass in only one of the two parameters.'
+      );
+    } else if (rootUserNameParamStorePath === undefined && rootUserName === undefined) {
+      throw new Error('Either "rootUserNameParamStorePath" or "rootUserName" should be defined');
+    } else if (rootUserNameParamStorePath) {
+      userName = await this._getSSMParamValue(rootUserNameParamStorePath);
+    }
 
     const clientSecret = await this._getClientSecret(userPoolId, clientId);
     const secretHash = crypto
       .createHmac('SHA256', clientSecret)
-      .update(rootUsername + clientId)
+      .update(userName + clientId)
       .digest('base64');
 
     const response = await this._aws.clients.cognito.adminInitiateAuth({
@@ -46,7 +65,7 @@ export default class CognitoTokenService {
       ClientId: clientId,
       AuthFlow: 'ADMIN_NO_SRP_AUTH',
       AuthParameters: {
-        USERNAME: rootUsername,
+        USERNAME: userName,
         PASSWORD: password,
         SECRET_HASH: secretHash
       }

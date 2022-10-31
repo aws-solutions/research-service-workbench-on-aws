@@ -6,5 +6,5 @@ then
     exit 1
 else 
     echo $NEXT_PUBLIC_API_BASE_URL
-    NEXT_PUBLIC_API_BASE_URL=$apiURL next dev
+    NEXT_PUBLIC_API_BASE_URL=$apiURL rush build && next dev
 fi

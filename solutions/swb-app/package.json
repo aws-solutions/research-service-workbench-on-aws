@@ -2,10 +2,10 @@
   "name": "@aws/swb-app",
   "version": "0.1.2",
   "description": "This package sets up API routes for SWB",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -34,6 +34,7 @@
     "@aws/workbench-core-accounts": "workspace:*",
     "@aws/workbench-core-authentication": "workspace:*",
     "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",

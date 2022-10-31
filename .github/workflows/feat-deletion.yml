@@ -1,0 +1,32 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+# This workflow disables feat/* branch protection and deletes the branch after merge to develop
+name: "feat deletion"
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+
+jobs:
+  delete-feat-branch-on-merge:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'feat/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete feat/* branch protection after merge to develop
+        uses: octokit/request-action@v2.x
+        with:
+          route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          branch: ${{ github.head_ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: Delete feat/* branch after merge to develop
+        uses: dawidd6/action-delete-branch@v3
+        with:
+          github_token: ${{ github.token }}
+          branches: ${{ github.head_ref }}

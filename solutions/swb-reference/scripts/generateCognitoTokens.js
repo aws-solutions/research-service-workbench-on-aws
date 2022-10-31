@@ -30,8 +30,8 @@ try {
 const clientId = outputs.cognitoUserPoolClientId;
 const userPoolId = outputs.cognitoUserPoolId;
 const region = outputs.awsRegion;
-const username = process.argv[2];
-const password = process.argv[3];
+const rootUserName = process.argv[2];
+const rootPassword = process.argv[3];
 
 const csrf = new Csrf();
 const secret = csrf.secretSync();
@@ -40,13 +40,12 @@ const token = csrf.create(secret);
 async function run() {
   try {
     const cognitoTokenService = new CognitoTokenService(region);
-    const tokens = await cognitoTokenService.generateCognitoToken(
+    const tokens = await cognitoTokenService.generateCognitoToken({
       userPoolId,
       clientId,
-      username,
-      undefined,
-      password
-    );
+      rootUserName,
+      rootPassword
+    });
     console.log({
       ...tokens,
       csrfCookie: secret,

@@ -3,22 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  AdminAddUserToGroupCommand,
-  AdminCreateUserCommand,
-  AdminDeleteUserCommand,
-  AdminGetUserCommand,
-  AdminListGroupsForUserCommand,
-  AdminRemoveUserFromGroupCommand,
-  AdminUpdateUserAttributesCommand,
-  CognitoIdentityProviderClient,
-  CreateGroupCommand,
-  DeleteGroupCommand,
-  DeliveryMediumType,
-  ListGroupsCommand,
-  ListUsersCommand,
-  ListUsersInGroupCommand
-} from '@aws-sdk/client-cognito-identity-provider';
+import { DeliveryMediumType } from '@aws-sdk/client-cognito-identity-provider';
+import { AwsService } from '@aws/workbench-core-base';
 import { IdpUnavailableError } from '../errors/idpUnavailableError';
 import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
@@ -26,7 +12,7 @@ import { RoleAlreadyExistsError } from '../errors/roleAlreadyExistsError';
 import { RoleNotFoundError } from '../errors/roleNotFoundError';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
-import { User } from '../user';
+import { CreateUser, Status, User } from '../user';
 import { UserManagementPlugin } from '../userManagementPlugin';
 
 /**
@@ -34,26 +20,17 @@ import { UserManagementPlugin } from '../userManagementPlugin';
  */
 export class CognitoUserManagementPlugin implements UserManagementPlugin {
   private _userPoolId: string;
-
-  private _cognitoClient: CognitoIdentityProviderClient;
+  private _aws: AwsService;
 
   /**
    *
    * @param userPoolId - the user pool id to update with the plugin
+   * @param aws - a {@link AwsService} instance with permissions to perform Cognito actions
    */
-  public constructor(userPoolId: string) {
+  public constructor(userPoolId: string, aws: AwsService) {
     this._userPoolId = userPoolId;
 
-    // eslint-disable-next-line security/detect-unsafe-regex
-    const regionMatch = userPoolId.match(/^(?<region>(\w+-)?\w+-\w+-\d)+_\w+$/);
-
-    if (!regionMatch) {
-      throw new PluginConfigurationError('Invalid Cognito user pool id');
-    }
-
-    const region = regionMatch.groups!.region;
-
-    this._cognitoClient = new CognitoIdentityProviderClient({ region });
+    this._aws = aws;
   }
 
   /**
@@ -69,39 +46,38 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async getUser(uid: string): Promise<User> {
     try {
-      const { UserAttributes: userAttributes } = await this._cognitoClient.send(
-        new AdminGetUserCommand({
+      const { UserAttributes: userAttributes, Enabled: enabled } =
+        await this._aws.clients.cognito.adminGetUser({
           UserPoolId: this._userPoolId,
           Username: uid
-        })
-      );
+        });
 
-      const { Groups: groups } = await this._cognitoClient.send(
-        new AdminListGroupsForUserCommand({
-          UserPoolId: this._userPoolId,
-          Username: uid
-        })
-      );
+      const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
+        UserPoolId: this._userPoolId,
+        Username: uid
+      });
 
       return {
         uid,
         firstName: userAttributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
         lastName: userAttributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
         email: userAttributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
+        status: enabled ? Status.ACTIVE : Status.INACTIVE,
         roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
       };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to get user info');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -111,6 +87,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * Creates a new user with the given details. Roles need to be added with `addUserToRole()`.
    *
    * @param user - the user to create
+   * @returns the created {@link User}
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to add a user to a user pool
@@ -118,51 +95,57 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    */
-  public async createUser(user: Omit<User, 'roles'>): Promise<void> {
+  public async createUser(user: CreateUser): Promise<User> {
     try {
-      await this._cognitoClient.send(
-        new AdminCreateUserCommand({
-          UserPoolId: this._userPoolId,
-          Username: user.email,
-          UserAttributes: [
-            {
-              Name: 'given_name',
-              Value: user.firstName
-            },
-            {
-              Name: 'family_name',
-              Value: user.lastName
-            },
-            {
-              Name: 'email',
-              Value: user.email
-            },
-            {
-              Name: 'email_verified',
-              Value: 'true'
-            }
-          ],
-          DesiredDeliveryMediums: [DeliveryMediumType.EMAIL]
-        })
-      );
+      const { User: createdUser } = await this._aws.clients.cognito.adminCreateUser({
+        UserPoolId: this._userPoolId,
+        Username: user.email,
+        UserAttributes: [
+          {
+            Name: 'given_name',
+            Value: user.firstName
+          },
+          {
+            Name: 'family_name',
+            Value: user.lastName
+          },
+          {
+            Name: 'email',
+            Value: user.email
+          },
+          {
+            Name: 'email_verified',
+            Value: 'true'
+          }
+        ],
+        DesiredDeliveryMediums: [DeliveryMediumType.EMAIL]
+      });
+
+      // if the above call is successful all of the below values will be set
+      return {
+        uid: createdUser!.Username!,
+        firstName: createdUser!.Attributes!.find((attr) => attr.Name === 'given_name')!.Value!,
+        lastName: createdUser!.Attributes!.find((attr) => attr.Name === 'family_name')!.Value!,
+        email: createdUser!.Attributes!.find((attr) => attr.Name === 'email')!.Value!,
+        status: Status.ACTIVE,
+        roles: []
+      };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to create a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UsernameExistsException') {
-        if (error.message === 'An account with the email already exists.') {
-          throw new UserAlreadyExistsError('A user with this email already exists');
-        }
-        throw new UserAlreadyExistsError('A user with this user ID already exists');
+        throw new UserAlreadyExistsError(error.message);
       }
       if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid email');
+        throw new InvalidParameterError(error.message);
       }
       throw error;
     }
@@ -179,44 +162,44 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
+   * @throws {@link InvalidParameterError} if the email parameter is already in use by a different account
    */
-  public async updateUser(uid: string, user: Omit<User, 'uid' | 'roles'>): Promise<void> {
+  public async updateUser(uid: string, user: User): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new AdminUpdateUserAttributesCommand({
-          UserPoolId: this._userPoolId,
-          Username: uid,
-          UserAttributes: [
-            {
-              Name: 'given_name',
-              Value: user.firstName
-            },
-            {
-              Name: 'family_name',
-              Value: user.lastName
-            },
-            {
-              Name: 'email',
-              Value: user.email
-            }
-          ]
-        })
-      );
+      await this._aws.clients.cognito.adminUpdateUserAttributes({
+        UserPoolId: this._userPoolId,
+        Username: uid,
+        UserAttributes: [
+          {
+            Name: 'given_name',
+            Value: user.firstName
+          },
+          {
+            Name: 'family_name',
+            Value: user.lastName
+          },
+          {
+            Name: 'email',
+            Value: user.email
+          }
+        ]
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to update user info');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
-      if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid email');
+      if (error.name === 'AliasExistsException' || error.name === 'InvalidParameterException') {
+        throw new InvalidParameterError(error.message);
       }
       throw error;
     }
@@ -234,56 +217,144 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async deleteUser(uid: string): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new AdminDeleteUserCommand({
-          UserPoolId: this._userPoolId,
-          Username: uid
-        })
-      );
+      await this._aws.clients.cognito.adminDeleteUser({
+        UserPoolId: this._userPoolId,
+        Username: uid
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
   }
 
   /**
-   * Lists the user ids within the user pool.
+   * Activates an inactive user.
    *
-   * @returns an array containing the user ids within the user pool
+   * @param uid - the id of the user to activate
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dones't have permission to activate a user
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
+  public async activateUser(uid: string): Promise<void> {
+    try {
+      await this._aws.clients.cognito.adminEnableUser({
+        UserPoolId: this._userPoolId,
+        Username: uid
+      });
+    } catch (error) {
+      if (error.name === 'InternalErrorException') {
+        throw new IdpUnavailableError(error.message);
+      }
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'UserNotFoundException') {
+        throw new UserNotFoundError(error.message);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Deactivates an active user.
+   *
+   * @param uid - the id of the user to deactivate
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin dones't have permission to deactivate a user
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
+  public async deactivateUser(uid: string): Promise<void> {
+    try {
+      await this._aws.clients.cognito.adminDisableUser({
+        UserPoolId: this._userPoolId,
+        Username: uid
+      });
+    } catch (error) {
+      if (error.name === 'InternalErrorException') {
+        throw new IdpUnavailableError(error.message);
+      }
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'UserNotFoundException') {
+        throw new UserNotFoundError(error.message);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Lists the users within the user pool.
+   *
+   * @returns an array of {@link User}s
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    */
-  public async listUsers(): Promise<string[]> {
+  public async listUsers(): Promise<User[]> {
     try {
-      const { Users: users } = await this._cognitoClient.send(
-        new ListUsersCommand({
-          UserPoolId: this._userPoolId
+      const response = await this._aws.clients.cognito.listUsers({
+        UserPoolId: this._userPoolId
+      });
+
+      if (!response.Users) {
+        return [];
+      }
+
+      const users = await Promise.all(
+        response.Users.map(async (user) => {
+          const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
+            UserPoolId: this._userPoolId,
+            Username: user.Username
+          });
+
+          return {
+            uid: user.Username ?? '',
+            firstName: user.Attributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
+            lastName: user.Attributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
+            email: user.Attributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
+            status: user.Enabled ? Status.ACTIVE : Status.INACTIVE,
+            roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
+          };
         })
       );
 
-      return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
+      return users.filter((user) => user.uid);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the users in the user pool');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -302,26 +373,24 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async listUsersForRole(role: string): Promise<string[]> {
     try {
-      const { Users: users } = await this._cognitoClient.send(
-        new ListUsersInGroupCommand({
-          UserPoolId: this._userPoolId,
-          GroupName: role
-        })
-      );
+      const { Users: users } = await this._aws.clients.cognito.listUsersInGroup({
+        UserPoolId: this._userPoolId,
+        GroupName: role
+      });
 
       return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the users within a group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError('Role does not exist.');
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -338,22 +407,21 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async listRoles(): Promise<string[]> {
     try {
-      const { Groups: groups } = await this._cognitoClient.send(
-        new ListGroupsCommand({
-          UserPoolId: this._userPoolId
-        })
-      );
+      const { Groups: groups } = await this._aws.clients.cognito.listGroups({
+        UserPoolId: this._userPoolId
+      });
 
       return groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? [];
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the groups in the user pool');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -373,28 +441,26 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async addUserToRole(uid: string, role: string): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new AdminAddUserToGroupCommand({
-          UserPoolId: this._userPoolId,
-          Username: uid,
-          GroupName: role
-        })
-      );
+      await this._aws.clients.cognito.adminAddUserToGroup({
+        UserPoolId: this._userPoolId,
+        Username: uid,
+        GroupName: role
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to add a user to a user pool group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError('Role does not exist.');
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -414,30 +480,26 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async removeUserFromRole(uid: string, role: string): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new AdminRemoveUserFromGroupCommand({
-          UserPoolId: this._userPoolId,
-          Username: uid,
-          GroupName: role
-        })
-      );
+      await this._aws.clients.cognito.adminRemoveUserFromGroup({
+        UserPoolId: this._userPoolId,
+        Username: uid,
+        GroupName: role
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError(
-          'Plugin is not authorized to remove a user from a user pool group'
-        );
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError(error.message);
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -455,24 +517,23 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async createRole(role: string): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new CreateGroupCommand({
-          UserPoolId: this._userPoolId,
-          GroupName: role
-        })
-      );
+      await this._aws.clients.cognito.createGroup({
+        UserPoolId: this._userPoolId,
+        GroupName: role
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to create a user pool group');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'GroupExistsException') {
-        throw new RoleAlreadyExistsError('A group with this name already exists');
+        throw new RoleAlreadyExistsError(error.message);
       }
       throw error;
     }
@@ -490,24 +551,22 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    */
   public async deleteRole(role: string): Promise<void> {
     try {
-      await this._cognitoClient.send(
-        new DeleteGroupCommand({
-          UserPoolId: this._userPoolId,
-          GroupName: role
-        })
-      );
+      await this._aws.clients.cognito.deleteGroup({
+        UserPoolId: this._userPoolId,
+        GroupName: role
+      });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user pool group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError(error.message);
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }

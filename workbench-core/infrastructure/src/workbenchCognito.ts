@@ -23,7 +23,7 @@ import merge from 'lodash/merge';
 const userPoolDefaults: UserPoolProps = {
   accountRecovery: AccountRecovery.EMAIL_ONLY,
   enableSmsRole: false,
-  mfa: Mfa.OFF,
+  mfa: Mfa.OPTIONAL,
   selfSignUpEnabled: false, // only admin can create users
   signInAliases: {
     // only sign in with email
@@ -41,6 +41,10 @@ const userPoolDefaults: UserPoolProps = {
     email: {
       required: true
     }
+  },
+  mfaSecondFactor: {
+    sms: false,
+    otp: true
   }
 };
 
@@ -61,7 +65,7 @@ const userPoolClientDefaults: UserPoolClientOptions = {
   enableTokenRevocation: true,
   idTokenValidity: Duration.minutes(15),
   accessTokenValidity: Duration.minutes(15),
-  refreshTokenValidity: Duration.days(30)
+  refreshTokenValidity: Duration.days(7)
 };
 
 export interface WorkbenchCognitoProps {
@@ -71,6 +75,9 @@ export interface WorkbenchCognitoProps {
   userPoolClientName?: string;
   oidcIdentityProviders?: WorkbenchUserPoolOidcIdentityProvider[];
   accessTokenValidity?: Duration;
+  idTokenValidity?: Duration;
+  refreshTokenValidity?: Duration;
+  mfa?: Mfa;
 }
 
 export interface WorkbenchUserPoolOidcIdentityProvider
@@ -90,13 +97,19 @@ export class WorkbenchCognito extends Construct {
     const {
       domainPrefix,
       websiteUrls,
-      userPoolName,
       userPoolClientName,
       oidcIdentityProviders: oidcIdentityProviderProps
     } = props;
     super(scope, id);
 
-    this.userPool = new UserPool(this, 'WorkbenchUserPool', { ...userPoolDefaults, userPoolName });
+    const tempUserPoolProps: UserPoolProps = {
+      mfa: props.mfa,
+      userPoolName: props.userPoolName
+    };
+
+    const userPoolProps = merge(userPoolDefaults, tempUserPoolProps);
+
+    this.userPool = new UserPool(this, 'WorkbenchUserPool', userPoolProps);
 
     this.userPoolDomain = new UserPoolDomain(this, 'WorkbenchUserPoolDomain', {
       userPool: this.userPool,
@@ -116,14 +129,16 @@ export class WorkbenchCognito extends Construct {
       this.userPool.registerIdentityProvider(provider);
     });
 
-    const tempProps: UserPoolClientOptions = {
+    const tempUserPoolClientProps: UserPoolClientOptions = {
       oAuth: {
         callbackUrls: websiteUrls,
         logoutUrls: websiteUrls
       },
-      accessTokenValidity: props.accessTokenValidity
+      accessTokenValidity: props.accessTokenValidity,
+      idTokenValidity: props.idTokenValidity,
+      refreshTokenValidity: props.refreshTokenValidity
     };
-    const userPoolClientProps = merge(userPoolClientDefaults, tempProps);
+    const userPoolClientProps = merge(userPoolClientDefaults, tempUserPoolClientProps);
     this.userPoolClient = new UserPoolClient(this, 'WorkbenchUserPoolClient', {
       ...userPoolClientProps,
       userPool: this.userPool,

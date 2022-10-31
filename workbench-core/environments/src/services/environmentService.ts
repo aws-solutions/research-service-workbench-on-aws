@@ -7,10 +7,14 @@
 
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { AwsService, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
@@ -24,7 +28,6 @@ export interface Environment {
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
   status: EnvironmentStatus;
-  datasetIds: string[];
   provisionedProductId: string;
   envTypeConfigId: string;
   updatedAt: string;
@@ -57,7 +60,6 @@ const defaultEnv: Environment = {
   outputs: [],
   projectId: '',
   status: 'PENDING',
-  datasetIds: [],
   envTypeConfigId: '',
   updatedAt: '',
   updatedBy: '',
@@ -370,11 +372,12 @@ export class EnvironmentService {
     },
     user: AuthenticatedUser
   ): Promise<Environment> {
+    const environmentTypeConfigSK = `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`;
     const itemsToGet = [
       // ETC
       {
         pk: resourceTypeToKey.envTypeConfig,
-        sk: `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
+        sk: environmentTypeConfigSK
       },
       // PROJ
       this._buildPkSk(params.projectId, resourceTypeToKey.project),
@@ -387,7 +390,7 @@ export class EnvironmentService {
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
     const newEnv: Environment = {
-      id: uuidv4(),
+      id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,
@@ -396,7 +399,6 @@ export class EnvironmentService {
       name: params.name,
       outputs: params.outputs,
       projectId: params.projectId,
-      datasetIds: params.datasetIds,
       envTypeConfigId: params.envTypeConfigId,
       updatedAt: new Date().toISOString(),
       updatedBy: user.id,
@@ -404,18 +406,53 @@ export class EnvironmentService {
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
-      type: params.envTypeId,
+      type: environmentTypeConfigSK,
       dependency: params.projectId
     };
     // GET metadata
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let metadata: any[] = [];
-    if (batchGetResult.Responses![this._tableName].length !== itemsToGet.length) {
-      throw new Error('Unable to get metadata for all keys defined in environment');
+    interface MetaData {
+      id: string;
+      pk: string;
+      sk: string;
+      resourceType: string;
+      [key: string]: string;
     }
+    let metadata: MetaData[] = [];
     metadata = batchGetResult.Responses![this._tableName].map((item) => {
-      return item;
+      return item as unknown as MetaData;
     });
+
+    // Check all expected metadata exist
+    const envTypeConfig = metadata.find((item) => {
+      return item.resourceType === 'envTypeConfig';
+    });
+    // ETC
+    if (envTypeConfig === undefined) {
+      throw Boom.badRequest(
+        `envTypeId ${params.envTypeId} with envTypeConfigId ${params.envTypeConfigId} does not exist`
+      );
+    }
+    // PROJ
+    const project = metadata.find((item) => {
+      return item.resourceType === 'project';
+    });
+    if (project === undefined) {
+      throw Boom.badRequest(`projectId ${params.projectId} does not exist`);
+    }
+    // DATASET
+    const datasets = metadata.filter((item) => {
+      return item.resourceType === 'dataset';
+    });
+    const validDatasetIds = datasets.map((dataset) => {
+      return dataset.id;
+    });
+    const dsIdsNotFound = params.datasetIds.filter((id) => {
+      return !validDatasetIds.includes(id);
+    });
+    if (dsIdsNotFound.length > 0) {
+      throw Boom.badRequest(`datasetIds ${dsIdsNotFound} do not exist`);
+    }
 
     // WRITE metadata to DDB
     const items: { [key: string]: unknown }[] = [];
@@ -429,10 +466,6 @@ export class EnvironmentService {
       return { pk, sk };
     };
 
-    //add envTypeConfig
-    const envTypeConfig = metadata.find((item) => {
-      return item.resourceType === 'envTypeConfig';
-    });
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.envTypeConfig, newEnv.envTypeConfigId),
       id: newEnv.envTypeConfigId,
@@ -442,10 +475,6 @@ export class EnvironmentService {
       params: envTypeConfig.params
     });
 
-    //add project
-    const project = metadata.find((item) => {
-      return item.resourceType === 'project';
-    });
     items.push({
       ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.project, newEnv.projectId),
       id: newEnv.projectId,
@@ -460,10 +489,6 @@ export class EnvironmentService {
       awsAccountId: project.awsAccountId
     });
 
-    //add dataset
-    const datasets = metadata.filter((item) => {
-      return item.resourceType === 'dataset';
-    });
     datasets.forEach((dataset) => {
       items.push({
         ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.dataset, dataset.id),

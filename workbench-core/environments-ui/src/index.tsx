@@ -6,7 +6,4 @@
 import EnvironmentsPage from './pages/environments/index';
 import NewEnvironmentPage from './pages/environments/new';
 
-
-export {
-  EnvironmentsPage, NewEnvironmentPage
-};
+export { EnvironmentsPage, NewEnvironmentPage };

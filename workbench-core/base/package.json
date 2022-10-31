@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-base",
   "version": "0.1.2",
   "description": "Package to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -59,7 +59,8 @@
     "@aws-sdk/util-dynamodb": "^3.87.0",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-sdk-client-mock": "^0.6.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -72,6 +73,7 @@
     "@types/js-yaml": "^4.0.5",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
+    "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "eslint-plugin-import": "^2.26.0",
