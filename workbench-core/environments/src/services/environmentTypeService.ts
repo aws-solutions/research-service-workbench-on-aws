@@ -95,6 +95,7 @@ export default class EnvironmentTypeService {
     envTypeId: string,
     updatedValues: { [key: string]: string }
   ): Promise<EnvironmentType> {
+    let environmentType: EnvironmentType | undefined = undefined;
     const attributesAllowedToUpdate = ['description', 'name', 'status'];
     const attributesNotAllowed = Object.keys(updatedValues).filter((key) => {
       return !attributesAllowedToUpdate.includes(key);
@@ -103,14 +104,14 @@ export default class EnvironmentTypeService {
       throw Boom.badRequest(`We do not support updating these attributes ${attributesNotAllowed}`);
     }
     try {
-      await this.getEnvironmentType(envTypeId);
+      environmentType = await this.getEnvironmentType(envTypeId);
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.notFound(`Could not find environment type ${envTypeId} to update`);
       }
       throw e;
     }
-
+    await this._validateStatusChange(updatedValues, environmentType);
     const currentDate = new Date().toISOString();
     const updatedEnvType = {
       ...updatedValues,
@@ -174,5 +175,31 @@ export default class EnvironmentTypeService {
     }
     console.error('Unable to create environment type', newEnvType);
     throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
+  }
+  private async _validateStatusChange(
+    updatedValues: { [key: string]: string },
+    environmentType?: EnvironmentType
+  ): Promise<void> {
+    if (
+      Object.entries(updatedValues).filter(([key, value]) => key === 'status' && value === 'NOT_APPROVED')
+        .length > 0 &&
+      environmentType?.status === 'APPROVED'
+    ) {
+      const etcQueryParams: QueryParams = {
+        key: { name: 'resourceType', value: 'envTypeConfig' },
+        index: 'getResourceByDependency',
+        sortKey: 'dependency',
+        eq: { S: environmentType.id },
+        limit: DEFAULT_API_PAGE_SIZE
+      };
+      const dependencies = await this._aws.helpers.ddb.query(etcQueryParams).execute();
+      if (dependencies?.Items?.length) {
+        const errorMessage = `Unable to update environment type: ${
+          environmentType.id
+        }  with params: ${JSON.stringify(updatedValues)}, Environment Type has active configurations`;
+        console.error(errorMessage);
+        throw Boom.internal(errorMessage);
+      }
+    }
   }
 }

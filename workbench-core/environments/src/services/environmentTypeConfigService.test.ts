@@ -96,34 +96,25 @@ describe('environmentTypeConfigService', () => {
         Items: [marshall(envTypeConfig)],
         $metadata: {}
       };
-
-      const params = {
+      const envTypeFilterParams = {
         TableName: TABLE_NAME,
-        KeyConditionExpression: '#pk = :pk AND begins_with ( #sk, :sk )',
+        IndexName: 'getResourceByDependency',
+        KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
         ExpressionAttributeNames: {
-          '#pk': 'pk',
-          '#sk': 'sk'
+          '#resourceType': 'resourceType',
+          '#dependency': 'dependency'
         },
         ExpressionAttributeValues: {
-          ':pk': {
-            S: 'ETC'
+          ':resourceType': {
+            S: 'envTypeConfig'
           },
-          ':sk': {
-            S: `ET#${envTypeId}`
-          }
-        },
-        ExclusiveStartKey: {
-          pk: {
-            S: 'ETC'
-          },
-          sk: {
-            S: `ET#${envTypeId}ETC#${envTypeConfigId}`
+          ':dependency': {
+            S: envTypeId
           }
         },
         Limit: 1
       };
-
-      ddbMock.on(QueryCommand, params).resolves(queryItemResponse);
+      ddbMock.on(QueryCommand, envTypeFilterParams).resolves(queryItemResponse);
       const validPaginationToken =
         'eyJwayI6IkVUQyIsInNrIjoiRVQjMWIwNTAyZjMtMTIxZi00ZDYzLWIwM2EtNDRkYzc1NmU0YzIwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9';
 

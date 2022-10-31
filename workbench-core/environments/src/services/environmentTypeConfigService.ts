@@ -81,9 +81,10 @@ export default class EnvironmentTypeConfigService {
     paginationToken?: string
   ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }> {
     let queryParams: QueryParams = {
-      key: { name: 'pk', value: resourceTypeToKey.envTypeConfig },
-      sortKey: 'sk',
-      begins: { S: `${resourceTypeToKey.envType}#${envTypeId}` },
+      key: { name: 'resourceType', value: this._resourceType },
+      index: 'getResourceByDependency',
+      sortKey: 'dependency',
+      eq: { S: envTypeId },
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
     queryParams = addPaginationToken(paginationToken, queryParams);

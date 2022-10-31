@@ -144,7 +144,7 @@ export const routesMap: RoutesMap = {
         subject: 'EnvironmentType'
       }
     ],
-    PUT: [
+    PATCH: [
       {
         action: 'UPDATE',
         subject: 'EnvironmentType'

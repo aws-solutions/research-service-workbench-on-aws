@@ -16,6 +16,7 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { debounce } from 'lodash';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 
@@ -47,6 +48,50 @@ describe('environmentTypeService', () => {
     pk: `ET#${envTypeId}`,
     productId: 'prod-dwqdqdqdwq2e3',
     type: 'sagemaker'
+  };
+  const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
+  const envTypeConfig = {
+    createdAt: '2022-06-17T16:28:40.360Z',
+    updatedBy: 'owner-123',
+    createdBy: 'owner-123',
+    name: 'config 1',
+    allowRoleIds: [],
+    resourceType: 'envTypeConfig',
+    // provisioningArtifactId: 'pa-dewjn123',
+    params: [],
+    updatedAt: '2022-06-17T21:25:24.333Z',
+    sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+    owner: 'owner-123',
+    description: 'Example config 1',
+    id: envTypeConfigId,
+    pk: 'ETC',
+    // productId: 'prod-dasjk123',
+    type: 'sagemaker'
+  };
+  const listEnvTypeConfigCommandParams = {
+    TableName: TABLE_NAME,
+    IndexName: 'getResourceByDependency',
+    KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
+    ExpressionAttributeNames: {
+      '#resourceType': 'resourceType',
+      '#dependency': 'dependency'
+    },
+    ExpressionAttributeValues: {
+      ':resourceType': {
+        S: 'envTypeConfig'
+      },
+      ':dependency': {
+        S: envTypeId
+      }
+    },
+    Limit: 50
+  };
+  const getEnvTypeCommandParams = {
+    TableName: TABLE_NAME,
+    Key: marshall({
+      pk: `${resourceTypeToKey.envType}#${envTypeId}`,
+      sk: `${resourceTypeToKey.envType}#${envTypeId}`
+    })
   };
   describe('getEnvironmentType', () => {
     test('valid id', async () => {
@@ -274,15 +319,12 @@ describe('environmentTypeService', () => {
         Item: marshall(envType),
         $metadata: {}
       };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: TABLE_NAME,
-          Key: marshall({
-            pk: `${resourceTypeToKey.envType}#${envTypeId}`,
-            sk: `${resourceTypeToKey.envType}#${envTypeId}`
-          })
-        })
-        .resolves(getItemResponse);
+      const configsItemResponse: QueryCommandOutput = {
+        Items: [],
+        $metadata: {}
+      };
+      ddbMock.on(GetItemCommand, getEnvTypeCommandParams).resolves(getItemResponse);
+      ddbMock.on(QueryCommand, listEnvTypeConfigCommandParams).resolves(configsItemResponse);
       ddbMock
         .on(UpdateItemCommand)
         //@ts-ignore
@@ -319,6 +361,25 @@ describe('environmentTypeService', () => {
           provisioningArtifactId: 'pa-ehksiu2735sha'
         })
       ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
+    });
+    test('should throw exception when revoking environment type with dependencies', async () => {
+      // BUILD & OPERATE & CHECK
+      const getEnvTypeItemResponse: GetItemCommandOutput = {
+        Item: marshall(envType),
+        $metadata: {}
+      };
+      const configsItemResponse: QueryCommandOutput = {
+        Items: [marshall(envTypeConfig)],
+        $metadata: {}
+      };
+      ddbMock.on(GetItemCommand, getEnvTypeCommandParams).resolves(getEnvTypeItemResponse);
+      ddbMock.on(QueryCommand, listEnvTypeConfigCommandParams).resolves(configsItemResponse);
+      const updateBody = { status: 'NOT_APPROVED' };
+      await expect(envTypeService.updateEnvironmentType('owner-123', envTypeId, updateBody)).rejects.toThrow(
+        `Unable to update environment type: ${envTypeId}  with params: ${JSON.stringify(
+          updateBody
+        )}, Environment Type has active configurations`
+      );
     });
   });
 

@@ -533,7 +533,7 @@
         {
           "name": "Update envType",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
