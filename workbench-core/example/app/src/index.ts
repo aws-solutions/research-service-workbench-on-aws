@@ -3,4 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export * from './routes/default';
+import { generateRouter } from './generateRouter';
+
+export { generateRouter };
