@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "refactored common DDB code",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

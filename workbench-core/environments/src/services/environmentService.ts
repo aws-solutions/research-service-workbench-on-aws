@@ -13,12 +13,14 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefix,
   buildDynamoDBPkSk,
-  buildDynamoDbKey
+  buildDynamoDbKey,
+  DEFAULT_API_PAGE_SIZE,
+  addPaginationToken,
+  getPaginationToken
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
-import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export interface Environment {
   id: string | undefined;

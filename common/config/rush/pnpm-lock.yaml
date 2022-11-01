@@ -805,6 +805,7 @@ importers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
@@ -850,6 +851,7 @@ importers:
       '@aws-sdk/util-dynamodb': 3.105.0
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-logging': link:../logging
+      '@hapi/boom': 10.0.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
       lodash: 4.17.21
       uuid: 8.3.2
@@ -9929,7 +9931,7 @@ packages:
       eslint-plugin-jsx-a11y: 6.5.1_eslint@8.16.0
       eslint-plugin-react: 7.29.1_eslint@8.16.0
       eslint-plugin-react-hooks: 4.3.0_eslint@8.16.0
-      next: 12.1.6_fe3859d3c8c94a7c7e52ff5ea4f038fc
+      next: 12.1.6_757e1cdb914f1581201e1269321c5a94
       typescript: 4.7.2
     transitivePeerDependencies:
       - supports-color
