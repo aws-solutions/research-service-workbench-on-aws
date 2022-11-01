@@ -167,8 +167,21 @@ export class WorkbenchCognito extends Construct {
       },
       policy: AwsCustomResourcePolicy.fromSdkCalls({
         resources: [this.userPool.userPoolArn]
-      })
+      }),
     });
+
+    //const lambdaMetadataNode = describeCognitoUserPoolClient.node.findChild('Provider').node.defaultChild as CfnResource;
+    /*
+    
+    lambdaMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'princess',
+          reason: 'TODO: potato'
+        },
+      ]
+    });*/
 
     const userPoolClientSecret = describeCognitoUserPoolClient.getResponseField(
       'UserPoolClient.ClientSecret'
