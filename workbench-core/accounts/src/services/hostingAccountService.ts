@@ -12,7 +12,9 @@ import HostingAccountLifecycleService, {
 
 export default class HostingAccountService {
   public async list(): Promise<ListAccountsResponse> {
-    return await new HostingAccountLifecycleService().listAccounts();
+    const pageSize = 20;
+    const paginationToken = '';
+    return await new HostingAccountLifecycleService().listAccounts(pageSize, paginationToken);
   }
 
   public async get(accountId: string): Promise<Account> {

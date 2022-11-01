@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "updated List Projects logic",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

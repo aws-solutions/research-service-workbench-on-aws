@@ -249,7 +249,10 @@ describe('AccountService', () => {
     mockDDB.on(QueryCommand).resolves({});
 
     // OPERATE
-    const response = await accountService.getAccounts();
+    const response = await accountService.getAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     // CHECK
     expect(response).toEqual([]);
@@ -283,7 +286,10 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.getAccounts();
+    const response = await accountService.getAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     // CHECK
     expect(response).toEqual(expectedList);

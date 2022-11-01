@@ -8,7 +8,12 @@ import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
-import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
+import {
+  addPaginationToken,
+  AwsService,
+  DEFAULT_API_PAGE_SIZE,
+  IamRoleCloneService
+} from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -51,11 +56,11 @@ export default class HostingAccountLifecycleService {
     this._accountService = new AccountService(ddbTableName);
   }
 
-  public async listAccounts(pageSize: number, paginationToken: number): Promise<ListAccountsResponse> {
+  public async listAccounts(pageSize: number, paginationToken: string): Promise<ListAccountsResponse> {
     const queryParams = addPaginationToken(paginationToken, {
       index: 'getResourceByName',
       key: { name: 'resourceType', value: 'account' },
-      limit: pageSize
+      limit: pageSize || DEFAULT_API_PAGE_SIZE
     });
 
     const accounts = await this._accountService.getAccounts(queryParams);
