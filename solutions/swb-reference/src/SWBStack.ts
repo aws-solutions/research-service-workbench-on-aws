@@ -8,7 +8,7 @@
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -32,6 +32,7 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+// import IConstruct from 'constructs';
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
@@ -247,7 +248,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates the product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
@@ -753,6 +754,14 @@ export class SWBStack extends Stack {
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
       }
     });
+
+    const metadatanode = API.latestDeployment?.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [{
+          id: 'W68',
+          reason: 'placeholder2'
+      }]}); 
 
     new CfnOutput(this, 'apiUrlOutput', {
       value: API.url
