@@ -23,6 +23,7 @@ import _ from 'lodash';
 import CostCenter from '../models/costCenter';
 import CreateProjectRequest from '../models/createProjectRequest';
 import ListProjectsRequest from '../models/listProjectsRequest';
+import ListProjectsResponse from '../models/listProjectsResponse';
 import Project from '../models/project';
 import CostCenterService from './costCenterService';
 
@@ -75,14 +76,11 @@ export default class ProjectService {
    * @returns Project entries in DDB
    */
   // TODO--add filter support
-  public async listProjects(
-    user: AuthenticatedUser,
-    request?: ListProjectsRequest
-  ): Promise<{ data: Project[]; paginationToken: string | undefined }> {
-    const pageSize = request ? request.pageSize : undefined;
-    let paginationToken = request ? request.paginationToken : undefined;
+  public async listProjects(request: ListProjectsRequest): Promise<ListProjectsResponse> {
+    const pageSize = request.pageSize;
+    let paginationToken = request.paginationToken;
     // Get user groups--TODO implement after dynamic AuthZ
-    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(user.id);
+    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
     const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
 
     // If no group membership, return
@@ -105,17 +103,16 @@ export default class ProjectService {
 
         paginationToken = getPaginationToken(projectsResponse);
 
-        return Promise.resolve({
+        return {
           data: projectsResponse.Items as unknown as Project[],
           paginationToken: paginationToken
-        });
+        };
       }
+
       // If member of 1 group, get project item
-      if (userGroupsForCurrentUser[0] !== 'ITAdmin') {
-        const projectId = userGroupsForCurrentUser[0].split('#')[0];
-        const project = await this.getProject(projectId);
-        return Promise.resolve({ data: [project], paginationToken: undefined });
-      }
+      const projectId = userGroupsForCurrentUser[0].split('#')[0];
+      const project = await this.getProject(projectId);
+      return { data: [project], paginationToken: undefined };
     }
 
     // Else, member of more than 1 group, query for project items with pagination
@@ -195,10 +192,10 @@ export default class ProjectService {
       }
     }
 
-    return Promise.resolve({
+    return {
       data: projects,
       paginationToken: paginationToken
-    });
+    };
   }
 
   /**

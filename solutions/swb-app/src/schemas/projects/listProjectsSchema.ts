@@ -10,11 +10,12 @@ const ListProjectsSchema: Schema = {
   id: '/listProjects',
   type: 'object',
   properties: {
+    user: { type: 'AuthenticatedUser' },
     pageSize: { type: 'number' },
     paginationToken: { type: 'string' }
   },
   additionalProperties: false,
-  required: []
+  required: ['user']
 };
 
 export default ListProjectsSchema;

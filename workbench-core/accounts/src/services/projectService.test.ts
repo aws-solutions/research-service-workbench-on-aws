@@ -97,7 +97,7 @@ describe('ProjectService', () => {
       jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => []);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user);
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse).toEqual({ data: [] });
@@ -139,7 +139,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user);
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -190,7 +190,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -241,7 +241,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -276,7 +276,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user);
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse.data).toEqual(items);
@@ -326,7 +326,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -383,7 +383,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -467,7 +467,7 @@ describe('ProjectService', () => {
         .resolvesOnce(queryItemResponse2);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -553,7 +553,7 @@ describe('ProjectService', () => {
         .resolvesOnce(queryItemResponse2);
 
       // OPERATE
-      const actualResponse = await projService.listProjects(user, { pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
