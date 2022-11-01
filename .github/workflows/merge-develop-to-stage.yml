@@ -52,14 +52,11 @@ jobs:
 
   # deploy-example:
   #   needs: [pre-deployment-check]
-  #   uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
+  #   uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
   #   secrets:
-  #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
-  #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
-  #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-  #     cognito-username: "${{ secrets.COGNITO_USERNAME }}"
-  #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
-  #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
+  #     aws-test-region: ${{ secrets.AWS_TEST_REGION }}
+  #     test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
+  #     aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
 
   merge-develop-to-stage:
     name: Merge develop to stage

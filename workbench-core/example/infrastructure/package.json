@@ -30,7 +30,6 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
-    "test:integration": "heft test -u --clean --no-build",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {
