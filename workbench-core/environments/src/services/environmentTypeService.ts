@@ -194,11 +194,9 @@ export default class EnvironmentTypeService {
       };
       const dependencies = await this._aws.helpers.ddb.query(etcQueryParams).execute();
       if (dependencies?.Items?.length) {
-        const errorMessage = `Unable to update environment type: ${
-          environmentType.id
-        }  with params: ${JSON.stringify(updatedValues)}, Environment Type has active configurations`;
+        const errorMessage = `Unable to reovke environment type: ${environmentType.id}, Environment Type has active configurations`;
         console.error(errorMessage);
-        throw Boom.internal(errorMessage);
+        throw Boom.conflict(errorMessage);
       }
     }
   }

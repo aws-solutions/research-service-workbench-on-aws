@@ -376,9 +376,7 @@ describe('environmentTypeService', () => {
       ddbMock.on(QueryCommand, listEnvTypeConfigCommandParams).resolves(configsItemResponse);
       const updateBody = { status: 'NOT_APPROVED' };
       await expect(envTypeService.updateEnvironmentType('owner-123', envTypeId, updateBody)).rejects.toThrow(
-        `Unable to update environment type: ${envTypeId}  with params: ${JSON.stringify(
-          updateBody
-        )}, Environment Type has active configurations`
+        `Unable to reovke environment type: ${envTypeId}, Environment Type has active configurations`
       );
     });
   });
