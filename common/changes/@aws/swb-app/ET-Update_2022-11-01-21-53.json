@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Replace PUT http verb by PATCH for Environment Type route",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

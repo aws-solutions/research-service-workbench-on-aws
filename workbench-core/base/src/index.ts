@@ -6,7 +6,7 @@
 import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { CFNTemplate, CFNTemplateParameters } from './aws/helpers/cloudFormationTemplate';
-import { buildDynamoDbKey, buildDynamoDBPkSk } from './aws/helpers/dynamoDB/ddbUtil';
+import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
 import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
@@ -38,6 +38,7 @@ export {
   IamRoleCloneService,
   buildDynamoDbKey,
   buildDynamoDBPkSk,
+  removeDynamoDbKeys,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
   uuidRegExp,

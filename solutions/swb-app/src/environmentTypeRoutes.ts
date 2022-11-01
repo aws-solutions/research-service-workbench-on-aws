@@ -66,7 +66,7 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   );
 
   // Update envTypes
-  router.put(
+  router.patch(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateEnvironmentTypeSchema));
