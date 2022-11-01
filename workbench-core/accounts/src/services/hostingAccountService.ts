@@ -4,12 +4,17 @@
  */
 
 import Account from '../models/account';
+import ListAccountsResponse from '../models/listAccountsResponse';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
+  public async list(): Promise<ListAccountsResponse> {
+    return await new HostingAccountLifecycleService().listAccounts();
+  }
+
   public async get(accountId: string): Promise<Account> {
     return await new HostingAccountLifecycleService().getAccount(accountId, true);
   }

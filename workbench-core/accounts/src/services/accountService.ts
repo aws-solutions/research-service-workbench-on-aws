@@ -4,7 +4,12 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
@@ -37,11 +42,7 @@ export default class AccountService {
    *
    * @returns Account entries in DDB
    */
-  public async getAccounts(): Promise<Account[]> {
-    const queryParams = {
-      index: 'getResourceByCreatedAt',
-      key: { name: 'resourceType', value: 'account' }
-    };
+  public async getAccounts(queryParams: QueryParams): Promise<Account[]> {
     const response = await this._aws.helpers.ddb.query(queryParams).execute();
     let accounts: Account[] = [];
     if (response && response.Items) {

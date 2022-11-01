@@ -14,6 +14,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import Account from '../models/account';
+import ListAccountsResponse from '../models/listAccountsResponse';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -48,6 +49,21 @@ export default class HostingAccountLifecycleService {
     const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
     this._accountService = new AccountService(ddbTableName);
+  }
+
+  public async listAccounts(pageSize: number, paginationToken: number): Promise<ListAccountsResponse> {
+    const queryParams = addPaginationToken(paginationToken, {
+      index: 'getResourceByName',
+      key: { name: 'resourceType', value: 'account' },
+      limit: pageSize
+    });
+
+    const accounts = await this._accountService.getAccounts(queryParams);
+
+    return {
+      data: accounts,
+      paginationToken: ''
+    };
   }
 
   public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {

@@ -118,7 +118,7 @@ describe('CostCenterService', () => {
 
   describe('create', () => {
     describe('with a valid CreateCostCenter object', () => {
-      const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+      let accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
       const createCostCenter: CreateCostCenter = {
         name: 'the name',
         description: 'the description',
@@ -132,7 +132,7 @@ describe('CostCenterService', () => {
               removeUndefinedValues: true
             })
           });
-
+          accountId = 'whatever';
           ddbMock.on(UpdateItemCommand).resolves({});
         });
 
