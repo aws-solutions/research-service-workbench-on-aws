@@ -629,7 +629,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject({ user: user, projectId: 'proj-123' });
+      const actualResponse = await projService.getProject({ user, projectId: 'proj-123' });
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -652,7 +652,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject({ user: user, projectId: 'proj-123' })).rejects.toThrow(
+      await expect(projService.getProject({ user, projectId: 'proj-123' })).rejects.toThrow(
         'Could not find project proj-123'
       );
     });
