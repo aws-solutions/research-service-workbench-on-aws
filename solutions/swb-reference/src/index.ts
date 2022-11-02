@@ -12,20 +12,7 @@ import { SWBStack } from './SWBStack';
 const app: cdk.App = new cdk.App();
 const stack : SWBStack = new SWBStack(app);
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
-
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const all_descendants = [];
-    //const lambdaMetadataNode = describeCognitoUserPoolClient.node.findChild('Provider').node.defaultChild as CfnResource;
-    const childs = stack.node.findAll(0);
-    for (const c of childs) {
-      const innerobj = {
-        id: c.node.id,
-        reason: c.node.path
-      }
-      all_descendants.push(innerobj);
-    }
   
-NagSuppressions.addStackSuppressions(stack, all_descendants);
 NagSuppressions.addStackSuppressions(stack, [
   {
     id: 'AwsSolutions-COG1',
