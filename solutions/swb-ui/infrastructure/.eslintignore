@@ -4,4 +4,4 @@ lib
 temp
 cdk.out
 build
-#redirectFunction.js
+src/redirectFunction.js
