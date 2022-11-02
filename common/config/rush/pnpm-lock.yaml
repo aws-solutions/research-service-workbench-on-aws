@@ -424,6 +424,7 @@ importers:
       '@types/prettier': 2.6.3
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.29.1
+      cdk-nag: ^2.12.25
       constructs: ^10.0.0
       jest: ^27.5.1
       js-yaml: ^4.1.0
@@ -446,6 +447,7 @@ importers:
       '@types/prettier': 2.6.3
       aws-cdk: 2.26.0
       aws-cdk-lib: 2.29.1_constructs@10.1.25
+      cdk-nag: 2.14.26_8d994d7bf27edab84c843ce1928354a1
       constructs: 10.1.25
       jest: 27.5.1_ts-node@10.8.0
       license-check-and-add: 4.0.5

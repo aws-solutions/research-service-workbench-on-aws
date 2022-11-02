@@ -7,12 +7,13 @@
 
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { SWBUIStack } from './SWBUIStack';
 
 // eslint-disable-next-line @rushstack/typedef-var
 const app = new cdk.App();
 // eslint-disable-next-line no-new
-new SWBUIStack(app, 'SWBUIStack', {
+const stack = new SWBUIStack(app, 'SWBUIStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -24,3 +25,5 @@ new SWBUIStack(app, 'SWBUIStack', {
   // env: { account: '123456789012', region: 'us-east-1' },
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
