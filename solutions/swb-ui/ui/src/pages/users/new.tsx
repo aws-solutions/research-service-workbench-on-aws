@@ -3,7 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { emailRegex, nameRegex, addUserToRole, createUser, CreateUserForm, CreateUserFormValidation, BaseLayout } from '@aws/workbench-core-swb-common-ui';
+import {
+  emailRegex,
+  nameRegex,
+  addUserToRole,
+  createUser,
+  CreateUserForm,
+  CreateUserFormValidation,
+  BaseLayout
+} from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
   BreadcrumbGroupProps,
