@@ -161,15 +161,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO: Lambda functions require permission to write CloudWatch Logs'
+          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         },
         {
           id: 'W89',
-          reason: 'TODO: Lambda functions should be deployed inside a VPC'
+          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         },
         {
           id: 'W92',
-          reason: 'TODO: ambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         }
       ]
     })
