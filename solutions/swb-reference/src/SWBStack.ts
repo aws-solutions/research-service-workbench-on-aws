@@ -32,7 +32,6 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
-import ConstructOrder from 'constructs';
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
