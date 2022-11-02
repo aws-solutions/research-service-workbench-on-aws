@@ -37,7 +37,9 @@ function getConstants(): {
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_DNS_OUTPUT_KEY: string;
   VPC_ID: string;
-  SUBNET_IDS: string[];
+  ALB_SUBNET_IDS: string[];
+  ECS_SUBNET_IDS: string[];
+  ALB_INTERNET_FACING: boolean;
   HOST_ZONE_ID: string;
   DOMAIN_NAME: string;
   CERTIFICATE_ID: string;
@@ -69,7 +71,9 @@ function getConstants(): {
   const CLIENT_ID = config.clientId;
   const CLIENT_SECRET = config.clientSecret;
   const VPC_ID = config.vpcId;
-  const SUBNET_IDS = config.subnetIds;
+  const ALB_SUBNET_IDS = config.albSubnetIds;
+  const ECS_SUBNET_IDS = config.ecsSubnetIds;
+  const ALB_INTERNET_FACING = config.albInternetFacing;
 
   const HOST_ZONE_ID = config.hostZoneId;
   const DOMAIN_NAME = config.domainName;
@@ -118,7 +122,9 @@ function getConstants(): {
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
     VPC_ID,
-    SUBNET_IDS,
+    ALB_SUBNET_IDS,
+    ECS_SUBNET_IDS,
+    ALB_INTERNET_FACING,
     HOST_ZONE_ID,
     DOMAIN_NAME,
     CERTIFICATE_ID

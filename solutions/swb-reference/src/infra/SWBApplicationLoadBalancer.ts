@@ -23,7 +23,7 @@ export class SWBApplicationLoadBalancer extends Construct {
     this.applicationLoadBalancer = new ApplicationLoadBalancer(this, id, {
       vpc,
       vpcSubnets: subnets,
-      internetFacing: internetFacing
+      internetFacing
     });
   }
 }

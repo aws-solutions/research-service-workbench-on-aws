@@ -6,7 +6,9 @@ rootUserEmail: aws-chamonix-dev+testEnvRoot@amazon.com
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: 'chamonix-dev-test-domain'
 vpcId: ''
-subnetIds: []
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
 domainName: 'chamonix-dev-test-domain.example.com'
 #hostZoneId: ''
 #tlsCertificateId: ''

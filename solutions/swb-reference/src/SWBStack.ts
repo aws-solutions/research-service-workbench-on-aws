@@ -95,10 +95,12 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
       VPC_ID,
-      SUBNET_IDS,
+      ALB_SUBNET_IDS,
+      ECS_SUBNET_IDS,
       HOST_ZONE_ID,
       CERTIFICATE_ID,
-      DOMAIN_NAME
+      DOMAIN_NAME,
+      ALB_INTERNET_FACING
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -174,10 +176,18 @@ export class SWBStack extends Stack {
 
     const swbVpc = new SWBVpc(this, 'SWBVpc', {
       vpcId: VPC_ID,
-      subnetIds: SUBNET_IDS
+      albSubnetIds: ALB_SUBNET_IDS,
+      ecsSubnetIds: ECS_SUBNET_IDS
     });
 
-    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
+    this._createLoadBalancer(
+      swbVpc,
+      apiGwUrl,
+      DOMAIN_NAME,
+      HOST_ZONE_ID,
+      CERTIFICATE_ID,
+      ALB_INTERNET_FACING
+    );
   }
 
   private _createLoadBalancer(
@@ -185,12 +195,13 @@ export class SWBStack extends Stack {
     apiGwUrl: string,
     domainName: string,
     hostZoneId: string,
-    certificateId: string
+    certificateId: string,
+    internetFacing: boolean
   ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
-      subnets: swbVpc.subnetSelection,
-      internetFacing: true // TODO: See if this is required if we are directly passing in subnets
+      subnets: swbVpc.albSubnetSelection,
+      internetFacing
     });
 
     const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
