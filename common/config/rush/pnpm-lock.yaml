@@ -1239,41 +1239,71 @@ importers:
       sort-package-json: 1.57.0
       typescript: 4.7.2
 
-  ../../workbench-core/example/express:
+  ../../workbench-core/example/app:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-authentication': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
       '@rushstack/heft-node-rig': ^1.10.5
+      '@types/cookie-parser': ^1.4.3
+      '@types/cors': ^2.8.12
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/uuid': ^8.3.4
+      cookie-parser: ^1.4.6
+      cors: ^2.8.5
       depcheck: ^1.4.3
       eslint: ^8.7.0
       eslint-plugin-import: ^2.26.0
       eslint-plugin-security: ^1.4.0
       express: ^4.17.3
+      express-rate-limit: ^6.6.0
+      jsonschema: ^1.4.1
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
+      lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
       '@aws/workbench-core-audit': link:../../audit
+      '@aws/workbench-core-authentication': link:../../authentication
+      '@aws/workbench-core-authorization': link:../../authorization
+      '@aws/workbench-core-base': link:../../base
+      '@aws/workbench-core-datasets': link:../../datasets
       '@aws/workbench-core-logging': link:../../logging
+      '@hapi/boom': 10.0.0
+      cookie-parser: 1.4.6
+      cors: 2.8.5
+      express-rate-limit: 6.6.0_express@4.18.1
+      jsonschema: 1.4.1
+      lodash: 4.17.21
+      uuid: 8.3.2
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
-      '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.2
+      '@rushstack/eslint-config': 3.0.0_eslint@8.16.0+typescript@4.7.4
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
       '@rushstack/heft-node-rig': 1.10.5_@rushstack+heft@0.47.5
+      '@types/cookie-parser': 1.4.3
+      '@types/cors': 2.8.12
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      '@types/uuid': 8.3.4
       depcheck: 1.4.3
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
@@ -1284,7 +1314,7 @@ importers:
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
-      typescript: 4.7.2
+      typescript: 4.7.4
 
   ../../workbench-core/example/infrastructure:
     specifiers:
@@ -1292,22 +1322,43 @@ importers:
       '@aws-cdk/aws-apigatewayv2-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-authorizers-alpha': ^2.22.0-alpha.0
       '@aws-cdk/aws-apigatewayv2-integrations-alpha': ^2.22.0-alpha.0
+      '@aws-cdk/aws-iam': ^1.159.0
+      '@aws-sdk/client-cloudformation': ^3.118.1
+      '@aws-sdk/client-s3': ^3.118.1
+      '@aws-sdk/client-s3-control': ^3.118.1
+      '@aws-sdk/client-sagemaker': ^3.118.1
+      '@aws-sdk/client-service-catalog': ^3.118.1
+      '@aws-sdk/client-ssm': ^3.118.1
+      '@aws-sdk/client-sts': ^3.118.1
+      '@aws-sdk/types': ^3.110.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-example-express': workspace:*
+      '@aws/workbench-core-authentication': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-base': workspace:*
+      '@aws/workbench-core-datasets': workspace:*
+      '@aws/workbench-core-environments': workspace:*
+      '@aws/workbench-core-example-app': workspace:*
+      '@aws/workbench-core-infrastructure': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
       '@rushstack/heft-node-rig': ^1.10.5
+      '@types/cookie-parser': ^1.4.3
+      '@types/csrf': ^3.1.0
       '@types/express': ^4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/jest': ^27.4.1
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/uuid': ^8.3.4
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.29.1
       axios: ^0.27.1
       cdk-nag: ^2.12.25
       constructs: ^10.0.0
+      cookie-parser: ^1.4.6
+      csrf: ^3.1.0
       depcheck: ^1.4.3
       esbuild: ^0.14.21
       eslint: ^8.7.0
@@ -1316,6 +1367,7 @@ importers:
       express: ^4.17.3
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      js-yaml: ^4.1.0
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
@@ -1323,13 +1375,35 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       source-map-support: ^0.5.16
+      ts-jest: ^27.1.3
       typescript: ^4.5.2
+      uuid: ^8.3.2
     dependencies:
-      '@aws/workbench-core-example-express': link:../express
+      '@aws-cdk/aws-iam': 1.159.0
+      '@aws-sdk/client-cloudformation': 3.130.0
+      '@aws-sdk/client-s3': 3.130.0
+      '@aws-sdk/client-s3-control': 3.130.0
+      '@aws-sdk/client-sagemaker': 3.130.0
+      '@aws-sdk/client-service-catalog': 3.130.0
+      '@aws-sdk/client-ssm': 3.130.0
+      '@aws-sdk/client-sts': 3.130.0
+      '@aws-sdk/types': 3.127.0
+      '@aws/workbench-core-authentication': link:../../authentication
+      '@aws/workbench-core-authorization': link:../../authorization
+      '@aws/workbench-core-base': link:../../base
+      '@aws/workbench-core-datasets': link:../../datasets
+      '@aws/workbench-core-environments': link:../../environments
+      '@aws/workbench-core-example-app': link:../app
+      '@aws/workbench-core-infrastructure': link:../../infrastructure
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       constructs: 10.1.25
+      cookie-parser: 1.4.6
+      csrf: 3.1.0
+      express: 4.18.1
+      js-yaml: 4.1.0
       lodash: 4.17.21
       source-map-support: 0.5.21
+      uuid: 8.3.2
     devDependencies:
       '@aws-cdk/assert': 2.26.0_c9e2f77c41c390210db2e247727e987d
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_8d994d7bf27edab84c843ce1928354a1
@@ -1340,10 +1414,14 @@ importers:
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
       '@rushstack/heft-node-rig': 1.10.5_@rushstack+heft@0.47.5
+      '@types/cookie-parser': 1.4.3
+      '@types/csrf': 3.1.0
       '@types/express': 4.17.13
       '@types/heft-jest': 1.0.2
+      '@types/jest': 27.5.2
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      '@types/uuid': 8.3.4
       '@vendia/serverless-express': 4.8.0
       aws-cdk: 2.26.0
       axios: 0.27.2
@@ -1353,7 +1431,6 @@ importers:
       eslint: 8.16.0
       eslint-plugin-import: 2.26.0_eslint@8.16.0
       eslint-plugin-security: 1.5.0
-      express: 4.18.1
       istanbul-badges-readme: 1.8.1
       jest: 27.5.1
       license-check-and-add: 4.0.5
@@ -1361,6 +1438,7 @@ importers:
       npm-package-json-lint: 6.3.0
       npm-package-json-lint-config-default: 5.0.0_npm-package-json-lint@6.3.0
       sort-package-json: 1.57.0
+      ts-jest: 27.1.5_1b4874bc0c3bb6b4d44d6be38bf36242
       typescript: 4.7.2
 
   ../../workbench-core/infrastructure:
@@ -7112,6 +7190,13 @@ packages:
     resolution: {integrity: sha512-vt+kDhq/M2ayberEtJcIN/hxXy1Pk+59g2FV/ZQceeaTyCtCucjL2Q7FXlFjtWn4n15KCr1NE2lNNFhp0lEThw==}
     dev: true
 
+  /@types/csrf/3.1.0:
+    resolution: {integrity: sha512-QawgCDN1oWa6qYvDWBW7CDlp5Gtay22DJCJAXMAhdOpWh75sXyzZ1pvMJ+EZsFpwXdLHC/Jk50Xxahf/mP/b9Q==}
+    deprecated: This is a stub types definition. csrf provides its own type definitions, so you do not need this installed.
+    dependencies:
+      csrf: 3.1.0
+    dev: true
+
   /@types/csurf/1.11.2:
     resolution: {integrity: sha512-9bc98EnwmC1S0aSJiA8rWwXtgXtXHHOQOsGHptImxFgqm6CeH+mIOunHRg6+/eg2tlmDMX3tY7XrWxo2M/nUNQ==}
     dependencies:
@@ -9129,7 +9214,6 @@ packages:
       rndm: 1.2.0
       tsscmp: 1.0.6
       uid-safe: 2.1.5
-    dev: false
 
   /css-selector-tokenizer/0.8.0:
     resolution: {integrity: sha512-Jd6Ig3/pe62/qe5SBPTN8h8LeUg/pT4lLgtavPf7updwwHpvFzxvOQBHYj2LZDMjUnBzgvIUSjRcf6oT5HzHFg==}
@@ -10448,6 +10532,15 @@ packages:
       jest-matcher-utils: 27.5.1
       jest-message-util: 27.5.1
     dev: true
+
+  /express-rate-limit/6.6.0_express@4.18.1:
+    resolution: {integrity: sha512-HFN2+4ZGdkQOS8Qli4z6knmJFnw6lZed67o6b7RGplWeb1Z0s8VXaj3dUgPIdm9hrhZXTRpCTHXA0/2Eqex0vA==}
+    engines: {node: '>= 12.9.0'}
+    peerDependencies:
+      express: ^4 || ^5
+    dependencies:
+      express: 4.18.1
+    dev: false
 
   /express/4.18.1:
     resolution: {integrity: sha512-zZBcOX9TfehHQhtupq57OF8lFZ3UZi08Y97dwFCkD8p9d/d2Y3M+ykKcwaMDEL+4qyUolgBDX6AblpR3fL212Q==}
@@ -14318,7 +14411,6 @@ packages:
   /random-bytes/1.0.0:
     resolution: {integrity: sha512-iv7LhNVO047HzYR3InF6pUcUsPQiHTM1Qal51DcGSuZFBil1aBBWG5eHPNek7bvILMaYJ/8RU1e8w1AMdHmLQQ==}
     engines: {node: '>= 0.8'}
-    dev: false
 
   /range-parser/1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -14772,7 +14864,6 @@ packages:
 
   /rndm/1.2.0:
     resolution: {integrity: sha512-fJhQQI5tLrQvYIYFpOnFinzv9dwmR7hRnUz1XqP3OJ1jIweTNOd6aTO4jwQSgcBSFUB+/KHJxuGneime+FdzOw==}
-    dev: false
 
   /rsvp/4.8.5:
     resolution: {integrity: sha512-nfMOlASu9OnRJo1mbEk2cz0D56a1MBNrJ7orjRZQG10XDyuvwksKbuXNp6qa+kbn839HwjwhBzhFmdsaEAfauA==}
@@ -15744,7 +15835,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1_ts-node@10.8.0
+      jest: 27.5.1
       jest-util: 27.5.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
@@ -15938,7 +16029,6 @@ packages:
   /tsscmp/1.0.6:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
-    dev: false
 
   /tsutils/3.21.0_typescript@4.7.2:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
@@ -16045,7 +16135,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       random-bytes: 1.0.0
-    dev: false
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
