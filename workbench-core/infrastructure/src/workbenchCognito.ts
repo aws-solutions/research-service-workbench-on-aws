@@ -17,7 +17,7 @@ import {
   UserPoolProps
 } from 'aws-cdk-lib/aws-cognito';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
-import { Construct } from 'constructs';
+import { Construct} from 'constructs';
 import merge from 'lodash/merge';
 
 const userPoolDefaults: UserPoolProps = {
@@ -170,7 +170,6 @@ export class WorkbenchCognito extends Construct {
       }),
     });
 
-    //const lambdaMetadataNode = describeCognitoUserPoolClient.node.findChild('Provider').node.defaultChild as CfnResource;
     /*
     
     lambdaMetadataNode.addMetadata('cfn_nag', {

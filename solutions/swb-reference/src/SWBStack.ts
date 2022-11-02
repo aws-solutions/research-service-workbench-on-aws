@@ -32,7 +32,7 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
-// import IConstruct from 'constructs';
+import ConstructOrder from 'constructs';
 import _ from 'lodash';
 import { getConstants } from './constants';
 import Workflow from './environment/workflow';
@@ -155,6 +155,24 @@ export class SWBStack extends Stack {
     const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
+
+    const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'TODO: Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO: Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason: 'TODO: ambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    })
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
