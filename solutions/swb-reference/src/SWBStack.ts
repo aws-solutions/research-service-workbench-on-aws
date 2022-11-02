@@ -161,15 +161,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         },
         {
           id: 'W89',
-          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         },
         {
           id: 'W92',
-          reason: 'Lambda created and managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         }
       ]
     })
