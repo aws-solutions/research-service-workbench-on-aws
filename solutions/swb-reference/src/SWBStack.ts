@@ -365,11 +365,11 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W28',
-          reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
+          reason: 'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
         },
         {
           id: 'W11',
-          reason: 'TODO: IAM role should not allow * resource on its permissions policy'
+          reason: 'TODO:triage IAM role should not allow * resource on its permissions policy'
         },
       ]
     }); 
@@ -415,7 +415,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W35',
-          reason: 'TODO: S3 Bucket should have access logging configured'
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
         },
       ]
     }); 
@@ -475,11 +475,11 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'F15',
-          reason: 'TODO: S3 Bucket policy should not allow * action'
+          reason: 'TODO:triage S3 Bucket policy should not allow * action'
         },
         {
           id: 'F16',
-          reason: 'TODO: S3 Bucket policy should not allow * principal'
+          reason: 'TODO:triage S3 Bucket policy should not allow * principal'
         },
       ]
     }); 
@@ -499,7 +499,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W35',
-          reason: 'TODO: S3 Bucket should have access logging configured'
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
         },
       ]
     }); 
@@ -587,15 +587,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO: (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+          reason: 'TODO:triage (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
         },
         {
           id: 'W89',
-          reason: 'TODO: (statusHandlerLambda) Lambda functions should be deployed inside a VPC'
+          reason: 'TODO:triage (statusHandlerLambda) Lambda functions should be deployed inside a VPC'
         },
         {
           id: 'W92',
-          reason: 'TODO: (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+          reason: 'TODO:triage (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
         },
       ]
     }); 
@@ -680,7 +680,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W76',
-          reason: 'TODO: (AccountHandlerLambdaPolicy) SPCM for IAM policy document is higher than 25'
+          reason: 'TODO:triage (AccountHandlerLambdaPolicy) SPCM for IAM policy document is higher than 25'
         }
       ]
     }); 
@@ -713,15 +713,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO: (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
         },
         {
           id: 'W89',
-          reason: 'TODO: (AccountHandlerLambda) Lambda functions should be deployed inside a VPC'
+          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions should be deployed inside a VPC'
         },
         {
           id: 'W92',
-          reason: 'TODO: (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
         },
       ]
     }); 
@@ -839,11 +839,11 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W76',
-          reason: 'TODO: (ApiLambdaPolicy) SPCM for IAM policy document is higher than 25'
+          reason: 'TODO:triage (ApiLambdaPolicy) SPCM for IAM policy document is higher than 25'
         },
         {
           id: 'W12',
-          reason: 'TODO: (ApiLambdaPolicy) IAM policy should not allow * resource'
+          reason: 'TODO:triage (ApiLambdaPolicy) IAM policy should not allow * resource'
         }
       ]
     }); 
@@ -860,15 +860,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO: (ApiLambda) Lambda functions require permission to write CloudWatch Logs'
+          reason: 'TODO:triage (ApiLambda) Lambda functions require permission to write CloudWatch Logs'
         },
         {
           id: 'W89',
-          reason: 'TODO: (ApiLambda) Lambda functions should be deployed inside a VPC'
+          reason: 'TODO:triage (ApiLambda) Lambda functions should be deployed inside a VPC'
         },
         {
           id: 'W92',
-          reason: 'TODO: (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+          reason: 'TODO:triage (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
         },
       ]
     }); 
@@ -885,7 +885,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W84', //was 68...
-          reason: 'TODO: CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
+          reason: 'TODO:triage CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
         }
       ]
     }); 
@@ -957,7 +957,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W64',
-          reason: 'TODO: resources should be associated with an AWS::ApiGateway::UsagePlan.'
+          reason: 'TODO:triage resources should be associated with an AWS::ApiGateway::UsagePlan.'
         },
       ]
     });
@@ -968,7 +968,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W59',
-          reason: 'TODO: should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
+          reason: 'TODO:triage should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
         },
       ]
     });
@@ -979,7 +979,7 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W59',
-          reason: 'TODO: should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
+          reason: 'TODO:triage should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
         },
       ]
     });
@@ -1048,15 +1048,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W28',
-          reason: 'TODO: Resource found with an explicit name, this disallows updates that require replacement of this resource'
+          reason: 'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
         },
         {
           id: 'W74',
-          reason: 'TODO: DynamoDB table should have encryption enabled using a CMK stored in KMS'
+          reason: 'TODO:triage DynamoDB table should have encryption enabled using a CMK stored in KMS'
         },
         {
           id: 'W78',
-          reason: 'TODO: DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
+          reason: 'TODO:triage DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
         },
     ]
   }); 

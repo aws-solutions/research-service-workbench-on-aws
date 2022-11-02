@@ -32,82 +32,82 @@ NagSuppressions.addStackSuppressions(stack, [
   {
     id: 'AwsSolutions-APIG1',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-APIG2',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-APIG3',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-APIG4',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-APIG6',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-COG4',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-DDB3',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-IAM4',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-IAM5',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-KMS5',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-L1',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-S1',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-S2',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-S3',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-S5',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
   {
     id: 'AwsSolutions-S10',
     reason:
-      'TODO: come back and fill the suppression reason'
+      'TODO:triage come back and fill the suppression reason'
   },
 ]);
 
