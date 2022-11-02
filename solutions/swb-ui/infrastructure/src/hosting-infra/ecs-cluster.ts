@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable no-new */
-import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { InstanceType, SubnetFilter, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Cluster, ContainerImage, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { SWBUIStack } from '../SWBUIStack';
@@ -13,16 +13,18 @@ export function createECSCluster(
   stack: SWBUIStack,
   apiGwUrl: string,
   albArn: string,
-  vpcId: string = '',
+  vpcId: string,
+  subnetIds: string[],
   isNetworkPublic: boolean = true
 ): void {
   // Create VPC, or use config-entered VPC
-  const vpc = vpcId === '' ? new Vpc(stack, 'MainVPC', {}) : Vpc.fromLookup(stack, 'MainVPC', { vpcId });
+  const vpc = Vpc.fromLookup(stack, 'MainVPC', { vpcId });
+  const subnets = vpc.selectSubnets({ subnetFilters: [SubnetFilter.byIds(subnetIds)] });
 
   // Create an ECS cluster
   new Cluster(stack, 'Cluster', {
     vpc,
-    capacity: { instanceType: new InstanceType('t2.xlarge') }
+    capacity: { instanceType: new InstanceType('t2.xlarge'), vpcSubnets: subnets }
   });
 
   const taskDefinition = new FargateTaskDefinition(stack, 'TaskDefinition', {

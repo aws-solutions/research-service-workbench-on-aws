@@ -26,6 +26,8 @@ function getConstants(): {
   RESPONSE_HEADERS_NAME: string;
   COGNITO_DOMAIN_NAME_OUTPUT_KEY: string;
   COGNITO_DOMAIN_NAME: string;
+  VPC_ID: string;
+  ECS_SUBNET_IDS: string[];
 } {
   const config = getAPIOutputs();
   const STAGE = process.env.STAGE || '';
@@ -52,6 +54,9 @@ function getConstants(): {
   const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
 
+  const VPC_ID = config.vpcId;
+  const ECS_SUBNET_IDS = config.ecsSubnetIds;
+
   return {
     STAGE,
     API_BASE_URL,
@@ -71,15 +76,18 @@ function getConstants(): {
     RESPONSE_HEADERS_ARTIFACT_NAME,
     RESPONSE_HEADERS_NAME,
     COGNITO_DOMAIN_NAME_OUTPUT_KEY,
-    COGNITO_DOMAIN_NAME
+    COGNITO_DOMAIN_NAME,
+    VPC_ID,
+    ECS_SUBNET_IDS
   };
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getAPIOutputs(): {
   awsRegionShortName: string;
   apiUrlOutput: string;
   awsRegion: string;
   cognitoDomainName: string;
+  vpcId: string;
+  ecsSubnetIds: string[];
 } {
   try {
     if (process.env.SYNTH_REGION_SHORTNAME && process.env.SYNTH_REGION)
@@ -88,11 +96,12 @@ function getAPIOutputs(): {
         awsRegionShortName: process.env.SYNTH_REGION_SHORTNAME,
         apiUrlOutput: '',
         awsRegion: process.env.SYNTH_REGION,
-        cognitoDomainName: ''
+        cognitoDomainName: '',
+        vpcId: '',
+        ecsSubnetIds: []
       };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const apiStackOutputs: any = JSON.parse(
+    const apiStackOutputs = JSON.parse(
       // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
       // correct file
       // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -107,11 +116,14 @@ function getAPIOutputs(): {
         `Configuration file for ${process.env.STAGE} was found with incorrect format. Please deploy application swb-reference and try again.`
       ); //validate when API unsuccessfully finished and UI is deployed
     }
+
     return {
       awsRegionShortName: outputs.awsRegionShortName,
       apiUrlOutput: outputs.apiUrlOutput,
       awsRegion: outputs.awsRegion,
-      cognitoDomainName: outputs.cognitoDomainName
+      cognitoDomainName: outputs.cognitoDomainName,
+      vpcId: outputs.vpcId,
+      ecsSubnetIds: outputs.ecsSubnetIds.split(',')
     };
   } catch {
     console.error(

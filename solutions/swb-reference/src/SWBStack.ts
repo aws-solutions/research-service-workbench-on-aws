@@ -174,11 +174,7 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    const swbVpc = new SWBVpc(this, 'SWBVpc', {
-      vpcId: VPC_ID,
-      albSubnetIds: ALB_SUBNET_IDS,
-      ecsSubnetIds: ECS_SUBNET_IDS
-    });
+    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
 
     this._createLoadBalancer(
       swbVpc,
@@ -188,6 +184,24 @@ export class SWBStack extends Stack {
       CERTIFICATE_ID,
       ALB_INTERNET_FACING
     );
+  }
+
+  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
+    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+      vpcId,
+      albSubnetIds,
+      ecsSubnetIds
+    });
+
+    new CfnOutput(this, 'vpcId', {
+      value: swbVpc.vpc.vpcId
+    });
+
+    new CfnOutput(this, 'ecsSubnetIds', {
+      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+    });
+
+    return swbVpc;
   }
 
   private _createLoadBalancer(
