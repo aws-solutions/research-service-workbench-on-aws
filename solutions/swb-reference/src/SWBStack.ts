@@ -171,7 +171,7 @@ export class SWBStack extends Stack {
           reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
         }
       ]
-    })
+    });
 
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
