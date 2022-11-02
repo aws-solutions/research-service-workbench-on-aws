@@ -815,12 +815,12 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:id",
+              "raw": "{{API_URL}}/projects/:projectId",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":id"],
+              "path": ["projects", ":projectId"],
               "variable": [
                 {
-                  "key": "id",
+                  "key": "projectId",
                   "value": null,
                   "description": "ID of project to GET"
                 }

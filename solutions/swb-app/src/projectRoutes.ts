@@ -21,11 +21,11 @@ import { processValidatorResult } from './validatorHelper';
 export function setUpProjectRoutes(router: Router, projectService: ProjectService): void {
   // Get project
   router.get(
-    '/projects/:id',
+    '/projects/:projectId',
     wrapAsync(async (req: Request, res: Response) => {
       const objectToValidate = {
         user: res.locals.user as AuthenticatedUser,
-        projectId: req.params.id
+        projectId: req.params.projectId
       };
       processValidatorResult(validate(objectToValidate, GetProjectSchema));
       const request: GetProjectRequest = objectToValidate as GetProjectRequest;
