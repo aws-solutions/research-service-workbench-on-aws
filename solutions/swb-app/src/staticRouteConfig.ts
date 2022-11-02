@@ -194,6 +194,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {
