@@ -45,7 +45,7 @@ export default class ProjectService {
 
   /**
    * Get project
-   * @param projectID - Project Id of project to retrieve
+   * @param request - the request object for getting a project
    *
    * @returns Project entry in DDB
    */
@@ -56,11 +56,11 @@ export default class ProjectService {
     //   subjectType: 'Project',
     //   subjectId: `${projectId}`, // TODO--verify that this is correct for the full projectId since it will be proj-<uuid>
     // };
-    // const request: IsAuthorizedOnSubjectRequest = {
+    // const authRequest: IsAuthorizedOnSubjectRequest = {
     //   dynamicOperation: dynamicOperation
     // };
     // Will throw error if not authorized
-    // await this._dynamicAuthorizationService.isAuthorizedOnSubject(request.user, request);
+    // await this._dynamicAuthorizationService.isAuthorizedOnSubject(request.user, authRequest);
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
       .execute();
@@ -82,8 +82,7 @@ export default class ProjectService {
   /**
    * List projects
    *
-   * @param request - the optional fields to list projects
-   * @param user - authenticated user listing the projects
+   * @param request - the request object for listing projects
    * @returns Project entries in DDB
    */
   // TODO--add filter support
