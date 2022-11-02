@@ -7,6 +7,7 @@
 
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { SWBUIStack } from './SWBUIStack';
 
@@ -27,3 +28,75 @@ const stack = new SWBUIStack(app, 'SWBUIStack', {
 });
 
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+NagSuppressions.addStackSuppressions(stack, [
+  {
+    id: 'AwsSolutions-CFR1',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-CFR2',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-CFR3',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-CFR4',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-CFR5',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-CFR6',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-IAM4',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-IAM5',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-L1',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-S1',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-S2',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-S3',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-S5',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+  {
+    id: 'AwsSolutions-S10',
+    reason:
+      'TODO:triage come back and fill the suppression reason'
+  },
+]);
