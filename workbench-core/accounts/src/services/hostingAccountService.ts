@@ -3,15 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Account from '../models/account';
-import ListAccountsResponse from '../models/listAccountsResponse';
+import { PaginatedResponse } from '@aws/workbench-core-base';
+import { Account } from '../models/account';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
-  public async list(): Promise<ListAccountsResponse> {
+  public async list(): Promise<PaginatedResponse<Account>> {
     const pageSize = 20;
     const paginationToken = '';
     return await new HostingAccountLifecycleService().listAccounts(pageSize, paginationToken);

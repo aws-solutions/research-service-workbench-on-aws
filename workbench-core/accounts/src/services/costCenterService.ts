@@ -12,9 +12,9 @@ import {
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import Account from '../models/account';
-import CostCenter from '../models/costCenter';
-import CreateCostCenterRequest from '../models/createCostCenterRequest';
+import { Account } from '../models/account';
+import CostCenter from '../models/costCenter/costCenter';
+import CreateCostCenterRequest from '../models/costCenter/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {

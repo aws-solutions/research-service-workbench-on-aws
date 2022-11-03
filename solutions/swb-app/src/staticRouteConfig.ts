@@ -13,6 +13,12 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'Account'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
     ]
   },
   [`/aws-accounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {

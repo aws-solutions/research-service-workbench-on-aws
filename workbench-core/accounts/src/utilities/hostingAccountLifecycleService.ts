@@ -12,14 +12,14 @@ import {
   addPaginationToken,
   AwsService,
   DEFAULT_API_PAGE_SIZE,
-  IamRoleCloneService
+  IamRoleCloneService,
+  PaginatedResponse
 } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
-import Account from '../models/account';
-import ListAccountsResponse from '../models/listAccountsResponse';
+import { Account } from '../models/account';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -56,19 +56,14 @@ export default class HostingAccountLifecycleService {
     this._accountService = new AccountService(ddbTableName);
   }
 
-  public async listAccounts(pageSize: number, paginationToken: string): Promise<ListAccountsResponse> {
+  public async listAccounts(pageSize: number, paginationToken: string): Promise<PaginatedResponse<Account>> {
     const queryParams = addPaginationToken(paginationToken, {
       index: 'getResourceByName',
       key: { name: 'resourceType', value: 'account' },
       limit: pageSize || DEFAULT_API_PAGE_SIZE
     });
 
-    const accounts = await this._accountService.getAccounts(queryParams);
-
-    return {
-      data: accounts,
-      paginationToken: ''
-    };
+    return await this._accountService.getAccounts(queryParams);
   }
 
   public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {

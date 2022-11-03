@@ -91,7 +91,7 @@ export default class AccountHandler {
     const ddbTableName = process.env.STACK_NAME!;
     const accountService = new AccountService(ddbTableName);
 
-    const accounts = await accountService.getAccounts({
+    const accounts = await accountService.getAccountsForAccountHandler({
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     });

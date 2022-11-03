@@ -6,14 +6,15 @@
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   AwsService,
+  PaginatedResponse,
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import Account from '../models/account';
-import CostCenter from '../models/costCenter';
+import { Account, AccountProperties } from '../models/account';
+import CostCenter from '../models/costCenter/costCenter';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -38,11 +39,12 @@ export default class AccountService {
   }
 
   /**
-   * Get all account entries from DDB
+   * @Deprecated in favor of getAccounts
+   * Get account entries from DDB
    *
    * @returns Account entries in DDB
    */
-  public async getAccounts(queryParams: QueryParams): Promise<Account[]> {
+  public async getAccountsForAccountHandler(queryParams: QueryParams): Promise<Account[]> {
     const response = await this._aws.helpers.ddb.query(queryParams).execute();
     let accounts: Account[] = [];
     if (response && response.Items) {
@@ -51,6 +53,19 @@ export default class AccountService {
       });
     }
     return accounts;
+  }
+
+  public async getAccounts(queryParams: QueryParams): Promise<PaginatedResponse<Account>> {
+    const response = await this._aws.helpers.ddb.query(queryParams).execute();
+
+    const items = response.Items || [];
+
+    return {
+      data: items.map((item) => {
+        return Account.fromDynamoItem(item);
+      }),
+      paginationToken: response.LastEvaluatedKey as unknown as string
+    };
   }
 
   /**
@@ -181,27 +196,18 @@ export default class AccountService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let account: Account = {
-      awsAccountId: '',
-      cidr: '',
-      encryptionKeyArn: '',
-      envMgmtRoleArn: '',
-      environmentInstanceFiles: '',
-      externalId: '',
-      hostingAccountHandlerRoleArn: '',
-      id: '',
-      name: '',
-      stackName: '',
-      status: '',
-      subnetId: '',
-      vpcId: ''
-    };
+
+    const accountProperties = items.find((item) => {
+      return (item.sk as unknown as string) === pk;
+    }) as unknown as AccountProperties;
+
+    const account: Account = new Account(accountProperties);
+
     for (const item of items) {
       // parent environment item
       const sk = item.sk as unknown as string;
 
       if (sk === pk) {
-        account = { ...account, ...item };
         continue;
       }
 
@@ -211,6 +217,7 @@ export default class AccountService {
         account.CC = item as unknown as CostCenter;
       }
     }
+
     return account;
   }
 }

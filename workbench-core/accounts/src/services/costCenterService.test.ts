@@ -9,14 +9,14 @@ import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/clie
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import Account from '../models/account';
-import CostCenter from '../models/costCenter';
-import CreateCostCenter from '../models/createCostCenterRequest';
+import { Account } from '../models/account';
+import CostCenter from '../models/costCenter/costCenter';
+import CreateCostCenter from '../models/costCenter/createCostCenterRequest';
 import CostCenterService from './costCenterService';
 
 describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
-  let accountMetadata: Account;
+  let account: Account;
   const costCenterService = new CostCenterService({ TABLE_NAME: 'tableName' });
   const accountId = 'acc-someId';
   const ddbMock = mockClient(DynamoDBClient);
@@ -32,7 +32,9 @@ describe('CostCenterService', () => {
 
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
-    accountMetadata = {
+    account = new Account({
+      createdAt: '',
+      updatedAt: '',
       name: '',
       error: undefined,
       id: accountId,
@@ -47,7 +49,7 @@ describe('CostCenterService', () => {
       status: 'CURRENT',
       awsAccountId: 'awsAccountId',
       externalId: 'externalId'
-    };
+    });
   });
 
   afterAll(() => {
@@ -65,14 +67,14 @@ describe('CostCenterService', () => {
         expectedCostCenter = {
           createdAt: mockDateObject.toISOString(),
           updatedAt: mockDateObject.toISOString(),
-          awsAccountId: accountMetadata.awsAccountId,
-          encryptionKeyArn: accountMetadata.encryptionKeyArn,
-          envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-          environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
-          externalId: accountMetadata.externalId,
-          hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
-          subnetId: accountMetadata.subnetId,
-          vpcId: accountMetadata.vpcId,
+          awsAccountId: account.awsAccountId,
+          encryptionKeyArn: account.encryptionKeyArn,
+          envMgmtRoleArn: account.envMgmtRoleArn,
+          environmentInstanceFiles: account.environmentInstanceFiles,
+          externalId: account.externalId,
+          hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
+          subnetId: account.subnetId,
+          vpcId: account.vpcId,
           name: 'a name',
           accountId: accountId,
           description: 'a description',
@@ -128,7 +130,7 @@ describe('CostCenterService', () => {
       describe('`dependency` is the id of a saved Account', () => {
         beforeEach(() => {
           ddbMock.on(GetItemCommand).resolves({
-            Item: marshall(accountMetadata, {
+            Item: marshall(account, {
               removeUndefinedValues: true
             })
           });
@@ -140,14 +142,14 @@ describe('CostCenterService', () => {
           const expectedCostCenter: CostCenter = {
             createdAt: mockDateObject.toISOString(),
             updatedAt: mockDateObject.toISOString(),
-            awsAccountId: accountMetadata.awsAccountId,
-            encryptionKeyArn: accountMetadata.encryptionKeyArn,
-            envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-            environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
-            externalId: accountMetadata.externalId,
-            hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
-            subnetId: accountMetadata.subnetId,
-            vpcId: accountMetadata.vpcId,
+            awsAccountId: account.awsAccountId,
+            encryptionKeyArn: account.encryptionKeyArn,
+            envMgmtRoleArn: account.envMgmtRoleArn,
+            environmentInstanceFiles: account.environmentInstanceFiles,
+            externalId: account.externalId,
+            hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
+            subnetId: account.subnetId,
+            vpcId: account.vpcId,
             ...createCostCenter,
             id: `cc-someId`
           };

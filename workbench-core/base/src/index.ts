@@ -6,6 +6,7 @@
 import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
+import PaginatedResponse from './aws/helpers/dynamoDB/paginatedResponse';
 import CognitoTokenService from './cognitoTokenService';
 import QueryParams from './constants/queryParams';
 import resourceTypeToKey from './constants/resourceTypeToKey';
@@ -34,5 +35,6 @@ export {
   uuidRegExpAsString,
   addPaginationToken,
   getPaginationToken,
-  DEFAULT_API_PAGE_SIZE
+  DEFAULT_API_PAGE_SIZE,
+  PaginatedResponse
 };

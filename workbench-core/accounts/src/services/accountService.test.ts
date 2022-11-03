@@ -16,8 +16,8 @@ import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import Account from '../models/account';
-import CostCenter from '../models/costCenter';
+import { Account } from '../models/account';
+import CostCenter from '../models/costCenter/costCenter';
 import AccountService from './accountService';
 
 describe('AccountService', () => {
@@ -249,7 +249,7 @@ describe('AccountService', () => {
     mockDDB.on(QueryCommand).resolves({});
 
     // OPERATE
-    const response = await accountService.getAccounts({
+    const response = await accountService.getAccountsForAccountHandler({
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     });
@@ -286,7 +286,7 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.getAccounts({
+    const response = await accountService.getAccountsForAccountHandler({
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     });

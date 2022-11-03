@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// AWS Account management
 import {
   CreateAccountSchema,
   UpdateAccountSchema,
@@ -20,6 +19,13 @@ import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, account: HostingAccountService): void {
+  router.get(
+    '/aws-accounts',
+    wrapAsync(async (req: Request, res: Response) => {
+      res.send(await account.list());
+    })
+  );
+
   router.get(
     '/aws-accounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
