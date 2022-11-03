@@ -1,0 +1,29 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      # For debugging purposes
+      - ls -al
+      - npm --version
+      - node --version
+      # Install dependencies
+      - npm install -g aws-cdk
+
+  pre_build:
+    commands:
+      - rush install
+
+  build:
+    commands:
+      - cd solutions/swb-reference
+      - STAGE='testEnv' rushx cdk-deploy
+      - STAGE='testEnv' rushx run-postDeployment`
+      - cd ../swb-ui
+      - STAGE='testEnv' rushx deploy-ui-and-api
+
+artifacts:
+  base-directory: cdk/cdk.out
+  files:
+    - "**/*"
