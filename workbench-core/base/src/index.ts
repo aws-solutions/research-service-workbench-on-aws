@@ -5,10 +5,11 @@
 
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
-import { QueryParams } from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
+import QueryParams from './constants/queryParams';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
+import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
 import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
@@ -28,5 +29,8 @@ export {
   uuidWithLowercasePrefix,
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
-  uuidRegExpAsString
+  uuidRegExpAsString,
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE
 };

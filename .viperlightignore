@@ -27,4 +27,4 @@ workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 # email: 'sample.user@amazon.com' is not real email
 solutions/example-ui-app/src/models/User.ts:19
 # "email": "hello@cypress.io" is not real email
-solutions/swb-ui/end-to-end-tests/cypress/fixtures/example.json:3
+solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
