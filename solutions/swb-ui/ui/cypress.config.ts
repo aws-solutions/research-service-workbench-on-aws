@@ -7,7 +7,7 @@ const getEnvironmentVariables = (stage: string): CypressConfig => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const apiStackOutputs: any = JSON.parse(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(`${__dirname}/infrastructure/src/config/${stage}.json`, 'utf8') // nosemgrep
+    fs.readFileSync(`${__dirname}/../infrastructure/src/config/${stage}.json`, 'utf8') // nosemgrep
   );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const yamlConfig: any = yaml.load(

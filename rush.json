@@ -139,7 +139,7 @@
     },
     {
       "packageName": "@aws/swb-ui",
-      "projectFolder": "solutions/swb-ui",
+      "projectFolder": "solutions/swb-ui/ui",
       "reviewCategory": "production",
       "shouldPublish": false
     },
