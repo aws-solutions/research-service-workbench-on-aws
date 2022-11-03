@@ -14,12 +14,10 @@ phases:
   build:
     commands:
       - cd solutions/swb-reference
-      - node ../../common/scripts/install-run-rushx.js
-      - rush install
-      - STAGE='testEnv' rushx cdk-deploy
-      - STAGE='testEnv' rushx run-postDeployment`
+      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
+      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
       - cd ../swb-ui
-      - STAGE='testEnv' rushx deploy-ui-and-api
+      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js deploy-ui-and-api
 
 artifacts:
   base-directory: cdk/cdk.out
