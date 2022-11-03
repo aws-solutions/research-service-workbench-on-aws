@@ -13,11 +13,13 @@ phases:
 
   pre_build:
     commands:
+      - node common/scripts/install-run-rushx.js compile
       - rush install
 
   build:
     commands:
       - node common/scripts/install-run-rushx.js compile
+      - rush install
       - cd solutions/swb-reference
       - STAGE='testEnv' rushx cdk-deploy
       - STAGE='testEnv' rushx run-postDeployment`
