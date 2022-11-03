@@ -5,22 +5,21 @@
 
 /* eslint-disable no-new */
 import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { Cluster, ContainerImage, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
+import { Cluster, ContainerImage, FargateService, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
+import { ApplicationLoadBalancer, ApplicationProtocol } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { SWBUIStack } from '../SWBUIStack';
 
 export function createECSCluster(
   stack: SWBUIStack,
-  apiGwUrl: string,
   albArn: string,
   vpcId: string = '',
-  isNetworkPublic: boolean = true
+  repositoryName: string
 ): void {
-  // Create VPC, or use config-entered VPC
-  const vpc = vpcId === '' ? new Vpc(stack, 'MainVPC', {}) : Vpc.fromLookup(stack, 'MainVPC', { vpcId });
+  const vpc = Vpc.fromLookup(stack, 'MainVPC', { vpcId });
 
   // Create an ECS cluster
-  new Cluster(stack, 'Cluster', {
+  const cluster = new Cluster(stack, 'Cluster', {
     vpc,
     capacity: { instanceType: new InstanceType('t2.xlarge') }
   });
@@ -38,10 +37,33 @@ export function createECSCluster(
       ]
     })
   });
-
   taskDefinition.addContainer('HostContainer', {
-    image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+    image: ContainerImage.fromRegistry(
+      `${stack.account}.dkr.ecr.${stack.region}.amazonaws.com/${repositoryName}:latest`
+    ),
+    // image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
     memoryLimitMiB: 1024,
     portMappings: [{ containerPort: 80 }]
+  });
+  const fargateService = new FargateService(stack, 'SwbUi', { cluster, taskDefinition });
+
+  const alb = ApplicationLoadBalancer.fromLookup(stack, 'SWBApplicationLoadBalancer', {
+    loadBalancerArn: albArn
+  });
+
+  const httpListener = alb.addListener('HTTPListener', {
+    protocol: ApplicationProtocol.HTTP,
+    port: 80
+  });
+
+  httpListener.addTargets('uiContainer', {
+    port: 80,
+    protocol: ApplicationProtocol.HTTP,
+    targets: [
+      fargateService.loadBalancerTarget({
+        containerName: 'HostContainer',
+        containerPort: 80
+      })
+    ]
   });
 }

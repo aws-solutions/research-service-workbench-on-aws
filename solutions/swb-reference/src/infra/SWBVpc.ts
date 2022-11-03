@@ -21,6 +21,7 @@ export class SWBVpc extends Construct {
 
     this.vpc =
       vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId: vpcId });
+
     if (subnetIds.length === 0) {
       this.subnetSelection = this.vpc.selectSubnets({
         // Default behavior if no subnets are given is to use all public subnets from vpc above

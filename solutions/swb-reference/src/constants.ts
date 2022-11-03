@@ -11,6 +11,7 @@ function getConstants(): {
   STAGE: string;
   STACK_NAME: string;
   SC_PORTFOLIO_NAME: string;
+  ACCOUNT_ID: string;
   AWS_REGION: string;
   SSM_DOC_OUTPUT_KEY_SUFFIX: string;
   S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
@@ -33,14 +34,17 @@ function getConstants(): {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
+  VPC_ID: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_DNS_OUTPUT_KEY: string;
-  VPC_ID: string;
+  ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
+  VPC_ID_OUTPUT_KEY: string;
   SUBNET_IDS: string[];
   HOST_ZONE_ID: string;
   DOMAIN_NAME: string;
   CERTIFICATE_ID: string;
+  USE_CLOUD_FRONT: string;
 } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config: any = yaml.load(
@@ -52,6 +56,7 @@ function getConstants(): {
 
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
+  const ACCOUNT_ID = config.accountId;
   const AWS_REGION = config.awsRegion;
   const AWS_REGION_SHORT_NAME = config.awsRegionShortName;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
@@ -59,6 +64,7 @@ function getConstants(): {
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const ROOT_USER_EMAIL = config.rootUserEmail;
   const allowedOrigins: string[] = config.allowedOrigins || [];
+  const USE_CLOUD_FRONT = config.useCloudFront;
   const uiClientURL = getUiClientUrl();
   if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
@@ -87,11 +93,14 @@ function getConstants(): {
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
   const MAIN_ACCT_ALB_DNS_OUTPUT_KEY = 'MainAccountLoadBalancerDnsNameOutput';
+  const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
+  const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
 
   return {
     STAGE: config.stage,
     STACK_NAME,
     SC_PORTFOLIO_NAME,
+    ACCOUNT_ID,
     AWS_REGION,
     SSM_DOC_OUTPUT_KEY_SUFFIX,
     S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
@@ -114,18 +123,23 @@ function getConstants(): {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
+    VPC_ID,
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
-    VPC_ID,
+    ECR_REPOSITORY_NAME_OUTPUT_KEY,
+    VPC_ID_OUTPUT_KEY,
     SUBNET_IDS,
     HOST_ZONE_ID,
     DOMAIN_NAME,
-    CERTIFICATE_ID
+    CERTIFICATE_ID,
+    USE_CLOUD_FRONT
   };
 }
 
 function getUiClientUrl(): string {
+  //useCloudFront: string): string {
+  // if (useCloudFront) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const uiClientOutput: any = JSON.parse(
@@ -144,6 +158,10 @@ function getUiClientUrl(): string {
     console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
     return '';
   }
+  // } else {
+  //   console.log(`Using ALB and ECS for ${process.env.STAGE} UI Client.`);
+  //   return '';
+  // }
 }
 
 export { getConstants };

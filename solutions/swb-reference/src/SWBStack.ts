@@ -5,6 +5,7 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
@@ -68,10 +69,12 @@ export class SWBStack extends Stack {
 
   private _accessLogsBucket: Bucket;
   private _s3AccessLogsPrefix: string;
+  private _mainAccountLoadBalancerDnsNameOutputKey: string;
 
   public constructor(app: App) {
     const {
       STAGE,
+      ACCOUNT_ID,
       AWS_REGION,
       AWS_REGION_SHORT_NAME,
       S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
@@ -93,13 +96,17 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
+      VPC_ID,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-      VPC_ID,
+      MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
+      ECR_REPOSITORY_NAME_OUTPUT_KEY,
+      VPC_ID_OUTPUT_KEY,
       SUBNET_IDS,
       HOST_ZONE_ID,
       CERTIFICATE_ID,
-      DOMAIN_NAME
+      DOMAIN_NAME,
+      USE_CLOUD_FRONT
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -152,8 +159,9 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY
     };
 
-    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
+    this._createInitialOutputs(ACCOUNT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._mainAccountLoadBalancerDnsNameOutputKey = MAIN_ACCT_ALB_DNS_OUTPUT_KEY;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
@@ -173,19 +181,29 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    const swbVpc = new SWBVpc(this, 'SWBVpc', {
-      vpcId: VPC_ID,
-      subnetIds: SUBNET_IDS
+    new CfnOutput(this, 'useCloudFront', {
+      value: USE_CLOUD_FRONT
     });
+    if (!USE_CLOUD_FRONT) {
+      const swbVpc = new SWBVpc(this, 'SWBVpc', {
+        vpcId: VPC_ID,
+        subnetIds: SUBNET_IDS
+      });
+      new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
+        value: swbVpc.vpc.vpcId,
+        exportName: VPC_ID_OUTPUT_KEY
+      });
 
-    this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
-    const repository = new Repository(this, 'Repository', {
-      imageScanOnPush: true
-    });
-    // eslint-disable-next-line no-new
-    new CfnOutput(this, 'ECRRepositoryName', {
-      value: repository.repositoryName
-    });
+      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
+
+      const repository = new Repository(this, 'Repository', {
+        imageScanOnPush: true
+      });
+      new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
+        value: repository.repositoryName,
+        exportName: ECR_REPOSITORY_NAME_OUTPUT_KEY
+      });
+    }
   }
 
   private _createLoadBalancer(
@@ -201,53 +219,66 @@ export class SWBStack extends Stack {
       internetFacing: true // TODO: See if this is required if we are directly passing in subnets
     });
 
-    const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
-      zoneName: domainName,
-      hostedZoneId: hostZoneId
-    });
+    // const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+    //   zoneName: domainName,
+    //   hostedZoneId: hostZoneId
+    // });
 
-    // Add a Route 53 alias with the Load Balancer as the target
-    new ARecord(this, 'AliasRecord', {
-      zone,
-      target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
-    });
+    // // Add a Route 53 alias with the Load Balancer as the target
+    // new ARecord(this, 'AliasRecord', {
+    //   zone,
+    //   target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
+    // });
 
-    const proxyLambda = new Function(this, 'LambdaProxy', {
-      handler: 'proxyHandlerLambda.handler',
-      code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
-      runtime: Runtime.NODEJS_16_X,
-      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
-      timeout: Duration.seconds(60),
-      memorySize: 256
-    });
+    // const proxyLambda = new Function(this, 'LambdaProxy', {
+    //   handler: 'proxyHandlerLambda.handler',
+    //   code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
+    //   runtime: Runtime.NODEJS_16_X,
+    //   environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
+    //   timeout: Duration.seconds(60),
+    //   memorySize: 256
+    // });
 
-    // Add a listener for HTTP calls
-    const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
-      port: 80
-    });
+    // // Add a listener for HTTP calls
+    // const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
+    //   port: 80
+    // });
 
-    httpListener.addTargets('proxyLambda', {
-      targets: [new LambdaTarget(proxyLambda)]
-    });
+    // httpListener.addTargets('proxyLambda', {
+    //   targets: [new LambdaTarget(proxyLambda)]
+    // });
 
-    // Add a listener on port 443 for and use the certificate for HTTPS
-    const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
-    const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
-      port: 443,
-      certificates: [certificate]
-    });
+    // // Add a listener on port 443 for and use the certificate for HTTPS
+    // const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
+    // const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
+    //   port: 443,
+    //   certificates: [certificate]
+    // });
 
-    httpsListener.addTargets('proxyLambda', {
-      targets: [new LambdaTarget(proxyLambda)],
-      healthCheck: { enabled: true }
-    });
+    // httpsListener.addTargets('proxyLambda', {
+    //   targets: [new LambdaTarget(proxyLambda)],
+    //   healthCheck: { enabled: true }
+    // });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {
       value: alb.applicationLoadBalancer.loadBalancerArn
     });
+
+    new CfnOutput(this, this._mainAccountLoadBalancerDnsNameOutputKey, {
+      value: alb.applicationLoadBalancer.loadBalancerDnsName,
+      exportName: this._mainAccountLoadBalancerDnsNameOutputKey
+    });
   }
 
-  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+  private _createInitialOutputs(
+    accountId: string,
+    awsRegion: string,
+    awsRegionName: string,
+    uiClientURL: string
+  ): void {
+    new CfnOutput(this, 'accountId', {
+      value: accountId
+    });
     new CfnOutput(this, 'awsRegion', {
       value: awsRegion
     });
