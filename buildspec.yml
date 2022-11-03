@@ -14,7 +14,7 @@ phases:
   build:
     commands:
       - cd solutions/swb-reference
-      - node ../../common/scripts/install-run-rushx.js compile
+      - node ../../common/scripts/install-run-rushx.js
       - rush install
       - STAGE='testEnv' rushx cdk-deploy
       - STAGE='testEnv' rushx run-postDeployment`
