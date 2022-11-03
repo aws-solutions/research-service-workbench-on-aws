@@ -14,6 +14,7 @@ phases:
   build:
     commands:
       - npm install -g @microsoft/rush
+      - rush install
       - cd solutions/swb-reference
       - STAGE='testEnv' rushx cdk-deploy
       - STAGE='testEnv' rushx run-postDeployment`
