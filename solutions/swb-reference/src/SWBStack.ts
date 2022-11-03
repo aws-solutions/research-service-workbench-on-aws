@@ -194,11 +194,13 @@ export class SWBStack extends Stack {
     });
 
     new CfnOutput(this, 'vpcId', {
-      value: swbVpc.vpc.vpcId
+      value: swbVpc.vpc.vpcId,
+      exportName: 'SWB-vpcId'
     });
 
     new CfnOutput(this, 'ecsSubnetIds', {
-      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(','),
+      exportName: 'SWB-ecsSubnetIds'
     });
 
     return swbVpc;

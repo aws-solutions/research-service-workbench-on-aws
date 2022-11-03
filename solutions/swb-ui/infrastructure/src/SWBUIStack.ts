@@ -63,9 +63,7 @@ export class SWBUIStack extends Stack {
       RESPONSE_HEADERS_ARTIFACT_NAME,
       RESPONSE_HEADERS_NAME,
       COGNITO_DOMAIN_NAME_OUTPUT_KEY,
-      COGNITO_DOMAIN_NAME,
-      VPC_ID,
-      ECS_SUBNET_IDS
+      COGNITO_DOMAIN_NAME
     } = getConstants();
     super(scope, STACK_NAME, {
       env: {
@@ -96,7 +94,7 @@ export class SWBUIStack extends Stack {
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     this._addCognitoURLOutput();
-    createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_ARN_OUTPUT_KEY, VPC_ID, ECS_SUBNET_IDS);
+    createECSCluster(this, API_BASE_URL, MAIN_ACCT_ALB_ARN_OUTPUT_KEY);
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {

@@ -22,19 +22,32 @@ export class SWBVpc extends Construct {
     super(scope, id);
 
     this.vpc = vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
-    this.albSubnetSelection = this._getSubnetSelection(scope, albSubnetIds, 'ALB');
-    this.ecsSubnetSelection = this._getSubnetSelection(scope, ecsSubnetIds, 'ECS');
+
+    // if only ecs or alb subnets are defined - use them for both alb and ecs
+    this.albSubnetSelection = this._getSubnetSelection(
+      scope,
+      !albSubnetIds.length ? ecsSubnetIds : albSubnetIds,
+      SubnetType.PUBLIC
+    );
+    this.ecsSubnetSelection = this._getSubnetSelection(
+      scope,
+      !ecsSubnetIds.length ? albSubnetIds : ecsSubnetIds,
+      SubnetType.PRIVATE_ISOLATED
+    );
   }
 
-  private _getSubnetSelection(scope: Construct, subnetIds: string[], subnetPrefix: string): SubnetSelection {
+  private _getSubnetSelection(
+    scope: Construct,
+    subnetIds: string[],
+    subnetType: SubnetType
+  ): SubnetSelection {
     if (!subnetIds.length) {
       return this.vpc.selectSubnets({
-        // Default behavior if no subnets are given is to use all public subnets from vpc above
-        // This should be switched to PRIVATE_WITH_NAT when setting this up with private subnets
-        subnetType: SubnetType.PUBLIC
+        subnetType
       });
     }
 
+    const subnetPrefix = subnetType === SubnetType.PUBLIC ? 'ALB' : 'ECS';
     const subnets: ISubnet[] = [];
     let subnetCount = 1;
     subnetIds.forEach(function (subnetId: string) {
