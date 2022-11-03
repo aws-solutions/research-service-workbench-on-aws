@@ -32,7 +32,7 @@ export class SWBVpc extends Construct {
     this.ecsSubnetSelection = this._getSubnetSelection(
       scope,
       !ecsSubnetIds.length ? albSubnetIds : ecsSubnetIds,
-      SubnetType.PRIVATE_ISOLATED
+      SubnetType.PRIVATE_WITH_NAT
     );
   }
 
