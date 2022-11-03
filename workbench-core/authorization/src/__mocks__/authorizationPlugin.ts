@@ -4,7 +4,7 @@
  */
 
 import { Operation, Permission, AuthorizationPlugin, DynamicOperation } from '..';
-import { IdentityPermission } from '../dynamicAuthorization/dynamicPermissionsPluginInputs';
+import { IdentityPermission } from '../dynamicAuthorization/dynamicPermissionsPluginInputs/identityPermission';
 import {
   mockAdminPermissions,
   mockGetOperations,

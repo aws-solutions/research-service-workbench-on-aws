@@ -4,7 +4,7 @@
  */
 
 import { fc, itProp } from 'jest-fast-check';
-import { IdentityPermission } from './dynamicAuthorization/dynamicPermissionsPluginInputs';
+import { IdentityPermission } from './dynamicAuthorization/dynamicPermissionsPluginInputs/identityPermission';
 import { Operation, Permission, CASLAuthorizationPlugin, ForbiddenError, DynamicOperation } from '.';
 
 describe('CASL Authorization Plugin', () => {

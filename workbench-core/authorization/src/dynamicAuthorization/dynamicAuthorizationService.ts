@@ -9,26 +9,32 @@ import { DynamicOperation } from '../operation';
 import { DynamicPermissionsPlugin } from './dynamicPermissionsPlugin';
 import {
   AssignUserToGroupRequest,
-  AssignUserToGroupResponse,
-  CreateGroupRequest,
-  CreateGroupResponse,
+  AssignUserToGroupResponse
+} from './dynamicPermissionsPluginInputs/assignUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './dynamicPermissionsPluginInputs/createGroup';
+import {
   CreateIdentityPermissionsRequest,
-  CreateIdentityPermissionsResponse,
-  DeleteGroupRequest,
-  DeleteGroupResponse,
+  CreateIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/createIdentityPermissions';
+import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicPermissionsPluginInputs/deleteGroup';
+import {
   DeleteIdentityPermissionsRequest,
-  DeleteIdentityPermissionsResponse,
+  DeleteIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteIdentityPermissions';
+import {
   DeleteSubjectPermissionsRequest,
-  DeleteSubjectPermissionsResponse,
-  GetUserGroupsRequest,
-  GetUserGroupsResponse,
+  DeleteSubjectPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteSubjectPermissions';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicPermissionsPluginInputs/getUserGroups';
+import {
   GetUsersFromGroupRequest,
-  GetUsersFromGroupResponse,
-  Identity,
-  IdentityPermission,
+  GetUsersFromGroupResponse
+} from './dynamicPermissionsPluginInputs/getUsersFromGroup';
+import { Identity, IdentityPermission } from './dynamicPermissionsPluginInputs/identityPermission';
+import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
-} from './dynamicPermissionsPluginInputs';
+} from './dynamicPermissionsPluginInputs/removeUserFromGroup';
 
 /**
  * Request object for DynamicAuthorizationService's isAuthorizedOnSubjectRequest

@@ -43,30 +43,54 @@ export {
 export { DynamicPermissionsPlugin } from './dynamicAuthorization/dynamicPermissionsPlugin';
 export {
   CreateGroupRequest,
-  CreateGroupResponse,
+  CreateGroupResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/createGroup';
+export {
   DeleteGroupRequest,
-  DeleteGroupResponse,
+  DeleteGroupResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/deleteGroup';
+export {
   IdentityType,
-  GetUserGroupsRequest,
-  GetUserGroupsResponse,
-  GetUsersFromGroupRequest,
-  GetUsersFromGroupResponse,
   IdentityPermission,
+  Identity
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/identityPermission';
+export {
+  GetUserGroupsRequest,
+  GetUserGroupsResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/getUserGroups';
+export {
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/getUsersFromGroup';
+export {
   CreateIdentityPermissionsRequest,
-  CreateIdentityPermissionsResponse,
+  CreateIdentityPermissionsResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/createIdentityPermissions';
+export {
   DeleteIdentityPermissionsRequest,
-  DeleteIdentityPermissionsResponse,
+  DeleteIdentityPermissionsResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/deleteIdentityPermissions';
+
+export {
   DeleteSubjectPermissionsRequest,
-  DeleteSubjectPermissionsResponse,
+  DeleteSubjectPermissionsResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/deleteSubjectPermissions';
+export {
   AssignUserToGroupRequest,
-  AssignUserToGroupResponse,
+  AssignUserToGroupResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/assignUserToGroup';
+export {
   RemoveUserFromGroupRequest,
-  RemoveUserFromGroupResponse,
+  RemoveUserFromGroupResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/removeUserFromGroup';
+export {
   GetIdentityPermissionsBySubjectRequest,
-  GetIdentityPermissionsBySubjectResponse,
+  GetIdentityPermissionsBySubjectResponse
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/getIdentityPermissionsBySubject';
+export {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
-} from './dynamicAuthorization/dynamicPermissionsPluginInputs';
+} from './dynamicAuthorization/dynamicPermissionsPluginInputs/getIdentityPermissionsByIdentity';
 export {
   DynamoDBDynamicPermissionsPlugin,
   InitRequest,

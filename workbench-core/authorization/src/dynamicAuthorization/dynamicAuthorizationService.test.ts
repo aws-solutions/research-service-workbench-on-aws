@@ -90,40 +90,11 @@ describe('Dynamic Authorization Service', () => {
 
     test('Check user with a valid permissions for a dynamic operation', async () => {
       expect(
-        await dynamicAuthorizationService.isAuthorizedOnSubject(mockAuthenticatedUser, {
-          dynamicOperation: mockDynamicOperation
-        })
-      ).toBeUndefined();
-
-      expect(mockDynamicPermissionsPlugin.getUserGroups).toBeCalledWith({
-        userId: mockAuthenticatedUser.id
-      });
-
-      expect(mockDynamicPermissionsPlugin.getIdentityPermissionsBySubject).toHaveBeenNthCalledWith(1, {
-        subjectType: mockDynamicOperation.subjectType,
-        subjectId: mockDynamicOperation.subjectId,
-        action: mockDynamicOperation.action,
-        identities: [
-          { identityType: 'USER', identityId: mockAuthenticatedUser.id },
-          { identityType: 'GROUP', identityId: 'groupId1' },
-          { identityType: 'GROUP', identityId: 'groupId0' }
-        ]
-      });
-      expect(mockDynamicPermissionsPlugin.getIdentityPermissionsBySubject).toHaveBeenNthCalledWith(2, {
-        subjectType: mockDynamicOperation.subjectType,
-        subjectId: '*',
-        action: mockDynamicOperation.action,
-        identities: [
-          { identityType: 'USER', identityId: mockAuthenticatedUser.id },
-          { identityType: 'GROUP', identityId: 'groupId1' },
-          { identityType: 'GROUP', identityId: 'groupId0' }
-        ]
-      });
-
-      expect(mockAuthorizationPlugin.isAuthorizedOnDynamicOperations).toBeCalledWith(
-        [...sampleGroupPermissions, ...sampleGroupWildcardPermissions],
-        [mockDynamicOperation]
-      );
+        async () =>
+          await dynamicAuthorizationService.isAuthorizedOnSubject(mockAuthenticatedUser, {
+            dynamicOperation: mockDynamicOperation
+          })
+      ).not.toThrowError();
     });
 
     test('Check user with invalid permissions for a dynamic operation', async () => {
@@ -168,180 +139,122 @@ describe('Dynamic Authorization Service', () => {
       }
     });
   });
-
-  describe('createGroup', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest.spyOn(mockDynamicPermissionsPlugin, 'createGroup').mockResolvedValue({ created: true });
-      expect(
-        await dynamicAuthorizationService.createGroup({
-          groupId: 'sampleId',
-          description: 'sample description'
-        })
-      ).toStrictEqual({
-        created: true
-      });
-      expect(mockDynamicPermissionsPlugin.createGroup).toBeCalledWith({
+  test('createGroup', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'createGroup').mockResolvedValue({ created: true });
+    expect(
+      await dynamicAuthorizationService.createGroup({
         groupId: 'sampleId',
         description: 'sample description'
-      });
+      })
+    ).toStrictEqual({
+      created: true
     });
   });
-
-  describe('deleteGroup', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest.spyOn(mockDynamicPermissionsPlugin, 'deleteGroup').mockResolvedValue({ deleted: true });
-      expect(
-        await dynamicAuthorizationService.deleteGroup({
-          groupId: 'sampleId'
-        })
-      ).toStrictEqual({
-        deleted: true
-      });
-      expect(mockDynamicPermissionsPlugin.deleteGroup).toBeCalledWith({
+  test('deleteGroup', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'deleteGroup').mockResolvedValue({ deleted: true });
+    expect(
+      await dynamicAuthorizationService.deleteGroup({
         groupId: 'sampleId'
-      });
+      })
+    ).toStrictEqual({
+      deleted: true
     });
   });
-
-  describe('createIdentityPermissions', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest
-        .spyOn(mockDynamicPermissionsPlugin, 'createIdentityPermissions')
-        .mockResolvedValue({ created: true });
-      const mockIdentityPermission: IdentityPermission = {
-        effect: 'ALLOW',
-        action: 'CREATE',
-        subjectType: 'sampleSubject',
-        subjectId: 'sampleSubject123',
-        identityType: 'GROUP',
-        identityId: 'groupId'
-      };
-      expect(
-        await dynamicAuthorizationService.createIdentityPermissions({
-          identityPermissions: [mockIdentityPermission]
-        })
-      ).toStrictEqual({
-        created: true
-      });
-      expect(mockDynamicPermissionsPlugin.createIdentityPermissions).toBeCalledWith({
+  test('createIdentityPermissions', async () => {
+    jest
+      .spyOn(mockDynamicPermissionsPlugin, 'createIdentityPermissions')
+      .mockResolvedValue({ created: true });
+    const mockIdentityPermission: IdentityPermission = {
+      effect: 'ALLOW',
+      action: 'CREATE',
+      subjectType: 'sampleSubject',
+      subjectId: 'sampleSubject123',
+      identityType: 'GROUP',
+      identityId: 'groupId'
+    };
+    expect(
+      await dynamicAuthorizationService.createIdentityPermissions({
         identityPermissions: [mockIdentityPermission]
-      });
+      })
+    ).toStrictEqual({
+      created: true
     });
   });
-
-  describe('deleteIdentityPermissions', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest
-        .spyOn(mockDynamicPermissionsPlugin, 'deleteIdentityPermissions')
-        .mockResolvedValue({ deleted: true });
-      const mockIdentityPermission: IdentityPermission = {
-        effect: 'ALLOW',
-        action: 'CREATE',
-        subjectType: 'sampleSubject',
-        subjectId: 'sampleSubject123',
-        identityType: 'GROUP',
-        identityId: 'groupId'
-      };
-      expect(
-        await dynamicAuthorizationService.deleteIdentityPermissions({
-          identityPermissions: [mockIdentityPermission]
-        })
-      ).toStrictEqual({
-        deleted: true
-      });
-      expect(mockDynamicPermissionsPlugin.deleteIdentityPermissions).toBeCalledWith({
+  test('deleteIdentityPermissions', async () => {
+    jest
+      .spyOn(mockDynamicPermissionsPlugin, 'deleteIdentityPermissions')
+      .mockResolvedValue({ deleted: true });
+    const mockIdentityPermission: IdentityPermission = {
+      effect: 'ALLOW',
+      action: 'CREATE',
+      subjectType: 'sampleSubject',
+      subjectId: 'sampleSubject123',
+      identityType: 'GROUP',
+      identityId: 'groupId'
+    };
+    expect(
+      await dynamicAuthorizationService.deleteIdentityPermissions({
         identityPermissions: [mockIdentityPermission]
-      });
+      })
+    ).toStrictEqual({
+      deleted: true
     });
   });
-
-  describe('deleteSubjectPermissions', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest
-        .spyOn(mockDynamicPermissionsPlugin, 'deleteSubjectPermissions')
-        .mockResolvedValue({ deleted: true });
-      expect(
-        await dynamicAuthorizationService.deleteSubjectPermissions({
-          subjectId: 'sampleId',
-          subjectType: 'sampleSubject'
-        })
-      ).toStrictEqual({
-        deleted: true
-      });
-      expect(mockDynamicPermissionsPlugin.deleteSubjectPermissions).toBeCalledWith({
+  test('deleteSubjectPermissions', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'deleteSubjectPermissions').mockResolvedValue({ deleted: true });
+    expect(
+      await dynamicAuthorizationService.deleteSubjectPermissions({
         subjectId: 'sampleId',
         subjectType: 'sampleSubject'
-      });
+      })
+    ).toStrictEqual({
+      deleted: true
+    });
+    expect(mockDynamicPermissionsPlugin.deleteSubjectPermissions).toBeCalledWith({
+      subjectId: 'sampleId',
+      subjectType: 'sampleSubject'
     });
   });
-
-  describe('assignUserToGroup', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest.spyOn(mockDynamicPermissionsPlugin, 'assignUserToGroup').mockResolvedValue({ assigned: true });
-      expect(
-        await dynamicAuthorizationService.assignUserToGroup({
-          userId: 'userId0',
-          groupId: 'groupId0'
-        })
-      ).toStrictEqual({
-        assigned: true
-      });
-      expect(mockDynamicPermissionsPlugin.assignUserToGroup).toBeCalledWith({
+  test('assignUserToGroup', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'assignUserToGroup').mockResolvedValue({ assigned: true });
+    expect(
+      await dynamicAuthorizationService.assignUserToGroup({
         userId: 'userId0',
         groupId: 'groupId0'
-      });
+      })
+    ).toStrictEqual({
+      assigned: true
     });
   });
-
-  describe('removeUserFromGroup', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest.spyOn(mockDynamicPermissionsPlugin, 'removeUserFromGroup').mockResolvedValue({ removed: true });
-      expect(
-        await dynamicAuthorizationService.removeUserFromGroup({
-          userId: 'userId0',
-          groupId: 'groupId0'
-        })
-      ).toStrictEqual({
-        removed: true
-      });
-      expect(mockDynamicPermissionsPlugin.removeUserFromGroup).toBeCalledWith({
+  test('removeUserFromGroup', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'removeUserFromGroup').mockResolvedValue({ removed: true });
+    expect(
+      await dynamicAuthorizationService.removeUserFromGroup({
         userId: 'userId0',
         groupId: 'groupId0'
-      });
+      })
+    ).toStrictEqual({
+      removed: true
     });
   });
-
-  describe('getUsersFromGroup', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest
-        .spyOn(mockDynamicPermissionsPlugin, 'getUsersFromGroup')
-        .mockResolvedValue({ userIds: ['userId0'] });
-      expect(
-        await dynamicAuthorizationService.getUsersFromGroup({
-          groupId: 'groupId0'
-        })
-      ).toStrictEqual({
-        userIds: ['userId0']
-      });
-      expect(mockDynamicPermissionsPlugin.getUsersFromGroup).toBeCalledWith({
+  test('getUsersFromGroup', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'getUsersFromGroup').mockResolvedValue({ userIds: ['userId0'] });
+    expect(
+      await dynamicAuthorizationService.getUsersFromGroup({
         groupId: 'groupId0'
-      });
+      })
+    ).toStrictEqual({
+      userIds: ['userId0']
     });
   });
-
-  describe('getUserGroups', () => {
-    test('Check for dynamic permissions plugin was called', async () => {
-      jest.spyOn(mockDynamicPermissionsPlugin, 'getUserGroups').mockResolvedValue({ groupIds: ['groupId0'] });
-      expect(
-        await dynamicAuthorizationService.getUserGroups({
-          userId: 'userId0'
-        })
-      ).toStrictEqual({
-        groupIds: ['groupId0']
-      });
-      expect(mockDynamicPermissionsPlugin.getUserGroups).toBeCalledWith({
+  test('Check for dynamic permissions plugin was called', async () => {
+    jest.spyOn(mockDynamicPermissionsPlugin, 'getUserGroups').mockResolvedValue({ groupIds: ['groupId0'] });
+    expect(
+      await dynamicAuthorizationService.getUserGroups({
         userId: 'userId0'
-      });
+      })
+    ).toStrictEqual({
+      groupIds: ['groupId0']
     });
   });
 });

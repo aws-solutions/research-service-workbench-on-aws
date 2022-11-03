@@ -5,28 +5,39 @@
 
 import {
   AssignUserToGroupRequest,
-  AssignUserToGroupResponse,
-  CreateGroupRequest,
-  CreateGroupResponse,
+  AssignUserToGroupResponse
+} from './dynamicPermissionsPluginInputs/assignUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './dynamicPermissionsPluginInputs/createGroup';
+import {
   CreateIdentityPermissionsRequest,
-  CreateIdentityPermissionsResponse,
-  DeleteGroupRequest,
-  DeleteGroupResponse,
+  CreateIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/createIdentityPermissions';
+import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicPermissionsPluginInputs/deleteGroup';
+import {
   DeleteIdentityPermissionsRequest,
-  DeleteIdentityPermissionsResponse,
+  DeleteIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteIdentityPermissions';
+import {
   DeleteSubjectPermissionsRequest,
-  DeleteSubjectPermissionsResponse,
+  DeleteSubjectPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteSubjectPermissions';
+import {
   GetIdentityPermissionsByIdentityRequest,
-  GetIdentityPermissionsByIdentityResponse,
+  GetIdentityPermissionsByIdentityResponse
+} from './dynamicPermissionsPluginInputs/getIdentityPermissionsByIdentity';
+import {
   GetIdentityPermissionsBySubjectRequest,
-  GetIdentityPermissionsBySubjectResponse,
-  GetUserGroupsRequest,
-  GetUserGroupsResponse,
+  GetIdentityPermissionsBySubjectResponse
+} from './dynamicPermissionsPluginInputs/getIdentityPermissionsBySubject';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicPermissionsPluginInputs/getUserGroups';
+import {
   GetUsersFromGroupRequest,
-  GetUsersFromGroupResponse,
+  GetUsersFromGroupResponse
+} from './dynamicPermissionsPluginInputs/getUsersFromGroup';
+import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
-} from './dynamicPermissionsPluginInputs';
+} from './dynamicPermissionsPluginInputs/removeUserFromGroup';
 
 export interface DynamicPermissionsPlugin {
   /**

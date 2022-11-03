@@ -5,7 +5,7 @@
 
 import { Ability, AbilityBuilder, ForbiddenError as CASLForbiddenError, subject } from '@casl/ability';
 import AuthorizationPlugin from './authorizationPlugin';
-import { IdentityPermission } from './dynamicAuthorization/dynamicPermissionsPluginInputs';
+import { IdentityPermission } from './dynamicAuthorization/dynamicPermissionsPluginInputs/identityPermission';
 import { ForbiddenError } from './errors/forbiddenError';
 import { DynamicOperation, Operation } from './operation';
 import Permission from './permission';

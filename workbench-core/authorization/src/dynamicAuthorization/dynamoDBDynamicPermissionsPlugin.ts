@@ -11,31 +11,41 @@ import { Action } from '../action';
 import { Effect } from '../permission';
 import { DynamicPermissionsPlugin } from './dynamicPermissionsPlugin';
 import {
-  CreateGroupRequest,
-  CreateGroupResponse,
-  DeleteGroupRequest,
-  DeleteGroupResponse,
-  GetUserGroupsRequest,
-  GetUserGroupsResponse,
-  CreateIdentityPermissionsRequest,
-  CreateIdentityPermissionsResponse,
-  DeleteIdentityPermissionsRequest,
-  DeleteIdentityPermissionsResponse,
-  DeleteSubjectPermissionsRequest,
-  DeleteSubjectPermissionsResponse,
   AssignUserToGroupRequest,
-  AssignUserToGroupResponse,
-  RemoveUserFromGroupRequest,
-  RemoveUserFromGroupResponse,
-  GetIdentityPermissionsBySubjectRequest,
-  GetIdentityPermissionsBySubjectResponse,
-  IdentityPermission,
-  IdentityType,
-  GetUsersFromGroupRequest,
-  GetUsersFromGroupResponse,
+  AssignUserToGroupResponse
+} from './dynamicPermissionsPluginInputs/assignUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './dynamicPermissionsPluginInputs/createGroup';
+import {
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/createIdentityPermissions';
+import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicPermissionsPluginInputs/deleteGroup';
+import {
+  DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteIdentityPermissions';
+import {
+  DeleteSubjectPermissionsRequest,
+  DeleteSubjectPermissionsResponse
+} from './dynamicPermissionsPluginInputs/deleteSubjectPermissions';
+import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
-} from './dynamicPermissionsPluginInputs';
+} from './dynamicPermissionsPluginInputs/getIdentityPermissionsByIdentity';
+import {
+  GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectResponse
+} from './dynamicPermissionsPluginInputs/getIdentityPermissionsBySubject';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicPermissionsPluginInputs/getUserGroups';
+import {
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupResponse
+} from './dynamicPermissionsPluginInputs/getUsersFromGroup';
+import { IdentityPermission, IdentityType } from './dynamicPermissionsPluginInputs/identityPermission';
+import {
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupResponse
+} from './dynamicPermissionsPluginInputs/removeUserFromGroup';
 import { DynamoDBIdentityPermissionItem } from './dynamoDbIdentityItem';
 import { BadConfigurationError } from './errors/badConfigurationError';
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';

@@ -7,7 +7,7 @@ import { LoggingService } from '@aws/workbench-core-logging';
 import AuditEntry from './auditEntry';
 import Writer from './plugins/writer';
 
-export class AuditLogger implements Writer {
+export default class AuditLogger implements Writer {
   private _logger: LoggingService;
   public constructor(logger: LoggingService) {
     this._logger = logger;
