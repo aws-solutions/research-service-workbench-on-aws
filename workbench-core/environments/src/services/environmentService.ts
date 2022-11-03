@@ -368,6 +368,10 @@ export class EnvironmentService {
     user: AuthenticatedUser
   ): Promise<Environment> {
     const environmentTypeConfigSK = `${resourceTypeToKey.envType}#${params.envTypeId}${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`;
+    const datasetIds = params.datasetIds;
+    if (!_.isArray(datasetIds)) {
+      throw Boom.badRequest('DatasetIds passed in as parameter must be an array.');
+    }
     const itemsToGet = [
       // ETC
       {
@@ -377,7 +381,7 @@ export class EnvironmentService {
       // PROJ
       buildDynamoDBPkSk(params.projectId, resourceTypeToKey.project),
       // DATASETS
-      ..._.map(params.datasetIds, (dsId) => {
+      ..._.map(datasetIds, (dsId) => {
         return buildDynamoDBPkSk(dsId, resourceTypeToKey.dataset);
       })
     ];
