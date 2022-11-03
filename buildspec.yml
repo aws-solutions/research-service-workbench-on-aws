@@ -13,11 +13,12 @@ phases:
 
   build:
     commands:
+      - npm install -g @microsoft/rush
       - cd solutions/swb-reference
-      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
-      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
+      - STAGE='testEnv' rushx cdk-deploy
+      - STAGE='testEnv' rushx run-postDeployment`
       - cd ../swb-ui
-      - STAGE='testEnv' node ../../common/scripts/install-run-rushx.js deploy-ui-and-api
+      - STAGE='testEnv' rushx deploy-ui-and-api
 
 artifacts:
   base-directory: cdk/cdk.out
