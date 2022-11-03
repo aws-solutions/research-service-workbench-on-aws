@@ -5,8 +5,8 @@
 import { marshall } from '@aws-sdk/util-dynamodb';
 import Boom from '@hapi/boom';
 import { QueryParams } from '../aws/helpers/dynamoDB/dynamoDBService';
-import { FilterRequest } from '../interfaces/FilterRequest';
-import { SortRequest } from '../interfaces/SortRequest';
+import { FilterRequest } from '../interfaces/filterRequest';
+import { SortRequest } from '../interfaces/sortRequest';
 
 /************************************************************
  * Validates only one sorting or filter in list requests
