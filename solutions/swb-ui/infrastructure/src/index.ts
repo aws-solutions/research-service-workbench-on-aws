@@ -12,9 +12,9 @@ import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { SWBUIStack } from './SWBUIStack';
 
 // eslint-disable-next-line @rushstack/typedef-var
-const app = new cdk.App();
+const app : cdk.App = new cdk.App();
 // eslint-disable-next-line no-new
-const stack = new SWBUIStack(app, 'SWBUIStack', {
+const stack : SWBUIStack = new SWBUIStack(app, 'SWBUIStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
