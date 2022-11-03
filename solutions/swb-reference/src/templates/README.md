@@ -15,6 +15,9 @@ This template was originally designed for use with Palo Alto Networks' VM Series
 ### onboard-account-tgw.cfn.yaml
 A template to help hosting/member accounts integrate with the Network account. 
 
+### Dependencies
+As is, these templates depend on a subscription to an EC2 firewall appliance. We recommend you or your SA review the network settings in both the `new-firewall-vpc.yaml` file and the `onboard-account-tgw.cfn.yaml` to update them to best suit your needs. This may include removing the EC2 firewall and the Gatewayload balancer, and updating the Transit Gateway's and onboarding account's route tables to reroute trafic that used to go through the EC2 firewall.
+
 ### How to use these:
 1. Launch the stack in a network account
 1. Share the network account's transit gateway with the hosting account
@@ -23,4 +26,5 @@ A template to help hosting/member accounts integrate with the Network account.
     1. If a resource share doesn't already exist for your TGW, then create one. Make sure to give access to the app account on the "Grant access to principals"
 1. On the onboarding account, accept the resource share
     1. Resource Access Manager -> Shared with me -> Accept the invite
-1. Launch the onboarding stack in the hosting account with the relevant outputs from the network account onboarding
+1. Launch the onboarding stack (`onboard-account-tgw.cfn.yaml`) in the hosting account with the relevant outputs from the network account onboarding
+1. Use the outputs from the onboarding stack to onboard the account with the main account per the instructions in the [setup instructions](../../SETUP_v2p1.md).
