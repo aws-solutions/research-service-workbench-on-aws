@@ -155,20 +155,25 @@ export class SWBStack extends Stack {
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
-    const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node.defaultChild as CfnResource;
+    const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node
+      .defaultChild as CfnResource;
     metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
         },
         {
           id: 'W89',
-          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
         },
         {
           id: 'W92',
-          reason: 'Lambda created by using AWSCustomResource and is managed by CDK internals. We don\'t want to jeopardize it\'s functionality'
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
         }
       ]
     });
@@ -364,14 +369,15 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W28',
-          reason: 'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
         },
         {
           id: 'W11',
           reason: 'TODO:triage IAM role should not allow * resource on its permissions policy'
-        },
+        }
       ]
-    }); 
+    });
 
     return iamRole;
   }
@@ -415,9 +421,9 @@ export class SWBStack extends Stack {
         {
           id: 'W35',
           reason: 'TODO:triage S3 Bucket should have access logging configured'
-        },
+        }
       ]
-    }); 
+    });
 
     return s3Bucket;
   }
@@ -479,9 +485,9 @@ export class SWBStack extends Stack {
         {
           id: 'F16',
           reason: 'TODO:triage S3 Bucket policy should not allow * principal'
-        },
+        }
       ]
-    }); 
+    });
   }
 
   private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
@@ -499,9 +505,9 @@ export class SWBStack extends Stack {
         {
           id: 'W35',
           reason: 'TODO:triage S3 Bucket should have access logging configured'
-        },
+        }
       ]
-    }); 
+    });
     new CfnOutput(this, 'DataSetsBucketName', {
       value: bucket.bucketName
     });
@@ -586,7 +592,8 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO:triage (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
         },
         {
           id: 'W89',
@@ -594,10 +601,11 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W92',
-          reason: 'TODO:triage (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
-        },
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
       ]
-    }); 
+    });
 
     return statusHandlerLambda;
   }
@@ -682,7 +690,7 @@ export class SWBStack extends Stack {
           reason: 'TODO:triage (AccountHandlerLambdaPolicy) SPCM for IAM policy document is higher than 25'
         }
       ]
-    }); 
+    });
 
     if (!_.isEmpty(amiIdsList)) {
       lambdaPolicy.addStatements(
@@ -712,7 +720,8 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W58',
-          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
         },
         {
           id: 'W89',
@@ -720,10 +729,11 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W92',
-          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
-        },
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
       ]
-    }); 
+    });
 
     return lambda;
   }
@@ -764,7 +774,10 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['sts:AssumeRole'],
-          resources: ['arn:aws:iam::*:role/*EnvManagementRole*', 'arn:aws:iam::*:role/*HostingAccountHandlerRol*'],
+          resources: [
+            'arn:aws:iam::*:role/*EnvManagementRole*',
+            'arn:aws:iam::*:role/*HostingAccountHandlerRol*'
+          ],
           sid: 'AssumeRole'
         }),
         new PolicyStatement({
@@ -830,7 +843,7 @@ export class SWBStack extends Stack {
           resources: ['*']
         })
       ]
-    })
+    });
 
     const apiLambdaPolicyMetadataNode = apiLambdaPolicy.node.defaultChild as CfnResource;
     apiLambdaPolicyMetadataNode.addMetadata('cfn_nag', {
@@ -845,7 +858,7 @@ export class SWBStack extends Stack {
           reason: 'TODO:triage (ApiLambdaPolicy) IAM policy should not allow * resource'
         }
       ]
-    }); 
+    });
 
     apiLambda.role?.attachInlinePolicy(apiLambdaPolicy);
 
@@ -867,10 +880,11 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W92',
-          reason: 'TODO:triage (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
-        },
+          reason:
+            'TODO:triage (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
       ]
-    }); 
+    });
 
     return apiLambda;
   }
@@ -887,7 +901,7 @@ export class SWBStack extends Stack {
           reason: 'TODO:triage CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
         }
       ]
-    }); 
+    });
 
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: 'Backend API Name',
@@ -928,7 +942,7 @@ export class SWBStack extends Stack {
           reason: 'placeholder2'
         }
       ]
-    }); 
+    });
 
     new CfnOutput(this, 'apiUrlOutput', {
       value: API.url
@@ -957,7 +971,7 @@ export class SWBStack extends Stack {
         {
           id: 'W64',
           reason: 'TODO:triage resources should be associated with an AWS::ApiGateway::UsagePlan.'
-        },
+        }
       ]
     });
 
@@ -967,22 +981,24 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W59',
-          reason: 'TODO:triage should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
-        },
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
       ]
     });
 
-    childMetadataNode = API.node.findChild('Default').node.findChild('{proxy+}').node.findChild('ANY').node.defaultChild as CfnResource;
+    childMetadataNode = API.node.findChild('Default').node.findChild('{proxy+}').node.findChild('ANY').node
+      .defaultChild as CfnResource;
     childMetadataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
         {
           id: 'W59',
-          reason: 'TODO:triage should not have AuthorizationType set to \'NONE\' unless it is of HttpMethod: OPTIONS..'
-        },
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
       ]
     });
-
   }
 
   // DynamoDB Table
@@ -1047,7 +1063,8 @@ export class SWBStack extends Stack {
       rules_to_suppress: [
         {
           id: 'W28',
-          reason: 'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
         },
         {
           id: 'W74',
@@ -1055,11 +1072,11 @@ export class SWBStack extends Stack {
         },
         {
           id: 'W78',
-          reason: 'TODO:triage DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
-        },
-    ]
-  }); 
-
+          reason:
+            'TODO:triage DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
+        }
+      ]
+    });
 
     return table;
   }

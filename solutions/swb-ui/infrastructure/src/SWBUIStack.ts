@@ -92,10 +92,13 @@ export class SWBUIStack extends Stack {
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     this._addCognitoURLOutput();
 
-    const customBucketDeploymentNode = this.node.findChild('Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C');
+    const customBucketDeploymentNode = this.node.findChild(
+      'Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C'
+    );
     let metadataNode = customBucketDeploymentNode.node.defaultChild as CfnResource;
     metadataNode.addMetadata('cfn_nag', {
-      rules_to_suppress : [
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
         {
           id: 'W58',
           reason: 'TODO:triage Lambda functions require permission to write CloudWatch Logs'
@@ -106,21 +109,23 @@ export class SWBUIStack extends Stack {
         },
         {
           id: 'W92',
-          reason: 'TODO:triage Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
-        },
+          reason:
+            'TODO:triage Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
       ]
     });
 
-    metadataNode = customBucketDeploymentNode.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node.defaultChild as CfnResource;
+    metadataNode = customBucketDeploymentNode.node.findChild('ServiceRole').node.findChild('DefaultPolicy')
+      .node.defaultChild as CfnResource;
     metadataNode.addMetadata('cfn_nag', {
-      rules_to_suppress : [
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
         {
           id: 'W12',
           reason: 'TODO:triage IAM policy should not allow * resource'
-        },
+        }
       ]
     });
-
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -226,7 +231,8 @@ export class SWBUIStack extends Stack {
 
     let metadataNode = distribution.node.defaultChild as CfnResource;
     metadataNode.addMetadata('cfn_nag', {
-      rules_to_suppress : [
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
         {
           id: 'W70',
           reason: 'TODO:triage Cloudfront should use minimum protocol version TLS 1.2'
@@ -236,7 +242,8 @@ export class SWBUIStack extends Stack {
 
     metadataNode = distribution.node.findChild('LoggingBucket').node.defaultChild as CfnResource;
     metadataNode.addMetadata('cfn_nag', {
-      rules_to_suppress : [
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
         {
           id: 'W35',
           reason: 'TODO:triage S3 Bucket should have access logging configured'
@@ -247,7 +254,7 @@ export class SWBUIStack extends Stack {
         }
       ]
     });
-    
+
     return distribution;
   }
   /*
