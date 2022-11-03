@@ -97,6 +97,7 @@ solutions/swb-reference/integration-tests/config/*.yaml
 !solutions/swb-reference/integration-tests/config/testEnv.yaml
 !solutions/swb-reference/src/config/example.yaml
 !solutions/swb-reference/src/config/testEnv.yaml
+!solutions/swb-reference/src/config/demo.yaml
 solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 
