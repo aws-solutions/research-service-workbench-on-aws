@@ -11,16 +11,11 @@ phases:
       # Install dependencies
       - npm install -g aws-cdk
 
-  pre_build:
-    commands:
-      - node common/scripts/install-run-rushx.js compile
-      - rush install
-
   build:
     commands:
+      - cd solutions/swb-reference
       - node common/scripts/install-run-rushx.js compile
       - rush install
-      - cd solutions/swb-reference
       - STAGE='testEnv' rushx cdk-deploy
       - STAGE='testEnv' rushx run-postDeployment`
       - cd ../swb-ui
