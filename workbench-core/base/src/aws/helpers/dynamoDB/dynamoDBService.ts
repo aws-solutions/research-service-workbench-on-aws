@@ -5,6 +5,8 @@
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import QueryParams from '../../../constants/queryParams';
+import DatabaseService from '../../../interfaces/databaseService';
+import ExecuteQueryResult from '../../../interfaces/executeQueryResult';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -13,7 +15,7 @@ import Scanner from './scanner';
 import TransactEdit from './transactEdit';
 import Updater from './updater';
 
-export default class DynamoDBService {
+export default class DynamoDBService implements DatabaseService {
   private _awsRegion: string;
   private _tableName: string;
 
@@ -138,6 +140,26 @@ export default class DynamoDBService {
       }
     }
     return getter;
+  }
+
+  /**
+   * Queries the DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a query request
+   * @returns ExecuteQueryResult object
+   *
+   * @example Use this to execute a query to the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.executeQuery({sortKey: 'value', eq: {N: '5'}});
+   * ```
+   */
+  public async executeQuery(params?: QueryParams): Promise<ExecuteQueryResult> {
+    const result = await this.query(params).execute();
+
+    return {
+      data: result.Items || [],
+      paginationToken: result.LastEvaluatedKey as unknown as string | undefined
+    };
   }
 
   /**
