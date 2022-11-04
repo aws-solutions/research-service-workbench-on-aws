@@ -6,6 +6,7 @@
 import { DynamoDBClient, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
+import JSONValue from '../../../types/json';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -16,7 +17,7 @@ describe('DynamoDBService', () => {
 
   describe('executeQuery', () => {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let unmarshalledData: { [key: string]: any };
+    let unmarshalledData: Record<string, JSONValue>;
     let unmarshalledPaginationToken: { pk: string; sk: string };
 
     beforeEach(() => {

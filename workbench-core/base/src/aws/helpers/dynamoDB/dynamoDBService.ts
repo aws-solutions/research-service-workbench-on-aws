@@ -7,6 +7,7 @@ import _ from 'lodash';
 import QueryParams from '../../../constants/queryParams';
 import DatabaseService from '../../../interfaces/databaseService';
 import ExecuteQueryResult from '../../../interfaces/executeQueryResult';
+import JSONType from '../../../types/json';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -155,7 +156,7 @@ export default class DynamoDBService implements DatabaseService {
    */
   public async executeQuery(params?: QueryParams): Promise<ExecuteQueryResult> {
     const result = await this.query(params).execute();
-    const data = result.Items?.map((item) => item) || [];
+    const data = result.Items?.map((item) => item as unknown as Record<string, JSONType>) || [];
 
     return {
       data,
