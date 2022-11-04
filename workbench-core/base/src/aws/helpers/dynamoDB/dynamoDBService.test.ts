@@ -16,19 +16,17 @@ describe('DynamoDBService', () => {
 
   describe('executeQuery', () => {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let unmarshalledData: { [key: string]: any }[];
+    let unmarshalledData: { [key: string]: any };
     let unmarshalledPaginationToken: { pk: string; sk: string };
 
     beforeEach(() => {
-      unmarshalledData = [
-        {
-          accountId: 'sampleAccId',
-          awsAccountId: '123456789012',
-          id: 'sampleAccId',
-          portfolioId: 'port-1234',
-          targetAccountStackName: 'swb-dev-va-hosting-account'
-        }
-      ];
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
 
       unmarshalledPaginationToken = {
         pk: 'pk',
@@ -44,7 +42,7 @@ describe('DynamoDBService', () => {
 
     test('returns unmarshalled data', async () => {
       const result = await dbService.executeQuery();
-      expect(result.data).toEqual(unmarshalledData);
+      expect(result.data).toEqual([unmarshalledData]);
       expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
     });
   });

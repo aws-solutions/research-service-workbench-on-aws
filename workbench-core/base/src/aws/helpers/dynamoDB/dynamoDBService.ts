@@ -155,7 +155,7 @@ export default class DynamoDBService implements DatabaseService {
    */
   public async executeQuery(params?: QueryParams): Promise<ExecuteQueryResult> {
     const result = await this.query(params).execute();
-    const data = result.Items?.map((item) => item[0]) || [];
+    const data = result.Items?.map((item) => item) || [];
 
     return {
       data,
