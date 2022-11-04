@@ -497,7 +497,7 @@ class Query {
   public async execute(): Promise<QueryCommandOutput> {
     const result = await this._ddb.query(this._params);
     if (result.Items) {
-      result.Items = result.Items.map((item) => unmarshall(item)[0]);
+      result.Items = result.Items.map((item) => unmarshall(item));
     }
 
     if (result.LastEvaluatedKey) {
