@@ -4,16 +4,16 @@
 #
 
 name: Deploy-and-integration-test-example-app
-# on: ['pull_request']
-on:
-  workflow_call:
-    secrets:
-      aws-test-region:
-        required: true
-      role-to-assume:
-        required: true
-      aws-test-account-region:
-        required: true
+on: ['pull_request']
+# on:
+#   workflow_call:
+#     secrets:
+#       aws-test-region:
+#         required: true
+#       role-to-assume:
+#         required: true
+#       aws-test-account-region:
+#         required: true
 
 jobs:
   deploy-and-integration-test-example:
