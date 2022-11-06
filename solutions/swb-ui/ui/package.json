@@ -28,7 +28,7 @@
     "lint": "eslint . && rushx pkg-json-lint",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage",
-    "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
+    "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "serve": "node .next/server/webpack-runtime.js",
     "sort-package-json": "sort-package-json package.json",
     "test": "jest --coverage --passWithNoTests 2>&1 && rushx make-badges",
