@@ -34,14 +34,14 @@ jobs:
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ secrets.aws-test-region }}
-          role-to-assume: ${{ secrets.test-role-to-assume }}
+          aws-region: ${{ secrets.AWS_TEST_REGION }}
+          role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
           role-session-name: TestOIDCSessionName
 
       - name: Deploy example package to Test environment
         run: |
           cd workbench-core/example/infrastructure
-          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.aws-test-account-region }} -v
+          node ../../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.AWS_TEST_ACCOUNT_REGION }} -v
           node ../../../common/scripts/install-run-rushx.js cdk:deploy
 
       - name: Example package integration test
