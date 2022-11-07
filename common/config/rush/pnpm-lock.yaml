@@ -834,6 +834,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       istanbul-badges-readme: 1.8.1
       jest: ^27.5.1
+      jsonschema: ^1.4.1
       license-check-and-add: ^4.0.5
       license-checker: ^25.0.1
       lodash: ^4.17.21
@@ -865,6 +866,7 @@ importers:
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
+      jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
     devDependencies:
