@@ -12,7 +12,8 @@ describe('SWBvpc tests', () => {
   it('has the correct vpc properties when given no arguments', () => {
     const swbVpcPropsProps: SWBVpcProps = {
       vpcId: '',
-      subnetIds: []
+      albSubnetIds: [],
+      ecsSubnetIds: []
     };
     const stack = new Stack();
     new SWBVpc(stack, 'TestSWBVpc', swbVpcPropsProps);
@@ -57,7 +58,7 @@ describe('SWBvpc tests', () => {
     });
   });
 
-  it('has the correct vpc properties when given vpcId and subnetId', () => {
+  it('has the correct vpc properties when given vpcId and albSubnetId', () => {
     const stack = new Stack();
     const template = Template.fromStack(stack);
     const mockVpc = new Vpc(stack, 'testVpc');
@@ -71,12 +72,13 @@ describe('SWBvpc tests', () => {
 
     const swbVpcPropsProps: SWBVpcProps = {
       vpcId: mockVpc.vpcId,
-      subnetIds: [mockSubnet.subnetId]
+      albSubnetIds: [mockSubnet.subnetId],
+      ecsSubnetIds: []
     };
     const swbVpc = new SWBVpc(stack, 'TestSWBVpc', swbVpcPropsProps);
 
     expect(swbVpc.vpc.vpcId).toEqual(mockVpc.vpcId);
-    expect(swbVpc.subnetSelection.subnets).toEqual([mockSubnet]);
+    expect(swbVpc.albSubnetSelection.subnets).toEqual([mockSubnet]);
 
     // No VPCs or Subnets should be in the template because we are taking existing resources
     template.resourceCountIs('AWS::EC2::VPC', 0);

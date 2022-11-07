@@ -8,36 +8,56 @@ import { Construct } from 'constructs';
 
 export interface SWBVpcProps {
   vpcId: string;
-  subnetIds: string[];
+  albSubnetIds: string[];
+  ecsSubnetIds: string[];
 }
 
 export class SWBVpc extends Construct {
   public readonly vpc: IVpc;
-  public readonly subnetSelection: SubnetSelection;
+  public readonly albSubnetSelection: SubnetSelection;
+  public readonly ecsSubnetSelection: SubnetSelection;
 
   public constructor(scope: Construct, id: string, props: SWBVpcProps) {
-    const { vpcId, subnetIds } = props;
+    const { vpcId, albSubnetIds, ecsSubnetIds } = props;
     super(scope, id);
 
-    this.vpc =
-      vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId: vpcId });
-    if (subnetIds.length === 0) {
-      this.subnetSelection = this.vpc.selectSubnets({
-        // Default behavior if no subnets are given is to use all public subnets from vpc above
-        // This should be switched to PRIVATE_WITH_NAT when setting this up with private subnets
-        subnetType: SubnetType.PUBLIC
+    this.vpc = vpcId === '' ? new Vpc(this, 'MainVPC', {}) : Vpc.fromLookup(this, 'MainVPC', { vpcId });
+
+    // if only ecs or alb subnets are defined - use them for both alb and ecs
+    this.albSubnetSelection = this._getSubnetSelection(
+      scope,
+      !albSubnetIds.length ? ecsSubnetIds : albSubnetIds,
+      SubnetType.PUBLIC
+    );
+    this.ecsSubnetSelection = this._getSubnetSelection(
+      scope,
+      !ecsSubnetIds.length ? albSubnetIds : ecsSubnetIds,
+      SubnetType.PRIVATE_WITH_NAT
+    );
+  }
+
+  private _getSubnetSelection(
+    scope: Construct,
+    subnetIds: string[],
+    subnetType: SubnetType
+  ): SubnetSelection {
+    if (!subnetIds.length) {
+      return this.vpc.selectSubnets({
+        subnetType
       });
-    } else {
-      const subnets: ISubnet[] = [];
-      let subnetCount = 1;
-      subnetIds.forEach(function (subnetId: string) {
-        const subnet = Subnet.fromSubnetId(scope, 'SWBSubnet' + subnetCount, subnetId);
-        subnets.push(subnet);
-        subnetCount++;
-      });
-      this.subnetSelection = {
-        subnets: subnets
-      };
     }
+
+    const subnetPrefix = subnetType === SubnetType.PUBLIC ? 'ALB' : 'ECS';
+    const subnets: ISubnet[] = [];
+    let subnetCount = 1;
+    subnetIds.forEach(function (subnetId: string) {
+      const subnet = Subnet.fromSubnetId(scope, `SWB${subnetPrefix}Subnet${subnetCount}`, subnetId);
+      subnets.push(subnet);
+      subnetCount++;
+    });
+
+    return {
+      subnets
+    };
   }
 }
