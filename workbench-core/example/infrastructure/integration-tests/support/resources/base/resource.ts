@@ -42,7 +42,6 @@ export default class Resource {
     return this._axiosInstance.put(this._api, body);
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async delete(): Promise<void> {
     await this._axiosInstance.delete(this._api);
   }

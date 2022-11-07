@@ -8,12 +8,10 @@ import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
-// import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 
 describe('userManagement create user integration test', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  // const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -56,13 +54,12 @@ describe('userManagement create user integration test', () => {
       // create user again
       await adminSession.resources.users.create(user);
     } catch (e) {
-      console.log(e);
       checkHttpError(
         e,
         new HttpError(400, {
           statusCode: 400,
           error: 'Bad Request',
-          message: "requires property 'datasetName'"
+          message: 'An account with the given email already exists.'
         })
       );
     }
@@ -78,13 +75,12 @@ describe('userManagement create user integration test', () => {
     try {
       await adminSession.resources.users.create(user);
     } catch (e) {
-      console.log(e);
       checkHttpError(
         e,
         new HttpError(400, {
           statusCode: 400,
           error: 'Bad Request',
-          message: "requires property 'datasetName'"
+          message: 'Invalid email address format.'
         })
       );
     }

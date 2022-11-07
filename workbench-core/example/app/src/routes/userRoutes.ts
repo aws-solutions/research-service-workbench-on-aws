@@ -60,6 +60,21 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     })
   );
 
+  router.delete(
+    '/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const user = await service.deleteUser(req.params.userId);
+        res.status(200).json(user);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {

@@ -12,14 +12,18 @@ export default class User extends Resource {
     super(clientSession, 'dataset', id, parentApi);
   }
 
-  public async share(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/share`, requestBody);
+  public async activate(): Promise<AxiosResponse> {
+    return this._axiosInstance.post(`${this._api}/activate`);
+  }
+
+  public async deactivate(): Promise<AxiosResponse> {
+    return this._axiosInstance.post(`${this._api}/deactivate`);
   }
 
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
-    const { data: resource } = await defAdminSession.resources.users.user(this._id).get();
-    console.log(resource);
-    // TODO
+
+    // delete the user
+    await defAdminSession.resources.users.user(this._id).delete();
   }
 }
