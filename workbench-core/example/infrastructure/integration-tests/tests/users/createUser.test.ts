@@ -12,9 +12,16 @@ import { checkHttpError } from '../../support/utils/utilities';
 describe('userManagement create user integration test', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let user: CreateUser;
 
   beforeEach(() => {
     expect.hasAssertions();
+
+    user = {
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'fakeemail@notanemail.com'
+    };
   });
 
   beforeAll(async () => {
@@ -26,12 +33,6 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a created user', async () => {
-    const user: CreateUser = {
-      firstName: 'Test',
-      lastName: 'User',
-      email: 'fakeemail@notanemail.com'
-    };
-
     const response = await adminSession.resources.users.create(user);
 
     expect(response.data).toMatchObject({
@@ -42,16 +43,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return an error when a user with the provided email already exists', async () => {
-    const user: CreateUser = {
-      firstName: 'Test',
-      lastName: 'User',
-      email: 'fakeemail2@notanemail.com'
-    };
-
     try {
-      // create user
-      await adminSession.resources.users.create(user);
-      // create user again
       await adminSession.resources.users.create(user);
     } catch (e) {
       checkHttpError(
@@ -66,14 +58,8 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return an error when the provided email is not a valid email address', async () => {
-    const user: CreateUser = {
-      firstName: 'Test',
-      lastName: 'User',
-      email: 'notanemail'
-    };
-
     try {
-      await adminSession.resources.users.create(user);
+      await adminSession.resources.users.create({ ...user, email: 'notanemail' });
     } catch (e) {
       checkHttpError(
         e,
