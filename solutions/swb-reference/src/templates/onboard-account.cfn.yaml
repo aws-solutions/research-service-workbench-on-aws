@@ -386,6 +386,7 @@ Resources:
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']] # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -403,6 +404,11 @@ Resources:
       ManagedPolicyArns:
         - !Ref PolicyHostingAccountHandler
       PermissionsBoundary: !Ref PolicyHostingAccountHandler
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W28
+            reason: "TODO:triage Suppressing because the main account depends on a role with this pattern"
 
   VPC:
     Type: AWS::EC2::VPC
