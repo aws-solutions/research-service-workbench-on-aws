@@ -316,7 +316,7 @@ describe('AccountService', () => {
     const response = await accountService.getAndUploadTemplateForAccount(accountId);
 
     // CHECK
-    expect(response).toEqual(expectedTemplate);
+    expect(response.url).toEqual(expectedTemplate);
   });
 
   describe('getAccount', () => {

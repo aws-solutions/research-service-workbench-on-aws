@@ -8,8 +8,8 @@ import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/wor
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
-import CostCenter from '../models/costCenter';
 import AccountCfnTemplate from "../models/accountCfnTemplate";
+import CostCenter from '../models/costCenter';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -60,10 +60,10 @@ export default class AccountService {
    * @param includeMetadata - Controls inclusion of metadata associated with the account
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<URL> {
+  public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<AccountCfnTemplate> {
     const url = new URL('http://potato.com');
     const responseObj : AccountCfnTemplate = { url: url };
-    return responseObj.url;
+    return responseObj;
   }
 
   /**

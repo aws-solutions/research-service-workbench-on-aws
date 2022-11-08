@@ -14,6 +14,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import Account from '../models/account';
+import AccountCfnTemplate from "../models/accountCfnTemplate";
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -61,7 +62,7 @@ export default class HostingAccountLifecycleService {
    * @param includeMetadata - Controls inclusion of metadata associated with the account
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async applesauce2(accountId: string, includeMetadata: boolean = false): Promise<URL> {
+  public async applesauce2(accountId: string, includeMetadata: boolean = false): Promise<AccountCfnTemplate> {
     return this._accountService.getAndUploadTemplateForAccount(accountId, includeMetadata);
   }
 
