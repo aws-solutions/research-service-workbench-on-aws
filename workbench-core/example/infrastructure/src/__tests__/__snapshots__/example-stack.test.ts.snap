@@ -15,11 +15,11 @@ Object {
         },
         Object {
           "id": "AwsSolutions-APIG4",
-          "reason": "@aws/workbench-core-authentication implemented",
+          "reason": "@aws/workbench-core-authorization implemented at app level",
         },
         Object {
           "id": "AwsSolutions-COG4",
-          "reason": "@aws/workbench-core-authentication implemented",
+          "reason": "@aws/workbench-core-authorization implemented at app level",
         },
       ],
     },
@@ -64,14 +64,6 @@ Object {
         ],
       },
     },
-    "ExampleAPIGatewayAccessLogsEncryptionKeyEncryptionKeyOutput2A75575B": Object {
-      "Value": Object {
-        "Fn::GetAtt": Array [
-          "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
-          "Arn",
-        ],
-      },
-    },
     "ExampleCognitoDomainName": Object {
       "Export": Object {
         "Name": "ExampleCognitoDomain",
@@ -107,6 +99,11 @@ Object {
       },
       "Value": Object {
         "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+      },
+    },
+    "ExampleDynamoDBTableName": Object {
+      "Value": Object {
+        "Ref": "ExampleStackF2AEB7EA",
       },
     },
     "ExampleDynamoDBTableOutput": Object {
@@ -167,14 +164,6 @@ Object {
         ],
       },
     },
-    "TableEncryptionKeyEncryptionKeyOutput33C766B9": Object {
-      "Value": Object {
-        "Fn::GetAtt": Array [
-          "TableEncryptionKeyD2A97AAC",
-          "Arn",
-        ],
-      },
-    },
   },
   "Parameters": Object {
     "BootstrapVersion": Object {
@@ -193,7 +182,7 @@ Object {
           "rules_to_suppress": Array [
             Object {
               "id": "AwsSolutions-L1",
-              "reason": "Should be fixed in the @aws/workbench-core-infrastructure package",
+              "reason": "This is an AWSCustom Resource Lambda Function, I am ok with this",
             },
           ],
         },
@@ -284,7 +273,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2Be563d6492e72adf9809c20f19056bfa3",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B010d1d6ef4b6be49cbb124b5428d210c",
             "Version",
           ],
         },
@@ -346,66 +335,21 @@ Object {
     },
     "ExampleAPIGatewayAccessLogs5DEC7E98": Object {
       "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "KmsKeyId": Object {
-          "Fn::GetAtt": Array [
-            "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
-            "Arn",
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W84",
+              "reason": "Cloudwatch LogGroups are encrypted by default",
+            },
           ],
         },
+      },
+      "Properties": Object {
         "RetentionInDays": 731,
       },
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
-    },
-    "ExampleAPIGatewayAccessLogsEncryptionKey94651546": Object {
-      "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "EnableKeyRotation": true,
-        "KeyPolicy": Object {
-          "Statement": Array [
-            Object {
-              "Action": "kms:*",
-              "Effect": "Allow",
-              "Principal": Object {
-                "AWS": Object {
-                  "Fn::Join": Array [
-                    "",
-                    Array [
-                      "arn:",
-                      Object {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      Object {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-              "Resource": "*",
-              "Sid": "main-key-share-statement",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::KMS::Key",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "ExampleAPIGatewayAccessLogsEncryptionKeyAliasB5E329E6": Object {
-      "Properties": Object {
-        "AliasName": "alias/ExampleAPIGatewayAccessLogs-EncryptionKey",
-        "TargetKeyId": Object {
-          "Fn::GetAtt": Array [
-            "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
     },
     "ExampleLambdaPolicy2109B1D9": Object {
       "Metadata": Object {
@@ -701,6 +645,10 @@ Object {
               "id": "W89",
               "reason": "This is an example Lambda Function for integration test and is not deployed inside a VPC",
             },
+            Object {
+              "id": "W92",
+              "reason": "This is an example Lambda Function, reserved concurrency is not required",
+            },
           ],
         },
       },
@@ -709,7 +657,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "49636ff8ab062219360b17dfecffc1384c0ffb5d828259bac9f9fa91de6000be.zip",
+          "S3Key": "f080608a7059b429fcb559091433d36697f956df6567d377faa3792cb7683d38.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -738,6 +686,9 @@ Object {
                 ],
               ],
             },
+            "DDB_TABLE_NAME": Object {
+              "Ref": "ExampleStackF2AEB7EA",
+            },
             "STACK_NAME": Object {
               "Ref": "AWS::StackName",
             },
@@ -749,7 +700,6 @@ Object {
         "FunctionName": "ExampleLambda",
         "Handler": "buildLambda.handler",
         "MemorySize": 832,
-        "ReservedConcurrentExecutions": 10,
         "Role": Object {
           "Fn::GetAtt": Array [
             "ExampleLambdaServiceServiceRole83FF9D48",
@@ -761,7 +711,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2Be563d6492e72adf9809c20f19056bfa3": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B010d1d6ef4b6be49cbb124b5428d210c": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
@@ -865,22 +815,6 @@ Object {
                   ],
                 },
               ],
-            },
-            Object {
-              "Action": Array [
-                "kms:Decrypt",
-                "kms:DescribeKey",
-                "kms:Encrypt",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-              ],
-              "Effect": "Allow",
-              "Resource": Object {
-                "Fn::GetAtt": Array [
-                  "TableEncryptionKeyD2A97AAC",
-                  "Arn",
-                ],
-              },
             },
           ],
           "Version": "2012-10-17",
@@ -1393,7 +1327,7 @@ Object {
           "rules_to_suppress": Array [
             Object {
               "id": "AwsSolutions-S1",
-              "reason": "I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket",
+              "reason": "This is an access log bucket, we don't need to configure access logging for access log buckets",
             },
           ],
         },
@@ -1909,6 +1843,10 @@ Object {
               "id": "W78",
               "reason": "This is an example app for integration test, backup is not required",
             },
+            Object {
+              "id": "W74",
+              "reason": "default: server-side encryption is enabled with an AWS owned customer master key",
+            },
           ],
         },
       },
@@ -2060,67 +1998,8 @@ Object {
             "KeyType": "RANGE",
           },
         ],
-        "SSESpecification": Object {
-          "KMSMasterKeyId": Object {
-            "Fn::GetAtt": Array [
-              "TableEncryptionKeyD2A97AAC",
-              "Arn",
-            ],
-          },
-          "SSEEnabled": true,
-          "SSEType": "KMS",
-        },
       },
       "Type": "AWS::DynamoDB::Table",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "TableEncryptionKeyAlias29795582": Object {
-      "Properties": Object {
-        "AliasName": "alias/Table-EncryptionKey",
-        "TargetKeyId": Object {
-          "Fn::GetAtt": Array [
-            "TableEncryptionKeyD2A97AAC",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::KMS::Alias",
-    },
-    "TableEncryptionKeyD2A97AAC": Object {
-      "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "EnableKeyRotation": true,
-        "KeyPolicy": Object {
-          "Statement": Array [
-            Object {
-              "Action": "kms:*",
-              "Effect": "Allow",
-              "Principal": Object {
-                "AWS": Object {
-                  "Fn::Join": Array [
-                    "",
-                    Array [
-                      "arn:",
-                      Object {
-                        "Ref": "AWS::Partition",
-                      },
-                      ":iam::",
-                      Object {
-                        "Ref": "AWS::AccountId",
-                      },
-                      ":root",
-                    ],
-                  ],
-                },
-              },
-              "Resource": "*",
-              "Sid": "main-key-share-statement",
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Retain",
     },
   },

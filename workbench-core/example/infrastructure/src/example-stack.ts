@@ -16,7 +16,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, CfnTable, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, CfnTable, Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
   AnyPrincipal,
   CfnPolicy,
@@ -27,7 +27,7 @@ import {
 } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
@@ -84,7 +84,9 @@ export class ExampleStack extends Stack {
 
     const exampleLambda: Function = this._createLambda(datasetBucket);
 
-    this._createDDBTable(exampleLambda);
+    const table = this._createDDBTable(exampleLambda);
+
+    exampleLambda.addEnvironment('DDB_TABLE_NAME', table.tableName);
 
     this._createRestApi(exampleLambda);
 
@@ -116,6 +118,7 @@ export class ExampleStack extends Stack {
       value: Aws.REGION
     });
 
+    //CDK NAG Suppression
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource',
@@ -132,7 +135,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/Resource',
-      [{ id: 'AwsSolutions-L1', reason: 'Should be fixed in the @aws/workbench-core-infrastructure package' }]
+      [{ id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }]
     );
 
     NagSuppressions.addResourceSuppressionsByPath(
@@ -173,28 +176,18 @@ export class ExampleStack extends Stack {
         id: 'AwsSolutions-APIG6',
         reason: 'I am ok with not enabling Cloudwatch logging at stage level, this is an example App'
       },
-      { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authentication implemented' },
-      { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authentication implemented' }
+      { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authorization implemented at app level' },
+      { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authorization implemented at app level' }
     ]);
   }
 
   // DynamoDB Table
   private _createDDBTable(exampleLambda: Function): Table {
-    const tableName: string = `${this.stackName}`;
-
-    const tableEncryption: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
-      this,
-      'Table-EncryptionKey'
-    );
-    const tableEncryptionKey: Key = tableEncryption.key;
-
-    const table = new Table(this, tableName, {
+    const table = new Table(this, `${this.stackName}`, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       // tableName: tableName,  W28: Resource found with an explicit name, this disallows updates that require replacement of this resource
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      encryption: TableEncryption.CUSTOMER_MANAGED,
-      encryptionKey: tableEncryptionKey
+      billingMode: BillingMode.PAY_PER_REQUEST
     });
 
     //CFN NAG Suppression
@@ -205,6 +198,10 @@ export class ExampleStack extends Stack {
         {
           id: 'W78',
           reason: 'This is an example app for integration test, backup is not required'
+        },
+        {
+          id: 'W74',
+          reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
         }
       ]
     });
@@ -248,7 +245,9 @@ export class ExampleStack extends Stack {
     });
     // Grant the Lambda Functions read access to the DynamoDB table
     table.grantReadWriteData(exampleLambda);
+
     new CfnOutput(this, 'ExampleDynamoDBTableOutput', { value: table.tableArn });
+    new CfnOutput(this, 'ExampleDynamoDBTableName', { value: table.tableName });
     return table;
   }
 
@@ -311,7 +310,8 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
       {
         id: 'AwsSolutions-S1',
-        reason: 'I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket'
+        reason:
+          "This is an access log bucket, we don't need to configure access logging for access log buckets"
       }
     ]);
 
@@ -319,14 +319,17 @@ export class ExampleStack extends Stack {
   }
 
   private _createRestApi(exampleLambda: Function): void {
-    const exampleAPIGatewayAccessLogsEncryption: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
-      this,
-      'ExampleAPIGatewayAccessLogs-EncryptionKey'
-    );
-    const exampleAPIGatewayAccessLogspEncryptionKey: Key = exampleAPIGatewayAccessLogsEncryption.key;
+    const logGroup = new LogGroup(this, 'ExampleAPIGatewayAccessLogs');
 
-    const logGroup = new LogGroup(this, 'ExampleAPIGatewayAccessLogs', {
-      encryptionKey: exampleAPIGatewayAccessLogspEncryptionKey
+    const logGroupNode = logGroup.node.defaultChild as CfnLogGroup;
+    logGroupNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W84',
+          reason: 'Cloudwatch LogGroups are encrypted by default'
+        }
+      ]
     });
 
     const API: RestApi = new RestApi(this, `ExampleRestApi`, {
@@ -447,8 +450,7 @@ export class ExampleStack extends Stack {
       functionName: 'ExampleLambda',
       environment: this._exampleLambdaEnvVars,
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
-      memorySize: 832,
-      reservedConcurrentExecutions: 10
+      memorySize: 832
     });
 
     const exampleLambdaPolicy: Policy = new Policy(this, 'ExampleLambdaPolicy', {
@@ -546,6 +548,10 @@ export class ExampleStack extends Stack {
         {
           id: 'W89',
           reason: 'This is an example Lambda Function for integration test and is not deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason: 'This is an example Lambda Function, reserved concurrency is not required'
         }
       ]
     });
