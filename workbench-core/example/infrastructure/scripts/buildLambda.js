@@ -4,7 +4,7 @@ const path = require('path');
 
 require('esbuild')
   .build({
-    entryPoints: [path.join(__dirname, '/../src/init.ts')],
+    entryPoints: [path.join(__dirname, '/../src/app.ts')],
     bundle: true,
     platform: 'node',
     target: 'node14',

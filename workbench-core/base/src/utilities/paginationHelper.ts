@@ -5,7 +5,7 @@
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import Boom from '@hapi/boom';
-import QueryParams from '../constants/queryParams';
+import QueryParams from '../interfaces/queryParams';
 
 export function addPaginationToken(
   paginationToken: string | undefined,

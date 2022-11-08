@@ -77,7 +77,7 @@ export class UserManagementService {
   }
 
   /**
-   * Activates a deactive user from the backing store.
+   * Activates an inactive user from the backing store.
    *
    * @param uid - the id of the user to activate
    *

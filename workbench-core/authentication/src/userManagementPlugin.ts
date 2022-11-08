@@ -67,7 +67,7 @@ export interface UserManagementPlugin {
   deleteUser(uid: string): Promise<void>;
 
   /**
-   * Activates a deactive user.
+   * Activates an inactive user.
    *
    * @param uid - the id of the user to activate
    *
