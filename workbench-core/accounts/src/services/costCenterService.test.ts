@@ -9,7 +9,7 @@ import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/clie
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import Account from '../models/account';
+import { Account } from '../models/account';
 import CostCenter from '../models/costCenter';
 import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
