@@ -251,7 +251,7 @@ If you would like to launch a sagemaker notebook instance with a different insta
 
 ### Setup Account Resources
 #### Onboard hosting account
-Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+Start by going over to `solutions/swb-ui/ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
 
 Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
 
@@ -271,9 +271,9 @@ POST `{{API_URL}}/aws-accounts`
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
-## Setup UI 
+## Setup UI
 
-Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
+Follow the instructions [here](../swb-ui/ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS.
 
 # Test the API
 
@@ -363,7 +363,7 @@ Replace `:id` with the `id` value from launching the environment. You should rec
 
 # User Management
 Going to the SWB UI `http:localhost:3000/users` (or your CloudFront distribution if you deployed swb-ui) allows you to see and create additional Researchers.
-In order to create new Admins: 
+In order to create new Admins:
 1. You must go to the Cognito console in your AWS Console.
 1. Under "User pools", look for and click on `swb-userpool-<stage>-<abbreviation>`.
 1. Under the Users tab, click the "Create user" button to create a new user.

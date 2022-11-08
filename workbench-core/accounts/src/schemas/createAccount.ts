@@ -14,6 +14,11 @@ const CreateAccountSchema: Schema = {
     awsAccountId: { type: 'string' },
     envMgmtRoleArn: { type: 'string' },
     hostingAccountHandlerRoleArn: { type: 'string' },
+    vpcId: { type: 'string' },
+    subnetId: { type: 'string' },
+    cidr: { type: 'string' },
+    environmentInstanceFiles: { type: 'string' },
+    encryptionKeyArn: { type: 'string' },
     externalId: { type: 'string' }
   },
   additionalProperties: false,

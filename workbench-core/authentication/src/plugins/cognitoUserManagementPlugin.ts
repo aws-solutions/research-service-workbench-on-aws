@@ -67,16 +67,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to get user info');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -131,22 +132,20 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       };
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to create a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UsernameExistsException') {
-        if (error.message === 'An account with the email already exists.') {
-          throw new UserAlreadyExistsError('A user with this email already exists');
-        }
-        throw new UserAlreadyExistsError('A user with this user ID already exists');
+        throw new UserAlreadyExistsError(error.message);
       }
       if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid email');
+        throw new InvalidParameterError(error.message);
       }
       throw error;
     }
@@ -163,6 +162,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
+   * @throws {@link InvalidParameterError} if the email parameter is already in use by a different account
    */
   public async updateUser(uid: string, user: User): Promise<void> {
     try {
@@ -186,19 +186,20 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to update user info');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
-      if (error.name === 'InvalidParameterException') {
-        throw new InvalidParameterError('Invalid email');
+      if (error.name === 'AliasExistsException' || error.name === 'InvalidParameterException') {
+        throw new InvalidParameterError(error.message);
       }
       throw error;
     }
@@ -222,23 +223,24 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
   }
 
   /**
-   * Activates a deactive user.
+   * Activates an inactive user.
    *
    * @param uid - the id of the user to activate
    *
@@ -255,16 +257,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -288,16 +291,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -343,13 +347,14 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       return users.filter((user) => user.uid);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the users in the user pool');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -376,16 +381,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       return users?.map((user) => user.Username ?? '').filter((username) => username) ?? [];
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the users within a group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError('Role does not exist.');
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -409,13 +414,14 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       return groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? [];
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to list the groups in the user pool');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
@@ -442,19 +448,19 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to add a user to a user pool group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError('Role does not exist.');
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -481,21 +487,19 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError(
-          'Plugin is not authorized to remove a user from a user pool group'
-        );
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError(error.message);
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'UserNotFoundException') {
-        throw new UserNotFoundError('User does not exist');
+        throw new UserNotFoundError(error.message);
       }
       throw error;
     }
@@ -519,16 +523,17 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to create a user pool group');
-      }
-      if (error.name === 'ResourceNotFoundException') {
-        throw new PluginConfigurationError('Invalid user pool id');
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'GroupExistsException') {
-        throw new RoleAlreadyExistsError('A group with this name already exists');
+        throw new RoleAlreadyExistsError(error.message);
       }
       throw error;
     }
@@ -552,16 +557,16 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
-        throw new IdpUnavailableError('Cognito encountered an internal error');
+        throw new IdpUnavailableError(error.message);
       }
-      if (error.name === 'NotAuthorizedException') {
-        throw new PluginConfigurationError('Plugin is not authorized to delete a user pool group');
+      if (error.name === 'AccessDeniedException' || error.name === 'NotAuthorizedException') {
+        throw new PluginConfigurationError(error.message);
       }
       if (error.name === 'ResourceNotFoundException') {
         if (error.message === 'Group not found.') {
-          throw new RoleNotFoundError('Role does not exist');
+          throw new RoleNotFoundError(error.message);
         }
-        throw new PluginConfigurationError('Invalid user pool id');
+        throw new PluginConfigurationError(error.message);
       }
       throw error;
     }
