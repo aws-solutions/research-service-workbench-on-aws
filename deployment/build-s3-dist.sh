@@ -78,15 +78,15 @@ echo "[Rebuild] Console"
 echo "------------------------------------------------------------------------------"
 cd $source_dir
 rush build
+ls -a
 mkdir $build_dist_dir/console
-cd $source_dir/build
+cd $source_dir/lib
 cp -r ./ $build_dist_dir/console/
 
 echo "------------------------------------------------------------------------------"
 echo "[Create] Console manifest"
 echo "------------------------------------------------------------------------------"
 echo "Creating console manifest file"
-cd $source_dir/build
 manifest=(`find * -type f ! -iname "aws_exports.js" ! -iname ".DS_Store"`)
 manifest_json=$(IFS=,;printf "%s" "${manifest[*]}")
 echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/console/site-manifest.json
@@ -94,6 +94,5 @@ echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/con
 echo "------------------------------------------------------------------------------"
 echo "[Rebuild] Services"
 echo "------------------------------------------------------------------------------"
-cd $source_dir/lib/
-zip -r /build/service-workbench-services.zip ./*
-cp ./build/service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
+zip -r service-workbench-services.zip ./*
+cp service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
