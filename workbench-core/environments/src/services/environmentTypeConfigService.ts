@@ -8,10 +8,12 @@ import {
   AwsService,
   QueryParams,
   resourceTypeToKey,
-  uuidWithLowercasePrefix
+  uuidWithLowercasePrefix,
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {
