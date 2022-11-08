@@ -35,8 +35,8 @@ mkdir -p $dist_template_dir
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "cp $source_template_dir/operations-conductor.template $dist_template_dir/operations-conductor.template"
-cp $source_template_dir/operations-conductor.template $dist_template_dir/operations-conductor.template
+echo "cp $source_template_dir/service-workbench.template $dist_template_dir/service-workbench.template"
+cp $source_template_dir/service-workbench.template $dist_template_dir/service-workbench.template
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Build Script"

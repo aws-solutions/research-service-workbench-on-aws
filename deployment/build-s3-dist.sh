@@ -44,33 +44,33 @@ mkdir -p $build_dist_dir
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "cp $template_dir/operations-conductor.template $template_dist_dir/operations-conductor.template"
-cp $template_dir/operations-conductor.template $template_dist_dir/operations-conductor.template
+echo "cp $template_dir/service-workbench.template $template_dist_dir/service-workbench.template"
+cp $template_dir/service-workbench.template $template_dist_dir/service-workbench.template
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac OS
     echo "Updating code source bucket in template with $1"
     replace="s/%%BUCKET_NAME%%/$1/g"
-    echo "sed -i '' -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i '' -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
+    sed -i '' -e $replace $template_dist_dir/service-workbench.template
     replace="s/%%SOLUTION_NAME%%/$2/g"
-    echo "sed -i '' -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i '' -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
+    sed -i '' -e $replace $template_dist_dir/service-workbench.template
     replace="s/%%VERSION%%/$3/g"
-    echo "sed -i '' -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i '' -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
+    sed -i '' -e $replace $template_dist_dir/service-workbench.template
 else
     # Other linux
     echo "Updating code source bucket in template with $1"
     replace="s/%%BUCKET_NAME%%/$1/g"
-    echo "sed -i -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
+    sed -i -e $replace $template_dist_dir/service-workbench.template
     replace="s/%%SOLUTION_NAME%%/$2/g"
-    echo "sed -i -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
+    sed -i -e $replace $template_dist_dir/service-workbench.template
     replace="s/%%VERSION%%/$3/g"
-    echo "sed -i -e $replace $template_dist_dir/operations-conductor.template"
-    sed -i -e $replace $template_dist_dir/operations-conductor.template
+    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
+    sed -i -e $replace $template_dist_dir/service-workbench.template
 fi
 
 echo "------------------------------------------------------------------------------"
@@ -96,7 +96,7 @@ echo "[Rebuild] Services"
 echo "------------------------------------------------------------------------------"
 cd $source_dir/services/
 npm run package
-cp ./build/operations-conductor-services.zip $build_dist_dir/operations-conductor-services.zip
+cp ./build/service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
 
 echo "------------------------------------------------------------------------------"
 echo "[Copy] Lambda Edge"
@@ -104,4 +104,4 @@ echo "--------------------------------------------------------------------------
 cd $source_dir/services/
 mkdir -p $source_dir/services/build/lambda-edge
 npm run build:lambda-edge
-cp ./build/lambda-edge/operations-conductor-lambda-edge.zip $build_dist_dir/operations-conductor-lambda-edge.zip
+cp ./build/lambda-edge/service-workbench-lambda-edge.zip $build_dist_dir/service-workbench-lambda-edge.zip
