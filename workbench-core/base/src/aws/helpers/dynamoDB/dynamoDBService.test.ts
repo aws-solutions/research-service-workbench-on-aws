@@ -16,7 +16,6 @@ describe('DynamoDBService', () => {
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
 
   describe('getPaginatedItems', () => {
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     let unmarshalledData: Record<string, JSONValue>;
     let unmarshalledPaginationToken: { pk: string; sk: string };
 
