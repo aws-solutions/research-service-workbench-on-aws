@@ -397,6 +397,8 @@ export class ExampleStack extends Stack {
             'cognito-idp:AdminListGroupsForUser',
             'cognito-idp:AdminRemoveUserFromGroup',
             'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:AdminEnableUser',
+            'cognito-idp:AdminDisableUser',
             'cognito-idp:CreateGroup',
             'cognito-idp:DeleteGroup',
             'cognito-idp:ListGroups',

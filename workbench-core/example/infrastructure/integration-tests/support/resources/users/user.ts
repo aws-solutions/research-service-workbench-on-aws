@@ -13,11 +13,11 @@ export default class User extends Resource {
   }
 
   public async activate(): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/activate`);
+    return this._axiosInstance.put(`${this._api}/activate`);
   }
 
   public async deactivate(): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/deactivate`);
+    return this._axiosInstance.put(`${this._api}/deactivate`);
   }
 
   protected async cleanup(): Promise<void> {

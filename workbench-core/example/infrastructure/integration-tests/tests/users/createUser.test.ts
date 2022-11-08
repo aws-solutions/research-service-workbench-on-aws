@@ -20,7 +20,7 @@ describe('userManagement create user integration test', () => {
     user = {
       firstName: 'Test',
       lastName: 'User',
-      email: 'fakeemail@notanemail.com'
+      email: 'create@user.com'
     };
   });
 
