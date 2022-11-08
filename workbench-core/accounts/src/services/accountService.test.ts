@@ -6,8 +6,10 @@
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
 
 import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
+import Account from '../models/account';
 import AccountService from './accountService';
 
 describe('AccountService', () => {
@@ -248,24 +250,25 @@ describe('AccountService', () => {
   test('getAccounts returns list of onboarded accounts', async () => {
     // BUILD
     const accountService = new AccountService(process.env.STACK_NAME!);
-    const accounts = [
-      {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        id: { S: 'sampleAccId' },
-        accountId: { S: 'sampleAccId' }
-      }
-    ];
-    const expectedList = [
-      {
-        accountId: 'sampleAccId',
-        awsAccountId: '123456789012',
-        id: 'sampleAccId',
-        portfolioId: 'port-1234',
-        targetAccountStackName: 'swb-dev-va-hosting-account'
-      }
-    ];
+
+    const account: Account = {
+      cidr: '',
+      encryptionKeyArn: '',
+      envMgmtRoleArn: '',
+      environmentInstanceFiles: '',
+      externalId: '',
+      hostingAccountHandlerRoleArn: '',
+      stackName: '',
+      status: 'CURRENT',
+      subnetId: '',
+      vpcId: '',
+      awsAccountId: '123456789012',
+      id: 'sampleAccId'
+    };
+
+    const accounts = [marshall(account)];
+
+    const expectedList = [account];
 
     const mockDDB = mockClient(DynamoDBClient);
     mockDDB.on(QueryCommand).resolves({
