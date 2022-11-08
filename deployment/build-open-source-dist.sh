@@ -35,8 +35,8 @@ mkdir -p $dist_template_dir
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "cp $source_template_dir/service-workbench.template $dist_template_dir/service-workbench.template"
-cp $source_template_dir/service-workbench.template $dist_template_dir/service-workbench.template
+echo "cp $source_template_dir/cdk.out/swb-testEnv-va.template.json $dist_template_dir/cdk.out/swb-testEnv-va.template.json"
+cp $source_template_dir/cdk.out/swb-testEnv-va.template.json $dist_template_dir/cdk.out/swb-testEnv-va.template.json
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Build Script"

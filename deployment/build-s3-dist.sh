@@ -44,33 +44,33 @@ mkdir -p $build_dist_dir
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "cp $template_dir/service-workbench.template $template_dist_dir/service-workbench.template"
-cp $template_dir/service-workbench.template $template_dist_dir/service-workbench.template
+echo "cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/cdk.out/swb-testEnv-va.template.json
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac OS
     echo "Updating code source bucket in template with $1"
     replace="s/%%BUCKET_NAME%%/$1/g"
-    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
-    sed -i '' -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
     replace="s/%%SOLUTION_NAME%%/$2/g"
-    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
-    sed -i '' -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
     replace="s/%%VERSION%%/$3/g"
-    echo "sed -i '' -e $replace $template_dist_dir/service-workbench.template"
-    sed -i '' -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i '' -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
 else
     # Other linux
     echo "Updating code source bucket in template with $1"
     replace="s/%%BUCKET_NAME%%/$1/g"
-    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
-    sed -i -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
     replace="s/%%SOLUTION_NAME%%/$2/g"
-    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
-    sed -i -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
     replace="s/%%VERSION%%/$3/g"
-    echo "sed -i -e $replace $template_dist_dir/service-workbench.template"
-    sed -i -e $replace $template_dist_dir/service-workbench.template
+    echo "sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json"
+    sed -i -e $replace $template_dist_dir/cdk.out/swb-testEnv-va.template.json
 fi
 
 echo "------------------------------------------------------------------------------"

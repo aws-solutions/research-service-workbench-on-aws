@@ -12,32 +12,32 @@ phases:
       - npm install -g aws-cdk
   pre_build:
     commands:
-      - echo "Installing dependencies and executing unit tests " `pwd`
+      - echo "Installing dependencies and executing unit tests `pwd`"
       - npm install -g @microsoft/rush
       - rush install && rush build && rush test
-      - echo "Installing dependencies and executing unit tests completed on " `date`
+      - echo "Installing dependencies and executing unit tests completed on `date`"
   build:
     commands:
       - cd solutions/swb-reference
       - node ./../../common/scripts/install-run-rushx.js compile
       - STAGE=testEnv node ./../../common/scripts/install-run-rushx.js cdk synth
-      - echo "Starting build " `date` `pwd`
+      - echo "Starting build `date` `pwd`"
       - chmod +x ./../../deployment/build-s3-dist.sh && ./../../deployment/build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
-      - echo "Build completed " `date`
-      - echo "Starting open-source-dist " `date` `pwd`
+      - echo "Build completed `date`"
+      - echo "Starting open-source-dist `date` `pwd`"
       - chmod +x ./../../deployment/build-open-source-dist.sh && ./../../deployment/build-open-source-dist.sh $SOLUTION_NAME
-      - echo "Open Source Dist completed " `date`
+      - echo "Open Source Dist completed `date`"
       - cd ../..
   post_build:
     commands:
-      - echo "Retrieving next stage buildspec " `date` `pwd`
+      - echo "Retrieving next stage buildspec `date` `pwd`"
       - aws s3 cp s3://solutions-build-assets/changelog-spec.yml buildspec.yml
       - echo "Retrieving next stage buildspec complete"
-      - echo "Post build completed on " `date`
+      - echo "Post build completed on `date`"
 
 artifacts:
   files:
-    - '**/*'
+    - cdk.out/**/*
     - deployment/**/*
     - source/**/*
     - .gitignore
