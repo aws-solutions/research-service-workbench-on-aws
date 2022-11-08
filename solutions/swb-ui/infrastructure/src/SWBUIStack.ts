@@ -152,7 +152,7 @@ export class SWBUIStack extends Stack {
     // eslint-disable-next-line no-new
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../out'))],
+      sources: [Source.asset(path.resolve(__dirname, '../../ui/out'))],
       distribution: distribution,
       distributionPaths: ['/*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });
