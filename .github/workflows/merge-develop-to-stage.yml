@@ -50,7 +50,7 @@ jobs:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
-  deploy-example:
+  deploy-example-app:
     needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
     secrets:
@@ -61,7 +61,7 @@ jobs:
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference]
+    needs: [readme-commit, deploy-swb-reference, deploy-example-app]
     env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
