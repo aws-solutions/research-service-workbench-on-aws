@@ -12,6 +12,11 @@ import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
 import {
+  getFilterQueryParams,
+  getSortQueryParams,
+  validateSingleSortAndFilter
+} from './utilities/queryParamsFiltersUtils';
+import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   uuidRegExp,
@@ -32,6 +37,13 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
+  QueryParameterFilter,
+  validateSingleSortAndFilter,
+  getFilterQueryParams,
+  getSortQueryParams,
+  QueryParameterFilterSchema,
+  FilterRequest,
+  SortRequest,
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE
