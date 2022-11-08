@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { z } from 'zod';
 import { HOSTING_ACCOUNT_STATUS } from '../constants/hostingAccountStatus';
 
