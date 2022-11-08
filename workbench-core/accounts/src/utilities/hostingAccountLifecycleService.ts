@@ -13,7 +13,7 @@ import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
-import Account from '../models/account';
+import { Account } from '../models/account';
 import AccountService from '../services/accountService';
 
 interface Arns {
