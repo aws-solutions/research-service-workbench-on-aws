@@ -19,6 +19,7 @@ phases:
   build:
     commands:
       - cd solutions/swb-reference
+      - node ./../../common/scripts/install-run-rushx.js compile
       - STAGE=testEnv node ./../../common/scripts/install-run-rushx.js cdk synth
       - echo "Starting build " `date` `pwd`
       - chmod +x ./../../deployment/build-s3-dist.sh && ./../../deployment/build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
