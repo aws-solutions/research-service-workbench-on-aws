@@ -12,11 +12,11 @@ phases:
       - npm install -g aws-cdk
   pre_build:
     commands:
-      - echo "Installing dependencies and executing unit tests - `pwd`"
+      - echo "Installing dependencies and executing unit tests " `pwd``
       - npm install -g @microsoft/rush
-      - rush install
+      - rush install && rush build && rush test
       - rush test
-      - echo "Installing dependencies and executing unit tests completed `date`"
+      - echo "Installing dependencies and executing unit tests completed on " `date`
   build:
     commands:
       - node common/scripts/install-run-rushx.js compile
@@ -36,6 +36,7 @@ phases:
 
 artifacts:
   files:
+    - '**/*'
     - deployment/**/*
     - source/**/*
     - .gitignore
