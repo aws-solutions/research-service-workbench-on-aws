@@ -63,7 +63,6 @@
     "aws-sdk-client-mock": "^0.6.2",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "ts-to-zod": "^1.13.1",
     "uuid": "^8.3.2",
     "zod": "^3.19.1"
   },

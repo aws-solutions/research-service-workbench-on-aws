@@ -547,10 +547,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "ts-to-zod",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "tslib",
       "allowedCategories": [ "production" ]
     },

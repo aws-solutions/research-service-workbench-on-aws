@@ -23,17 +23,17 @@ export interface Account {
 }
 
 // eslint-disable-next-line @rushstack/typedef-var
-const ErrorSchema = z.object({
+const ErrorParser = z.object({
   type: z.string(),
   value: z.string()
 });
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const AccountSchema = z.object({
+export const AccountParser = z.object({
   id: z.string(),
   awsAccountId: z.string(),
   envMgmtRoleArn: z.string(),
-  error: ErrorSchema.optional(),
+  error: ErrorParser.optional(),
   hostingAccountHandlerRoleArn: z.string(),
   vpcId: z.string(),
   subnetId: z.string(),

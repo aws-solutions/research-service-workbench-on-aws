@@ -7,7 +7,7 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { Account, AccountSchema } from '../models/account';
+import { Account, AccountParser } from '../models/account';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -65,7 +65,7 @@ export default class AccountService {
     const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
 
     return response.data.map((item) => {
-      return AccountSchema.parse(item);
+      return AccountParser.parse(item);
     });
   }
 
