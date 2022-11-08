@@ -32,7 +32,8 @@ export class EncryptionKeyWithRotation extends Construct {
 
     this.key = new Key(this, 'EncryptionKey', {
       enableKeyRotation: true,
-      policy: mainKeyPolicy
+      policy: mainKeyPolicy,
+      alias: `alias/${id}`
     });
 
     const encryptionKeyOutputName: string = props ? props.encryptionKeyOutputName : 'EncryptionKeyOutput';

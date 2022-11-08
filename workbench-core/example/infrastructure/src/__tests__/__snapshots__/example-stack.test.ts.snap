@@ -30,6 +30,14 @@ Object {
         "Ref": "AWS::Region",
       },
     },
+    "DataSetBucketEncryptionKeyEncryptionKeyOutput9FE77D81": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "DataSetBucketEncryptionKeyA5F2B215",
+          "Arn",
+        ],
+      },
+    },
     "ExampleAPIEndpoint": Object {
       "Value": Object {
         "Fn::Join": Array [
@@ -53,6 +61,14 @@ Object {
             },
             "/",
           ],
+        ],
+      },
+    },
+    "ExampleAPIGatewayAccessLogsEncryptionKeyEncryptionKeyOutput2A75575B": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
+          "Arn",
         ],
       },
     },
@@ -101,14 +117,6 @@ Object {
         ],
       },
     },
-    "ExampleEncryptionKeyEncryptionKeyOutput172B0370": Object {
-      "Value": Object {
-        "Fn::GetAtt": Array [
-          "ExampleEncryptionKey83E707EA",
-          "Arn",
-        ],
-      },
-    },
     "ExampleLambdaRoleOutput": Object {
       "Value": Object {
         "Fn::GetAtt": Array [
@@ -148,13 +156,21 @@ Object {
         "Name": "ExampleS3BucketAccessLogsNameOutput",
       },
       "Value": Object {
-        "Ref": "ExampleS3AccessLogs4CD1BB55",
+        "Ref": "ExampleS3AccessLogsBucketD89A792D",
       },
     },
     "ExampleS3BucketExampleS3BucketDatasetsArnOutput393A6D8B": Object {
       "Value": Object {
         "Fn::GetAtt": Array [
           "ExampleS3Bucketexamples3datasets657A5691",
+          "Arn",
+        ],
+      },
+    },
+    "TableEncryptionKeyEncryptionKeyOutput33C766B9": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "TableEncryptionKeyD2A97AAC",
           "Arn",
         ],
       },
@@ -178,6 +194,22 @@ Object {
             Object {
               "id": "AwsSolutions-L1",
               "reason": "Should be fixed in the @aws/workbench-core-infrastructure package",
+            },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W58",
+              "reason": "AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs",
+            },
+            Object {
+              "id": "W89",
+              "reason": "AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC",
+            },
+            Object {
+              "id": "W92",
+              "reason": "AWSCustomResource Lambda Function used for provisioning infrastructure, reserved concurrency is not required",
             },
           ],
         },
@@ -263,15 +295,7 @@ Object {
       },
       "Type": "AWS::Lambda::Alias",
     },
-    "ExampleAPIGatewayAccessLogs5DEC7E98": Object {
-      "DeletionPolicy": "Retain",
-      "Properties": Object {
-        "RetentionInDays": 731,
-      },
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "ExampleEncryptionKey83E707EA": Object {
+    "DataSetBucketEncryptionKeyA5F2B215": Object {
       "DeletionPolicy": "Retain",
       "Properties": Object {
         "EnableKeyRotation": true,
@@ -308,6 +332,81 @@ Object {
       "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Retain",
     },
+    "DataSetBucketEncryptionKeyAliasCA10BD1C": Object {
+      "Properties": Object {
+        "AliasName": "alias/DataSetBucket-EncryptionKey",
+        "TargetKeyId": Object {
+          "Fn::GetAtt": Array [
+            "DataSetBucketEncryptionKeyA5F2B215",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "ExampleAPIGatewayAccessLogs5DEC7E98": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "KmsKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
+            "Arn",
+          ],
+        },
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleAPIGatewayAccessLogsEncryptionKey94651546": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "EnableKeyRotation": true,
+        "KeyPolicy": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "main-key-share-statement",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleAPIGatewayAccessLogsEncryptionKeyAliasB5E329E6": Object {
+      "Properties": Object {
+        "AliasName": "alias/ExampleAPIGatewayAccessLogs-EncryptionKey",
+        "TargetKeyId": Object {
+          "Fn::GetAtt": Array [
+            "ExampleAPIGatewayAccessLogsEncryptionKey94651546",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
     "ExampleLambdaPolicy2109B1D9": Object {
       "Metadata": Object {
         "cdk_nag": Object {
@@ -315,6 +414,14 @@ Object {
             Object {
               "id": "AwsSolutions-IAM5",
               "reason": "I am OK with using wildcard here",
+            },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W12",
+              "reason": "I am ok with using wildcard here !",
             },
           ],
         },
@@ -423,13 +530,59 @@ Object {
               "Sid": "EventbridgeAccess",
             },
             Object {
+              "Action": "logs:CreateLogGroup",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":logs:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":*",
+                  ],
+                ],
+              },
+            },
+            Object {
               "Action": Array [
-                "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
               ],
               "Effect": "Allow",
-              "Resource": "*",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:",
+                    Object {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":logs:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":log-group:/aws/lambda/",
+                    Object {
+                      "Ref": "ExampleLambdaServiceB41FF26F",
+                    },
+                    ":*",
+                  ],
+                ],
+              },
             },
             Object {
               "Action": Array [
@@ -538,6 +691,18 @@ Object {
             },
           ],
         },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W58",
+              "reason": "Lambda Function has permission to write to Cloudwatch Logs in exampleLambdaPolicy",
+            },
+            Object {
+              "id": "W89",
+              "reason": "This is an example Lambda Function for integration test and is not deployed inside a VPC",
+            },
+          ],
+        },
       },
       "Properties": Object {
         "Code": Object {
@@ -584,6 +749,7 @@ Object {
         "FunctionName": "ExampleLambda",
         "Handler": "buildLambda.handler",
         "MemorySize": 832,
+        "ReservedConcurrentExecutions": 10,
         "Role": Object {
           "Fn::GetAtt": Array [
             "ExampleLambdaServiceServiceRole83FF9D48",
@@ -700,6 +866,22 @@ Object {
                 },
               ],
             },
+            Object {
+              "Action": Array [
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "TableEncryptionKeyD2A97AAC",
+                  "Arn",
+                ],
+              },
+            },
           ],
           "Version": "2012-10-17",
         },
@@ -720,13 +902,6 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
           ],
         },
       },
@@ -744,12 +919,13 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
             Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+              "id": "W59",
+              "reason": "Making use of custom Authorization at the App level, this is ok !",
             },
           ],
         },
@@ -783,13 +959,6 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
           ],
         },
       },
@@ -808,13 +977,6 @@ Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
             Object {
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
@@ -858,7 +1020,7 @@ Object {
       },
       "Type": "AWS::IAM::Role",
     },
-    "ExampleRestApiDeployment10B028B13f152292fba52d790e02ed44106514fc": Object {
+    "ExampleRestApiDeployment10B028B1c24514979f5d5eed14d80bc6f1504a87": Object {
       "DependsOn": Array [
         "ExampleRestApiproxyANY021C44AD",
         "ExampleRestApiproxyOPTIONSFCAA263B",
@@ -873,12 +1035,13 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
             Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+              "id": "W68",
+              "reason": "No need to enforce Usage Plan. This is an example App",
             },
           ],
         },
@@ -902,12 +1065,13 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
             Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+              "id": "W64",
+              "reason": "No need to enforce Usage Plan. This is an example App",
             },
           ],
         },
@@ -923,8 +1087,17 @@ Object {
           "Format": "{\\"stage\\":\\"$context.stage\\",\\"requestId\\":\\"$context.requestId\\",\\"integrationRequestId\\":\\"$context.integration.requestId\\",\\"status\\":\\"$context.status\\",\\"apiId\\":\\"$context.apiId\\",\\"resourcePath\\":\\"$context.resourcePath\\",\\"path\\":\\"$context.path\\",\\"resourceId\\":\\"$context.resourceId\\",\\"httpMethod\\":\\"$context.httpMethod\\",\\"sourceIp\\":\\"$context.identity.sourceIp\\",\\"userAgent\\":\\"$context.identity.userAgent\\"}",
         },
         "DeploymentId": Object {
-          "Ref": "ExampleRestApiDeployment10B028B13f152292fba52d790e02ed44106514fc",
+          "Ref": "ExampleRestApiDeployment10B028B1c24514979f5d5eed14d80bc6f1504a87",
         },
+        "MethodSettings": Array [
+          Object {
+            "DataTraceEnabled": false,
+            "HttpMethod": "*",
+            "ResourcePath": "/*",
+            "ThrottlingBurstLimit": 50,
+            "ThrottlingRateLimit": 100,
+          },
+        ],
         "RestApiId": Object {
           "Ref": "ExampleRestApi66BED094",
         },
@@ -937,13 +1110,6 @@ Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
             Object {
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
@@ -1003,12 +1169,13 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
             Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+              "id": "W59",
+              "reason": "Making use of custom Authorization at the App level, this is ok !",
             },
           ],
         },
@@ -1054,13 +1221,6 @@ Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
             Object {
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
@@ -1112,13 +1272,6 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
           ],
         },
       },
@@ -1163,13 +1316,6 @@ Object {
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
           ],
         },
       },
@@ -1192,13 +1338,6 @@ Object {
         "cdk_nag": Object {
           "rules_to_suppress": Array [
             Object {
-              "id": "AwsSolutions-APIG2",
-              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
-            },
-            Object {
-              "applies_to": Array [
-                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
-              ],
               "id": "AwsSolutions-APIG2",
               "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
             },
@@ -1247,7 +1386,7 @@ Object {
       },
       "Type": "AWS::ApiGateway::Method",
     },
-    "ExampleS3AccessLogs4CD1BB55": Object {
+    "ExampleS3AccessLogsBucketD89A792D": Object {
       "DeletionPolicy": "Retain",
       "Metadata": Object {
         "cdk_nag": Object {
@@ -1255,6 +1394,14 @@ Object {
             Object {
               "id": "AwsSolutions-S1",
               "reason": "I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket",
+            },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W35",
+              "reason": "This is an access log bucket, we don't need to configure access logging for access log buckets",
             },
           ],
         },
@@ -1280,10 +1427,10 @@ Object {
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Retain",
     },
-    "ExampleS3AccessLogsPolicy5AE379EC": Object {
+    "ExampleS3AccessLogsBucketPolicy139BD001": Object {
       "Properties": Object {
         "Bucket": Object {
-          "Ref": "ExampleS3AccessLogs4CD1BB55",
+          "Ref": "ExampleS3AccessLogsBucketD89A792D",
         },
         "PolicyDocument": Object {
           "Statement": Array [
@@ -1301,7 +1448,7 @@ Object {
               "Resource": Array [
                 Object {
                   "Fn::GetAtt": Array [
-                    "ExampleS3AccessLogs4CD1BB55",
+                    "ExampleS3AccessLogsBucketD89A792D",
                     "Arn",
                   ],
                 },
@@ -1311,7 +1458,7 @@ Object {
                     Array [
                       Object {
                         "Fn::GetAtt": Array [
-                          "ExampleS3AccessLogs4CD1BB55",
+                          "ExampleS3AccessLogsBucketD89A792D",
                           "Arn",
                         ],
                       },
@@ -1340,7 +1487,7 @@ Object {
                   Array [
                     Object {
                       "Fn::GetAtt": Array [
-                        "ExampleS3AccessLogs4CD1BB55",
+                        "ExampleS3AccessLogsBucketD89A792D",
                         "Arn",
                       ],
                     },
@@ -1365,7 +1512,7 @@ Object {
               "ServerSideEncryptionByDefault": Object {
                 "KMSMasterKeyID": Object {
                   "Fn::GetAtt": Array [
-                    "ExampleEncryptionKey83E707EA",
+                    "DataSetBucketEncryptionKeyA5F2B215",
                     "Arn",
                   ],
                 },
@@ -1376,7 +1523,7 @@ Object {
         },
         "LoggingConfiguration": Object {
           "DestinationBucketName": Object {
-            "Ref": "ExampleS3AccessLogs4CD1BB55",
+            "Ref": "ExampleS3AccessLogsBucketD89A792D",
           },
           "LogFilePrefix": "example-access-log",
         },
@@ -1394,6 +1541,20 @@ Object {
       "UpdateReplacePolicy": "Retain",
     },
     "ExampleS3Bucketexamples3datasetsPolicy8F1A54DC": Object {
+      "Metadata": Object {
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "F15",
+              "reason": "All S3 actions needs to be denied, this is ok !",
+            },
+            Object {
+              "id": "F16",
+              "reason": "All Principals needs to be denied, this is ok !",
+            },
+          ],
+        },
+      },
       "Properties": Object {
         "Bucket": Object {
           "Ref": "ExampleS3Bucketexamples3datasets657A5691",
@@ -1738,7 +1899,15 @@ Object {
           "rules_to_suppress": Array [
             Object {
               "id": "AwsSolutions-DDB3",
-              "reason": "I am OK with not having Point-in-time Recovery enabled for DynamoDB",
+              "reason": "I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app",
+            },
+          ],
+        },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "W78",
+              "reason": "This is an example app for integration test, backup is not required",
             },
           ],
         },
@@ -1891,9 +2060,67 @@ Object {
             "KeyType": "RANGE",
           },
         ],
-        "TableName": "ExampleStack",
+        "SSESpecification": Object {
+          "KMSMasterKeyId": Object {
+            "Fn::GetAtt": Array [
+              "TableEncryptionKeyD2A97AAC",
+              "Arn",
+            ],
+          },
+          "SSEEnabled": true,
+          "SSEType": "KMS",
+        },
       },
       "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "TableEncryptionKeyAlias29795582": Object {
+      "Properties": Object {
+        "AliasName": "alias/Table-EncryptionKey",
+        "TargetKeyId": Object {
+          "Fn::GetAtt": Array [
+            "TableEncryptionKeyD2A97AAC",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::KMS::Alias",
+    },
+    "TableEncryptionKeyD2A97AAC": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "EnableKeyRotation": true,
+        "KeyPolicy": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "main-key-share-statement",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
       "UpdateReplacePolicy": "Retain",
     },
   },
