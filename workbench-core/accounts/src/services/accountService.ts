@@ -59,7 +59,7 @@ export default class AccountService {
    * @param includeMetadata - Controls inclusion of metadata associated with the account
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async applesauce3(accountId: string, includeMetadata: boolean = false): Promise<URL> {
+  public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<URL> {
     // contains S3 url?
     return new URL('http://potato.com');
   }

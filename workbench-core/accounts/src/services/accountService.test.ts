@@ -313,7 +313,7 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.applesauce3(accountId);
+    const response = await accountService.getAndUploadTemplateForAccount(accountId);
 
     // CHECK
     expect(response).toEqual(expectedTemplate);

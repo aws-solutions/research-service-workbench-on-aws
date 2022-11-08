@@ -62,7 +62,7 @@ export default class HostingAccountLifecycleService {
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
   public async applesauce2(accountId: string, includeMetadata: boolean = false): Promise<URL> {
-    return this._accountService.applesauce3(accountId, includeMetadata);
+    return this._accountService.getAndUploadTemplateForAccount(accountId, includeMetadata);
   }
 
   /**
