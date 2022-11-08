@@ -16,7 +16,7 @@ export function addPaginationToken(
   // from: https://notes.serverlessfirst.com/public/How+to+paginate+lists+returned+from+DynamoDB+through+an+API+endpoint#Implementing+this+in+code
   if (paginationToken) {
     try {
-      params.start = JSON.parse(Buffer.from(paginationToken, 'base64').toString('utf8'));
+      params.start = fromPaginationToken(paginationToken);
     } catch (error) {
       throw Boom.badRequest('Invalid paginationToken');
     }
@@ -29,6 +29,14 @@ export function getPaginationToken(ddbQueryResponse: QueryCommandOutput): string
   return ddbQueryResponse.LastEvaluatedKey
     ? Buffer.from(JSON.stringify(ddbQueryResponse.LastEvaluatedKey)).toString('base64')
     : undefined;
+}
+
+export function toPaginationToken(key: { [key: string]: string }): string {
+  return Buffer.from(JSON.stringify(key)).toString('base64');
+}
+
+export function fromPaginationToken(token: string): { [key: string]: string } {
+  return JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
 }
 
 export const DEFAULT_API_PAGE_SIZE: number = 50;

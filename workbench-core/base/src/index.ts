@@ -10,7 +10,13 @@ import CognitoTokenService from './cognitoTokenService';
 import QueryParams from './constants/queryParams';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
+import {
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
+} from './utilities/paginationHelper';
 import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
@@ -34,5 +40,7 @@ export {
   uuidRegExpAsString,
   addPaginationToken,
   getPaginationToken,
-  DEFAULT_API_PAGE_SIZE
+  DEFAULT_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
 };

@@ -5,7 +5,7 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -15,7 +15,9 @@ import {
   uuidWithLowercasePrefix,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
-  getPaginationToken
+  getPaginationToken,
+  toPaginationToken,
+  fromPaginationToken
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
@@ -127,91 +129,124 @@ export default class ProjectService {
       return { data: [project], paginationToken: undefined };
     }
 
-    // Else, member of more than 1 group, query for project items with pagination
-    // welcome to party town
+    // Else, member of more than 1 group, batch get items and manually filter, sort, and paginate
     const projectIds: string[] = userGroupsForCurrentUser.map(
       (projectGroup: string) => projectGroup.split('#')[0]
     );
-
-    // i = 0
-    let filterExpression = 'id = :proj1';
-    const expressionAttributeValues: { [key: string]: string } = { ':proj1': projectIds[0] };
-    for (let i = 1; i < projectIds.length; i++) {
-      // build filter string "id = :proj1 OR id = :proj2 OR ... OR id = projN+1"
-      filterExpression = filterExpression + ` OR id = :proj${i + 1}`;
-      // build expressionAttributeValues object {":proj1": "projectId1", ..., ":projN+1": "projectIdN"}
-      expressionAttributeValues[`:proj${i + 1}`] = projectIds[i];
-    }
-
-    // TODO--extend to other GSIs after filtering is added
-    let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByCreatedAt',
-      limit: pageSize,
-      filter: filterExpression,
-      values: expressionAttributeValues
-    };
-
-    let projects: Project[] = [];
-
-    let returnedCount = 0;
-    while (returnedCount < pageSize && returnedCount < projectIds.length) {
-      queryParams = addPaginationToken(paginationToken, queryParams);
-
-      const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-
-      returnedCount += projectsResponse.Count!;
-
-      // nothing returned
-      if (projectsResponse.Items === undefined || _.isEmpty(projectsResponse.Items)) {
-        paginationToken = getPaginationToken(projectsResponse);
-        console.log(paginationToken);
+    const keys: { [key: string]: unknown }[] = projectIds.map((projectId) =>
+      buildDynamoDBPkSk(projectId, resourceTypeToKey.project)
+    );
+    const projectsResponse = (await this._aws.helpers.ddb.get(keys).execute()) as BatchGetItemCommandOutput;
+    if (projectsResponse.Responses) {
+      const projects: Project[] = projectsResponse.Responses[this._tableName].map((item) =>
+        this._formatFromDDB(item)
+      );
+      // apply sort or filter--TODO after Fernando's utilities
+      let projectsOnPage: Project[] = projects;
+      // build page and pagination token
+      if (paginationToken) {
+        const manualExclusiveStartKey = fromPaginationToken(paginationToken);
+        const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
+        const exclusiveStartProject = projectsOnPage.find(
+          (project) => project.id === exclusiveStartProjectId
+        );
+        if (exclusiveStartProject === undefined) {
+          throw Boom.badImplementation('Something went wrong with listing projects');
+        }
+        const indexOfExclusiveStartProject = projectsOnPage.indexOf(exclusiveStartProject);
+        projectsOnPage = projectsOnPage.slice(indexOfExclusiveStartProject + 1);
       }
-
-      // nothing else to get from DDB
-      else if (projectsResponse.LastEvaluatedKey === undefined) {
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-        paginationToken = undefined;
-      }
-
-      // too little--while loop continues
-      else if (returnedCount < pageSize) {
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-        paginationToken = getPaginationToken(projectsResponse);
-      }
-
-      // juuuust the right amount--getPaginationToken from response and exit loop
-      else if (returnedCount === pageSize) {
-        paginationToken = getPaginationToken(projectsResponse);
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-      }
-
-      // too much--take enough to fill and manually get pagination token from reponse and exit loop
-      else if (returnedCount > pageSize) {
-        const leftoverAmount = returnedCount - pageSize;
-        const totalProjectsFromResponse = projectsResponse.Items.map((item) => this._formatFromDDB(item));
-        projects = projects.concat(totalProjectsFromResponse.slice(0, -leftoverAmount));
-        const manualLastEvaluatedItem =
-          projectsResponse.Items[projectsResponse.Items.length - (leftoverAmount + 1)]; // this will be the whole entry
-        // If we query on GSI, then the LastEvaluatedKey will be the compose of GSI partition key, GSI sort key, primary partition key and primary sort key.
-        // TODO--extend to other GSIs after filtering is added
-        const manualLastEvaluatedKey = {
-          pk: manualLastEvaluatedItem.pk,
-          sk: manualLastEvaluatedItem.sk,
-          resourceType: manualLastEvaluatedItem.resourceType,
-          createdAt: manualLastEvaluatedItem.createdAt
+      if (projectsOnPage.length < pageSize) {
+        return {
+          data: projectsOnPage,
+          paginationToken: undefined
         };
-        paginationToken = Buffer.from(JSON.stringify(manualLastEvaluatedKey)).toString('base64');
+      } else {
+        projectsOnPage = projectsOnPage.slice(0, pageSize);
+        const manualLastEvaluatedKey = buildDynamoDBPkSk(
+          projectsOnPage[pageSize - 1].id,
+          resourceTypeToKey.project
+        );
+        return { data: projectsOnPage, paginationToken: toPaginationToken(manualLastEvaluatedKey) };
       }
-      if (paginationToken === undefined) {
-        break;
-      }
+    } else {
+      return { data: [], paginationToken: undefined };
     }
 
-    return {
-      data: projects,
-      paginationToken: paginationToken
-    };
+    // // i = 0
+    // let filterExpression = 'id = :proj1';
+    // const expressionAttributeValues: { [key: string]: string } = { ':proj1': projectIds[0] };
+    // for (let i = 1; i < projectIds.length; i++) {
+    //   // build filter string "id = :proj1 OR id = :proj2 OR ... OR id = projN+1"
+    //   filterExpression = filterExpression + ` OR id = :proj${i + 1}`;
+    //   // build expressionAttributeValues object {":proj1": "projectId1", ..., ":projN+1": "projectIdN"}
+    //   expressionAttributeValues[`:proj${i + 1}`] = projectIds[i];
+    // }
+
+    // // TODO--extend to other GSIs after filtering is added
+    // let queryParams: QueryParams = {
+    //   key: { name: 'resourceType', value: this._resourceType },
+    //   index: 'getResourceByCreatedAt',
+    //   limit: pageSize,
+    //   filter: filterExpression,
+    //   values: expressionAttributeValues
+    // };
+
+    // let projects: Project[] = [];
+
+    // let returnedCount = 0;
+    // while (returnedCount < pageSize && returnedCount < projectIds.length) {
+    //   queryParams = addPaginationToken(paginationToken, queryParams);
+
+    //   const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+
+    //   returnedCount += projectsResponse.Count!;
+
+    //   // nothing returned
+    //   if (projectsResponse.Items === undefined || _.isEmpty(projectsResponse.Items)) {
+    //     paginationToken = getPaginationToken(projectsResponse);
+    //     console.log(paginationToken);
+    //   }
+
+    //   // nothing else to get from DDB
+    //   else if (projectsResponse.LastEvaluatedKey === undefined) {
+    //     projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
+    //     paginationToken = undefined;
+    //   }
+
+    //   // too little--while loop continues
+    //   else if (returnedCount < pageSize) {
+    //     projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
+    //     paginationToken = getPaginationToken(projectsResponse);
+    //   }
+
+    //   // juuuust the right amount--getPaginationToken from response and exit loop
+    //   else if (returnedCount === pageSize) {
+    //     paginationToken = getPaginationToken(projectsResponse);
+    //     projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
+    //   }
+
+    //   // too much--take enough to fill and manually get pagination token from reponse and exit loop
+    //   else if (returnedCount > pageSize) {
+    //     const leftoverAmount = returnedCount - pageSize;
+    //     const totalProjectsFromResponse = projectsResponse.Items.map((item) => this._formatFromDDB(item));
+    //     projects = projects.concat(totalProjectsFromResponse.slice(0, -leftoverAmount));
+    //     const manualLastEvaluatedItem =
+    //       projectsResponse.Items[projectsResponse.Items.length - (leftoverAmount + 1)]; // this will be the whole entry
+    //     // If we query on GSI, then the LastEvaluatedKey will be the compose of GSI partition key, GSI sort key, primary partition key and primary sort key.
+    //     // TODO--extend to other GSIs after filtering is added
+    //     const manualLastEvaluatedKey = {
+    //       pk: manualLastEvaluatedItem.pk,
+    //       sk: manualLastEvaluatedItem.sk,
+    //       resourceType: manualLastEvaluatedItem.resourceType,
+    //       createdAt: manualLastEvaluatedItem.createdAt
+    //     };
+    //     paginationToken = Buffer.from(JSON.stringify(manualLastEvaluatedKey)).toString('base64');
+    //   }
+    //   if (paginationToken === undefined) {
+    //     break;
+    //   }
+    // }
   }
 
   /**
