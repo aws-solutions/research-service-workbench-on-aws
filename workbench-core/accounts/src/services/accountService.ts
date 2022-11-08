@@ -9,6 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
 import CostCenter from '../models/costCenter';
+import AccountCFNTemplate from "../models/accountCfnTemplate";
 
 export default class AccountService {
   private _aws: AwsService;
@@ -60,8 +61,9 @@ export default class AccountService {
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
   public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<URL> {
-    // contains S3 url?
-    return new URL('http://potato.com');
+    const url = new URL('http://potato.com');
+    const responseObj : AccountCFNTemplate = { url: url };
+    return responseObj.url;
   }
 
   /**
