@@ -94,5 +94,5 @@ echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/con
 echo "------------------------------------------------------------------------------"
 echo "[Rebuild] Services"
 echo "------------------------------------------------------------------------------"
-zip -r service-workbench-services.zip ./*
+zip -r service-workbench-services.zip $source_dir/lib/*
 cp service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
