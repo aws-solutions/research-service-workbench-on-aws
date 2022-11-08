@@ -5,7 +5,7 @@
 
 import JSONValue from '../types/json';
 
-export default interface PaginatedQueryResponse {
+export default interface PaginatedItemsResponse {
   data: Record<string, JSONValue>[];
   paginationToken?: string;
 }

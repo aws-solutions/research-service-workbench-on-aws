@@ -9,7 +9,7 @@ import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from 
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import Account from '../models/account';
+import { Account } from '../models/account';
 import AccountService from './accountService';
 
 describe('AccountService', () => {

@@ -4,7 +4,7 @@
  */
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
-import PaginatedQueryResponse from '../../../interfaces/paginatedQueryResponse';
+import PaginatedItemsResponse from '../../../interfaces/paginatedItemsResponse';
 import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
 import BatchEdit from './batchEdit';
@@ -146,14 +146,14 @@ export default class DynamoDBService {
    * Queries the DynamoDB table.
    *
    * @param params - optional object of optional properties to generate a query request
-   * @returns Promise<PaginatedQueryResponse>
+   * @returns Promise<PaginatedItemsResponse>
    *
    * @example Use this to get paginated items from the DynamoDb table.
    * ```ts
    * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
    * ```
    */
-  public async getPaginatedItems(params?: QueryParams): Promise<PaginatedQueryResponse> {
+  public async getPaginatedItems(params?: QueryParams): Promise<PaginatedItemsResponse> {
     const result = await this.query(params).execute();
 
     const retrievedItems = result.Items || [];
