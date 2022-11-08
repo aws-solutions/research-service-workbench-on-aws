@@ -3,9 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import { z } from 'zod';
+import { HOSTING_ACCOUNT_STATUS, HostingAccountStatus } from '../constants/hostingAccountStatus';
 
-interface Account {
+export interface Account {
   id: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
@@ -21,4 +22,25 @@ interface Account {
   status: HostingAccountStatus;
 }
 
-export default Account;
+// eslint-disable-next-line @rushstack/typedef-var
+const ErrorParser = z.object({
+  type: z.string(),
+  value: z.string()
+});
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const AccountParser = z.object({
+  id: z.string(),
+  awsAccountId: z.string(),
+  envMgmtRoleArn: z.string(),
+  error: ErrorParser.optional(),
+  hostingAccountHandlerRoleArn: z.string(),
+  vpcId: z.string(),
+  subnetId: z.string(),
+  cidr: z.string(),
+  environmentInstanceFiles: z.string(),
+  encryptionKeyArn: z.string(),
+  externalId: z.string(),
+  stackName: z.string(),
+  status: z.enum(HOSTING_ACCOUNT_STATUS as [string, ...string[]])
+});

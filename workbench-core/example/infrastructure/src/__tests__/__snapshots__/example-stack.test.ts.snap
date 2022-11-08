@@ -252,7 +252,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2Be563d6492e72adf9809c20f19056bfa3",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B9b9c79fb44cad026e6114dcbb2adeec6",
             "Version",
           ],
         },
@@ -544,7 +544,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "49636ff8ab062219360b17dfecffc1384c0ffb5d828259bac9f9fa91de6000be.zip",
+          "S3Key": "4b28689c71859e3ed14cfb5bd3f3637cbfcdcbad5c45c5bf7ff326bf4eaf9ad1.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -595,7 +595,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2Be563d6492e72adf9809c20f19056bfa3": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B9b9c79fb44cad026e6114dcbb2adeec6": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
