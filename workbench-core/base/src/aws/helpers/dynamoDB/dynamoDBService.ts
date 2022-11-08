@@ -4,8 +4,8 @@
  */
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
-import QueryParams from '../../../constants/queryParams';
 import PaginatedQueryResponse from '../../../interfaces/paginatedQueryResponse';
+import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
