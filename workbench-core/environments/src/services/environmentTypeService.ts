@@ -14,14 +14,16 @@ import {
   productIdRegExpString,
   validateSingleSortAndFilter,
   getSortQueryParams,
-  getFilterQueryParams
+  getFilterQueryParams,
+  DEFAULT_API_PAGE_SIZE,
+  addPaginationToken,
+  getPaginationToken
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { EnvironmentType } from '../interfaces/environmentType';
 import { ListEnvironmentTypesRequest } from '../interfaces/listEnvironmentTypesRequest';
-import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export default class EnvironmentTypeService {
   private _aws: AwsService;
