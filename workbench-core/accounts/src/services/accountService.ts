@@ -8,6 +8,7 @@ import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/wor
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
+import { AccountSchema } from '../models/accountSchema';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -61,14 +62,12 @@ export default class AccountService {
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     };
-    const response = await this._aws.helpers.ddb.query(queryParams).execute();
-    let accounts: Account[] = [];
-    if (response && response.Items) {
-      accounts = response.Items.map((item: unknown) => {
-        return item as unknown as Account;
-      });
-    }
-    return accounts;
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.map((item) => {
+      return AccountSchema.parse(item);
+    });
   }
 
   /**

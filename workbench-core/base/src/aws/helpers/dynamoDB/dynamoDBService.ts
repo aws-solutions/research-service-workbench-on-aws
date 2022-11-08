@@ -5,9 +5,8 @@
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import QueryParams from '../../../constants/queryParams';
-import DatabaseService from '../../../interfaces/databaseService';
-import ExecuteQueryResult from '../../../interfaces/executeQueryResult';
-import JSONType from '../../../types/json';
+import PaginatedQueryResponse from '../../../interfaces/paginatedQueryResponse';
+import JSONValue from '../../../types/json';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -16,7 +15,7 @@ import Scanner from './scanner';
 import TransactEdit from './transactEdit';
 import Updater from './updater';
 
-export default class DynamoDBService implements DatabaseService {
+export default class DynamoDBService {
   private _awsRegion: string;
   private _tableName: string;
 
@@ -147,17 +146,19 @@ export default class DynamoDBService implements DatabaseService {
    * Queries the DynamoDB table.
    *
    * @param params - optional object of optional properties to generate a query request
-   * @returns ExecuteQueryResult object
+   * @returns Promise<PaginatedQueryResponse>
    *
-   * @example Use this to execute a query to the DynamoDb table.
+   * @example Use this to get paginated items from the DynamoDb table.
    * ```ts
-   * const result = dynamoDBService.executeQuery({sortKey: 'value', eq: {N: '5'}});
+   * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
    * ```
    */
-  public async executeQuery(params?: QueryParams): Promise<ExecuteQueryResult> {
+  public async getPaginatedItems(params?: QueryParams): Promise<PaginatedQueryResponse> {
     const result = await this.query(params).execute();
-    const data = result.Items?.map((item) => item as unknown as Record<string, JSONType>) || [];
 
+    const retrievedItems = result.Items || [];
+
+    const data = retrievedItems.map((item) => item as unknown as Record<string, JSONValue>);
     return {
       data,
       paginationToken: result.LastEvaluatedKey as unknown as string | undefined

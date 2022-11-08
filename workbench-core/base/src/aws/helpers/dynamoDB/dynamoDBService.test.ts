@@ -42,7 +42,7 @@ describe('DynamoDBService', () => {
     });
 
     test('returns unmarshalled data', async () => {
-      const result = await dbService.executeQuery();
+      const result = await dbService.getPaginatedItems();
       expect(result.data).toEqual([unmarshalledData]);
       expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
     });

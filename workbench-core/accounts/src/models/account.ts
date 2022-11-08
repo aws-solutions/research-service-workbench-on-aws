@@ -5,7 +5,7 @@
 
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 
-interface Account {
+export default interface Account {
   id: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
@@ -20,5 +20,3 @@ interface Account {
   stackName: string;
   status: HostingAccountStatus;
 }
-
-export default Account;
