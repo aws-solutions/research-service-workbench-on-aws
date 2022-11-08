@@ -27,7 +27,7 @@ fi
 template_dir="$PWD"
 template_dist_dir="$template_dir/global-s3-assets"
 build_dist_dir="$template_dir/regional-s3-assets"
-source_dir="$template_dir/../source"
+source_dir="$template_dir/solutions/swb-reference"
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Clean old dist folders"
@@ -44,8 +44,8 @@ mkdir -p $build_dist_dir
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "ls $template_dir/cdk.out && cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/swb-testEnv-va.template"
-ls $template_dir/cdk.out && cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/swb-testEnv-va.template
+echo "cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/swb-testEnv-va.template"
+cp $template_dir/cdk.out/swb-testEnv-va.template.json $template_dist_dir/swb-testEnv-va.template
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Mac OS
@@ -76,17 +76,17 @@ fi
 echo "------------------------------------------------------------------------------"
 echo "[Rebuild] Console"
 echo "------------------------------------------------------------------------------"
-cd $source_dir/console
-INLINE_RUNTIME_CHUNK=false npm run build
+cd $source_dir
+rush build
 mkdir $build_dist_dir/console
-cd $source_dir/console/build
+cd $source_dir/build
 cp -r ./ $build_dist_dir/console/
 
 echo "------------------------------------------------------------------------------"
 echo "[Create] Console manifest"
 echo "------------------------------------------------------------------------------"
 echo "Creating console manifest file"
-cd $source_dir/console/build
+cd $source_dir/build
 manifest=(`find * -type f ! -iname "aws_exports.js" ! -iname ".DS_Store"`)
 manifest_json=$(IFS=,;printf "%s" "${manifest[*]}")
 echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/console/site-manifest.json
@@ -94,14 +94,6 @@ echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/con
 echo "------------------------------------------------------------------------------"
 echo "[Rebuild] Services"
 echo "------------------------------------------------------------------------------"
-cd $source_dir/services/
-npm run package
+cd $source_dir/lib/
+zip -r /build/service-workbench-services.zip ./*
 cp ./build/service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
-
-echo "------------------------------------------------------------------------------"
-echo "[Copy] Lambda Edge"
-echo "------------------------------------------------------------------------------"
-cd $source_dir/services/
-mkdir -p $source_dir/services/build/lambda-edge
-npm run build:lambda-edge
-cp ./build/lambda-edge/service-workbench-lambda-edge.zip $build_dist_dir/service-workbench-lambda-edge.zip
