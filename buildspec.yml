@@ -13,12 +13,12 @@ phases:
   pre_build:
     commands:
       - echo "Installing dependencies and executing unit tests " `pwd`
-      - cd solutions/swb-reference
-      - node ./../../common/scripts/install-run-rushx.js compile
-      - rush build && rush test
+      - npm install -g @microsoft/rush
+      - rush install && rush build && rush test
       - echo "Installing dependencies and executing unit tests completed on " `date`
   build:
     commands:
+      - cd solutions/swb-reference
       - STAGE=testEnv node ./../../common/scripts/install-run-rushx.js cdk synth
       - echo "Starting build " `date` `pwd`
       - chmod +x ./../../deployment/build-s3-dist.sh && ./../../deployment/build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
