@@ -9,7 +9,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
 import CostCenter from '../models/costCenter';
-import AccountCFNTemplate from "../models/accountCfnTemplate";
+import AccountCfnTemplate from "../models/accountCfnTemplate";
 
 export default class AccountService {
   private _aws: AwsService;
@@ -62,7 +62,7 @@ export default class AccountService {
    */
   public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<URL> {
     const url = new URL('http://potato.com');
-    const responseObj : AccountCFNTemplate = { url: url };
+    const responseObj : AccountCfnTemplate = { url: url };
     return responseObj.url;
   }
 

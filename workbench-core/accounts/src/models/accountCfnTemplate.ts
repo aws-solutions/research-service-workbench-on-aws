@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-interface AccountCFNTemplate{
+interface AccountCfnTemplate {
     url : URL
 }
 
-export default AccountCFNTemplate;
+export default AccountCfnTemplate;
