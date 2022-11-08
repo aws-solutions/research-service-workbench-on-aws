@@ -4,7 +4,7 @@
  */
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
-import QueryParams from '../../../constants/queryParams';
+import QueryParams from '../../../interfaces/queryParams';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
