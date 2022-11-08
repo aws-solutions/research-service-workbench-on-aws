@@ -27,6 +27,14 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     })
   );
 
+  router.get(
+    'aws-accounts/:id/get-template',
+    wrapAsync(async (req: Request, res: Response) => {
+      // TODO: maybe validate inputs?
+      res.send(await account.applesauce1(req.params.id));
+    })
+  );
+
   router.post(
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {

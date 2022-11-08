@@ -289,6 +289,36 @@ describe('AccountService', () => {
     expect(response).toEqual(expectedList);
   });
 
+  test('applesauce', async () => {
+    const accountService = new AccountService(process.env.STACK_NAME!);
+    const accId = 'testAccountId';
+    const account = {
+      id: accId,
+      sk: `ACC#${accId}`,
+      awsAccountId: '',
+      encryptionKeyArn: '',
+      envMgmtRoleArn: '',
+      environmentInstanceFiles: '',
+      hostingAccountHandlerRoleArn: '',
+      stackName: '',
+      status: '',
+      subnetId: '',
+      vpcId: ''
+    };
+
+    const expectedTemplate = new URL('http://potato.com');
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(GetItemCommand).resolves({
+      Item: marshall(account)
+    });
+
+    // OPERATE
+    const response = await accountService.applesauce3(accountId);
+
+    // CHECK
+    expect(response).toEqual(expectedTemplate);
+  });
+
   describe('getAccount', () => {
     let dynamoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
     let accountService: AccountService;

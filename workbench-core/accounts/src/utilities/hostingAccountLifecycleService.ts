@@ -55,6 +55,17 @@ export default class HostingAccountLifecycleService {
   }
 
   /**
+   * Create/Upload template and return its URL
+   * @param accountId - ID of account to retrieve
+   *
+   * @param includeMetadata - Controls inclusion of metadata associated with the account
+   * @returns A URL to a prepopulated template for onboarding the hosting account.
+   */
+  public async applesauce2(accountId: string, includeMetadata: boolean = false): Promise<URL> {
+    return this._accountService.applesauce3(accountId, includeMetadata);
+  }
+
+  /**
    * Links hosting account with main account policies for cross account communication
    * @param accountMetadata - the attributes of the given hosting account from the onboarded CFN stack outputs
    *

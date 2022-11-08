@@ -11,7 +11,15 @@ import HostingAccountLifecycleService, {
 
 export default class HostingAccountService {
   public async get(accountId: string): Promise<Account> {
-    return await new HostingAccountLifecycleService().getAccount(accountId, true);
+    return await new HostingAccountLifecycleService().getAccount(accountId, false);
+  }
+
+  // TODO: Do I want a URL, a Url, or a string?
+  public async applesauce1(accountId: string): Promise<URL> {
+    // TODO: do we need to upload as well?
+
+    const metadata = true; // TODO: Do I want, or do I not want metadata?
+    return await new HostingAccountLifecycleService().applesauce2(accountId, metadata);
   }
 
   /**
