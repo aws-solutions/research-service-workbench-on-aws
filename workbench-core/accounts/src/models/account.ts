@@ -48,5 +48,7 @@ export const AccountParser = z.object({
   encryptionKeyArn: z.string(),
   externalId: z.string(),
   stackName: z.string(),
-  status: z.enum(HOSTING_ACCOUNT_STATUS as [string, ...string[]])
+  status: z.enum(HOSTING_ACCOUNT_STATUS as [string, ...string[]]),
+  updatedAt: z.string(),
+  createdAt: z.string()
 });

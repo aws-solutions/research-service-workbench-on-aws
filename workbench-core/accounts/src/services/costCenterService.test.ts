@@ -9,7 +9,7 @@ import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/clie
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import { Account } from '../models/account';
+import { Account, AccountParser } from '../models/account';
 import CostCenter from '../models/costCenter/costCenter';
 import CreateCostCenter from '../models/costCenter/createCostCenterRequest';
 import CostCenterService from './costCenterService';
@@ -32,9 +32,8 @@ describe('CostCenterService', () => {
 
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
-    account = {
+    account = AccountParser.parse({
       name: '',
-      error: undefined,
       id: accountId,
       cidr: '',
       hostingAccountHandlerRoleArn: '',
@@ -46,8 +45,12 @@ describe('CostCenterService', () => {
       stackName: `${process.env.STACK_NAME!}-hosting-account`,
       status: 'CURRENT',
       awsAccountId: 'awsAccountId',
-      externalId: 'externalId'
-    };
+      externalId: 'externalId',
+      updatedAt: '',
+      createdAt: '',
+      error: undefined,
+      CC: undefined
+    });
   });
 
   afterAll(() => {
