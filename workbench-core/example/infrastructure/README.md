@@ -61,5 +61,7 @@ rushx cdk:destroy -f
 ./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
 ```
 After `rushx cdk:deploy` you can find:
-    1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
-    2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.jsonL12)
+
+1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
+
+2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.jsonL12)
