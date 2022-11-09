@@ -50,10 +50,10 @@ export class ExampleStack extends Stack {
     super(scope, id, props);
 
     const exampleCognito = this._createExampleCognitoResources(
-      'example-express-domain',
+      'example-app-domain',
       ['http://localhost:3000/'],
-      'example-express-userPool',
-      'example-express-userPoolClient'
+      'example-app-userPool',
+      'example-app-userPoolClient'
     );
 
     this._exampleLambdaEnvVars = {

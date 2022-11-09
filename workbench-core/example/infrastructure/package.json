@@ -18,7 +18,7 @@
     "build:test": "rushx compile && heft test -u --clean && rushx pkg-json-lint && rushx make-badges",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
-    "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/cdk-outputs.json",
+    "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
     "cdk:synth": "cdk synth",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "compile": "node scripts/buildLambda.js",

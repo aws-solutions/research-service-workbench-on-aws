@@ -273,7 +273,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2B010d1d6ef4b6be49cbb124b5428d210c",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B28200c70ddae0942c3a572d0f9cd2738",
             "Version",
           ],
         },
@@ -285,7 +285,7 @@ Object {
       "Type": "AWS::Lambda::Alias",
     },
     "DataSetBucketEncryptionKeyA5F2B215": Object {
-      "DeletionPolicy": "Retain",
+      "DeletionPolicy": "Delete",
       "Properties": Object {
         "EnableKeyRotation": true,
         "KeyPolicy": Object {
@@ -319,7 +319,7 @@ Object {
         },
       },
       "Type": "AWS::KMS::Key",
-      "UpdateReplacePolicy": "Retain",
+      "UpdateReplacePolicy": "Delete",
     },
     "DataSetBucketEncryptionKeyAliasCA10BD1C": Object {
       "Properties": Object {
@@ -657,7 +657,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "f080608a7059b429fcb559091433d36697f956df6567d377faa3792cb7683d38.zip",
+          "S3Key": "85e620f5492ff4d7e7b335d8fd5fdd320940810af16e39e13fd9b11e37d263fc.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -711,7 +711,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2B010d1d6ef4b6be49cbb124b5428d210c": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B28200c70ddae0942c3a572d0f9cd2738": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
@@ -1758,7 +1758,7 @@ Object {
         "UserPoolAddOns": Object {
           "AdvancedSecurityMode": "ENFORCED",
         },
-        "UserPoolName": "example-express-userPool",
+        "UserPoolName": "example-app-userPool",
         "UsernameAttributes": Array [
           "email",
         ],
@@ -1788,7 +1788,7 @@ Object {
         "CallbackURLs": Array [
           "http://localhost:3000/",
         ],
-        "ClientName": "example-express-userPoolClient",
+        "ClientName": "example-app-userPoolClient",
         "EnableTokenRevocation": true,
         "ExplicitAuthFlows": Array [
           "ALLOW_ADMIN_USER_PASSWORD_AUTH",
@@ -1819,7 +1819,7 @@ Object {
     },
     "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F": Object {
       "Properties": Object {
-        "Domain": "example-express-domain",
+        "Domain": "example-app-domain",
         "UserPoolId": Object {
           "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
         },
