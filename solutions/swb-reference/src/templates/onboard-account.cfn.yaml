@@ -83,6 +83,7 @@ Resources:
   EnvManagementRole:
     Type: 'AWS::IAM::Role'
     Properties:
+      RoleName: !Join ['-', [Ref: Namespace, 'env-mgmt']]
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -386,7 +387,7 @@ Resources:
   HostingAccountHandlerRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']] # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
+      RoleName: !Join ['-', [Ref: Namespace, 'hosting-account-role']]     # Confirm the suffix `hosting-account-role` matches with the suffix in SWBStack for AccountHandler
       Path: '/'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -404,11 +405,6 @@ Resources:
       ManagedPolicyArns:
         - !Ref PolicyHostingAccountHandler
       PermissionsBoundary: !Ref PolicyHostingAccountHandler
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: W28
-            reason: "TODO:triage Suppressing because the main account depends on a role with this pattern"
 
   VPC:
     Type: AWS::EC2::VPC
@@ -459,11 +455,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${Namespace} public subnet 1
-    Metadata: 
-      cfn_nag:
-        rules_to_suppress:
-          - id: W33
-            reason: We pass this VPC back to the main account, where it is used to create a short-lived URL by which environments can be accessed. Users should only use non-sensistive data in these environments.
 
   FlowLogPublicSubnet:
     Type: AWS::EC2::FlowLog
