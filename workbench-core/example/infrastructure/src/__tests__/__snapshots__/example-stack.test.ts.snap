@@ -1620,6 +1620,14 @@ Object {
             },
           ],
         },
+        "cfn_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "F78",
+              "reason": "By design. MFA is unecessary for this test environment. However, we encourage users to update this to best suit their organization's needs.",
+            },
+          ],
+        },
       },
       "Properties": Object {
         "AccountRecoverySetting": Object {
