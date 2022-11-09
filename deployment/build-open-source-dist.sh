@@ -20,7 +20,7 @@ fi
 source_template_dir="$PWD"
 dist_dir="$source_template_dir/open-source"
 dist_template_dir="$dist_dir/deployment"
-source_dir="$source_template_dir/../source"
+source_dir="$source_template_dir/../../source"
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Clean old open-source folder"
@@ -31,6 +31,8 @@ echo "mkdir -p $dist_dir"
 mkdir -p $dist_dir
 echo "mkdir -p $dist_template_dir"
 mkdir -p $dist_template_dir
+echo "mkdir -p $source_dir"
+mkdir -p $source_dir
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
@@ -43,20 +45,21 @@ echo "[Packing] Source Folder"
 echo "------------------------------------------------------------------------------"
 echo "cp -r $source_dir $dist_dir"
 cp -r $source_dir $dist_dir
-echo "cp $source_template_dir/../LICENSE.txt $dist_dir"
-cp $source_template_dir/../LICENSE.txt $dist_dir
-echo "cp $source_template_dir/../NOTICE.txt $dist_dir"
-cp $source_template_dir/../NOTICE.txt $dist_dir
-echo "cp $source_template_dir/../README.md $dist_dir"
-cp $source_template_dir/../README.md $dist_dir
-echo "cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir"
-cp $source_template_dir/../CODE_OF_CONDUCT.md $dist_dir
-echo "cp $source_template_dir/../CONTRIBUTING.md $dist_dir"
-cp $source_template_dir/../CONTRIBUTING.md $dist_dir
-echo "cp $source_template_dir/../CHANGELOG.md $dist_dir"
-cp $source_template_dir/../CHANGELOG.md $dist_dir
-echo "cp $source_template_dir/../.gitignore $dist_dir"
-cp $source_template_dir/../.gitignore $dist_dir
+
+echo "cp $source_template_dir/../../LICENSE.txt $dist_dir"
+cp $source_template_dir/../../LICENSE.txt $dist_dir
+echo "cp $source_template_dir/../../NOTICE.txt $dist_dir"
+cp $source_template_dir/../../NOTICE.txt $dist_dir
+echo "cp $source_template_dir/../../README.md $dist_dir"
+cp $source_template_dir/../../README.md $dist_dir
+echo "cp $source_template_dir/../../CODE_OF_CONDUCT.md $dist_dir"
+cp $source_template_dir/../../CODE_OF_CONDUCT.md $dist_dir
+echo "cp $source_template_dir/../../CONTRIBUTING.md $dist_dir"
+cp $source_template_dir/../../CONTRIBUTING.md $dist_dir
+echo "cp $source_template_dir/../../CHANGELOG.md $dist_dir"
+cp $source_template_dir/../../CHANGELOG.md $dist_dir
+echo "cp $source_template_dir/../../.gitignore $dist_dir"
+cp $source_template_dir/../../.gitignore $dist_dir
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Clean up the open-source distributable"
