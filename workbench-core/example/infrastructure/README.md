@@ -22,21 +22,21 @@
 
  ### Needs to be run one time to boostrap the environment
 ```bash
-    `rushx cdk:bootstrap`
+rushx cdk:bootstrap
 ```
 
 ### Deploy the ExampleStack
 ```bash
-    `rushx cdk:deploy`
+rushx cdk:deploy
 ```
 
 ### Cognito User/Group Setup
 ```bash
-    `./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c`
+./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c
 ```
-[Find USER_POOL_ID here](./src/config/testEnv.json#L13)
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13) 
 
 ### Run Integration Test
 ```bash
-    `rushx integration-tests`
+rushx integration-tests
 ```
