@@ -56,7 +56,7 @@ rushx cdk:destroy
 rushx cdk:destroy -f
 ```
 
-### Delete Cognito UserPool and DynamoDB Table and SSM Parameters
+### Delete Cognito UserPool, DynamoDB Table and SSM Parameters
 ```bash
 ./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
 ```
