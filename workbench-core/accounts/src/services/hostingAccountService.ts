@@ -4,11 +4,11 @@
  */
 
 import Account from '../models/account';
+import {TemplateResponse} from "../models/accountCfnTemplate";
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
-import AccountCfnTemplate from "../models/accountCfnTemplate";
 
 export default class HostingAccountService {
   public async get(accountId: string): Promise<Account> {
@@ -16,7 +16,7 @@ export default class HostingAccountService {
   }
 
   // TODO: Do I want a URL, a Url, or a string?
-  public async applesauce1(accountId: string): Promise<AccountCfnTemplate> {
+  public async applesauce1(accountId: string): Promise<TemplateResponse> {
     // TODO: do we need to upload as well?
 
     const metadata = true; // TODO: Do I want, or do I not want metadata?

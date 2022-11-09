@@ -3,8 +3,23 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-interface AccountCfnTemplate {
-    url : URL
+interface TemplateResponse{
+    url: URL;
 }
 
-export default AccountCfnTemplate;
+interface AccountCfnTemplateParameters{
+    accountHandlerRoleArn : string;
+    enableFlowLogs : string;
+    externalId : string;
+    launchConstraintPolicyPrefix : string;
+    launchConstraintRolePrefix : string;
+    mainAccountId : string;
+    namespace : string;
+    publicSubnetCidr : string;
+    stackName : string;
+    statusHandlerRoleArn : string;
+    url : URL;
+    vpcCidr : string;
+}
+
+export {AccountCfnTemplateParameters, TemplateResponse} ;
