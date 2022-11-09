@@ -22,14 +22,22 @@ function main(){
 }
 
 function help(){
-    echo "Usage: `basename $0`
-            -h [Help]
-            -u [COGNITO USER_POOL_ID]
-            -e [EMAIL FOR COGNITO USER]
-            -p [PASSWORD FOR COGNITO USER]
-            -r [AWS REGION]
-            -o [!! IF YOU WANT TO OVERWRITE SSM PARAM VALUES]
-            -c [CREATE FLAG]
+    echo "This script performs the following actions:
+    1. Create Cognito User
+    2. Confirm Cognito User
+    3. Create Admin Group
+    4. Add User to Admin Group
+    5. Store Username to SSM Parameter Store
+    6. Store Password to SSM Parameter Store
+
+Usage: `basename $0`
+    -h [Help]
+    -u [COGNITO USER_POOL_ID]
+    -e [EMAIL FOR COGNITO USER]
+    -p [PASSWORD FOR COGNITO USER]
+    -r [AWS REGION]
+    -o [!! IF YOU WANT TO OVERWRITE SSM PARAM VALUES]
+    -c [CREATE FLAG]
 
 Example:
     `basename $0` -u 'us-east-1_abcde' -e 'abc@def.com' -p 'AS@#R#RSER*TA' -r 'us-east-1' -c
@@ -54,7 +62,7 @@ function create(){
     --user-attributes Name=email,Value=$EMAIL Name=email_verified,Value=True \
     --region $REGION 1> /dev/null;
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}*** Cognito User create ***${NC}"
+        echo -e "${GREEN}*** Cognito User created ***${NC}"
     else
         echo -e "${RED}*** [ERROR] Cognito User could not be created ***${NC}"
     fi

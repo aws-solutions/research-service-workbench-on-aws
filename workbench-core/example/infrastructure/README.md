@@ -11,13 +11,13 @@
 
  Infrastructure for Example App integration tests
 
- ## Pre-requisites for integration test
+ ## Pre-requisites
  1. [Complete the Pre-requisites for development](./../../../DEVELOPMENT.md/#prerequisites-for-development)
  2. `rush cinstall`
  3. `rush build:test -t @aws/workbench-core-example-infrastructure`
  4. Configure AWS Credentials locally for your AWS Account: either `export the credentials` or on the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `account` as the `default` profile
 
- ## Integration Test steps
+ ## Setup your environment for Integration Test
  Navigate to `workbench-core/example/infrastructure`
 
  ### Needs to be run one time to boostrap the environment
@@ -40,3 +40,26 @@ After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testE
 ```bash
 rushx integration-tests
 ```
+
+## Cleanup your environment
+Navigate to `workbench-core/example/infrastructure`
+
+### Destroy the ExampleStack
+#### Require Approval
+```bash
+rushx cdk:destroy
+```
+#### No Approval required
+
+**Be sure to be in the correct folder, this deletes the stack by force, no prompts for confirmation**
+```bash
+rushx cdk:destroy -f
+```
+
+### Delete Cognito UserPool and DynamoDB Table and SSM Parameters
+```bash
+./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
+```
+After `rushx cdk:deploy` you can find:
+    1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
+    2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.jsonL12)
