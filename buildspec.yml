@@ -37,10 +37,10 @@ phases:
 
 artifacts:
   files:
-    - cdk.out/**/*
     - deployment/**/*
     - source/**/*
     - .gitignore
     - sonar-project.properties
-    - CHANGELOG.md
     - buildspec.yml
+    - CHANGELOG.md
+    - .cfnnag_*
