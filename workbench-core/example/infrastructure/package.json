@@ -18,7 +18,7 @@
     "build:test": "rushx compile && heft test -u --clean && rushx pkg-json-lint && rushx make-badges",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
-    "cdk:deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/cdk-outputs.json",
+    "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/cdk-outputs.json",
     "cdk:synth": "cdk synth",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "compile": "node scripts/buildLambda.js",
@@ -30,6 +30,7 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only && rushx make-badges",
+    "test-cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/cdk-outputs.json",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {
