@@ -55,6 +55,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ID: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -118,6 +119,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const MAIN_ACCT_ID = `${this.account}`
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -133,7 +135,8 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ID
     };
 
     this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
