@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-infrastructure",
-      "comment": "suppress cdk/cfn issues to unblock enabling the check in develop",
-      "type": "none"
+      "comment": "revert commit",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-infrastructure"
