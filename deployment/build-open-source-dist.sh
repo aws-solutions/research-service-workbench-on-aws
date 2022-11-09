@@ -39,14 +39,6 @@ echo "cp $source_template_dir/cdk.out/swb-testEnv-va.template.json $dist_templat
 cp $source_template_dir/cdk.out/swb-testEnv-va.template.json $dist_template_dir/swb-testEnv-va.template
 
 echo "------------------------------------------------------------------------------"
-echo "[Packing] Build Script"
-echo "------------------------------------------------------------------------------"
-echo "cp $source_template_dir/build-s3-dist.sh $dist_template_dir"
-cp $source_template_dir/build-s3-dist.sh $dist_template_dir
-echo "cp $source_template_dir/run-unit-tests.sh $dist_template_dir"
-cp $source_template_dir/run-unit-tests.sh $dist_template_dir
-
-echo "------------------------------------------------------------------------------"
 echo "[Packing] Source Folder"
 echo "------------------------------------------------------------------------------"
 echo "cp -r $source_dir $dist_dir"
@@ -67,18 +59,23 @@ echo "cp $source_template_dir/../.gitignore $dist_dir"
 cp $source_template_dir/../.gitignore $dist_dir
 
 echo "------------------------------------------------------------------------------"
-echo "[Packing] Clean build, node_modules and coverage folders"
+echo "[Packing] Clean up the open-source distributable"
 echo "------------------------------------------------------------------------------"
-echo "find $dist_dir -iname "node_modules" -type d -exec rm -r "{}" \; 2> /dev/null"
-find $dist_dir -iname "node_modules" -type d -exec rm -r "{}" \; 2> /dev/null
-echo "find $dist_dir -iname "tests" -type d -exec rm -r "{}" \; 2> /dev/null"
-find $dist_dir -iname "tests" -type d -exec rm -r "{}" \; 2> /dev/null
-echo "find $dist_dir -iname "build" -type d -exec rm -r "{}" \; 2> /dev/null"
-find $dist_dir -iname "build" -type d -exec rm -r "{}" \; 2> /dev/null
-echo "find $dist_dir -iname "coverage" -type d -exec rm -r "{}" \; 2> /dev/null"
-find $dist_dir -iname "coverage" -type d -exec rm -r "{}" \; 2> /dev/null
-echo "find $dist_dir -type f -name 'package-lock.json' -delete"
-find $dist_dir -type f -name 'package-lock.json' -delete
+# General cleanup of node_modules and package-lock.json files
+echo "find $dist_dir -iname "node_modules" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname "node_modules" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname ".venv" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname ".venv" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname "pytest_cache" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname "pytest_cache" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname ".mypy_cache" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname ".mypy_cache" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname ".viperlightignore" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname ".viperlightignore" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname "cdk.out" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname "cdk.out" -type d -exec rm -rf "{}" \; 2> /dev/null
+echo "find $dist_dir -iname "dist" -type d -exec rm -rf "{}" \; 2> /dev/null"
+find $dist_dir -iname "dist" -type d -exec rm -rf "{}" \; 2> /dev/null
 
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Create GitHub (open-source) zip file"
