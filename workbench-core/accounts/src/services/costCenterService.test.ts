@@ -32,9 +32,7 @@ describe('CostCenterService', () => {
 
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
-    account = new Account({
-      createdAt: '',
-      updatedAt: '',
+    account = {
       name: '',
       error: undefined,
       id: accountId,
@@ -49,7 +47,7 @@ describe('CostCenterService', () => {
       status: 'CURRENT',
       awsAccountId: 'awsAccountId',
       externalId: 'externalId'
-    });
+    };
   });
 
   afterAll(() => {

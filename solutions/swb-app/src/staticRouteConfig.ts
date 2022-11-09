@@ -51,22 +51,6 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/costCenters': {
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'CostCenter'
-      }
-    ]
-  },
-  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
-    GET: [
-      {
-        action: 'READ',
-        subject: 'CostCenter'
-      }
-    ]
-  },
   '/datasets': {
     GET: [
       {

@@ -8,7 +8,12 @@ import '@cloudscape-design/global-styles/index.css';
 import '../styles/globals.scss';
 import '../styles/Header.module.scss';
 import '../styles/Hero.module.scss';
-import { AuthenticationProvider, NotificationsProvider, SettingsProvider, Header } from '@aws/workbench-core-swb-common-ui';
+import {
+  AuthenticationProvider,
+  NotificationsProvider,
+  SettingsProvider,
+  Header
+} from '@aws/workbench-core-swb-common-ui';
 import type { AppProps } from 'next/app';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -18,7 +23,7 @@ function App({ Component, pageProps }: AppProps): JSX.Element {
       <NotificationsProvider>
         <AuthenticationProvider>
           <Header />
-          <Component {...pageProps}/>
+          <Component {...pageProps} />
           <footer id="footer"></footer>
         </AuthenticationProvider>
       </NotificationsProvider>

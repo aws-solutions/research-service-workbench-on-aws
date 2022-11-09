@@ -48,7 +48,6 @@ describe('aws-accounts create negative tests', () => {
 
       const existingAwsAccountId = _.first(existingAccounts)!.awsAccountId;
       invalidParam.awsAccountId = existingAwsAccountId;
-
       try {
         await adminSession.resources.accounts.create(invalidParam, false);
       } catch (e) {

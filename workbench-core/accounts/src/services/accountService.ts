@@ -13,8 +13,8 @@ import {
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { Account, AccountProperties } from '../models/account';
-import CostCenter from '../models/costCenter/costCenter';
+import { Account, AccountParser } from '../models/account';
+import CostCenter from '../models/costCenter';
 
 export default class AccountService {
   private _aws: AwsService;
@@ -44,6 +44,19 @@ export default class AccountService {
    *
    * @returns Account entries in DDB
    */
+  public async getAccounts(): Promise<Account[]> {
+    const queryParams = {
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    };
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.map((item) => {
+      return AccountParser.parse(item);
+    });
+  }
+
   public async getAccountsForAccountHandler(queryParams: QueryParams): Promise<Account[]> {
     const response = await this._aws.helpers.ddb.query(queryParams).execute();
     let accounts: Account[] = [];
@@ -53,19 +66,6 @@ export default class AccountService {
       });
     }
     return accounts;
-  }
-
-  public async getAccounts(queryParams: QueryParams): Promise<PaginatedResponse<Account>> {
-    const response = await this._aws.helpers.ddb.query(queryParams).execute();
-
-    const items = response.Items || [];
-
-    return {
-      data: items.map((item) => {
-        return Account.fromDynamoItem(item);
-      }),
-      paginationToken: response.LastEvaluatedKey as unknown as string
-    };
   }
 
   /**
@@ -199,9 +199,9 @@ export default class AccountService {
 
     const accountProperties = items.find((item) => {
       return (item.sk as unknown as string) === pk;
-    }) as unknown as AccountProperties;
+    });
 
-    const account: Account = new Account(accountProperties);
+    const account: Account = AccountParser.parse(accountProperties);
 
     for (const item of items) {
       // parent environment item
