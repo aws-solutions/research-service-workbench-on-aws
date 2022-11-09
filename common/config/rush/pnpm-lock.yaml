@@ -223,6 +223,7 @@ importers:
       aws-lambda: ^1.0.7
       aws-sdk-client-mock: ^0.6.2
       axios: ^0.27.1
+      cdk-nag: ^2.12.25
       constructs: ^10.0.0
       csrf: ^3.1.0
       depcheck: ^1.4.3
@@ -264,6 +265,7 @@ importers:
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_e3d47e7de0bdd7e8ce04c01f4d10cebe
+      cdk-nag: 2.14.26_8d994d7bf27edab84c843ce1928354a1
       csrf: 3.1.0
       express: 4.18.1
       js-yaml: 4.1.0
@@ -320,6 +322,7 @@ importers:
       '@types/prettier': 2.6.3
       aws-cdk: ^2.12.0
       aws-cdk-lib: ^2.29.1
+      cdk-nag: ^2.12.25
       constructs: ^10.0.0
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -349,6 +352,7 @@ importers:
       '@types/prettier': 2.6.3
       aws-cdk: 2.26.0
       aws-cdk-lib: 2.29.1_constructs@10.1.25
+      cdk-nag: 2.14.26_8d994d7bf27edab84c843ce1928354a1
       constructs: 10.1.25
       depcheck: 1.4.3
       eslint: 8.16.0

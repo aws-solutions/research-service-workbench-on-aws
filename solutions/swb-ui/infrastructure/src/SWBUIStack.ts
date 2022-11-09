@@ -4,7 +4,7 @@
  */
 
 import * as path from 'path';
-import { CfnOutput, Duration, Fn, Stack, StackProps } from 'aws-cdk-lib';
+import { CfnOutput, CfnResource, Duration, Fn, Stack, StackProps } from 'aws-cdk-lib';
 import {
   Distribution,
   Function,
@@ -20,6 +20,7 @@ import { S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { BlockPublicAccess, Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+//import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { getConstants } from './constants';
 
@@ -90,6 +91,41 @@ export class SWBUIStack extends Stack {
     const distribution = this._createDistribution(bucket);
     this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     this._addCognitoURLOutput();
+
+    const customBucketDeploymentNode = this.node.findChild(
+      'Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C'
+    );
+    let metadataNode = customBucketDeploymentNode.node.defaultChild as CfnResource;
+    metadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'TODO:triage Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
+
+    metadataNode = customBucketDeploymentNode.node.findChild('ServiceRole').node.findChild('DefaultPolicy')
+      .node.defaultChild as CfnResource;
+    metadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W12',
+          reason: 'TODO:triage IAM policy should not allow * resource'
+        }
+      ]
+    });
   }
 
   private _addS3TLSSigV4BucketPolicy(s3Bucket: Bucket): void {
@@ -145,6 +181,7 @@ export class SWBUIStack extends Stack {
     new CfnOutput(this, outputKey, {
       value: s3Bucket.bucketArn
     });
+
     return s3Bucket;
   }
 
@@ -191,6 +228,33 @@ export class SWBUIStack extends Stack {
     new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
       value: `https://${distribution.distributionDomainName}`
     });
+
+    let metadataNode = distribution.node.defaultChild as CfnResource;
+    metadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W70',
+          reason: 'TODO:triage Cloudfront should use minimum protocol version TLS 1.2'
+        }
+      ]
+    });
+
+    metadataNode = distribution.node.findChild('LoggingBucket').node.defaultChild as CfnResource;
+    metadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
+        },
+        {
+          id: 'W51',
+          reason: 'TODO:triage S3 bucket should likely have a bucket policy'
+        }
+      ]
+    });
+
     return distribution;
   }
   /*
