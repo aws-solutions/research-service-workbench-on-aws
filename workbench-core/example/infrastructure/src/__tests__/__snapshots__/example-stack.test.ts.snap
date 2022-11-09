@@ -1819,7 +1819,7 @@ Object {
     },
     "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F": Object {
       "Properties": Object {
-        "Domain": "example-app-domain-e35d2dc8-7b49-4aa2-874a-de9faf15b18f",
+        "Domain": "example-app-domain-167b9e6c-1701-422a-ab74-8b303af3dc61",
         "UserPoolId": Object {
           "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
         },
