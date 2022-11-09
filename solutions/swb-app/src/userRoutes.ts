@@ -7,8 +7,10 @@
 import {
   CreateRoleSchema,
   CreateUserSchema,
+  Status,
   UpdateRoleSchema,
-  UserManagementService
+  UserManagementService,
+  UserNotFoundError
 } from '@aws/workbench-core-authentication';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -32,6 +34,36 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
     wrapAsync(async (req: Request, res: Response) => {
       const users = await user.listUsers();
       res.status(200).json({ users });
+    })
+  );
+
+  router.delete(
+    '/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const userId = req.params.userId;
+      try {
+        const existingUser = await user.getUser(userId);
+        if (existingUser.status !== Status.INACTIVE) {
+          throw Boom.badRequest(
+            `Could not delete user ${userId}. Expected status: ${Status[Status.INACTIVE]}; received: ${
+              Status[existingUser.status]
+            }`
+          );
+        }
+
+        await user.deleteUser(userId);
+        res.status(204).send();
+      } catch (err) {
+        if (err instanceof UserNotFoundError) {
+          throw Boom.notFound(`Could not find user ${userId}`);
+        }
+
+        if (Boom.isBoom(err)) {
+          throw err;
+        }
+
+        throw Boom.badImplementation(`Could not delete user ${userId}`);
+      }
     })
   );
 
