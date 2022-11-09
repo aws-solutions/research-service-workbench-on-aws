@@ -210,6 +210,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ]
+  },
   '/roles/Researcher': {
     PUT: [
       {
