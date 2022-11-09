@@ -57,10 +57,9 @@ export default class AccountService {
    * Create/Upload template and return its URL
    * @param accountId - ID of account to retrieve
    *
-   * @param includeMetadata - Controls inclusion of metadata associated with the account
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getAndUploadTemplateForAccount(accountId: string, includeMetadata: boolean = false): Promise<TemplateResponse> {
+  public async getAndUploadTemplateForAccount(accountId: string): Promise<TemplateResponse> {
     const url = new URL('http://potato.com');
     const responseObj : TemplateResponse = { url: url };
     return responseObj;

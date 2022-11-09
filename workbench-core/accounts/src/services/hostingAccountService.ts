@@ -18,9 +18,7 @@ export default class HostingAccountService {
   // TODO: Do I want a URL, a Url, or a string?
   public async applesauce1(accountId: string): Promise<TemplateResponse> {
     // TODO: do we need to upload as well?
-
-    const metadata = true; // TODO: Do I want, or do I not want metadata?
-    return await new HostingAccountLifecycleService().applesauce2(accountId, metadata);
+    return await new HostingAccountLifecycleService().applesauce2(accountId);
   }
 
   /**
