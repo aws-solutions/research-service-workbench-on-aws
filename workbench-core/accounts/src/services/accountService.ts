@@ -8,7 +8,7 @@ import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/wor
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
-import { AccountCfnTemplateParameters, TemplateResponse} from "../models/accountCfnTemplate";
+import { TemplateResponse} from "../models/accountCfnTemplate";
 import CostCenter from '../models/costCenter';
 
 export default class AccountService {
