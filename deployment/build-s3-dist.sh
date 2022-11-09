@@ -27,7 +27,6 @@ fi
 template_dir="$PWD"
 template_dist_dir="$template_dir/global-s3-assets"
 build_dist_dir="$template_dir/regional-s3-assets"
-source_dir="$template_dir/solutions/swb-reference"
 
 echo "------------------------------------------------------------------------------"
 echo "[Init] Clean old dist folders"
@@ -74,25 +73,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-echo "[Rebuild] Console"
+echo "[Packing] Services"
 echo "------------------------------------------------------------------------------"
-cd $source_dir
-rush build
-ls -a
-mkdir $build_dist_dir/console
-cd $source_dir/lib
-cp -r ./ $build_dist_dir/console/
-
-echo "------------------------------------------------------------------------------"
-echo "[Create] Console manifest"
-echo "------------------------------------------------------------------------------"
-echo "Creating console manifest file"
-manifest=(`find * -type f ! -iname "aws_exports.js" ! -iname ".DS_Store"`)
-manifest_json=$(IFS=,;printf "%s" "${manifest[*]}")
-echo "{\"files\":[\"$manifest_json\"]}" | sed 's/,/","/g' >> $build_dist_dir/console/site-manifest.json
-
-echo "------------------------------------------------------------------------------"
-echo "[Rebuild] Services"
-echo "------------------------------------------------------------------------------"
-zip -r service-workbench-services.zip $source_dir/lib/*
+zip -rq service-workbench-services.zip $template_dir/build/*
 cp service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
