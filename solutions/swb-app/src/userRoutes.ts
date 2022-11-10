@@ -11,7 +11,10 @@ import {
   Status,
   UpdateRoleSchema,
   UserManagementService,
-  UserNotFoundError
+  UserNotFoundError,
+  isUserNotFoundError,
+  isRoleNotFoundError,
+  isInvalidParameterError
 } from '@aws/workbench-core-authentication';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -55,7 +58,7 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
         await user.deleteUser(userId);
         res.status(204).send();
       } catch (err) {
-        if (err instanceof UserNotFoundError) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
         if (Boom.isBoom(err)) throw err;
         throw Boom.badImplementation(`Could not delete user ${userId}`);
       }
@@ -75,16 +78,37 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
             await user.activateUser(userId);
           if (req.body.status === 'INACTIVE' && existingUser.status === Status.ACTIVE)
             await user.deactivateUser(userId);
-          delete req.body.status; // Status update is complete
+          delete req.body.status; // Status update is complete, and type is different than expected for further steps
+        }
+
+        if (!_.isEmpty(req.body.roles) && !_.isEqual(existingUser.roles, req.body.roles)) {
+          const rolesToAdd = _.difference(req.body.roles, existingUser.roles);
+          await Promise.all(
+            _.map(rolesToAdd, async (role) => {
+              await user.addUserToRole(userId, role);
+            })
+          );
+          const rolesToRemove = _.difference(existingUser.roles, req.body.roles);
+          await Promise.all(
+            _.map(rolesToRemove, async (role) => {
+              await user.removeUserFromRole(userId, role);
+            })
+          );
         }
 
         // Since updateUser() requires object of type User
-        const userToUpdate = _.assign(existingUser, req.body);
-
-        await user.updateUser(userId, userToUpdate);
+        await user.updateUser(userId, { ...existingUser, ...req.body });
         res.status(204).send();
       } catch (err) {
-        if (err instanceof UserNotFoundError) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
+        if (isRoleNotFoundError(err))
+          throw Boom.notFound(
+            'Please make sure all specified roles exist as groups in the Cognito User Pool'
+          );
+        if (isInvalidParameterError(err))
+          throw Boom.notFound(
+            'Please make sure specified email is in valid email format and not already in use in the Cognito User Pool'
+          );
         if (Boom.isBoom(err)) throw err;
         throw Boom.badImplementation(`Could not update user ${userId}`);
       }

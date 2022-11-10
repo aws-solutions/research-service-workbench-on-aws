@@ -14,7 +14,7 @@ const UpdateUserSchema: Schema = {
     lastName: { type: 'string' },
     email: { type: 'string' },
     status: { enum: ['ACTIVE', 'INACTIVE'] },
-    roles: { type: 'string[]' }
+    roles: { type: 'array', items: { type: 'string' } }
   },
   additionalProperties: false,
   required: []
