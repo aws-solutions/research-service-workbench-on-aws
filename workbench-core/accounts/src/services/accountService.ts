@@ -8,7 +8,7 @@ import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/wor
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
-import { TemplateResponse} from "../models/accountCfnTemplate";
+import { AccountCfnTemplateParameters, TemplateResponse} from "../models/accountCfnTemplate";
 import CostCenter from '../models/costCenter';
 
 export default class AccountService {
@@ -54,12 +54,34 @@ export default class AccountService {
   }
 
   /**
-   * Create/Upload template and return its URL
-   * @param accountId - ID of account to retrieve
+   * Create/Upload template and return its UfRL
+   * @param externalAccountId - ID of account to retrieve
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getAndUploadTemplateForAccount(accountId: string): Promise<TemplateResponse> {
+  public async getAndUploadTemplateForAccount(externalAccountId: string): Promise<TemplateResponse> {
+    const cfService = this._aws.helpers.cloudformation;
+    const {
+      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,  //TODO: need to create, doesn't exist
+      [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
+     } = await cfService.getCfnOutput(process.env.stackName!, [
+         process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+         process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
+     ]);
+    const templateParameters : AccountCfnTemplateParameters = {
+      accountHandlerRoleArn : accountHandlerRoleArn,
+      enableFlowLogs : "true",
+      externalId: externalAccountId,
+      launchConstraintPolicyPrefix : "*", // We can do better, get from stack outputs?
+      launchConstraintRolePrefix : "*",  // We can do better, get from stack outputs?
+      mainAccountId : process.env.MAIN_ACCT_ID!,
+      namespace : process.env.STACK_NAME!,
+      publicSubnetCidr: "todo",
+      stackName: process.env.STACK_NAME!.concat("-hosting-account"),
+      statusHandlerRoleArn : "todo",
+      vpcCidr : "todo"
+    }
+
     const url = new URL('http://potato.com');
     const responseObj : TemplateResponse = { url: url };
     return responseObj;

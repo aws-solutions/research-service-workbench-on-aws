@@ -18,7 +18,6 @@ interface AccountCfnTemplateParameters{
     publicSubnetCidr : string;
     stackName : string;
     statusHandlerRoleArn : string;
-    url : URL;
     vpcCidr : string;
 }
 
