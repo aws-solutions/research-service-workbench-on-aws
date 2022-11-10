@@ -4,11 +4,12 @@
  */
 
 import { Status } from '@aws/workbench-core-authentication';
-import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 import { checkHttpError } from '../../support/utils/utilities';
+
+const fakeUuid = '00000000-0000-0000-0000-000000000000';
 
 describe('userManagement activate/deactivate user integration test', () => {
   const setup: Setup = new Setup();
@@ -80,7 +81,7 @@ describe('userManagement activate/deactivate user integration test', () => {
 
   it('should return an error when activating a user that doesnt exist', async () => {
     try {
-      await adminSession.resources.users.user(uuidv4()).activate();
+      await adminSession.resources.users.user(fakeUuid).activate();
     } catch (e) {
       checkHttpError(
         e,
@@ -95,7 +96,7 @@ describe('userManagement activate/deactivate user integration test', () => {
 
   it('should return an error when deactivating a user that doesnt exist', async () => {
     try {
-      await adminSession.resources.users.user(uuidv4()).deactivate();
+      await adminSession.resources.users.user(fakeUuid).deactivate();
     } catch (e) {
       checkHttpError(
         e,
