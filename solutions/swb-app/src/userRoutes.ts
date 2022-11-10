@@ -7,6 +7,7 @@
 import {
   CreateRoleSchema,
   CreateUserSchema,
+  UpdateUserSchema,
   Status,
   UpdateRoleSchema,
   UserManagementService,
@@ -54,15 +55,41 @@ export function setUpUserRoutes(router: Router, user: UserManagementService): vo
         await user.deleteUser(userId);
         res.status(204).send();
       } catch (err) {
-        if (err instanceof UserNotFoundError) {
-          throw Boom.notFound(`Could not find user ${userId}`);
-        }
-
-        if (Boom.isBoom(err)) {
-          throw err;
-        }
-
+        if (err instanceof UserNotFoundError) throw Boom.notFound(`Could not find user ${userId}`);
+        if (Boom.isBoom(err)) throw err;
         throw Boom.badImplementation(`Could not delete user ${userId}`);
+      }
+    })
+  );
+
+  router.patch(
+    '/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      processValidatorResult(validate(req.body, UpdateUserSchema));
+
+      // Since service requires User object, uid attribute has to be added
+      req.body.uid = req.params.userId;
+
+      // Schema verifies status has to be one of these: ACTIVE|INACTIVE
+      req.body.status = req.body.status === 'ACTIVE' ? Status.ACTIVE : Status.INACTIVE;
+
+      const userId = req.params.userId;
+      try {
+        const existingUser = await user.getUser(userId);
+        if (existingUser.status !== req.body.status) {
+          if (req.body.status === Status.ACTIVE) {
+            await user.activateUser(userId);
+          } else if (req.body.status === Status.INACTIVE) {
+            await user.deactivateUser(userId);
+          }
+        }
+
+        await user.updateUser(userId, req.body);
+        res.status(204).send();
+      } catch (err) {
+        if (err instanceof UserNotFoundError) throw Boom.notFound(`Could not find user ${userId}`);
+        if (Boom.isBoom(err)) throw err;
+        throw Boom.badImplementation(`Could not update user ${userId}`);
       }
     })
   );
