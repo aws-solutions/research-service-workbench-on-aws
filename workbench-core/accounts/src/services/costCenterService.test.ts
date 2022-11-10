@@ -121,12 +121,17 @@ describe('CostCenterService', () => {
 
   describe('create', () => {
     describe('with a valid CreateCostCenter object', () => {
-      let accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
-      const createCostCenter: CreateCostCenter = {
-        name: 'the name',
-        description: 'the description',
-        accountId: accountId
-      };
+      let accountId: string;
+      let createCostCenter: CreateCostCenter;
+
+      beforeEach(() => {
+        accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
+        createCostCenter = {
+          name: 'the name',
+          description: 'the description',
+          accountId: accountId
+        };
+      });
 
       describe('`dependency` is the id of a saved Account', () => {
         beforeEach(() => {
