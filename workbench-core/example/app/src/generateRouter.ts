@@ -9,6 +9,7 @@ import { withAuth } from '@aws/workbench-core-authorization';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { Router, Express } from 'express';
+import rateLimit from 'express-rate-limit';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
 import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
