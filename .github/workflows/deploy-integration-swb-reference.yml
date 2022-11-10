@@ -6,7 +6,7 @@
 name: Deploy-and-integration-test-swb-reference
 on:
   workflow_call:
-    secrets: 
+    secrets:
       aws-dev-region:
         required: true
       role-to-assume:

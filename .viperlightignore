@@ -28,3 +28,7 @@ workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
 solutions/example-ui-app/src/models/User.ts:19
 # "email": "hello@cypress.io" is not real email
 solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
+
+#Fake email used
+workbench-core/example/infrastructure/scripts/setupCognito.sh:43
+workbench-core/example/infrastructure/scripts/setupCognito.sh:44
