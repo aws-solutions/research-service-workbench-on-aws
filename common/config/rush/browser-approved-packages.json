@@ -573,6 +573,10 @@
     {
       "name": "winston-transport",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "zod",
+      "allowedCategories": [ "production" ]
     }
   ]
 }

@@ -5,12 +5,10 @@
 
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
-// import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 
 describe('datasets integration test', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
-  // const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
   beforeEach(() => {
     expect.hasAssertions();

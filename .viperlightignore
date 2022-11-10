@@ -33,3 +33,6 @@ solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
 workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
 # email: 'activatedeactivate@user.com' is not real email
 workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:28
+#Fake email used
+workbench-core/example/infrastructure/scripts/setupCognito.sh:43
+workbench-core/example/infrastructure/scripts/setupCognito.sh:44
