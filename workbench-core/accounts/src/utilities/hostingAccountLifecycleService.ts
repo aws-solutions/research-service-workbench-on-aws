@@ -20,7 +20,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import { Account } from '../models/accounts/account';
-import { ListAccountRequest } from '../models/accounts/listAcountsRequest';
+import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import AccountService from '../services/accountService';
 
 interface Arns {

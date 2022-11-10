@@ -5,7 +5,7 @@
 
 import { PaginatedResponse } from '@aws/workbench-core-base';
 import { Account } from '../models/accounts/account';
-import { ListAccountRequest } from '../models/accounts/listAcountsRequest';
+import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
