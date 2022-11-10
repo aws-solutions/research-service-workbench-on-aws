@@ -208,14 +208,14 @@ describe('environmentTypeConfigService', () => {
   describe('createNewEnvironmentTypeConfig', () => {
     const createParams = {
       name: 'config 1',
-      allowRoleIds: [],
       resourceType: 'envTypeConfig',
       provisioningArtifactId: 'pa-dewjn123',
       params: [],
       owner: 'owner-123',
       description: 'Example config 1',
       productId: 'prod-dasjk123',
-      type: 'sagemaker'
+      type: 'sagemaker',
+      projectIds: []
     };
     test('successfully create envTypeConfig', async () => {
       // BUILD
@@ -224,11 +224,10 @@ describe('environmentTypeConfigService', () => {
       });
 
       // OPERATE
-      const actualResponse = await envTypeConfigService.createNewEnvironmentTypeConfig(
-        'owner-123',
+      const actualResponse = await envTypeConfigService.createNewEnvironmentTypeConfig({
         envTypeId,
-        createParams
-      );
+        params: createParams
+      });
 
       // CHECK
       expect(actualResponse).toEqual(envTypeConfig);
@@ -242,7 +241,7 @@ describe('environmentTypeConfigService', () => {
 
       // OPERATE & CHECK
       await expect(
-        envTypeConfigService.createNewEnvironmentTypeConfig('owner-123', envTypeId, createParams)
+        envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, params: createParams })
       ).rejects.toThrow(`Unable to create environment type with params: ${JSON.stringify(createParams)}`);
     });
   });

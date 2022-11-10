@@ -14,6 +14,7 @@ import {
   DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
+import { CreateEnvironmentTypeConfigRequest } from '../interfaces/createEnvironmentTypeConfigRequest';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {
@@ -22,17 +23,15 @@ interface EnvironmentTypeConfig {
   id: string;
   productId: string;
   provisioningArtifactId: string;
-  allowRoleIds: string[];
   type: string;
   description: string;
   name: string;
-  owner: string;
   params: { key: string; value: string }[];
   resourceType: string;
   createdAt: string;
-  createdBy: string;
   updatedAt: string;
-  updatedBy: string;
+  estimatedCost?: string;
+  dependency: string;
 }
 
 export default class EnvironmentTypeConfigService {
@@ -57,9 +56,7 @@ export default class EnvironmentTypeConfigService {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<EnvironmentTypeConfig> {
-    const response = await this._aws.helpers.ddb
-      .get(this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId))
-      .execute();
+    const response = await this._aws.helpers.ddb.get(this._buildEnvTypeConfigPkSk(envTypeConfigId)).execute();
     const item = (response as GetItemCommandOutput).Item;
     if (item === undefined) {
       throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
@@ -100,34 +97,25 @@ export default class EnvironmentTypeConfigService {
 
   /**
    * Create environment type config object in DDB
-   * @param ownerId - the user requesting the operation
    * @param envTypeId - the environment type identifier for this config
    * @param params - the environment type config object attribute key value pairs
    *
    * @returns environment type config object
    */
   public async createNewEnvironmentTypeConfig(
-    ownerId: string,
-    envTypeId: string,
-    params: {
-      allowRoleIds: string[];
-      type: string;
-      description: string;
-      name: string;
-      params: { key: string; value: string }[];
-    }
+    request: CreateEnvironmentTypeConfigRequest
   ): Promise<EnvironmentTypeConfig> {
     // To create envTypeConfig, we must ensure the parent envType exist
     let productId = '';
     let provisioningArtifactId = '';
     try {
-      const envType = await this._envTypeService.getEnvironmentType(envTypeId);
+      const envType = await this._envTypeService.getEnvironmentType(request.envTypeId);
       productId = envType.productId;
       provisioningArtifactId = envType.provisioningArtifactId;
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         throw Boom.badRequest(
-          `Could not create environment type config because environment type ${envTypeId} does not exist`
+          `Could not create environment type config because environment type ${request.envTypeId} does not exist`
         );
       }
     }
@@ -136,27 +124,25 @@ export default class EnvironmentTypeConfigService {
 
     const newEnvTypeConfig: EnvironmentTypeConfig = {
       id: envTypeConfigId,
-      ...this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId),
+      ...this._buildEnvTypeConfigPkSk(envTypeConfigId),
       productId,
       provisioningArtifactId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      createdBy: ownerId,
-      updatedBy: ownerId,
       resourceType: this._resourceType,
-      ...params,
-      owner: ownerId
+      dependency: request.envTypeId,
+      ...request.params
     };
 
     const item = newEnvTypeConfig as unknown as { [key: string]: unknown };
     const response = await this._aws.helpers.ddb
-      .update(this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId), { item })
+      .update(this._buildEnvTypeConfigPkSk(envTypeConfigId), { item })
       .execute();
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentTypeConfig;
     }
     console.error('Unable to create environment type', newEnvTypeConfig);
-    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
+    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(request.params)}`);
   }
 
   /**
@@ -201,7 +187,7 @@ export default class EnvironmentTypeConfigService {
     };
 
     const response = await this._aws.helpers.ddb
-      .update(this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId), { item: updatedEnvTypeConfig })
+      .update(this._buildEnvTypeConfigPkSk(envTypeConfigId), { item: updatedEnvTypeConfig })
       .execute();
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentTypeConfig;
@@ -212,10 +198,10 @@ export default class EnvironmentTypeConfigService {
     );
   }
 
-  private _buildEnvTypeConfigPkSk(envTypeId: string, envTypeConfigId: string): { pk: string; sk: string } {
+  private _buildEnvTypeConfigPkSk(envTypeConfigId: string): { pk: string; sk: string } {
     return {
-      pk: resourceTypeToKey.envTypeConfig,
-      sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+      pk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+      sk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
     };
   }
 }

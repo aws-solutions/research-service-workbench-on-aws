@@ -5,9 +5,9 @@
 
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
-  CreateEnvironmentTypeConfigSchema,
   EnvironmentTypeConfigService,
-  UpdateEnvironmentTypeConfigSchema
+  UpdateEnvironmentTypeConfigSchema,
+  createEnvironmentTypeConfigRequestParser
 } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -24,12 +24,12 @@ export function setUpEnvTypeConfigRoutes(
   router.post(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateEnvironmentTypeConfigSchema));
-      const user = res.locals.user;
+      const envTypeConfigRequest = createEnvironmentTypeConfigRequestParser.parse({
+        envTypeId: req.params.envTypeId,
+        params: req.body
+      });
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
-        user.id,
-        req.params.envTypeId,
-        req.body
+        envTypeConfigRequest
       );
       res.status(201).send(envTypeConfig);
     })

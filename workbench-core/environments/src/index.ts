@@ -12,6 +12,10 @@ import {
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
 import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
+import {
+  CreateEnvironmentTypeConfigRequest,
+  createEnvironmentTypeConfigRequestParser
+} from './interfaces/createEnvironmentTypeConfigRequest';
 import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
@@ -21,7 +25,6 @@ import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
-import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
 import ListEnvironmentTypesSchema from './schemas/listEnvironmentTypes';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
 import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
@@ -50,7 +53,6 @@ export {
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
-  CreateEnvironmentTypeConfigSchema,
   UpdateEnvironmentTypeConfigSchema,
   CreateEnvironmentTypeSchema,
   UpdateEnvironmentTypeSchema,
@@ -58,5 +60,7 @@ export {
   EnvironmentTypeHandler,
   EnvironmentTypeFilter,
   ListEnvironmentTypesSchema,
-  ListEnvironmentTypesRequest
+  ListEnvironmentTypesRequest,
+  createEnvironmentTypeConfigRequestParser,
+  CreateEnvironmentTypeConfigRequest
 };
