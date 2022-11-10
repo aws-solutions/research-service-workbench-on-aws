@@ -63,23 +63,26 @@ export default class AccountService {
     const cfService = this._aws.helpers.cloudformation;
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,  //TODO: need to create, doesn't exist
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!] : statusHandlerRoleArn,
+      [process.env.API_HANDLER_ARN_OUTPUT_KEY!] : apiHandlerRoleArn,  //TODO: need to create, doesn't exist
       [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
      } = await cfService.getCfnOutput(process.env.stackName!, [
-         process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
-         process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
+        process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+        process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+        process.env.API_HANDLER_ARN_OUTPUT_KEY!,
+        process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
      ]);
     const templateParameters : AccountCfnTemplateParameters = {
-      accountHandlerRoleArn : accountHandlerRoleArn,
+      accountHandlerRole : accountHandlerRoleArn,
+      apiHandlerRole : apiHandlerRoleArn,
       enableFlowLogs : "true",
       externalId: externalAccountId,
       launchConstraintPolicyPrefix : "*", // We can do better, get from stack outputs?
       launchConstraintRolePrefix : "*",  // We can do better, get from stack outputs?
       mainAccountId : process.env.MAIN_ACCT_ID!,
       namespace : process.env.STACK_NAME!,
-      publicSubnetCidr: "todo",
       stackName: process.env.STACK_NAME!.concat("-hosting-account"),
-      statusHandlerRoleArn : "todo",
-      vpcCidr : "todo"
+      statusHandlerRole : statusHandlerRoleArn,
     }
 
     const url = new URL('http://potato.com');

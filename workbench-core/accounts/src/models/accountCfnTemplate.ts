@@ -8,17 +8,16 @@ interface TemplateResponse{
 }
 
 interface AccountCfnTemplateParameters{
-    accountHandlerRoleArn : string;
+    accountHandlerRole : string;
+    apiHandlerRole : string;
     enableFlowLogs : string;
     externalId : string;
     launchConstraintPolicyPrefix : string;
     launchConstraintRolePrefix : string;
     mainAccountId : string;
     namespace : string;
-    publicSubnetCidr : string;
     stackName : string;
-    statusHandlerRoleArn : string;
-    vpcCidr : string;
+    statusHandlerRole : string;
 }
 
 export {AccountCfnTemplateParameters, TemplateResponse} ;
