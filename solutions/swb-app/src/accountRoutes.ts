@@ -8,6 +8,7 @@ import {
   UpdateAccountSchema,
   HostingAccountService
 } from '@aws/workbench-core-accounts';
+import { ListAccountsRequestParser } from '@aws/workbench-core-accounts/lib/models/accounts/listAcountsRequest';
 import {
   CreateAccountMetadata,
   UpdateAccountMetadata
@@ -18,18 +19,19 @@ import { escape } from 'lodash';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
-export function setUpAccountRoutes(router: Router, account: HostingAccountService): void {
+export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
   router.get(
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(await account.list());
+      const listRequest = ListAccountsRequestParser.parse(req.params);
+      res.send(await hostingAccountService.list(listRequest));
     })
   );
 
   router.get(
     '/aws-accounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(await account.get(req.params.id));
+      res.send(await hostingAccountService.get(req.params.id));
     })
   );
 
@@ -46,7 +48,7 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
         externalId: escape(externalId)
       };
 
-      const createdAccount = await account.create(createAccountMetadata);
+      const createdAccount = await hostingAccountService.create(createAccountMetadata);
       res.send(createdAccount);
     })
   );
@@ -67,7 +69,7 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
         externalId: externalId!! ? escape(externalId) : undefined
       };
 
-      const updatedAccount = await account.update(updateAccountMetadata);
+      const updatedAccount = await hostingAccountService.update(updateAccountMetadata);
       res.send(updatedAccount);
     })
   );

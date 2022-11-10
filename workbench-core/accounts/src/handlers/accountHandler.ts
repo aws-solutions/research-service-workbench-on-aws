@@ -88,8 +88,7 @@ export default class AccountHandler {
       externalId: string;
     }[]
   > {
-    const ddbTableName = process.env.STACK_NAME!;
-    const accountService = new AccountService(ddbTableName);
+    const accountService = new AccountService(this._mainAccountAwsService.helpers.ddb);
 
     const accounts = await accountService.getAccountsForAccountHandler({
       index: 'getResourceByCreatedAt',

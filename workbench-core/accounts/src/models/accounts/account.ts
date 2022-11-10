@@ -4,28 +4,8 @@
  */
 
 import { z } from 'zod';
-import { HOSTING_ACCOUNT_STATUS, HostingAccountStatus } from '../constants/hostingAccountStatus';
-import CostCenter from './costCenter';
-
-export interface Account {
-  id: string;
-  name: string;
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  error?: { type: string; value: string };
-  hostingAccountHandlerRoleArn: string;
-  vpcId: string;
-  subnetId: string;
-  cidr: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
-  externalId: string;
-  stackName: string;
-  status: HostingAccountStatus;
-  CC?: CostCenter;
-  updatedAt: string;
-  createdAt: string;
-}
+import { HOSTING_ACCOUNT_STATUS } from '../../constants/hostingAccountStatus';
+import { CostCenterParser } from '../costCenter/costCenter';
 
 // eslint-disable-next-line @rushstack/typedef-var
 const ErrorParser = z.object({
@@ -50,5 +30,8 @@ export const AccountParser = z.object({
   stackName: z.string(),
   status: z.enum(HOSTING_ACCOUNT_STATUS as [string, ...string[]]),
   updatedAt: z.string(),
-  createdAt: z.string()
+  createdAt: z.string(),
+  costCenter: CostCenterParser.optional()
 });
+
+export type Account = z.infer<typeof AccountParser>;

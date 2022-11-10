@@ -19,7 +19,8 @@ import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
-import { Account } from '../models/account';
+import { Account } from '../models/accounts/account';
+import { ListAccountRequest } from '../models/accounts/listAcountsRequest';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -53,14 +54,14 @@ export default class HostingAccountLifecycleService {
     this._stackName = process.env.STACK_NAME!;
     const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
-    this._accountService = new AccountService(ddbTableName);
+    this._accountService = new AccountService(this._aws.helpers.ddb);
   }
 
-  public async listAccounts(pageSize: number, paginationToken: string): Promise<PaginatedResponse<Account>> {
-    const queryParams = addPaginationToken(paginationToken, {
+  public async listAccounts(listAccountRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
+    const queryParams = addPaginationToken(listAccountRequest.paginationToken, {
       index: 'getResourceByName',
       key: { name: 'resourceType', value: 'account' },
-      limit: pageSize || DEFAULT_API_PAGE_SIZE
+      limit: listAccountRequest.pageSize || DEFAULT_API_PAGE_SIZE
     });
 
     return await this._accountService.getAccounts(queryParams);

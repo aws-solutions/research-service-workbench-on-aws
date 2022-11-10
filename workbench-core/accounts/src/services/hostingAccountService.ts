@@ -4,17 +4,16 @@
  */
 
 import { PaginatedResponse } from '@aws/workbench-core-base';
-import { Account } from '../models/account';
+import { Account } from '../models/accounts/account';
+import { ListAccountRequest } from '../models/accounts/listAcountsRequest';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
-  public async list(): Promise<PaginatedResponse<Account>> {
-    const pageSize = 20;
-    const paginationToken = '';
-    return await new HostingAccountLifecycleService().listAccounts(pageSize, paginationToken);
+  public async list(listAccountsRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
+    return await new HostingAccountLifecycleService().listAccounts(listAccountsRequest);
   }
 
   public async get(accountId: string): Promise<Account> {
