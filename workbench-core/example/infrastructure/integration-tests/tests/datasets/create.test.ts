@@ -25,7 +25,7 @@ describe('datasets integration test', () => {
   describe('IntegrationTest', () => {
     test('should return DataSets entries', async () => {
       const response = await adminSession.resources.datasets.get({});
-      expect(response.data).toEqual([]);
+      expect(response.data.length).toEqual(0);
     });
   });
 });

@@ -273,7 +273,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2Bb2a4aa2f7eb38c6f050ada5df7c15447",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B21e6f4962f4ee5c5bcf69a10b9a4c866",
             "Version",
           ],
         },
@@ -596,6 +596,8 @@ Object {
                 "cognito-idp:AdminListGroupsForUser",
                 "cognito-idp:AdminRemoveUserFromGroup",
                 "cognito-idp:AdminUpdateUserAttributes",
+                "cognito-idp:AdminEnableUser",
+                "cognito-idp:AdminDisableUser",
                 "cognito-idp:CreateGroup",
                 "cognito-idp:DeleteGroup",
                 "cognito-idp:ListGroups",
@@ -657,7 +659,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "ec82992d5c2d2422b570b4ea0fb19c2e9b33d3a388311ca4f4dad447bb473d30.zip",
+          "S3Key": "92f481f688fc0547c9c1b65f6f24b2de6d1b3b13f942f2c47cdd0ce987f60403.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -711,7 +713,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2Bb2a4aa2f7eb38c6f050ada5df7c15447": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B21e6f4962f4ee5c5bcf69a10b9a4c866": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
