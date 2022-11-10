@@ -71,4 +71,106 @@ describe('userManagement create user integration test', () => {
       );
     }
   });
+
+  it('should return an error when the email parameter is missing', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      delete invalidParam.email;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: "requires property 'email'"
+        })
+      );
+    }
+  });
+
+  it('should return an error when the email parameter is the wrong type', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      invalidParam.email = 123;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'email is not of a type(s) string'
+        })
+      );
+    }
+  });
+
+  it('should return an error when the firstName parameter is missing', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      delete invalidParam.firstName;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: "requires property 'firstName'"
+        })
+      );
+    }
+  });
+
+  it('should return an error when the firstName parameter is the wrong type', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      invalidParam.firstName = 123;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'firstName is not of a type(s) string'
+        })
+      );
+    }
+  });
+
+  it('should return an error when the lastName parameter is missing', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      delete invalidParam.lastName;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: "requires property 'lastName'"
+        })
+      );
+    }
+  });
+
+  it('should return an error when the lastName parameter is the wrong type', async () => {
+    try {
+      const invalidParam: { [id: string]: unknown } = { ...user };
+      invalidParam.lastName = 123;
+      await adminSession.resources.users.create(invalidParam, false);
+    } catch (e) {
+      checkHttpError(
+        e,
+        new HttpError(400, {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'lastName is not of a type(s) string'
+        })
+      );
+    }
+  });
 });
