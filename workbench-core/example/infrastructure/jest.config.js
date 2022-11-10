@@ -21,12 +21,16 @@ async function init() {
   // the global initialization logic multiple times.
   if (settings) return;
 
-  const config = yaml.load(fs.readFileSync(join(__dirname, `integration-tests/config/testEnv.yaml`), 'utf8'));
+  const stage = 'testEnv';
+
+  const config = yaml.load(
+    fs.readFileSync(join(__dirname, `integration-tests/config/${stage}.yaml`), 'utf8')
+  );
 
   let outputs;
   try {
     const apiStackOutputs = JSON.parse(
-      fs.readFileSync(join(__dirname, `src/config/cdk-outputs.json`), 'utf8') // nosemgrep
+      fs.readFileSync(join(__dirname, `src/config/${stage}.json`), 'utf8') // nosemgrep
     );
     const apiStackName = Object.entries(apiStackOutputs).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
     outputs = apiStackOutputs[apiStackName];
