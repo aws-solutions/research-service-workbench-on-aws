@@ -1,23 +1,7 @@
 ## Note:
-## Please deploy the swb-reference package before running the integration test suite.
+## Please deploy the example/infrastructure package before running the integration test suite.
 ## Settings declared here are merged with the main accounts CFN outputs to create integration test config items
 
-## Default Env Config for launching a new environment
-#envTypeId: ''
-#envTypeConfigId: ''
-#projectId: ''
-#envType: ''
-
-## Negative Testing
-#terminatedEnvId: ''   # id of an environment that has already been terminated
-
-## Cognito Integ Test Client
-#rootUserNameParamStorePath: ''
-#rootPasswordParamStorePath: ''
-
-## Pre-requisite for running aws-accounts integration test
-## Create the onboard_account stack in an external AWS account, and populate the following values below:
-#awsAccountId: ''
-#envMgmtRoleArn: ''
-#hostingAccountHandlerRoleArn: ''
-#encryptionKeyArn: ''
+#Cognito Integ Test Client
+# rootUserNameParamStorePath: ''
+# rootPasswordParamStorePath: ''
