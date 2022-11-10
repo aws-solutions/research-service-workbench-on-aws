@@ -17,7 +17,18 @@ export default class Datasets extends CollectionResource {
   public dataset(id: string): Dataset {
     return new Dataset(id, this._clientSession, this._api);
   }
+  // List call
+  public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+    if (!queryParams) {
+      return this._axiosInstance.get(this._api, { params: queryParams });
+    } else {
+      return this._axiosInstance.get(`${this._api}/${queryParams.id}`);
+    }
+  }
 
+  public async delete(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(`${this._api}/${queryParams.id}`);
+  }
   public async import(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
@@ -25,12 +36,16 @@ export default class Datasets extends CollectionResource {
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const dataSetName = randomTextGenerator.getFakeText('test-DS');
+    const storageName = this._settings.get('ExampleS3DataSetsBucketName');
+    const awsAccountId = this._settings.get('mainAccountId');
+    const region = this._settings.get('AwsRegion');
+
     return {
       datasetName: resource.datasetName ?? dataSetName,
       path: resource.path ?? dataSetName,
-      storageName: resource.storageName,
-      awsAccountId: resource.awsAccountId,
-      region: resource.region
+      storageName: resource.storageName ?? storageName,
+      awsAccountId: resource.awsAccountId ?? awsAccountId,
+      region: resource.region ?? region
     };
   }
 }

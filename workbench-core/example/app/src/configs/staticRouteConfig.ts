@@ -4,6 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+import { uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -63,6 +64,20 @@ export const routesMap: RoutesMap = {
       {
         action: 'CREATE',
         subject: 'User'
+      }
+    ]
+  },
+  [`/datasets/example-ds-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Dataset'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Dataset'
       }
     ]
   }

@@ -80,6 +80,10 @@ export class ExampleStack extends Stack {
     });
     const datasetBucket: Bucket = createDatasetBucket.bucket;
 
+    new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
+      value: datasetBucket.bucketName
+    });
+
     this._addAccessPointDelegationStatement(datasetBucket);
 
     const exampleLambda: Function = this._createLambda(datasetBucket);

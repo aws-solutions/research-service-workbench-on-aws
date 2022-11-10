@@ -19,12 +19,16 @@ export default class Dataset extends Resource {
 
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
-    const { data: resource } = await defAdminSession.resources.datasets.dataset(this._id).get();
-    const { storageName, path } = resource;
+    try {
+      const { data: resource } = await defAdminSession.resources.datasets.dataset(this._id).get();
+      const { storageName, path } = resource;
 
-    // Delete DDB entries, and path folder from bucket (to prevent test resources polluting a prod env)
-    const datasetHelper = new DatasetHelper();
-    await datasetHelper.deleteS3Resources(storageName, path);
-    await datasetHelper.deleteDdbRecords(this._id);
+      // Delete DDB entries, and path folder from bucket (to prevent test resources polluting a prod env)
+      const datasetHelper = new DatasetHelper();
+      await datasetHelper.deleteS3Resources(storageName, path);
+      await datasetHelper.deleteDdbRecords(this._id);
+    } catch (error) {
+      console.log(`Error caught in cleanup of dataset '${this._id}': ${error}.`);
+    }
   }
 }

@@ -101,7 +101,7 @@ solutions/swb-reference/integration-tests/config/*.yaml
 solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 
-
+out/
 
 # local environment variables
 .env*.local

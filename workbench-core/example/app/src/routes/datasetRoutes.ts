@@ -77,7 +77,7 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp('example-ds')) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
       const ds = await dataSetService.getDataSet(req.params.id);
@@ -98,7 +98,7 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp('example-ds')) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
       await dataSetService.removeDataSet(req.params.id);
