@@ -837,37 +837,78 @@
       ]
     },
     {
-      "name": "Create Hosting Account",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Cookie",
-            "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-            "type": "text"
-          },
-          {
-            "key": "csrf-token",
-            "value": "{{CSRF_TOKEN}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "hosting accounts",
+      "items": [
+        {
+          "name": "Create Hosting Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
+              "host": ["{{API_URL}}"],
+              "path": ["aws-accounts"]
             }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
-          "host": ["{{API_URL}}"],
-          "path": ["aws-accounts"]
+        {
+          "name": "List Hosting Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/aws-accounts",
+              "host": ["{{API_URL}}"],
+              "path": ["aws-accounts"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     }
   ]
 }
