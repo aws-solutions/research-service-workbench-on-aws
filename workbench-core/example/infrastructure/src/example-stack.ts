@@ -31,7 +31,6 @@ import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { v4 as uuid } from 'uuid';
 import { EncryptionKeyWithRotation } from './constructs/encryptionKeyWithRotation';
 import { SecureS3Bucket } from './constructs/secureS3Bucket';
 
@@ -50,9 +49,9 @@ export class ExampleStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const random = uuid({});
+    const domainSuffix = `${Aws.ACCOUNT_ID}-${Aws.REGION}`;
     const exampleCognito = this._createExampleCognitoResources(
-      `example-app-domain-${random}`,
+      `example-app-domain-${domainSuffix}`,
       ['http://localhost:3000/'],
       `example-app-userPool`,
       `example-app-userPoolClient`

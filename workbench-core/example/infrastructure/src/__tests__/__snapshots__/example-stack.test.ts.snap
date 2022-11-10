@@ -1819,7 +1819,21 @@ Object {
     },
     "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F": Object {
       "Properties": Object {
-        "Domain": "example-app-domain-167b9e6c-1701-422a-ab74-8b303af3dc61",
+        "Domain": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "example-app-domain-",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              "-",
+              Object {
+                "Ref": "AWS::Region",
+              },
+            ],
+          ],
+        },
         "UserPoolId": Object {
           "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
         },

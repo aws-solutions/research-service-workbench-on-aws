@@ -57,8 +57,7 @@
     "express": "^4.17.3",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "source-map-support": "^0.5.16",
-    "uuid": "^8.3.2"
+    "source-map-support": "^0.5.16"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^2.0.0",
