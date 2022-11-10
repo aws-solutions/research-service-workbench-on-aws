@@ -30,5 +30,5 @@ solutions/example-ui-app/src/models/User.ts:19
 solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
 
 #Fake email used
-workbench-core/example/infrastructure/scripts/setupCognito.sh:35
-workbench-core/example/infrastructure/scripts/setupCognito.sh:36
+workbench-core/example/infrastructure/scripts/setupCognito.sh:43
+workbench-core/example/infrastructure/scripts/setupCognito.sh:44

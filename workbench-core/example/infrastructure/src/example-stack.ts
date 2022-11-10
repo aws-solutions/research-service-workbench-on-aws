@@ -49,11 +49,12 @@ export class ExampleStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const domainSuffix = `${Aws.ACCOUNT_ID}-${Aws.REGION}`;
     const exampleCognito = this._createExampleCognitoResources(
-      'example-app-domain',
+      `example-app-domain-${domainSuffix}`,
       ['http://localhost:3000/'],
-      'example-app-userPool',
-      'example-app-userPoolClient'
+      `example-app-userPool`,
+      `example-app-userPoolClient`
     );
 
     this._exampleLambdaEnvVars = {

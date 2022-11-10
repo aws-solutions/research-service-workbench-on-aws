@@ -278,7 +278,7 @@ Object {
         },
         "FunctionVersion": Object {
           "Fn::GetAtt": Array [
-            "ExampleLambdaServiceCurrentVersionDB4EDA2B4b3a25908b2468443ab2e1723150e17f",
+            "ExampleLambdaServiceCurrentVersionDB4EDA2Ba9f761fef106c6a515474617009fbef5",
             "Version",
           ],
         },
@@ -662,7 +662,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "076f06ce871fc16a344de772fdc52b1ca0d724129b3ad304c4d566da587efed2.zip",
+          "S3Key": "272b5ad8fa23ccd2eb36baac2575c1ade59a842228b8092ae024cd14b372c0da.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -716,7 +716,7 @@ Object {
       },
       "Type": "AWS::Lambda::Function",
     },
-    "ExampleLambdaServiceCurrentVersionDB4EDA2B4b3a25908b2468443ab2e1723150e17f": Object {
+    "ExampleLambdaServiceCurrentVersionDB4EDA2Ba9f761fef106c6a515474617009fbef5": Object {
       "Properties": Object {
         "FunctionName": Object {
           "Ref": "ExampleLambdaServiceB41FF26F",
@@ -1824,7 +1824,21 @@ Object {
     },
     "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F": Object {
       "Properties": Object {
-        "Domain": "example-app-domain",
+        "Domain": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "example-app-domain-",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              "-",
+              Object {
+                "Ref": "AWS::Region",
+              },
+            ],
+          ],
+        },
         "UserPoolId": Object {
           "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
         },
