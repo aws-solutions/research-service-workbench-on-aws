@@ -11,7 +11,6 @@ import {
   Status,
   UpdateRoleSchema,
   UserManagementService,
-  UserNotFoundError,
   isUserNotFoundError,
   isRoleNotFoundError,
   isInvalidParameterError
