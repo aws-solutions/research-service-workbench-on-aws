@@ -36,7 +36,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Gets the details for a certain user.
    *
-   * @param uid - the user id to get details for
+   * @param id - the user id to get details for
    * @returns a {@link User} object containing the user's details
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -44,21 +44,21 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
-  public async getUser(uid: string): Promise<User> {
+  public async getUser(id: string): Promise<User> {
     try {
       const { UserAttributes: userAttributes, Enabled: enabled } =
         await this._aws.clients.cognito.adminGetUser({
           UserPoolId: this._userPoolId,
-          Username: uid
+          Username: id
         });
 
       const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
         UserPoolId: this._userPoolId,
-        Username: uid
+        Username: id
       });
 
       return {
-        uid,
+        id,
         firstName: userAttributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
         lastName: userAttributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
         email: userAttributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
@@ -92,7 +92,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to add a user to a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
-   * @throws {@link UserAlreadyExistsError} if the user id or email provided is already in use in the user pool
+   * @throws {@link UserAlreadyExistsError} if the email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    */
   public async createUser(user: CreateUser): Promise<User> {
@@ -123,7 +123,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
 
       // if the above call is successful all of the below values will be set
       return {
-        uid: createdUser!.Username!,
+        id: createdUser!.Username!,
         firstName: createdUser!.Attributes!.find((attr) => attr.Name === 'given_name')!.Value!,
         lastName: createdUser!.Attributes!.find((attr) => attr.Name === 'family_name')!.Value!,
         email: createdUser!.Attributes!.find((attr) => attr.Name === 'email')!.Value!,
@@ -152,9 +152,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   }
 
   /**
-   * Updates a user with new details. Roles and uid will not be updated.
+   * Updates a user with new details. Roles and id will not be updated.
    *
-   * @param uid - the id of the user to update
+   * @param id - the id of the user to update
    * @param user - the information to update
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -164,11 +164,11 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    * @throws {@link InvalidParameterError} if the email parameter is already in use by a different account
    */
-  public async updateUser(uid: string, user: User): Promise<void> {
+  public async updateUser(id: string, user: User): Promise<void> {
     try {
       await this._aws.clients.cognito.adminUpdateUserAttributes({
         UserPoolId: this._userPoolId,
-        Username: uid,
+        Username: id,
         UserAttributes: [
           {
             Name: 'given_name',
@@ -208,18 +208,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Deletes a user from the user pool.
    *
-   * @param uid - the id of the user to delete
+   * @param id - the id of the user to delete
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to delete a user from a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
-  public async deleteUser(uid: string): Promise<void> {
+  public async deleteUser(id: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminDeleteUser({
         UserPoolId: this._userPoolId,
-        Username: uid
+        Username: id
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -242,18 +242,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Activates an inactive user.
    *
-   * @param uid - the id of the user to activate
+   * @param id - the id of the user to activate
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to activate a user
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
-  public async activateUser(uid: string): Promise<void> {
+  public async activateUser(id: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminEnableUser({
         UserPoolId: this._userPoolId,
-        Username: uid
+        Username: id
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -276,18 +276,18 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Deactivates an active user.
    *
-   * @param uid - the id of the user to deactivate
+   * @param id - the id of the user to deactivate
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to deactivate a user
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    */
-  public async deactivateUser(uid: string): Promise<void> {
+  public async deactivateUser(id: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminDisableUser({
         UserPoolId: this._userPoolId,
-        Username: uid
+        Username: id
       });
     } catch (error) {
       if (error.name === 'InternalErrorException') {
@@ -334,7 +334,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
           });
 
           return {
-            uid: user.Username ?? '',
+            id: user.Username ?? '',
             firstName: user.Attributes?.find((attr) => attr.Name === 'given_name')?.Value ?? '',
             lastName: user.Attributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
             email: user.Attributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
@@ -344,7 +344,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         })
       );
 
-      return users.filter((user) => user.uid);
+      return users.filter((user) => user.id);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -430,7 +430,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Adds the given user to the given group in the user pool.
    *
-   * @param uid - the username of the user
+   * @param id - the username of the user
    * @param role - the group to add the user to
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -439,11 +439,11 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
-  public async addUserToRole(uid: string, role: string): Promise<void> {
+  public async addUserToRole(id: string, role: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminAddUserToGroup({
         UserPoolId: this._userPoolId,
-        Username: uid,
+        Username: id,
         GroupName: role
       });
     } catch (error) {
@@ -469,7 +469,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
   /**
    * Removes the given user from the given group in the user pool.
    *
-   * @param uid - the username of the user
+   * @param id - the username of the user
    * @param role - the group to remove the user from
    *
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
@@ -478,11 +478,11 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
    */
-  public async removeUserFromRole(uid: string, role: string): Promise<void> {
+  public async removeUserFromRole(id: string, role: string): Promise<void> {
     try {
       await this._aws.clients.cognito.adminRemoveUserFromGroup({
         UserPoolId: this._userPoolId,
-        Username: uid,
+        Username: id,
         GroupName: role
       });
     } catch (error) {
