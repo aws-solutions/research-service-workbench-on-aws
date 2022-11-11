@@ -6,7 +6,7 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
-import Dataset from './dataset';
+import Dataset, { DataSetCreateParams } from './dataset';
 
 export default class Datasets extends CollectionResource {
   public constructor(clientSession: ClientSession) {
@@ -14,9 +14,37 @@ export default class Datasets extends CollectionResource {
     this._api = 'datasets';
   }
 
-  public dataset(id: string): Dataset {
-    return new Dataset(id, this._clientSession, this._api);
+  public dataset(params: DataSetCreateParams): Dataset {
+    return new Dataset(params);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async create(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
+    // Because of the cleanup logic, before we do the create, we need to ensure that the extender of this collection
+    // resource class has a method that returns the resource operations helper for the child resource.
+    // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
+    // a method called 'user()'.
+    const requestBody = applyDefault ? this._buildDefaults(body) : body;
+    const response: AxiosResponse = await this._axiosInstance.post(this._api, requestBody);
+
+    const createParams: DataSetCreateParams = {
+      id: response.data.id,
+      clientSession: this._clientSession,
+      parentApi: 'datasets',
+      awsAccountId: response.data.awsAccountId,
+      storageName: response.data.storageName,
+      storagePath: response.data.path
+    };
+    const taskId = `${this._childType}-${createParams.id}`;
+    // @ts-ignore
+    const resourceNode = this[this._childType](createParams);
+    this.children.push(resourceNode);
+    // We add a cleanup task to the cleanup queue for the session
+    this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
+
+    return response;
+  }
+
   // List call
   public async get(queryParams?: { [key: string]: string }): Promise<AxiosResponse> {
     if (!queryParams) {

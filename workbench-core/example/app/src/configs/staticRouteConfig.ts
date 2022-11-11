@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { uuidRegExpAsString } from '@aws/workbench-core-base';
 import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
@@ -38,15 +38,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/datasets/share': {
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'Endpoint'
-      }
-    ]
-  },
-  [`/datasets/${uuidWithLowercasePrefixRegExp(dataSetPrefix)}`]: {
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -60,16 +52,23 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/datasets/${uuidWithLowercasePrefixRegExp(dataSetPrefix)}/share/${uuidWithLowercasePrefixRegExp(
-    endPointPrefix
-  )}`]: {
-    DELETE: [
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
+    POST: [
       {
-        action: 'DELETE',
+        action: 'CREATE',
         subject: 'Endpoint'
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}}/share/${endPointPrefix.toLowerCase()}-${uuidRegExpAsString}`]:
+    {
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'Endpoint'
+        }
+      ]
+    },
   '/roles': {
     POST: [
       {
