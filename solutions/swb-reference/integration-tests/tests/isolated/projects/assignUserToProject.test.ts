@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -25,7 +26,7 @@ describe('assign user to project negative tests', () => {
 
   describe('missing parameters', () => {
     const userId = '00000000-0000-0000-0000-000000000000';
-    const projectId = '00000000-0000-0000-0000-000000000000';
+    const projectId = `${resourceTypeToKey.project}-00000000-0000-0000-0000-000000000000`;
     test('role', async () => {
       try {
         await adminSession.resources.projects.project(projectId).assignUserToProject(userId, {});
@@ -44,7 +45,7 @@ describe('assign user to project negative tests', () => {
 
   test('user does not exist', async () => {
     const fakeUserId = '00000000-0000-0000-0000-000000000000';
-    const projectId = '00000000-0000-0000-0000-000000000000';
+    const projectId = `${resourceTypeToKey.project}-00000000-0000-0000-0000-000000000000`;
     try {
       await adminSession.resources.projects
         .project(projectId)
@@ -63,7 +64,7 @@ describe('assign user to project negative tests', () => {
 
   test('admin user cannot be assigned to a project', async () => {
     let adminUserId: string | undefined = '';
-    const projectId = '00000000-0000-0000-0000-000000000000';
+    const projectId = `${resourceTypeToKey.project}-00000000-0000-0000-0000-000000000000`;
     try {
       adminUserId = adminSession.getUserId();
       await adminSession.resources.projects
