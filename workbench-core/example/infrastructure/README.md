@@ -25,11 +25,14 @@ rushx cdk:bootstrap
 rushx cdk:deploy
 ```
 
-### Cognito User/Group Setup
+### Cognito User/Group Setup and update SSM Parameters
 ```bash
 ./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c
 ```
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13) 
+
+#### Get UserPool Id
+
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
 
 ### Run Integration Test
 ```bash
@@ -55,8 +58,17 @@ rushx cdk:destroy -f
 ```bash
 ./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
 ```
+#### Get UserPool Id and DynamoDB Table
+```bash
+./scripts/cleanup.sh -r <REGION> -i -t -c
+```
+#### OR
+
 After `rushx cdk:deploy` you can find:
 
 1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
 
 2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.json#L12)
+
+
+
