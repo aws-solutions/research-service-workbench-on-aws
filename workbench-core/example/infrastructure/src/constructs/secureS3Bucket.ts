@@ -42,7 +42,9 @@ export class SecureS3Bucket extends Construct {
       enforceSSL: true,
       serverAccessLogsBucket: props.serverAccessLogsBucket,
       serverAccessLogsPrefix: props.serverAccessLogsPrefix,
-      accessControl: BucketAccessControl.LOG_DELIVERY_WRITE
+      accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
+      removalPolicy: props.removalPolicy,
+      autoDeleteObjects: props.autoDeleteObjects
     };
 
     this.bucket = new Bucket(this, props.s3BucketId, secureS3BucketProps);

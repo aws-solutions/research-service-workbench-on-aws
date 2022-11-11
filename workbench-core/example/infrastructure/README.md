@@ -2,11 +2,6 @@
 
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
-# Code Coverage
-| Statements                  | Branches                | Functions                 | Lines             |
-| --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-100%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
-
  ## Description
 
  Infrastructure for Example App integration tests
@@ -30,11 +25,18 @@ rushx cdk:bootstrap
 rushx cdk:deploy
 ```
 
-### Cognito User/Group Setup
+### Cognito User/Group Setup and update SSM Parameters
 ```bash
 ./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c
 ```
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13) 
+
+#### Get UserPool Id
+```bash
+./scripts/getResources.sh -r <REGION> -i -g
+```
+
+#### OR
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
 
 ### Run Integration Test
 ```bash
@@ -49,8 +51,8 @@ Navigate to `workbench-core/example/infrastructure`
 ```bash
 rushx cdk:destroy
 ```
-#### No Approval required
 
+#### No Approval required
 **Be sure to be in the correct folder, this deletes the stack by force, no prompts for confirmation**
 ```bash
 rushx cdk:destroy -f
@@ -60,6 +62,13 @@ rushx cdk:destroy -f
 ```bash
 ./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
 ```
+
+#### Get UserPool Id and DynamoDB Table
+```bash
+./scripts/getResources.sh -r <REGION> -i -t -g
+```
+
+#### OR
 After `rushx cdk:deploy` you can find:
 
 1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
