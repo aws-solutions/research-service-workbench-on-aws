@@ -104,6 +104,22 @@ export const routesMap: RoutesMap = {
         subject: 'User'
       }
     ]
+  },
+  [`/users/${uuidRegExpAsString}/activate`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}/deactivate`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ]
   }
 };
 
