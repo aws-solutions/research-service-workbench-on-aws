@@ -4,6 +4,7 @@
  */
 
 import { CreateUser } from '@aws/workbench-core-authentication';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 
@@ -23,23 +24,28 @@ describe('userManagement list users integration test', () => {
     await setup.cleanup();
   });
 
-  it('should return a list containing only the default user', async () => {
-    const response = await adminSession.resources.users.get();
-
-    expect(response.data.length).toBe(1);
-  });
-
   it('should return a list containing the newly created user and the default user', async () => {
-    const userToCreate: CreateUser = {
+    const userToCreate1: CreateUser = {
       firstName: 'Test',
       lastName: 'User',
-      email: 'list@users.com'
+      email: `success+list-users-${uuidv4()}@simulator.amazonses.com`
     };
 
-    const { data: createdUser } = await adminSession.resources.users.create(userToCreate);
+    const userToCreate2: CreateUser = {
+      firstName: 'Test',
+      lastName: 'User',
+      email: `success+list-users-${uuidv4()}@simulator.amazonses.com`
+    };
+
+    const { data: createdUser1 } = await adminSession.resources.users.create(userToCreate1);
+    const { data: createdUser2 } = await adminSession.resources.users.create(userToCreate2);
     const response = await adminSession.resources.users.get();
 
-    expect(response.data.length).toBe(2);
-    expect(response.data).toEqual(expect.arrayContaining([expect.objectContaining({ ...createdUser })]));
+    expect(response.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ ...createdUser1 }),
+        expect.objectContaining({ ...createdUser2 })
+      ])
+    );
   });
 });
