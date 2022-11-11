@@ -18,7 +18,7 @@ export default class Datasets extends CollectionResource {
     return new Dataset(id, this._clientSession, this._api);
   }
   // List call
-  public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+  public async get(queryParams?: { [key: string]: string }): Promise<AxiosResponse> {
     if (!queryParams) {
       return this._axiosInstance.get(this._api, { params: queryParams });
     } else {

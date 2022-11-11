@@ -28,7 +28,7 @@ describe('datasets integration test', () => {
   describe('IntegrationTest', () => {
     describe('ListDataSets', () => {
       test('should return DataSets entries', async () => {
-        const response = await adminSession.resources.datasets.get({});
+        const response = await adminSession.resources.datasets.get();
         expect(response.data).toBeDefined();
       });
     });
@@ -45,8 +45,6 @@ describe('datasets integration test', () => {
         expect(response.data.length).toEqual(0);
         console.log('Deleted.');
 
-        // response = await adminSession.resources.datasets.get({'id': dataSetId});
-        // expect(response.data).toBeUndefined();
         await expect(adminSession.resources.datasets.get({ id: dataSetId })).rejects.toThrow(
           new HttpError(404, 'Not Found')
         );
