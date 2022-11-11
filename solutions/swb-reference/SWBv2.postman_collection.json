@@ -853,9 +853,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
+              "raw": "{{API_URL}}/awsAccounts?Authorization={{ACCESS_TOKEN}}",
               "host": ["{{API_URL}}"],
-              "path": ["aws-accounts"]
+              "path": ["awsAccounts"]
             }
           },
           "response": []
@@ -877,9 +877,9 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/aws-accounts",
+              "raw": "{{API_URL}}/awsAccounts",
               "host": ["{{API_URL}}"],
-              "path": ["aws-accounts"],
+              "path": ["awsAccounts"],
               "query": [
                 {
                   "key": "paginationToken",

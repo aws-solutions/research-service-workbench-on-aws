@@ -7,7 +7,7 @@ import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
-  '/aws-accounts': {
+  '/awsAccounts': {
     POST: [
       {
         action: 'CREATE',
@@ -21,7 +21,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/aws-accounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+  [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',

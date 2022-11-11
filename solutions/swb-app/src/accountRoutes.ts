@@ -20,7 +20,7 @@ import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
   router.get(
-    '/aws-accounts',
+    '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<ListAccountRequest>(ListAccountsRequestParser, req.query);
       res.send(await hostingAccountService.list(validatedRequest));
@@ -28,14 +28,14 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   );
 
   router.get(
-    '/aws-accounts/:id',
+    '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       res.send(await hostingAccountService.get(req.params.id));
     })
   );
 
   router.post(
-    '/aws-accounts',
+    '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateAccountSchema));
       const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
@@ -53,7 +53,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   );
 
   router.patch(
-    '/aws-accounts/:id',
+    '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
       const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
