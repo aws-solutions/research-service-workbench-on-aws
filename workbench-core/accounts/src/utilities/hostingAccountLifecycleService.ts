@@ -64,7 +64,7 @@ export default class HostingAccountLifecycleService {
       limit: listAccountRequest.pageSize || DEFAULT_API_PAGE_SIZE
     });
 
-    return await this._accountService.getAccounts(queryParams);
+    return await this._accountService.getPaginatedAccounts(queryParams);
   }
 
   public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {

@@ -140,7 +140,7 @@ describe('CostCenterService', () => {
               removeUndefinedValues: true
             })
           });
-          accountId = 'whatever';
+          accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
           ddbMock.on(UpdateItemCommand).resolves({});
         });
 

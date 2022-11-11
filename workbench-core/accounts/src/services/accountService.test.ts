@@ -14,9 +14,8 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter } from '../models/costCenter/costCenter';
@@ -220,11 +219,11 @@ describe('AccountService', () => {
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('getAccountsForAccountHandler returns no Items attribute', async () => {
+  test('getAllAccounts returns no Items attribute', async () => {
     mockDDB.on(QueryCommand).resolves({});
 
     // OPERATE
-    const response = await accountService.getAccountsForAccountHandler({
+    const response = await accountService.getAllAccounts({
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     });
@@ -233,7 +232,7 @@ describe('AccountService', () => {
     expect(response).toEqual([]);
   });
 
-  test('getAccountsForAccountHandler returns list of onboarded accounts', async () => {
+  test('getAllAccounts returns list of onboarded accounts', async () => {
     const account: Account = {
       name: '',
       cidr: '',
@@ -261,7 +260,7 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.getAccountsForAccountHandler({
+    const response = await accountService.getAllAccounts({
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     });
@@ -304,7 +303,7 @@ describe('AccountService', () => {
     });
 
     test('returns a paginated response of accounts', async () => {
-      const actualResponse = await accountService.getAccounts({});
+      const actualResponse = await accountService.getPaginatedAccounts({});
       expect(actualResponse).toEqual({
         data: [AccountParser.parse(accountJson)],
         paginationToken
@@ -317,7 +316,7 @@ describe('AccountService', () => {
       });
 
       test('it does not return a paginationToken', async () => {
-        const actualResponse = await accountService.getAccounts({});
+        const actualResponse = await accountService.getPaginatedAccounts({});
         expect(actualResponse.paginationToken).toEqual(undefined);
       });
     });

@@ -43,7 +43,7 @@ export default class AccountService {
    *
    * @returns Account entries in DDB
    */
-  public async getAccounts(queryParams: QueryParams): Promise<PaginatedResponse<Account>> {
+  public async getPaginatedAccounts(queryParams: QueryParams): Promise<PaginatedResponse<Account>> {
     const response = await this._dynamoDBService.getPaginatedItems(queryParams);
 
     return {
@@ -54,7 +54,7 @@ export default class AccountService {
     };
   }
 
-  public async getAccountsForAccountHandler(queryParams: QueryParams): Promise<Account[]> {
+  public async getAllAccounts(queryParams: QueryParams): Promise<Account[]> {
     const response = await this._dynamoDBService.query(queryParams).execute();
     let accounts: Account[] = [];
     if (response && response.Items) {

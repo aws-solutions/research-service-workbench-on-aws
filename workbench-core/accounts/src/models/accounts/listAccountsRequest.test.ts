@@ -31,9 +31,20 @@ describe('ListAccountsRequestParser', () => {
         };
       });
 
-      test('it throws an error', () => {
+      test('it returns an error', () => {
         const parsed = ListAccountsRequestParser.safeParse(requestObject);
         expect(parsed.success).toEqual(false);
+
+        if (!parsed.success) {
+          const expectedIssues = [
+            {
+              code: 'custom',
+              message: 'Must be a number',
+              path: ['pageSize']
+            }
+          ];
+          expect(parsed.error.issues).toEqual(expectedIssues);
+        }
       });
     });
 
@@ -44,9 +55,20 @@ describe('ListAccountsRequestParser', () => {
         };
       });
 
-      test('it throws an error', () => {
+      test('it returns an error', () => {
         const parsed = ListAccountsRequestParser.safeParse(requestObject);
         expect(parsed.success).toEqual(false);
+
+        if (!parsed.success) {
+          const expectedIssues = [
+            {
+              code: 'custom',
+              message: 'Must be between 1 and 100',
+              path: ['pageSize']
+            }
+          ];
+          expect(parsed.error.issues).toEqual(expectedIssues);
+        }
       });
     });
 
@@ -60,6 +82,17 @@ describe('ListAccountsRequestParser', () => {
       test('it throws an error', () => {
         const parsed = ListAccountsRequestParser.safeParse(requestObject);
         expect(parsed.success).toEqual(false);
+
+        if (!parsed.success) {
+          const expectedIssues = [
+            {
+              code: 'custom',
+              message: 'Must be between 1 and 100',
+              path: ['pageSize']
+            }
+          ];
+          expect(parsed.error.issues).toEqual(expectedIssues);
+        }
       });
     });
   });

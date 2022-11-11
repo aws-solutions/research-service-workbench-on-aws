@@ -6,16 +6,12 @@
 import {
   CreateAccountSchema,
   UpdateAccountSchema,
-  HostingAccountService
-} from '@aws/workbench-core-accounts';
-import {
+  HostingAccountService,
+  CreateAccountMetadata,
+  UpdateAccountMetadata,
   ListAccountRequest,
   ListAccountsRequestParser
-} from '@aws/workbench-core-accounts/lib/models/accounts/listAccountsRequest';
-import {
-  CreateAccountMetadata,
-  UpdateAccountMetadata
-} from '@aws/workbench-core-accounts/lib/utilities/hostingAccountLifecycleService';
+} from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { escape } from 'lodash';
