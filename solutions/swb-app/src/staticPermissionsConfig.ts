@@ -93,6 +93,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Project'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
@@ -171,7 +176,12 @@ const researcherPermissions: Permission[] = [
   }
 ];
 
+export enum PermissionRoles {
+  Admin = 'Admin',
+  Researcher = 'Researcher'
+}
+
 export const permissionsMap: PermissionsMap = {
-  Admin: adminPermissions,
-  Researcher: researcherPermissions
+  [PermissionRoles.Admin]: adminPermissions,
+  [PermissionRoles.Researcher]: researcherPermissions
 };
