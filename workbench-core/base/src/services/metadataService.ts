@@ -4,8 +4,8 @@
  */
 
 import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import Boom from '@hapi/boom';
 import AwsService from '../aws/awsService';
-import { metadataParser } from '../interfaces/metadata';
 
 export class MetadataService {
   private _aws: AwsService;
@@ -16,21 +16,20 @@ export class MetadataService {
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
   /************************************************************
-   * Given a main entity ,its dependencies and their mappers, this method
-   * -retrieves entities from database by their pk, sk
+   * Saves entity ,metadata related to entity and metadata related to dependencies
+   * -retrieves dependencies from database by their pk, sk
    * -iterates the dependencies and creates relationship items from main entity to dependency entity using mainRelationshipMapper
    * -if dependencyRelationshipMapper exists it creates relationship items from dependency entity to main entity using dependencyRelationshipMapper
-   * @param mainEntityId - pk sk pair of main Entity
+   * @param mainEntity - main Entity to save
    * @param dependencyIds - pk sk pair array of dependencies
-   * @param mainEntityMapper - function that parses ddb object to main Entity Type (zod parser)
    * @param dependencyEntityMapper - function that parses ddb object to dependencies Entity Type (zod parser)
-   * @param mainRelationshipMapper - function that parses main entity and dependency entity to relationship entity (main to dependency)
-   * @param dependencyRelationshipMapper - function that parses main entity and dependency entity to relationship entity (dependency to main)
+   * @param mainRelationshipMapper - function that parses main entity and dependency entity to relationship entity (main entity metadata)
+   * @param dependencyRelationshipMapper - function that parses main entity and dependency entity to relationship entity (dependency metadata)
+   * @returns object containing saved relationships and main entity
    ************************************************************/
-  public async GenerateMetadataItems<MainEntity, DependencyEntity, MainRelationship, DependencyRelationship>(
-    mainEntityId: { pk: string; sk: string },
+  public async saveMetadataItems<MainEntity, DependencyEntity, MainRelationship, DependencyRelationship>(
+    mainEntity: MainEntity,
     dependencyIds: { pk: string; sk: string }[],
-    mainEntityMapper: (metadata: unknown) => MainEntity,
     dependencyEntityMapper: (metadata: unknown) => DependencyEntity,
     mainRelationshipMapper: (
       mainEntityMetadata: MainEntity,
@@ -39,27 +38,55 @@ export class MetadataService {
     dependencyRelationshipMapper?: (
       mainEntityMetadata: MainEntity,
       dependencyMetadata: DependencyEntity
-    ) => DependencyRelationship
-  ): Promise<(MainRelationship | DependencyRelationship)[]> {
+    ) => DependencyRelationship,
+    saveMainEntity: boolean = false
+  ): Promise<{
+    entity: MainEntity;
+    mainEntityMetadata: MainRelationship[];
+    dependencyMetadata: DependencyRelationship[];
+  }> {
     const batchGetResult = (await this._aws.helpers.ddb
-      .get([mainEntityId, ...dependencyIds])
+      .get(dependencyIds)
       .execute()) as BatchGetItemCommandOutput;
-    const mainEntityMetadata = batchGetResult.Responses![this._tableName].find((item) => {
-      const metaDataItem = metadataParser.parse(item);
-      return metaDataItem.pk === mainEntityId.pk && metaDataItem.sk === mainEntityId.sk;
-    });
-    const dependenciesMetadata = batchGetResult.Responses![this._tableName].filter(
-      (item) => item !== mainEntityMetadata
-    );
+    const dependenciesMetadata = batchGetResult.Responses![this._tableName];
 
-    const relationshipItems: (MainRelationship | DependencyRelationship)[] = [];
+    const itemsToSave: Record<string, unknown>[] = [];
+    const mainEntityRelationships: MainRelationship[] = [];
+    const dependencyRelationships: DependencyRelationship[] = [];
+
+    if (saveMainEntity) {
+      itemsToSave.push(mainEntity as Record<string, unknown>);
+    }
+
     dependenciesMetadata.forEach((dependency) => {
-      const mainEntity = mainEntityMapper(mainEntityMetadata);
       const dependencyEntity = dependencyEntityMapper(dependency);
-      relationshipItems.push(mainRelationshipMapper(mainEntity, dependencyEntity));
-      if (dependencyRelationshipMapper)
-        relationshipItems.push(dependencyRelationshipMapper(mainEntity, dependencyEntity));
+      const mainRelationship = mainRelationshipMapper(mainEntity, dependencyEntity);
+      mainEntityRelationships.push(mainRelationship);
+      itemsToSave.push(mainRelationship as Record<string, unknown>);
+      if (dependencyRelationshipMapper) {
+        const dependencyRelationship = dependencyRelationshipMapper(mainEntity, dependencyEntity);
+        dependencyRelationships.push(dependencyRelationship);
+        itemsToSave.push(dependencyRelationship as Record<string, unknown>);
+      }
     });
-    return relationshipItems;
+    try {
+      await this._aws.helpers.ddb
+        .transactEdit({
+          addPutRequest: itemsToSave
+        })
+        .execute();
+    } catch (e) {
+      console.log(
+        `Failed to create metadata. DDB Transact Items attribute: ${JSON.stringify(itemsToSave)}`,
+        e
+      );
+      console.error('Failed to create metadata', e);
+      throw Boom.internal('Failed to create metadata');
+    }
+    return {
+      entity: mainEntity,
+      mainEntityMetadata: mainEntityRelationships,
+      dependencyMetadata: dependencyRelationships
+    };
   }
 }
