@@ -57,11 +57,11 @@ export default class AccountService {
 
   /**
    * Create/Upload template and return its UfRL
-   * @param externalAccountId - ID of account to retrieve
+   * @param externalAccountId - Unique ID we use to identify the hosting accout on the main account
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getAndUploadTemplateForAccount(externalAccountId: string): Promise<TemplateResponse> {
+  public async getTemplateURLForAccount(externalAccountId: string): Promise<TemplateResponse> {
     // Get parameters
     // Create signed URL
 
@@ -160,7 +160,7 @@ export default class AccountService {
     }
   }
 
-  private _orangeJuice (accountCfnTemplateParameters : AccountCfnTemplateParameters, signedUrl : string) : URL {
+  private _orangeJuice(accountCfnTemplateParameters: AccountCfnTemplateParameters, signedUrl: string): string {
     // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
 
     // We assume the hosting account's region is the same as where this lambda runs.
@@ -189,7 +189,7 @@ export default class AccountService {
       `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
       `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`,
     ].join('');
-    return new URL(url);
+    return url;
   }
 
   /*

@@ -16,9 +16,9 @@ export default class HostingAccountService {
   }
 
   // TODO: Do I want a URL, a Url, or a string?
-  public async applesauce1(accountId: string): Promise<TemplateResponse> {
+  public async getTemplateURLForAccount(accountId: string): Promise<TemplateResponse> {
     // TODO: do we need to upload as well?
-    return await new HostingAccountLifecycleService().applesauce2(accountId);
+    return await new HostingAccountLifecycleService().getTemplateURLForAccount(accountId);
   }
 
   /**

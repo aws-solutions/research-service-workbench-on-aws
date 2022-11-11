@@ -306,14 +306,14 @@ describe('AccountService', () => {
       vpcId: ''
     };
 
-    const expectedTemplate = new URL('http://potato.com');
+    const expectedTemplate = 'http://potato.com';
     const mockDDB = mockClient(DynamoDBClient);
     mockDDB.on(GetItemCommand).resolves({
       Item: marshall(account)
     });
 
     // OPERATE
-    const response = await accountService.getAndUploadTemplateForAccount(accountId);
+    const response = await accountService.getTemplateURLForAccount(accountId);
 
     // CHECK
     expect(response.url).toEqual(expectedTemplate);
