@@ -57,12 +57,13 @@ export default class HostingAccountLifecycleService {
 
   /**
    * Create/Upload template and return its URL
-   * @param accountId - ID of account to retrieve
+   * @param awsAcctId - ID of account to retrieve
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getTemplateURLForAccount(accountId: string): Promise<TemplateResponse> {
-    return this._accountService.getTemplateURLForAccount(accountId);
+  public async getTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
+    // Share the artifacts bucket with the new hosting accoutn
+    return this._accountService.getTemplateURLForAccount(externalId);
   }
 
   /**
@@ -153,9 +154,7 @@ export default class HostingAccountLifecycleService {
       }
     }
 
-    // If List statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, 'List:environment-files')) {
-      const listStatement = PolicyStatement.fromJson(
+    const listStatement = PolicyStatement.fromJson(
         JSON.parse(`
        {
         "Sid": "List:environment-files",
@@ -171,20 +170,20 @@ export default class HostingAccountLifecycleService {
             }
           }
         }`)
-      );
+    );
+    // If List statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, listStatement.sid!)) {
       bucketPolicy.addStatements(listStatement);
     } else {
       // If List statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
-        'List:environment-files',
+        listStatement.sid!,
         `arn:aws:iam::${awsAccountId}:root`
       );
     }
 
-    // If the Get statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:environment-files')) {
-      const getStatement = PolicyStatement.fromJson(
+    const getStatement = PolicyStatement.fromJson(
         JSON.parse(`
        {
         "Sid": "Get:environment-files",
@@ -195,14 +194,41 @@ export default class HostingAccountLifecycleService {
         "Action": "s3:GetObject",
         "Resource": ["${artifactBucketArn}/environment-files*"]
         }`)
-      );
+    );
+    // If the Get statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, getStatement.sid!)) {
       bucketPolicy.addStatements(getStatement);
     } else {
       // If the Get statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
         bucketPolicy,
-        'Get:environment-files',
+        getStatement.sid!,
         `arn:aws:iam::${awsAccountId}:root`
+      );
+    }
+
+    const onboardingTemplatePolicy = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "Get:onboarding-template",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
+        }`)
+    );
+    // If the Get statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
+
+      bucketPolicy.addStatements(onboardingTemplatePolicy);
+    } else {
+      // If the Get statement doesn't contain this accountId, add it
+      bucketPolicy = IamHelper.addPrincipalToStatement(
+          bucketPolicy,
+          onboardingTemplatePolicy.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
       );
     }
 

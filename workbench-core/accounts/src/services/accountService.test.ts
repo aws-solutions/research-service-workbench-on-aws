@@ -292,6 +292,7 @@ describe('AccountService', () => {
   test('applesauce', async () => {
     const accountService = new AccountService(process.env.STACK_NAME!);
     const accId = 'testAccountId';
+    const extId = 'workbench';
     const account = {
       id: accId,
       sk: `ACC#${accId}`,
@@ -313,7 +314,8 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.getTemplateURLForAccount(accountId);
+    const response = await accountService.getTemplateURLForAccount(accountId, extId);
+
 
     // CHECK
     expect(response.url).toEqual(expectedTemplate);

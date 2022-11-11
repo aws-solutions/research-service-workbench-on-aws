@@ -27,11 +27,13 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     })
   );
 
-  router.get(
+  router.post(
     'aws-accounts/:id/get-template',
     wrapAsync(async (req: Request, res: Response) => {
       // TODO: maybe validate inputs?
-      res.send(await account.getTemplateURLForAccount(req.params.id));
+      processValidatorResult(validate(req.body, CreateAccountSchema));
+      const { awsAcctId, externalId } = req.body;
+      res.send(await account.getTemplateURLForAccount(awsAcctId, externalId);
     })
   );
 
