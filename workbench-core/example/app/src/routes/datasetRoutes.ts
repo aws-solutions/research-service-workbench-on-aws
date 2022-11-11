@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
@@ -13,6 +13,7 @@ import {
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { dataSetPrefix, endPointPrefix } from '../configs/constants';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -59,7 +60,7 @@ export function setUpDSRoutes(
   router.post(
     '/datasets/:id/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
@@ -73,11 +74,29 @@ export function setUpDSRoutes(
     })
   );
 
+  // unshare dataset
+  router.delete(
+    '/datasets/:datasetId/share/:endpointId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (
+        req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null ||
+        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endPointPrefix)) === null
+      ) {
+        await dataSetService.removeDataSetExternalEndpoint(
+          req.params.datasetId,
+          req.params.endpointId,
+          dataSetStoragePlugin
+        );
+        res.status(204).send();
+      }
+    })
+  );
+
   // Get dataset
   router.get(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp('example-ds')) === null) {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
       const ds = await dataSetService.getDataSet(req.params.id);
@@ -98,7 +117,7 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp('example-ds')) === null) {
+      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
       await dataSetService.removeDataSet(req.params.id);

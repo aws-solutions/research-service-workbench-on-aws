@@ -4,7 +4,8 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidRegExpAsString } from '@aws/workbench-core-base';
+import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -41,7 +42,31 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'Endpoint'
+      }
+    ]
+  },
+  [`/datasets/${uuidWithLowercasePrefixRegExp(dataSetPrefix)}`]: {
+    GET: [
+      {
+        action: 'READ',
         subject: 'Dataset'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Dataset'
+      }
+    ]
+  },
+  [`/datasets/${uuidWithLowercasePrefixRegExp(dataSetPrefix)}/share/${uuidWithLowercasePrefixRegExp(
+    endPointPrefix
+  )}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Endpoint'
       }
     ]
   },
@@ -64,20 +89,6 @@ export const routesMap: RoutesMap = {
       {
         action: 'CREATE',
         subject: 'User'
-      }
-    ]
-  },
-  [`/datasets/example-ds-${uuidRegExpAsString}`]: {
-    GET: [
-      {
-        action: 'READ',
-        subject: 'Dataset'
-      }
-    ],
-    DELETE: [
-      {
-        action: 'DELETE',
-        subject: 'Dataset'
       }
     ]
   }
