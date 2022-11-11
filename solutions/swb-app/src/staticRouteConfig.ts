@@ -224,6 +224,12 @@ export const routesMap: RoutesMap = {
         action: 'DELETE',
         subject: 'User'
       }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
     ]
   },
   '/roles/Researcher': {

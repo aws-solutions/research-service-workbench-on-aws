@@ -11,7 +11,8 @@ import {
   Bucket,
   BucketAccessControl,
   BucketEncryption,
-  BucketProps
+  BucketProps,
+  CfnBucketPolicy
 } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
@@ -82,5 +83,23 @@ export class SecureS3Bucket extends Construct {
         }
       })
     );
+
+    //CFN NAG Suppression
+    const s3BucketPolicyNode = s3Bucket.node.findChild('Policy');
+    const s3BucketPolicyMetaDataNode = s3BucketPolicyNode.node.defaultChild as CfnBucketPolicy;
+
+    s3BucketPolicyMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'F15',
+          reason: 'All S3 actions needs to be denied, this is ok !'
+        },
+        {
+          id: 'F16',
+          reason: 'All Principals needs to be denied, this is ok !'
+        }
+      ]
+    });
   }
 }
