@@ -15,9 +15,7 @@ export default class HostingAccountService {
     return await new HostingAccountLifecycleService().getAccount(accountId, false);
   }
 
-  // TODO: Do I want a URL, a Url, or a string?
   public async getTemplateURLForAccount(accountId: string): Promise<TemplateResponse> {
-    // TODO: do we need to upload as well?
     return await new HostingAccountLifecycleService().getTemplateURLForAccount(accountId);
   }
 
