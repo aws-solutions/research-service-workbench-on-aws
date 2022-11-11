@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import _ from 'lodash';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 
