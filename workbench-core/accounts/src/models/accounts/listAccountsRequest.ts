@@ -7,7 +7,7 @@ export const ListAccountsRequestParser = z.object({
     if (isNaN(pageSize)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Not a number'
+        message: 'Must be a number'
       });
 
       return z.NEVER;
@@ -16,7 +16,7 @@ export const ListAccountsRequestParser = z.object({
     if (pageSize > 100 || pageSize < 1) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'pageSize must be between 1 and 100'
+        message: 'Must be between 1 and 100'
       });
 
       return z.NEVER;

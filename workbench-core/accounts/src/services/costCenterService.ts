@@ -59,15 +59,14 @@ export default class CostCenterService {
       accountId: createCostCenter.accountId,
       description: createCostCenter.description,
       name: createCostCenter.name,
-      // Account data
       awsAccountId: account.awsAccountId,
-      encryptionKeyArn: account.encryptionKeyArn,
-      envMgmtRoleArn: account.envMgmtRoleArn,
-      environmentInstanceFiles: account.environmentInstanceFiles,
-      externalId: account.externalId,
       hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
-      subnetId: account.subnetId,
-      vpcId: account.vpcId
+      envMgmtRoleArn: account.envMgmtRoleArn,
+      encryptionKeyArn: account.encryptionKeyArn!,
+      subnetId: account.subnetId!,
+      vpcId: account.vpcId!,
+      environmentInstanceFiles: account.environmentInstanceFiles!,
+      externalId: account.externalId
     };
 
     const dynamoItem: { [key: string]: string } = {

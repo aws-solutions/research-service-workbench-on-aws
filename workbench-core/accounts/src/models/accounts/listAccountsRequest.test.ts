@@ -34,18 +34,6 @@ describe('ListAccountsRequestParser', () => {
       test('it throws an error', () => {
         const parsed = ListAccountsRequestParser.safeParse(requestObject);
         expect(parsed.success).toEqual(false);
-
-        if (!parsed.success) {
-          const expectedError = [
-            {
-              code: 'custom',
-              message: 'Not a number',
-              path: ['pageSize']
-            }
-          ];
-
-          expect(parsed.error.issues).toEqual(expectedError);
-        }
       });
     });
 

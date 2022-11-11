@@ -8,7 +8,10 @@ import {
   UpdateAccountSchema,
   HostingAccountService
 } from '@aws/workbench-core-accounts';
-import { ListAccountsRequestParser } from '@aws/workbench-core-accounts/lib/models/accounts/listAcountsRequest';
+import {
+  ListAccountRequest,
+  ListAccountsRequestParser
+} from '@aws/workbench-core-accounts/lib/models/accounts/listAccountsRequest';
 import {
   CreateAccountMetadata,
   UpdateAccountMetadata
@@ -17,14 +20,14 @@ import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { escape } from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
   router.get(
     '/aws-accounts',
     wrapAsync(async (req: Request, res: Response) => {
-      const listRequest = ListAccountsRequestParser.parse(req.params);
-      res.send(await hostingAccountService.list(listRequest));
+      const validatedRequest = validateAndParse<ListAccountRequest>(ListAccountsRequestParser, req.query);
+      res.send(await hostingAccountService.list(validatedRequest));
     })
   );
 
