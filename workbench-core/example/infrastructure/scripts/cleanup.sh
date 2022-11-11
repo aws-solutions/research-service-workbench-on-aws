@@ -5,7 +5,6 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 function main(){
@@ -15,8 +14,6 @@ function main(){
             d) DYNAMO_DB_TABLE_NAME=$OPTARG;;
             r) REGION=$OPTARG;;
             p) DELETE_SSM_PARAMETERS=1;;
-            i) GET_USER_POOL_ID=1;;
-            t) GET_DYNAMO_DB_TABLE=1;;
             c) cleanup;;
             \?) help; exit 0;;
         esac
@@ -35,13 +32,9 @@ Usage: `basename $0`
     -d [DELETE_DYNAMO_DB_TABLE]
     -r [AWS REGION]
     -p [DELETE_SSM_PARAMETERS]
-    -i [GET_USER_POOL_ID]
-    -t [GET_DYNAMO_DB_TABLE]
     -c [CLEANUP FLAG]
 
 Example:
-    Get UserPoolId:                     `basename $0` -r 'us-east-1' -i -c
-    Get DynamoDBTable:                  `basename $0` -r 'us-east-1' -t -c
     Delete UserPool:                    `basename $0` -u 'us-east-1_abcde' -r 'us-east-1' -c
     Delete DynamoDB Table:              `basename $0` -d 'TABLE_NAME' -r 'us-east-1' -c
     Delete Ssm Parameter:               `basename $0` -r 'us-east-1' -p -c
@@ -57,6 +50,7 @@ function check(){
 
 function cleanup(){
     check
+    
     if [[ -n $USER_POOL_ID ]]; then
         ### Delete Cognito UserPool
         echo -e "${YELLOW}### Delete Cognito UserPool ###${NC}"
@@ -92,33 +86,9 @@ function cleanup(){
             echo -e "${RED}*** [ERROR] SSM paramters could not be deleted ***${NC}"
         fi
     fi
-
-
-    if [[ -n $GET_USER_POOL_ID ]]; then
-        ### Get UserPool Id
-        echo -e "${YELLOW}### Get UserPool Id ###${NC}"
-        Id=`aws cognito-idp list-user-pools --region $REGION --max-results 5 | jq '.UserPools[] | select(.Name == "example-app-userPool") | {Id}' | jq '.Id'`
-        if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Id: $Id${NC}"
-        else
-            echo -e "${RED}*** [ERROR] Could not get the UserPool Id ***${NC}"
-        fi
-    fi
-
-    if [[ -n $GET_DYNAMO_DB_TABLE ]]; then
-        ### Get DynamoDB Table
-        echo -e "${YELLOW}### Get DynamoDb Table ###${NC}"
-        DBName=`aws dynamodb list-tables --region $REGION --max-items 4 | jq '.TableNames[]' | grep Example`
-        if [ $? -eq 0 ]; then
-        echo -e "${GREEN}DBName: $DBName${NC}"
-        else
-            echo -e "${RED}*** [ERROR] Could not get the DynamoDB Table***${NC}"
-        fi
-    fi
 }
 
 function sanitize() {
-    # echo -e "${BLUE}Sanitizing environment variables..${NC}"
     unset USER_POOL_ID
     unset DYNAMO_DB_TABLE_NAME
     unset DELETE_SSM_PARAMETERS

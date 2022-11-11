@@ -31,7 +31,11 @@ rushx cdk:deploy
 ```
 
 #### Get UserPool Id
+```bash
+./scripts/getResources.sh -r <REGION> -i -g
+```
 
+#### OR
 After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
 
 ### Run Integration Test
@@ -47,8 +51,8 @@ Navigate to `workbench-core/example/infrastructure`
 ```bash
 rushx cdk:destroy
 ```
-#### No Approval required
 
+#### No Approval required
 **Be sure to be in the correct folder, this deletes the stack by force, no prompts for confirmation**
 ```bash
 rushx cdk:destroy -f
@@ -58,17 +62,15 @@ rushx cdk:destroy -f
 ```bash
 ./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
 ```
+
 #### Get UserPool Id and DynamoDB Table
 ```bash
-./scripts/cleanup.sh -r <REGION> -i -t -c
+./scripts/getResources.sh -r <REGION> -i -t -g
 ```
-#### OR
 
+#### OR
 After `rushx cdk:deploy` you can find:
 
 1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
 
 2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.json#L12)
-
-
-
