@@ -4,6 +4,7 @@
  */
 
 import { CreateUser, Status } from '@aws/workbench-core-authentication';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -19,7 +20,7 @@ describe('userManagement create user integration test', () => {
     user = {
       firstName: 'Test',
       lastName: 'User',
-      email: 'success+create-user@simulator.amazonses.com'
+      email: `success+create-user-${uuidv4()}@simulator.amazonses.com`
     };
   });
 

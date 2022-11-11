@@ -4,6 +4,7 @@
  */
 
 import { Status } from '@aws/workbench-core-authentication';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -26,7 +27,7 @@ describe('userManagement activate/deactivate user integration test', () => {
     const { data } = await adminSession.resources.users.create({
       firstName: 'Test',
       lastName: 'User',
-      email: 'success+activate-deactivate-user@simulator.amazonses.com'
+      email: `success+activate-deactivate-user-${uuidv4()}@simulator.amazonses.com`
     });
     userId = data.id;
   });
