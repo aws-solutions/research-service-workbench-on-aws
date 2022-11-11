@@ -90,6 +90,20 @@ export const routesMap: RoutesMap = {
         subject: 'User'
       }
     ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'User'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ]
   }
 };
 
