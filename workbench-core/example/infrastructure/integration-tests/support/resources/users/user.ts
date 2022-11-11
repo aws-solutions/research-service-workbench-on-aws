@@ -21,9 +21,13 @@ export default class User extends Resource {
   }
 
   protected async cleanup(): Promise<void> {
-    const defAdminSession = await this._setup.getDefaultAdminSession();
+    try {
+      const defAdminSession = await this._setup.getDefaultAdminSession();
 
-    // delete the user
-    await defAdminSession.resources.users.user(this._id).delete();
+      // delete the user
+      await defAdminSession.resources.users.user(this._id).delete();
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
