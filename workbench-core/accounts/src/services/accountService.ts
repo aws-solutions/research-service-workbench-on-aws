@@ -3,12 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import {GetItemCommandOutput} from '@aws-sdk/client-dynamodb';
+import {GetObjectCommand, S3Client} from "@aws-sdk/client-s3";
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import {AwsService, resourceTypeToKey, uuidWithLowercasePrefix} from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
-import { AccountCfnTemplateParameters, TemplateResponse} from "../models/accountCfnTemplate";
+import {AccountCfnTemplateParameters, TemplateResponse} from "../models/accountCfnTemplate";
 import CostCenter from '../models/costCenter';
 
 export default class AccountService {
@@ -60,17 +62,22 @@ export default class AccountService {
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
   public async getAndUploadTemplateForAccount(externalAccountId: string): Promise<TemplateResponse> {
+    // Get parameters
+    // Create signed URL
+
     const cfService = this._aws.helpers.cloudformation;
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,  //TODO: need to create, doesn't exist
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!] : statusHandlerRoleArn,
       [process.env.API_HANDLER_ARN_OUTPUT_KEY!] : apiHandlerRoleArn,  //TODO: need to create, doesn't exist
-      [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
+      // [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
+        [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!] : artifactBucketArn,
      } = await cfService.getCfnOutput(process.env.stackName!, [
         process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
         process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
         process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-        process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
+        // process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
+        process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
      ]);
     const templateParameters : AccountCfnTemplateParameters = {
       accountHandlerRole : accountHandlerRoleArn,
@@ -85,9 +92,17 @@ export default class AccountService {
       statusHandlerRole : statusHandlerRoleArn,
     }
 
-    const url = new URL('http://potato.com');
-    const responseObj : TemplateResponse = { url: url };
-    return responseObj;
+    const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
+    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    const bucket = parsedBucketArn[0];
+
+    // Sign the url
+    const s3Client = new S3Client({region : process.env.AWS_REGION!});
+    const command = new GetObjectCommand( { Bucket: bucket, Key:key});
+    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
+
+    const oj = this._orangeJuice(templateParameters, signedUrl);
+    return {url: oj};
   }
 
   /**
@@ -143,6 +158,38 @@ export default class AccountService {
         throw Boom.badRequest('The AWS Account mapped to this accountId is different than the one provided');
       }
     }
+  }
+
+  private _orangeJuice (accountCfnTemplateParameters : AccountCfnTemplateParameters, signedUrl : string) : URL {
+    // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
+
+    // We assume the hosting account's region is the same as where this lambda runs.
+    const region = process.env.AWS_REGION;
+    const {
+      accountHandlerRole,
+      apiHandlerRole,
+      enableFlowLogs,
+      externalId,
+      // launchConstraintPolicyPrefix,
+      // launchConstraintRolePrefix,
+      mainAccountId,
+      namespace,
+      stackName,
+      statusHandlerRole
+    } = accountCfnTemplateParameters;
+    const url = [
+      `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/create/review/`,
+      `?templateURL=${encodeURIComponent(signedUrl)}`,
+      `&stackName=${stackName}`,
+      `&param_Namespace=${namespace}`,
+      `&param_MainAccountId=${mainAccountId}`,
+      `&param_ExternalId=${externalId}`,
+      `&param_AccountHandlerRoleArn=${accountHandlerRole}`,
+      `&param_ApiHandlerRoleArn=${apiHandlerRole}`,
+      `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
+      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`,
+    ].join('');
+    return new URL(url);
   }
 
   /*
