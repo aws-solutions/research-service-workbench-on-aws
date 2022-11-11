@@ -7,9 +7,9 @@ import { Status } from '@aws/workbench-core-authentication';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
-import { checkHttpError } from '../../support/utils/utilities';
 
 const fakeUuid = '00000000-0000-0000-0000-000000000000';
+const invalidUuid = '12345';
 
 describe('userManagement activate/deactivate user integration test', () => {
   const setup: Setup = new Setup();
@@ -26,7 +26,7 @@ describe('userManagement activate/deactivate user integration test', () => {
     const { data } = await adminSession.resources.users.create({
       firstName: 'Test',
       lastName: 'User',
-      email: 'activatedeactivate@user.com'
+      email: 'success+activate-deactivate-user@simulator.amazonses.com'
     });
     userId = data.id;
   });
@@ -79,33 +79,27 @@ describe('userManagement activate/deactivate user integration test', () => {
     });
   });
 
-  it('should return an error when activating a user that doesnt exist', async () => {
-    try {
-      await adminSession.resources.users.user(fakeUuid).activate();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          statusCode: 404,
-          error: 'Not Found',
-          message: 'User does not exist.'
-        })
-      );
-    }
+  it('should return a 404 error when activating a user that doesnt exist', async () => {
+    await expect(adminSession.resources.users.user(fakeUuid).activate()).rejects.toThrow(
+      new HttpError(404, {})
+    );
   });
 
-  it('should return an error when deactivating a user that doesnt exist', async () => {
-    try {
-      await adminSession.resources.users.user(fakeUuid).deactivate();
-    } catch (e) {
-      checkHttpError(
-        e,
-        new HttpError(404, {
-          statusCode: 404,
-          error: 'Not Found',
-          message: 'User does not exist.'
-        })
-      );
-    }
+  it('should return a 404 error when deactivating a user that doesnt exist', async () => {
+    await expect(adminSession.resources.users.user(fakeUuid).deactivate()).rejects.toThrow(
+      new HttpError(404, {})
+    );
+  });
+
+  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
+    await expect(adminSession.resources.users.user(invalidUuid).deactivate()).rejects.toThrow(
+      new HttpError(403, {})
+    );
+  });
+
+  it('should return a 403 error when deactivating a user with an invalid UUID', async () => {
+    await expect(adminSession.resources.users.user(invalidUuid).deactivate()).rejects.toThrow(
+      new HttpError(403, {})
+    );
   });
 });
