@@ -36,9 +36,8 @@ export default class Datasets extends CollectionResource {
       storagePath: response.data.path
     };
     const taskId = `${this._childType}-${createParams.id}`;
-    // @ts-ignore
-    const resourceNode = this[this._childType](createParams);
-    this.children.push(resourceNode);
+    const resourceNode = this.dataset(createParams);
+    this.children.set(resourceNode.id, resourceNode);
     // We add a cleanup task to the cleanup queue for the session
     this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
 
@@ -46,7 +45,7 @@ export default class Datasets extends CollectionResource {
   }
 
   // List call
-  public async get(queryParams?: { [key: string]: string }): Promise<AxiosResponse> {
+  public async get(queryParams?: Record<string, string>): Promise<AxiosResponse> {
     if (!queryParams) {
       return this._axiosInstance.get(this._api, { params: queryParams });
     } else {
@@ -54,10 +53,10 @@ export default class Datasets extends CollectionResource {
     }
   }
 
-  public async delete(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
+  public async delete(queryParams: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.delete(`${this._api}/${queryParams.id}`);
   }
-  public async import(requestBody: { [id: string]: string }): Promise<AxiosResponse> {
+  public async import(requestBody: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
 

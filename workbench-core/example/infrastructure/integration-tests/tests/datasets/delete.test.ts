@@ -1,4 +1,8 @@
-import _ from 'lodash';
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import ClientSession from '../../support/clientSession';
 import Dataset from '../../support/resources/datasets/dataset';
 import Setup from '../../support/setup';
@@ -43,15 +47,12 @@ describe('datasets delete integration test', () => {
     it('throws when attempting to remove a DataSet with an endpoint', async () => {
       const response = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = response.data.id;
-      const ds: Dataset = _.find(
-        adminSession.resources.datasets.children,
-        (d: Dataset) => d._id === dataSetId
-      ) as unknown as Dataset;
+      const ds: Dataset = adminSession.resources.datasets.children.get(dataSetId) as Dataset;
       await ds.share({});
 
       await expect(adminSession.resources.datasets.delete({ id: dataSetId })).rejects.toThrow(
         new HttpError(
-          500,
+          400,
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         )
       );

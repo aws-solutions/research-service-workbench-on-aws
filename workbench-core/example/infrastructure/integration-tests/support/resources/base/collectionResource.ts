@@ -2,12 +2,12 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { Resource } from 'aws-cdk-lib';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import _ from 'lodash';
 import ClientSession from '../../clientSession';
 import Setup from '../../setup';
 import Settings from '../../utils/settings';
+import Resource from './resource';
 
 export default class CollectionResource {
   private _type: string;
@@ -18,7 +18,7 @@ export default class CollectionResource {
   protected _parentApi: string;
   protected _api: string;
   protected _setup: Setup;
-  public children: Resource[];
+  public children: Map<string, Resource>;
 
   public constructor(clientSession: ClientSession, type: string, childType: string, parentApi: string = '') {
     this._setup = clientSession.getSetup();
@@ -29,7 +29,7 @@ export default class CollectionResource {
     this._childType = childType;
     this._parentApi = parentApi;
     this._api = '';
-    this.children = [];
+    this.children = new Map<string, Resource>();
   }
 
   //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,7 +51,7 @@ export default class CollectionResource {
     const taskId = `${this._childType}-${id}`;
     // @ts-ignore
     const resourceNode = this[this._childType](id);
-    this.children.push(resourceNode);
+    this.children.set(id, resourceNode);
     // We add a cleanup task to the cleanup queue for the session
     this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
 
@@ -62,6 +62,12 @@ export default class CollectionResource {
   public async get(queryParams: { [key: string]: string }): Promise<AxiosResponse> {
     return this._axiosInstance.get(this._api, { params: queryParams });
   }
+
+  // This method should be overridden by the class extending `collectionResource`
+  /**
+   * Delete any resource that was created
+   */
+  public async cleanup(): Promise<void> {}
 
   // This method should be overridden by the class extending `CollectionResource`
   // eslint-disable-next-line

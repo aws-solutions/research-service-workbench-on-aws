@@ -43,6 +43,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when a user with the provided email already exists', async () => {
+    await adminSession.resources.users.create(user);
     await expect(adminSession.resources.users.create(user)).rejects.toThrow(new HttpError(400, {}));
   });
 

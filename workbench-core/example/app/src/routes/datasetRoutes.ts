@@ -8,7 +8,8 @@ import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
   DataSetService,
-  DataSetsStoragePlugin
+  DataSetsStoragePlugin,
+  isDataSetHasEndpointError
 } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -58,14 +59,14 @@ export function setUpDSRoutes(
 
   // share dataset
   router.post(
-    '/datasets/:id/share',
+    '/datasets/:datasetId/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
       await dataSetService.addDataSetExternalEndpoint(
-        req.params.id,
+        req.params.datasetId,
         req.body.externalEndpointName,
         dataSetStoragePlugin,
         req.body.externalRoleName
@@ -82,24 +83,26 @@ export function setUpDSRoutes(
         req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null ||
         req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endPointPrefix)) === null
       ) {
-        await dataSetService.removeDataSetExternalEndpoint(
-          req.params.datasetId,
-          req.params.endpointId,
-          dataSetStoragePlugin
-        );
-        res.status(204).send();
+        throw Boom.badRequest('datasetId and endpointId parameters must be valid');
       }
+
+      await dataSetService.removeDataSetExternalEndpoint(
+        req.params.datasetId,
+        req.params.endpointId,
+        dataSetStoragePlugin
+      );
+      res.status(204).send();
     })
   );
 
   // Get dataset
   router.get(
-    '/datasets/:id',
+    '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetId request parameter is invalid');
       }
-      const ds = await dataSetService.getDataSet(req.params.id);
+      const ds = await dataSetService.getDataSet(req.params.datasetId);
       res.send(ds);
     })
   );
@@ -115,12 +118,20 @@ export function setUpDSRoutes(
 
   // Delete dataset
   router.delete(
-    '/datasets/:id',
+    '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetId request parameter is invalid');
       }
-      await dataSetService.removeDataSet(req.params.id);
+
+      try {
+        await dataSetService.removeDataSet(req.params.datasetId);
+      } catch (error) {
+        if (isDataSetHasEndpointError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
       res.status(204).send();
     })
   );

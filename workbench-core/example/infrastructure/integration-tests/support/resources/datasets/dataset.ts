@@ -7,22 +7,27 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
-import CollectionResource from '../base/collectionResource';
+import Resource from '../base/resource';
 import Endpoint, { EndpointCreateParams } from './endpoint';
 
-export default class Dataset extends CollectionResource {
+export default class Dataset extends Resource {
   private _awsAccountId: string;
   private _storageName: string;
   private _storagePath: string;
-  public _id: string;
+  private _children: Map<string, Endpoint>;
+
+  private _clientSession: ClientSession;
+  public id: string;
 
   public constructor(params: DataSetCreateParams) {
-    super(params.clientSession, 'dataset', 'endpoint', params.parentApi);
+    super(params.clientSession, 'dataset', params.id, params.parentApi);
     this._awsAccountId = params.awsAccountId;
     this._storageName = params.storageName;
     this._storagePath = params.storagePath;
-    this._id = params.id;
+    this.id = params.id;
     this._api = `datasets/${params.id}`;
+    this._clientSession = params.clientSession;
+    this._children = new Map<string, Endpoint>();
   }
 
   public endpoint(params: EndpointCreateParams): Endpoint {
@@ -53,24 +58,23 @@ export default class Dataset extends CollectionResource {
       externalEndpointName: endPointName
     };
 
-    const taskid = `${this._childType}-${endPointParams.id}`;
-    // @ts-ignore
-    const resourceNode = this[this._childType](endPointParams);
-    this.children.push(resourceNode);
+    const taskid = `endpoint-${endPointParams.id}`;
+    const resourceNode: Endpoint = this.endpoint(endPointParams);
+    this._children.set(resourceNode.id, resourceNode);
 
     this._clientSession.addCleanupTask({ id: taskid, task: async () => resourceNode.cleanup() });
 
     return response;
   }
 
-  protected async cleanup(): Promise<void> {
+  public async cleanup(): Promise<void> {
     try {
       // Delete DDB entries, and path folder from bucket (to prevent test resources polluting a prod env)
       const datasetHelper = new DatasetHelper();
       await datasetHelper.deleteS3Resources(this._storageName, this._storagePath);
-      await datasetHelper.deleteDdbRecords(this._id);
+      await datasetHelper.deleteDdbRecords(this.id);
     } catch (error) {
-      console.log(`Error caught in cleanup of dataset '${this._id}': ${error}.`);
+      console.log(`Error caught in cleanup of dataset '${this.id}': ${error}.`);
     }
   }
 }
