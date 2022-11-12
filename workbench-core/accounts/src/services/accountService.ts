@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import {GetItemCommandOutput} from '@aws-sdk/client-dynamodb';
-import {GetObjectCommand, S3Client} from "@aws-sdk/client-s3";
-import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
-import {AwsService, resourceTypeToKey, uuidWithLowercasePrefix} from '@aws/workbench-core-base';
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+// import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import Account from '../models/account';
-import {AccountCfnTemplateParameters, TemplateResponse} from "../models/accountCfnTemplate";
+import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import CostCenter from '../models/costCenter';
 
 export default class AccountService {
@@ -67,42 +67,43 @@ export default class AccountService {
 
     const cfService = this._aws.helpers.cloudformation;
     const {
-      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,  //TODO: need to create, doesn't exist
-      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!] : statusHandlerRoleArn,
-      [process.env.API_HANDLER_ARN_OUTPUT_KEY!] : apiHandlerRoleArn,  //TODO: need to create, doesn't exist
+      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn, //TODO: need to create, doesn't exist
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
+      [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn, //TODO: need to create, doesn't exist
       // [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
-        [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!] : artifactBucketArn,
-     } = await cfService.getCfnOutput(process.env.stackName!, [
-        process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
-        process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
-        process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-        // process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
-        process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
-     ]);
-    const templateParameters : AccountCfnTemplateParameters = {
-      accountHandlerRole : accountHandlerRoleArn,
-      apiHandlerRole : apiHandlerRoleArn,
-      enableFlowLogs : "true",
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
+    } = await cfService.getCfnOutput(process.env.stackName!, [
+      process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.API_HANDLER_ARN_OUTPUT_KEY!,
+      // process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
+    ]);
+    const templateParameters: AccountCfnTemplateParameters = {
+      accountHandlerRole: accountHandlerRoleArn,
+      apiHandlerRole: apiHandlerRoleArn,
+      enableFlowLogs: 'true',
       externalId: externalAccountId,
-      launchConstraintPolicyPrefix : "*", // We can do better, get from stack outputs?
-      launchConstraintRolePrefix : "*",  // We can do better, get from stack outputs?
-      mainAccountId : process.env.MAIN_ACCT_ID!,
-      namespace : process.env.STACK_NAME!,
-      stackName: process.env.STACK_NAME!.concat("-hosting-account"),
-      statusHandlerRole : statusHandlerRoleArn,
-    }
+      launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
+      launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
+      mainAccountId: process.env.MAIN_ACCT_ID!,
+      namespace: process.env.STACK_NAME!,
+      stackName: process.env.STACK_NAME!.concat('-hosting-account'),
+      statusHandlerRole: statusHandlerRoleArn
+    };
 
-    const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
-    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
-    const bucket = parsedBucketArn[0];
+    //const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
+    //const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    //const bucket = parsedBucketArn[0];
 
     // Sign the url
-    const s3Client = new S3Client({region : process.env.AWS_REGION!});
-    const command = new GetObjectCommand( { Bucket: bucket, Key:key});
-    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
+    // const s3Client = new S3Client({region : process.env.AWS_REGION!});
+    // const command = new GetObjectCommand( { Bucket: bucket, Key:key});
+    //const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
+    const signedUrl = 'TODO: sign a url';
 
     const oj = this._orangeJuice(templateParameters, signedUrl);
-    return {url: oj};
+    return { url: oj };
   }
 
   /**
@@ -160,7 +161,10 @@ export default class AccountService {
     }
   }
 
-  private _orangeJuice(accountCfnTemplateParameters: AccountCfnTemplateParameters, signedUrl: string): string {
+  private _orangeJuice(
+    accountCfnTemplateParameters: AccountCfnTemplateParameters,
+    signedUrl: string
+  ): string {
     // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
 
     // We assume the hosting account's region is the same as where this lambda runs.
@@ -187,7 +191,7 @@ export default class AccountService {
       `&param_AccountHandlerRoleArn=${accountHandlerRole}`,
       `&param_ApiHandlerRoleArn=${apiHandlerRole}`,
       `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
-      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`,
+      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`
     ].join('');
     return url;
   }

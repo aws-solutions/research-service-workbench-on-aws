@@ -314,8 +314,7 @@ describe('AccountService', () => {
     });
 
     // OPERATE
-    const response = await accountService.getTemplateURLForAccount(accountId, extId);
-
+    const response = await accountService.getTemplateURLForAccount(extId);
 
     // CHECK
     expect(response.url).toEqual(expectedTemplate);

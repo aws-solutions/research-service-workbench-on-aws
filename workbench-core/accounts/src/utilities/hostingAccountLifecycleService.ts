@@ -14,7 +14,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import Account from '../models/account';
-import {TemplateResponse} from "../models/accountCfnTemplate";
+import { TemplateResponse } from '../models/accountCfnTemplate';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -62,7 +62,7 @@ export default class HostingAccountLifecycleService {
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
   public async getTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
-    // Share the artifacts bucket with the new hosting accoutn
+    // Share the artifacts bucket with the new hosting account
     return this._accountService.getTemplateURLForAccount(externalId);
   }
 
@@ -155,7 +155,7 @@ export default class HostingAccountLifecycleService {
     }
 
     const listStatement = PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
        {
         "Sid": "List:environment-files",
         "Effect": "Allow",
@@ -184,7 +184,7 @@ export default class HostingAccountLifecycleService {
     }
 
     const getStatement = PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
        {
         "Sid": "Get:environment-files",
         "Effect": "Allow",
@@ -208,7 +208,7 @@ export default class HostingAccountLifecycleService {
     }
 
     const onboardingTemplatePolicy = PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
        {
         "Sid": "Get:onboarding-template",
         "Effect": "Allow",
@@ -221,14 +221,13 @@ export default class HostingAccountLifecycleService {
     );
     // If the Get statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
-
       bucketPolicy.addStatements(onboardingTemplatePolicy);
     } else {
       // If the Get statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          onboardingTemplatePolicy.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
+        bucketPolicy,
+        onboardingTemplatePolicy.sid!,
+        `arn:aws:iam::${awsAccountId}:root`
       );
     }
 

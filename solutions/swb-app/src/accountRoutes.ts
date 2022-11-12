@@ -33,7 +33,7 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
       // TODO: maybe validate inputs?
       processValidatorResult(validate(req.body, CreateAccountSchema));
       const { awsAcctId, externalId } = req.body;
-      res.send(await account.getTemplateURLForAccount(awsAcctId, externalId);
+      res.send(await account.getTemplateURLForAccount(awsAcctId, externalId));
     })
   );
 
