@@ -48,9 +48,8 @@ export default class Datasets extends CollectionResource {
   public async get(queryParams?: Record<string, string>): Promise<AxiosResponse> {
     if (!queryParams) {
       return this._axiosInstance.get(this._api, { params: queryParams });
-    } else {
-      return this._axiosInstance.get(`${this._api}/${queryParams.id}`);
     }
+    return this._axiosInstance.get(`${this._api}/${queryParams.id}`);
   }
 
   public async delete(queryParams: Record<string, string>): Promise<AxiosResponse> {
