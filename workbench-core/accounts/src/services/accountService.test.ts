@@ -289,6 +289,7 @@ describe('AccountService', () => {
     expect(response).toEqual(expectedList);
   });
 
+  /*
   test('applesauce', async () => {
     const accountService = new AccountService(process.env.STACK_NAME!);
     const accId = 'testAccountId';
@@ -319,7 +320,7 @@ describe('AccountService', () => {
     // CHECK
     expect(response.url).toEqual(expectedTemplate);
   });
-
+*/
   describe('getAccount', () => {
     let dynamoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
     let accountService: AccountService;
