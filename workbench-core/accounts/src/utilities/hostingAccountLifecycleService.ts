@@ -153,9 +153,20 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
+    bucketPolicy = this.updatePolicyDocumentWithAllStatements(awsAccountId, artifactBucketArn, bucketPolicy);
 
+    const putPolicyParams: PutBucketPolicyCommandInput = {
+      Bucket: bucketName,
+      Policy: JSON.stringify(bucketPolicy.toJSON())
+    };
+
+    // Update bucket policy
+    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+  }
+
+  private updatePolicyDocumentWithAllStatements(awsAccountId: string, artifactBucketArn: string, bucketPolicy: PolicyDocument) : PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
-      JSON.parse(`
+        JSON.parse(`
        {
         "Sid": "List:environment-files",
         "Effect": "Allow",
@@ -177,14 +188,14 @@ export default class HostingAccountLifecycleService {
     } else {
       // If List statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
-        bucketPolicy,
-        listStatement.sid!,
-        `arn:aws:iam::${awsAccountId}:root`
+          bucketPolicy,
+          listStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
       );
     }
 
     const getStatement = PolicyStatement.fromJson(
-      JSON.parse(`
+        JSON.parse(`
        {
         "Sid": "Get:environment-files",
         "Effect": "Allow",
@@ -201,14 +212,14 @@ export default class HostingAccountLifecycleService {
     } else {
       // If the Get statement doesn't contain this accountId, add it
       bucketPolicy = IamHelper.addPrincipalToStatement(
-        bucketPolicy,
-        getStatement.sid!,
-        `arn:aws:iam::${awsAccountId}:root`
+          bucketPolicy,
+          getStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
       );
     }
 
-    const onboardingTemplatePolicy = PolicyStatement.fromJson(
-      JSON.parse(`
+    const onboardingTemplateStatement = PolicyStatement.fromJson(
+        JSON.parse(`
        {
         "Sid": "Get:onboarding-template",
         "Effect": "Allow",
@@ -221,23 +232,16 @@ export default class HostingAccountLifecycleService {
     );
     // If the Get statement doesn't exist, create one
     if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
-      bucketPolicy.addStatements(onboardingTemplatePolicy);
+      bucketPolicy.addStatements(onboardingTemplateStatement);
     } else {
       // If the Get statement doesn't contain this accountId, add it
-      bucketPolicy = IamHelper.addPrincipalToStatement(
-        bucketPolicy,
-        onboardingTemplatePolicy.sid!,
-        `arn:aws:iam::${awsAccountId}:root`
+      return IamHelper.addPrincipalToStatement(
+          bucketPolicy,
+          onboardingTemplateStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
       );
     }
-
-    const putPolicyParams: PutBucketPolicyCommandInput = {
-      Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
-    };
-
-    // Update bucket policy
-    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+    return bucketPolicy;
   }
 
   /**
