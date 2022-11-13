@@ -33,6 +33,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Storage'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Endpoint'
   },

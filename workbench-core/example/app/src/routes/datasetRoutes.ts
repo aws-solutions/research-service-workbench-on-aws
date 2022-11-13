@@ -95,6 +95,15 @@ export function setUpDSRoutes(
     })
   );
 
+  // List storag locations
+  router.get(
+    '/datasets/storage',
+    wrapAsync(async (req: Request, res: Response) => {
+      const locations = await dataSetService.listStorageLocations();
+      res.send(locations);
+    })
+  );
+
   // Get dataset
   router.get(
     '/datasets/:datasetId',

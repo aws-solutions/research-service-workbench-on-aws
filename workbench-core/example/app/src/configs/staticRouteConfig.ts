@@ -69,6 +69,14 @@ export const routesMap: RoutesMap = {
         }
       ]
     },
+  '/datasets/storage': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Storage'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {

@@ -58,6 +58,9 @@ export default class Datasets extends CollectionResource {
   public async import(requestBody: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
+  public async storageLocations(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/storage`);
+  }
 
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
