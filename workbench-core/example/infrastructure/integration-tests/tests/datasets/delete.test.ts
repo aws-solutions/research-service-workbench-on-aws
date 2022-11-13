@@ -57,5 +57,11 @@ describe('datasets delete integration test', () => {
         )
       );
     });
+
+    it('throws when dataset Id passed to remove is not a UUID', async () => {
+      await expect(adminSession.resources.datasets.delete({ id: 'this is not a UUID!' })).rejects.toThrow(
+        new HttpError(403, 'User is forbidden: Route has not been secured')
+      );
+    });
   });
 });
