@@ -14,7 +14,13 @@ import { QueryParameterFilter } from './interfaces/queryParameterFilter';
 import { SortRequest } from './interfaces/sortRequest';
 import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
+import {
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
+} from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -50,5 +56,7 @@ export {
   SortRequest,
   addPaginationToken,
   getPaginationToken,
-  DEFAULT_API_PAGE_SIZE
+  DEFAULT_API_PAGE_SIZE,
+  toPaginationToken,
+  fromPaginationToken
 };

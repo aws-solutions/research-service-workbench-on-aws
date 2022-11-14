@@ -41,7 +41,9 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
       const objectToValidate = {
         user: res.locals.user as AuthenticatedUser,
         pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
-        paginationToken: req.query.paginationToken
+        paginationToken: req.query.paginationToken,
+        filter: req.query.filter,
+        sort: req.query.sort
       };
       processValidatorResult(validate(objectToValidate, ListProjectsSchema));
       const request: ListProjectsRequest = objectToValidate as ListProjectsRequest;
