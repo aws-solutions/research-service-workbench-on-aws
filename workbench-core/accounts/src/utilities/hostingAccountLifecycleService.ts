@@ -244,68 +244,71 @@ export default class HostingAccountLifecycleService {
     return bucketPolicy;
   }
 
-  public applesauce(artifactBucketArn: string, awsAccountId: string, bucketPolicy: PolicyDocument): PolicyDocument {
+  public applesauce(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
         JSON.parse(`
-       {
-        "Sid": "List:environment-files",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:ListBucket",
-        "Resource": ["${artifactBucketArn}"],
-        "Condition": {
-          "StringLike": {
-            "s3:prefix": "environment-files*"
-            }
+     {
+      "Sid": "List:environment-files",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"arn:aws:iam::${awsAccountId}:root"
+      },
+      "Action": "s3:ListBucket",
+      "Resource": ["${artifactBucketArn}"],
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": "environment-files*"
           }
-        }`)
+        }
+      }`)
     );
     const getStatement = PolicyStatement.fromJson(
         JSON.parse(`
-       {
-        "Sid": "Get:environment-files",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:GetObject",
-        "Resource": ["${artifactBucketArn}/environment-files*"]
-        }`)
+     {
+      "Sid": "Get:environment-files",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"arn:aws:iam::${awsAccountId}:root"
+      },
+      "Action": "s3:GetObject",
+      "Resource": ["${artifactBucketArn}/environment-files*"]
+      }`)
     );
     const onboardingTemplateStatement = PolicyStatement.fromJson(
         JSON.parse(`
-       {
-        "Sid": "Get:onboarding-template",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:GetObject",
-        "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
-        }`)
+     {
+      "Sid": "Get:onboarding-template",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS":"arn:aws:iam::${awsAccountId}:root"
+      },
+      "Action": "s3:GetObject",
+      "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
+      }`)
     );
 
     const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
 
+    return this.applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
+  }
+
+  private applyPoliciesToPolicyDocument(awsAccountId: string, policyDocument: PolicyDocument, policyStatements: PolicyStatement[]) {
     for (const statement of policyStatements) {
-      // If List statement doesn't exist, create one
-      if (!IamHelper.containsStatementId(bucketPolicy, statement.sid!)) {
-        bucketPolicy.addStatements(statement);
+      // If policy statement doesn't exist, create one
+      // We iterate through these 1 by 1 in case the policy exists, but may be missing the awsAccoutId
+      if (!IamHelper.containsStatementId(policyDocument, statement.sid!)) {
+        policyDocument.addStatements(statement);
       } else {
         // If List statement doesn't contain this accountId, add it
-        bucketPolicy = IamHelper.addPrincipalToStatement(
-            bucketPolicy,
+        policyDocument = IamHelper.addPrincipalToStatement(
+            policyDocument,
             statement.sid!,
             `arn:aws:iam::${awsAccountId}:root`
         );
       }
     }
-
-    return bucketPolicy;
+    return policyDocument;
   }
-
 
   /**
    * Update target account with resources required for launching environments in the account

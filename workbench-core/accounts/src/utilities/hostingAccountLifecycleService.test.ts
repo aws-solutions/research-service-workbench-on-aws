@@ -694,7 +694,7 @@ describe('HostingAccountLifecycleService', () => {
     const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`
     const sampleAccountId = '123456789012'
 
-    const basePolicy = PolicyDocument.fromJson(JSON.parse(`{
+    const text = `{
         "Version": "2012-10-17",
         "Statement": [
             {
@@ -712,9 +712,12 @@ describe('HostingAccountLifecycleService', () => {
                 }
             }
         ]
-    }`));
-    expect(service.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy)).
-        toEqual(service.applesauce(sampleBucketArn, sampleAccountId, basePolicy));
+    }`;
+    const basePolicyA = PolicyDocument.fromJson(JSON.parse(text));
+    const basePolicyB = PolicyDocument.fromJson(JSON.parse(text));
+    const expected = service.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicyA);
+    const policyDocument = service.applesauce(sampleBucketArn, sampleAccountId, basePolicyB);
+    expect(policyDocument).toEqual(expected);
 
   });
 
