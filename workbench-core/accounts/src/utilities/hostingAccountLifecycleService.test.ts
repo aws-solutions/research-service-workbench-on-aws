@@ -5,6 +5,7 @@
 
 import { Readable } from 'stream';
 
+import {PolicyDocument} from "@aws-cdk/aws-iam";
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -600,4 +601,91 @@ describe('HostingAccountLifecycleService', () => {
       )
     ).resolves.not.toThrowError();
   });
-});
+
+  test('updatePolicyDocumentWithAllStatements works when adding new statements', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    const sampleBucketName = 'randomBucketName';
+    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`
+    const sampleAccountId = '123456789012'
+
+    // Mock S3 calls
+    const s3Mock = mockClient(S3Client);
+    s3Mock.on(PutBucketPolicyCommand).resolves({});
+    const basePolicy = PolicyDocument.fromJson(JSON.parse(`{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            }
+        ]
+    }`));
+
+    const expectedPolicy = PolicyDocument.fromJson( JSON.parse(`
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            },
+            {
+                "Sid": "List:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::${sampleAccountId}:root"
+                },
+                "Action": "s3:ListBucket",
+                "Resource": "${sampleBucketArn}",
+                "Condition": {
+                    "StringLike": {
+                        "s3:prefix": "environment-files*"
+                    }
+                }
+            },
+            {
+                "Sid": "Get:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::${sampleAccountId}:root"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "${sampleBucketArn}/environment-files*"
+            },
+            {
+              "Sid": "Get:onboarding-template",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS":"arn:aws:iam::${sampleAccountId}:root"
+              },
+              "Action": "s3:GetObject",
+              "Resource": ["${sampleBucketArn}/onboard-account.cfn.yaml"]
+            }
+        ]
+    }`));
+
+    const postUpdatedPolicy = hostingAccountLifecycleService.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy);
+    expect(postUpdatedPolicy).toEqual(expectedPolicy);
+  });
+
+  });
