@@ -38,7 +38,7 @@ export default class Resource {
     return this._axiosInstance.get(this._api);
   }
 
-  public async update(body: { [key: string]: string }): Promise<AxiosResponse> {
+  public async update(body: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.put(this._api, body);
   }
 
