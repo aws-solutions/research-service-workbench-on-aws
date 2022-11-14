@@ -9,22 +9,59 @@ import {
   buildDynamoDBPkSk,
   removeDynamoDbKeys,
   resourceTypeToKey,
-  uuidWithLowercasePrefix
+  uuidWithLowercasePrefix,
+  PaginatedResponse,
+  validateSingleSortAndFilter,
+  getSortQueryParams,
+  getFilterQueryParams,
+  DEFAULT_API_PAGE_SIZE,
+  QueryParams
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
-import CostCenter from '../models/costCenter';
+import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
   private _aws: AwsService;
   private readonly _tableName: string;
+  private _resourceType: string = 'costCenter';
 
   public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
+  }
+
+  public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
+    const { filter, sort, pageSize, paginationToken } = request;
+    validateSingleSortAndFilter(filter, sort);
+
+    let queryParams: QueryParams = {
+      key: { name: 'resourceType', value: this._resourceType },
+      index: 'getResourceByCreatedAt',
+      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+    };
+    const gsiNames = ['getResourceByName', 'getResourceByStatus'];
+    const filterQuery = getFilterQueryParams(filter, gsiNames);
+    const sortQuery = getSortQueryParams(sort, gsiNames);
+    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+
+    const queryParams = {
+      index: 'getResourceByName',
+      key: { name: 'resourceType', value: this._resourceType }
+    };
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return {
+      data: response.data.map((item) => {
+        return CostCenterParser.parse(item);
+      }),
+      paginationToken: response.paginationToken
+    };
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
@@ -72,7 +109,7 @@ export default class CostCenterService {
 
     const dynamoItem: { [key: string]: string } = {
       ...costCenter,
-      resourceType: 'cost center',
+      resourceType: this._resourceType,
       dependency: createCostCenter.accountId
     };
 
