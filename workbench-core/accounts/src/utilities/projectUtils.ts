@@ -46,18 +46,17 @@ export function manualSortProjects(sort: ProjectSort, projects: Project[]): Proj
 }
 
 function order(sortKey: string, selectedDirection: string, project1: Project, project2: Project): number {
-  if (project1.hasOwnProperty(sortKey) && project2.hasOwnProperty(sortKey)) {
-    const project1Value = project1[sortKey as keyof Project];
-    const project2Value = project2[sortKey as keyof Project];
-    if (selectedDirection === 'asc') {
-      return project1Value.localeCompare(project2Value);
-    } else if (selectedDirection === 'desc') {
-      return project2Value.localeCompare(project1Value);
-    } else {
-      throw Boom.badRequest('Invalid sort operation.');
-    }
-  } else {
+  if (!project1.hasOwnProperty(sortKey) || !project2.hasOwnProperty(sortKey)) {
     throw Boom.badRequest(`No ${sortKey} on Project. Please sort by another attribute.`);
+  }
+  const project1Value = project1[sortKey as keyof Project];
+  const project2Value = project2[sortKey as keyof Project];
+  if (selectedDirection === 'asc') {
+    return project1Value.localeCompare(project2Value);
+  } else if (selectedDirection === 'desc') {
+    return project2Value.localeCompare(project1Value);
+  } else {
+    throw Boom.badRequest('Invalid sort operation.');
   }
 }
 
@@ -115,12 +114,12 @@ function compare(
       return projectValue >= selectedValue;
     case 'between':
       if (!(selectedValue.value1 && selectedValue.value2)) {
-        throw Error('Need two values for between operation');
+        throw Boom.badRequest('Need two values for between operation');
       }
       return projectValue >= selectedValue.value1 && projectValue <= selectedValue.value2;
     case 'begins':
       return selectedValue.startsWith(selectedValue);
     default:
-      throw Error('invalid comparison');
+      throw Boom.badRequest('You supplied an invalid comparison. Please try again');
   }
 }

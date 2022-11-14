@@ -86,7 +86,7 @@ describe('ProjectService', () => {
   };
 
   // DDB object for project1
-  const projItem1: { [key: string]: string } = {
+  const projItem1: Record<string, string> = {
     ...project1,
     pk: `PROJ#proj-123`,
     sk: `PROJ#proj-123`,
@@ -95,7 +95,7 @@ describe('ProjectService', () => {
   };
   delete projItem1.costCenterId;
   // DDB object for project2
-  const projItem2: { [key: string]: string } = {
+  const projItem2: Record<string, string> = {
     ...project2,
     pk: `PROJ#proj-456`,
     sk: `PROJ#proj-456`,
@@ -104,7 +104,7 @@ describe('ProjectService', () => {
   };
   delete projItem2.costCenterId;
   // DDB object for project3
-  const projItem3: { [key: string]: string } = {
+  const projItem3: Record<string, string> = {
     ...project3,
     pk: `PROJ#proj-789`,
     sk: `PROJ#proj-789`,
@@ -143,7 +143,7 @@ describe('ProjectService', () => {
   };
 
   // DDB object for project item
-  const projItem: { [key: string]: string } = {
+  const projItem: Record<string, string> = {
     ...proj,
     pk: `PROJ#${projId}`,
     sk: `PROJ#${projId}`,
@@ -173,6 +173,43 @@ describe('ProjectService', () => {
   };
 
   describe('listProjects', () => {
+    test('should fail on list projects for negative pageSize', async () => {
+      // BUILD
+      // const items = [projItem1, projItem2, projItem3];
+      // const lastEvaluatedKey = {
+      //   pk: 'notPk',
+      //   sk: 'notSk'
+      // };
+      // const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
+      const pageSize = -1;
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      // const batchGetItems: BatchGetItemCommandOutput = {
+      //   Responses: {
+      //     exampleDDBTable: items.map((item) => {
+      //       return marshall(item);
+      //     })
+      //   },
+      //   $metadata: {}
+      // };
+      // ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE n CHECK
+      await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
+        'Please supply a non-negative page size.'
+      );
+    });
+
     test('list all projects with no group membership', async () => {
       // BUILD
       const user: AuthenticatedUser = {
@@ -1272,7 +1309,7 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(() => projService.listProjects({ user, pageSize, paginationToken })).rejects.toThrow(
-        'Something went wrong with listing projects'
+        'Pagination token is invalid.'
       );
     });
 
