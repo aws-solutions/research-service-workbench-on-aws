@@ -46,11 +46,13 @@ describe('HostingAccountLifecycleService', () => {
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
-    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'SampleStatusHandlerArnOutput';
     process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
     process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
+    process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+    process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   });
 
   afterAll(() => {
@@ -77,6 +79,14 @@ describe('HostingAccountLifecycleService', () => {
             {
               OutputKey: process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+            },
+            {
+              OutputKey: process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`
+            },
+            {
+              OutputKey: process.env.API_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`
             },
             {
               OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,

@@ -5,6 +5,7 @@
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
 
+import {CloudFormationClient, DescribeStacksCommand} from "@aws-sdk/client-cloudformation";
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -28,6 +29,11 @@ describe('AccountService', () => {
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.AWS_REGION = 'us-east-1';
     process.env.STACK_NAME = 'swb-swbv2-va';
+    process.env.MAIN_ACCT_ID = '123456789012';
+    process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+    process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
     accountMetadata = {
       envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
       accountHandlerRoleArn: 'sampleAccountHandlerRoleArn',
@@ -289,35 +295,68 @@ describe('AccountService', () => {
     expect(response).toEqual(expectedList);
   });
 
+  // TODO: DRY: this functionality can be pulled out to a test helper (it's also used in hostingAccoutnLifecycleService.test.ts
+  function mockCloudformationOutputs(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cfMock: AwsStub<any, any>,
+      stackStatus: string = 'CREATE_COMPLETE',
+      artifactBucketArn: string = 'arn:aws:s3:::sampleArtifactsBucketName'
+  ): void {
+    cfMock.on(DescribeStacksCommand).resolves({
+      Stacks: [
+        {
+          StackName: process.env.STACK_NAME!,
+          StackStatus: stackStatus,
+          CreationTime: new Date(),
+          Outputs: [
+            {
+              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_OUTPUT_KEY_SUFFIX}`,
+              OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
+            },
+            {
+              OutputKey: process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+            },
+            {
+              OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+              OutputValue: artifactBucketArn
+            },
+            {
+              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
+              OutputValue: 'arn:aws:kms:::key/123-123-123'
+            },
+            {
+              OutputKey: process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`
+            },
+            {
+              OutputKey: process.env.API_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`
+            },
+            { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
+            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
+            { OutputKey: 'EncryptionKeyArn', OutputValue: 'FakeEncryptionKeyArn' }
+          ]
+        }
+      ]
+    });
+  }
+
   test('getTemplateURLForAccount returns a signed URL', async () => {
     const accountService = new AccountService(process.env.STACK_NAME!);
-    const accId = 'testAccountId';
     const extId = 'workbench';
-    const account = {
-      id: accId,
-      sk: `ACC#${accId}`,
-      awsAccountId: '',
-      encryptionKeyArn: '',
-      envMgmtRoleArn: '',
-      environmentInstanceFiles: '',
-      hostingAccountHandlerRoleArn: '',
-      stackName: '',
-      status: '',
-      subnetId: '',
-      vpcId: ''
-    };
 
-    const expectedTemplate = 'http://potato.com';
-    const mockDDB = mockClient(DynamoDBClient);
-    mockDDB.on(GetItemCommand).resolves({
-      Item: marshall(account)
-    });
+    const expectedTemplate = encodeURIComponent('http://potato.com');
+    const expectedUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=${expectedTemplate}&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true`
+
+    const cfnMock = mockClient(CloudFormationClient);
+    mockCloudformationOutputs(cfnMock);
 
     // OPERATE
     const response = await accountService.getTemplateURLForAccount(extId);
 
     // CHECK
-    expect(response.url).toEqual(expectedTemplate);
+    expect(response.url).toEqual(expectedUrl);
   });
 
 

@@ -100,7 +100,8 @@ export default class AccountService {
     // const s3Client = new S3Client({region : process.env.AWS_REGION!});
     // const command = new GetObjectCommand( { Bucket: bucket, Key:key});
     //const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
-    const signedUrl = 'TODO: sign a url';
+    // TODO: sign a url
+    const signedUrl = 'http://potato.com';
 
     const oj = this._orangeJuice(templateParameters, signedUrl);
     return { url: oj };
