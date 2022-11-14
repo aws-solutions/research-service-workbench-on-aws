@@ -4,8 +4,6 @@
  */
 
 import JSONValue from '../types/json';
+import PaginatedResponse from './paginatedResponse';
 
-export default interface PaginatedItemsResponse {
-  data: Record<string, JSONValue>[];
-  paginationToken?: string;
-}
+export default interface PaginatedJsonResponse extends PaginatedResponse<Record<string, JSONValue>> {}

@@ -3,13 +3,19 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Account } from '../models/account';
+import { PaginatedResponse } from '@aws/workbench-core-base';
+import { Account } from '../models/accounts/account';
+import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import HostingAccountLifecycleService, {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
+  public async list(listAccountsRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
+    return await new HostingAccountLifecycleService().listAccounts(listAccountsRequest);
+  }
+
   public async get(accountId: string): Promise<Account> {
     return await new HostingAccountLifecycleService().getAccount(accountId, true);
   }

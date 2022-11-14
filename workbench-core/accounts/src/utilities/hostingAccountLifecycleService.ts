@@ -8,12 +8,19 @@ import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
-import { AwsService, IamRoleCloneService } from '@aws/workbench-core-base';
+import {
+  addPaginationToken,
+  AwsService,
+  DEFAULT_API_PAGE_SIZE,
+  IamRoleCloneService,
+  PaginatedResponse
+} from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
-import { Account } from '../models/account';
+import { Account } from '../models/accounts/account';
+import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -47,7 +54,17 @@ export default class HostingAccountLifecycleService {
     this._stackName = process.env.STACK_NAME!;
     const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
     this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
-    this._accountService = new AccountService(ddbTableName);
+    this._accountService = new AccountService(this._aws.helpers.ddb);
+  }
+
+  public async listAccounts(listAccountRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
+    const queryParams = addPaginationToken(listAccountRequest.paginationToken, {
+      index: 'getResourceByName',
+      key: { name: 'resourceType', value: 'account' },
+      limit: listAccountRequest.pageSize || DEFAULT_API_PAGE_SIZE
+    });
+
+    return this._accountService.getPaginatedAccounts(queryParams);
   }
 
   public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {

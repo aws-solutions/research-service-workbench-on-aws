@@ -88,10 +88,12 @@ export default class AccountHandler {
       externalId: string;
     }[]
   > {
-    const ddbTableName = process.env.STACK_NAME!;
-    const accountService = new AccountService(ddbTableName);
+    const accountService = new AccountService(this._mainAccountAwsService.helpers.ddb);
 
-    const accounts = await accountService.getAccounts();
+    const accounts = await accountService.getAllAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     return accounts.map((account) => {
       return {

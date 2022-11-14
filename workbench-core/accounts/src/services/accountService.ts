@@ -4,17 +4,23 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import {
+  PaginatedResponse,
+  QueryParams,
+  resourceTypeToKey,
+  uuidWithLowercasePrefix
+} from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { Account, AccountParser } from '../models/account';
-import CostCenter from '../models/costCenter';
+import { Account, AccountParser } from '../models/accounts/account';
+import { CostCenterParser } from '../models/costCenter/costCenter';
 
 export default class AccountService {
-  private _aws: AwsService;
+  private readonly _dynamoDBService: DynamoDBService;
 
-  public constructor(tableName: string) {
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: tableName });
+  public constructor(dynamoDBService: DynamoDBService) {
+    this._dynamoDBService = dynamoDBService;
   }
 
   /**
@@ -33,21 +39,30 @@ export default class AccountService {
   }
 
   /**
-   * Get all account entries from DDB
+   * Get account entries from DDB
    *
    * @returns Account entries in DDB
    */
-  public async getAccounts(): Promise<Account[]> {
-    const queryParams = {
-      index: 'getResourceByCreatedAt',
-      key: { name: 'resourceType', value: 'account' }
+  public async getPaginatedAccounts(queryParams: QueryParams): Promise<PaginatedResponse<Account>> {
+    const response = await this._dynamoDBService.getPaginatedItems(queryParams);
+
+    return {
+      data: response.data.map((item) => {
+        return AccountParser.parse(item);
+      }),
+      paginationToken: response.paginationToken
     };
+  }
 
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-
-    return response.data.map((item) => {
-      return AccountParser.parse(item);
-    });
+  public async getAllAccounts(queryParams: QueryParams): Promise<Account[]> {
+    const response = await this._dynamoDBService.query(queryParams).execute();
+    let accounts: Account[] = [];
+    if (response && response.Items) {
+      accounts = response.Items.map((item: unknown) => {
+        return item as unknown as Account;
+      });
+    }
+    return accounts;
   }
 
   /**
@@ -86,7 +101,7 @@ export default class AccountService {
 
     // Check if AWS account ID already exists in DDB
     const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
-    const ddbEntries = await this._aws.helpers.ddb.query(key).execute();
+    const ddbEntries = await this._dynamoDBService.query(key).execute();
     // When trying to onboard a new account, its AWS account ID shouldn't be present in DDB
     if (ddbEntries && ddbEntries.Count && ddbEntries.Count > 0) {
       throw Boom.badRequest(
@@ -131,7 +146,7 @@ export default class AccountService {
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
 
     // Store Account row in DDB
-    await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
+    await this._dynamoDBService.update(accountKey, accountParams).execute();
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
@@ -148,14 +163,14 @@ export default class AccountService {
       };
 
       // Store AWS Account row in DDB (for easier duplicate checks later on)
-      await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+      await this._dynamoDBService.update(awsAccountKey, awsAccountParams).execute();
     }
 
     return accountMetadata.id;
   }
 
   private async _getAccountWithoutMetadata(accountId: string): Promise<Account> {
-    const accountEntry = (await this._aws.helpers.ddb
+    const accountEntry = (await this._dynamoDBService
       .get({ pk: `${resourceTypeToKey.account}#${accountId}` })
       .execute()) as GetItemCommandOutput;
 
@@ -169,7 +184,7 @@ export default class AccountService {
   private async _getAccountWithMetadata(accountId: string): Promise<Account> {
     const pk = `${resourceTypeToKey.account}#${accountId}`;
 
-    const data = await this._aws.helpers.ddb.query({ key: { name: 'pk', value: pk } }).execute();
+    const data = await this._dynamoDBService.query({ key: { name: 'pk', value: pk } }).execute();
 
     if (data.Count === 0) {
       throw Boom.notFound(`Could not find account ${accountId}`);
@@ -178,36 +193,28 @@ export default class AccountService {
     const items = data.Items!.map((item) => {
       return item;
     });
-    let account: Account = {
-      awsAccountId: '',
-      cidr: '',
-      encryptionKeyArn: '',
-      envMgmtRoleArn: '',
-      environmentInstanceFiles: '',
-      externalId: '',
-      hostingAccountHandlerRoleArn: '',
-      id: '',
-      name: '',
-      stackName: '',
-      status: '',
-      subnetId: '',
-      vpcId: ''
-    };
+
+    const accountProperties = items.find((item) => {
+      return (item.sk as unknown as string) === pk;
+    });
+
+    const account: Account = AccountParser.parse(accountProperties);
+
     for (const item of items) {
       // parent environment item
       const sk = item.sk as unknown as string;
 
       if (sk === pk) {
-        account = { ...account, ...item };
         continue;
       }
 
       const associationPrefix = sk.split('#')[0];
 
       if (associationPrefix === resourceTypeToKey.costCenter) {
-        account.CC = item as unknown as CostCenter;
+        account.costCenter = CostCenterParser.parse(item);
       }
     }
+
     return account;
   }
 }
