@@ -37,7 +37,7 @@ export function getPaginationToken(ddbQueryResponse: QueryCommandOutput): string
  * @param key - object of key-value pairs to convert to a pagination token
  * @returns string of a pagination token
  */
-export function toPaginationToken(key: { [key: string]: string }): string {
+export function toPaginationToken(key: Record<string, string>): string {
   return Buffer.from(JSON.stringify(key)).toString('base64');
 }
 
@@ -47,7 +47,7 @@ export function toPaginationToken(key: { [key: string]: string }): string {
  * @param token - pagination token to convert to an object of key-value string pairs
  * @returns object of key-value string pairs
  */
-export function fromPaginationToken(token: string): { [key: string]: string } {
+export function fromPaginationToken(token: string): Record<string, string> {
   return JSON.parse(Buffer.from(token, 'base64').toString('utf8'));
 }
 
