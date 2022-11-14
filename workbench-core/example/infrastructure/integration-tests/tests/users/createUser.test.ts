@@ -43,13 +43,9 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when a user with the provided email already exists', async () => {
-    try {
-      // this test fails when the user doesn't already exist.
-      await adminSession.resources.users.create(user);
-    } catch (error) {
-      // could throw if user already exists
-      console.warn(error);
-    }
+    // create user
+    await adminSession.resources.users.create(user);
+    //try to create it again
     await expect(adminSession.resources.users.create(user)).rejects.toThrow(new HttpError(400, {}));
   });
 
@@ -60,7 +56,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the email parameter is missing', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     delete invalidParam.email;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
@@ -68,7 +64,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the email parameter is the wrong type', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.email = 123;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
@@ -76,7 +72,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the firstName parameter is missing', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     delete invalidParam.firstName;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
@@ -84,7 +80,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the firstName parameter is the wrong type', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.firstName = 123;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
@@ -92,7 +88,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the lastName parameter is missing', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     delete invalidParam.lastName;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
@@ -100,7 +96,7 @@ describe('userManagement create user integration test', () => {
   });
 
   it('should return a 400 error when the lastName parameter is the wrong type', async () => {
-    const invalidParam: { [id: string]: unknown } = { ...user };
+    const invalidParam: Record<string, unknown> = { ...user };
     invalidParam.lastName = 123;
     await expect(adminSession.resources.users.create(invalidParam, false)).rejects.toThrow(
       new HttpError(400, {})
