@@ -63,6 +63,36 @@ export default class HostingAccountLifecycleService {
    */
   public async getTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
+    const {
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+    } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+    ]);
+    const bucketName = artifactBucketArn.split(':').pop() as string;
+
+    let bucketPolicy: PolicyDocument = new PolicyDocument();
+    try {
+      const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
+        Bucket: bucketName
+      });
+      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
+    } catch (e) {
+      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
+      if (e instanceof NoSuchBucket) {
+        throw e;
+      }
+    }
+    const templatePolicy = this._getOnboardingTemplatePolicyStatement(awsAcctId, artifactBucketArn);
+
+    bucketPolicy = this._applyPoliciesToPolicyDocument(awsAcctId, bucketPolicy, [templatePolicy]);
+    const putPolicyParams: PutBucketPolicyCommandInput = {
+      Bucket: bucketName,
+      Policy: JSON.stringify(bucketPolicy.toJSON())
+    };
+
+    // Update bucket policy
+    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+
     return this._accountService.getTemplateURLForAccount(externalId);
   }
 
@@ -153,7 +183,7 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this.updatePolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
+    bucketPolicy = this.updateBucketPolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -164,7 +194,7 @@ export default class HostingAccountLifecycleService {
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
-  public updatePolicyDocumentWithAllStatements(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
+  public updateBucketPolicyDocumentWithAllStatements(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
         JSON.parse(`
      {
@@ -194,7 +224,15 @@ export default class HostingAccountLifecycleService {
       "Resource": ["${artifactBucketArn}/environment-files*"]
       }`)
     );
-    const onboardingTemplateStatement = PolicyStatement.fromJson(
+    const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(awsAccountId, artifactBucketArn);
+
+    const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
+
+    return this._applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
+  }
+
+  private _getOnboardingTemplatePolicyStatement(awsAccountId: string, artifactBucketArn: string): PolicyStatement {
+    return PolicyStatement.fromJson(
         JSON.parse(`
      {
       "Sid": "Get:onboarding-template",
@@ -206,13 +244,9 @@ export default class HostingAccountLifecycleService {
       "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
       }`)
     );
-
-    const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
-
-    return this.applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
   }
 
-  private applyPoliciesToPolicyDocument(awsAccountId: string, policyDocument: PolicyDocument, policyStatements: PolicyStatement[]) {
+  private _applyPoliciesToPolicyDocument(awsAccountId: string, policyDocument: PolicyDocument, policyStatements: PolicyStatement[]): PolicyDocument {
     for (const statement of policyStatements) {
       // If policy statement doesn't exist, create one
       // We iterate through these 1 by 1 in case the policy exists, but may be missing the awsAccoutId
