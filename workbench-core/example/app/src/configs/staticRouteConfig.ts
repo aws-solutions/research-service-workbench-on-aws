@@ -4,6 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+import { uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -62,6 +63,36 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'User'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}/activate`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}/deactivate`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
         subject: 'User'
       }
     ]
