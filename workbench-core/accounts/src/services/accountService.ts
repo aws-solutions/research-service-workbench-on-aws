@@ -67,9 +67,9 @@ export default class AccountService {
 
     const cfService = this._aws.helpers.cloudformation;
     const {
-      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn, //TODO: need to create, doesn't exist
+      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
-      [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn, //TODO: need to create, doesn't exist
+      [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
       // [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
       [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
     } = await cfService.getCfnOutput(process.env.stackName!, [
@@ -92,16 +92,16 @@ export default class AccountService {
       statusHandlerRole: statusHandlerRoleArn
     };
 
-    //const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
-    //const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
-    //const bucket = parsedBucketArn[0];
+    const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
+    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    const bucket = parsedBucketArn[0];
 
     // Sign the url
-    // const s3Client = new S3Client({region : process.env.AWS_REGION!});
-    // const command = new GetObjectCommand( { Bucket: bucket, Key:key});
-    //const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
+    const s3Client = new S3Client({region : process.env.AWS_REGION!});
+    const command = new GetObjectCommand( { Bucket: bucket, Key:key});
     // TODO: sign a url
-    const signedUrl = 'http://potato.com';
+    // const signedUrl = 'http://potato.com';
+    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
     const oj = this._orangeJuice(templateParameters, signedUrl);
     return { url: oj };
