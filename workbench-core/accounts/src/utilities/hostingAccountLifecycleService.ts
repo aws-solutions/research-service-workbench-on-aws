@@ -286,41 +286,23 @@ export default class HostingAccountLifecycleService {
         "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
         }`)
     );
-    // If List statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, listStatement.sid!)) {
-      bucketPolicy.addStatements(listStatement);
-    } else {
-      // If List statement doesn't contain this accountId, add it
-      bucketPolicy = IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          listStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
-    }
-    // If the Get statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, getStatement.sid!)) {
-      bucketPolicy.addStatements(getStatement);
-    } else {
-      // If the Get statement doesn't contain this accountId, add it
-      bucketPolicy = IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          getStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
+
+    const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
+
+    for (const statement of policyStatements) {
+      // If List statement doesn't exist, create one
+      if (!IamHelper.containsStatementId(bucketPolicy, statement.sid!)) {
+        bucketPolicy.addStatements(statement);
+      } else {
+        // If List statement doesn't contain this accountId, add it
+        bucketPolicy = IamHelper.addPrincipalToStatement(
+            bucketPolicy,
+            statement.sid!,
+            `arn:aws:iam::${awsAccountId}:root`
+        );
+      }
     }
 
-
-    // If the Get statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
-      bucketPolicy.addStatements(onboardingTemplateStatement);
-    } else {
-      // If the Get statement doesn't contain this accountId, add it
-      return IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          onboardingTemplateStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
-    }
     return bucketPolicy;
   }
 
