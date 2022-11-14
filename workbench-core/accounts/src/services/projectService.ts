@@ -313,7 +313,7 @@ export default class ProjectService {
       const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
       const exclusiveStartProject = projectsOnPage.find((project) => project.id === exclusiveStartProjectId);
       if (exclusiveStartProject === undefined) {
-        throw Boom.badImplementation('Pagination token is invalid.');
+        throw Boom.badRequest('Pagination token is invalid.');
       }
       const indexOfExclusiveStartProject = projectsOnPage.indexOf(exclusiveStartProject);
       projectsOnPage = projectsOnPage.slice(indexOfExclusiveStartProject + 1);

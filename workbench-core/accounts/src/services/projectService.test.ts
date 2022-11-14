@@ -175,12 +175,6 @@ describe('ProjectService', () => {
   describe('listProjects', () => {
     test('should fail on list projects for negative pageSize', async () => {
       // BUILD
-      // const items = [projItem1, projItem2, projItem3];
-      // const lastEvaluatedKey = {
-      //   pk: 'notPk',
-      //   sk: 'notSk'
-      // };
-      // const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = -1;
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -192,17 +186,6 @@ describe('ProjectService', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
         .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
-
-      // mock batchGetItems call
-      // const batchGetItems: BatchGetItemCommandOutput = {
-      //   Responses: {
-      //     exampleDDBTable: items.map((item) => {
-      //       return marshall(item);
-      //     })
-      //   },
-      //   $metadata: {}
-      // };
-      // ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE n CHECK
       await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
