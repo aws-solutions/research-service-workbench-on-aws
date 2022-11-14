@@ -153,7 +153,7 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this.applesauce(artifactBucketArn, awsAccountId, bucketPolicy);
+    bucketPolicy = this.updatePolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -164,7 +164,7 @@ export default class HostingAccountLifecycleService {
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
-  public applesauce(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
+  public updatePolicyDocumentWithAllStatements(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
         JSON.parse(`
      {

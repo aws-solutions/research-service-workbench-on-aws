@@ -684,7 +684,7 @@ describe('HostingAccountLifecycleService', () => {
         ]
     }`));
 
-    const postUpdatedPolicy = hostingAccountLifecycleService.applesauce(sampleBucketArn, sampleAccountId, basePolicy);
+    const postUpdatedPolicy = hostingAccountLifecycleService.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy);
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
