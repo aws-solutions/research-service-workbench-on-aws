@@ -149,7 +149,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminListGroupsForUserCommand)
         .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
 
-      const user = await plugin.getUser(userInfo.uid);
+      const user = await plugin.getUser(userInfo.id);
 
       expect(user).toMatchObject<User>({
         ...userInfo,
