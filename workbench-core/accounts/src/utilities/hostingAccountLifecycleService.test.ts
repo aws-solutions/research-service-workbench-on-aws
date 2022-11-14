@@ -684,41 +684,8 @@ describe('HostingAccountLifecycleService', () => {
         ]
     }`));
 
-    const postUpdatedPolicy = hostingAccountLifecycleService.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy);
+    const postUpdatedPolicy = hostingAccountLifecycleService.applesauce(sampleBucketArn, sampleAccountId, basePolicy);
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
-  });
-
-  test('updatePolicyDocumentWithAllStatements results in the same output as applesauce', async () => {
-    const service = new HostingAccountLifecycleService();
-    const sampleBucketName = 'randomBucketName';
-    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`
-    const sampleAccountId = '123456789012'
-
-    const text = `{
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "Deny requests that do not use SigV4",
-                "Effect": "Deny",
-                "Principal": {
-                    "AWS": "*"
-                },
-                "Action": "s3:*",
-                "Resource": "${sampleBucketArn}/*",
-                "Condition": {
-                    "StringNotEquals": {
-                        "s3:signatureversion": "AWS4-HMAC-SHA256"
-                    }
-                }
-            }
-        ]
-    }`;
-    const basePolicyA = PolicyDocument.fromJson(JSON.parse(text));
-    const basePolicyB = PolicyDocument.fromJson(JSON.parse(text));
-    const expected = service.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicyA);
-    const policyDocument = service.applesauce(sampleBucketArn, sampleAccountId, basePolicyB);
-    expect(policyDocument).toEqual(expected);
-
   });
 
   });

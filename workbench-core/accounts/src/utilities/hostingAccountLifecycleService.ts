@@ -153,7 +153,7 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this.updatePolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
+    bucketPolicy = this.applesauce(artifactBucketArn, awsAccountId, bucketPolicy);
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -162,86 +162,6 @@ export default class HostingAccountLifecycleService {
 
     // Update bucket policy
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
-  }
-
-  public updatePolicyDocumentWithAllStatements(artifactBucketArn: string, awsAccountId: string, bucketPolicy: PolicyDocument): PolicyDocument {
-    const listStatement = PolicyStatement.fromJson(
-        JSON.parse(`
-       {
-        "Sid": "List:environment-files",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:ListBucket",
-        "Resource": ["${artifactBucketArn}"],
-        "Condition": {
-          "StringLike": {
-            "s3:prefix": "environment-files*"
-            }
-          }
-        }`)
-    );
-    // If List statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, listStatement.sid!)) {
-      bucketPolicy.addStatements(listStatement);
-    } else {
-      // If List statement doesn't contain this accountId, add it
-      bucketPolicy = IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          listStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
-    }
-
-    const getStatement = PolicyStatement.fromJson(
-        JSON.parse(`
-       {
-        "Sid": "Get:environment-files",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:GetObject",
-        "Resource": ["${artifactBucketArn}/environment-files*"]
-        }`)
-    );
-    // If the Get statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, getStatement.sid!)) {
-      bucketPolicy.addStatements(getStatement);
-    } else {
-      // If the Get statement doesn't contain this accountId, add it
-      bucketPolicy = IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          getStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
-    }
-
-    const onboardingTemplateStatement = PolicyStatement.fromJson(
-        JSON.parse(`
-       {
-        "Sid": "Get:onboarding-template",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS":"arn:aws:iam::${awsAccountId}:root"
-        },
-        "Action": "s3:GetObject",
-        "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
-        }`)
-    );
-    // If the Get statement doesn't exist, create one
-    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
-      bucketPolicy.addStatements(onboardingTemplateStatement);
-    } else {
-      // If the Get statement doesn't contain this accountId, add it
-      return IamHelper.addPrincipalToStatement(
-          bucketPolicy,
-          onboardingTemplateStatement.sid!,
-          `arn:aws:iam::${awsAccountId}:root`
-      );
-    }
-    return bucketPolicy;
   }
 
   public applesauce(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
