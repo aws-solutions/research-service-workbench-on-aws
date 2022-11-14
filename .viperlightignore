@@ -11,7 +11,7 @@ lib
 
 # NOTICE files
 
-.*/NOTICE
+.\*/NOTICE
 
 # Test files
 
@@ -41,3 +41,13 @@ solutions/example-ui-app/src/models/User.ts:19
 # "email": "hello@cypress.io" is not real email
 
 solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
+
+# Fake emails for UserManagementService integ tests
+
+workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:30
+workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
+workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
+workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
+#Fake email used
+workbench-core/example/infrastructure/scripts/setupCognito.sh:43
+workbench-core/example/infrastructure/scripts/setupCognito.sh:44

@@ -4,7 +4,6 @@
   "coveragePathIgnorePatterns": [
     "<rootDir>/src/index.ts",
     "<rootDir>/src/app.ts",
-    "<rootDir>/src/infrastructure-stack.ts",
     "<rootDir>/src/constructs"
   ],
   "coverageThreshold": {

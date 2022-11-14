@@ -23,14 +23,14 @@ export interface UserManagementPlugin {
   /**
    * Get details for a particular user from the user/role data store.
    *
-   * @param uid - the identifier of a given user.
+   * @param id - the identifier of a given user.
    * @returns a {@link User} object containing the user's details
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  getUser(uid: string): Promise<User>;
+  getUser(id: string): Promise<User>;
 
   /**
    * Create a new user with the given details.
@@ -46,7 +46,7 @@ export interface UserManagementPlugin {
 
   /**
    * Update a user with new details.
-   * @param uid - the ID of the user to update.
+   * @param id - the ID of the user to update.
    * @param user - the new details for the user.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -54,17 +54,39 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  updateUser(uid: string, user: User): Promise<void>;
+  updateUser(id: string, user: User): Promise<void>;
 
   /**
    * Delete a user from the backing store.
-   * @param uid - the ID of the user to delete.
+   * @param id - the ID of the user to delete.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  deleteUser(uid: string): Promise<void>;
+  deleteUser(id: string): Promise<void>;
+
+  /**
+   * Activates an inactive user.
+   *
+   * @param id - the id of the user to activate
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   */
+  activateUser(id: string): Promise<void>;
+
+  /**
+   * Deactivates an active user.
+   *
+   * @param id - the id of the user to deactivate
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   */
+  deactivateUser(id: string): Promise<void>;
 
   /**
    * Activates an inactive user.
@@ -120,7 +142,7 @@ export interface UserManagementPlugin {
 
   /**
    * Add the given user to the given role.
-   * @param uid - the ID of the user to add to the role.
+   * @param id - the ID of the user to add to the role.
    * @param role - the name which identifies the role.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -128,11 +150,11 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  addUserToRole(uid: string, role: string): Promise<void>;
+  addUserToRole(id: string, role: string): Promise<void>;
 
   /**
    * Remove the given user from the given role.
-   * @param uid - the ID of the user to remove from the given role.
+   * @param id - the ID of the user to remove from the given role.
    * @param role - the role from which the user is to be removed.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -140,7 +162,7 @@ export interface UserManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  removeUserFromRole(uid: string, role: string): Promise<void>;
+  removeUserFromRole(id: string, role: string): Promise<void>;
 
   /**
    * Create a new role with no associated users.
