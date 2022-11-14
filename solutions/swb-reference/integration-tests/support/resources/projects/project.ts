@@ -14,7 +14,7 @@ export default class Project extends Resource {
 
   public async assignUserToProject(
     userId: string,
-    requestBody: { [role: string]: string }
+    requestBody: Record<string, string>
   ): Promise<AxiosResponse> {
     return this._axiosInstance.post(`${this._api}/users/${userId}`, requestBody);
   }
