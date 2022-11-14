@@ -244,6 +244,87 @@ export default class HostingAccountLifecycleService {
     return bucketPolicy;
   }
 
+  public applesauce(artifactBucketArn: string, awsAccountId: string, bucketPolicy: PolicyDocument): PolicyDocument {
+    const listStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "List:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:ListBucket",
+        "Resource": ["${artifactBucketArn}"],
+        "Condition": {
+          "StringLike": {
+            "s3:prefix": "environment-files*"
+            }
+          }
+        }`)
+    );
+    const getStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "Get:environment-files",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": ["${artifactBucketArn}/environment-files*"]
+        }`)
+    );
+    const onboardingTemplateStatement = PolicyStatement.fromJson(
+        JSON.parse(`
+       {
+        "Sid": "Get:onboarding-template",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS":"arn:aws:iam::${awsAccountId}:root"
+        },
+        "Action": "s3:GetObject",
+        "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
+        }`)
+    );
+    // If List statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, listStatement.sid!)) {
+      bucketPolicy.addStatements(listStatement);
+    } else {
+      // If List statement doesn't contain this accountId, add it
+      bucketPolicy = IamHelper.addPrincipalToStatement(
+          bucketPolicy,
+          listStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
+      );
+    }
+    // If the Get statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, getStatement.sid!)) {
+      bucketPolicy.addStatements(getStatement);
+    } else {
+      // If the Get statement doesn't contain this accountId, add it
+      bucketPolicy = IamHelper.addPrincipalToStatement(
+          bucketPolicy,
+          getStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
+      );
+    }
+
+
+    // If the Get statement doesn't exist, create one
+    if (!IamHelper.containsStatementId(bucketPolicy, 'Get:onboarding-template')) {
+      bucketPolicy.addStatements(onboardingTemplateStatement);
+    } else {
+      // If the Get statement doesn't contain this accountId, add it
+      return IamHelper.addPrincipalToStatement(
+          bucketPolicy,
+          onboardingTemplateStatement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
+      );
+    }
+    return bucketPolicy;
+  }
+
+
   /**
    * Update target account with resources required for launching environments in the account
    * @param params - Listed below

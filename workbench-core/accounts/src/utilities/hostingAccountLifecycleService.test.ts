@@ -688,4 +688,34 @@ describe('HostingAccountLifecycleService', () => {
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
+  test('updatePolicyDocumentWithAllStatements results in the same output as applesauce', async () => {
+    const service = new HostingAccountLifecycleService();
+    const sampleBucketName = 'randomBucketName';
+    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`
+    const sampleAccountId = '123456789012'
+
+    const basePolicy = PolicyDocument.fromJson(JSON.parse(`{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            }
+        ]
+    }`));
+    expect(service.updatePolicyDocumentWithAllStatements(sampleBucketArn, sampleAccountId, basePolicy)).
+        toEqual(service.applesauce(sampleBucketArn, sampleAccountId, basePolicy));
+
+  });
+
   });
