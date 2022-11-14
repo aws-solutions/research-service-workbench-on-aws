@@ -9,7 +9,7 @@ import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/h
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
-import { QueryParameterFilter } from './interfaces/queryParameterFilter';
+import { QueryParamFilterParser, QueryParamFilter } from './interfaces/queryParameterFilter';
 import QueryParams from './interfaces/queryParams';
 import { SortRequest } from './interfaces/sortRequest';
 import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
@@ -41,7 +41,8 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
-  QueryParameterFilter,
+  QueryParamFilter,
+  QueryParamFilterParser,
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,

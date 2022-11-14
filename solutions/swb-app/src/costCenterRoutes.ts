@@ -33,23 +33,22 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
   router.get(
     '/costCenters',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.query, ListCostCentersSchema));
-      const { paginationToken, pageSize } = req.query;
-      const request: ListCostCentersSchema = req.query as ListCostCentersSchema;
-      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
-      } else {
-        const envType = await costCenterService.listCostCenters(request);
-        res.send(envType);
-      }
-
-      // const validatedRequest = validateAndParse<ListCostCentersRequest>(
-      //   ListCostCentersRequestParser,
-      //   req.query
-      // );
-      // res.send(await costCenterService.listCostCenters(validatedRequest));
+      // processValidatorResult(validate(req.query, ListCostCentersSchema));
+      // const { paginationToken, pageSize } = req.query;
+      // const request: ListCostCentersSchema = req.query as ListCostCentersSchema;
+      // if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
+      //   res
+      //     .status(400)
+      //     .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
+      // } else {
+      //   const envType = await costCenterService.listCostCenters(request);
+      //   res.send(envType);
+      // }
+      const validatedRequest = validateAndParse<ListCostCentersRequest>(
+        ListCostCentersRequestParser,
+        req.query
+      );
+      res.send(await costCenterService.listCostCenters(validatedRequest));
     })
   );
 }

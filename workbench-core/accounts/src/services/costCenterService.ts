@@ -37,31 +37,32 @@ export default class CostCenterService {
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
     const { filter, sort, pageSize, paginationToken } = request;
+    console.log('filter', filter);
     validateSingleSortAndFilter(filter, sort);
 
-    let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByCreatedAt',
-      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
-    };
-    const gsiNames = ['getResourceByName', 'getResourceByStatus'];
-    const filterQuery = getFilterQueryParams(filter, gsiNames);
-    const sortQuery = getSortQueryParams(sort, gsiNames);
-    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-
-    const queryParams = {
-      index: 'getResourceByName',
-      key: { name: 'resourceType', value: this._resourceType }
-    };
-
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-
-    return {
-      data: response.data.map((item) => {
-        return CostCenterParser.parse(item);
-      }),
-      paginationToken: response.paginationToken
-    };
+    // let queryParams: QueryParams = {
+    //   key: { name: 'resourceType', value: this._resourceType },
+    //   index: 'getResourceByCreatedAt',
+    //   limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+    // };
+    // const gsiNames = ['getResourceByName', 'getResourceByStatus'];
+    // const filterQuery = getFilterQueryParams(filter, gsiNames);
+    // const sortQuery = getSortQueryParams(sort, gsiNames);
+    // queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+    //
+    // const queryParams = {
+    //   index: 'getResourceByName',
+    //   key: { name: 'resourceType', value: this._resourceType }
+    // };
+    //
+    // const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    //
+    // return {
+    //   data: response.data.map((item) => {
+    //     return CostCenterParser.parse(item);
+    //   }),
+    //   paginationToken: response.paginationToken
+    // };
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
