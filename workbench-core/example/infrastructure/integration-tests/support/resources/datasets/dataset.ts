@@ -74,7 +74,7 @@ export default class Dataset extends Resource {
       await datasetHelper.deleteS3Resources(this._storageName, this._storagePath);
       await datasetHelper.deleteDdbRecords(this.id);
     } catch (error) {
-      console.log(`Error caught in cleanup of dataset '${this.id}': ${error}.`);
+      console.warn(`Error caught in cleanup of dataset '${this.id}': ${error}.`);
     }
   }
 }

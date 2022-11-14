@@ -105,7 +105,7 @@ export class DataSetService {
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
-    if (targetDS.externalEndpoints && targetDS.externalEndpoints.length > 0) {
+    if (targetDS.externalEndpoints?.length) {
       throw new DataSetHasEndpointError(
         'External endpoints found on Dataset must be removed before DataSet can be removed.'
       );
