@@ -5,7 +5,6 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
-  AwsService,
   buildDynamoDBPkSk,
   removeDynamoDbKeys,
   resourceTypeToKey,
@@ -18,6 +17,7 @@ import {
   QueryParams,
   addPaginationToken
 } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
@@ -26,20 +26,23 @@ import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
-  private _aws: AwsService;
+  private _dynamoDbService: DynamoDBService;
   private readonly _tableName: string;
   private _resourceType: string = 'costCenter';
 
-  public constructor(constants: { TABLE_NAME: string }) {
+  // public constructor(constants: { TABLE_NAME: string }) {
+  //   const { TABLE_NAME } = constants;
+  //   this._tableName = TABLE_NAME;
+  //   this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
+  // }
+  public constructor(constants: { TABLE_NAME: string }, dynamoDbService: DynamoDBService) {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
+    this._dynamoDbService = dynamoDbService;
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
-    console.log('ZZZ: request', request);
     const { filter, sort, pageSize, paginationToken } = request;
-    console.log('ZZZ: filter', filter);
     validateSingleSortAndFilter(filter, sort);
 
     let queryParams: QueryParams = {
@@ -53,8 +56,7 @@ export default class CostCenterService {
     queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
-    console.log('ZZZ: queryParams', queryParams);
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    const response = await this._dynamoDbService.getPaginatedItems(queryParams);
 
     console.log('paginationToken', response.paginationToken);
     return {
@@ -67,7 +69,7 @@ export default class CostCenterService {
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     // Get by id
-    const response = (await this._aws.helpers.ddb
+    const response = (await this._dynamoDbService
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
@@ -117,7 +119,7 @@ export default class CostCenterService {
 
     const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
-    await this._aws.helpers.ddb
+    await this._dynamoDbService
       .update(key, {
         item: dynamoItem
       })
