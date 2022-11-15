@@ -5,6 +5,7 @@
 
 import AccountHandler from './handlers/accountHandler';
 import CreateAccountSchema from './schemas/createAccount';
+import GetTemplateSchema from './schemas/getTemplate';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -20,5 +21,6 @@ export {
   CostCenterService,
   ProjectService,
   CreateAccountSchema,
-  UpdateAccountSchema
+  UpdateAccountSchema,
+  GetTemplateSchema
 };

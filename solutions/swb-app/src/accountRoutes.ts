@@ -6,6 +6,7 @@
 // AWS Account management
 import {
   CreateAccountSchema,
+  GetTemplateSchema,
   UpdateAccountSchema,
   HostingAccountService
 } from '@aws/workbench-core-accounts';
@@ -31,7 +32,7 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     'aws-accounts/:id/get-template',
     wrapAsync(async (req: Request, res: Response) => {
       // TODO: maybe validate inputs?
-      processValidatorResult(validate(req.body, CreateAccountSchema));
+      processValidatorResult(validate(req.body, GetTemplateSchema));
       const { awsAcctId, externalId } = req.body;
       res.send(await account.getTemplateURLForAccount(awsAcctId, externalId));
     })
