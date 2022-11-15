@@ -75,6 +75,36 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     })
   );
 
+  router.put(
+    '/users/:userId/activate',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const user = await service.activateUser(req.params.userId);
+        res.status(200).json(user);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
+  router.put(
+    '/users/:userId/deactivate',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const user = await service.deactivateUser(req.params.userId);
+        res.status(200).json(user);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {

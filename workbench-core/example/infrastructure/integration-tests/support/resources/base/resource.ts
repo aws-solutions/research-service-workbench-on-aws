@@ -13,16 +13,16 @@ export default class Resource {
   private _parentApi: string;
   protected _settings: Settings;
   protected _axiosInstance: AxiosInstance;
-  protected _id: string;
   protected _api: string = '';
   protected _setup: Setup;
+  public id: string;
 
   public constructor(clientSession: ClientSession, type: string, id: string, parentApi: string) {
     this._axiosInstance = clientSession.getAxiosInstance();
     this._settings = clientSession.getSettings();
     this._setup = clientSession.getSetup();
     this._type = type;
-    this._id = id;
+    this.id = id;
     this._parentApi = parentApi;
 
     // Most child resources have standard api patterns: /api/<parent resource type>/{id}
@@ -38,7 +38,7 @@ export default class Resource {
     return this._axiosInstance.get(this._api);
   }
 
-  public async update(body: { [key: string]: string }): Promise<AxiosResponse> {
+  public async update(body: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.put(this._api, body);
   }
 
@@ -50,5 +50,5 @@ export default class Resource {
   /**
    * Delete any resource that was created
    */
-  protected async cleanup(): Promise<void> {}
+  public async cleanup(): Promise<void> {}
 }
