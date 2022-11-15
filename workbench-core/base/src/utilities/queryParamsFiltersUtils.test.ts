@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { QueryNumberParamFilterParser } from '../interfaces/queryNumberParamFilter';
-import { QueryStringParamFilterParser } from '../interfaces/queryStringParamFilter';
 import {
   getFilterQueryParams,
   getSortQueryParams,
