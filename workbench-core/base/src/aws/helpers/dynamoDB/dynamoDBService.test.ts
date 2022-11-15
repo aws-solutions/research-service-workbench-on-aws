@@ -3,10 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, QueryCommand, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import JSONValue from '../../../types/json';
+import { getPaginationToken } from '../../../utilities/paginationHelper';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -18,6 +19,7 @@ describe('DynamoDBService', () => {
   describe('getPaginatedItems', () => {
     let unmarshalledData: Record<string, JSONValue>;
     let unmarshalledPaginationToken: { pk: string; sk: string };
+    let base64DecodingOfPaginationToken = '';
 
     beforeEach(() => {
       unmarshalledData = {
@@ -32,6 +34,7 @@ describe('DynamoDBService', () => {
         pk: 'pk',
         sk: 'sk'
       };
+      base64DecodingOfPaginationToken = 'eyJwayI6InBrIiwic2siOiJzayJ9';
 
       const mockDDB = mockClient(DynamoDBClient);
       mockDDB.on(QueryCommand).resolves({
@@ -43,7 +46,7 @@ describe('DynamoDBService', () => {
     test('returns unmarshalled data', async () => {
       const result = await dbService.getPaginatedItems();
       expect(result.data).toEqual([unmarshalledData]);
-      expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
+      expect(result.paginationToken).toEqual(base64DecodingOfPaginationToken);
     });
   });
 
