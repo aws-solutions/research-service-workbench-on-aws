@@ -153,7 +153,7 @@ describe('CognitoUserManagementPlugin tests', () => {
 
       expect(user).toMatchObject<User>({
         ...userInfo,
-        status: Status.INACTIVE,
+        email: '',
         roles
       });
     });
