@@ -15,7 +15,8 @@ import {
   getSortQueryParams,
   getFilterQueryParams,
   DEFAULT_API_PAGE_SIZE,
-  QueryParams
+  QueryParams,
+  addPaginationToken
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
@@ -37,32 +38,30 @@ export default class CostCenterService {
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
     const { filter, sort, pageSize, paginationToken } = request;
-    console.log('filter', filter);
     validateSingleSortAndFilter(filter, sort);
 
-    // let queryParams: QueryParams = {
-    //   key: { name: 'resourceType', value: this._resourceType },
-    //   index: 'getResourceByCreatedAt',
-    //   limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
-    // };
-    // const gsiNames = ['getResourceByName', 'getResourceByStatus'];
-    // const filterQuery = getFilterQueryParams(filter, gsiNames);
-    // const sortQuery = getSortQueryParams(sort, gsiNames);
-    // queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-    //
-    // const queryParams = {
-    //   index: 'getResourceByName',
-    //   key: { name: 'resourceType', value: this._resourceType }
-    // };
-    //
-    // const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-    //
-    // return {
-    //   data: response.data.map((item) => {
-    //     return CostCenterParser.parse(item);
-    //   }),
-    //   paginationToken: response.paginationToken
-    // };
+    let queryParams: QueryParams = {
+      key: { name: 'resourceType', value: this._resourceType },
+      index: 'getResourceByCreatedAt',
+      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+    };
+    const gsiNames = ['getResourceByName'];
+    const filterQuery = getFilterQueryParams(filter, gsiNames);
+    const sortQuery = getSortQueryParams(sort, gsiNames);
+    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+
+    queryParams = addPaginationToken(paginationToken, queryParams);
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return {
+      data: response.data.map((item) => {
+        // let costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
+        // costCenter = removeDynamoDbKeys(costCenter);
+        // return CostCenterParser.parse(costCenter);
+        return this._mapDDBItemToCostCenter(item);
+      }),
+      paginationToken: response.paginationToken
+    };
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
@@ -75,12 +74,11 @@ export default class CostCenterService {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    response.Item.accountId = response.Item.dependency;
-
-    let costCenter = response.Item as { [key: string]: never };
-    costCenter = removeDynamoDbKeys(costCenter);
-
-    return costCenter as unknown as CostCenter;
+    // response.Item.accountId = response.Item.dependency;
+    //
+    // // let costCenter = response.Item as { [key: string]: never };
+    // return CostCenterParser.parse(removeDynamoDbKeys(response.Item));
+    return this._mapDDBItemToCostCenter(response.Item);
   }
 
   public async create(createCostCenter: CreateCostCenterRequest): Promise<CostCenter> {
@@ -125,6 +123,12 @@ export default class CostCenterService {
       .execute();
 
     return costCenter;
+  }
+
+  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
+    let costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
+    costCenter = removeDynamoDbKeys(costCenter);
+    return CostCenterParser.parse(costCenter);
   }
 
   private async _getAccount(accountId: string): Promise<Account> {

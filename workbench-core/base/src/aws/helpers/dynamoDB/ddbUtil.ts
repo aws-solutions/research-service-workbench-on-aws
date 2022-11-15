@@ -12,7 +12,7 @@ export function buildDynamoDbKey(id: string, type: string): string {
   return `${type}#${id}`;
 }
 
-export function removeDynamoDbKeys(entry: { [key: string]: never }): { [key: string]: never } {
+export function removeDynamoDbKeys(entry: { [key: string]: unknown }): { [key: string]: unknown } {
   delete entry.pk;
   delete entry.sk;
   delete entry.dependency;

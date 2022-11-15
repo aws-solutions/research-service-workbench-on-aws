@@ -7,7 +7,7 @@ export const ListCostCentersRequestParser = z.object({
   paginationToken: z.string().optional(),
   filter: z
     .object({
-      name: QueryParamFilterParser.required()
+      name: QueryParamFilterParser
     })
     .optional(),
   sort: z
