@@ -13,6 +13,7 @@ import { QueryParameterFilter } from './interfaces/queryParameterFilter';
 import QueryParams from './interfaces/queryParams';
 import { SortRequest } from './interfaces/sortRequest';
 import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
+import { MetadataService } from './services/metadataService';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
 import {
@@ -50,5 +51,6 @@ export {
   SortRequest,
   addPaginationToken,
   getPaginationToken,
-  DEFAULT_API_PAGE_SIZE
+  DEFAULT_API_PAGE_SIZE,
+  MetadataService
 };

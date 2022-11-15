@@ -444,8 +444,16 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
-  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+  public transactEdit(params?: {
+    addPutRequest?: Record<string, unknown>[];
+    addDeleteRequests?: Record<string, unknown>[];
+  }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params?.addDeleteRequests) {
+      transactEdit = transactEdit.addDeleteRequests(
+        params.addDeleteRequests.map((request) => marshall(request))
+      );
+    }
     if (params?.addPutRequest) {
       transactEdit = transactEdit.addPutRequests(
         params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
