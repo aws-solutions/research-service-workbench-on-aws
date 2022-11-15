@@ -513,7 +513,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
-      cognitoMock.on(AdminEnableUserCommand).rejects(new InternalErrorException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminEnableUserCommand)
+        .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
       await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
         new IdpUnavailableError('Cognito encountered an internal error')
@@ -521,7 +523,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
-      cognitoMock.on(AdminEnableUserCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminEnableUserCommand)
+        .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
         new PluginConfigurationError('Plugin is not authorized to delete a user')
@@ -529,7 +533,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
-      cognitoMock.on(AdminEnableUserCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminEnableUserCommand)
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
         new PluginConfigurationError('Invalid user pool id')
@@ -537,7 +543,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
-      cognitoMock.on(AdminEnableUserCommand).rejects(new UserNotFoundException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminEnableUserCommand)
+        .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
         new UserAlreadyExistsError('User does not exist')
@@ -561,7 +569,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
-      cognitoMock.on(AdminDisableUserCommand).rejects(new InternalErrorException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminDisableUserCommand)
+        .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
         new IdpUnavailableError('Cognito encountered an internal error')
@@ -569,7 +579,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
-      cognitoMock.on(AdminDisableUserCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminDisableUserCommand)
+        .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
         new PluginConfigurationError('Plugin is not authorized to delete a user')
@@ -577,7 +589,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
-      cognitoMock.on(AdminDisableUserCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminDisableUserCommand)
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
         new PluginConfigurationError('Invalid user pool id')
@@ -585,7 +599,9 @@ describe('CognitoUserManagementPlugin tests', () => {
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
-      cognitoMock.on(AdminDisableUserCommand).rejects(new UserNotFoundException({ $metadata: {} }));
+      cognitoMock
+        .on(AdminDisableUserCommand)
+        .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
         new UserAlreadyExistsError('User does not exist')

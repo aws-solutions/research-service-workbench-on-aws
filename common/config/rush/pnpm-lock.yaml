@@ -466,6 +466,7 @@ importers:
       '@aws-sdk/client-s3-control': ^3.186.0
       '@aws-sdk/client-service-catalog': ^3.186.0
       '@aws-sdk/client-ssm': ^3.186.0
+      '@aws-sdk/s3-request-presigner': ^3.186.0
       '@aws-sdk/types': ^3.186.0
       '@aws-sdk/util-dynamodb': ^3.186.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
@@ -512,6 +513,7 @@ importers:
       '@aws-sdk/client-s3-control': 3.186.0
       '@aws-sdk/client-service-catalog': 3.186.0
       '@aws-sdk/client-ssm': 3.186.0
+      '@aws-sdk/s3-request-presigner': 3.186.0
       '@aws-sdk/types': 3.186.0
       '@aws-sdk/util-dynamodb': 3.186.0
       '@aws/workbench-core-audit': link:../audit
