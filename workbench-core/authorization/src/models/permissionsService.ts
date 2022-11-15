@@ -30,7 +30,7 @@ import { GetUserGroupsRequest, GetUserGroupsResponse } from './getUserGroups';
 import { GetUsersFromGroupRequest, GetUsersFromGroupResponse } from './getUsersFromGroup';
 import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './removeUserFromGroup';
 
-export interface DynamicPermissionsPlugin {
+export interface PermissionsService {
   /**
    * Create an authorization group
    * @param createGroupRequest - {@link CreateGroupRequest}
@@ -64,6 +64,7 @@ export interface DynamicPermissionsPlugin {
    * @returns - {@link GetUsersFromGroupResponse}
    */
   getUsersFromGroup(getUsersFromGroupRequest: GetUsersFromGroupRequest): Promise<GetUsersFromGroupResponse>;
+
   /**
    * Create an identity permission.
    * An Identity permissions associates a user/group to a {@link Permission} and subjectId
@@ -95,13 +96,14 @@ export interface DynamicPermissionsPlugin {
   deleteSubjectPermissions(
     deleteSubjectPermissionsRequest: DeleteSubjectPermissionsRequest
   ): Promise<DeleteSubjectPermissionsResponse>;
+
   /**
    * Assign user to a group
    * @param assignUserToGroupRequest - {@link AssignUserToGroupRequest}
    *
    * @returns - {@link AssignUserToGroupResponse}
    *
-   * @throws - {@link GroupDoesNotExist} Assigned group does not
+   * @throws - {@link GroupNotFoundError} Assigned group does not
    */
   assignUserToGroup(assignUserToGroupRequest: AssignUserToGroupRequest): Promise<AssignUserToGroupResponse>;
 

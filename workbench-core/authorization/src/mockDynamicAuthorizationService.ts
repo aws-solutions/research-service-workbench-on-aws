@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
+import { GroupNotFoundError } from './errors/groupNotFoundError';
 import { AssignUserToGroupRequest, AssignUserToGroupResponse } from './models/assignUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './models/createGroup';
 import {
@@ -18,7 +20,6 @@ import {
   DeleteSubjectPermissionsRequest,
   DeleteSubjectPermissionsResponse
 } from './models/deleteSubjectPermissions';
-import { DynamicPermissionsPlugin } from './models/dynamicPermissionsPlugin';
 import {
   GetIdentityPermissionsByIdentityRequest,
   GetIdentityPermissionsByIdentityResponse
@@ -29,66 +30,75 @@ import {
 } from './models/getIdentityPermissionsBySubject';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './models/getUserGroups';
 import { GetUsersFromGroupRequest, GetUsersFromGroupResponse } from './models/getUsersFromGroup';
+import { PermissionsService } from './models/permissionsService';
 import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './models/removeUserFromGroup';
 
-export class MockDynamicAuthorizationService implements DynamicPermissionsPlugin {
+export class MockDynamicAuthorizationService implements PermissionsService {
   public createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
-    throw new Error('Method not implemented.');
+    if (createGroupRequest.groupId.includes('existing')) {
+      return Promise.reject(new GroupAlreadyExistsError('Group already exists.'));
+    }
+
+    return Promise.resolve({ created: true });
   }
 
   public deleteGroup(deleteGroupRequest: DeleteGroupRequest): Promise<DeleteGroupResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ deleted: true });
   }
 
   public getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ groupIds: [] });
   }
 
   public getUsersFromGroup(
     getUsersFromGroupRequest: GetUsersFromGroupRequest
   ): Promise<GetUsersFromGroupResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ userIds: [] });
   }
 
   public createIdentityPermissions(
     createIdentityPermissionsRequest: CreateIdentityPermissionsRequest
   ): Promise<CreateIdentityPermissionsResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ created: true });
   }
 
   public deleteIdentityPermissions(
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ deleted: true });
   }
 
   public deleteSubjectPermissions(
     deleteSubjectPermissionsRequest: DeleteSubjectPermissionsRequest
   ): Promise<DeleteSubjectPermissionsResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ deleted: true });
   }
 
   public assignUserToGroup(
     assignUserToGroupRequest: AssignUserToGroupRequest
   ): Promise<AssignUserToGroupResponse> {
-    throw new Error('Method not implemented.');
+    if (assignUserToGroupRequest.groupId.includes('notfound')) {
+      return Promise.reject(new GroupNotFoundError('Group does not exist.'));
+    }
+
+    return Promise.resolve({ assigned: true });
   }
 
   public removeUserFromGroup(
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ removed: true });
   }
 
   public getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ identityPermissions: [] });
   }
 
   public getIdentityPermissionsByIdentity(
     getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
   ): Promise<GetIdentityPermissionsByIdentityResponse> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve({ identityPermissions: [] });
   }
 }
