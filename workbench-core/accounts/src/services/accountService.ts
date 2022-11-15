@@ -99,12 +99,9 @@ export default class AccountService {
     // Sign the url
     const s3Client = new S3Client({region : process.env.AWS_REGION!});
     const command = new GetObjectCommand( { Bucket: bucket, Key:key});
-    // TODO: sign a url
-    // const signedUrl = 'http://potato.com';
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    const oj = this._orangeJuice(templateParameters, signedUrl);
-    return { url: oj };
+    return { url: this._constructOnboardingCreateCFUrl(templateParameters, signedUrl)};
   }
 
   /**
@@ -162,9 +159,9 @@ export default class AccountService {
     }
   }
 
-  private _orangeJuice(
-    accountCfnTemplateParameters: AccountCfnTemplateParameters,
-    signedUrl: string
+  private _constructOnboardingCreateCFUrl(
+      accountCfnTemplateParameters: AccountCfnTemplateParameters,
+      signedUrl: string
   ): string {
     // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
 
