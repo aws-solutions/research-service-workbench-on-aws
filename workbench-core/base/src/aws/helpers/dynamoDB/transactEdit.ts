@@ -31,7 +31,7 @@ class TransactEdit {
   public addPutRequests(items: Record<string, AttributeValue>[]): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
-        'TransactEdit<==need to initialize the TransactItems property before adding new request'
+        'TransactEdit needs to initialize the TransactItems property before adding new request'
       );
     }
     const updatedItems = items.map((item) => {
@@ -79,7 +79,7 @@ class TransactEdit {
   public addDeleteRequest(key: Record<string, AttributeValue>): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
-        'TransactEdit<==need to initialize the TransactItems property before adding new request'
+        'TransactEdit needs to initialize the TransactItems property before adding new request'
       );
     }
     this._params.TransactItems!.push({
