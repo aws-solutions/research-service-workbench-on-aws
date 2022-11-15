@@ -3,11 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, QueryCommand, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import JSONValue from '../../../types/json';
-import { getPaginationToken } from '../../../utilities/paginationHelper';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
