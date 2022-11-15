@@ -11,7 +11,7 @@ lib
 
 # NOTICE files
 
-.*/NOTICE
+.\*/NOTICE
 
 # Test files
 
