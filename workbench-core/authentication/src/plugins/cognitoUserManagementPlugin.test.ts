@@ -158,28 +158,7 @@ describe('CognitoUserManagementPlugin tests', () => {
       });
     });
 
-    it('should return Status.INACTIVE for the Users status when it is not set', async () => {
-      cognitoMock.on(AdminGetUserCommand).resolves({
-        UserAttributes: [
-          { Name: 'given_name', Value: userInfo.firstName },
-          { Name: 'family_name', Value: userInfo.lastName },
-          { Name: 'email', Value: userInfo.email }
-        ]
-      });
-      cognitoMock
-        .on(AdminListGroupsForUserCommand)
-        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
-
-      const user = await plugin.getUser(userInfo.id);
-
-      expect(user).toMatchObject<User>({
-        ...userInfo,
-        status: Status.INACTIVE,
-        roles
-      });
-    });
-
-    it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
+    it('should return Status.INACTIVE for the Users status when the user is disabled', async () => {
       cognitoMock.on(AdminGetUserCommand).resolves({
         UserAttributes: [
           { Name: 'given_name', Value: userInfo.firstName },
