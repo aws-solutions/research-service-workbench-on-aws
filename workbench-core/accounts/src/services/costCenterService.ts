@@ -38,6 +38,7 @@ export default class CostCenterService {
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
     const { filter, sort, pageSize, paginationToken } = request;
+    console.log('ZZZ: filter', filter);
     validateSingleSortAndFilter(filter, sort);
 
     let queryParams: QueryParams = {

@@ -10,10 +10,10 @@ import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
-import { QueryParamFilterParser, QueryParamFilter } from './interfaces/queryParameterFilter';
+import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
 import QueryParams from './interfaces/queryParams';
+import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
 import {
@@ -42,12 +42,13 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
-  QueryParamFilter,
-  QueryParamFilterParser,
+  QueryStringParamFilter,
+  QueryStringParamFilterParser,
+  QueryNumberParamFilter,
+  QueryNumberParamFilterParser,
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
-  QueryParameterFilterSchema,
   FilterRequest,
   SortRequest,
   addPaginationToken,

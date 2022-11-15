@@ -1,4 +1,4 @@
-import { QueryParamFilterParser } from '@aws/workbench-core-base';
+import { QueryStringParamFilterParser } from '@aws/workbench-core-base';
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
@@ -7,7 +7,7 @@ export const ListCostCentersRequestParser = z.object({
   paginationToken: z.string().optional(),
   filter: z
     .object({
-      name: QueryParamFilterParser
+      name: QueryStringParamFilterParser
     })
     .optional(),
   sort: z
