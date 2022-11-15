@@ -262,6 +262,40 @@ export default class ProjectService {
     return newProject;
   }
 
+  public async updateProject(
+    projectId: string,
+    user: AuthenticatedUser,
+    updatedValues: {
+      name?: string;
+      description?: string;
+    }
+  ): Promise<Project> {
+    // verify at least one attribute is being updated
+    if (!updatedValues.name && !updatedValues.description) {
+      throw Boom.badRequest('You must supply a new name and/or description to update the project.');
+    }
+
+    // verify project exists
+    await this.getProject({ projectId, user });
+
+    // if updating name, verify it is not in use
+    if (updatedValues.name) {
+      await this._isProjectNameInUse(updatedValues.name);
+    }
+
+    // TODO: update metadata of other collections that have project information as metadata?
+
+    // update project DDB item
+    const updateResponse = await this._aws.helpers.ddb
+      .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), { item: updatedValues })
+      .execute();
+
+    if (!updateResponse.Attributes) {
+      throw Boom.badImplementation('Could not update project.');
+    }
+    return this._mapToProjectFromDDBItem(updateResponse.Attributes);
+  }
+
   /**
    * This method formats a Project object as a DDB item containing project data
    *
