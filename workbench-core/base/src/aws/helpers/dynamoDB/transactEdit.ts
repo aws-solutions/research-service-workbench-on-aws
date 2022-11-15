@@ -28,7 +28,7 @@ class TransactEdit {
    *
    * @param items - Object of the items to add
    */
-  public addPutRequests(items: { [key: string]: AttributeValue }[]): TransactEdit {
+  public addPutRequests(items: Record<string, AttributeValue>[]): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
         'TransactEdit<==need to initialize the TransactItems property before adding new request'
@@ -63,7 +63,7 @@ class TransactEdit {
    * @param keys - list of object(s) of the primary key(s) of item(s) to delete
    * @returns TransactEdit item with populated params
    */
-  public addDeleteRequests(keys: { [key: string]: AttributeValue }[]): TransactEdit {
+  public addDeleteRequests(keys: Record<string, AttributeValue>[]): TransactEdit {
     keys.forEach((key) => {
       this.addDeleteRequest(key);
     });
@@ -76,7 +76,7 @@ class TransactEdit {
    * @param key - object of the primary key of item to delete
    * @returns TransactEdit item with populated params
    */
-  public addDeleteRequest(key: { [key: string]: AttributeValue }): TransactEdit {
+  public addDeleteRequest(key: Record<string, AttributeValue>): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
         'TransactEdit<==need to initialize the TransactItems property before adding new request'

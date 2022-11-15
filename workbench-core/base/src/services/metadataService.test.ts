@@ -6,46 +6,39 @@ import { MetadataService } from './metadataService';
 
 describe('metadata service', () => {
   const metadataService = new MetadataService();
-  interface EntityA {
+  interface EntityTest {
     id: string;
     sk: string;
     pk: string;
+  }
+  interface EntityA extends EntityTest {
     productName: string;
   }
-  interface EntityB {
-    id: string;
-    sk: string;
-    pk: string;
+  interface EntityB extends EntityTest {
     projectName: string;
     projectType: string;
   }
-  interface EntityAMetadata {
-    id: string;
-    sk: string;
-    pk: string;
-    projectName: string;
-    projectType: string;
+  interface EntityAMetadata extends EntityTest {
+    entityBProject: string;
+    entityBProjectType: string;
   }
-  interface EntityBMetadata {
-    id: string;
-    sk: string;
-    pk: string;
-    productName: string;
+  interface EntityBMetadata extends EntityTest {
+    entityAProduct: string;
   }
   const mapperA = (entityA: EntityA, entityB: EntityB): EntityAMetadata => {
     return {
       id: entityB.id,
       sk: entityB.pk,
       pk: entityA.pk,
-      projectName: entityB.projectName,
-      projectType: entityB.projectType
+      entityBProject: entityB.projectName,
+      entityBProjectType: entityB.projectType
     };
   };
   const mapperB = (entityA: EntityA, entityB: EntityB): EntityBMetadata => {
-    return { id: entityA.id, sk: entityA.pk, pk: entityB.pk, productName: entityA.productName };
+    return { id: entityA.id, sk: entityA.pk, pk: entityB.pk, entityAProduct: entityA.productName };
   };
-  const entityA = { id: 'etityAId', sk: 'etityASk', pk: 'etityAPk', productName: 'Product' };
-  const entityB = {
+  const entityA: EntityA = { id: 'etityAId', sk: 'etityASk', pk: 'etityAPk', productName: 'Product' };
+  const entityB: EntityB = {
     id: 'etityBId',
     sk: 'etityBSk',
     pk: 'etityBPk',
@@ -53,14 +46,14 @@ describe('metadata service', () => {
     projectType: 'Type 1'
   };
   test('should return mapping metadata successfully', () => {
-    const result = {
+    const result: { mainEntityMetadata: EntityAMetadata[]; dependencyMetadata: EntityBMetadata[] } = {
       mainEntityMetadata: [
         {
           id: entityB.id,
           sk: entityB.pk,
           pk: entityA.pk,
-          projectName: entityB.projectName,
-          projectType: entityB.projectType
+          entityBProject: entityB.projectName,
+          entityBProjectType: entityB.projectType
         }
       ],
       dependencyMetadata: [
@@ -68,7 +61,7 @@ describe('metadata service', () => {
           id: entityA.id,
           sk: entityA.pk,
           pk: entityB.pk,
-          productName: entityA.productName
+          entityAProduct: entityA.productName
         }
       ]
     };
