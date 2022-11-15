@@ -10,6 +10,7 @@ import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
+import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
@@ -100,8 +101,15 @@ export class DataSetService {
   /**
    * Removes a DataSet from the solution however it does not delete the storage.
    * @param dataSetId - the ID of the DataSet to remove.
+   * @throws DataSetHasEndpontError - if the dataset has external endpoints assigned.
    */
   public async removeDataSet(dataSetId: string): Promise<void> {
+    const targetDS: DataSet = await this.getDataSet(dataSetId);
+    if (targetDS.externalEndpoints?.length) {
+      throw new DataSetHasEndpointError(
+        'External endpoints found on Dataset must be removed before DataSet can be removed.'
+      );
+    }
     await this._dbProvider.removeDataSet(dataSetId);
   }
 

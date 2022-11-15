@@ -3,6 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DynamoDBClient, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { mockClient } from 'aws-sdk-client-mock';
+import JSONValue from '../../../types/json';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -10,6 +14,39 @@ describe('DynamoDBService', () => {
   const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
+
+  describe('getPaginatedItems', () => {
+    let unmarshalledData: Record<string, JSONValue>;
+    let unmarshalledPaginationToken: { pk: string; sk: string };
+
+    beforeEach(() => {
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      unmarshalledPaginationToken = {
+        pk: 'pk',
+        sk: 'sk'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(QueryCommand).resolves({
+        Items: [marshall(unmarshalledData)],
+        LastEvaluatedKey: marshall(unmarshalledPaginationToken)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.getPaginatedItems();
+      expect(result.data).toEqual([unmarshalledData]);
+      expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
+    });
+  });
+
   describe('batchEdit', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
