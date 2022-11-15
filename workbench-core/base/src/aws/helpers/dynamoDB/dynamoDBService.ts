@@ -7,6 +7,7 @@ import _ from 'lodash';
 import PaginatedItemsResponse from '../../../interfaces/paginatedItemsResponse';
 import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
+import { getPaginationToken } from '../../../utilities/paginationHelper';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -155,13 +156,14 @@ export default class DynamoDBService {
    */
   public async getPaginatedItems(params?: QueryParams): Promise<PaginatedItemsResponse> {
     const result = await this.query(params).execute();
+    console.log('result', result);
 
     const retrievedItems = result.Items || [];
 
     const data = retrievedItems.map((item) => item as unknown as Record<string, JSONValue>);
     return {
       data,
-      paginationToken: result.LastEvaluatedKey as unknown as string | undefined
+      paginationToken: getPaginationToken(result)
     };
   }
 

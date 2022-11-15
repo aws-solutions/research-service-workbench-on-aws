@@ -3,7 +3,21 @@ import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListCostCentersRequestParser = z.object({
-  pageSize: z.number().optional(),
+  pageSize: z
+    .string()
+    .transform((pageSizeString, ctx) => {
+      const pageSize = parseInt(pageSizeString);
+      if (isNaN(pageSize)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Must be a number'
+        });
+
+        return z.NEVER;
+      }
+      return parseInt(pageSizeString);
+    })
+    .optional(),
   paginationToken: z.string().optional(),
   filter: z
     .object({

@@ -118,6 +118,20 @@ describe('CostCenterService', () => {
   describe('list costCenters', () => {
     describe('with more than one "page" of costCenters', () => {
       test('it return costCenters with a pagination token', () => {
+        // request {
+        //   pageSize: 1,
+        //       filter: { name: { begins: 'Co' } },
+        //   sort: { name: 'desc' }
+        // }
+
+        // queryParams {
+        //   key: { name: 'resourceType', value: 'costCenter' },
+        //   index: 'getResourceByName',
+        //       limit: 1,
+        //       sortKey: 'name',
+        //       begins: { S: 'Co' },
+        //   forward: false
+        // }
         // TODO Implement this test
         expect(true).toBe(true);
       });

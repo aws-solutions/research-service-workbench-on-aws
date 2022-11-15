@@ -37,6 +37,7 @@ export default class CostCenterService {
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
+    console.log('ZZZ: request', request);
     const { filter, sort, pageSize, paginationToken } = request;
     console.log('ZZZ: filter', filter);
     validateSingleSortAndFilter(filter, sort);
@@ -52,13 +53,12 @@ export default class CostCenterService {
     queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
+    console.log('ZZZ: queryParams', queryParams);
     const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
 
+    console.log('paginationToken', response.paginationToken);
     return {
       data: response.data.map((item) => {
-        // let costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
-        // costCenter = removeDynamoDbKeys(costCenter);
-        // return CostCenterParser.parse(costCenter);
         return this._mapDDBItemToCostCenter(item);
       }),
       paginationToken: response.paginationToken
