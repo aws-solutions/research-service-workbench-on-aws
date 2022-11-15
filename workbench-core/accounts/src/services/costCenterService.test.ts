@@ -175,7 +175,7 @@ describe('CostCenterService', () => {
               externalId: 'workbench',
               encryptionKeyArn:
                 'arn:aws:kms:eu-north-1:123456789012:key/e39aa1b2-8509-426a-adaf-ef86d84a3d26',
-              environmentInstanceFiles: "'s3://swb-dev1-sto-s3artifact/environment-files",
+              environmentInstanceFiles: 's3://swb-dev1-sto-s3artifact/environment-files',
               hostingAccountHandlerRoleArn:
                 'arn:aws:iam::123456789012:role/swb-dev1-sto-hosting-account-role',
               awsAccountId: '123456789012'
