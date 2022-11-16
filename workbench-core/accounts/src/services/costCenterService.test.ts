@@ -11,7 +11,7 @@ import { removeDynamoDbKeys, resourceTypeToKey } from '@aws/workbench-core-base'
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
-import { CostCenter } from '../models/costCenters/costCenter';
+import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { ListCostCentersRequestParser } from '../models/costCenters/listCostCentersRequest';
 import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
@@ -119,34 +119,39 @@ describe('CostCenterService', () => {
   });
 
   describe('list costCenters', () => {
-    const costCenterId = 'cc-someId';
-    const costCenterJson = {
-      pk: `CC#${costCenterId}`,
-      sk: `CC#${costCenterId}`,
-      id: costCenterId,
-      name: 'CostCenter-2',
-      // dependency: 'acc-2272f4a8-1791-419a-8e49-b926f3eb46f9',
-      dependency: accountId,
-      description: 'Description for CostCenter-2',
-      subnetId: accountMetadata.subnetId,
-      vpcId: accountMetadata.vpcId,
-      envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-      externalId: accountMetadata.externalId,
-      encryptionKeyArn: accountMetadata.encryptionKeyArn,
-      environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
-      hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
-      awsAccountId: accountMetadata.awsAccountId,
-      createdAt: mockDateObject.toISOString(),
-      updatedAt: mockDateObject.toISOString()
-    };
-    let expectedCostCenter: { [key: string]: unknown } = {
-      ...costCenterJson,
-      accountId: costCenterJson.dependency
-    };
-    expectedCostCenter = removeDynamoDbKeys(expectedCostCenter);
+    let costCenterId: string;
+    type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
+    let costCenterJson: CostCenterJson;
+    let expectedCostCenter: CostCenter;
+    beforeAll(() => {
+      costCenterId = 'cc-someId';
+      costCenterJson = {
+        pk: `CC#${costCenterId}`,
+        sk: `CC#${costCenterId}`,
+        id: costCenterId,
+        name: 'CostCenter-2',
+        dependency: accountId,
+        description: 'Description for CostCenter-2',
+        subnetId: accountMetadata.subnetId,
+        vpcId: accountMetadata.vpcId,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+        externalId: accountMetadata.externalId,
+        encryptionKeyArn: accountMetadata.encryptionKeyArn,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+        awsAccountId: accountMetadata.awsAccountId,
+        createdAt: mockDateObject.toISOString(),
+        updatedAt: mockDateObject.toISOString()
+      };
+      expectedCostCenter = {
+        ...costCenterJson,
+        accountId: costCenterJson.dependency
+      };
+      expectedCostCenter = CostCenterParser.parse(removeDynamoDbKeys(expectedCostCenter));
+    });
 
     describe('with more than one "page" of costCenters', () => {
-      test('it return costCenters with a pagination token', async () => {
+      test('it returns cost centers and a pagination token', async () => {
         // BUILD
         // Build request for system under test
         const request = ListCostCentersRequestParser.parse({
@@ -180,8 +185,8 @@ describe('CostCenterService', () => {
       });
     });
 
-    describe('with one cost center', () => {
-      test('it returns one cost center', async () => {
+    describe('with one "page" of costCenters ', () => {
+      test('it returns cost center and no pagination token', async () => {
         // BUILD
         // Build request for system under test
         const request = ListCostCentersRequestParser.parse({

@@ -23,7 +23,7 @@ export const ListCostCentersRequestParser = z.object({
       if (pageSize < 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Page size must be 0 or larger'
+          message: 'Must be 0 or larger'
         });
 
         return z.NEVER;

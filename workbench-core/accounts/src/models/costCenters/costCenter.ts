@@ -5,23 +5,6 @@
 
 import { z } from 'zod';
 
-export interface CostCenter {
-  id: string;
-  name: string;
-  accountId: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  subnetId: string;
-  vpcId: string;
-  envMgmtRoleArn: string;
-  externalId: string;
-  encryptionKeyArn: string;
-  environmentInstanceFiles: string;
-  hostingAccountHandlerRoleArn: string;
-  awsAccountId: string;
-}
-
 // eslint-disable-next-line @rushstack/typedef-var
 export const CostCenterParser = z.object({
   id: z.string(),
@@ -39,3 +22,5 @@ export const CostCenterParser = z.object({
   hostingAccountHandlerRoleArn: z.string(),
   awsAccountId: z.string()
 });
+
+export type CostCenter = z.infer<typeof CostCenterParser>;
