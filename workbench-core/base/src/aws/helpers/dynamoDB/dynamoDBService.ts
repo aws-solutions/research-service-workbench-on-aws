@@ -156,7 +156,6 @@ export default class DynamoDBService {
    */
   public async getPaginatedItems(params?: QueryParams): Promise<PaginatedItemsResponse> {
     const result = await this.query(params).execute();
-    console.log('result', result);
 
     const retrievedItems = result.Items || [];
 
