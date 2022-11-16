@@ -11,19 +11,21 @@ import { z } from 'zod';
  *
  ************/
 // eslint-disable-next-line @rushstack/typedef-var
-export const QueryStringParamFilterParser = z.object({
-  eq: z.string().optional(),
-  lt: z.string().optional(),
-  lte: z.string().optional(),
-  gt: z.string().optional(),
-  gte: z.string().optional(),
-  between: z
-    .object({
-      value1: z.string(),
-      value2: z.string()
-    })
-    .optional(),
-  begins: z.string().optional()
-});
+export const QueryStringParamFilterParser = z
+  .object({
+    eq: z.string().optional(),
+    lt: z.string().optional(),
+    lte: z.string().optional(),
+    gt: z.string().optional(),
+    gte: z.string().optional(),
+    between: z
+      .object({
+        value1: z.string(),
+        value2: z.string()
+      })
+      .optional(),
+    begins: z.string().optional()
+  })
+  .strict();
 
 export type QueryStringParamFilter = z.infer<typeof QueryStringParamFilterParser>;

@@ -6,7 +6,6 @@
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   buildDynamoDBPkSk,
-  removeDynamoDbKeys,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
   PaginatedResponse,
@@ -36,6 +35,7 @@ export default class CostCenterService {
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
+    console.log('request', request);
     const { filter, sort, pageSize, paginationToken } = request;
     validateSingleSortAndFilter(filter, sort);
 
@@ -119,8 +119,8 @@ export default class CostCenterService {
   }
 
   private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
-    let costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
-    costCenter = removeDynamoDbKeys(costCenter);
+    const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
+    // parse will remove pk and sk from the DDB item
     return CostCenterParser.parse(costCenter);
   }
 

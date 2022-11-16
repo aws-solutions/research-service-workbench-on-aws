@@ -7,7 +7,7 @@ jest.mock('uuid', () => ({ v4: () => 'someId' }));
 
 import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { removeDynamoDbKeys, resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
@@ -19,6 +19,7 @@ import CostCenterService from './costCenterService';
 describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
   const accountId = 'acc-someId';
+  // TODO: Use AccountParser to validate Account object once AccountParser is merged into develop
   const accountMetadata: Account = {
     error: undefined,
     id: accountId,
@@ -129,9 +130,9 @@ describe('CostCenterService', () => {
         pk: `CC#${costCenterId}`,
         sk: `CC#${costCenterId}`,
         id: costCenterId,
-        name: 'CostCenter-2',
+        name: 'CostCenter-1',
         dependency: accountId,
-        description: 'Description for CostCenter-2',
+        description: 'Description for CostCenter-1',
         subnetId: accountMetadata.subnetId,
         vpcId: accountMetadata.vpcId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
@@ -147,7 +148,7 @@ describe('CostCenterService', () => {
         ...costCenterJson,
         accountId: costCenterJson.dependency
       };
-      expectedCostCenter = CostCenterParser.parse(removeDynamoDbKeys(expectedCostCenter));
+      expectedCostCenter = CostCenterParser.parse(expectedCostCenter);
     });
 
     describe('with more than one "page" of costCenters', () => {
