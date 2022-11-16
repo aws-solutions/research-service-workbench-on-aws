@@ -13,7 +13,6 @@ import {
   validateSingleSortAndFilter,
   getSortQueryParams,
   getFilterQueryParams,
-  DEFAULT_API_PAGE_SIZE,
   QueryParams,
   addPaginationToken
 } from '@aws/workbench-core-base';
@@ -40,20 +39,20 @@ export default class CostCenterService {
     const { filter, sort, pageSize, paginationToken } = request;
     validateSingleSortAndFilter(filter, sort);
 
+    //Prep queryParams
     let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByCreatedAt',
-      limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+      limit: pageSize
     };
     const gsiNames = ['getResourceByName'];
     const filterQuery = getFilterQueryParams(filter, gsiNames);
     const sortQuery = getSortQueryParams(sort, gsiNames);
     queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-
     queryParams = addPaginationToken(paginationToken, queryParams);
+
     const response = await this._dynamoDbService.getPaginatedItems(queryParams);
 
-    console.log('paginationToken', response.paginationToken);
     return {
       data: response.data.map((item) => {
         return this._mapDDBItemToCostCenter(item);
