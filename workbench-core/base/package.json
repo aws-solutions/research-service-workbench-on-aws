@@ -60,9 +60,12 @@
     "@aws-sdk/util-dynamodb": "^3.186.0",
     "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@hapi/boom": "^10.0.0",
     "aws-sdk-client-mock": "^0.6.2",
+    "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

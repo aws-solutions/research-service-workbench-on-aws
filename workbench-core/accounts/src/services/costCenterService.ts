@@ -12,9 +12,9 @@ import {
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import Account from '../models/account';
-import CostCenter from '../models/costCenter';
-import CreateCostCenterRequest from '../models/createCostCenterRequest';
+import { Account } from '../models/accounts/account';
+import { CostCenter } from '../models/costCenter/costCenter';
+import CreateCostCenterRequest from '../models/costCenter/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
@@ -59,15 +59,14 @@ export default class CostCenterService {
       accountId: createCostCenter.accountId,
       description: createCostCenter.description,
       name: createCostCenter.name,
-      // Account data
       awsAccountId: account.awsAccountId,
-      encryptionKeyArn: account.encryptionKeyArn,
-      envMgmtRoleArn: account.envMgmtRoleArn,
-      environmentInstanceFiles: account.environmentInstanceFiles,
-      externalId: account.externalId,
       hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
-      subnetId: account.subnetId,
-      vpcId: account.vpcId
+      envMgmtRoleArn: account.envMgmtRoleArn,
+      encryptionKeyArn: account.encryptionKeyArn!,
+      subnetId: account.subnetId!,
+      vpcId: account.vpcId!,
+      environmentInstanceFiles: account.environmentInstanceFiles!,
+      externalId: account.externalId
     };
 
     const dynamoItem: { [key: string]: string } = {
@@ -90,7 +89,7 @@ export default class CostCenterService {
   }
 
   private async _getAccount(accountId: string): Promise<Account> {
-    const accountService = new AccountService(this._tableName);
+    const accountService = new AccountService(this._aws.helpers.ddb);
 
     try {
       return await accountService.getAccount(accountId);

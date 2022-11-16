@@ -2,10 +2,11 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-
-import { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
+import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
+import QueryParams from '../../../interfaces/queryParams';
+import JSONValue from '../../../types/json';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -13,31 +14,6 @@ import Query from './query';
 import Scanner from './scanner';
 import TransactEdit from './transactEdit';
 import Updater from './updater';
-
-interface QueryParams {
-  index?: string;
-  key?: { name: string; value: unknown };
-  sortKey?: string;
-  eq?: AttributeValue;
-  lt?: AttributeValue;
-  lte?: AttributeValue;
-  gt?: AttributeValue;
-  gte?: AttributeValue;
-  between?: { value1: AttributeValue; value2: AttributeValue };
-  begins?: AttributeValue;
-  start?: { [key: string]: unknown };
-  filter?: string;
-  strong?: boolean;
-  names?: { [key: string]: string };
-  values?: { [key: string]: unknown };
-  projection?: string | string[];
-  select?: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT';
-  limit?: number;
-  forward?: boolean;
-  capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
-}
-
-export { QueryParams };
 
 export default class DynamoDBService {
   private _awsRegion: string;
@@ -167,6 +143,29 @@ export default class DynamoDBService {
   }
 
   /**
+   * Queries the DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a query request
+   * @returns Promise<PaginatedJsonResponse>
+   *
+   * @example Use this to get paginated items from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
+   * ```
+   */
+  public async getPaginatedItems(params?: QueryParams): Promise<PaginatedJsonResponse> {
+    const result = await this.query(params).execute();
+
+    const retrievedItems = result.Items || [];
+
+    const data = retrievedItems.map((item) => item as unknown as Record<string, JSONValue>);
+    return {
+      data,
+      paginationToken: result.LastEvaluatedKey as unknown as string | undefined
+    };
+  }
+
+  /**
    * Creates a Query to do query operations on a DynamoDB table.
    *
    * @param params - optional object of optional properties to generate a query request
@@ -191,7 +190,7 @@ export default class DynamoDBService {
         query = query.index(params.index);
       }
       if (params.key) {
-        query = query.key(params.key.name, marshall(params.key.value));
+        query = query.key(params.key.name, marshall(params.key.value, { removeUndefinedValues: true }));
       }
       if (params.sortKey) {
         query = query.sortKey(params.sortKey);
@@ -250,7 +249,7 @@ export default class DynamoDBService {
         query = query.names(params.names);
       }
       if (params.values) {
-        query = query.values(marshall(params.values));
+        query = query.values(marshall(params.values, { removeUndefinedValues: true }));
       }
       if (params.projection) {
         query = query.projection(params.projection);

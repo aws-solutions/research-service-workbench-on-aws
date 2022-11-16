@@ -259,17 +259,13 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(AdminGetUserCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(AdminGetUserCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to get user info')
-      );
+      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -277,17 +273,13 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminGetUserCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw UserNotFoundError when the user doesnt exist in the user pool', async () => {
       cognitoMock.on(AdminGetUserCommand).rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(
-        new UserNotFoundError('User does not exist')
-      );
+      await expect(plugin.getUser(userInfo.uid)).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -321,9 +313,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -331,9 +321,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to create a user')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -341,9 +329,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw UserAlreadyExistsError when a user with the user id already exists', async () => {
@@ -351,9 +337,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects(new UsernameExistsException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(
-        new UserAlreadyExistsError('A user with this user ID already exists')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(UserAlreadyExistsError);
     });
 
     it('should throw UserAlreadyExistsError when a user with the email already exists', async () => {
@@ -361,9 +345,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects({ name: 'UsernameExistsException', message: 'An account with the email already exists.' });
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(
-        new UserAlreadyExistsError('A user with this email already exists')
-      );
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(UserAlreadyExistsError);
     });
 
     it('should throw InvalidParameterError the email provided is not in the proper format', async () => {
@@ -371,7 +353,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminCreateUserCommand)
         .rejects(new InvalidParameterException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createUser(userInfo)).rejects.toThrow(new InvalidParameterError('Invalid email'));
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(InvalidParameterError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -396,7 +378,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
       await expect(plugin.updateUser(userInfo.uid, { ...userInfo, roles })).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
+        IdpUnavailableError
       );
     });
 
@@ -406,7 +388,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin.updateUser(userInfo.uid, { ...userInfo, roles })).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to update user info')
+        PluginConfigurationError
       );
     });
 
@@ -416,7 +398,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.updateUser(userInfo.uid, { ...userInfo, roles })).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
+        PluginConfigurationError
       );
     });
 
@@ -426,7 +408,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.updateUser(userInfo.uid, { ...userInfo, roles })).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
+        UserNotFoundError
       );
     });
 
@@ -436,7 +418,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new InvalidParameterException({ $metadata: {}, message: '' }));
 
       await expect(plugin.updateUser(userInfo.uid, { ...userInfo, roles })).rejects.toThrow(
-        new InvalidParameterError('Invalid email')
+        InvalidParameterError
       );
     });
 
@@ -461,9 +443,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDeleteUserCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -471,9 +451,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDeleteUserCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to delete a user')
-      );
+      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -481,9 +459,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDeleteUserCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
@@ -491,9 +467,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDeleteUserCommand)
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
-      );
+      await expect(plugin.deleteUser(userInfo.uid)).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -517,9 +491,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminEnableUserCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -527,9 +499,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminEnableUserCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to delete a user')
-      );
+      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -537,9 +507,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminEnableUserCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
@@ -547,9 +515,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminEnableUserCommand)
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
-      );
+      await expect(plugin.activateUser(userInfo.uid)).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -573,9 +539,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDisableUserCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -583,9 +547,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDisableUserCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to delete a user')
-      );
+      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -593,9 +555,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDisableUserCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
@@ -603,9 +563,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminDisableUserCommand)
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
-      );
+      await expect(plugin.deactivateUser(userInfo.uid)).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -708,23 +666,19 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.listUsers()).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to list the users in the user pool')
-      );
+      await expect(plugin.listUsers()).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsers()).rejects.toThrow(new PluginConfigurationError('Invalid user pool id'));
+      await expect(plugin.listUsers()).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -767,9 +721,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -777,9 +729,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to list the users within a group')
-      );
+      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -787,9 +737,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
@@ -797,9 +745,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListUsersInGroupCommand)
         .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
 
-      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(
-        new RoleNotFoundError('Role does not exist')
-      );
+      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -840,17 +786,13 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(ListGroupsCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listRoles()).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.listRoles()).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(ListGroupsCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listRoles()).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to list the groups in the user pool')
-      );
+      await expect(plugin.listRoles()).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -858,7 +800,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(ListGroupsCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.listRoles()).rejects.toThrow(new PluginConfigurationError('Invalid user pool id'));
+      await expect(plugin.listRoles()).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -882,9 +824,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminAddUserToGroupCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -892,9 +832,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminAddUserToGroupCommand)
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to add a user to a user pool group')
-      );
+      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -902,9 +840,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminAddUserToGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
@@ -912,9 +848,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminAddUserToGroupCommand)
         .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
 
-      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new RoleNotFoundError('Role does not exist')
-      );
+      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
@@ -922,9 +856,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminAddUserToGroupCommand)
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
-      );
+      await expect(plugin.addUserToRole(userInfo.uid, roles[0])).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -948,9 +880,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminRemoveUserFromGroupCommand)
         .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
@@ -959,7 +889,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to remove a user from a user pool group')
+        PluginConfigurationError
       );
     });
 
@@ -969,7 +899,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
+        PluginConfigurationError
       );
     });
 
@@ -978,9 +908,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminRemoveUserFromGroupCommand)
         .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
 
-      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new RoleNotFoundError('Role does not exist')
-      );
+      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should throw UserNotFoundError when the user id doesnt exist in the user pool', async () => {
@@ -988,9 +916,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(AdminRemoveUserFromGroupCommand)
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(
-        new UserAlreadyExistsError('User does not exist')
-      );
+      await expect(plugin.removeUserFromRole(userInfo.uid, roles[0])).rejects.toThrow(UserNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -1012,17 +938,13 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(CreateGroupCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createRole(roles[0])).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.createRole(roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(CreateGroupCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to create a user pool group')
-      );
+      await expect(plugin.createRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -1030,17 +952,13 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(CreateGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.createRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleAlreadyExistsError when the user id doesnt exist in the user pool', async () => {
       cognitoMock.on(CreateGroupCommand).rejects(new GroupExistsException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.createRole(roles[0])).rejects.toThrow(
-        new RoleAlreadyExistsError('A group with this name already exists')
-      );
+      await expect(plugin.createRole(roles[0])).rejects.toThrow(RoleAlreadyExistsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -1062,17 +980,13 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
       cognitoMock.on(DeleteGroupCommand).rejects(new InternalErrorException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(
-        new IdpUnavailableError('Cognito encountered an internal error')
-      );
+      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(IdpUnavailableError);
     });
 
     it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
       cognitoMock.on(DeleteGroupCommand).rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Plugin is not authorized to delete a user pool group')
-      );
+      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
@@ -1080,9 +994,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(DeleteGroupCommand)
         .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
-      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(
-        new PluginConfigurationError('Invalid user pool id')
-      );
+      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(PluginConfigurationError);
     });
 
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
@@ -1090,7 +1002,7 @@ describe('CognitoUserManagementPlugin tests', () => {
         .on(DeleteGroupCommand)
         .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
 
-      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(new RoleNotFoundError('Role does not exist'));
+      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(RoleNotFoundError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
