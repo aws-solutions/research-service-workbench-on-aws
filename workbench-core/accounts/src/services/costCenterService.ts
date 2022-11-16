@@ -30,11 +30,6 @@ export default class CostCenterService {
   private readonly _tableName: string;
   private _resourceType: string = 'costCenter';
 
-  // public constructor(constants: { TABLE_NAME: string }) {
-  //   const { TABLE_NAME } = constants;
-  //   this._tableName = TABLE_NAME;
-  //   this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
-  // }
   public constructor(constants: { TABLE_NAME: string }, dynamoDbService: DynamoDBService) {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
@@ -77,10 +72,6 @@ export default class CostCenterService {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    // response.Item.accountId = response.Item.dependency;
-    //
-    // // let costCenter = response.Item as { [key: string]: never };
-    // return CostCenterParser.parse(removeDynamoDbKeys(response.Item));
     return this._mapDDBItemToCostCenter(response.Item);
   }
 
