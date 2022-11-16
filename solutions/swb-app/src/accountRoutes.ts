@@ -14,6 +14,7 @@ import {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '@aws/workbench-core-accounts/lib/utilities/hostingAccountLifecycleService';
+import Boom from "@hapi/boom";
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { escape } from 'lodash';
@@ -32,7 +33,8 @@ export function setUpAccountRoutes(router: Router, account: HostingAccountServic
     '/aws-accounts/get-template',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, GetTemplateSchema));
-      const { awsAcctId, externalId } = req.body;
+      const awsAcctId = req.body.awsAccountId;
+      const externalId = req.body.externalId;
       res.send(await account.getTemplateURLForAccount(awsAcctId, externalId));
     })
   );
