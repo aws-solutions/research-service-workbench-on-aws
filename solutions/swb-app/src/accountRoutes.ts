@@ -14,7 +14,6 @@ import {
   CreateAccountMetadata,
   UpdateAccountMetadata
 } from '@aws/workbench-core-accounts/lib/utilities/hostingAccountLifecycleService';
-import Boom from "@hapi/boom";
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { escape } from 'lodash';

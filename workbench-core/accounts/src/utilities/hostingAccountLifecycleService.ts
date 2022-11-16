@@ -14,7 +14,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import Account from '../models/account';
-import { TemplateResponse } from '../models/accountCfnTemplate';
+import {AccountCfnTemplateParameters, TemplateResponse} from '../models/accountCfnTemplate';
 import AccountService from '../services/accountService';
 
 interface Arns {
@@ -63,9 +63,16 @@ export default class HostingAccountLifecycleService {
    */
   public async getTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
+
     const {
+      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
+      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
+      [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
       [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
     } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
+      process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
+      process.env.API_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
     ]);
     const bucketName = artifactBucketArn.split(':').pop() as string;
@@ -93,7 +100,19 @@ export default class HostingAccountLifecycleService {
     // Update bucket policy
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
 
-    return this._accountService.getTemplateURLForAccount(externalId);
+    const templateParameters: AccountCfnTemplateParameters = {
+      accountHandlerRole: accountHandlerRoleArn,
+      apiHandlerRole: apiHandlerRoleArn,
+      enableFlowLogs: 'true',
+      externalId: externalId,
+      launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
+      launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
+      mainAccountId: process.env.MAIN_ACCT_ID!,
+      namespace: process.env.STACK_NAME!,
+      stackName: process.env.STACK_NAME!.concat('-hosting-account'),
+      statusHandlerRole: statusHandlerRoleArn
+    };
+    return this._accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters);
   }
 
   /**

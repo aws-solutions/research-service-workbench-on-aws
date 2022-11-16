@@ -57,51 +57,22 @@ export default class AccountService {
 
   /**
    * Create/Upload template and return its UfRL
-   * @param externalAccountId - Unique ID we use to identify the hosting accout on the main account
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getTemplateURLForAccount(externalAccountId: string): Promise<TemplateResponse> {
-    // Get parameters
-    // Create signed URL
-
-    const cfService = this._aws.helpers.cloudformation;
-    const {
-      [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
-      [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
-      [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
-      // [process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!]: launchConstrainRole,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
-    } = await cfService.getCfnOutput(process.env.stackName!, [
-      process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-      // process.env.LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY!
-      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
-    ]);
-    const templateParameters: AccountCfnTemplateParameters = {
-      accountHandlerRole: accountHandlerRoleArn,
-      apiHandlerRole: apiHandlerRoleArn,
-      enableFlowLogs: 'true',
-      externalId: externalAccountId,
-      launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
-      launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
-      mainAccountId: process.env.MAIN_ACCT_ID!,
-      namespace: process.env.STACK_NAME!,
-      stackName: process.env.STACK_NAME!.concat('-hosting-account'),
-      statusHandlerRole: statusHandlerRoleArn
-    };
+  public async getTemplateURLForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters): Promise<TemplateResponse> {
 
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
     const bucket = parsedBucketArn[0];
+    console.log(bucket)
 
     // Sign the url
     const s3Client = new S3Client({region : process.env.AWS_REGION!});
     const command = new GetObjectCommand( { Bucket: bucket, Key:key});
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { url: this._constructOnboardingCreateCFUrl(templateParameters, signedUrl)};
+    return { url: this._constructOnboardingCreateCFUrl(templateParams, signedUrl)};
   }
 
   /**

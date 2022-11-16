@@ -13,11 +13,12 @@ import {
   QueryCommandOutput,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
-import { marshall } from '@aws-sdk/util-dynamodb';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import {ServiceInputTypes, ServiceOutputTypes} from '@aws-sdk/client-s3';
+import {marshall} from '@aws-sdk/util-dynamodb';
+import {resourceTypeToKey} from '@aws/workbench-core-base';
+import {AwsStub, mockClient} from 'aws-sdk-client-mock';
 import Account from '../models/account';
+import {AccountCfnTemplateParameters} from "../models/accountCfnTemplate";
 import CostCenter from '../models/costCenter';
 import AccountService from './accountService';
 
@@ -352,8 +353,22 @@ describe('AccountService', () => {
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
 
+    const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
+    const templateParameters: AccountCfnTemplateParameters = {
+      accountHandlerRole: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`,
+      apiHandlerRole: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`,
+      enableFlowLogs: 'true',
+      externalId: extId,
+      launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
+      launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
+      mainAccountId: process.env.MAIN_ACCT_ID!,
+      namespace: process.env.STACK_NAME!,
+      stackName: process.env.STACK_NAME!.concat('-hosting-account'),
+      statusHandlerRole: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
+    };
+
     // OPERATE
-    const response = await accountService.getTemplateURLForAccount(extId);
+    const response = await accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters);
 
     // CHECK
     expect(response.url).toEqual(expectedUrl);
