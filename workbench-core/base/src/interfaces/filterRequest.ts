@@ -6,6 +6,4 @@
 import { QueryNumberParamFilter } from './queryNumberParamFilter';
 import { QueryStringParamFilter } from './queryStringParamFilter';
 
-export interface FilterRequest {
-  [key: string]: QueryStringParamFilter | QueryNumberParamFilter;
-}
+export interface FilterRequest extends Record<string, QueryStringParamFilter | QueryNumberParamFilter> {}
