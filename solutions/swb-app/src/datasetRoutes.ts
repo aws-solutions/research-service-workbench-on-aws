@@ -28,9 +28,9 @@ export function setUpDSRoutes(
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.provisionDataSet({
         name: req.body.datasetName,
-        storageName: datasetStorageAccount,
+        storageName: req.body.storageName,
         path: req.body.path,
-        awsAccountId: mainAccountId,
+        awsAccountId: req.body.awsAccountId,
         region: req.body.region,
         storageProvider: dataSetStoragePlugin
       });
@@ -46,9 +46,9 @@ export function setUpDSRoutes(
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.importDataSet({
         name: req.body.datasetName,
-        storageName: datasetStorageAccount,
+        storageName: req.body.storageName,
         path: req.body.path,
-        awsAccountId: mainAccountId,
+        awsAccountId: req.body.awsAccountId,
         region: req.body.region,
         storageProvider: dataSetStoragePlugin
       });

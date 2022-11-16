@@ -14,6 +14,7 @@ import Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
+import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
 describe('DataSetService', () => {
