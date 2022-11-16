@@ -11,7 +11,11 @@ import {
   PermissionNotGrantedError,
   isPermissionNotGrantedError,
   RouteNotSecuredError,
-  isRouteNotSecuredError
+  isRouteNotSecuredError,
+  GroupAlreadyExistsError,
+  GroupNotFoundError,
+  isGroupAlreadyExistsError,
+  isGroupNotFoundError
 } from '../';
 
 const error = new Error();
@@ -45,5 +49,21 @@ describe('custom error tests', () => {
   });
   test('not routeNotSecuredError', () => {
     expect(isRouteNotSecuredError(error)).toBe(false);
+  });
+
+  test('GroupAlreadyExistsError', () => {
+    const groupAlreadyExistsError = new GroupAlreadyExistsError();
+    expect(isGroupAlreadyExistsError(groupAlreadyExistsError)).toBe(true);
+  });
+  test('not GroupAlreadyExistsError', () => {
+    expect(isGroupAlreadyExistsError(error)).toBe(false);
+  });
+
+  test('GroupNotFoundError', () => {
+    const groupNotFoundError = new GroupNotFoundError();
+    expect(isGroupNotFoundError(groupNotFoundError)).toBe(true);
+  });
+  test('not GroupNotFoundError', () => {
+    expect(isGroupNotFoundError(error)).toBe(false);
   });
 });
