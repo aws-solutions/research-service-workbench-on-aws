@@ -36,6 +36,7 @@ import {
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { SdkStream } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
@@ -293,7 +294,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
@@ -363,7 +364,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
@@ -430,7 +431,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
