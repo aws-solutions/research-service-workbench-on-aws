@@ -1387,7 +1387,6 @@ importers:
       source-map-support: ^0.5.16
       ts-jest: ^27.1.3
       typescript: ^4.5.2
-      uuid: ^8.3.2
     dependencies:
       '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-cloudformation': 3.130.0
@@ -1413,7 +1412,6 @@ importers:
       js-yaml: 4.1.0
       lodash: 4.17.21
       source-map-support: 0.5.21
-      uuid: 8.3.2
     devDependencies:
       '@aws-cdk/assert': 2.26.0_c9e2f77c41c390210db2e247727e987d
       '@aws-cdk/aws-apigatewayv2-alpha': 2.22.0-alpha.0_8d994d7bf27edab84c843ce1928354a1
