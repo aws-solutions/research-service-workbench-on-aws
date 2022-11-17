@@ -6,7 +6,8 @@ module.exports = {
     '@aws/eslint-config-workbench-core-eslint-custom',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
-    'plugin:@next/next/recommended'
+    'plugin:@next/next/recommended',
+    'plugin:react/jsx-runtime'
   ],
   parserOptions: { tsconfigRootDir: __dirname },
   plugins: ['testing-library'],
@@ -21,11 +22,5 @@ module.exports = {
     react: {
       version: 'detect'
     }
-  },
-  rules: {
-    // suppress errors for missing 'import React' in files
-    'react/react-in-jsx-scope': 'off',
-    // allow jsx syntax in js files (for next.js project)
-    'react/jsx-filename-extension': [1, { extensions: ['.ts', '.tsx'] }] //should add ".ts" if typescript project
   }
 };

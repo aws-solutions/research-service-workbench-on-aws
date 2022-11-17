@@ -9,13 +9,10 @@ module.exports = {
     'plugin:@next/next/recommended'
   ],
   parserOptions: { tsconfigRootDir: __dirname },
-  rules: {
-    // These rules are turned off to be compatible with @cloudscape-design/components exported components
-    'import/namespace': 0
-  },
   settings: {
     react: {
       version: 'detect'
-    }
+    },
+    'import/ignore': ['@cloudscape-design/components']
   }
 };
