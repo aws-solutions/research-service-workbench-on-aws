@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "mock dynamic authz service",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
