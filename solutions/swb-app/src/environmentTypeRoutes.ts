@@ -5,18 +5,18 @@
 
 import {
   CreateEnvironmentTypeSchema,
-  ListEnvironmentTypesSchema,
   EnvironmentTypeService,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
   UpdateEnvironmentTypeSchema,
-  ListEnvironmentTypesRequest
+  ListEnvironmentTypesRequest,
+  ListEnvironmentTypesRequestParser
 } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeRoutes(router: Router, environmentTypeService: EnvironmentTypeService): void {
   // Create envType
@@ -51,9 +51,12 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.get(
     '/environmentTypes',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.query, ListEnvironmentTypesSchema));
-      const { paginationToken, pageSize } = req.query;
-      const request: ListEnvironmentTypesRequest = req.query as ListEnvironmentTypesRequest;
+      const request = validateAndParse<ListEnvironmentTypesRequest>(
+        ListEnvironmentTypesRequestParser,
+        req.query
+      );
+      const { paginationToken, pageSize } = request;
+
       if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
         res
           .status(400)
