@@ -21,3 +21,5 @@ export {
 } from './errors/authenticatedUserNotFoundError';
 export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors/permissionNotGrantedError';
 export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';
+export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
+export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
