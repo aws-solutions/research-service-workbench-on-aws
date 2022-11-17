@@ -3,6 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// TODO: Any code that use this file should be refactored to use `queryStringParamFilter` or `queryNumberParamFilter`.
+// This file has not been deleted because some feature branches uses this file. Keeping this file for now will help alleviate merge conflicts when the feature branch is merged into develop
+
 // Schema filter Query Params filters in API
 import { Schema } from 'jsonschema';
 

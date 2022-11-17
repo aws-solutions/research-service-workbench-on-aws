@@ -2,6 +2,8 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+
+import { QueryNumberParamFilterParser } from '../interfaces/queryNumberParamFilter';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -44,13 +46,14 @@ describe('Query params filters utils', () => {
 
     test('should parse successfuly a between queryParam', () => {
       const inputQueryParam = {
-        age: {
+        age: QueryNumberParamFilterParser.parse({
           between: {
             value1: 1,
             value2: 10
           }
-        }
+        })
       };
+
       const expectedResult = {
         index: 'getResourceByAge',
         sortKey: 'age',
