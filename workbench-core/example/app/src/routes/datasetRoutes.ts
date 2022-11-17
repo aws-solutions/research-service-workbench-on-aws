@@ -3,16 +3,18 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
   DataSetService,
-  DataSetsStoragePlugin
+  DataSetsStoragePlugin,
+  isDataSetHasEndpointError
 } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { dataSetPrefix, endPointPrefix } from '../configs/constants';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -57,14 +59,14 @@ export function setUpDSRoutes(
 
   // share dataset
   router.post(
-    '/datasets/:id/share',
+    '/datasets/:datasetId/share',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
       await dataSetService.addDataSetExternalEndpoint(
-        req.params.id,
+        req.params.datasetId,
         req.body.externalEndpointName,
         dataSetStoragePlugin,
         req.body.externalRoleName
@@ -73,14 +75,43 @@ export function setUpDSRoutes(
     })
   );
 
+  // unshare dataset
+  router.delete(
+    '/datasets/:datasetId/share/:endpointId',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (
+        req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null ||
+        req.params.endpointId.match(uuidWithLowercasePrefixRegExp(endPointPrefix)) === null
+      ) {
+        throw Boom.badRequest('datasetId and endpointId parameters must be valid');
+      }
+
+      await dataSetService.removeDataSetExternalEndpoint(
+        req.params.datasetId,
+        req.params.endpointId,
+        dataSetStoragePlugin
+      );
+      res.status(204).send();
+    })
+  );
+
+  // List storag locations
+  router.get(
+    '/datasets/storage',
+    wrapAsync(async (req: Request, res: Response) => {
+      const locations = await dataSetService.listStorageLocations();
+      res.send(locations);
+    })
+  );
+
   // Get dataset
   router.get(
-    '/datasets/:id',
+    '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetId request parameter is invalid');
       }
-      const ds = await dataSetService.getDataSet(req.params.id);
+      const ds = await dataSetService.getDataSet(req.params.datasetId);
       res.send(ds);
     })
   );
@@ -96,12 +127,20 @@ export function setUpDSRoutes(
 
   // Delete dataset
   router.delete(
-    '/datasets/:id',
+    '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
-        throw Boom.badRequest('id request parameter is invalid');
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetId request parameter is invalid');
       }
-      await dataSetService.removeDataSet(req.params.id);
+
+      try {
+        await dataSetService.removeDataSet(req.params.datasetId);
+      } catch (error) {
+        if (isDataSetHasEndpointError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
       res.status(204).send();
     })
   );

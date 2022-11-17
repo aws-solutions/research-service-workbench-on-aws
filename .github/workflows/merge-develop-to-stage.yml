@@ -44,27 +44,24 @@ jobs:
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
 
   deploy-swb-demo:
-    needs: [ deploy-swb-reference]
+    needs: [deploy-swb-reference]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
-  # deploy-example:
-  #   needs: [pre-deployment-check]
-  #   uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
-  #   secrets:
-  #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
-  #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
-  #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-  #     cognito-username: "${{ secrets.COGNITO_USERNAME }}"
-  #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
-  #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
+  deploy-example-app:
+    needs: [pre-deployment-check]
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
+    secrets:
+      aws-test-region: ${{ secrets.AWS_TEST_REGION }}
+      test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
+      aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
 
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference]
+    needs: [readme-commit, deploy-swb-reference, deploy-example-app]
     env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"

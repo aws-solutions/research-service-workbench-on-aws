@@ -7,6 +7,7 @@ import _ from 'lodash';
 import PaginatedItemsResponse from '../../../interfaces/paginatedItemsResponse';
 import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
+import { getPaginationToken } from '../../../utilities/paginationHelper';
 import BatchEdit from './batchEdit';
 import Deleter from './deleter';
 import Getter from './getter';
@@ -161,7 +162,7 @@ export default class DynamoDBService {
     const data = retrievedItems.map((item) => item as unknown as Record<string, JSONValue>);
     return {
       data,
-      paginationToken: result.LastEvaluatedKey as unknown as string | undefined
+      paginationToken: getPaginationToken(result)
     };
   }
 
@@ -444,8 +445,16 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
-  public transactEdit(params?: { addPutRequest?: { [key: string]: unknown }[] }): TransactEdit {
+  public transactEdit(params?: {
+    addPutRequest?: Record<string, unknown>[];
+    addDeleteRequests?: Record<string, unknown>[];
+  }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
+    if (params?.addDeleteRequests) {
+      transactEdit = transactEdit.addDeleteRequests(
+        params.addDeleteRequests.map((request) => marshall(request))
+      );
+    }
     if (params?.addPutRequest) {
       transactEdit = transactEdit.addPutRequests(
         params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))

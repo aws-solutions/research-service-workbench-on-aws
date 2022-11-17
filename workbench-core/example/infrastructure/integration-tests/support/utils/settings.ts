@@ -23,6 +23,8 @@ interface Setting {
   ExampleDynamoDBTableOutput: string;
   ExampleCognitoUserPoolId: string;
   ExampleLambdaRoleOutput: string;
+  ExampleDynamoDBTableName: string;
+  ExampleS3DataSetsBucketName: string;
 
   // Derived
   mainAccountId: string;
