@@ -9,8 +9,11 @@ import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/h
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
+import PaginatedResponse from './interfaces/paginatedResponse';
+import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
 import { QueryParameterFilter } from './interfaces/queryParameterFilter';
 import QueryParams from './interfaces/queryParams';
+import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
 import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { MetadataService } from './services/metadataService';
@@ -42,6 +45,10 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
+  QueryStringParamFilter,
+  QueryStringParamFilterParser,
+  QueryNumberParamFilter,
+  QueryNumberParamFilterParser,
   QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,
@@ -52,5 +59,6 @@ export {
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
+  PaginatedResponse,
   MetadataService
 };

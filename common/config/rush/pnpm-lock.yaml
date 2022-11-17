@@ -140,6 +140,7 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
       uuid: ^8.3.2
+      zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-accounts': link:../../workbench-core/accounts
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
@@ -155,6 +156,7 @@ importers:
       jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
+      zod: 3.19.1
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../workbench-core/eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle

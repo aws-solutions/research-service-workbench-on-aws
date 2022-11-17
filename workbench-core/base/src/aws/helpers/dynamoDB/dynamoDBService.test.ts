@@ -18,6 +18,7 @@ describe('DynamoDBService', () => {
   describe('getPaginatedItems', () => {
     let unmarshalledData: Record<string, JSONValue>;
     let unmarshalledPaginationToken: { pk: string; sk: string };
+    let base64EncodingOfPaginationToken = '';
 
     beforeEach(() => {
       unmarshalledData = {
@@ -32,6 +33,7 @@ describe('DynamoDBService', () => {
         pk: 'pk',
         sk: 'sk'
       };
+      base64EncodingOfPaginationToken = 'eyJwayI6InBrIiwic2siOiJzayJ9';
 
       const mockDDB = mockClient(DynamoDBClient);
       mockDDB.on(QueryCommand).resolves({
@@ -43,7 +45,7 @@ describe('DynamoDBService', () => {
     test('returns unmarshalled data', async () => {
       const result = await dbService.getPaginatedItems();
       expect(result.data).toEqual([unmarshalledData]);
-      expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
+      expect(result.paginationToken).toEqual(base64EncodingOfPaginationToken);
     });
   });
 
