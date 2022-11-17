@@ -83,36 +83,4 @@ describe('awsAccounts create negative tests', () => {
       });
     });
   });
-  describe('when updating an account', () => {
-    const accountId = `${resourceTypeToKey.account.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
-    let account: Account;
-    beforeEach(() => {
-      account = adminSession.resources.accounts.account(accountId);
-    });
-    describe('and the update params are invalid', () => {
-      test('it throws a validation error', async () => {
-        try {
-          const badValue = 1 as unknown as string;
-
-          await account.update({
-            name: badValue,
-            awsAccountId: badValue,
-            envMgmtRoleArn: badValue,
-            hostingAccountHandlerRoleArn: badValue,
-            externalId: badValue
-          });
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              statusCode: 400,
-              error: 'Bad Request',
-              message:
-                'name is not of a type(s) string. awsAccountId is not of a type(s) string. envMgmtRoleArn is not of a type(s) string. hostingAccountHandlerRoleArn is not of a type(s) string. externalId is not of a type(s) string'
-            })
-          );
-        }
-      });
-    });
-  });
 });
