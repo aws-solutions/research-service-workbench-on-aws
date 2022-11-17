@@ -247,6 +247,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@next/eslint-plugin-next",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -371,6 +375,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "d3-color",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "date-fns",
       "allowedCategories": [ "production" ]
     },
@@ -396,6 +404,14 @@
     },
     {
       "name": "eslint-plugin-import",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {

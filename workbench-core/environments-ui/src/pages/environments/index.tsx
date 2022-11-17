@@ -311,7 +311,6 @@ const EnvironmentsPage: NextPage = () => {
       ...prevState,
       paginationTokens: prevState.paginationTokens.set(prevState.currentPageIndex + 1, paginationToken)
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationToken]);
 
   const getContent = (): JSX.Element => {
