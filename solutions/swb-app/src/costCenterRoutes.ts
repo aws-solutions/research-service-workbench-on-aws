@@ -8,7 +8,9 @@ import {
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
-  UpdateCostCenterRequestParser
+  UpdateCostCenterRequestParser,
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser
 } from '@aws/workbench-core-accounts';
 import CreateCostCenterSchema from '@aws/workbench-core-accounts/lib/schemas/createCostCenter';
 import { Request, Response, Router } from 'express';
@@ -25,10 +27,21 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
     })
   );
 
+  router.put(
+    '/costCenters/:id/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      const deleteCostCenterRequest = { id: req.params.id };
+      const validatedRequest = validateAndParse<DeleteCostCenterRequest>(
+        DeleteCostCenterRequestParser,
+        deleteCostCenterRequest
+      );
+      res.status(204).send(await costCenterService.softDeleteCostCenter(validatedRequest));
+    })
+  );
+
   router.patch(
     '/costCenters/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      console.log('inside patch costCenter');
       const updateCostCenterRequest = { id: req.params.id, ...req.body };
       const validatedRequest = validateAndParse<UpdateCostCenterRequest>(
         UpdateCostCenterRequestParser,

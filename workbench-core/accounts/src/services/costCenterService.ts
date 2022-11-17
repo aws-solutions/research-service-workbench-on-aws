@@ -19,6 +19,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';
@@ -33,6 +34,38 @@ export default class CostCenterService {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
     this._dynamoDbService = dynamoDbService;
+  }
+
+  /**
+   * Soft Delete Cost Center
+   * @param request - request for deleting cost center
+   * @returns void
+   */
+  public async softDeleteCostCenter(request: DeleteCostCenterRequest): Promise<void> {
+    const costCenterHaveProjects = await this._doesCostCenterHaveProjects(request.id);
+    if (costCenterHaveProjects) {
+      throw Boom.conflict(
+        `CostCenter ${request.id} cannot be deleted because it has project(s) associated with it`
+      );
+    }
+
+    const getCostCenterResponse = (await this._dynamoDbService
+      .get(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter))
+      .execute()) as GetItemCommandOutput;
+
+    if (getCostCenterResponse.Item === undefined) {
+      throw Boom.notFound(`Could not find cost center ${request.id}`);
+    }
+
+    try {
+      await this._dynamoDbService
+        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), {
+          item: { resourceType: `${this._resourceType}_deleted` }
+        })
+        .execute();
+    } catch (e) {
+      throw Boom.internal('Unable to delete CostCenter');
+    }
   }
 
   /**
@@ -53,7 +86,6 @@ export default class CostCenterService {
       .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
       .execute();
     if (response.Attributes) {
-      console.log('response attributes', response.Attributes);
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
     console.error('Unable to update cost center', updatedCostCenter);
@@ -157,5 +189,22 @@ export default class CostCenterService {
     } catch (e) {
       throw Boom.badRequest(`Could not find account ${accountId}`);
     }
+  }
+
+  /**
+   * Check whether a CostCenter have any projects associated with it
+   * @param costCenterId - id of CostCenter we want to check
+   * @returns Whether a CostCenter have any projects associated with it
+   */
+  public async _doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'project' },
+      sortKey: 'dependency',
+      eq: { S: costCenterId }
+    };
+
+    const associatedProjResponse = await this._dynamoDbService.query(queryParams).execute();
+    return associatedProjResponse.Items !== undefined && associatedProjResponse.Items.length > 0;
   }
 }

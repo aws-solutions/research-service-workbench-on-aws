@@ -43,6 +43,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
   '/datasets': {
     GET: [
       {

@@ -5,6 +5,10 @@
 
 import AccountHandler from './handlers/accountHandler';
 import {
+  DeleteCostCenterRequestParser,
+  DeleteCostCenterRequest
+} from './models/costCenters/deleteCostCenterRequest';
+import {
   ListCostCentersRequest,
   ListCostCentersRequestParser
 } from './models/costCenters/listCostCentersRequest';
@@ -30,5 +34,7 @@ export {
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
-  UpdateCostCenterRequestParser
+  UpdateCostCenterRequestParser,
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser
 };
