@@ -5,7 +5,6 @@
 
 import { GroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from './errors/groupNotFoundError';
-import { MockDynamicAuthorizationService } from './mockDynamicAuthorizationService';
 import { AssignUserToGroupRequest } from './models/assignUserToGroup';
 import { CreateGroupRequest } from './models/createGroup';
 import { CreateIdentityPermissionsRequest } from './models/createIdentityPermissions';
@@ -17,6 +16,7 @@ import { GetIdentityPermissionsBySubjectRequest } from './models/getIdentityPerm
 import { GetUserGroupsRequest } from './models/getUserGroups';
 import { GetUsersFromGroupRequest } from './models/getUsersFromGroup';
 import { RemoveUserFromGroupRequest } from './models/removeUserFromGroup';
+import { MockDynamicAuthorizationService } from '.';
 
 describe('Mock Dynamic Authorization Service', () => {
   let authorizationService: MockDynamicAuthorizationService;
