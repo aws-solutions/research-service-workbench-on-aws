@@ -77,11 +77,9 @@ Please refer to [Contributing via Pull Requests](./CONTRIBUTING.md#contributing-
 
 ### Add packages using rush:
 1. Add package to 1 project: `cd <TO_PROJECT_DIR>; rush add -p <packageName> --caret -s; rush cupdate`
-2. Add to all projects: `rush add -p <packageName> --caret -s --all --make-consistent; rush cupdate`
 
 ### Remove packages using rush:
 1. Remove package from 1 project: `cd <TO_PROJECT_DIR>; rush remove -p <packageName> -s; rush cupdate`
-2. Remove package from  all projects: `rush remove -p <packageName> -s --all; rush cupdate`
 
 ## Getting support for rush
 [Getting Support](https://rushjs.io/pages/help/support/)
