@@ -42,7 +42,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
       processValidatorResult(validate(req.body, GetTemplateSchema));
       const awsAcctId = req.body.awsAccountId;
       const externalId = req.body.externalId;
-      res.send(await account.getTemplateURLForAccount(awsAcctId, externalId));
+      res.send(await hostingAccountService.getTemplateURLForAccount(awsAcctId, externalId));
     })
   );
 

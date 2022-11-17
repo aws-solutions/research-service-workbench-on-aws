@@ -7,7 +7,7 @@ import { Readable } from 'stream';
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket, S3Client } from '@aws-sdk/client-s3';
 import {
   addPaginationToken,
   AwsService,
@@ -85,12 +85,12 @@ export default class HostingAccountLifecycleService {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
       [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
     } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
       process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
     ]);
     const bucketName = artifactBucketArn.split(':').pop() as string;
 
@@ -129,9 +129,13 @@ export default class HostingAccountLifecycleService {
       stackName: process.env.STACK_NAME!.concat('-hosting-account'),
       statusHandlerRole: statusHandlerRoleArn
     };
-    return this._accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters);
-  }
 
+    const s3Client = new S3Client({
+      credentials: await this._aws.clients.s3.config.credentials(),
+      region : process.env.AWS_REGION!
+    });
+    return this._accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
+  }
   /**
    * Links hosting account with main account policies for cross account communication
    * @param accountMetadata - the attributes of the given hosting account from the onboarded CFN stack outputs

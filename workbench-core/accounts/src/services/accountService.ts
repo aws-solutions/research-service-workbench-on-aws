@@ -73,23 +73,18 @@ export default class AccountService {
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async getTemplateURLForAccount(
-    artifactBucketArn: string,
-    templateParams: AccountCfnTemplateParameters
-  ): Promise<TemplateResponse> {
+  public async getTemplateURLForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters, s3Client: S3Client): Promise<TemplateResponse> {
+
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
-    console.log(bucket);
+    console.log(bucket)
 
     // Sign the url
-    const s3Client = new S3Client({
-      region: process.env.AWS_REGION!
-    });
-    const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const command = new GetObjectCommand( { Bucket: bucket, Key:key});
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { url: signedUrl /*this._constructOnboardingCreateCFUrl(templateParams, signedUrl)*/ };
+    return { url: this._constructOnboardingCreateCFUrl(templateParams, signedUrl )};
   }
 
   /**

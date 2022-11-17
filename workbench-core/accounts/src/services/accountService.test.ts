@@ -13,7 +13,7 @@ import {
   QueryCommandOutput,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
+import { ServiceInputTypes, ServiceOutputTypes, S3Client } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
@@ -380,8 +380,8 @@ describe('AccountService', () => {
   test('getTemplateURLForAccount returns a signed URL', async () => {
     const extId = 'workbench';
 
-    const expectedTemplate = encodeURIComponent('http://potato.com');
-    const expectedUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=${expectedTemplate}&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true`;
+    const urlStart = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Fs3.us-east-1.amazonaws.com%2FsampleArtifactsBucketName%2Fonboard-account.cfn.yaml`;
+    const urlEnd = `&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true`;
 
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
@@ -400,11 +400,20 @@ describe('AccountService', () => {
       statusHandlerRole: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
     };
 
+    const s3Client = new S3Client({
+      region : process.env.AWS_REGION!,
+      credentials: {
+        accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+        secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      },
+    });
+
     // OPERATE
-    const response = await accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters);
+    const response = await accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
 
     // CHECK
-    expect(response.url).toEqual(expectedUrl);
+    expect(response.url.startsWith(urlStart)).toEqual(true);
+    expect(response.url.endsWith(urlEnd)).toEqual(true);
   });
 
   describe('getAccount', () => {

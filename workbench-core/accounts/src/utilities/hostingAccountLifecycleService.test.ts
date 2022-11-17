@@ -706,13 +706,4 @@ describe('HostingAccountLifecycleService', () => {
     );
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
-
-  test('TODO: getTemplateURLForAccount basic unit test', async () => {
-    const service = new HostingAccountLifecycleService();
-    const sampleAccountId = '123456789012';
-    const sampleExternalId = 'sample';
-    expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
-      service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)
-    );
-  });
 });
