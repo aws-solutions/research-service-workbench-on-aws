@@ -19,8 +19,8 @@ import { IamHelper } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
-import {AccountCfnTemplateParameters, TemplateResponse} from '../models/accountCfnTemplate';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import AccountService from '../services/accountService';
 
@@ -85,12 +85,12 @@ export default class HostingAccountLifecycleService {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
       [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
     } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
       process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
     ]);
     const bucketName = artifactBucketArn.split(':').pop() as string;
 
@@ -219,7 +219,11 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this.updateBucketPolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
+    bucketPolicy = this.updateBucketPolicyDocumentWithAllStatements(
+      artifactBucketArn,
+      awsAccountId,
+      bucketPolicy
+    );
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -230,9 +234,13 @@ export default class HostingAccountLifecycleService {
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
-  public updateBucketPolicyDocumentWithAllStatements(artifactBucketArn: string, awsAccountId: string, policyDocument: PolicyDocument): PolicyDocument {
+  public updateBucketPolicyDocumentWithAllStatements(
+    artifactBucketArn: string,
+    awsAccountId: string,
+    policyDocument: PolicyDocument
+  ): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
      {
       "Sid": "List:environment-files",
       "Effect": "Allow",
@@ -249,7 +257,7 @@ export default class HostingAccountLifecycleService {
       }`)
     );
     const getStatement = PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
      {
       "Sid": "Get:environment-files",
       "Effect": "Allow",
@@ -260,16 +268,22 @@ export default class HostingAccountLifecycleService {
       "Resource": ["${artifactBucketArn}/environment-files*"]
       }`)
     );
-    const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(awsAccountId, artifactBucketArn);
+    const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(
+      awsAccountId,
+      artifactBucketArn
+    );
 
     const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
 
     return this._applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
   }
 
-  private _getOnboardingTemplatePolicyStatement(awsAccountId: string, artifactBucketArn: string): PolicyStatement {
+  private _getOnboardingTemplatePolicyStatement(
+    awsAccountId: string,
+    artifactBucketArn: string
+  ): PolicyStatement {
     return PolicyStatement.fromJson(
-        JSON.parse(`
+      JSON.parse(`
      {
       "Sid": "Get:onboarding-template",
       "Effect": "Allow",
@@ -282,7 +296,11 @@ export default class HostingAccountLifecycleService {
     );
   }
 
-  private _applyPoliciesToPolicyDocument(awsAccountId: string, policyDocument: PolicyDocument, policyStatements: PolicyStatement[]): PolicyDocument {
+  private _applyPoliciesToPolicyDocument(
+    awsAccountId: string,
+    policyDocument: PolicyDocument,
+    policyStatements: PolicyStatement[]
+  ): PolicyDocument {
     for (const statement of policyStatements) {
       // If policy statement doesn't exist, create one
       // We iterate through these 1 by 1 in case the policy exists, but may be missing the awsAccoutId
@@ -291,9 +309,9 @@ export default class HostingAccountLifecycleService {
       } else {
         // If List statement doesn't contain this accountId, add it
         policyDocument = IamHelper.addPrincipalToStatement(
-            policyDocument,
-            statement.sid!,
-            `arn:aws:iam::${awsAccountId}:root`
+          policyDocument,
+          statement.sid!,
+          `arn:aws:iam::${awsAccountId}:root`
         );
       }
     }
