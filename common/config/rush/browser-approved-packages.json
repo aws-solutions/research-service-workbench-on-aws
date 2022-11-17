@@ -299,6 +299,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@typescript-eslint/parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@vendia/serverless-express",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -401,6 +405,10 @@
     {
       "name": "eslint-config-next",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-import-resolver-typescript",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "eslint-plugin-import",

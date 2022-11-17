@@ -7,6 +7,7 @@
 export const importConvention: any = {
   rules: {
     'import/no-unresolved': ['off'],
+    'import/no-named-as-default-member': ['off'],
     'import/named': ['off'],
     'import/order': [
       'error',
