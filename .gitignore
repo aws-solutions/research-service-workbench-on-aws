@@ -108,6 +108,7 @@ solutions/swb-reference/.aws-sam/
 
 # example package
 workbench-core/example/infrastructure/build
+workbench-core/example/infrastructure/src/config/testEnv.json
 
 #next static export
 solutions/swb-ui/ui/out

@@ -6,6 +6,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import Boom from '@hapi/boom';
 import { FilterRequest } from '../interfaces/filterRequest';
 import QueryParams from '../interfaces/queryParams';
+
 import { SortRequest } from '../interfaces/sortRequest';
 
 /************************************************************
