@@ -46,6 +46,13 @@ echo "--------------------------------------------------------------------------
 echo "cp -r $source_dir $dist_dir"
 cp -r $source_dir $dist_dir
 
+echo "ls $source_template_dir/../"
+ls $source_template_dir/../
+echo "ls $source_template_dir/../../"
+ls $source_template_dir/../../
+echo "ls $source_template_dir/../../../"
+ls $source_template_dir/../../../
+
 echo "cp $source_template_dir/../../LICENSE $dist_dir"
 cp $source_template_dir/../../LICENSE $dist_dir/LICENSE.txt
 echo "cp $source_template_dir/../../NOTICE $dist_dir"
