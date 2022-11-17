@@ -93,11 +93,6 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
-    action: 'UPDATE',
-    subject: 'Project'
-  },
-  {
-    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
@@ -125,6 +120,16 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'DELETE',
     subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'AssignUserToProject'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'AssignUserToProject'
   }
 ];
 
