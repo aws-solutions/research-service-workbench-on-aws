@@ -48,7 +48,7 @@ describe('delete user negative tests', () => {
 
       expect(user).toBeDefined();
 
-      userId = user.uid;
+      userId = user.id;
       await adminSession.resources.users.user(userId).delete();
     } catch (e) {
       checkHttpError(

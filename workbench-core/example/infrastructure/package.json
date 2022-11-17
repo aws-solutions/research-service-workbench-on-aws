@@ -15,7 +15,7 @@
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
     "build": "rushx compile && heft build --clean && rushx pkg-json-lint",
-    "build:test": "rushx compile && heft test -u --clean && rushx pkg-json-lint && rushx make-badges",
+    "build:test": "rushx compile && heft test -u --clean && rushx pkg-json-lint",
     "cdk": "cdk",
     "cdk:bootstrap": "cdk bootstrap",
     "cdk:deploy": "rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
@@ -30,7 +30,8 @@
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
-    "test": "rushx test:only && rushx make-badges",
+    "test": "rushx test:only",
+    "test-cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {

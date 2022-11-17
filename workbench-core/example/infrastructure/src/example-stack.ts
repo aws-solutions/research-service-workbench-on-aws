@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
-import { Aws, aws_cognito, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   CfnDeployment,
@@ -77,9 +77,15 @@ export class ExampleStack extends Stack {
       s3OutputId: 'ExampleS3BucketDatasetsArnOutput',
       encryptionKey: encryptionKey,
       serverAccessLogsBucket: this._accessLogsBucket,
-      serverAccessLogsPrefix: this._s3AccessLogsPrefix
+      serverAccessLogsPrefix: this._s3AccessLogsPrefix,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     });
     const datasetBucket: Bucket = createDatasetBucket.bucket;
+
+    new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
+      value: datasetBucket.bucketName
+    });
 
     this._addAccessPointDelegationStatement(datasetBucket);
 
@@ -272,7 +278,9 @@ export class ExampleStack extends Stack {
     const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
-      enforceSSL: true
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     });
 
     exampleS3AccessLogsBucket.addToResourcePolicy(
@@ -526,6 +534,8 @@ export class ExampleStack extends Stack {
             'cognito-idp:AdminListGroupsForUser',
             'cognito-idp:AdminRemoveUserFromGroup',
             'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:AdminEnableUser',
+            'cognito-idp:AdminDisableUser',
             'cognito-idp:CreateGroup',
             'cognito-idp:DeleteGroup',
             'cognito-idp:ListGroups',
