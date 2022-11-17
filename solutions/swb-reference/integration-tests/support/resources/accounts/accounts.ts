@@ -10,7 +10,7 @@ import Account from './account';
 export default class Accounts extends CollectionResource {
   public constructor(clientSession: ClientSession) {
     super(clientSession, 'aws-accounts', 'account');
-    this._api = 'aws-accounts';
+    this._api = 'awsAccounts';
   }
 
   public account(id: string): Account {
