@@ -109,7 +109,7 @@ const EnvironmentsPage: NextPage = () => {
   ];
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateRangePickerProps.RelativeValue | null>(null);
 
   // Property and date filter collections
   const { items, filteredItemsCount, collectionProps, propertyFilterProps } = useCollection(environments, {
