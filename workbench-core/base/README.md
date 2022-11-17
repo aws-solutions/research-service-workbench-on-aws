@@ -5,7 +5,7 @@
 ## Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-81.3%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-72.19%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-79.58%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-82.17%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-81.21%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-72.19%25-red.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-78.75%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-82.07%25-yellow.svg?style=flat) |
 # `base`
 
 > This package is intended to provide a base AWS Service class that encapsulates all the service clients and commands that the application currently requires. We use `aws-sdk` V3 to improve the load-time of the modules imported at runtime.

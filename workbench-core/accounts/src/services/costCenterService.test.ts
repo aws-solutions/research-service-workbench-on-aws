@@ -8,17 +8,37 @@ jest.mock('uuid', () => ({ v4: () => 'someId' }));
 import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
-import CostCenter from '../models/costCenter';
+import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import { ListCostCentersRequestParser } from '../models/costCenters/listCostCentersRequest';
 import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
 
 describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
-  let accountMetadata: Account;
-  const costCenterService = new CostCenterService({ TABLE_NAME: 'tableName' });
   const accountId = 'acc-someId';
+  // TODO: Use AccountParser to validate Account object once AccountParser is merged into develop
+  const accountMetadata: Account = {
+    error: undefined,
+    id: accountId,
+    cidr: '',
+    hostingAccountHandlerRoleArn: '',
+    envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+    vpcId: 'vpc-123',
+    subnetId: 'subnet-123',
+    encryptionKeyArn: 'sampleEncryptionKeyArn',
+    environmentInstanceFiles: '',
+    stackName: `${process.env.STACK_NAME!}-hosting-account`,
+    status: 'CURRENT',
+    awsAccountId: 'awsAccountId',
+    externalId: 'externalId'
+  };
+  const costCenterService = new CostCenterService(
+    { TABLE_NAME: 'tableName' },
+    new DynamoDBService({ region: 'us-east-1', table: 'tableName' })
+  );
   const ddbMock = mockClient(DynamoDBClient);
   const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
 
@@ -31,22 +51,6 @@ describe('CostCenterService', () => {
     jest.clearAllMocks();
 
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
-
-    accountMetadata = {
-      error: undefined,
-      id: accountId,
-      cidr: '',
-      hostingAccountHandlerRoleArn: '',
-      envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-      vpcId: 'vpc-123',
-      subnetId: 'subnet-123',
-      encryptionKeyArn: 'sampleEncryptionKeyArn',
-      environmentInstanceFiles: '',
-      stackName: `${process.env.STACK_NAME!}-hosting-account`,
-      status: 'CURRENT',
-      awsAccountId: 'awsAccountId',
-      externalId: 'externalId'
-    };
   });
 
   afterAll(() => {
@@ -110,6 +114,104 @@ describe('CostCenterService', () => {
           await expect(costCenterService.getCostCenter(costCenterId)).rejects.toThrow(
             `Could not find cost center ${costCenterId}`
           );
+        });
+      });
+    });
+  });
+
+  describe('list costCenters', () => {
+    let costCenterId: string;
+    type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
+    let costCenterJson: CostCenterJson;
+    let expectedCostCenter: CostCenter;
+    beforeAll(() => {
+      costCenterId = 'cc-someId';
+      costCenterJson = {
+        pk: `CC#${costCenterId}`,
+        sk: `CC#${costCenterId}`,
+        id: costCenterId,
+        name: 'CostCenter-1',
+        dependency: accountId,
+        description: 'Description for CostCenter-1',
+        subnetId: accountMetadata.subnetId,
+        vpcId: accountMetadata.vpcId,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+        externalId: accountMetadata.externalId,
+        encryptionKeyArn: accountMetadata.encryptionKeyArn,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+        awsAccountId: accountMetadata.awsAccountId,
+        createdAt: mockDateObject.toISOString(),
+        updatedAt: mockDateObject.toISOString()
+      };
+      expectedCostCenter = {
+        ...costCenterJson,
+        accountId: costCenterJson.dependency
+      };
+      expectedCostCenter = CostCenterParser.parse(expectedCostCenter);
+    });
+
+    describe('with more than one "page" of costCenters', () => {
+      test('it returns cost centers and a pagination token', async () => {
+        // BUILD
+        // Build request for system under test
+        const request = ListCostCentersRequestParser.parse({
+          pageSize: '1',
+          filter: { name: { begins: 'CostCenter' } },
+          sort: { name: 'desc' }
+        });
+
+        // Mock out DDB Service call. DDB service return JSON data and paginationToken
+        const paginationToken = 'exampleToken';
+        jest.spyOn(DynamoDBService.prototype, 'getPaginatedItems').mockImplementation((param) => {
+          expect(param).toEqual({
+            key: { name: 'resourceType', value: 'costCenter' },
+            index: 'getResourceByName',
+            limit: 1,
+            sortKey: 'name',
+            begins: { S: 'CostCenter' },
+            forward: false
+          });
+          return Promise.resolve({
+            data: [costCenterJson],
+            paginationToken
+          });
+        });
+
+        // OPERATE & CHECK
+        await expect(costCenterService.listCostCenters(request)).resolves.toEqual({
+          data: [expectedCostCenter],
+          paginationToken: 'exampleToken'
+        });
+      });
+    });
+
+    describe('with one "page" of costCenters ', () => {
+      test('it returns cost center and no pagination token', async () => {
+        // BUILD
+        // Build request for system under test
+        const request = ListCostCentersRequestParser.parse({
+          filter: { name: { begins: 'CostCenter' } },
+          sort: { name: 'desc' }
+        });
+
+        // Mock out DDB Service call. DDB service return JSON data
+        jest.spyOn(DynamoDBService.prototype, 'getPaginatedItems').mockImplementation((param) => {
+          expect(param).toEqual({
+            key: { name: 'resourceType', value: 'costCenter' },
+            index: 'getResourceByName',
+            sortKey: 'name',
+            begins: { S: 'CostCenter' },
+            forward: false
+          });
+          return Promise.resolve({
+            data: [costCenterJson]
+          });
+        });
+
+        // OPERATE & CHECK
+        await expect(costCenterService.listCostCenters(request)).resolves.toEqual({
+          data: [expectedCostCenter]
         });
       });
     });

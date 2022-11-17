@@ -21,6 +21,12 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'CostCenter'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
     ]
   },
   [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {

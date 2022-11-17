@@ -4,6 +4,10 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import {
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
+} from './models/costCenters/listCostCentersRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -18,5 +22,7 @@ export {
   AccountService,
   CostCenterService,
   ProjectService,
-  CreateAccountSchema
+  CreateAccountSchema,
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
 };
