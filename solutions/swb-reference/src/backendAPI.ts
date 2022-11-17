@@ -78,7 +78,7 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   metadataService: new MetadataService(),
-  authrozationService: new MockDynamicAuthorizationService()
+  authorizationService: new MockDynamicAuthorizationService()
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

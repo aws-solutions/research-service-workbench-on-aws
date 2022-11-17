@@ -108,7 +108,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     router,
     apiRouteConfig.projectService,
     apiRouteConfig.userManagementService,
-    apiRouteConfig.authrozationService
+    apiRouteConfig.authorizationService
   );
 
   // Error handling. Order of the error handlers is important

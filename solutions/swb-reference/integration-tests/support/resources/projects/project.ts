@@ -20,6 +20,7 @@ export default class Project extends Resource {
   }
 
   protected async cleanup(): Promise<void> {
+    // TODO: add delete project once delete API is implemented
     await this._setup.getDefaultAdminSession();
   }
 }

@@ -31,7 +31,7 @@ export interface ApiRouteConfig {
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;
   metadataService: MetadataService;
-  authrozationService: PermissionsService;
+  authorizationService: PermissionsService;
 }
 
 export interface ApiRoute {

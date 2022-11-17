@@ -14,6 +14,13 @@ import AssignUserToProject from './schemas/assignUserToProject';
 import { PermissionRoles } from './staticPermissionsConfig';
 import { processValidatorResult } from './validatorHelper';
 
+/**
+ * Project API routes
+ * @param router - express router
+ * @param projectService -  project management service
+ * @param userService - user management service
+ * @param authService - dynamic authorization service
+ */
 export function setUpProjectRoutes(
   router: Router,
   projectService: ProjectService,
@@ -41,11 +48,9 @@ export function setUpProjectRoutes(
 
       try {
         const existingUser = await userService.getUser(userId);
-        const isAdmin = existingUser.roles.some((role) => role === PermissionRoles.Admin);
-        if (isAdmin) {
-          throw Boom.badRequest(
-            `${PermissionRoles.Admin} ${userId} cannot be assigned to the project ${projectId}`
-          );
+        const isITAdmin = existingUser.roles.some((role) => role === PermissionRoles.Admin);
+        if (isITAdmin) {
+          throw Boom.badRequest(`IT Admin ${userId} cannot be assigned to the project ${projectId}`);
         }
 
         // this call is needed to validate that project exists.

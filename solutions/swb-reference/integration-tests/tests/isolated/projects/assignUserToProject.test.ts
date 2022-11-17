@@ -2,7 +2,9 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { User } from '@aws/workbench-core-authentication';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
@@ -76,9 +78,78 @@ describe('assign user to project negative tests', () => {
         new HttpError(400, {
           statusCode: 400,
           error: 'Bad Request',
-          message: `Admin ${adminUserId} cannot be assigned to the project ${projectId}`
+          message: `IT Admin ${adminUserId} cannot be assigned to the project ${projectId}`
         })
       );
     }
+  });
+
+  describe('user based tests', () => {
+    let userId: string = '';
+    beforeEach(async () => {
+      const response = await adminSession.resources.users.create({
+        firstName: 'Test',
+        lastName: 'User',
+        email: `user-${uuidv4()}@simulator.amazonses.com`
+      });
+
+      const user: User = response.data;
+      userId = user.id;
+    });
+
+    test('project does not exist', async () => {
+      const projectId = `${resourceTypeToKey.project.toLowerCase()}-00000000-0000-0000-0000-000000000000`;
+      try {
+        await adminSession.resources.projects
+          .project(projectId)
+          .assignUserToProject(userId ?? '', { role: 'Researcher' });
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(404, {
+            statusCode: 404,
+            error: 'Not Found',
+            message: `Could not find project ${projectId}`
+          })
+        );
+      }
+    });
+
+    test('cannot assing user to the same project', async () => {
+      let projectId = '';
+      try {
+        const projects = await adminSession.resources.projects.get();
+        if (!projects.data.data.length) {
+          console.warn('There are no projects');
+
+          // dummy assertion to make sure that test always passes
+          // will be considered to move to multistep test:
+          // create user, project, asign/remove user from project, remove user/project
+          // as soon as project as a boundary feature is implemented
+          expect(true).toBeTruthy();
+          return;
+        }
+
+        projectId = projects.data.data[0].id;
+
+        const response = await adminSession.resources.projects
+          .project(projectId)
+          .assignUserToProject(userId ?? '', { role: 'Researcher' });
+
+        expect(response.status).toBe(204);
+
+        // TODO: need dynamic auth z implementation to verify that group was assigned.
+        // expect subsequent call to fail
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: `User ${userId} is already assigned to the project ${projectId}`
+          })
+        );
+      }
+    });
   });
 });
