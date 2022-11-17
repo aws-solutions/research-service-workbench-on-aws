@@ -5,6 +5,7 @@
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
 import { UserManagementService } from '@aws/workbench-core-authentication';
+import { PermissionsService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import { DataSetService, DataSetsStoragePlugin } from '@aws/workbench-core-datasets';
 
@@ -30,6 +31,7 @@ export interface ApiRouteConfig {
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;
   metadataService: MetadataService;
+  authrozationService: PermissionsService;
 }
 
 export interface ApiRoute {

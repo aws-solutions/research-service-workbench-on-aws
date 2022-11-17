@@ -5,6 +5,7 @@
 
 import { ProjectService } from '@aws/workbench-core-accounts';
 import { isUserNotFoundError, UserManagementService } from '@aws/workbench-core-authentication';
+import { PermissionsService } from '@aws/workbench-core-authorization';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -16,7 +17,8 @@ import { processValidatorResult } from './validatorHelper';
 export function setUpProjectRoutes(
   router: Router,
   projectService: ProjectService,
-  userService: UserManagementService
+  userService: UserManagementService,
+  authService: PermissionsService
 ): void {
   // Get projects
   router.get(
@@ -50,17 +52,14 @@ export function setUpProjectRoutes(
         // If not - 404 will be returned
         await projectService.getProject(projectId);
 
-        // TODO: here will be dynamic AuthZ call
-        // const groups = await authService.getUserGroups({ userId })
-        const groups = { groupIds: ['dummyProjectId#Researcher'] };
+        const groups = await authService.getUserGroups({ userId });
 
         const isUserAssignedToProject = groups.groupIds.some((id) => id === groupId);
         if (isUserAssignedToProject) {
           throw Boom.badRequest(`User ${userId} is already assigned to the project ${projectId}`);
         }
 
-        // TODO: here will be dynamic AuthZ call
-        // await authService.assignUserToGroup({ userId, groupId })
+        await authService.assignUserToGroup({ userId, groupId });
         res.status(204).send();
       } catch (err) {
         if (isUserNotFoundError(err)) {
