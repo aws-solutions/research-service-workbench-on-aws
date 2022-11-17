@@ -35,6 +35,12 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'CostCenter'
       }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
     ]
   },
   '/datasets': {

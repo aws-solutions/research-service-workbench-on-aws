@@ -6,7 +6,9 @@
 import {
   CostCenterService,
   ListCostCentersRequest,
-  ListCostCentersRequestParser
+  ListCostCentersRequestParser,
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
 } from '@aws/workbench-core-accounts';
 import CreateCostCenterSchema from '@aws/workbench-core-accounts/lib/schemas/createCostCenter';
 import { Request, Response, Router } from 'express';
@@ -20,6 +22,19 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateCostCenterSchema));
       res.send(await costCenterService.create({ ...req.body }));
+    })
+  );
+
+  router.patch(
+    '/costCenters/:id',
+    wrapAsync(async (req: Request, res: Response) => {
+      console.log('inside patch costCenter');
+      const updateCostCenterRequest = { id: req.params.id, ...req.body };
+      const validatedRequest = validateAndParse<UpdateCostCenterRequest>(
+        UpdateCostCenterRequestParser,
+        updateCostCenterRequest
+      );
+      res.send(await costCenterService.updateCostCenter(validatedRequest));
     })
   );
 

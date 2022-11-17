@@ -11,8 +11,6 @@ export const CostCenterParser = z.object({
   name: z.string(),
   accountId: z.string(),
   description: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
   subnetId: z.string(),
   vpcId: z.string(),
   envMgmtRoleArn: z.string(),
@@ -20,7 +18,9 @@ export const CostCenterParser = z.object({
   encryptionKeyArn: z.string(),
   environmentInstanceFiles: z.string(),
   hostingAccountHandlerRoleArn: z.string(),
-  awsAccountId: z.string()
+  awsAccountId: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
 });
 
 export type CostCenter = z.infer<typeof CostCenterParser>;

@@ -8,6 +8,10 @@ import {
   ListCostCentersRequest,
   ListCostCentersRequestParser
 } from './models/costCenters/listCostCentersRequest';
+import {
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
+} from './models/costCenters/updateCostCenterRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -24,5 +28,7 @@ export {
   ProjectService,
   CreateAccountSchema,
   ListCostCentersRequest,
-  ListCostCentersRequestParser
+  ListCostCentersRequestParser,
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
 };

@@ -20,6 +20,7 @@ import Boom from '@hapi/boom';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
+import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
@@ -32,6 +33,31 @@ export default class CostCenterService {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
     this._dynamoDbService = dynamoDbService;
+  }
+
+  /**
+   * Update costCenter
+   * @param request - request for updating cost center
+   * @returns CostCenter object with updated attributes
+   */
+  public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
+    const currentDate = new Date().toISOString();
+
+    const updatedCostCenter = {
+      name: request.name,
+      description: request.description,
+      updatedAt: currentDate
+    };
+
+    const response = await this._dynamoDbService
+      .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
+      .execute();
+    if (response.Attributes) {
+      console.log('response attributes', response.Attributes);
+      return this._mapDDBItemToCostCenter(response.Attributes);
+    }
+    console.error('Unable to update cost center', updatedCostCenter);
+    throw Boom.internal(`Unable to update CostCenter with params ${updatedCostCenter}`);
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
