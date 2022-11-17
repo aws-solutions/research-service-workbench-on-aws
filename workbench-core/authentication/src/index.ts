@@ -10,7 +10,7 @@ import UpdateUserSchema from './schemas/updateUser';
 
 export { AuthenticationPlugin } from './authenticationPlugin';
 export { AuthenticationService } from './authenticationService';
-export { Status, User } from './user';
+export { Status, User, CreateUser } from './user';
 export { UserManagementPlugin } from './userManagementPlugin';
 export {
   CognitoAuthenticationPlugin,

@@ -8,7 +8,7 @@ YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 function main(){
-    while getopts :u:d:r:pc opts; do
+    while getopts :u:d:r:pitc opts; do
         case $opts in
             u) USER_POOL_ID=$OPTARG;;
             d) DYNAMO_DB_TABLE_NAME=$OPTARG;;
@@ -35,10 +35,10 @@ Usage: `basename $0`
     -c [CLEANUP FLAG]
 
 Example:
-    Delete UserPool:        `basename $0` -u 'us-east-1_abcde' -r 'us-east-1' -c
-    Delete DynamoDB Table:  `basename $0` -d 'TABLE_NAME' -r 'us-east-1' -c
-    Delete Ssm Parameter:   `basename $0` -r 'us-east-1' -p -c
-    Delete All:             `basename $0` -u 'us-east-1_abcde' -d 'TABLE_NAME' -r 'us-east-1' -p -c"
+    Delete UserPool:                    `basename $0` -u 'us-east-1_abcde' -r 'us-east-1' -c
+    Delete DynamoDB Table:              `basename $0` -d 'TABLE_NAME' -r 'us-east-1' -c
+    Delete Ssm Parameter:               `basename $0` -r 'us-east-1' -p -c
+    Delete All:                         `basename $0` -u 'us-east-1_abcde' -d 'TABLE_NAME' -r 'us-east-1' -p -c"
 }
 
 function check(){
@@ -50,6 +50,7 @@ function check(){
 
 function cleanup(){
     check
+    
     if [[ -n $USER_POOL_ID ]]; then
         ### Delete Cognito UserPool
         echo -e "${YELLOW}### Delete Cognito UserPool ###${NC}"
@@ -88,7 +89,6 @@ function cleanup(){
 }
 
 function sanitize() {
-    echo 'Sanitizing environment variables..'
     unset USER_POOL_ID
     unset DYNAMO_DB_TABLE_NAME
     unset DELETE_SSM_PARAMETERS
