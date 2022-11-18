@@ -92,34 +92,6 @@ export default class HostingAccountLifecycleService {
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
     ]);
-    /*
-    const bucketName = artifactBucketArn.split(':').pop() as string;
-
-    let bucketPolicy: PolicyDocument = new PolicyDocument();
-    try {
-      const bucketPolicyResponse: GetBucketPolicyCommandOutput = await this._aws.clients.s3.getBucketPolicy({
-        Bucket: bucketName
-      });
-      bucketPolicy = PolicyDocument.fromJson(JSON.parse(bucketPolicyResponse.Policy!));
-    } catch (e) {
-      // All errors should be thrown except "NoSuchBucketPolicy" error. For "NoSuchBucketPolicy" error we assign new bucket policy for bucket
-      if (e instanceof NoSuchBucket) {
-        throw e;
-      }
-    }
-
-    const templatePolicy = this._getOnboardingTemplatePolicyStatement(awsAcctId, artifactBucketArn);
-
-    bucketPolicy = this._applyPoliciesToPolicyDocument(awsAcctId, bucketPolicy, [templatePolicy]);
-    const putPolicyParams: PutBucketPolicyCommandInput = {
-      Bucket: bucketName,
-      Policy: JSON.stringify(bucketPolicy.toJSON())
-    };
-
-     */
-
-    // Update bucket policy
-    //await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
 
     const templateParameters: AccountCfnTemplateParameters = {
       accountHandlerRole: accountHandlerRoleArn,
@@ -276,32 +248,10 @@ export default class HostingAccountLifecycleService {
       "Resource": ["${artifactBucketArn}/environment-files*"]
       }`)
     );
-    // const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(
-    //   awsAccountId,
-    //   artifactBucketArn
-    // );
 
-    const policyStatements = [listStatement, getStatement /*, onboardingTemplateStatement */];
+    const policyStatements = [listStatement, getStatement];
 
     return this._applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
-  }
-
-  private _getOnboardingTemplatePolicyStatement(
-    awsAccountId: string,
-    artifactBucketArn: string
-  ): PolicyStatement {
-    return PolicyStatement.fromJson(
-      JSON.parse(`
-     {
-      "Sid": "Get:onboarding-template",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS":"arn:aws:iam::${awsAccountId}"
-      },
-      "Action": "s3:GetObject",
-      "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
-      }`)
-    );
   }
 
   private _applyPoliciesToPolicyDocument(
