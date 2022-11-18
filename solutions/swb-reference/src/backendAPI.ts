@@ -7,7 +7,7 @@ import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
-import { AwsService, AuditLogger } from '@aws/workbench-core-base';
+import { AwsService, AuditLogger, MetadataService } from '@aws/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
@@ -75,7 +75,8 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   costCenterService: new CostCenterService({
     TABLE_NAME: process.env.STACK_NAME!
-  })
+  }),
+  metadataService: new MetadataService()
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

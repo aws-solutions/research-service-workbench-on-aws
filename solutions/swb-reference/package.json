@@ -91,7 +91,6 @@
     "depcheck": "^1.4.3",
     "esbuild": "^0.14.21",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "jest-circus": "^26.6.3",
