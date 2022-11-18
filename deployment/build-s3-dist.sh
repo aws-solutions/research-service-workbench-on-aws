@@ -77,5 +77,15 @@ echo "[Packing] Services"
 echo "------------------------------------------------------------------------------"
 echo "Checking files under $template_dir/build/"
 ls $template_dir/build/
+
+echo "Creating zip file of this folder: $template_dir/build/*"
 zip -rq service-workbench-services.zip $template_dir/build/*
+
+echo "Placing zip file under folder: $build_dist_dir"
 cp service-workbench-services.zip $build_dist_dir/service-workbench-services.zip
+
+echo "Checking files under $build_dist_dir"
+ls $build_dist_dir
+
+echo "Checking files under $template_dist_dir"
+ls $template_dist_dir

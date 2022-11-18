@@ -37,6 +37,8 @@ phases:
 
 artifacts:
   files:
+    - "**/*"
+    - build/**/*
     - deployment/**/*
     - source/**/*
     - .gitignore
