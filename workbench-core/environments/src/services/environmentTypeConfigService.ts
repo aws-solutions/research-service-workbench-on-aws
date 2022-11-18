@@ -13,7 +13,7 @@ import {
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {

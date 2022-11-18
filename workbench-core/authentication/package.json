@@ -55,6 +55,7 @@
     "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
+    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "license-check-and-add": "^4.0.5",
     "license-checker": "^25.0.1",
