@@ -5,49 +5,32 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
-  AwsService,
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
   addPaginationToken,
-  getPaginationToken,
   DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import { CreateEnvironmentTypeConfigRequest } from '../interfaces/createEnvironmentTypeConfigRequest';
+import { EnvironmentTypeConfig, EnvironmentTypeConfigParser } from '../interfaces/environmentTypeConfig';
+import { ListEnvironmentTypeConfigsRequest } from '../interfaces/listEnvironmentTypeConfigsRequest';
+import { UpdateEnvironmentTypeConfigRequest } from '../interfaces/updateEnvironmentTypeConfigsRequest';
 import EnvironmentTypeService from './environmentTypeService';
 
-interface EnvironmentTypeConfig {
-  pk: string;
-  sk: string;
-  id: string;
-  productId: string;
-  provisioningArtifactId: string;
-  type: string;
-  description: string;
-  name: string;
-  params: { key: string; value: string }[];
-  resourceType: string;
-  createdAt: string;
-  updatedAt: string;
-  estimatedCost?: string;
-  dependency: string;
-}
-
 export default class EnvironmentTypeConfigService {
-  private _aws: AwsService;
   private _envTypeService: EnvironmentTypeService;
   private _resourceType: string = 'envTypeConfig';
+  private _dynamoDbService: DynamoDBService;
 
-  public constructor(constants: { TABLE_NAME: string }) {
-    const { TABLE_NAME } = constants;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
-    this._envTypeService = new EnvironmentTypeService({ TABLE_NAME });
+  public constructor(envTypeService: EnvironmentTypeService, dynamoDbService: DynamoDBService) {
+    this._envTypeService = envTypeService;
+    this._dynamoDbService = dynamoDbService;
   }
 
   /**
    * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
-   * @param envTypeId - the environment type identifier for this config
    * @param envTypeConfigId - the environment type config identifier
    *
    * @returns environment type config object
@@ -56,29 +39,26 @@ export default class EnvironmentTypeConfigService {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<EnvironmentTypeConfig> {
-    const response = await this._aws.helpers.ddb.get(this._buildEnvTypeConfigPkSk(envTypeConfigId)).execute();
+    const response = await this._dynamoDbService.get(this._buildEnvTypeConfigPkSk(envTypeConfigId)).execute();
     const item = (response as GetItemCommandOutput).Item;
-    if (item === undefined) {
+    if (item === undefined || (item.dependency as unknown as string) !== envTypeId) {
       throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
     } else {
-      const envTypeConfig = item as unknown as EnvironmentTypeConfig;
+      const envTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse(item);
       return Promise.resolve(envTypeConfig);
     }
   }
 
   /**
    * List environment type config objects from DDB
-   * @param envTypeId - the environment type identifier for this config
-   * @param pageSize - the number of environment type config objects to get (optional)
-   * @param paginationToken - the token from the previous page for continuation (optional)
+   * @param request - object containing environmentType, page size and pagination token for this configs
    *
    * @returns environment type config objects
    */
   public async listEnvironmentTypeConfigs(
-    envTypeId: string,
-    pageSize?: number,
-    paginationToken?: string
+    request: ListEnvironmentTypeConfigsRequest
   ): Promise<{ data: EnvironmentTypeConfig[]; paginationToken: string | undefined }> {
+    const { envTypeId, pageSize, paginationToken } = request;
     let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByDependency',
@@ -87,11 +67,12 @@ export default class EnvironmentTypeConfigService {
       limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
     };
     queryParams = addPaginationToken(paginationToken, queryParams);
-    const envTypeConfigsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    const token = getPaginationToken(envTypeConfigsResponse);
+    const envTypeConfigsResponse = await this._dynamoDbService.getPaginatedItems(queryParams);
     return {
-      data: envTypeConfigsResponse.Items as unknown as EnvironmentTypeConfig[],
-      paginationToken: token
+      data: envTypeConfigsResponse.data.map((item) => {
+        return EnvironmentTypeConfigParser.parse(item);
+      }),
+      paginationToken: envTypeConfigsResponse.paginationToken
     };
   }
 
@@ -122,24 +103,27 @@ export default class EnvironmentTypeConfigService {
     const envTypeConfigId = uuidWithLowercasePrefix(resourceTypeToKey.envTypeConfig);
     const currentDate = new Date().toISOString();
 
-    const newEnvTypeConfig: EnvironmentTypeConfig = {
+    const newEnvTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse({
       id: envTypeConfigId,
-      ...this._buildEnvTypeConfigPkSk(envTypeConfigId),
       productId,
       provisioningArtifactId,
       createdAt: currentDate,
       updatedAt: currentDate,
       resourceType: this._resourceType,
-      dependency: request.envTypeId,
       ...request.params
+    });
+    const dynamoItem: Record<string, unknown> = {
+      ...newEnvTypeConfig,
+      dependency: request.envTypeId
     };
-
-    const item = newEnvTypeConfig as unknown as { [key: string]: unknown };
-    const response = await this._aws.helpers.ddb
-      .update(this._buildEnvTypeConfigPkSk(envTypeConfigId), { item })
+    const key = this._buildEnvTypeConfigPkSk(envTypeConfigId);
+    const response = await this._dynamoDbService
+      .update(key, {
+        item: dynamoItem
+      })
       .execute();
     if (response.Attributes) {
-      return response.Attributes as unknown as EnvironmentTypeConfig;
+      return newEnvTypeConfig;
     }
     console.error('Unable to create environment type', newEnvTypeConfig);
     throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(request.params)}`);
@@ -155,13 +139,11 @@ export default class EnvironmentTypeConfigService {
    * @returns environment type config object with updated attributes
    */
   public async updateEnvironmentTypeConfig(
-    ownerId: string,
-    envTypeId: string,
-    envTypeConfigId: string,
-    updatedValues: { [key: string]: string }
+    request: UpdateEnvironmentTypeConfigRequest
   ): Promise<EnvironmentTypeConfig> {
-    const attributesAllowedToUpdate = ['description', 'name'];
-    const attributesNotAllowed = Object.keys(updatedValues).filter((key) => {
+    const { envTypeId, envTypeConfigId, params } = request;
+    const attributesAllowedToUpdate = ['description', 'estimatedCost'];
+    const attributesNotAllowed = Object.keys(params).filter((key) => {
       return !attributesAllowedToUpdate.includes(key);
     });
     if (attributesNotAllowed.length > 0) {
@@ -180,22 +162,19 @@ export default class EnvironmentTypeConfigService {
 
     const currentDate = new Date().toISOString();
     const updatedEnvTypeConfig = {
-      ...updatedValues,
+      ...params,
       createdAt: currentDate,
-      updatedAt: currentDate,
-      updatedBy: ownerId
+      updatedAt: currentDate
     };
 
-    const response = await this._aws.helpers.ddb
+    const response = await this._dynamoDbService
       .update(this._buildEnvTypeConfigPkSk(envTypeConfigId), { item: updatedEnvTypeConfig })
       .execute();
     if (response.Attributes) {
-      return response.Attributes as unknown as EnvironmentTypeConfig;
+      return EnvironmentTypeConfigParser.parse(response.Attributes);
     }
     console.error('Unable to update environment type config', updatedEnvTypeConfig);
-    throw Boom.internal(
-      `Unable to update environment type config with params: ${JSON.stringify(updatedValues)}`
-    );
+    throw Boom.internal(`Unable to update environment type config with params: ${JSON.stringify(params)}`);
   }
 
   private _buildEnvTypeConfigPkSk(envTypeConfigId: string): { pk: string; sk: string } {

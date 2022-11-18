@@ -14,22 +14,29 @@ import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
 import {
   CreateEnvironmentTypeConfigRequest,
-  createEnvironmentTypeConfigRequestParser
+  CreateEnvironmentTypeConfigRequestParser
 } from './interfaces/createEnvironmentTypeConfigRequest';
 import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
 import {
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
+} from './interfaces/listEnvironmentTypeConfigsRequest';
+import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
 } from './interfaces/listEnvironmentTypesRequest';
+import {
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser
+} from './interfaces/updateEnvironmentTypeConfigsRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
-import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
@@ -55,13 +62,16 @@ export {
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
-  UpdateEnvironmentTypeConfigSchema,
   CreateEnvironmentTypeSchema,
   UpdateEnvironmentTypeSchema,
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeHandler,
-  createEnvironmentTypeConfigRequestParser,
-  CreateEnvironmentTypeConfigRequest,
   ListEnvironmentTypesRequest,
-  ListEnvironmentTypesRequestParser
+  ListEnvironmentTypesRequestParser,
+  CreateEnvironmentTypeConfigRequestParser,
+  CreateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser,
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
 };

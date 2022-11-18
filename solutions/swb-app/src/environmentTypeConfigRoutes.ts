@@ -3,18 +3,18 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   EnvironmentTypeConfigService,
-  UpdateEnvironmentTypeConfigSchema,
-  createEnvironmentTypeConfigRequestParser
+  CreateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequest,
+  ListEnvironmentTypeConfigsRequest,
+  CreateEnvironmentTypeConfigRequestParser,
+  UpdateEnvironmentTypeConfigRequestParser,
+  ListEnvironmentTypeConfigsRequestParser
 } from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
-import { validate as uuidValidate } from 'uuid';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeConfigRoutes(
   router: Router,
@@ -24,10 +24,10 @@ export function setUpEnvTypeConfigRoutes(
   router.post(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      const envTypeConfigRequest = createEnvironmentTypeConfigRequestParser.parse({
-        envTypeId: req.params.envTypeId,
-        params: req.body
-      });
+      const envTypeConfigRequest = validateAndParse<CreateEnvironmentTypeConfigRequest>(
+        CreateEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, params: req.body }
+      );
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
         envTypeConfigRequest
       );
@@ -39,16 +39,6 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeId)) {
-        throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
-      }
-
-      if (
-        req.params.envTypeConfigId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.envTypeConfig)) ===
-        null
-      ) {
-        throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
-      }
       const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(
         req.params.envTypeId,
         req.params.envTypeConfigId
@@ -61,19 +51,15 @@ export function setUpEnvTypeConfigRoutes(
   router.get(
     '/environmentTypes/:envTypeId/configurations',
     wrapAsync(async (req: Request, res: Response) => {
-      const { paginationToken, pageSize } = req.query;
-      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
-      } else {
-        const envTypeConfig = await environmentTypeConfigService.listEnvironmentTypeConfigs(
-          req.params.envTypeId,
-          pageSize ? Number(pageSize) : undefined,
-          paginationToken
-        );
-        res.send(envTypeConfig);
-      }
+      const listEnvTypeConfigRequest = validateAndParse<ListEnvironmentTypeConfigsRequest>(
+        ListEnvironmentTypeConfigsRequestParser,
+        { envTypeId: req.params.envTypeId, ...req.body }
+      );
+
+      const envTypeConfig = await environmentTypeConfigService.listEnvironmentTypeConfigs(
+        listEnvTypeConfigRequest
+      );
+      res.send(envTypeConfig);
     })
   );
 
@@ -81,17 +67,12 @@ export function setUpEnvTypeConfigRoutes(
   router.put(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
-      if (!uuidValidate(req.params.envTypeConfigId)) {
-        throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
-      }
-
-      processValidatorResult(validate(req.body, UpdateEnvironmentTypeConfigSchema));
-      const user = res.locals.user;
+      const envTypeConfigRequest = validateAndParse<UpdateEnvironmentTypeConfigRequest>(
+        UpdateEnvironmentTypeConfigRequestParser,
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, params: req.body }
+      );
       const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
-        user.id,
-        req.params.envTypeId,
-        req.params.envTypeConfigId,
-        req.body
+        envTypeConfigRequest
       );
       res.status(200).send(envTypeConfig);
     })
