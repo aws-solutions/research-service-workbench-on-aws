@@ -71,11 +71,11 @@ echo "--------------------------------------------------------------------------
 echo "[Packing] Files from the root level of the project"
 echo "------------------------------------------------------------------------------"
 
-echo "cp $source_template_dir/../LICENSE.txt $dist_dir"
-cp $source_template_dir/../LICENSE.txt $dist_dir
+echo "cp $source_template_dir/../LICENSE $dist_dir/LICENSE.txt"
+cp $source_template_dir/../LICENSE $dist_dir/LICENSE.txt
 
-echo "cp $source_template_dir/../NOTICE.txt $dist_dir"
-cp $source_template_dir/../NOTICE.txt $dist_dir
+echo "cp $source_template_dir/../NOTICE $dist_dir/NOTICE.txt"
+cp $source_template_dir/../NOTICE $dist_dir/NOTICE.txt
 
 echo "cp $source_template_dir/../README.md $dist_dir"
 cp $source_template_dir/../README.md $dist_dir
