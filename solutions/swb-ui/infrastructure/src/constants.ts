@@ -112,7 +112,7 @@ function getAPIOutputs(): {
     };
   } catch {
     console.error(
-      `No API Stack deployed found for ${process.env.STAGE}.Please deploy application swb-reference and try again.`
+      `No API Stack deployed found for ${process.env.STAGE}. Please deploy application swb-reference and try again.`
     );
     throw new Error(`No API Stack deployed found for ${process.env.STAGE}.`);
   }
