@@ -11,12 +11,16 @@ import {
   AwsService,
   QueryParams,
   resourceTypeToKey,
-  uuidWithLowercasePrefix
+  uuidWithLowercasePrefix,
+  buildDynamoDBPkSk,
+  buildDynamoDbKey,
+  DEFAULT_API_PAGE_SIZE,
+  addPaginationToken,
+  getPaginationToken
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
-import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export interface Environment {
   id: string | undefined;
@@ -89,7 +93,7 @@ export class EnvironmentService {
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
     if (includeMetadata) {
       const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: this._buildKey(envId, resourceTypeToKey.environment) } })
+        .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
         .execute();
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find environment ${envId}`);
