@@ -3,12 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostCenterRequest';
+
 jest.mock('uuid', () => ({ v4: () => 'someId' }));
 
 import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
@@ -268,6 +271,42 @@ describe('CostCenterService', () => {
           );
         });
       });
+    });
+  });
+
+  describe('update', () => {
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    describe('with a valid request', async () => {
+      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
+        id: '',
+        name: 'Cost Center 1',
+        description: 'Description for Cost Center 1'
+      });
+      // jest.spyOn(Updater.prototype, 'execute').mockImplementation((param) => {
+      //   console.log('params', param);
+      //   return Promise.resolve({});
+      // });
+      // jest.spyOn(DynamoDBService.prototype, 'update').mockImplementation((param) => {
+      //   expect(param).toEqual({
+      //     key: { name: 'resourceType', value: 'costCenter' },
+      //     index: 'getResourceByName',
+      //     limit: 1,
+      //     sortKey: 'name',
+      //     begins: { S: 'CostCenter' },
+      //     forward: false
+      //   });
+      //   return Promise.resolve({
+      //     data: [costCenterJson],
+      //     paginationToken
+      //   });
+      // });
+
+      const response = await costCenterService.updateCostCenter(costCenterUpdateRequest);
+
+      console.log('hello world');
     });
   });
 });
