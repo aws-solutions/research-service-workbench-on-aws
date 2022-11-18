@@ -27,22 +27,25 @@ phases:
       - echo "Starting open-source-dist `date` `pwd`"
       - chmod +x ./../../deployment/build-open-source-dist.sh && ./../../deployment/build-open-source-dist.sh $SOLUTION_NAME
       - echo "Open Source Dist completed `date`"
-      - cd ../..
   post_build:
     commands:
       - echo "Retrieving next stage buildspec `date` `pwd`"
-      - aws s3 cp s3://solutions-build-assets/changelog-spec.yml buildspec.yml
+      - aws s3 cp s3://solutions-build-assets/changelog-spec.yml ../../buildspec.yml
       - echo "Retrieving next stage buildspec complete"
       - echo "Post build completed on `date`"
 
 artifacts:
   files:
-    - "**/*"
     - build/**/*
     - deployment/**/*
     - source/**/*
     - .gitignore
     - sonar-project.properties
     - buildspec.yml
+    - LICENSE.txt
+    - NOTICE.txt
+    - README.md
+    - CODE_OF_CONDUCT.md
+    - CONTRIBUTING.md
     - CHANGELOG.md
     - .cfnnag_*

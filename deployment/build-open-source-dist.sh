@@ -23,6 +23,16 @@ dist_template_dir="$dist_dir/deployment"
 source_dir="$source_template_dir/../../source"
 
 echo "------------------------------------------------------------------------------"
+echo "[Check] Check contents of important folders"
+echo "------------------------------------------------------------------------------"
+echo "Checking files under $dist_dir"
+ls $dist_dir
+echo "Checking files under $dist_template_dir"
+ls $dist_template_dir
+echo "Checking files under $source_dir"
+ls $source_dir
+
+echo "------------------------------------------------------------------------------"
 echo "[Init] Clean old open-source folder"
 echo "------------------------------------------------------------------------------"
 echo "rm -rf $dist_dir"
