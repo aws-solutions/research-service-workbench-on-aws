@@ -9,7 +9,7 @@
 
 # Get reference for all important folders
 template_dir="$PWD"
-source_dir="$template_dir/../../source"
+source_dir="$template_dir/../../solutions/swb-reference"
 
 echo "------------------------------------------------------------------------------"
 echo "Install packages"
@@ -24,6 +24,5 @@ echo "--------------------------------------------------------------------------
 cd $source_dir
 rush purge
 rush update
-rush build
-rush test
+rush build:test
 echo "Test Complete"

@@ -4,18 +4,14 @@ phases:
     runtime-versions:
       nodejs: 14
     commands:
-      # For debugging purposes
-      - ls -al
-      - npm --version
-      - node --version
-      # Install dependencies
-      - npm install -g aws-cdk
+      - echo "nothing to do in install"
   pre_build:
     commands:
-      - echo "Installing dependencies and executing unit tests `pwd`"
-      - npm install -g @microsoft/rush
-      - rush install && rush build && rush test
-      - echo "Installing dependencies and executing unit tests completed on `date`"
+      - echo "Installing dependencies and executing unit tests - `pwd`"
+      - echo Update npm to latest
+      - npm install -g npm@latest
+      - cd deployment && chmod +x ./run-unit-tests.sh && ./run-unit-tests.sh
+      - echo "Installing dependencies and executing unit tests completed `date`"
   build:
     commands:
       - cd solutions/swb-reference
