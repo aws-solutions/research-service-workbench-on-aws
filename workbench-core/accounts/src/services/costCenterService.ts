@@ -80,11 +80,12 @@ export default class CostCenterService {
 
     const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
-    await this._aws.helpers.ddb
-      .update(key, {
+    await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key,
+      params: {
         item: dynamoItem
-      })
-      .execute();
+      }
+    });
 
     return costCenter;
   }
