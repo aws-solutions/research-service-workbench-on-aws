@@ -292,7 +292,7 @@ export default class HostingAccountLifecycleService {
       "Sid": "Get:onboarding-template",
       "Effect": "Allow",
       "Principal": {
-        "AWS":"arn:aws:iam::${awsAccountId}:root"
+        "AWS":"arn:aws:iam::${awsAccountId}"
       },
       "Action": "s3:GetObject",
       "Resource": ["${artifactBucketArn}/onboard-account.cfn.yaml"]
@@ -629,7 +629,7 @@ export default class HostingAccountLifecycleService {
   }
 
   private _getEnvironmentFilesPathForArn(artifactBucketArn: string): string {
-    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3::::', '').split('/');
+    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucketName = parsedBucketArn[0];
 
     if (_.isEmpty(bucketName) || bucketName.length === 0) {

@@ -78,13 +78,12 @@ export default class AccountService {
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
-    console.log(bucket)
 
     // Sign the url
     const command = new GetObjectCommand( { Bucket: bucket, Key:key});
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { url: this._constructOnboardingCreateCFUrl(templateParams, signedUrl )};
+    return { url: signedUrl /*this._constructOnboardingCreateCFUrl(templateParams, signedUrl )*/};
   }
 
   /**

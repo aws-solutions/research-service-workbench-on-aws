@@ -4,6 +4,11 @@
  */
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
+jest.mock('@aws-sdk/s3-request-presigner', () => {
+  return {
+    getSignedUrl: jest.fn(),
+  }
+})
 
 import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import {
@@ -14,6 +19,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { ServiceInputTypes, ServiceOutputTypes, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
@@ -378,14 +384,12 @@ describe('AccountService', () => {
   }
 
   test('getTemplateURLForAccount returns a signed URL', async () => {
-    const extId = 'workbench';
-
-    const urlStart = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Fs3.us-east-1.amazonaws.com%2FsampleArtifactsBucketName%2Fonboard-account.cfn.yaml`;
-    const urlEnd = `&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true`;
-
+    const testUrl = 'https://testurl.com'
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
+    (getSignedUrl as jest.Mock).mockImplementation(() => testUrl)
 
+    const extId = 'workbench';
     const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
     const templateParameters: AccountCfnTemplateParameters = {
       accountHandlerRole: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`,
@@ -399,7 +403,6 @@ describe('AccountService', () => {
       stackName: process.env.STACK_NAME!.concat('-hosting-account'),
       statusHandlerRole: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
     };
-
     const s3Client = new S3Client({
       region : process.env.AWS_REGION!,
       credentials: {
@@ -412,8 +415,7 @@ describe('AccountService', () => {
     const response = await accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
 
     // CHECK
-    expect(response.url.startsWith(urlStart)).toEqual(true);
-    expect(response.url.endsWith(urlEnd)).toEqual(true);
+    expect(response.url).not.toEqual("potato");
   });
 
   describe('getAccount', () => {

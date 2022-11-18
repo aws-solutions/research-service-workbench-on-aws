@@ -11,7 +11,12 @@ import {
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  QueryCommand,
+  UpdateItemCommand
+} from '@aws-sdk/client-dynamodb';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import {
   EventBridgeClient,
@@ -170,7 +175,7 @@ describe('HostingAccountLifecycleService', () => {
     hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
 
     const cfnMock = mockClient(CloudFormationClient);
-    const missingBucketNameArn = 'arn:aws:s3::::';
+    const missingBucketNameArn = 'arn:aws:s3:::';
     mockCloudformationOutputs(cfnMock, 'CREATE_COMPLETE', missingBucketNameArn);
 
     const mockDDB = mockClient(DynamoDBClient);
@@ -706,4 +711,22 @@ describe('HostingAccountLifecycleService', () => {
     );
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
+
+  /*
+  test('TODO: getTemplateURLForAccount basic unit test', async () => {
+    const service = new HostingAccountLifecycleService();
+    const sampleAccountId = '123456789012';
+    const sampleExternalId = 'sample';
+    const s3Mock = mockClient(S3Client);
+    // Mocking expected template pulled from S3
+    s3Mock.on(Credentials).resolves({
+      Body: readableStream as SdkStream<Readable>
+    });
+
+    expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
+        service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)
+    );
+  });
+
+   */
 });
