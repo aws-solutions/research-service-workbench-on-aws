@@ -690,15 +690,6 @@ describe('HostingAccountLifecycleService', () => {
                 },
                 "Action": "s3:GetObject",
                 "Resource": "${sampleBucketArn}/environment-files*"
-            },
-            {
-              "Sid": "Get:onboarding-template",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS":"arn:aws:iam::${sampleAccountId}:root"
-              },
-              "Action": "s3:GetObject",
-              "Resource": ["${sampleBucketArn}/onboard-account.cfn.yaml"]
             }
         ]
     }`)
