@@ -36,6 +36,9 @@ phases:
 
 artifacts:
   files:
+    - common/**/*
+    - solutions/**/*
+    - workbench-core/**/*
     - build/**/*
     - deployment/**/*
     - source/**/*
