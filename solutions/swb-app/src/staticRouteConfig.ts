@@ -192,8 +192,14 @@ export const routesMap: RoutesMap = {
     {
       POST: [
         {
-          action: 'UPDATE',
-          subject: 'Project'
+          action: 'CREATE',
+          subject: 'AssignUserToProject'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'AssignUserToProject'
         }
       ]
     },
