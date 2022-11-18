@@ -1560,7 +1560,6 @@ describe('DynamoDBService', () => {
         key: buildDynamoDBPkSk('sampleAccId', 'someType')
       });
       expect(result).toEqual({ Attributes: unmarshalledAttributes });
-      // expect(result.paginationToken).toEqual(unmarshalledPaginationToken);
     });
   });
 

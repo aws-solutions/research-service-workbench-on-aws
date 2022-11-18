@@ -525,7 +525,6 @@ class Updater {
    * ```
    */
   public async execute(): Promise<UpdateItemCommandOutput> {
-    // const result = await this._ddb.updateItem(this._internals.toParams());
     return this._ddb.updateItem(this._internals.toParams());
   }
 }
