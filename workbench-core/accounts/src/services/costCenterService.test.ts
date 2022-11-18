@@ -5,10 +5,11 @@
 
 jest.mock('uuid', () => ({ v4: () => 'someId' }));
 
-import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
@@ -272,26 +273,20 @@ describe('CostCenterService', () => {
     });
   });
 
-  describe('update', () => {
+  describe('delete', () => {
     let costCenterId: string;
-    let costCenterName: string;
-    let costCenterDescription: string;
+    type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
+    let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
-
       costCenterId = 'cc-someId';
-      costCenterName = 'CostCenter-1';
-      costCenterDescription = 'Description for CostCenter-1';
-    });
-
-    test('with a valid request', async () => {
-      const costCenterJson = {
+      costCenterJson = {
         pk: `CC#${costCenterId}`,
         sk: `CC#${costCenterId}`,
         id: costCenterId,
-        name: costCenterName,
+        name: 'CostCenter 1',
         dependency: accountId,
-        description: costCenterDescription,
+        description: 'Cost Center 1 description',
         subnetId: accountMetadata.subnetId,
         vpcId: accountMetadata.vpcId,
         envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
@@ -303,44 +298,123 @@ describe('CostCenterService', () => {
         createdAt: mockDateObject.toISOString(),
         updatedAt: mockDateObject.toISOString()
       };
-      ddbMock.on(UpdateItemCommand).resolves({
-        Attributes: marshall(costCenterJson)
+      // Mock getting projects associated with cost center
+      ddbMock.on(QueryCommand).resolves({
+        Items: []
       });
-      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
-        id: costCenterId,
-        name: costCenterName,
-        description: costCenterDescription
-      });
+      // Mock getting cost center item to check if cost center exist
+      ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
+      // Mock updating cost center
+      ddbMock.on(UpdateItemCommand).resolves({});
+    });
 
-      await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).resolves.toEqual({
-        id: costCenterId,
-        name: costCenterName,
-        accountId: 'acc-someId',
-        description: costCenterDescription,
-        subnetId: 'subnet-123',
-        vpcId: 'vpc-123',
-        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
-        externalId: 'externalId',
-        encryptionKeyArn: 'sampleEncryptionKeyArn',
-        environmentInstanceFiles: '',
-        hostingAccountHandlerRoleArn: '',
-        awsAccountId: 'awsAccountId',
-        createdAt: '2021-02-26T22:42:16.652Z',
-        updatedAt: '2021-02-26T22:42:16.652Z'
+    describe('with no projects associated to the cost center', () => {
+      it('soft delete the CostCenter', async () => {
+        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).resolves;
+      });
+    });
+    describe('with CostCenter that does not exist in DDB', () => {
+      it('should throw "not find cost center error"', async () => {
+        ddbMock.on(GetItemCommand).resolves({ Item: undefined });
+        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).rejects.toThrowError(
+          Boom.notFound(`Could not find cost center ${costCenterId}`)
+        );
+      });
+    });
+    describe('with a projects associated to the cost center', () => {
+      it('does not delete the CostCenter and throws an error', async () => {
+        ddbMock.on(QueryCommand).resolves({
+          Items: [
+            marshall({
+              sk: 'proj-example1',
+              resourceType: 'project',
+              pk: 'proj-example1',
+              dependency: costCenterId
+            })
+          ]
+        });
+        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).rejects.toThrowError(
+          Boom.conflict(
+            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
+          )
+        );
+      });
+    });
+  });
+
+  describe('update', () => {
+    let costCenterId: string;
+    let costCenterName: string;
+    let costCenterDescription: string;
+    beforeEach(() => {
+      jest.restoreAllMocks();
+      costCenterId = 'cc-someId';
+      costCenterName = 'CostCenter-1';
+      costCenterDescription = 'Description for CostCenter-1';
+    });
+
+    describe('with a valid request', () => {
+      test('it returns a valid response', async () => {
+        const costCenterJson = {
+          pk: `CC#${costCenterId}`,
+          sk: `CC#${costCenterId}`,
+          id: costCenterId,
+          name: costCenterName,
+          dependency: accountId,
+          description: costCenterDescription,
+          subnetId: accountMetadata.subnetId,
+          vpcId: accountMetadata.vpcId,
+          envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+          externalId: accountMetadata.externalId,
+          encryptionKeyArn: accountMetadata.encryptionKeyArn,
+          environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+          hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+          awsAccountId: accountMetadata.awsAccountId,
+          createdAt: mockDateObject.toISOString(),
+          updatedAt: mockDateObject.toISOString()
+        };
+
+        ddbMock.on(UpdateItemCommand).resolves({
+          Attributes: marshall(costCenterJson)
+        });
+        const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
+          id: costCenterId,
+          name: costCenterName,
+          description: costCenterDescription
+        });
+
+        await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).resolves.toEqual({
+          id: costCenterId,
+          name: costCenterName,
+          accountId: 'acc-someId',
+          description: costCenterDescription,
+          subnetId: 'subnet-123',
+          vpcId: 'vpc-123',
+          envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+          externalId: 'externalId',
+          encryptionKeyArn: 'sampleEncryptionKeyArn',
+          environmentInstanceFiles: '',
+          hostingAccountHandlerRoleArn: '',
+          awsAccountId: 'awsAccountId',
+          createdAt: '2021-02-26T22:42:16.652Z',
+          updatedAt: '2021-02-26T22:42:16.652Z'
+        });
       });
     });
 
-    test('with a DDB error', async () => {
-      ddbMock.on(UpdateItemCommand).rejects('DDB Update error');
-      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
-        id: costCenterId,
-        name: costCenterName,
-        description: costCenterDescription
-      });
+    describe('with a DDB update error', () => {
+      test('it returns a Boom error', async () => {
+        ddbMock.on(UpdateItemCommand).rejects('DDB Update error');
+        const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
+          id: costCenterId,
+          name: costCenterName,
+          description: costCenterDescription
+        });
 
-      await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).rejects.toThrowError(
-        `Unable to update CostCenter with params ${JSON.stringify(costCenterUpdateRequest)}`
-      );
+        await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).rejects.toThrowError(
+          Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(costCenterUpdateRequest)}`)
+        );
+      });
     });
   });
 });
