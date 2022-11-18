@@ -3,19 +3,17 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostCenterRequest';
-
 jest.mock('uuid', () => ({ v4: () => 'someId' }));
 
 import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import { ListCostCentersRequestParser } from '../models/costCenters/listCostCentersRequest';
+import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostCenterRequest';
 import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
 
@@ -275,38 +273,74 @@ describe('CostCenterService', () => {
   });
 
   describe('update', () => {
+    let costCenterId: string;
+    let costCenterName: string;
+    let costCenterDescription: string;
     beforeEach(() => {
       jest.restoreAllMocks();
+
+      costCenterId = 'cc-someId';
+      costCenterName = 'CostCenter-1';
+      costCenterDescription = 'Description for CostCenter-1';
     });
 
-    describe('with a valid request', async () => {
-      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
-        id: '',
-        name: 'Cost Center 1',
-        description: 'Description for Cost Center 1'
+    test('with a valid request', async () => {
+      const costCenterJson = {
+        pk: `CC#${costCenterId}`,
+        sk: `CC#${costCenterId}`,
+        id: costCenterId,
+        name: costCenterName,
+        dependency: accountId,
+        description: costCenterDescription,
+        subnetId: accountMetadata.subnetId,
+        vpcId: accountMetadata.vpcId,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+        externalId: accountMetadata.externalId,
+        encryptionKeyArn: accountMetadata.encryptionKeyArn,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+        awsAccountId: accountMetadata.awsAccountId,
+        createdAt: mockDateObject.toISOString(),
+        updatedAt: mockDateObject.toISOString()
+      };
+      ddbMock.on(UpdateItemCommand).resolves({
+        Attributes: marshall(costCenterJson)
       });
-      // jest.spyOn(Updater.prototype, 'execute').mockImplementation((param) => {
-      //   console.log('params', param);
-      //   return Promise.resolve({});
-      // });
-      // jest.spyOn(DynamoDBService.prototype, 'update').mockImplementation((param) => {
-      //   expect(param).toEqual({
-      //     key: { name: 'resourceType', value: 'costCenter' },
-      //     index: 'getResourceByName',
-      //     limit: 1,
-      //     sortKey: 'name',
-      //     begins: { S: 'CostCenter' },
-      //     forward: false
-      //   });
-      //   return Promise.resolve({
-      //     data: [costCenterJson],
-      //     paginationToken
-      //   });
-      // });
+      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
+        id: costCenterId,
+        name: costCenterName,
+        description: costCenterDescription
+      });
 
-      const response = await costCenterService.updateCostCenter(costCenterUpdateRequest);
+      await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).resolves.toEqual({
+        id: costCenterId,
+        name: costCenterName,
+        accountId: 'acc-someId',
+        description: costCenterDescription,
+        subnetId: 'subnet-123',
+        vpcId: 'vpc-123',
+        envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+        externalId: 'externalId',
+        encryptionKeyArn: 'sampleEncryptionKeyArn',
+        environmentInstanceFiles: '',
+        hostingAccountHandlerRoleArn: '',
+        awsAccountId: 'awsAccountId',
+        createdAt: '2021-02-26T22:42:16.652Z',
+        updatedAt: '2021-02-26T22:42:16.652Z'
+      });
+    });
 
-      console.log('hello world');
+    test('with a DDB error', async () => {
+      ddbMock.on(UpdateItemCommand).rejects('DDB Update error');
+      const costCenterUpdateRequest = UpdateCostCenterRequestParser.parse({
+        id: costCenterId,
+        name: costCenterName,
+        description: costCenterDescription
+      });
+
+      await expect(costCenterService.updateCostCenter(costCenterUpdateRequest)).rejects.toThrowError(
+        `Unable to update CostCenter with params ${JSON.stringify(costCenterUpdateRequest)}`
+      );
     });
   });
 });

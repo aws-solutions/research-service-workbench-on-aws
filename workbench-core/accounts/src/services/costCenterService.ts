@@ -82,14 +82,19 @@ export default class CostCenterService {
       updatedAt: currentDate
     };
 
-    const response = await this._dynamoDbService
-      .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
-      .execute();
+    let response;
+    try {
+      response = await this._dynamoDbService
+        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
+        .execute();
+    } catch (e) {
+      console.error('Unable to update cost center', request);
+      throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+    }
     if (response.Attributes) {
       return this._mapDDBItemToCostCenter(response.Attributes);
     }
-    console.error('Unable to update cost center', updatedCostCenter);
-    throw Boom.internal(`Unable to update CostCenter with params ${updatedCostCenter}`);
+    throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
