@@ -18,15 +18,16 @@ phases:
       - node ./../../common/scripts/install-run-rushx.js compile
       - STAGE=testEnv node ./../../common/scripts/install-run-rushx.js cdk synth
       - echo "Starting build `date` `pwd`"
-      - chmod +x ./../../deployment/build-s3-dist.sh && ./../../deployment/build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
+      - cd ../../deployment
+      - chmod +x ./build-s3-dist.sh && ./build-s3-dist.sh $DIST_OUTPUT_BUCKET $SOLUTION_NAME $VERSION
       - echo "Build completed `date`"
       - echo "Starting open-source-dist `date` `pwd`"
-      - chmod +x ./../../deployment/build-open-source-dist.sh && ./../../deployment/build-open-source-dist.sh $SOLUTION_NAME
+      - chmod +x ./build-open-source-dist.sh && ./build-open-source-dist.sh $SOLUTION_NAME
       - echo "Open Source Dist completed `date`"
   post_build:
     commands:
       - echo "Retrieving next stage buildspec `date` `pwd`"
-      - aws s3 cp s3://solutions-build-assets/changelog-spec.yml ../../buildspec.yml
+      - aws s3 cp s3://solutions-build-assets/changelog-spec.yml ../buildspec.yml
       - echo "Retrieving next stage buildspec complete"
       - echo "Post build completed on `date`"
 
