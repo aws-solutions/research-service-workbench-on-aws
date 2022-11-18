@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-environments",
-      "comment": "eslint fixes",
+      "comment": "revert to 2ae2a9a",
       "type": "none"
     }
   ],

@@ -4,7 +4,6 @@
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { useUsers, BaseLayout, useSettings } from '@aws/workbench-core-swb-common-ui';
 import {
   Box,
@@ -16,7 +15,7 @@ import {
   StatusIndicator
 } from '@cloudscape-design/components';
 import type { NextPage } from 'next';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { columnDefinitions } from '../../users-table-config/usersColumnDefinitions';
 
 export interface UserProps {

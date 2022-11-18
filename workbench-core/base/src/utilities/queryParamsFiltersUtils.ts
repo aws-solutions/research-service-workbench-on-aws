@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { marshall } from '@aws-sdk/util-dynamodb';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import { FilterRequest } from '../interfaces/filterRequest';
 import QueryParams from '../interfaces/queryParams';
 

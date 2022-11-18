@@ -10,7 +10,7 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import { AwsService } from '@aws/workbench-core-base';
 import { CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
-import axios from 'axios';
+import Axios from 'axios';
 import { getConstants, getConstantsWithSecrets } from './constants';
 
 async function run(): Promise<void> {
@@ -62,7 +62,7 @@ async function uploadOnboardAccountCfnToS3(): Promise<void> {
 async function downloadFile(fileUrl: string, outputLocationPath: string): Promise<void> {
   const finished = promisify(stream.finished);
   const writer = createWriteStream(outputLocationPath);
-  return axios({
+  return Axios({
     method: 'get',
     url: fileUrl,
     responseType: 'stream'

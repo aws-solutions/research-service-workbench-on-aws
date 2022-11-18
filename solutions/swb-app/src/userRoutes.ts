@@ -10,7 +10,7 @@ import {
   UpdateRoleSchema,
   UserManagementService
 } from '@aws/workbench-core-authentication';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import _ from 'lodash';
