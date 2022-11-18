@@ -11,16 +11,12 @@ import {
   AwsService,
   QueryParams,
   resourceTypeToKey,
-  uuidWithLowercasePrefix,
-  buildDynamoDBPkSk,
-  buildDynamoDbKey,
-  DEFAULT_API_PAGE_SIZE,
-  addPaginationToken,
-  getPaginationToken
+  uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
+import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 export interface Environment {
   id: string | undefined;
@@ -93,7 +89,7 @@ export class EnvironmentService {
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
     if (includeMetadata) {
       const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
+        .query({ key: { name: 'pk', value: this._buildKey(envId, resourceTypeToKey.environment) } })
         .execute();
       if (data.Count === 0) {
         throw Boom.notFound(`Could not find environment ${envId}`);
@@ -337,9 +333,10 @@ export class EnvironmentService {
       throw e;
     }
 
-    const updateResponse = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(envId, resourceTypeToKey.environment), { item: updatedValues })
-      .execute();
+    const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(envId, resourceTypeToKey.environment),
+      params: { item: updatedValues }
+    });
 
     return updateResponse.Attributes! as unknown as Environment;
   }
@@ -534,6 +531,6 @@ export class EnvironmentService {
   ): Promise<void> {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
-    await this._aws.helpers.ddb.update(key, { item: data }).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key, params: { item: data } });
   }
 }
