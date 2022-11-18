@@ -196,7 +196,7 @@ export default class CostCenterService {
    * @param costCenterId - id of CostCenter we want to check
    * @returns Whether a CostCenter have any projects associated with it
    */
-  public async _doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+  private async _doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
     const queryParams: QueryParams = {
       index: 'getResourceByDependency',
       key: { name: 'resourceType', value: 'project' },
