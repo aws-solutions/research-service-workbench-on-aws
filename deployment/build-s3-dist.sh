@@ -283,11 +283,20 @@ fi
                            # and may succeed using old build files. This ensures we
                            # have fresh javascript from a successful build
 
-do_cmd cd $source_dir/swb-reference
-
 echo "------------------------------------------------------------------------------"
 echo "${bold}[Create] Templates${normal}"
 echo "------------------------------------------------------------------------------"
+
+do_cmd cd $source_dir/swb-reference
+
+if fn_exists create_template_${template_format}; then
+    create_template_${template_format}
+else
+    echo "Invalid setting for \$template_format: $template_format"
+    exit 255
+fi
+
+do_cmd cd $source_dir/swb-ui/infrastructure
 
 if fn_exists create_template_${template_format}; then
     create_template_${template_format}
