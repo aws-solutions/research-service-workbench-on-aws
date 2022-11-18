@@ -65,4 +65,16 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
       res.send(await projectService.createProject(request, res.locals.user));
     })
   );
+
+  // Delete project
+  router.patch(
+    '/projects/:projectId/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      // validate request--TODO
+      // get environments (if any)--TODO
+      // get datasets (if any)--TODO
+      // get etcs (if any)--TODO
+      // delete project
+    })
+  );
 }

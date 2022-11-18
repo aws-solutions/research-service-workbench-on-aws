@@ -27,11 +27,12 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
 import CostCenter from '../models/costCenter';
-import CreateProjectRequest from '../models/createProjectRequest';
-import GetProjectRequest from '../models/getProjectRequest';
-import { listProjectGSINames, ListProjectsRequest } from '../models/listProjectsRequest';
-import ListProjectsResponse from '../models/listProjectsResponse';
-import Project from '../models/project';
+import CreateProjectRequest from '../models/projects/createProjectRequest';
+import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
+import GetProjectRequest from '../models/projects/getProjectRequest';
+import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
+import ListProjectsResponse from '../models/projects/listProjectsResponse';
+import { Project } from '../models/projects/project';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
 
@@ -57,17 +58,6 @@ export default class ProjectService {
    * @returns Project entry in DDB
    */
   public async getProject(request: GetProjectRequest): Promise<Project> {
-    // Check permissions--TODO implement after dynamic AuthZ
-    // const dynamicOperation: DynamicOperation = {
-    //   action: 'READ',
-    //   subjectType: 'Project',
-    //   subjectId: `${projectId}`, // TODO--verify that this is correct for the full projectId since it will be proj-<uuid>
-    // };
-    // const authRequest: IsAuthorizedOnSubjectRequest = {
-    //   dynamicOperation: dynamicOperation
-    // };
-    // Will throw error if not authorized
-    // await this._dynamicAuthorizationService.isAuthorizedOnSubject(request.user, authRequest);
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
       .execute();
@@ -80,6 +70,17 @@ export default class ProjectService {
       return this._mapToProjectFromDDBItem(item);
     }
   }
+
+  // public async getProjectAndMetadata(request: GetProjectRequest): Promise<Project>{
+  //   const response = await this._aws.helpers.ddb.
+  // }
+
+  // private async _getEnvironmentTypeConfigMetadata(): Promise<void> {
+  //   let nextToken: string = '';
+  //   while(nextToken){
+  //     const response = await this._aws.helpers.ddb.getPaginatedItems({...buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project)})
+  //   }
+  // }
 
   // TODO--delete after dynamic Authz
   private _mockGetUserGroups(): string[] {
@@ -140,7 +141,7 @@ export default class ProjectService {
 
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
-      const project = await this.getProject({ user: request.user, projectId: projectId });
+      const project = await this.getProject({ projectId });
       return { data: [project], paginationToken: undefined };
     }
 
@@ -215,7 +216,7 @@ export default class ProjectService {
     // }
 
     // Create Permissions for the groups--TODO implement after dynamic AuthZ
-    // const identityPermissions: IdentityPermission[] = this._createIdentityPermissionsForProject(projectId);
+    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
     // const createIdentityPermissionsResponse = this._dynamicAuthorizationService.createIdentityPermissions(
     //   user,
     //   identityPermissions
@@ -250,8 +251,11 @@ export default class ProjectService {
     };
     try {
       await this._aws.helpers.ddb
-        .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
-          item: this._mapToDDBItemFromProject(newProject)
+        .update({
+          key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
+          params: {
+            item: this._mapToDDBItemFromProject(newProject)
+          }
         })
         .execute();
     } catch (e) {
@@ -260,6 +264,60 @@ export default class ProjectService {
     }
 
     return newProject;
+  }
+
+  public async deleteProject(request: DeleteProjectRequest): Promise<Project> {
+    // verify project exists
+    console.log(request.projectId);
+    await this.getProject({ projectId: request.projectId });
+
+    // verify all dependencies are empty
+    Object.keys(request.dependencies).forEach((dependency) => {
+      if (!_.isEmpty(request.dependencies[dependency])) {
+        throw Boom.badRequest(
+          `Please cleanup dependencies of project. At least one ${dependency} is still attached to project ${request.projectId}.`
+        );
+      }
+    });
+
+    // Delete Permissions for the groups--TODO implement after dynamic AuthZ
+    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
+    // const deleteIdentityPermissionsResponse = this._dynamicAuthorizationService.deleteIdentityPermissions(
+    //   identityPermissions
+    // );
+    // if (!createIdentityPermissionsResponse.deleted) {
+    //   throw Boom.badImplementation(
+    //     'Failed to delete batch identity permissions for project with dyamic authorization service.'
+    //   );
+    // }
+
+    // Delete ProjectAdmin and Researcher groups--TODO implement after dynamic AuthZ
+    // const deleteProjectAdminGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
+    //   groupId: `${projId}#PA`
+    // });
+    // const deleteResearcherGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
+    //   groupId: `${projId}#Researcher`
+    // });
+    // if (!deleteProjectAdminGroupResponse.created || !deleteResearcherGroupResponse.created) {
+    //   throw Boom.badImplementation(
+    //     'Failed to delete Project Admin group or Researcher group with dynamic authorization service.'
+    //   );
+    // }
+
+    // delete from DDB
+    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
+      params: {
+        item: { resourceType: 'deleted_project', status: 'DELETED' },
+        return: 'ALL_NEW'
+      }
+    });
+
+    if (!response.Attributes) {
+      throw Boom.badImplementation('Could not delete project from DDB.');
+    }
+    console.log(response.Attributes);
+    return this._mapToProjectFromDDBItem(response.Attributes);
   }
 
   /**
@@ -286,11 +344,12 @@ export default class ProjectService {
    * @param item - the DDB item to conver to a Project object
    * @returns a Project object containing only project data from DDB attributes
    */
-  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue>): Project {
+  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue> | Record<string, string>): Project {
     const copyItem = { ...item };
     const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
     itemWithoutValues.costCenterId = copyItem.dependency;
     const project: Project = itemWithoutValues as unknown as Project;
+    console.log(project);
     return project;
   }
 
@@ -364,7 +423,7 @@ export default class ProjectService {
   }
 
   // TODO--implement after dynamic AuthZ
-  // private _createIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
+  // private _generateIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
   //   return [
   //     {
   //       // create for PA

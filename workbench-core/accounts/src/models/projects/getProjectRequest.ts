@@ -3,10 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+// import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 
 interface GetProjectRequest {
-  user: AuthenticatedUser;
   projectId: string;
 }
 

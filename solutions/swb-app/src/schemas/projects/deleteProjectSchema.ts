@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// Schema for GetProject API
+// Schema for deleteAccount API
 import { Schema } from 'jsonschema';
 
-const GetProjectSchema: Schema = {
-  id: '/getProject',
+const DeleteProjectSchema: Schema = {
+  id: '/deleteProject',
   type: 'object',
   properties: {
     projectId: { type: 'string' }
@@ -16,4 +16,4 @@ const GetProjectSchema: Schema = {
   required: ['projectId']
 };
 
-export default GetProjectSchema;
+export default DeleteProjectSchema;

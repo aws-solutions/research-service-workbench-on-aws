@@ -202,6 +202,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PATCH: [
+      {
+        action: 'DELETE',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {

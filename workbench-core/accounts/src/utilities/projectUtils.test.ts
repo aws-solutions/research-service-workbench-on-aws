@@ -4,8 +4,8 @@
  */
 
 import { ProjectStatus } from '../constants/projectStatus';
-import { ProjectFilter, ProjectSort } from '../models/listProjectsRequest';
-import Project from '../models/project';
+import { ProjectFilter, ProjectSort } from '../models/projects/listProjectsRequest';
+import { Project } from '../models/projects/project';
 import { manualFilterProjects, manualSortProjects } from './projectUtils';
 
 describe('projectUtils', () => {

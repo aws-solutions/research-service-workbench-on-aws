@@ -4,9 +4,9 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
-import CreateProjectRequest from './models/createProjectRequest';
-import GetProjectRequest from './models/getProjectRequest';
-import { ListProjectsRequest } from './models/listProjectsRequest';
+import CreateProjectRequest from './models/projects/createProjectRequest';
+import GetProjectRequest from './models/projects/getProjectRequest';
+import { ListProjectsRequest } from './models/projects/listProjectsRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
