@@ -80,7 +80,10 @@ export default class AccountService {
     const bucket = parsedBucketArn[0];
 
     // Sign the url
-    const command = new GetObjectCommand( { Bucket: bucket, Key:key});
+    const command = new GetObjectCommand( {
+      Bucket: bucket,
+      Key:key,
+    });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
     return { url: signedUrl /*this._constructOnboardingCreateCFUrl(templateParams, signedUrl )*/};

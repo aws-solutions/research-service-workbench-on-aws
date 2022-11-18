@@ -92,6 +92,7 @@ export default class HostingAccountLifecycleService {
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
     ]);
+    /*
     const bucketName = artifactBucketArn.split(':').pop() as string;
 
     let bucketPolicy: PolicyDocument = new PolicyDocument();
@@ -106,6 +107,7 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
+
     const templatePolicy = this._getOnboardingTemplatePolicyStatement(awsAcctId, artifactBucketArn);
 
     bucketPolicy = this._applyPoliciesToPolicyDocument(awsAcctId, bucketPolicy, [templatePolicy]);
@@ -114,8 +116,10 @@ export default class HostingAccountLifecycleService {
       Policy: JSON.stringify(bucketPolicy.toJSON())
     };
 
+     */
+
     // Update bucket policy
-    await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
+    //await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
 
     const templateParameters: AccountCfnTemplateParameters = {
       accountHandlerRole: accountHandlerRoleArn,
@@ -132,7 +136,7 @@ export default class HostingAccountLifecycleService {
 
     const s3Client = new S3Client({
       credentials: await this._aws.clients.s3.config.credentials(),
-      region : process.env.AWS_REGION!
+      region : process.env.AWS_REGION!,
     });
     return this._accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
   }
@@ -272,12 +276,12 @@ export default class HostingAccountLifecycleService {
       "Resource": ["${artifactBucketArn}/environment-files*"]
       }`)
     );
-    const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(
-      awsAccountId,
-      artifactBucketArn
-    );
+    // const onboardingTemplateStatement = this._getOnboardingTemplatePolicyStatement(
+    //   awsAccountId,
+    //   artifactBucketArn
+    // );
 
-    const policyStatements = [listStatement, getStatement, onboardingTemplateStatement];
+    const policyStatements = [listStatement, getStatement /*, onboardingTemplateStatement */];
 
     return this._applyPoliciesToPolicyDocument(awsAccountId, policyDocument, policyStatements);
   }
