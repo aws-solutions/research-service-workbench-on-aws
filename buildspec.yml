@@ -14,7 +14,7 @@ phases:
       - echo "Installing dependencies and executing unit tests completed `date`"
   build:
     commands:
-      - cd solutions/swb-reference
+      - cd ./../../solutions/swb-reference
       - node ./../../common/scripts/install-run-rushx.js compile
       - STAGE=testEnv node ./../../common/scripts/install-run-rushx.js cdk synth
       - echo "Starting build `date` `pwd`"
