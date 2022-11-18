@@ -11,7 +11,7 @@ import {
   resourceTypeToKey,
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import { Account } from '../models/account';
 import CostCenter from '../models/costCenter';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';

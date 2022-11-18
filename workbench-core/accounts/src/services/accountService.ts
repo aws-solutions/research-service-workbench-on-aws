@@ -5,7 +5,7 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/account';
 

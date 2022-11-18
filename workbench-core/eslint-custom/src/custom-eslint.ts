@@ -15,18 +15,7 @@ export const customESLint: any = {
     '@rushstack/eslint-config/profile/node',
     '@rushstack/eslint-config/mixins/tsdoc',
     'plugin:security/recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript'
+    'plugin:import/recommended'
   ],
-  rules: rules,
-  settings: {
-    'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx']
-    },
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true
-      }
-    }
-  }
+  rules: rules
 };
