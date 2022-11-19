@@ -60,6 +60,7 @@ describe('HostingAccountLifecycleService', () => {
     process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
     process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
     process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.AWS_REGION = 'us-east-1';
   });
 
   afterAll(() => {
@@ -317,7 +318,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -387,7 +388,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -454,7 +455,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -704,11 +705,11 @@ describe('HostingAccountLifecycleService', () => {
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
-  test('TODO: getTemplateURLForAccount basic unit test', async () => {
+  test('getTemplateURLForAccount basic unit test', async () => {
     const service = new HostingAccountLifecycleService();
     const sampleAccountId = '123456789012';
     const sampleExternalId = 'sample';
-    const region = 'us-east-1';
+    const region = process.env.AWS_REGION!;
 
     service['_aws'].clients.s3 = new S3({
       region : region,
