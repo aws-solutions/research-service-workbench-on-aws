@@ -29,6 +29,7 @@ import {
 import { KMSClient, GetKeyPolicyCommand, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetObjectCommand,
+  S3,
   S3Client,
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
@@ -703,15 +704,18 @@ describe('HostingAccountLifecycleService', () => {
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
-  /*
   test('TODO: getTemplateURLForAccount basic unit test', async () => {
     const service = new HostingAccountLifecycleService();
     const sampleAccountId = '123456789012';
     const sampleExternalId = 'sample';
-    const s3Mock = mockClient(S3Client);
-    // Mocking expected template pulled from S3
-    s3Mock.on(Credentials).resolves({
-      Body: readableStream as SdkStream<Readable>
+    const region = 'us-east-1';
+
+    service['_aws'].clients.s3 = new S3({
+      region : region,
+      credentials: {
+        accessKeyId: "AKIAIOSFODNN7EXAMPLE",
+        secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      }
     });
 
     expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
@@ -719,5 +723,5 @@ describe('HostingAccountLifecycleService', () => {
     );
   });
 
-   */
+  //test("")
 });

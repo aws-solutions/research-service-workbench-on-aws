@@ -521,6 +521,15 @@ describe('AccountService', () => {
           `Could not find account ${noMatchId}`
         );
       });
+
+      test('throws an error when there is no Item associated with the accountId with metadata', async () => {
+        mockDDB.on(QueryCommand).resolves({ Count: 0 });
+        const noMatchId = 'noMatchId';
+        await expect(accountService.getAccount(noMatchId, true)).rejects.toThrowError(
+            `Could not find account ${noMatchId}`
+        );
+      });
+
     });
   });
 });
