@@ -385,6 +385,8 @@ describe('AccountService', () => {
 
   test('getTemplateURLForAccount returns a signed URL', async () => {
     const testUrl = 'https://testurl.com'
+    const expectedUrl = 'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true'
+
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
     (getSignedUrl as jest.Mock).mockImplementation(() => testUrl)
@@ -415,7 +417,7 @@ describe('AccountService', () => {
     const response = await accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
 
     // CHECK
-    expect(response.url).not.toEqual("potato");
+    expect(response.url).toEqual(expectedUrl);
   });
 
   describe('getAccount', () => {

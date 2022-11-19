@@ -86,7 +86,7 @@ export default class AccountService {
     });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { url: signedUrl /*this._constructOnboardingCreateCFUrl(templateParams, signedUrl )*/};
+    return { url: this._constructOnboardingCreateCFUrl(templateParams, signedUrl )};
   }
 
   /**
