@@ -3,8 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryParameterFilter } from './queryParameterFilter';
+import { QueryNumberParamFilter } from './queryNumberParamFilter';
+import { QueryStringParamFilter } from './queryStringParamFilter';
 
-export interface FilterRequest {
-  [key: string]: QueryParameterFilter<unknown> | undefined;
-}
+export interface FilterRequest extends Record<string, QueryStringParamFilter | QueryNumberParamFilter> {}

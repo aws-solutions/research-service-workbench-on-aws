@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { FilterRequest, SortRequest } from '@aws/workbench-core-base';
 import { ProjectStatus } from '../constants/projectStatus';
-import { ProjectFilter, ProjectSort } from '../models/listProjectsRequest';
 import Project from '../models/project';
 import { manualFilterProjects, manualSortProjects } from './projectUtils';
 
@@ -71,7 +71,7 @@ describe('projectUtils', () => {
   });
 
   describe('manualSortProjects', () => {
-    let sortRequest: ProjectSort;
+    let sortRequest: SortRequest;
     let expectedProjects: Project[];
 
     test('should return original list if no sort passed in', async () => {
@@ -180,7 +180,7 @@ describe('projectUtils', () => {
   });
 
   describe('manualFilterProjects', () => {
-    let filterRequest: ProjectFilter;
+    let filterRequest: FilterRequest;
     let expectedProjects: Project[];
 
     test('should return original list if no filter passed in', async () => {
@@ -195,14 +195,6 @@ describe('projectUtils', () => {
       expect(() => manualFilterProjects(filterRequest, projects)).toThrow(
         'Cannot filter by more than one attribute.'
       );
-    });
-
-    test('should fail if filterValue is undefined', async () => {
-      // BUILD
-      filterRequest = { createdAt: undefined };
-
-      // TEST n CHECK
-      expect(() => manualFilterProjects(filterRequest, projects)).toThrow('Filter contains invalid format');
     });
 
     test('should fail if filterKey is not property on project', async () => {
