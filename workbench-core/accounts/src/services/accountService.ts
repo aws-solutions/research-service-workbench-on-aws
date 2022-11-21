@@ -145,7 +145,7 @@ export default class AccountService {
     }
   }
 
-  private _constructCreateAndUpdateUrlss(
+  private _constructCreateAndUpdateUrls(
     accountCfnTemplateParameters: AccountCfnTemplateParameters,
     signedUrl: string
   ): string {
