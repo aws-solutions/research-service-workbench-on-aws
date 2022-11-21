@@ -500,7 +500,6 @@ class Query {
       result.Items = result.Items.map((item) => unmarshall(item));
     }
 
-    console.log('result', result);
     if (result.LastEvaluatedKey) {
       result.LastEvaluatedKey = unmarshall(result.LastEvaluatedKey);
     }
