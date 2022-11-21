@@ -19,7 +19,9 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
+import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
@@ -32,6 +34,62 @@ export default class CostCenterService {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
     this._dynamoDbService = dynamoDbService;
+  }
+
+  /**
+   * Soft Delete Cost Center
+   * @param request - request for deleting cost center
+   * @param checkDependency - check whether we can delete the costCenter. The function should throw a Boom error if costCenter cannot be deleted
+   * @returns void
+   */
+  public async softDeleteCostCenter(
+    request: DeleteCostCenterRequest,
+    checkDependency: (costCenterId: string) => void
+  ): Promise<void> {
+    await checkDependency(request.id);
+
+    await this.getCostCenter(request.id);
+
+    try {
+      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
+      await this._dynamoDbService
+        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), {
+          item: { resourceType: `${this._resourceType}_deleted` }
+        })
+        .execute();
+    } catch (e) {
+      throw Boom.internal('Unable to delete CostCenter');
+    }
+  }
+
+  /**
+   * Update costCenter
+   * @param request - request for updating cost center
+   * @returns CostCenter object with updated attributes
+   */
+  public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
+    const currentDate = new Date().toISOString();
+
+    const updatedCostCenter = {
+      name: request.name,
+      description: request.description,
+      updatedAt: currentDate
+    };
+
+    let response;
+    try {
+      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
+      response = await this._dynamoDbService
+        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
+        .execute();
+    } catch (e) {
+      console.error('Unable to update cost center', request);
+      throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
+    }
+    if (response.Attributes) {
+      return this._mapDDBItemToCostCenter(response.Attributes);
+    }
+    throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
   }
 
   public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
