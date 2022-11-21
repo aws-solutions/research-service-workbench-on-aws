@@ -110,7 +110,7 @@ export default class HostingAccountLifecycleService {
       credentials: await this._aws.clients.s3.config.credentials(),
       region : process.env.AWS_REGION!,
     });
-    return this._accountService.getTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
+    return this._accountService.buildTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
   }
   /**
    * Links hosting account with main account policies for cross account communication
