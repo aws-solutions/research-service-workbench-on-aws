@@ -86,7 +86,7 @@ export default class AccountService {
     });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { createUrl: this._constructOnboardingCreateCFUrl(templateParams, signedUrl ),
+    return { createUrl: this._constructCreateAndUpdateUrls(templateParams, signedUrl ),
              updateUrl: ""};
   }
 
@@ -145,7 +145,7 @@ export default class AccountService {
     }
   }
 
-  private _constructOnboardingCreateCFUrl(
+  private _constructCreateAndUpdateUrlss(
     accountCfnTemplateParameters: AccountCfnTemplateParameters,
     signedUrl: string
   ): string {
