@@ -7,7 +7,7 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, buildDynamoDBPkSk, resourceTypeToKey } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 
 interface Project {
   pk: string;

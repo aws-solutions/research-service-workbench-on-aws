@@ -5,7 +5,7 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/account';
 
@@ -149,7 +149,7 @@ export default class AccountService {
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
 
     // Store Account row in DDB
-    await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: accountKey, params: accountParams });
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
@@ -166,7 +166,7 @@ export default class AccountService {
       };
 
       // Store AWS Account row in DDB (for easier duplicate checks later on)
-      await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+      await this._aws.helpers.ddb.updateExecuteAndFormat({ key: awsAccountKey, params: awsAccountParams });
     }
 
     return accountMetadata.id;

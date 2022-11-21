@@ -2,8 +2,8 @@
   "changes": [
     {
       "packageName": "@aws/workbench-core-environments",
-      "comment": "eslint fixes",
-      "type": "none"
+      "comment": "refactor ddb.update()",
+      "type": "patch"
     }
   ],
   "packageName": "@aws/workbench-core-environments"

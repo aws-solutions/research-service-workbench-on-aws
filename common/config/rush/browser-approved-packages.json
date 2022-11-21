@@ -143,6 +143,10 @@
       "allowedCategories": [ "prototypes" ]
     },
     {
+      "name": "@aws/workbench-core-example-express",
+      "allowedCategories": [ "prototypes" ]
+    },
+    {
       "name": "@aws/workbench-core-infrastructure",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -155,32 +159,52 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-swb-datasets-ui",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/components-react",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/design-tokens",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/global-styles",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/test-utils-core",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@babel/core",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@babel/plugin-syntax-dynamic-import",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/plugin-syntax-flow",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@babel/plugin-transform-react-jsx",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@babel/preset-env",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@babel/preset-next",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@babel/preset-react",
@@ -189,6 +213,10 @@
     {
       "name": "@babel/preset-typescript",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@babel/runtime",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@casl/ability",
@@ -219,10 +247,6 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "@next/eslint-plugin-next",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -237,6 +261,14 @@
     {
       "name": "@rushstack/heft-node-rig",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@rushstack/heft-web-rig",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@rushstack/heft-webpack5-plugin",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@rushstack/node-core-library",
@@ -261,10 +293,6 @@
     {
       "name": "@testing-library/user-event",
       "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "@typescript-eslint/parser",
-      "allowedCategories": [ "production" ]
     },
     {
       "name": "@vendia/serverless-express",
@@ -299,8 +327,20 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "babel-loader",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "babel-preset-next",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "cdk-nag",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "cdk-ssm-document",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "concurrently",
@@ -351,19 +391,11 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "eslint-import-resolver-typescript",
-      "allowedCategories": [ "production" ]
+      "name": "eslint-config-next",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint-plugin-import",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "eslint-plugin-react",
-      "allowedCategories": [ "production", "prototypes" ]
-    },
-    {
-      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
@@ -439,6 +471,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "next-compose-plugins",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "next-global-css",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -475,6 +511,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "react-scripts",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "sass",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -507,12 +547,24 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "tslib",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "typescript",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "uuid",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "web-vitals",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "webpack",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "winston",

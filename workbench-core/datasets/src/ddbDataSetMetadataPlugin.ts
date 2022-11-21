@@ -5,7 +5,7 @@
 
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
-import * as Boom from '@hapi/boom';
+import Boom from '@hapi/boom';
 import _ from 'lodash';
 
 import { DataSet } from './dataSet';
@@ -199,7 +199,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       endPointParams.item.endPointAlias = endPoint.endPointAlias;
     }
 
-    await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endPointKey, params: endPointParams });
 
     return endPoint.id!;
   }
@@ -225,7 +225,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (dataSet.externalEndpoints) dataSetParams.item.externalEndpoints = dataSet.externalEndpoints!;
 
-    await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: dataSetKey, params: dataSetParams });
 
     return dataSet.id!;
   }
