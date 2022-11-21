@@ -39,25 +39,19 @@ export default class CostCenterService {
   /**
    * Soft Delete Cost Center
    * @param request - request for deleting cost center
+   * @param checkDependency - check whether we can delete the costCenter. The function should throw a Boom error if costCenter cannot be deleted
    * @returns void
    */
-  public async softDeleteCostCenter(request: DeleteCostCenterRequest): Promise<void> {
-    const costCenterHaveProjects = await this._doesCostCenterHaveProjects(request.id);
-    if (costCenterHaveProjects) {
-      throw Boom.conflict(
-        `CostCenter ${request.id} cannot be deleted because it has project(s) associated with it`
-      );
-    }
+  public async softDeleteCostCenter(
+    request: DeleteCostCenterRequest,
+    checkDependency: (costCenterId: string) => void
+  ): Promise<void> {
+    await checkDependency(request.id);
 
-    const getCostCenterResponse = (await this._dynamoDbService
-      .get(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter))
-      .execute()) as GetItemCommandOutput;
-
-    if (getCostCenterResponse.Item === undefined) {
-      throw Boom.notFound(`Could not find cost center ${request.id}`);
-    }
+    await this.getCostCenter(request.id);
 
     try {
+      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
       await this._dynamoDbService
         .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), {
           item: { resourceType: `${this._resourceType}_deleted` }
@@ -84,6 +78,7 @@ export default class CostCenterService {
 
     let response;
     try {
+      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
       response = await this._dynamoDbService
         .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
         .execute();
@@ -194,22 +189,5 @@ export default class CostCenterService {
     } catch (e) {
       throw Boom.badRequest(`Could not find account ${accountId}`);
     }
-  }
-
-  /**
-   * Check whether a CostCenter have any projects associated with it
-   * @param costCenterId - id of CostCenter we want to check
-   * @returns Whether a CostCenter have any projects associated with it
-   */
-  private async _doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
-    const queryParams: QueryParams = {
-      index: 'getResourceByDependency',
-      key: { name: 'resourceType', value: 'project' },
-      sortKey: 'dependency',
-      eq: { S: costCenterId }
-    };
-
-    const associatedProjResponse = await this._dynamoDbService.query(queryParams).execute();
-    return associatedProjResponse.Items !== undefined && associatedProjResponse.Items.length > 0;
   }
 }

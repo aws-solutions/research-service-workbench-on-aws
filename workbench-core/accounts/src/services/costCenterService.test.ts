@@ -308,21 +308,32 @@ describe('CostCenterService', () => {
       ddbMock.on(UpdateItemCommand).resolves({});
     });
 
+    async function checkDependencyAndProjDoesNotExist(): Promise<void> {
+      return;
+    }
+
     describe('with no projects associated to the cost center', () => {
       it('soft delete the CostCenter', async () => {
-        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).resolves;
+        await expect(
+          costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjDoesNotExist)
+        ).resolves;
       });
     });
     describe('with CostCenter that does not exist in DDB', () => {
       it('should throw "not find cost center error"', async () => {
         ddbMock.on(GetItemCommand).resolves({ Item: undefined });
-        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).rejects.toThrowError(
-          Boom.notFound(`Could not find cost center ${costCenterId}`)
-        );
+        await expect(
+          costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjDoesNotExist)
+        ).rejects.toThrowError(Boom.notFound(`Could not find cost center ${costCenterId}`));
       });
     });
     describe('with a projects associated to the cost center', () => {
       it('does not delete the CostCenter and throws an error', async () => {
+        async function checkDependencyAndProjExist(costCenterId: string): Promise<void> {
+          throw Boom.conflict(
+            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
+          );
+        }
         ddbMock.on(QueryCommand).resolves({
           Items: [
             marshall({
@@ -333,7 +344,9 @@ describe('CostCenterService', () => {
             })
           ]
         });
-        await expect(costCenterService.softDeleteCostCenter({ id: costCenterId })).rejects.toThrowError(
+        await expect(
+          costCenterService.softDeleteCostCenter({ id: costCenterId }, checkDependencyAndProjExist)
+        ).rejects.toThrowError(
           Boom.conflict(
             `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
           )

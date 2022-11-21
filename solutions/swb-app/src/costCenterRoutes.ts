@@ -10,15 +10,21 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
-  DeleteCostCenterRequestParser
+  DeleteCostCenterRequestParser,
+  ProjectService
 } from '@aws/workbench-core-accounts';
 import CreateCostCenterSchema from '@aws/workbench-core-accounts/lib/schemas/createCostCenter';
+import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult, validateAndParse } from './validatorHelper';
 
-export function setUpCostCenterRoutes(router: Router, costCenterService: CostCenterService): void {
+export function setUpCostCenterRoutes(
+  router: Router,
+  costCenterService: CostCenterService,
+  projectService: ProjectService
+): void {
   router.post(
     '/costCenters',
     wrapAsync(async (req: Request, res: Response) => {
@@ -35,7 +41,16 @@ export function setUpCostCenterRoutes(router: Router, costCenterService: CostCen
         DeleteCostCenterRequestParser,
         deleteCostCenterRequest
       );
-      res.status(204).send(await costCenterService.softDeleteCostCenter(validatedRequest));
+
+      async function checkDependency(costCenterId: string): Promise<void> {
+        const costCenterHaveProjects = await projectService.doesCostCenterHaveProjects(costCenterId);
+        if (costCenterHaveProjects) {
+          throw Boom.conflict(
+            `CostCenter ${costCenterId} cannot be deleted because it has project(s) associated with it`
+          );
+        }
+      }
+      res.status(204).send(await costCenterService.softDeleteCostCenter(validatedRequest, checkDependency));
     })
   );
 
