@@ -91,10 +91,11 @@ export default class ProjectService {
       index: 'getResourceByDependency',
       key: { name: 'resourceType', value: 'project' },
       sortKey: 'dependency',
-      eq: { S: costCenterId }
+      eq: { S: costCenterId },
+      limit: 1
     };
 
-    const associatedProjResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    return associatedProjResponse.Items !== undefined && associatedProjResponse.Items.length > 0;
+    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    return associatedProjResponse.data.length > 0;
   }
 }
