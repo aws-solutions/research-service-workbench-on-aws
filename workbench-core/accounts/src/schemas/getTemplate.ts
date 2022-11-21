@@ -6,7 +6,7 @@
 // Schema for GetTemplate API
 import { Schema } from 'jsonschema';
 
-const GetTemplateSchema: Schema = {
+const AwsAccountTemplateUrlsSchema: Schema = {
     id: '/getTemplate',
     type: 'object',
     properties: {
@@ -17,4 +17,4 @@ const GetTemplateSchema: Schema = {
     required: ['awsAccountId', 'externalId']
 };
 
-export default GetTemplateSchema;
+export default AwsAccountTemplateUrlsSchema;
