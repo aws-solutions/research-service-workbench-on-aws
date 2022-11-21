@@ -86,8 +86,7 @@ export default class AccountService {
     });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { createUrl: this._constructCreateAndUpdateUrls(templateParams, signedUrl ),
-             updateUrl: ""};
+    return this._constructCreateAndUpdateUrls(templateParams, signedUrl);
   }
 
   /**
@@ -146,9 +145,9 @@ export default class AccountService {
   }
 
   private _constructCreateAndUpdateUrls(
-    accountCfnTemplateParameters: AccountCfnTemplateParameters,
-    signedUrl: string
-  ): string {
+      accountCfnTemplateParameters: AccountCfnTemplateParameters,
+      signedUrl: string
+  ): TemplateResponse {
     // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
 
     // We assume the hosting account's region is the same as where this lambda runs.
@@ -165,7 +164,7 @@ export default class AccountService {
       stackName,
       statusHandlerRole
     } = accountCfnTemplateParameters;
-    const url = [
+    const createUrl = [
       `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/create/review/`,
       `?templateURL=${encodeURIComponent(signedUrl)}`,
       `&stackName=${stackName}`,
@@ -184,7 +183,7 @@ export default class AccountService {
       `&templateURL=${encodeURIComponent(signedUrl)}`,
     ].join('');
 
-    return url;
+    return { createUrl, updateUrl};
   }
 
   /*
