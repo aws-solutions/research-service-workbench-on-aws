@@ -86,7 +86,8 @@ export default class AccountService {
     });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
 
-    return { url: this._constructOnboardingCreateCFUrl(templateParams, signedUrl )};
+    return { createUrl: this._constructOnboardingCreateCFUrl(templateParams, signedUrl ),
+             updateUrl: ""};
   }
 
   /**
@@ -176,6 +177,13 @@ export default class AccountService {
       `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
       `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`
     ].join('');
+
+    const updateUrl = [
+      `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/update/template`,
+      `?stackId=${encodeURIComponent(stackName)}`,
+      `&templateURL=${encodeURIComponent(signedUrl)}`,
+    ].join('');
+
     return url;
   }
 

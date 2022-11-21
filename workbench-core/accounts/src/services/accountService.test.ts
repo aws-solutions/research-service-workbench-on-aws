@@ -417,7 +417,7 @@ describe('AccountService', () => {
     const response = await accountService.buildTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
 
     // CHECK
-    expect(response.url).toEqual(expectedUrl);
+    expect(response.createUrl).toEqual(expectedUrl);
   });
 
   describe('getAccount', () => {

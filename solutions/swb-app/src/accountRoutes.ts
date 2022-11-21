@@ -6,7 +6,7 @@
 // AWS Account management
 import {
   CreateAccountSchema,
-  GetTemplateSchema,
+  AwsAccountTemplateUrlsSchema,
   UpdateAccountSchema,
   HostingAccountService,
   CreateAccountMetadata,

@@ -5,8 +5,8 @@
 
 import AccountHandler from './handlers/accountHandler';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import AwsAccountTemplateUrlsSchema from './schemas/awsAccountTemplateUrls';
 import CreateAccountSchema from './schemas/createAccount';
-import AwsAccountTemplateUrlsSchema from './schemas/getTemplate';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';

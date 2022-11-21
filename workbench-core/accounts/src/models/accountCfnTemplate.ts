@@ -4,7 +4,8 @@
  */
 
 interface TemplateResponse{
-    url: string;
+    createUrl: string;
+    updateUrl: string;
 }
 
 interface AccountCfnTemplateParameters{
