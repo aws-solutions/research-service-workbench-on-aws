@@ -3,9 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryParameterFilter } from '@aws/workbench-core-base';
+import { FilterRequest, QueryParameterFilter, SortRequest } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import { ProjectFilter, ProjectSort } from '../models/projects/listProjectsRequest';
 import { Project } from '../models/projects/project';
 
 /**
@@ -16,7 +15,7 @@ import { Project } from '../models/projects/project';
  * @param projects - list of {@link Project} objects to sort
  * @returns a list of {@link Project} objects after sort
  */
-export function manualSortProjects(sort: ProjectSort, projects: Project[]): Project[] {
+export function manualSortProjects(sort: SortRequest, projects: Project[]): Project[] {
   // if no sort attribute, return original list
   if (!sort || Object.keys(sort).length === 0) {
     return projects;
@@ -60,7 +59,7 @@ function order(sortKey: string, selectedDirection: string, project1: Project, pr
   }
 }
 
-export function manualFilterProjects(filter: ProjectFilter, projects: Project[]): Project[] {
+export function manualFilterProjects(filter: FilterRequest, projects: Project[]): Project[] {
   // if no filter attribute, return original list
   if (!filter || Object.keys(filter).length === 0) {
     return projects;
