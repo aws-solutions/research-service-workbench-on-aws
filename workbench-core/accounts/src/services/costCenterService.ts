@@ -136,11 +136,11 @@ export default class CostCenterService {
 
     const account = await this._getAccount(createCostCenter.accountId);
 
-    const createdAt = new Date(Date.now()).toISOString();
+    const currentDateTime = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
-      createdAt: createdAt,
-      updatedAt: createdAt,
+      createdAt: currentDateTime,
+      updatedAt: currentDateTime,
       id: id,
       accountId: createCostCenter.accountId,
       description: createCostCenter.description,
@@ -172,7 +172,7 @@ export default class CostCenterService {
       })
       .execute();
 
-    return costCenter;
+    return this.getCostCenter(id);
   }
 
   private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {

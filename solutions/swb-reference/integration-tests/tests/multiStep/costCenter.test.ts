@@ -14,33 +14,40 @@ describe('multiStep costCenter test', () => {
   });
 
   test('create, get, update, list, delete', async () => {
-    // Create Cost Center
     console.log('Creating Cost Centers');
     const accountId = setup.getSettings().get('defaultHostingAccountId');
-    // const { data: createdCostCenterA } = await adminSession.resources.costCenters.create({ accountId, name: 'costCenterA' });
-    // console.log('response', createdCostCenterA);
     const { data: createdCostCenterA } = await adminSession.resources.costCenters.create({
       accountId,
       name: 'costCenterA'
     });
-    console.log('createdCostCenterA', createdCostCenterA);
 
     const { data: createdCostCenterB } = await adminSession.resources.costCenters.create({
       accountId,
       name: 'costCenterB'
     });
-    console.log('createdCostCenterB', createdCostCenterB);
 
     console.log('Get Cost Center A');
     const { data: getCostCenterA } = await adminSession.resources.costCenters
       .costCenter(createdCostCenterA.id)
       .get();
-    expect(createdCostCenterA).toMatchObject(getCostCenterA);
+    expect(getCostCenterA).toMatchObject(createdCostCenterA);
 
     console.log('Search for Cost Center B');
-    const {
-      data: [listCostCenterB]
-    } = await adminSession.resources.costCenters.get({ 'filter[name][begins]': 'costCenterB' });
-    expect(listCostCenterB).toMatchObject(createdCostCenterB);
+    const { data: listCostCenter } = await adminSession.resources.costCenters.get({
+      'filter[name][begins]': 'costCenterB'
+    });
+    expect(listCostCenter.data.length).toEqual(1);
+    expect(listCostCenter.data[0]).toMatchObject(createdCostCenterB);
+
+    console.log('Update Cost Center B');
+    const name = 'costCenterB-nameUpdated';
+    const description = 'costCenterB-descriptionUpdated';
+    const { data: updatedCostCenterB } = await adminSession.resources.costCenters
+      .costCenter(createdCostCenterB.id)
+      .update({ name, description }, true);
+    expect(updatedCostCenterB).toMatchObject({ name, description });
+
+    console.log('Delete Cost Center B');
+    await expect(adminSession.resources.costCenters.costCenter(createdCostCenterB.id).softDelete()).resolves;
   });
 });
