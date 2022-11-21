@@ -20,12 +20,12 @@ export default class User extends Resource {
     return this._axiosInstance.put(`${this._api}/deactivate`);
   }
 
-  protected async cleanup(): Promise<void> {
+  public async cleanup(): Promise<void> {
     try {
       const defAdminSession = await this._setup.getDefaultAdminSession();
 
       // delete the user
-      await defAdminSession.resources.users.user(this._id).delete();
+      await defAdminSession.resources.users.user(this.id).delete();
     } catch (e) {
       console.error(e);
     }

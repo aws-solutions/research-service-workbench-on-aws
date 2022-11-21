@@ -108,11 +108,12 @@ export default class CostCenterService {
 
     const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
-    await this._dynamoDbService
-      .update(key, {
+    await this._dynamoDbService.updateExecuteAndFormat({
+      key,
+      params: {
         item: dynamoItem
-      })
-      .execute();
+      }
+    });
 
     return costCenter;
   }

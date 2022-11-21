@@ -12,7 +12,7 @@ import { AwsService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
+import { DataSet, DataSetHasEndpointError, DataSetService, S3DataSetStoragePlugin } from '.';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -288,6 +288,14 @@ describe('DataSetService', () => {
 
     it('returns nothing when the dataset is removed', async () => {
       await expect(service.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+    });
+
+    it('throws when an external endpoint exists on the DataSet.', async () => {
+      await expect(service.removeDataSet(mockDataSetWithEndpointId)).rejects.toThrow(
+        new DataSetHasEndpointError(
+          'External endpoints found on Dataset must be removed before DataSet can be removed.'
+        )
+      );
     });
   });
 
