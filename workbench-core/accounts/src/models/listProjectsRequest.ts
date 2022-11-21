@@ -3,14 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { QueryStringParamFilterParser } from '@aws/workbench-core-base';
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListProjectsRequestParser = z
   .object({
-    user: z.any(), // TODO what should this value be?
+    userId: z.string(), // TODO what should this value be?
     pageSize: z
       .string()
       .transform((pageSizeString, ctx) => {

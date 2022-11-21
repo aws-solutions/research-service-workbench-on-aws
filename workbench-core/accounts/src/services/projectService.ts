@@ -103,7 +103,7 @@ export default class ProjectService {
     validateSingleSortAndFilter(filter, sort);
 
     // Get user groups--TODO implement after dynamic AuthZ
-    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
+    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.userId);
     const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
 
     // If no group membership, return
@@ -140,7 +140,7 @@ export default class ProjectService {
 
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
-      const project = await this.getProject({ user: request.user, projectId: projectId });
+      const project = await this.getProject({ userId: request.userId, projectId: projectId });
       return { data: [project], paginationToken: undefined };
     }
 

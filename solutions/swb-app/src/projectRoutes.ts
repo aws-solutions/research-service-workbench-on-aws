@@ -10,7 +10,6 @@ import {
   ListProjectsRequestParser,
   GetProjectRequest
 } from '@aws/workbench-core-accounts';
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
@@ -24,7 +23,7 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
     '/projects/:projectId',
     wrapAsync(async (req: Request, res: Response) => {
       const objectToValidate = {
-        user: res.locals.user as AuthenticatedUser,
+        userId: res.locals.user.id,
         projectId: req.params.projectId
       };
       processValidatorResult(validate(objectToValidate, GetProjectSchema));
@@ -38,7 +37,10 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
   router.get(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<ListProjectsRequest>(ListProjectsRequestParser, req.query);
+      const validatedRequest = validateAndParse<ListProjectsRequest>(ListProjectsRequestParser, {
+        ...req.query,
+        userId: res.locals.user.id
+      });
 
       res.send(await projectService.listProjects(validatedRequest));
     })
