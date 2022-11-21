@@ -4,6 +4,8 @@
  */
 
 import {
+  DataSetHasEndpointError,
+  isDataSetHasEndpointError,
   EndPointExistsError,
   isEndPointExistsError,
   isRoleExistsOnEndpointError,
@@ -13,6 +15,15 @@ import {
 const error = new Error();
 
 describe('custom error tests', () => {
+  test('dataSetHasEndpointError', () => {
+    const dataSetHasEndpointError = new DataSetHasEndpointError();
+
+    expect(isDataSetHasEndpointError(dataSetHasEndpointError)).toBe(true);
+  });
+  test('not dataSetHasEndpointError', () => {
+    expect(isDataSetHasEndpointError(error)).toBe(false);
+  });
+
   test('endPointExistsError', () => {
     const endPointExistsError = new EndPointExistsError();
 
