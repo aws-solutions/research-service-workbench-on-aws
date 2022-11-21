@@ -10,6 +10,7 @@ import {
   DataSetService,
   DataSetsStoragePlugin
 } from '@aws/workbench-core-datasets';
+import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -19,7 +20,8 @@ import { processValidatorResult } from './validatorHelper';
 export function setUpDSRoutes(
   router: Router,
   dataSetService: DataSetService,
-  dataSetStoragePlugin: DataSetsStoragePlugin
+  dataSetStoragePlugin: DataSetsStoragePlugin,
+  environmentService: EnvironmentService
 ): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
@@ -82,6 +84,25 @@ export function setUpDSRoutes(
       }
       const ds = await dataSetService.getDataSet(req.params.id);
       res.send(ds);
+    })
+  );
+
+  // Delete dataset
+  router.delete(
+    '/datasets/:datasetId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const environments: Environment[] = await environmentService.listEnvironmentsForDataSet(
+        req.params.datasetId
+      );
+      if (environments.length) {
+        const existingEnvironments = environments.map((env) => `${env.name}(${env.id})`).join(', ');
+        throw Boom.badRequest(
+          `Cannot delete dataset because it is associated with environments: ${existingEnvironments}`
+        );
+      }
+
+      await dataSetService.removeDataSet(req.params.datasetId);
+      res.status(204).send();
     })
   );
 

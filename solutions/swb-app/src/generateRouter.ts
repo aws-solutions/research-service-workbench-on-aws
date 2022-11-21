@@ -98,7 +98,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService);
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
-  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
+  setUpDSRoutes(
+    router,
+    apiRouteConfig.dataSetService,
+    apiRouteConfig.dataSetsStoragePlugin,
+    apiRouteConfig.environmentService
+  );
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);

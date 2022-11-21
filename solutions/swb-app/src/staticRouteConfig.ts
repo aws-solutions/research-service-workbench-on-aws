@@ -51,6 +51,12 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'Dataset'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'Dataset'
+      }
     ]
   },
   '/datasets/import': {

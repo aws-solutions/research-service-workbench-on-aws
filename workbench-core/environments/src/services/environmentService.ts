@@ -5,7 +5,11 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import {
+  BatchGetItemCommandOutput,
+  GetItemCommandOutput,
+  QueryCommandOutput
+} from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -535,5 +539,20 @@ export class EnvironmentService {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
     await this._aws.helpers.ddb.update(key, { item: data }).execute();
+  }
+
+  public async listEnvironmentsForDataSet(dataSetId: string): Promise<Environment[]> {
+    const params: QueryParams = {
+      key: { name: 'pk', value: `${resourceTypeToKey.dataset}#${dataSetId}` },
+      sortKey: 'sk',
+      begins: { S: `${resourceTypeToKey.environment}#` }
+    };
+
+    const dataSetEnvironments: QueryCommandOutput = await this._aws.helpers.ddb.query(params).execute();
+    if (!dataSetEnvironments?.Items) {
+      return [];
+    }
+
+    return dataSetEnvironments.Items as unknown as Environment[];
   }
 }
