@@ -705,7 +705,7 @@ describe('HostingAccountLifecycleService', () => {
     expect(postUpdatedPolicy).toEqual(expectedPolicy);
   });
 
-  test('getTemplateURLForAccount basic unit test', async () => {
+  test('buildTemplateURLForAccount basic unit test', async () => {
     const service = new HostingAccountLifecycleService();
     const sampleAccountId = '123456789012';
     const sampleExternalId = 'sample';
@@ -719,10 +719,8 @@ describe('HostingAccountLifecycleService', () => {
       }
     });
 
-    expect(service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
-        service.getTemplateURLForAccount(sampleAccountId, sampleExternalId)
+    expect(service.buildTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
+        service.buildTemplateURLForAccount(sampleAccountId, sampleExternalId)
     );
   });
-
-  //test("")
 });

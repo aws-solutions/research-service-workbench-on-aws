@@ -940,7 +940,7 @@
 								}
 							}
 						},
-						"url": "{{API_URL}}/awsAccounts/get-template"
+						"url": "{{API_URL}}/awsAccountTemplateUrls"
 					},
 					"response": []
 				}

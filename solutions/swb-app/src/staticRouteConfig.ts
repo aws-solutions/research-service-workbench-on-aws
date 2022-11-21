@@ -21,7 +21,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/awsAccounts/get-template': {
+  '/awsAccountTemplateUrls': {
     POST: [
       {
         action: 'CREATE',
