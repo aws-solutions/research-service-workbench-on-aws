@@ -7,6 +7,7 @@ import {
   ProjectService,
   CreateProjectRequest,
   ListProjectsRequest,
+  ListProjectsRequestParser,
   GetProjectRequest
 } from '@aws/workbench-core-accounts';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
@@ -15,8 +16,7 @@ import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
 import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
-import ListProjectsSchema from './schemas/projects/listProjectsSchema';
-import { processValidatorResult } from './validatorHelper';
+import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpProjectRoutes(router: Router, projectService: ProjectService): void {
   // Get project
@@ -38,17 +38,9 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
   router.get(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      const objectToValidate = {
-        user: res.locals.user as AuthenticatedUser,
-        pageSize: req.query.pageSize ? Number(req.query.pageSize) : undefined,
-        paginationToken: req.query.paginationToken,
-        filter: req.query.filter,
-        sort: req.query.sort
-      };
-      processValidatorResult(validate(objectToValidate, ListProjectsSchema));
-      const request: ListProjectsRequest = objectToValidate as ListProjectsRequest;
+      const validatedRequest = validateAndParse<ListProjectsRequest>(ListProjectsRequestParser, req.query);
 
-      res.send(await projectService.listProjects(request));
+      res.send(await projectService.listProjects(validatedRequest));
     })
   );
 

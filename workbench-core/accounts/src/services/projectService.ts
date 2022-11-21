@@ -249,11 +249,12 @@ export default class ProjectService {
       accountId: costCenter.accountId
     };
     try {
-      await this._aws.helpers.ddb
-        .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
+      await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
+        params: {
           item: this._mapToDDBItemFromProject(newProject)
-        })
-        .execute();
+        }
+      });
     } catch (e) {
       console.error('Failed to create project', e);
       throw Boom.internal('Failed to create project');
