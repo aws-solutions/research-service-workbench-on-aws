@@ -51,12 +51,12 @@ export default class CostCenterService {
     await this.getCostCenter(request.id);
 
     try {
-      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
-      await this._dynamoDbService
-        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), {
+      await this._dynamoDbService.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
+        params: {
           item: { resourceType: `${this._resourceType}_deleted` }
-        })
-        .execute();
+        }
+      });
     } catch (e) {
       throw Boom.internal('Unable to delete CostCenter');
     }
@@ -78,10 +78,10 @@ export default class CostCenterService {
 
     let response;
     try {
-      //TODO: Make the fix suggested here https://github.com/aws-solutions/solution-spark-on-aws/pull/632#discussion_r1028242550
-      response = await this._dynamoDbService
-        .update(buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter), { item: updatedCostCenter })
-        .execute();
+      response = await this._dynamoDbService.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
+        params: { item: updatedCostCenter }
+      });
     } catch (e) {
       console.error('Unable to update cost center', request);
       throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
