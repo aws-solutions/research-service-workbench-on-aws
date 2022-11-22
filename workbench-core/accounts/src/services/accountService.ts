@@ -71,7 +71,9 @@ export default class AccountService {
   /**
    * Create/Upload template and return its UfRL
    *
-   * @param externalId - unique ID to represent account
+   * @param artifactBucketArn - arn for the S3 artifact bucket that contains the CFN template
+   * @param templateParams - collection of parameters to use when creating the cfn template
+   * @param s3Client - s3 client used to by the presigner to create the signed url
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
