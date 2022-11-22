@@ -10,10 +10,8 @@ import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
 import {
   GetBucketPolicyCommandOutput,
   PutBucketPolicyCommandInput,
-  NoSuchBucket,
-  GetObjectCommand
+  NoSuchBucket
 } from '@aws-sdk/client-s3';
-import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import {
   addPaginationToken,
   AwsService,
@@ -117,13 +115,7 @@ export default class HostingAccountLifecycleService {
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
 
-    // Sign the url
-    const command = new GetObjectCommand( {
-      Bucket: bucket,
-      Key:key,
-    });
-    const signedUrl = await getSignedUrl(this._aws.clients.s3, command, { expiresIn: 15 * 60 });
-
+    const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, key);
     return  this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
   }
   /**
