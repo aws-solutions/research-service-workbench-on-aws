@@ -707,7 +707,6 @@ describe('HostingAccountLifecycleService', () => {
 
   test('buildTemplateURLForAccount basic unit test', async () => {
     const service = new HostingAccountLifecycleService();
-    const sampleAccountId = '123456789012';
     const sampleExternalId = 'sample';
     const region = process.env.AWS_REGION!;
 
@@ -719,8 +718,8 @@ describe('HostingAccountLifecycleService', () => {
       }
     });
 
-    expect(service.buildTemplateURLForAccount(sampleAccountId, sampleExternalId)).toEqual(
-        service.buildTemplateURLForAccount(sampleAccountId, sampleExternalId)
+    expect(service.buildTemplateURLForAccount(sampleExternalId)).toEqual(
+        service.buildTemplateURLForAccount(sampleExternalId)
     );
   });
 });

@@ -22,7 +22,7 @@ export default class HostingAccountService {
   }
 
   public async buildTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
-    return await new HostingAccountLifecycleService().buildTemplateURLForAccount(awsAcctId, externalId);
+    return await new HostingAccountLifecycleService().buildTemplateURLForAccount(externalId);
   }
 
   /**

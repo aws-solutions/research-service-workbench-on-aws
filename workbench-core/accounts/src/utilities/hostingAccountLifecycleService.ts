@@ -74,11 +74,11 @@ export default class HostingAccountLifecycleService {
 
   /**
    * Create/Upload template and return its URL
-   * @param awsAcctId - ID of account to retrieve
+   * @param externalId - unique ID to represent account
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async buildTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
+  public async buildTemplateURLForAccount(externalId: string): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
 
     const {
