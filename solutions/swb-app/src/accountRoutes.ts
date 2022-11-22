@@ -40,9 +40,8 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccountTemplateUrls',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, AwsAccountTemplateUrlsSchema));
-      const awsAcctId = req.body.awsAccountId;
       const externalId = req.body.externalId;
-      res.send(await hostingAccountService.buildTemplateURLForAccount(awsAcctId, externalId));
+      res.send(await hostingAccountService.buildTemplateURLForAccount(externalId));
     })
   );
 

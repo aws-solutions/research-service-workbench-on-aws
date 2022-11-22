@@ -10,11 +10,10 @@ const AwsAccountTemplateUrlsSchema: Schema = {
     id: '/getTemplate',
     type: 'object',
     properties: {
-        awsAccountId: { type: 'string' },
         externalId: { type: 'string' }
     },
     additionalProperties: false,
-    required: ['awsAccountId', 'externalId']
+    required: ['externalId']
 };
 
 export default AwsAccountTemplateUrlsSchema;
