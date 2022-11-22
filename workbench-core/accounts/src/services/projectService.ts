@@ -51,6 +51,7 @@ export default class ProjectService {
     // this._dynamicAuthorizationService = new DynamicAuthorizationService();
   }
 
+  // TODO--fix tests
   /**
    * Get project
    * @param request - the request object for getting a project
@@ -70,17 +71,6 @@ export default class ProjectService {
       return this._mapToProjectFromDDBItem(item);
     }
   }
-
-  // public async getProjectAndMetadata(request: GetProjectRequest): Promise<Project>{
-  //   const response = await this._aws.helpers.ddb.
-  // }
-
-  // private async _getEnvironmentTypeConfigMetadata(): Promise<void> {
-  //   let nextToken: string = '';
-  //   while(nextToken){
-  //     const response = await this._aws.helpers.ddb.getPaginatedItems({...buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project)})
-  //   }
-  // }
 
   // TODO--delete after dynamic Authz
   private _mockGetUserGroups(): string[] {
@@ -141,7 +131,7 @@ export default class ProjectService {
 
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
-      const project = await this.getProject({ userId: request.userId, projectId: projectId });
+      const project = await this.getProject({ projectId: projectId });
       return { data: [project], paginationToken: undefined };
     }
 
@@ -264,9 +254,9 @@ export default class ProjectService {
     return newProject;
   }
 
-  public async deleteProject(request: DeleteProjectRequest): Promise<Project> {
+  // TODO--add callback function as param and in body of method
+  public async softDeleteProject(request: DeleteProjectRequest): Promise<void> {
     // verify project exists
-    console.log(request.projectId);
     await this.getProject({ projectId: request.projectId });
 
     // verify all dependencies are empty
@@ -314,9 +304,20 @@ export default class ProjectService {
     if (!response.Attributes) {
       throw Boom.badImplementation('Could not delete project from DDB.');
     }
-    console.log(response.Attributes);
-    return this._mapToProjectFromDDBItem(response.Attributes);
   }
+
+  // TODO--checks for PROJ with X DDB items
+  // public async checkDependency(resourceType: string, projectId: string): Promise<boolean> {
+  //   const queryParams: QueryParams = {
+  //     key: { name: 'pk', value: buildDynamoDBPkSk(projectId, resourceTypeToKey.project) },
+  //     begins: { S: resourceTypeToKey[resourceType] },
+  //     limit: 1
+  //   };
+
+  //   const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+  //   return response.data.length > 0;
+  // }
 
   /**
    * This method formats a Project object as a DDB item containing project data
@@ -353,7 +354,7 @@ export default class ProjectService {
 
   /**
    * Builds the Page and Pagination Token after GetItems call has been used to
-   * get project information from DDB.=
+   * get project information from DDB.
    *
    * @param paginationToken - string pagination token if need to display not the first page. Otherwise, undefined
    * @param projectsOnPage - list of {@link Project}s to build a page from

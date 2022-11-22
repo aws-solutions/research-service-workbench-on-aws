@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 
+// TODO--get rid of dependencies and fix tests
 // eslint-disable-next-line @rushstack/typedef-var
 export const DeleteProjectRequestParser = z.object({
   projectId: z.string(),

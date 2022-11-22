@@ -537,4 +537,19 @@ export class EnvironmentService {
 
     await this._aws.helpers.ddb.updateExecuteAndFormat({ key, params: { item: data } });
   }
+
+  // TODO--unit test
+  public async doesDependencyHaveEnvironments(dependency: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'environment' },
+      sortKey: 'dependency',
+      eq: { S: dependency },
+      limit: 1
+    };
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.length > 0;
+  }
 }

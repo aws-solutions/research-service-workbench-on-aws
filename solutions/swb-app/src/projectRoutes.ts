@@ -8,8 +8,12 @@ import {
   CreateProjectRequest,
   ListProjectsRequest,
   ListProjectsRequestParser,
-  GetProjectRequest
+  GetProjectRequest,
+  DeleteProjectRequest,
+  DeleteProjectRequestParser
 } from '@aws/workbench-core-accounts';
+import { EnvironmentService } from '@aws/workbench-core-environments';
+import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
@@ -17,7 +21,11 @@ import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
 import { processValidatorResult, validateAndParse } from './validatorHelper';
 
-export function setUpProjectRoutes(router: Router, projectService: ProjectService): void {
+export function setUpProjectRoutes(
+  router: Router,
+  projectService: ProjectService,
+  environmentService: EnvironmentService
+): void {
   // Get project
   router.get(
     '/projects/:projectId',
@@ -60,15 +68,28 @@ export function setUpProjectRoutes(router: Router, projectService: ProjectServic
     })
   );
 
-  // Delete project
-  router.patch(
+  // Soft delete project
+  router.put(
     '/projects/:projectId/softDelete',
     wrapAsync(async (req: Request, res: Response) => {
-      // validate request--TODO
-      // get environments (if any)--TODO
-      // get datasets (if any)--TODO
-      // get etcs (if any)--TODO
+      // TODO
+      async function checkDependencies(projectId: string): Promise<void> {
+        // environments
+        const projectHasEnvironments = await environmentService.doesDependencyHaveEnvironments(projectId);
+        if (projectHasEnvironments) {
+          throw Boom.conflict(
+            `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
+          );
+        }
+        // datasets
+        // etcs
+      }
+      // validate request
+      const validatedRequest = validateAndParse<DeleteProjectRequest>(DeleteProjectRequestParser, {
+        ...req.params
+      });
       // delete project
+      res.status(204).send(await projectService.softDeleteProject(validatedRequest, checkDependencies));
     })
   );
 }
