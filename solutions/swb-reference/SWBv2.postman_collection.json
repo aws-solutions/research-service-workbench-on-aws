@@ -914,7 +914,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"awsAccountId\": \"\",\n    \"externalId\": \"workbench\"\n}",
+              "raw": "{\n    \"externalId\": \"workbench\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

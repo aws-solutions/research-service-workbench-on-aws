@@ -5,7 +5,8 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { S3 } from '@aws-sdk/client-s3';
+import {GetObjectCommand, S3} from '@aws-sdk/client-s3';
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 
 export default class S3Service {
   private _s3: S3;
@@ -74,5 +75,14 @@ export default class S3Service {
     };
 
     await recursiveUpload(path, '');
+  }
+
+  public async getPresignedUrl(s3BucketName: string, key: string) : Promise<string> {
+    // Sign the url
+    const command = new GetObjectCommand( {
+      Bucket: s3BucketName,
+      Key:key,
+    });
+    return getSignedUrl(this._s3, command, { expiresIn: 15 * 60 });
   }
 }

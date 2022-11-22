@@ -11,7 +11,7 @@ import {
   GetBucketPolicyCommandOutput,
   PutBucketPolicyCommandInput,
   NoSuchBucket,
-  S3Client,
+  // S3Client,
   GetObjectCommand
 } from '@aws-sdk/client-s3';
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
@@ -114,10 +114,12 @@ export default class HostingAccountLifecycleService {
       statusHandlerRole: statusHandlerRoleArn
     };
 
+    /*
     const s3Client = new S3Client({
       credentials: await this._aws.clients.s3.config.credentials(),
       region : process.env.AWS_REGION!,
     });
+    */
 
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
@@ -128,7 +130,7 @@ export default class HostingAccountLifecycleService {
       Bucket: bucket,
       Key:key,
     });
-    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
+    const signedUrl = await getSignedUrl(this._aws.clients.s3, command, { expiresIn: 15 * 60 });
 
     return  this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
   }
