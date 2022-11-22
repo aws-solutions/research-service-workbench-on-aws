@@ -5,9 +5,7 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
-
   buildDynamoDBPkSk,
-
   resourceTypeToKey,
   uuidWithLowercasePrefix,
   PaginatedResponse,
@@ -130,7 +128,6 @@ export default class CostCenterService {
     }
 
     return this._mapDDBItemToCostCenter(response.Item);
-
   }
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {

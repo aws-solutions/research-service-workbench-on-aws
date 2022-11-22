@@ -49,11 +49,9 @@ export {
   QueryStringParamFilterParser,
   QueryNumberParamFilter,
   QueryNumberParamFilterParser,
-
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
-
   FilterRequest,
   SortRequest,
   addPaginationToken,
