@@ -44,7 +44,7 @@ export default class CostCenterService {
    */
   public async softDeleteCostCenter(
     request: DeleteCostCenterRequest,
-    checkDependency: (costCenterId: string) => void
+    checkDependency: (costCenterId: string) => Promise<void>
   ): Promise<void> {
     await checkDependency(request.id);
     await this.getCostCenter(request.id);
