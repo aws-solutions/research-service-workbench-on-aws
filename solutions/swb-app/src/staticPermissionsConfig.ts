@@ -24,7 +24,7 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
-    subject: 'Template'
+    subject: 'AccountTemplate'
   },
   {
     effect: 'ALLOW',

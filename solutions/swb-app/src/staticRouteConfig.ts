@@ -25,7 +25,7 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
-        subject: 'Template'
+        subject: 'AccountTemplate'
       }
     ]
   },
