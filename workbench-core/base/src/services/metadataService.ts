@@ -6,6 +6,12 @@
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import AwsService from '../aws/awsService';
 import QueryParams from '../interfaces/queryParams';
+import {
+  addPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  getPaginationToken,
+  MAX_API_PAGE_SIZE
+} from '../utilities/paginationHelper';
 
 export class MetadataService {
   private readonly _awsService: AwsService;
@@ -60,21 +66,30 @@ export class MetadataService {
    * @param dependencyResourceType - dependency resource type
    * @returns list of dependent metadata objects
    */
-  public async listDependentMetadata<DependencyMetadata>(
-    mainEntityPk: string,
-    dependencyResourceType: string
-  ): Promise<DependencyMetadata[]> {
-    const params: QueryParams = {
-      key: { name: 'pk', value: mainEntityPk },
+  public async listDependentMetadata<DependencyMetadata extends { pk: string; sk: string; id: string }>(
+    mainEntityResourceType: string,
+    mainEntityId: string,
+    dependencyResourceType: string,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<{ data: DependencyMetadata[]; paginationToken: string | undefined }> {
+    let params: QueryParams = {
+      key: { name: 'pk', value: `${mainEntityResourceType}#${mainEntityId}` },
       sortKey: 'sk',
-      begins: { S: `${dependencyResourceType}#` }
+      begins: { S: `${dependencyResourceType}#` },
+      limit: Math.min(queryParams?.pageSize ?? DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE)
     };
 
-    const dependentMetadata: QueryCommandOutput = await this._awsService.helpers.ddb.query(params).execute();
-    if (!dependentMetadata?.Items) {
-      return [];
+    params = addPaginationToken(queryParams?.paginationToken, params);
+
+    const result: QueryCommandOutput = await this._awsService.helpers.ddb.query(params).execute();
+    if (!result?.Items) {
+      return { data: [], paginationToken: undefined };
     }
 
-    return dependentMetadata.Items as unknown as DependencyMetadata[];
+    const data = result.Items as unknown as DependencyMetadata[];
+    return { data, paginationToken: getPaginationToken(result) };
   }
 }

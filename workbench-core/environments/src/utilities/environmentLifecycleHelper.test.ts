@@ -53,6 +53,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const helper = new EnvironmentLifecycleHelper();
     const datasetIds: string[] = [];
     const envMetadata = {
+      pk: 'ENV#sampleEnvId',
+      sk: 'ENV#sampleEnvId',
       id: 'sampleEnvId',
       PROJ: {
         envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
@@ -95,6 +97,8 @@ describe('EnvironmentLifecycleHelper', () => {
     const helper = new EnvironmentLifecycleHelper();
     const datasetIds = ['exampleDatasetId'];
     const envMetadata = {
+      pk: 'ENV#sampleEnvId',
+      sk: 'ENV#sampleEnvId',
       id: 'sampleEnvId',
       PROJ: {
         envMgmtRoleArn: 'sampleEnvMgmtRoleArn',

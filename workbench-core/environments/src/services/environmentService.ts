@@ -23,11 +23,13 @@ import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 
 export interface Environment {
-  id: string | undefined;
-  instanceId: string | undefined;
+  pk: string;
+  sk: string;
+  id: string;
+  instanceId?: string;
   cidr: string;
   description: string;
-  error: { type: string; value: string } | undefined;
+  error?: { type: string; value: string };
   name: string;
   outputs: { id: string; value: string; description: string }[];
   projectId: string;
@@ -55,6 +57,8 @@ export interface Environment {
 }
 
 const defaultEnv: Environment = {
+  pk: '',
+  sk: '',
   id: '',
   instanceId: '',
   cidr: '',
@@ -389,8 +393,12 @@ export class EnvironmentService {
     const batchGetResult = (await this._aws.helpers.ddb
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
+
+    const id = uuidWithLowercasePrefix(resourceTypeToKey.environment);
     const newEnv: Environment = {
-      id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
+      pk: '',
+      sk: '',
+      id,
       instanceId: params.instanceId,
       cidr: params.cidr,
       description: params.description,

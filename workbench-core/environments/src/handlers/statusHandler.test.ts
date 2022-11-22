@@ -45,6 +45,8 @@ describe('StatusHandler', () => {
       }
     };
     environment = {
+      pk: 'ENV#6e185c8c-caeb-4305-8f08-d408b316dca7',
+      sk: 'ENV#6e185c8c-caeb-4305-8f08-d408b316dca7',
       id: '6e185c8c-caeb-4305-8f08-d408b316dca7',
       createdAt: '2022-05-05T19:39:03.023Z',
       status: 'PENDING',

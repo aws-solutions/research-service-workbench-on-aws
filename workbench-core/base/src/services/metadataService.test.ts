@@ -83,22 +83,18 @@ describe('metadata service', () => {
 
   test('should list dependent entity metadata', async () => {
     const expected: Record<string, AttributeValue>[] = [{ a: { N: '123.45' } }];
-    const envPk = `${resourceTypeToKey.environment}#id`;
 
     const output: QueryCommandOutput = { $metadata: {}, Items: expected };
 
     const query = new Query({ region: 'test' }, 'test');
-    query.execute = jest.fn(() => {
-      console.log('execute');
-      return Promise.resolve(output);
-    });
+    query.execute = jest.fn(() => Promise.resolve(output));
+    awsService.helpers.ddb.query = jest.fn(() => query);
 
-    awsService.helpers.ddb.query = jest.fn(() => {
-      console.log('queery');
-      return query;
-    });
-
-    const result = await metadataService.listDependentMetadata(envPk, resourceTypeToKey.dataset);
+    const { data: result } = await metadataService.listDependentMetadata(
+      resourceTypeToKey.environment,
+      'id',
+      resourceTypeToKey.dataset
+    );
     expect(result).toEqual(expected);
   });
 });

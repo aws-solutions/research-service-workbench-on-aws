@@ -91,16 +91,15 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      const environments: Environment[] = await metadataService.listDependentMetadata<Environment>(
-        `${resourceTypeToKey.dataset}#${req.params.datasetId}`,
-        resourceTypeToKey.environment
+      const { data: environments } = await metadataService.listDependentMetadata<Environment>(
+        resourceTypeToKey.dataset,
+        req.params.datasetId,
+        resourceTypeToKey.environment,
+        { pageSize: 1 }
       );
 
       if (environments.length) {
-        const existingEnvironments = environments.map((env) => `${env.name}(${env.id})`).join(', ');
-        throw Boom.badRequest(
-          `Cannot delete dataset because it has environments associated with it: ${existingEnvironments}.`
-        );
+        throw Boom.badRequest(`Cannot delete dataset because it has environments associated with it.`);
       }
 
       await dataSetService.removeDataSet(req.params.datasetId);
