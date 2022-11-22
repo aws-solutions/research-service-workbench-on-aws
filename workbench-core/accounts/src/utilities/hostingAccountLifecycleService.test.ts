@@ -3,6 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+jest.mock('@aws-sdk/s3-request-presigner', () => {
+  return {
+    getSignedUrl: jest.fn(),
+  }
+})
+
 import { Readable } from 'stream';
 
 import { PolicyDocument } from '@aws-cdk/aws-iam';
@@ -35,13 +41,13 @@ import {
   PutBucketPolicyCommand,
   NoSuchBucket
 } from '@aws-sdk/client-s3';
-
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import { SdkStream } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
@@ -61,6 +67,7 @@ describe('HostingAccountLifecycleService', () => {
     process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
     process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
     process.env.AWS_REGION = 'us-east-1';
+    process.env.MAIN_ACCT_ID = '123456789012';
   });
 
   afterAll(() => {
@@ -718,8 +725,14 @@ describe('HostingAccountLifecycleService', () => {
       }
     });
 
-    expect(service.buildTemplateUrlsForAccount(sampleExternalId)).toEqual(
-        service.buildTemplateUrlsForAccount(sampleExternalId)
-    );
+    const testUrl = 'https://testurl.com'
+    const expectedCreateUrl = 'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true'
+
+    const cfnMock = mockClient(CloudFormationClient);
+    mockCloudformationOutputs(cfnMock);
+    (getSignedUrl as jest.Mock).mockImplementation(() => testUrl)
+    const actual = await service.buildTemplateUrlsForAccount(sampleExternalId);
+
+    expect(actual.createUrl).toEqual(expectedCreateUrl);
   });
 });

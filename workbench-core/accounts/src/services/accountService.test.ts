@@ -4,13 +4,7 @@
  */
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
-jest.mock('@aws-sdk/s3-request-presigner', () => {
-  return {
-    getSignedUrl: jest.fn(),
-  }
-})
 
-import { CloudFormationClient, DescribeStacksCommand } from '@aws-sdk/client-cloudformation';
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -18,13 +12,11 @@ import {
   QueryCommandOutput,
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
-import { ServiceInputTypes, ServiceOutputTypes, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
-import { AccountCfnTemplateParameters } from '../models/accountCfnTemplate';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter } from '../models/costCenter/costCenter';
 import AccountService from './accountService';
@@ -334,90 +326,6 @@ describe('AccountService', () => {
         expect(actualResponse.paginationToken).toEqual(undefined);
       });
     });
-  });
-
-  // TODO: DRY: this functionality can be pulled out to a test helper (it's also used in hostingAccoutnLifecycleService.test.ts
-  function mockCloudformationOutputs(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    cfMock: AwsStub<any, any>,
-    stackStatus: string = 'CREATE_COMPLETE',
-    artifactBucketArn: string = 'arn:aws:s3:::sampleArtifactsBucketName'
-  ): void {
-    cfMock.on(DescribeStacksCommand).resolves({
-      Stacks: [
-        {
-          StackName: process.env.STACK_NAME!,
-          StackStatus: stackStatus,
-          CreationTime: new Date(),
-          Outputs: [
-            {
-              OutputKey: `SagemakerLaunch${process.env.SSM_DOC_OUTPUT_KEY_SUFFIX}`,
-              OutputValue: 'arn:aws:ssm:us-east-1:123456789012:document/swb-swbv2-va-SagemakerLaunch'
-            },
-            {
-              OutputKey: process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
-              OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
-            },
-            {
-              OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-              OutputValue: artifactBucketArn
-            },
-            {
-              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
-              OutputValue: 'arn:aws:kms:::key/123-123-123'
-            },
-            {
-              OutputKey: process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
-              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`
-            },
-            {
-              OutputKey: process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`
-            },
-            { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
-            { OutputKey: 'VpcSubnet', OutputValue: 'FakeSubnet' },
-            { OutputKey: 'EncryptionKeyArn', OutputValue: 'FakeEncryptionKeyArn' }
-          ]
-        }
-      ]
-    });
-  }
-
-  test('getTemplateURLForAccount returns a signed URL', async () => {
-    const testUrl = 'https://testurl.com'
-    const expectedUrl = 'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=workbench&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true'
-
-    const cfnMock = mockClient(CloudFormationClient);
-    mockCloudformationOutputs(cfnMock);
-    (getSignedUrl as jest.Mock).mockImplementation(() => testUrl)
-
-    const extId = 'workbench';
-    const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
-    const templateParameters: AccountCfnTemplateParameters = {
-      accountHandlerRole: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`,
-      apiHandlerRole: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`,
-      enableFlowLogs: 'true',
-      externalId: extId,
-      launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
-      launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
-      mainAccountId: process.env.MAIN_ACCT_ID!,
-      namespace: process.env.STACK_NAME!,
-      stackName: process.env.STACK_NAME!.concat('-hosting-account'),
-      statusHandlerRole: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
-    };
-    const s3Client = new S3Client({
-      region : process.env.AWS_REGION!,
-      credentials: {
-        accessKeyId: "AKIAIOSFODNN7EXAMPLE",
-        secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-      },
-    });
-
-    // OPERATE
-    const response = await accountService.buildTemplateUrlsForAccount(artifactBucketArn, templateParameters, s3Client);
-
-    // CHECK
-    expect(response.createUrl).toEqual(expectedUrl);
   });
 
   describe('getAccount', () => {

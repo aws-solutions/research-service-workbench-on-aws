@@ -4,8 +4,6 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
   PaginatedResponse,
   QueryParams,
@@ -15,7 +13,6 @@ import {
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenterParser } from '../models/costCenter/costCenter';
 
@@ -66,31 +63,6 @@ export default class AccountService {
       });
     }
     return accounts;
-  }
-
-  /**
-   * Create/Upload template and return its UfRL
-   *
-   * @param artifactBucketArn - arn for the S3 artifact bucket that contains the CFN template
-   * @param templateParams - collection of parameters to use when creating the cfn template
-   * @param s3Client - s3 client used to by the presigner to create the signed url
-   *
-   * @returns A URL to a prepopulated template for onboarding the hosting account.
-   */
-  public async buildTemplateUrlsForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters, s3Client: S3Client): Promise<TemplateResponse> {
-
-    const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
-    const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
-    const bucket = parsedBucketArn[0];
-
-    // Sign the url
-    const command = new GetObjectCommand( {
-      Bucket: bucket,
-      Key:key,
-    });
-    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 15 * 60 });
-
-    return this._constructCreateAndUpdateUrls(templateParams, signedUrl);
   }
 
   /**
@@ -146,48 +118,6 @@ export default class AccountService {
         throw Boom.badRequest('The AWS Account mapped to this accountId is different than the one provided');
       }
     }
-  }
-
-  private _constructCreateAndUpdateUrls(
-      accountCfnTemplateParameters: AccountCfnTemplateParameters,
-      signedUrl: string
-  ): TemplateResponse {
-    // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
-
-    // We assume the hosting account's region is the same as where this lambda runs.
-    const region = process.env.AWS_REGION;
-    const {
-      accountHandlerRole,
-      apiHandlerRole,
-      enableFlowLogs,
-      externalId,
-      // launchConstraintPolicyPrefix,
-      // launchConstraintRolePrefix,
-      mainAccountId,
-      namespace,
-      stackName,
-      statusHandlerRole
-    } = accountCfnTemplateParameters;
-    const createUrl = [
-      `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/create/review/`,
-      `?templateURL=${encodeURIComponent(signedUrl)}`,
-      `&stackName=${stackName}`,
-      `&param_Namespace=${namespace}`,
-      `&param_MainAccountId=${mainAccountId}`,
-      `&param_ExternalId=${externalId}`,
-      `&param_AccountHandlerRoleArn=${accountHandlerRole}`,
-      `&param_ApiHandlerRoleArn=${apiHandlerRole}`,
-      `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
-      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`
-    ].join('');
-
-    const updateUrl = [
-      `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/update/template`,
-      `?stackId=${encodeURIComponent(stackName)}`,
-      `&templateURL=${encodeURIComponent(signedUrl)}`,
-    ].join('');
-
-    return { createUrl, updateUrl};
   }
 
   /*
