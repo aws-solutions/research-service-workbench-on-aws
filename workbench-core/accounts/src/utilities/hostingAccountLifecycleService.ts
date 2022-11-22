@@ -11,7 +11,6 @@ import {
   GetBucketPolicyCommandOutput,
   PutBucketPolicyCommandInput,
   NoSuchBucket,
-  // S3Client,
   GetObjectCommand
 } from '@aws-sdk/client-s3';
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
@@ -113,13 +112,6 @@ export default class HostingAccountLifecycleService {
       stackName: process.env.STACK_NAME!.concat('-hosting-account'),
       statusHandlerRole: statusHandlerRoleArn
     };
-
-    /*
-    const s3Client = new S3Client({
-      credentials: await this._aws.clients.s3.config.credentials(),
-      region : process.env.AWS_REGION!,
-    });
-    */
 
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
