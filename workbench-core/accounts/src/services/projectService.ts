@@ -254,19 +254,21 @@ export default class ProjectService {
     return newProject;
   }
 
-  // TODO--add callback function as param and in body of method
-  public async softDeleteProject(request: DeleteProjectRequest): Promise<void> {
+  /**
+   * Soft deletes a project from the database.
+   *
+   * @param request - a {@link DeleteProjectRequest} object that contains the id of the project to delete
+   * @param checkDependencies - an async function that checks if there are dependencies associated with the project
+   */
+  public async softDeleteProject(
+    request: DeleteProjectRequest,
+    checkDependencies: (projectId: string) => Promise<void>
+  ): Promise<void> {
+    // verify all dependencies are empty
+    await checkDependencies(request.projectId);
+
     // verify project exists
     await this.getProject({ projectId: request.projectId });
-
-    // verify all dependencies are empty
-    Object.keys(request.dependencies).forEach((dependency) => {
-      if (!_.isEmpty(request.dependencies[dependency])) {
-        throw Boom.badRequest(
-          `Please cleanup dependencies of project. At least one ${dependency} is still attached to project ${request.projectId}.`
-        );
-      }
-    });
 
     // Delete Permissions for the groups--TODO implement after dynamic AuthZ
     // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
@@ -306,18 +308,28 @@ export default class ProjectService {
     }
   }
 
-  // TODO--checks for PROJ with X DDB items
-  // public async checkDependency(resourceType: string, projectId: string): Promise<boolean> {
-  //   const queryParams: QueryParams = {
-  //     key: { name: 'pk', value: buildDynamoDBPkSk(projectId, resourceTypeToKey.project) },
-  //     begins: { S: resourceTypeToKey[resourceType] },
-  //     limit: 1
-  //   };
+  /**
+   * Checks if project has a dependency in the PROJ#projId collection.
+   * Specifically, checks for items that match pk = PROJ#projId and sk.beginsWith(resourceType)
+   *
+   * @param resourceType - the string that should be a resource that is a key in {@link resourceTypeToKey} object
+   * @param projectId - the project id to check for dependencies
+   * @returns true if there are dependencies on the project that match the resource type, false otherwise
+   */
+  public async checkDependency(
+    resourceType: keyof typeof resourceTypeToKey,
+    projectId: string
+  ): Promise<boolean> {
+    const queryParams: QueryParams = {
+      key: { name: 'pk', value: buildDynamoDBPkSk(projectId, resourceTypeToKey.project) },
+      begins: { S: resourceTypeToKey[resourceType] },
+      limit: 1
+    };
 
-  //   const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
 
-  //   return response.data.length > 0;
-  // }
+    return response.data.length > 0;
+  }
 
   /**
    * This method formats a Project object as a DDB item containing project data

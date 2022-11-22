@@ -72,17 +72,33 @@ export function setUpProjectRoutes(
   router.put(
     '/projects/:projectId/softDelete',
     wrapAsync(async (req: Request, res: Response) => {
-      // TODO
       async function checkDependencies(projectId: string): Promise<void> {
         // environments
-        const projectHasEnvironments = await environmentService.doesDependencyHaveEnvironments(projectId);
-        if (projectHasEnvironments) {
+        const projectHasEnvironments = environmentService.doesDependencyHaveEnvironments(projectId);
+        // datasets
+        const projectHasDatasets = projectService.checkDependency('dataset', projectId);
+        // etcs
+        const projectHasEnvTypeConfigs = projectService.checkDependency('envTypeConfig', projectId);
+        const [envBoolean, datasetBoolean, envTypeConfigBoolean] = await Promise.all([
+          projectHasEnvironments,
+          projectHasDatasets,
+          projectHasEnvTypeConfigs
+        ]);
+        if (envBoolean) {
           throw Boom.conflict(
             `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
           );
         }
-        // datasets
-        // etcs
+        if (datasetBoolean) {
+          throw Boom.conflict(
+            `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
+          );
+        }
+        if (envTypeConfigBoolean) {
+          throw Boom.conflict(
+            `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+          );
+        }
       }
       // validate request
       const validatedRequest = validateAndParse<DeleteProjectRequest>(DeleteProjectRequestParser, {

@@ -18,6 +18,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { EnvironmentService } from './environmentService';
@@ -1128,6 +1129,44 @@ describe('EnvironmentService', () => {
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
         Boom.badRequest('datasetIds dataset-123 do not exist')
       );
+    });
+  });
+
+  describe('doesDpeendencyHaveEnvironments', () => {
+    describe('when dependencies exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: ['someDependency'] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to true', async () => {
+        // TEST
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
+
+        // CHECK
+        expect(result).toEqual(true);
+      });
+    });
+
+    describe('when dependencies do not exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: [] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to false', async () => {
+        // TEST
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
+
+        // CHECK
+        expect(result).toEqual(false);
+      });
     });
   });
 });

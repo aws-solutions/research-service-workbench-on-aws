@@ -19,8 +19,10 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
+import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
@@ -1225,7 +1227,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject({ userId, projectId: 'proj-123' });
+      const actualResponse = await projService.getProject({ projectId: 'proj-123' });
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1248,7 +1250,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject({ userId, projectId: 'proj-123' })).rejects.toThrow(
+      await expect(projService.getProject({ projectId: 'proj-123' })).rejects.toThrow(
         'Could not find project proj-123'
       );
     });
@@ -1493,7 +1495,7 @@ describe('ProjectService', () => {
     });
   });
 
-  describe('deleteProject', () => {
+  describe('softDeleteProject', () => {
     const deletedProject1: Project = {
       ...project1,
       status: ProjectStatus.DELETED
@@ -1508,11 +1510,16 @@ describe('ProjectService', () => {
     };
 
     let projectId: string;
-    const dependencies: Record<string, string[]> = {};
     let request: DeleteProjectRequest;
+    let checkDependency = async function (projectId: string): Promise<void> {
+      return;
+    };
 
     beforeEach(() => {
-      request = { projectId, dependencies };
+      request = { projectId };
+      checkDependency = async function (projectId: string): Promise<void> {
+        return;
+      };
     });
 
     describe('if project does not exist', () => {
@@ -1530,17 +1537,15 @@ describe('ProjectService', () => {
 
       test('it should fail', async () => {
         // TEST n CHECK
-        await expect(() => projService.deleteProject(request)).rejects.toThrow(
+        await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
           `Could not find project ${request.projectId}`
         );
       });
     });
 
     describe('if projectId is valid', () => {
-      let dependencyType: string;
       beforeEach(() => {
         request.projectId = deletedProject1.id;
-        request.dependencies = {};
 
         // mock get project ddb call
         const getItemResponse: GetItemCommandOutput = {
@@ -1554,45 +1559,51 @@ describe('ProjectService', () => {
       describe('if dependencies exist', () => {
         describe('of type environment', () => {
           beforeEach(() => {
-            dependencyType = 'environment';
-            // eslint-disable-next-line security/detect-object-injection
-            request.dependencies[dependencyType] = ['env-123'];
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
+              );
+            };
           });
 
           test('it should fail', async () => {
             // TEST n CHECK
-            await expect(() => projService.deleteProject(request)).rejects.toThrow(
-              `Please cleanup dependencies of project. At least one ${dependencyType} is still attached to project ${request.projectId}.`
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environments(s) associated with it`
             );
           });
         });
 
         describe('of type dataset', () => {
           beforeEach(() => {
-            dependencyType = 'dataset';
-            // eslint-disable-next-line security/detect-object-injection
-            request.dependencies[dependencyType] = ['ds-123'];
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
+              );
+            };
           });
 
           test('it should fail', async () => {
             // TEST n CHECK
-            await expect(() => projService.deleteProject(request)).rejects.toThrow(
-              `Please cleanup dependencies of project. At least one ${dependencyType} is still attached to project ${request.projectId}.`
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has dataset(s) associated with it`
             );
           });
         });
 
         describe('of type environment type config', () => {
           beforeEach(() => {
-            dependencyType = 'environmentTypeConfig';
-            // eslint-disable-next-line security/detect-object-injection
-            request.dependencies[dependencyType] = ['etc-123'];
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+              );
+            };
           });
 
           test('it should fail', async () => {
             // TEST n CHECK
-            await expect(() => projService.deleteProject(request)).rejects.toThrow(
-              `Please cleanup dependencies of project. At least one ${dependencyType} is still attached to project ${request.projectId}.`
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environment type config(s) associated with it`
             );
           });
         });
@@ -1600,7 +1611,6 @@ describe('ProjectService', () => {
         describe('if dependencies do not exist', () => {
           let updateItemResponse: UpdateItemCommandOutput;
           beforeEach(() => {
-            request.dependencies = { environment: [], dataset: [], environmentTypeConfig: [] };
             jest
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               .spyOn(Updater.prototype as any, 'execute')
@@ -1616,12 +1626,9 @@ describe('ProjectService', () => {
               };
             });
 
-            test('it should return deleted Project', async () => {
-              // TEST
-              const result = await projService.deleteProject(request);
-
-              // CHECK
-              expect(result).toEqual(deletedProject1);
+            test('it should pass', async () => {
+              // TEST n CHECK
+              await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
             });
           });
 
@@ -1640,12 +1647,51 @@ describe('ProjectService', () => {
 
             test('it should fail', async () => {
               // TEST n CHECK
-              await expect(() => projService.deleteProject(request)).rejects.toThrow(
+              await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
                 'Could not delete project from DDB.'
               );
             });
           });
         });
+      });
+    });
+  });
+
+  describe('checkDependency', () => {
+    const projectId = 'proj-123';
+
+    describe('when dependency exists', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: ['someEnvironment'] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to true', async () => {
+        // TEST
+        const result = await projService.checkDependency('environment', projectId);
+
+        // CHECK
+        expect(result).toEqual(true);
+      });
+    });
+
+    describe('when dependency does not exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: [] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+      test('evaluates to false', async () => {
+        // TEST
+        const result = await projService.checkDependency('environment', projectId);
+
+        // CHECK
+        expect(result).toEqual(false);
       });
     });
   });

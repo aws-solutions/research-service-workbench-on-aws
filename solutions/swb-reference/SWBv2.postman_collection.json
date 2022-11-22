@@ -946,7 +946,7 @@
         {
           "name": "Delete project",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [
               {
                 "key": "Cookie",

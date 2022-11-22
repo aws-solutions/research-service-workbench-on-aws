@@ -5,7 +5,7 @@
 
 import { FilterRequest, SortRequest } from '@aws/workbench-core-base';
 import { ProjectStatus } from '../constants/projectStatus';
-import Project from '../models/project';
+import { Project } from '../models/projects/project';
 import { manualFilterProjects, manualSortProjects } from './projectUtils';
 
 describe('projectUtils', () => {
