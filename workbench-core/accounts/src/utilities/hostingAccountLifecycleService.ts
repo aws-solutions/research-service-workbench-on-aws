@@ -199,11 +199,7 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this.updateBucketPolicyDocumentWithAllStatements(
-      artifactBucketArn,
-      awsAccountId,
-      bucketPolicy
-    );
+    bucketPolicy = this._updateBucketPolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -214,10 +210,10 @@ export default class HostingAccountLifecycleService {
     await this._aws.clients.s3.putBucketPolicy(putPolicyParams);
   }
 
-  public updateBucketPolicyDocumentWithAllStatements(
-    artifactBucketArn: string,
-    awsAccountId: string,
-    policyDocument: PolicyDocument
+  private _updateBucketPolicyDocumentWithAllStatements(
+      artifactBucketArn: string,
+      awsAccountId: string,
+      policyDocument: PolicyDocument
   ): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
       JSON.parse(`

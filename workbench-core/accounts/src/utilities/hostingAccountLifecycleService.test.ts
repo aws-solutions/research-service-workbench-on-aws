@@ -697,7 +697,7 @@ describe('HostingAccountLifecycleService', () => {
     }`)
     );
 
-    const postUpdatedPolicy = hostingAccountLifecycleService.updateBucketPolicyDocumentWithAllStatements(
+    const postUpdatedPolicy = hostingAccountLifecycleService['_updateBucketPolicyDocumentWithAllStatements'](
       sampleBucketArn,
       sampleAccountId,
       basePolicy
