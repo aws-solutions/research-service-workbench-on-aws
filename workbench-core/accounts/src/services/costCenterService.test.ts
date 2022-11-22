@@ -367,34 +367,35 @@ describe('CostCenterService', () => {
     let costCenterId: string;
     let costCenterName: string;
     let costCenterDescription: string;
+    let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
       costCenterId = 'cc-someId';
       costCenterName = 'CostCenter-1';
       costCenterDescription = 'Description for CostCenter-1';
+      costCenterJson = {
+        pk: `CC#${costCenterId}`,
+        sk: `CC#${costCenterId}`,
+        id: costCenterId,
+        name: costCenterName,
+        dependency: accountId,
+        description: costCenterDescription,
+        subnetId: accountMetadata.subnetId,
+        vpcId: accountMetadata.vpcId,
+        envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
+        externalId: accountMetadata.externalId,
+        encryptionKeyArn: accountMetadata.encryptionKeyArn,
+        environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
+        hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
+        awsAccountId: accountMetadata.awsAccountId,
+        createdAt: mockDateObject.toISOString(),
+        updatedAt: mockDateObject.toISOString()
+      };
+      ddbMock.on(GetItemCommand).resolves({ Item: marshall(costCenterJson) });
     });
 
     describe('with a valid request', () => {
       test('it returns a valid response', async () => {
-        const costCenterJson = {
-          pk: `CC#${costCenterId}`,
-          sk: `CC#${costCenterId}`,
-          id: costCenterId,
-          name: costCenterName,
-          dependency: accountId,
-          description: costCenterDescription,
-          subnetId: accountMetadata.subnetId,
-          vpcId: accountMetadata.vpcId,
-          envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-          externalId: accountMetadata.externalId,
-          encryptionKeyArn: accountMetadata.encryptionKeyArn,
-          environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
-          hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
-          awsAccountId: accountMetadata.awsAccountId,
-          createdAt: mockDateObject.toISOString(),
-          updatedAt: mockDateObject.toISOString()
-        };
-
         ddbMock.on(UpdateItemCommand).resolves({
           Attributes: marshall(costCenterJson)
         });

@@ -41,43 +41,39 @@ describe('Update Cost Center negative tests', () => {
     });
   });
   describe('with invalid parameters', () => {
-    describe('with incorrect name type', () => {
-      test('it throw 404 error', async () => {
-        const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
-        try {
-          await adminSession.resources.costCenters
-            .costCenter(id)
-            .update({ name: 1 as unknown as string }, true);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              statusCode: 400,
-              error: 'Bad Request',
-              message: 'name: Expected string, received number'
-            })
-          );
-        }
-      });
+    test('with incorrect name type it throw 404 error', async () => {
+      const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
+      try {
+        await adminSession.resources.costCenters
+          .costCenter(id)
+          .update({ name: 1 as unknown as string }, true);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: 'name: Expected string, received number'
+          })
+        );
+      }
     });
-    describe('with incorrect description type', () => {
-      test('it throw 404 error', async () => {
-        const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
-        try {
-          await adminSession.resources.costCenters
-            .costCenter(id)
-            .update({ description: 1 as unknown as string }, true);
-        } catch (e) {
-          checkHttpError(
-            e,
-            new HttpError(400, {
-              statusCode: 400,
-              error: 'Bad Request',
-              message: 'description: Expected string, received number'
-            })
-          );
-        }
-      });
+    test('with incorrect description type it throw 404 error', async () => {
+      const id = 'cc-abcdabcd-2199-46be-ac89-751a90f1999e';
+      try {
+        await adminSession.resources.costCenters
+          .costCenter(id)
+          .update({ description: 1 as unknown as string }, true);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: 'description: Expected string, received number'
+          })
+        );
+      }
     });
   });
 });
