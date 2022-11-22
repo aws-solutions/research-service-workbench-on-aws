@@ -71,6 +71,8 @@ export default class AccountService {
   /**
    * Create/Upload template and return its UfRL
    *
+   * @param externalId - unique ID to represent account
+   *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
   public async buildTemplateUrlsForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters, s3Client: S3Client): Promise<TemplateResponse> {

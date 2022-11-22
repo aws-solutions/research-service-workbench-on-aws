@@ -74,6 +74,7 @@ export default class HostingAccountLifecycleService {
 
   /**
    * Create/Upload template and return its URL
+   *
    * @param externalId - unique ID to represent account
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
