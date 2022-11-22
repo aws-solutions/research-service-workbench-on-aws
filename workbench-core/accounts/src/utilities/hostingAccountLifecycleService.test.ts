@@ -718,8 +718,8 @@ describe('HostingAccountLifecycleService', () => {
       }
     });
 
-    expect(service.buildTemplateURLForAccount(sampleExternalId)).toEqual(
-        service.buildTemplateURLForAccount(sampleExternalId)
+    expect(service.buildTemplateUrlsForAccount(sampleExternalId)).toEqual(
+        service.buildTemplateUrlsForAccount(sampleExternalId)
     );
   });
 });

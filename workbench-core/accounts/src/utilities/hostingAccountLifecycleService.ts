@@ -78,7 +78,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async buildTemplateURLForAccount(externalId: string): Promise<TemplateResponse> {
+  public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
 
     const {
@@ -110,7 +110,7 @@ export default class HostingAccountLifecycleService {
       credentials: await this._aws.clients.s3.config.credentials(),
       region : process.env.AWS_REGION!,
     });
-    return this._accountService.buildTemplateURLForAccount(artifactBucketArn, templateParameters, s3Client);
+    return this._accountService.buildTemplateUrlsForAccount(artifactBucketArn, templateParameters, s3Client);
   }
   /**
    * Links hosting account with main account policies for cross account communication

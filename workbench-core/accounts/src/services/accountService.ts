@@ -73,7 +73,7 @@ export default class AccountService {
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async buildTemplateURLForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters, s3Client: S3Client): Promise<TemplateResponse> {
+  public async buildTemplateUrlsForAccount(artifactBucketArn: string, templateParams: AccountCfnTemplateParameters, s3Client: S3Client): Promise<TemplateResponse> {
 
     const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
