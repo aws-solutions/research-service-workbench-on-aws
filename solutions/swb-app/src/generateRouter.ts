@@ -102,7 +102,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     router,
     apiRouteConfig.dataSetService,
     apiRouteConfig.dataSetsStoragePlugin,
-    apiRouteConfig.environmentService
+    apiRouteConfig.metadataService
   );
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);

@@ -3,14 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { MetadataService, resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
   DataSetService,
   DataSetsStoragePlugin
 } from '@aws/workbench-core-datasets';
-import { Environment, EnvironmentService } from '@aws/workbench-core-environments';
+import { Environment } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -21,7 +21,7 @@ export function setUpDSRoutes(
   router: Router,
   dataSetService: DataSetService,
   dataSetStoragePlugin: DataSetsStoragePlugin,
-  environmentService: EnvironmentService
+  metadataService: MetadataService
 ): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
@@ -91,13 +91,15 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      const environments: Environment[] = await environmentService.listEnvironmentsForDataSet(
-        req.params.datasetId
+      const environments: Environment[] = await metadataService.listDependentMetadata<Environment>(
+        `${resourceTypeToKey.dataset}#${req.params.datasetId}`,
+        resourceTypeToKey.environment
       );
+
       if (environments.length) {
         const existingEnvironments = environments.map((env) => `${env.name}(${env.id})`).join(', ');
         throw Boom.badRequest(
-          `Cannot delete dataset because it is associated with environments: ${existingEnvironments}`
+          `Cannot delete dataset because it has environments associated with it: ${existingEnvironments}.`
         );
       }
 
