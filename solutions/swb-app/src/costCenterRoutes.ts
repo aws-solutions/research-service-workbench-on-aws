@@ -29,7 +29,7 @@ export function setUpCostCenterRoutes(
     '/costCenters',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateCostCenterSchema));
-      res.send(await costCenterService.create({ ...req.body }));
+      res.status(201).send(await costCenterService.create({ ...req.body }));
     })
   );
 

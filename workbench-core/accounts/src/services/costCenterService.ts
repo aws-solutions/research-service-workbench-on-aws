@@ -47,7 +47,6 @@ export default class CostCenterService {
     checkDependency: (costCenterId: string) => void
   ): Promise<void> {
     await checkDependency(request.id);
-
     await this.getCostCenter(request.id);
 
     try {
@@ -68,8 +67,8 @@ export default class CostCenterService {
    * @returns CostCenter object with updated attributes
    */
   public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
+    await this.getCostCenter(request.id);
     const currentDate = new Date().toISOString();
-
     const updatedCostCenter = {
       name: request.name,
       description: request.description,
@@ -119,7 +118,6 @@ export default class CostCenterService {
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
-    // Get by id
     const response = (await this._dynamoDbService
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
@@ -131,10 +129,10 @@ export default class CostCenterService {
     return this._mapDDBItemToCostCenter(response.Item);
   }
 
-  public async create(createCostCenter: CreateCostCenterRequest): Promise<CostCenter> {
+  public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
 
-    const account = await this._getAccount(createCostCenter.accountId);
+    const account = await this._getAccount(request.accountId);
 
     const currentDateTime = new Date(Date.now()).toISOString();
 
@@ -142,9 +140,9 @@ export default class CostCenterService {
       createdAt: currentDateTime,
       updatedAt: currentDateTime,
       id: id,
-      accountId: createCostCenter.accountId,
-      description: createCostCenter.description,
-      name: createCostCenter.name,
+      accountId: request.accountId,
+      description: request.description,
+      name: request.name,
       // Account data
       awsAccountId: account.awsAccountId,
       encryptionKeyArn: account.encryptionKeyArn,
@@ -159,21 +157,23 @@ export default class CostCenterService {
     const dynamoItem: { [key: string]: string } = {
       ...costCenter,
       resourceType: this._resourceType,
-      dependency: createCostCenter.accountId
+      dependency: request.accountId
     };
 
     delete dynamoItem.accountId;
 
     const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
-    await this._dynamoDbService.updateExecuteAndFormat({
+    const response = await this._dynamoDbService.updateExecuteAndFormat({
       key,
       params: {
         item: dynamoItem
       }
     });
-
-    return this.getCostCenter(id);
+    if (response.Attributes) {
+      return this._mapDDBItemToCostCenter(response.Attributes);
+    }
+    throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
   }
 
   private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {

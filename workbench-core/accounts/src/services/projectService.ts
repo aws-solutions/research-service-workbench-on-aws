@@ -46,7 +46,7 @@ export default class ProjectService {
 
   /**
    * Get project
-   * @param projectID - Project Id of project to retrieve
+   * @param projectId - Project Id of project to retrieve
    *
    * @returns Project entry in DDB
    */

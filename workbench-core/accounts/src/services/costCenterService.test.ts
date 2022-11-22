@@ -21,6 +21,7 @@ import CostCenterService from './costCenterService';
 describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
   const accountId = 'acc-someId';
+  type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
   // TODO: Use AccountParser to validate Account object once AccountParser is merged into develop
   const accountMetadata: Account = {
     error: undefined,
@@ -123,7 +124,6 @@ describe('CostCenterService', () => {
 
   describe('list costCenters', () => {
     let costCenterId: string;
-    type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
     let costCenterJson: CostCenterJson;
     let expectedCostCenter: CostCenter;
     beforeAll(() => {
@@ -229,18 +229,15 @@ describe('CostCenterService', () => {
       };
 
       describe('`dependency` is the id of a saved Account', () => {
+        let costCenter: CostCenterJson;
         beforeEach(() => {
           ddbMock.on(GetItemCommand).resolves({
             Item: marshall(accountMetadata, {
               removeUndefinedValues: true
             })
           });
-
-          ddbMock.on(UpdateItemCommand).resolves({});
-        });
-
-        test('it returns a CostCenter object with the associated Account metadata', async () => {
-          const expectedCostCenter: CostCenter = {
+          const costCenterId = `cc-someId`;
+          costCenter = {
             createdAt: mockDateObject.toISOString(),
             updatedAt: mockDateObject.toISOString(),
             awsAccountId: accountMetadata.awsAccountId,
@@ -251,10 +248,22 @@ describe('CostCenterService', () => {
             hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
             subnetId: accountMetadata.subnetId,
             vpcId: accountMetadata.vpcId,
-            ...createCostCenter,
-            id: `cc-someId`
+            name: createCostCenter.name,
+            description: createCostCenter.description,
+            dependency: createCostCenter.accountId,
+            id: costCenterId,
+            pk: `CC#${costCenterId}`,
+            sk: `CC#${costCenterId}`
           };
 
+          ddbMock.on(UpdateItemCommand).resolves({ Attributes: marshall(costCenter) });
+        });
+
+        test('it returns a CostCenter object with the associated Account metadata', async () => {
+          const expectedCostCenter = CostCenterParser.parse({
+            ...costCenter,
+            accountId: costCenter.dependency
+          });
           await expect(costCenterService.create(createCostCenter)).resolves.toEqual(expectedCostCenter);
         });
       });
@@ -275,7 +284,6 @@ describe('CostCenterService', () => {
 
   describe('delete', () => {
     let costCenterId: string;
-    type CostCenterJson = Omit<CostCenter, 'accountId'> & { pk: string; sk: string; dependency: string };
     let costCenterJson: CostCenterJson;
     beforeEach(() => {
       jest.restoreAllMocks();
