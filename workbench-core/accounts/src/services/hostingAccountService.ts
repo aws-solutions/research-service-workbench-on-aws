@@ -18,7 +18,7 @@ export default class HostingAccountService {
   }
 
   public async get(accountId: string): Promise<Account> {
-    return await new HostingAccountLifecycleService().getAccount(accountId, false);
+    return await new HostingAccountLifecycleService().getAccount(accountId, true);
   }
 
   public async buildTemplateURLForAccount(awsAcctId: string, externalId: string): Promise<TemplateResponse> {
