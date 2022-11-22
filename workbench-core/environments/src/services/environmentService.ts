@@ -337,9 +337,10 @@ export class EnvironmentService {
       throw e;
     }
 
-    const updateResponse = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(envId, resourceTypeToKey.environment), { item: updatedValues })
-      .execute();
+    const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(envId, resourceTypeToKey.environment),
+      params: { item: updatedValues }
+    });
 
     return updateResponse.Attributes! as unknown as Environment;
   }
@@ -534,6 +535,6 @@ export class EnvironmentService {
   ): Promise<void> {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
-    await this._aws.helpers.ddb.update(key, { item: data }).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key, params: { item: data } });
   }
 }
