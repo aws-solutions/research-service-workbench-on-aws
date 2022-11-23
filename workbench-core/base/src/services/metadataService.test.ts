@@ -4,18 +4,18 @@
  */
 import { AttributeValue, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { z } from 'zod';
-import AwsService from '../aws/awsService';
+import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import Query from '../aws/helpers/dynamoDB/query';
 import resourceTypeToKey from '../constants/resourceTypeToKey';
 import { MetadataService } from './metadataService';
 
 describe('metadata service', () => {
-  let awsService: AwsService;
+  let ddbService: DynamoDBService;
   let metadataService: MetadataService;
 
   beforeEach(() => {
-    awsService = new AwsService({ region: 'test' });
-    metadataService = new MetadataService(awsService);
+    ddbService = new DynamoDBService({ region: 'test', table: 'test' });
+    metadataService = new MetadataService(ddbService);
   });
 
   test('should return mapping metadata successfully', () => {
@@ -89,7 +89,7 @@ describe('metadata service', () => {
 
     const query = new Query({ region: 'test' }, 'test');
     query.execute = jest.fn(() => Promise.resolve(output));
-    awsService.helpers.ddb.query = jest.fn(() => query);
+    ddbService.query = jest.fn(() => query);
 
     const parser = z
       .object({

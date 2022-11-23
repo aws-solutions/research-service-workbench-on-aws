@@ -76,7 +76,7 @@ const apiRouteConfig: ApiRouteConfig = {
   costCenterService: new CostCenterService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
-  metadataService: new MetadataService(aws)
+  metadataService: new MetadataService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

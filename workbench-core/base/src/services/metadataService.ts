@@ -5,7 +5,7 @@
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ZodTypeAny } from 'zod';
-import AwsService from '../aws/awsService';
+import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import QueryParams from '../interfaces/queryParams';
 import {
   addPaginationToken,
@@ -16,10 +16,10 @@ import {
 import { validateAndParse } from '../utilities/validatorHelper';
 
 export class MetadataService {
-  private readonly _awsService: AwsService;
+  private readonly _ddbService: DynamoDBService;
 
-  public constructor(awsService: AwsService) {
-    this._awsService = awsService;
+  public constructor(ddbService: DynamoDBService) {
+    this._ddbService = ddbService;
   }
 
   /************************************************************
@@ -87,7 +87,7 @@ export class MetadataService {
 
     params = addPaginationToken(queryParams?.paginationToken, params);
 
-    const result: QueryCommandOutput = await this._awsService.helpers.ddb.query(params).execute();
+    const result: QueryCommandOutput = await this._ddbService.query(params).execute();
     if (!result?.Items) {
       return { data: [], paginationToken: undefined };
     }
