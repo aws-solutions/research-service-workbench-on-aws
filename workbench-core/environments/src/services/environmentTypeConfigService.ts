@@ -14,6 +14,7 @@ import {
   DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
+import { DeleteEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {
@@ -46,6 +47,34 @@ export default class EnvironmentTypeConfigService {
     this._envTypeService = new EnvironmentTypeService({ TABLE_NAME });
   }
 
+  /**
+   * Soft Delete Cost Center
+   * @param request - request for deleting cost center
+   * @param checkDependency - check whether we can delete the costCenter. The function should throw a Boom error if costCenter cannot be deleted
+   * @returns void
+   */
+  public async softDeleteEnvironmentTypeConfig(
+    request: DeleteEnvironmentTypeConfigRequest,
+    checkDependency: (envTypeId: string, envTypeConfigId: string) => Promise<void>
+  ): Promise<void> {
+    const { envTypeId, envTypeConfigId } = request;
+    await checkDependency(envTypeId, envTypeConfigId);
+    await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
+
+    // TODO: Replace update with updateExecuteAndFormat
+    try {
+      await this._aws.helpers.ddb
+        .update({
+          key: this._buildEnvTypeConfigPkSk(envTypeId, resourceTypeToKey.costCenter),
+          params: {
+            item: { resourceType: `${this._resourceType}_deleted` }
+          }
+        })
+        .execute();
+    } catch (e) {
+      throw Boom.internal('Unable to delete CostCenter');
+    }
+  }
   /**
    * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
    * @param envTypeId - the environment type identifier for this config
