@@ -297,11 +297,15 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
+      metaPlugin.removeDataSet = jest.fn();
       service = new DataSetService(audit, log, metaPlugin);
     });
 
     it('returns nothing when the dataset is removed', async () => {
-      await expect(service.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      await service.removeDataSet(mockDataSetId);
+
+      expect(metaPlugin.removeDataSet).toBeCalledTimes(1);
+      expect(metaPlugin.removeDataSet).toBeCalledWith(mockDataSetId);
     });
 
     it('throws when an external endpoint exists on the DataSet.', async () => {
@@ -310,6 +314,18 @@ describe('DataSetService', () => {
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         )
       );
+
+      expect(metaPlugin.removeDataSet).toBeCalledTimes(0);
+    });
+
+    it('throws when preconditions are not met', async () => {
+      await expect(
+        service.removeDataSet(mockDataSetId, async () => {
+          await Promise.reject(new Error('Preconditions are not met'));
+        })
+      ).rejects.toThrow('Preconditions are not met');
+
+      expect(metaPlugin.removeDataSet).toBeCalledTimes(0);
     });
   });
 
