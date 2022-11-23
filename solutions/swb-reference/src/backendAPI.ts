@@ -73,12 +73,9 @@ const apiRouteConfig: ApiRouteConfig = {
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
-  costCenterService: new CostCenterService(
-    {
-      TABLE_NAME: process.env.STACK_NAME!
-    },
-    aws.helpers.ddb
-  ),
+  costCenterService: new CostCenterService({
+    TABLE_NAME: process.env.STACK_NAME!
+  }),
   metadataService: new MetadataService(aws.helpers.ddb)
 };
 

@@ -5,121 +5,31 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
+  AwsService,
   buildDynamoDBPkSk,
+  removeDynamoDbKeys,
   resourceTypeToKey,
-  uuidWithLowercasePrefix,
-  PaginatedResponse,
-  validateSingleSortAndFilter,
-  getSortQueryParams,
-  getFilterQueryParams,
-  QueryParams,
-  addPaginationToken
+  uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
 import { Account } from '../models/account';
-import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
-import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
-import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
-import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
+import CostCenter from '../models/costCenter';
 import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
-  private _dynamoDbService: DynamoDBService;
+  private _aws: AwsService;
   private readonly _tableName: string;
-  private _resourceType: string = 'costCenter';
 
-  public constructor(constants: { TABLE_NAME: string }, dynamoDbService: DynamoDBService) {
+  public constructor(constants: { TABLE_NAME: string }) {
     const { TABLE_NAME } = constants;
     this._tableName = TABLE_NAME;
-    this._dynamoDbService = dynamoDbService;
-  }
-
-  /**
-   * Soft Delete Cost Center
-   * @param request - request for deleting cost center
-   * @param checkDependency - check whether we can delete the costCenter. The function should throw a Boom error if costCenter cannot be deleted
-   * @returns void
-   */
-  public async softDeleteCostCenter(
-    request: DeleteCostCenterRequest,
-    checkDependency: (costCenterId: string) => Promise<void>
-  ): Promise<void> {
-    await checkDependency(request.id);
-    await this.getCostCenter(request.id);
-
-    try {
-      await this._dynamoDbService.updateExecuteAndFormat({
-        key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
-        params: {
-          item: { resourceType: `${this._resourceType}_deleted` }
-        }
-      });
-    } catch (e) {
-      throw Boom.internal('Unable to delete CostCenter');
-    }
-  }
-
-  /**
-   * Update costCenter
-   * @param request - request for updating cost center
-   * @returns CostCenter object with updated attributes
-   */
-  public async updateCostCenter(request: UpdateCostCenterRequest): Promise<CostCenter> {
-    await this.getCostCenter(request.id);
-    const currentDate = new Date().toISOString();
-    const updatedCostCenter = {
-      name: request.name,
-      description: request.description,
-      updatedAt: currentDate
-    };
-
-    let response;
-    try {
-      response = await this._dynamoDbService.updateExecuteAndFormat({
-        key: buildDynamoDBPkSk(request.id, resourceTypeToKey.costCenter),
-        params: { item: updatedCostCenter }
-      });
-    } catch (e) {
-      console.error('Unable to update cost center', request);
-      throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
-    }
-    if (response.Attributes) {
-      return this._mapDDBItemToCostCenter(response.Attributes);
-    }
-    throw Boom.internal(`Unable to update CostCenter with params ${JSON.stringify(request)}`);
-  }
-
-  public async listCostCenters(request: ListCostCentersRequest): Promise<PaginatedResponse<CostCenter>> {
-    const { filter, sort, pageSize, paginationToken } = request;
-    validateSingleSortAndFilter(filter, sort);
-
-    //Prep queryParams
-    let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByCreatedAt',
-      limit: pageSize
-    };
-    const gsiNames = ['getResourceByName'];
-    const filterQuery = getFilterQueryParams(filter, gsiNames);
-    const sortQuery = getSortQueryParams(sort, gsiNames);
-    queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
-    queryParams = addPaginationToken(paginationToken, queryParams);
-
-    const response = await this._dynamoDbService.getPaginatedItems(queryParams);
-
-    return {
-      data: response.data.map((item) => {
-        return this._mapDDBItemToCostCenter(item);
-      }),
-      paginationToken: response.paginationToken
-    };
+    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
   }
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const response = (await this._dynamoDbService
-
+    // Get by id
+    const response = (await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
@@ -127,23 +37,28 @@ export default class CostCenterService {
       throw Boom.notFound(`Could not find cost center ${costCenterId}`);
     }
 
-    return this._mapDDBItemToCostCenter(response.Item);
+    response.Item.accountId = response.Item.dependency;
+
+    let costCenter = response.Item as { [key: string]: never };
+    costCenter = removeDynamoDbKeys(costCenter);
+
+    return costCenter as unknown as CostCenter;
   }
 
-  public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
+  public async create(createCostCenter: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
 
-    const account = await this._getAccount(request.accountId);
+    const account = await this._getAccount(createCostCenter.accountId);
 
-    const currentDateTime = new Date(Date.now()).toISOString();
+    const createdAt = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
-      createdAt: currentDateTime,
-      updatedAt: currentDateTime,
+      createdAt: createdAt,
+      updatedAt: createdAt,
       id: id,
-      accountId: request.accountId,
-      description: request.description,
-      name: request.name,
+      accountId: createCostCenter.accountId,
+      description: createCostCenter.description,
+      name: createCostCenter.name,
       // Account data
       awsAccountId: account.awsAccountId,
       encryptionKeyArn: account.encryptionKeyArn,
@@ -157,30 +72,22 @@ export default class CostCenterService {
 
     const dynamoItem: { [key: string]: string } = {
       ...costCenter,
-      resourceType: this._resourceType,
-      dependency: request.accountId
+      resourceType: 'cost center',
+      dependency: createCostCenter.accountId
     };
 
     delete dynamoItem.accountId;
 
     const key = buildDynamoDBPkSk(id, resourceTypeToKey.costCenter);
 
-    const response = await this._dynamoDbService.updateExecuteAndFormat({
+    await this._aws.helpers.ddb.updateExecuteAndFormat({
       key,
       params: {
         item: dynamoItem
       }
     });
-    if (response.Attributes) {
-      return this._mapDDBItemToCostCenter(response.Attributes);
-    }
-    throw Boom.internal(`Unable to create CostCenter with params ${JSON.stringify(request)}`);
-  }
 
-  private _mapDDBItemToCostCenter(item: { [key: string]: unknown }): CostCenter {
-    const costCenter: { [key: string]: unknown } = { ...item, accountId: item.dependency };
-    // parse will remove pk and sk from the DDB item
-    return CostCenterParser.parse(costCenter);
+    return costCenter;
   }
 
   private async _getAccount(accountId: string): Promise<Account> {

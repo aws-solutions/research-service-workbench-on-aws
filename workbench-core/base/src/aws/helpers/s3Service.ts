@@ -5,8 +5,7 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { PutObjectCommand, S3, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { S3 } from '@aws-sdk/client-s3';
 
 export default class S3Service {
   private _s3: S3;
@@ -75,29 +74,5 @@ export default class S3Service {
     };
 
     await recursiveUpload(path, '');
-  }
-
-  /**
-   * Create a presigned URL for a signle-part file upload
-   * @param s3BucketName - the name of the s3 bucket
-   * @param prefix - the s3 prefix to upload to
-   * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
-   * @returns the presigned URL
-   */
-  public async createPresignedUploadUrl(
-    s3BucketName: string,
-    prefix: string,
-    timeToLiveSeconds: number
-  ): Promise<string> {
-    const config: S3ClientConfig = {
-      credentials: await this._s3.config.credentials(),
-      region: this._s3.config.region
-    };
-
-    return await getSignedUrl(
-      new S3Client(config),
-      new PutObjectCommand({ Bucket: s3BucketName, Key: prefix }),
-      { expiresIn: timeToLiveSeconds }
-    );
   }
 }

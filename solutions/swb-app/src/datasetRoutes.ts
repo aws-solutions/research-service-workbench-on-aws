@@ -31,15 +31,14 @@ export function setUpDSRoutes(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
-      const dataSet = await dataSetService.provisionDataSet({
-        name: req.body.datasetName,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
-        storageProvider: dataSetStoragePlugin
-      });
-
+      const dataSet = await dataSetService.provisionDataSet(
+        req.body.datasetName,
+        req.body.storageName,
+        req.body.path,
+        req.body.awsAccountId,
+        req.body.region,
+        dataSetStoragePlugin
+      );
       res.status(201).send(dataSet);
     })
   );
@@ -49,14 +48,14 @@ export function setUpDSRoutes(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
-      const dataSet = await dataSetService.importDataSet({
-        name: req.body.datasetName,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
-        storageProvider: dataSetStoragePlugin
-      });
+      const dataSet = await dataSetService.importDataSet(
+        req.body.datasetName,
+        req.body.storageName,
+        req.body.path,
+        req.body.awsAccountId,
+        req.body.region,
+        dataSetStoragePlugin
+      );
       res.status(201).send(dataSet);
     })
   );

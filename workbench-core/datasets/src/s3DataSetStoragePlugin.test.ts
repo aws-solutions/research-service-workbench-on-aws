@@ -3,12 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-jest.mock('@aws-sdk/s3-request-presigner', () => ({
-  getSignedUrl: jest.fn(() => {
-    return 'sampleUrl';
-  })
-}));
-
 import { GetKeyPolicyCommand, KMSClient, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetBucketPolicyCommand,
@@ -938,15 +932,10 @@ describe('S3DataSetStoragePlugin', () => {
   });
 
   describe('createPresignedUploadUrl', () => {
-    it('returns a presigned url for a single part file upload', async () => {
-      const ttl = 3600;
-
-      const url = await plugin.createPresignedUploadUrl(
-        { name: path, storageName: name, path, storageType: 'S3' },
-        ttl
+    itProp('throws not implemented error.', [fc.string(), fc.nat()], async (name, ttl) => {
+      await expect(plugin.createPresignedUploadUrl(name, ttl)).rejects.toEqual(
+        new Error('Method not implemented.')
       );
-
-      expect(url).toBe('sampleUrl');
     });
   });
 

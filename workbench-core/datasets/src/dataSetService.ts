@@ -14,54 +14,6 @@ import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
 import { StorageLocation } from './storageLocation';
 
-export interface CreateProvisionDatasetRequest {
-  /**
-   * the name of a DataSet
-   */
-  name: string;
-
-  /**
-   * (optional) a description of the dataset
-   */
-  description?: string;
-
-  /**
-   * (optional) the owner of the dataset
-   */
-  owner?: string;
-
-  /**
-   * (optional) the type of the dataset
-   */
-  type?: string;
-
-  /**
-   * a string which identifies the storage specific location such the URL to an S3 bucket.
-   */
-  storageName: string;
-
-  /**
-   * the storage path where the DataSet files can be found at the location.
-   */
-  path: string;
-
-  /**
-   * AWS Account ID of DataSet
-   */
-  awsAccountId?: string;
-
-  /**
-   * AWS region of the dataset storage
-   */
-  region?: string;
-
-  /**
-   * an instance of {@link DataSetsStoragePlugin} to provide the storage implementation
-   * for a particular platform, account, etc.
-   */
-  storageProvider: DataSetsStoragePlugin;
-}
-
 export class DataSetService {
   private _audit: AuditService;
   private _log: LoggingService;
@@ -84,17 +36,30 @@ export class DataSetService {
 
   /**
    * Adds a new DataSet to the provided storage.
-   * @param request - {@link CreateProvisionDatasetRequest}
+   * @param datasetName - the name of the DataSet to provision.
+   * @param storageName - the name of the storage, for instance, the name of an S3 bucket.
+   * @param path - the path to the DataSet within the storage.
+   * @param awsAccountId - the AWS account where the DataSet resides.
+   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
+   * for a particular platform, account, etc.
    *
    * @returns the DataSet object which is stored in the backing datastore.
    */
-  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    const { storageProvider, ...dataSet } = request;
-
-    await storageProvider.createStorage(dataSet.storageName, dataSet.path);
-
+  public async provisionDataSet(
+    datasetName: string,
+    storageName: string,
+    path: string,
+    awsAccountId: string,
+    region: string,
+    storageProvider: DataSetsStoragePlugin
+  ): Promise<DataSet> {
+    await storageProvider.createStorage(storageName, path);
     const provisioned: DataSet = {
-      ...dataSet,
+      name: datasetName,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -103,17 +68,30 @@ export class DataSetService {
 
   /**
    * Imports an existing storage location into the solution as a DataSet.
-   * @param request - {@link CreateProvisionDatasetRequest}
+   * @param datasetName - the name of the DataSet to import
+   * @param storageName - the name of the storage, for instance, the name of an S3 bucket.
+   * @param path - the path to the data within the storage, for instance, an S3 prefix.
+   * @param awsAccountId - the 12 digit Id of the AWS account where the dataSet resides.
+   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} to provide the storage impplementation
+   * for a particular platform, account, etc.
    *
    * @returns the DataSet object which is stored in teh backing datastore.
    */
-  public async importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    const { storageProvider, ...dataSet } = request;
-
-    await storageProvider.importStorage(dataSet.storageName, dataSet.path);
-
+  public async importDataSet(
+    datasetName: string,
+    storageName: string,
+    path: string,
+    awsAccountId: string,
+    region: string,
+    storageProvider: DataSetsStoragePlugin
+  ): Promise<DataSet> {
+    await storageProvider.importStorage(storageName, path);
     const imported: DataSet = {
-      ...dataSet,
+      name: datasetName,
+      storageName,
+      path,
+      awsAccountId,
+      region,
       storageType: storageProvider.getStorageType()
     };
 
@@ -123,16 +101,9 @@ export class DataSetService {
   /**
    * Removes a DataSet from the solution however it does not delete the storage.
    * @param dataSetId - the ID of the DataSet to remove.
-   * @param checkDependency - function to validate whether all required prerequisites are met before removing dataset.
-   * If prerequisites are not met - function should throw error.
    * @throws DataSetHasEndpontError - if the dataset has external endpoints assigned.
    */
-  public async removeDataSet(
-    dataSetId: string,
-    checkDependency: (dataSetId: string) => Promise<void>
-  ): Promise<void> {
-    await checkDependency(dataSetId);
-
+  public async removeDataSet(dataSetId: string): Promise<void> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
     if (targetDS.externalEndpoints?.length) {
       throw new DataSetHasEndpointError(
@@ -322,23 +293,6 @@ export class DataSetService {
    */
   public async getExternalEndPoint(dataSetId: string, endPointId: string): Promise<ExternalEndpoint> {
     return await this._dbProvider.getDataSetEndPointDetails(dataSetId, endPointId);
-  }
-
-  /**
-   * Create a presigned URL for a signle-part file upload
-   * @param datasetId - the ID of the Dataset.
-   * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
-   * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
-   * @returns the presigned URL
-   */
-  public async getPresignedSinglePartUploadUrl(
-    datasetId: string,
-    timeToLiveSeconds: number,
-    storageProvider: DataSetsStoragePlugin
-  ): Promise<string> {
-    const dataset = await this.getDataSet(datasetId);
-
-    return await storageProvider.createPresignedUploadUrl(dataset, timeToLiveSeconds);
   }
 
   /**

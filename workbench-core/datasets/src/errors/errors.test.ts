@@ -3,10 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHasEndpointError';
-import { EndPointExistsError, isEndPointExistsError } from './endPointExistsError';
-import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleError';
-import { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './roleExistsOnEndpointError';
+import {
+  DataSetHasEndpointError,
+  isDataSetHasEndpointError,
+  EndPointExistsError,
+  isEndPointExistsError,
+  isRoleExistsOnEndpointError,
+  RoleExistsOnEndpointError
+} from '../';
 
 const error = new Error();
 
@@ -36,14 +40,5 @@ describe('custom error tests', () => {
   });
   test('not RoleExistsOnEndPointError', () => {
     expect(isRoleExistsOnEndpointError(error)).toBe(false);
-  });
-
-  test('InvalidIamRoleError', () => {
-    const invalidIamRoleError = new InvalidIamRoleError();
-
-    expect(isInvalidIamRoleError(invalidIamRoleError)).toBe(true);
-  });
-  test('not InvalidIamRoleError', () => {
-    expect(isInvalidIamRoleError(error)).toBe(false);
   });
 });

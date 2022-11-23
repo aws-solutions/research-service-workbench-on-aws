@@ -64,8 +64,7 @@ describe('CognitoSetup', () => {
       const responseMetadata = { httpStatusCode: 400 };
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new GroupExistsException({
-          $metadata: responseMetadata,
-          message: ''
+          $metadata: responseMetadata
         })
       );
 
@@ -86,11 +85,10 @@ describe('CognitoSetup', () => {
       const cognitoMock = mockClient(CognitoIdentityProviderClient);
       mockCognito(cognitoMock);
 
-      const responseMetadata = { httpStatusCode: 500 };
+      const ResponseMetadata = { httpStatusCode: 500 };
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new UsernameExistsException({
-          $metadata: responseMetadata,
-          message: ''
+          $metadata: ResponseMetadata
         })
       );
       jest.spyOn(cognitoSetup, 'adminCreateUser').mockImplementation();
@@ -106,14 +104,12 @@ describe('CognitoSetup', () => {
       const responseMetadata = { httpStatusCode: 400 };
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new GroupExistsException({
-          $metadata: responseMetadata,
-          message: ''
+          $metadata: responseMetadata
         })
       );
       cognitoMock.on(AdminCreateUserCommand).rejects(
         new UsernameExistsException({
-          $metadata: responseMetadata,
-          message: ''
+          $metadata: responseMetadata
         })
       );
       jest.spyOn(cognitoSetup, 'createGroup').mockImplementation();

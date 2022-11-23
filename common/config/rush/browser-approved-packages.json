@@ -83,10 +83,6 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
-      "name": "@aws-sdk/s3-request-presigner",
-      "allowedCategories": [ "production" ]
-    },
-    {
       "name": "@aws-sdk/types",
       "allowedCategories": [ "production", "prototypes" ]
     },

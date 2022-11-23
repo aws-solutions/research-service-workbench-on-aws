@@ -14,6 +14,3 @@ terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environme
 #Cognito Integ Test Client
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
-
-## Default Hosting Account
-defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
