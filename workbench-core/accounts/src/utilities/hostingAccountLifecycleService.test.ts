@@ -720,8 +720,8 @@ describe('HostingAccountLifecycleService', () => {
     service['_aws'].clients.s3 = new S3({
       region : region,
       credentials: {
-        accessKeyId: "AKIAIOSFODNN7EXAMPLE",
-        secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+        accessKeyId: "EXAMPLE",
+        secretAccessKey: "EXAMPLEKEY"
       }
     });
 
