@@ -689,7 +689,7 @@ export default class HostingAccountLifecycleService {
       `&templateURL=${encodeURIComponent(signedUrl)}`,
     ].join('');
 
-    return { createUrl, updateUrl};
+    return { createUrl, updateUrl };
   }
 
 
