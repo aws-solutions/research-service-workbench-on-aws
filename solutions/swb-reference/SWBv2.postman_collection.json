@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "c7f31b8c-0e10-4a2c-90f6-38fe38bfe8ed",
+    "_postman_id": "5881d2db-d313-4094-9769-290c7088667f",
     "name": "SWBv2 Official",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "4320586"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -225,6 +224,30 @@
     {
       "name": "datasets",
       "item": [
+        {
+          "name": "Delete DataSet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/datasets/id",
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "id"]
+            }
+          },
+          "response": []
+        },
         {
           "name": "Create DataSet",
           "request": {
@@ -983,7 +1006,7 @@
           }
         },
         "url": {
-          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
+          "raw": "{{API_URL}}/aws-accounts",
           "host": ["{{API_URL}}"],
           "path": ["aws-accounts"]
         }

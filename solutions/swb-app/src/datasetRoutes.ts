@@ -110,10 +110,7 @@ export function setUpDSRoutes(
         }
       };
 
-      await dataSetService.removeDataSet(
-        req.params.datasetId,
-        async () => await checkDatasetDependencies(req.params.datasetId)
-      );
+      await dataSetService.removeDataSet(req.params.datasetId, checkDatasetDependencies);
       res.status(204).send();
     })
   );
