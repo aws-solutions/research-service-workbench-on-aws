@@ -18,6 +18,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'CostCenter'
   },
