@@ -10,11 +10,14 @@ import {
   DataSetService,
   DataSetsStoragePlugin
 } from '@aws/workbench-core-datasets';
-import { Environment } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
+import {
+  EnvironmentDatasetMetadata,
+  EnvironmentDatasetMetadataParser
+} from './schemas/environmentDatasetMetadataParser';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpDSRoutes(
@@ -91,10 +94,11 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:datasetId',
     wrapAsync(async (req: Request, res: Response) => {
-      const { data: environments } = await metadataService.listDependentMetadata<Environment>(
+      const { data: environments } = await metadataService.listDependentMetadata<EnvironmentDatasetMetadata>(
         resourceTypeToKey.dataset,
         req.params.datasetId,
         resourceTypeToKey.environment,
+        EnvironmentDatasetMetadataParser,
         { pageSize: 1 }
       );
 

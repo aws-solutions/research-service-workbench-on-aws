@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { AttributeValue, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { z } from 'zod';
 import AwsService from '../aws/awsService';
 import Query from '../aws/helpers/dynamoDB/query';
 import resourceTypeToKey from '../constants/resourceTypeToKey';
@@ -90,10 +91,17 @@ describe('metadata service', () => {
     query.execute = jest.fn(() => Promise.resolve(output));
     awsService.helpers.ddb.query = jest.fn(() => query);
 
+    const parser = z
+      .object({
+        a: z.any()
+      })
+      .strict();
+
     const { data: result } = await metadataService.listDependentMetadata(
       resourceTypeToKey.environment,
       'id',
-      resourceTypeToKey.dataset
+      resourceTypeToKey.dataset,
+      parser
     );
     expect(result).toEqual(expected);
   });

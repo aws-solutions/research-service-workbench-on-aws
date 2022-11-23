@@ -4,6 +4,7 @@
  */
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
+import { ZodTypeAny } from 'zod';
 import AwsService from '../aws/awsService';
 import QueryParams from '../interfaces/queryParams';
 import {
@@ -12,6 +13,7 @@ import {
   getPaginationToken,
   MAX_API_PAGE_SIZE
 } from '../utilities/paginationHelper';
+import { validateAndParse } from '../utilities/validatorHelper';
 
 export class MetadataService {
   private readonly _awsService: AwsService;
@@ -70,6 +72,7 @@ export class MetadataService {
     mainEntityResourceType: string,
     mainEntityId: string,
     dependencyResourceType: string,
+    parser: ZodTypeAny,
     queryParams?: {
       pageSize?: number;
       paginationToken?: string;
@@ -89,7 +92,11 @@ export class MetadataService {
       return { data: [], paginationToken: undefined };
     }
 
-    const data = result.Items as unknown as DependencyMetadata[];
+    const data: DependencyMetadata[] = [];
+    result.Items.forEach((item) => {
+      data.push(validateAndParse<DependencyMetadata>(parser, item));
+    });
+
     return { data, paginationToken: getPaginationToken(result) };
   }
 }
