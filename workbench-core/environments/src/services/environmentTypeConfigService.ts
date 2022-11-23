@@ -50,7 +50,7 @@ export default class EnvironmentTypeConfigService {
   /**
    * Soft Delete Cost Center
    * @param request - request for deleting cost center
-   * @param checkDependency - check whether we can delete the costCenter. The function should throw a Boom error if costCenter cannot be deleted
+   * @param checkDependency - check whether we can delete the envTypeConfig. The function should throw a Boom error if envTypeConfig cannot be deleted
    * @returns void
    */
   public async softDeleteEnvironmentTypeConfig(

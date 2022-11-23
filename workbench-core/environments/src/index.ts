@@ -20,6 +20,10 @@ import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
 } from './interfaces/listEnvironmentTypesRequest';
+import {
+  DeleteEnvironmentTypeConfigRequestParser,
+  DeleteEnvironmentTypeConfigRequest
+} from './models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
@@ -59,5 +63,7 @@ export {
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeHandler,
   ListEnvironmentTypesRequest,
-  ListEnvironmentTypesRequestParser
+  ListEnvironmentTypesRequestParser,
+  DeleteEnvironmentTypeConfigRequestParser,
+  DeleteEnvironmentTypeConfigRequest
 };

@@ -7,14 +7,16 @@ import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench
 import {
   CreateEnvironmentTypeConfigSchema,
   EnvironmentTypeConfigService,
-  UpdateEnvironmentTypeConfigSchema
+  UpdateEnvironmentTypeConfigSchema,
+  DeleteEnvironmentTypeConfigRequest,
+  DeleteEnvironmentTypeConfigRequestParser
 } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { validate as uuidValidate } from 'uuid';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeConfigRoutes(
   router: Router,
@@ -52,6 +54,31 @@ export function setUpEnvTypeConfigRoutes(
       const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(
         req.params.envTypeId,
         req.params.envTypeConfigId
+      );
+      res.send(envTypeConfig);
+    })
+  );
+
+  // Soft Delete envTypeConfig
+  router.put(
+    '/environmentTypes/:envTypeId/configurations/:envTypeConfigId/softDelete',
+    wrapAsync(async (req: Request, res: Response) => {
+      const envTypeConfigDeleteRequest = {
+        envTypeId: req.params.envTypeId,
+        envTypeConfigId: req.params.envTypeConfigId
+      };
+      const validatedRequest = validateAndParse<DeleteEnvironmentTypeConfigRequest>(
+        DeleteEnvironmentTypeConfigRequestParser,
+        envTypeConfigDeleteRequest
+      );
+
+      async function checkDependency(envTypeId: string, envTypeConfigId: string): Promise<void> {
+        // TODO: Implement this using metadataService
+        return Promise.resolve();
+      }
+      const envTypeConfig = await environmentTypeConfigService.softDeleteEnvironmentTypeConfig(
+        validatedRequest,
+        checkDependency
       );
       res.send(envTypeConfig);
     })
