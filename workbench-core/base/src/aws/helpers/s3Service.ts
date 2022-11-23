@@ -77,12 +77,12 @@ export default class S3Service {
     await recursiveUpload(path, '');
   }
 
-  public async getPresignedUrl(s3BucketName: string, key: string) : Promise<string> {
+  public async getPresignedUrl(s3BucketName: string, key: string, expirationMinutes: number) : Promise<string> {
     // Sign the url
     const command = new GetObjectCommand( {
       Bucket: s3BucketName,
       Key:key,
     });
-    return getSignedUrl(this._s3, command, { expiresIn: 15 * 60 });
+    return getSignedUrl(this._s3, command, { expiresIn: expirationMinutes });
   }
 }

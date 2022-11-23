@@ -115,7 +115,7 @@ export default class HostingAccountLifecycleService {
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
 
-    const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, key);
+    const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, key, 15 * 60);
     return  this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
   }
   /**
