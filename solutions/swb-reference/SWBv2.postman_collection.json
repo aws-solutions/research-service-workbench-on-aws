@@ -36,14 +36,19 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters/",
-              "host": ["{{API_URL}}"],
-              "path": ["costCenters", ""]
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "costCenters",
+                ""
+              ]
             }
           },
           "response": []
         },
         {
-          "name": "Get Cost Centers",
+          "name": "Get Cost Center",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -71,9 +76,171 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/costCenters/id",
-              "host": ["{{API_URL}}"],
-              "path": ["costCenters", "id"]
+              "raw": "{{API_URL}}/costCenters/:id",
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "costCenters",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete Cost Center",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/:id/softDelete",
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "costCenters",
+                ":id",
+                "softDelete"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cost Center",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"\",\n    \"description\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters/:id",
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "costCenters",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Cost Centers",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/costCenters",
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "costCenters"
+              ],
+              "query": [
+                {
+                  "key": "filter[name][begins]",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
@@ -143,8 +310,13 @@
             },
             "url": {
               "raw": "{{API_URL}}/datasets/import",
-              "host": ["{{API_URL}}"],
-              "path": ["datasets", "import"]
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "datasets",
+                "import"
+              ]
             }
           },
           "response": []
@@ -179,8 +351,13 @@
             },
             "url": {
               "raw": "{{API_URL}}/datasets/id",
-              "host": ["{{API_URL}}"],
-              "path": ["datasets", "id"]
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "datasets",
+                "id"
+              ]
             }
           },
           "response": []
@@ -201,19 +378,15 @@
                 "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "{{API_URL}}/datasets/",
-              "host": ["{{API_URL}}"],
-              "path": ["datasets", ""]
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "datasets",
+                ""
+              ]
             }
           },
           "response": []
@@ -241,8 +414,14 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/terminate",
-              "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "terminate"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments",
+                ":id",
+                "terminate"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -281,8 +460,12 @@
             },
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": ["{{API_URL}}"],
-              "path": ["environments"]
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments"
+              ]
             }
           },
           "response": []
@@ -305,8 +488,14 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/start",
-              "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "start"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments",
+                ":id",
+                "start"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -336,8 +525,14 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/stop",
-              "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "stop"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments",
+                ":id",
+                "stop"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -367,8 +562,13 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
-              "host": ["{{API_URL}}"],
-              "path": ["environments", ":id"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -398,8 +598,12 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": ["{{API_URL}}"],
-              "path": ["environments"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments"
+              ],
               "query": [
                 {
                   "key": "status",
@@ -479,8 +683,14 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/connections",
-              "host": ["{{API_URL}}"],
-              "path": ["environments", ":id", "connections"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environments",
+                ":id",
+                "connections"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -557,8 +767,13 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:id",
-              "host": ["{{API_URL}}"],
-              "path": ["environmentTypes", ":id"],
+              "host": [
+                "{{API_URL}}"
+              ],
+              "path": [
+                "environmentTypes",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",

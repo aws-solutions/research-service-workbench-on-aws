@@ -21,12 +21,32 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'CostCenter'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
     ]
   },
   [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
+        subject: 'CostCenter'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
         subject: 'CostCenter'
       }
     ]
