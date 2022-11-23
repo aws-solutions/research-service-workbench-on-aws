@@ -124,15 +124,14 @@ export class DataSetService {
    * Removes a DataSet from the solution however it does not delete the storage.
    * @param dataSetId - the ID of the DataSet to remove.
    * @param checkDependency - function to validate whether all required prerequisites are met before removing dataset.
+   * If prerequisites are not met - function should throw error.
    * @throws DataSetHasEndpontError - if the dataset has external endpoints assigned.
    */
   public async removeDataSet(
     dataSetId: string,
-    checkDependency?: (dataSetId: string) => Promise<void>
+    checkDependency: (dataSetId: string) => Promise<void>
   ): Promise<void> {
-    if (checkDependency) {
-      await checkDependency(dataSetId);
-    }
+    await checkDependency(dataSetId);
 
     const targetDS: DataSet = await this.getDataSet(dataSetId);
     if (targetDS.externalEndpoints?.length) {
