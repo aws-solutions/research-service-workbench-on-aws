@@ -3,12 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-jest.mock('@aws-sdk/s3-request-presigner', () => {
-  return {
-    getSignedUrl: jest.fn(),
-  }
-})
-
 import { Readable } from 'stream';
 
 import { PolicyDocument } from '@aws-cdk/aws-iam';
@@ -47,12 +41,15 @@ import {
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
-import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import { SdkStream } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
+import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+
+const sampleArtifactsBucketName = 'sampleArtifactsBucketName';
+const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
@@ -78,7 +75,7 @@ describe('HostingAccountLifecycleService', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cfMock: AwsStub<any, any>,
     stackStatus: string = 'CREATE_COMPLETE',
-    artifactBucketArn: string = 'arn:aws:s3:::sampleArtifactsBucketName'
+    artifactBucketArnCfn: string = artifactBucketArn
   ): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
@@ -105,7 +102,7 @@ describe('HostingAccountLifecycleService', () => {
             },
             {
               OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-              OutputValue: artifactBucketArn
+              OutputValue: artifactBucketArnCfn
             },
             {
               OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
@@ -718,21 +715,33 @@ describe('HostingAccountLifecycleService', () => {
     const region = process.env.AWS_REGION!;
 
     service['_aws'].clients.s3 = new S3({
-      region : region,
+      region: region,
       credentials: {
-        accessKeyId: "EXAMPLE",
-        secretAccessKey: "EXAMPLEKEY"
+        accessKeyId: 'EXAMPLE',
+        secretAccessKey: 'EXAMPLEKEY'
       }
     });
+    const testUrl = 'https://testurl.com';
+    jest
+        .spyOn(S3Service.prototype, 'getPresignedUrl')
+        .mockImplementationOnce(
+            (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
+              expect(s3BucketName).toEqual(sampleArtifactsBucketName);
+              expect(key).toEqual('onboard-account.cfn.yaml');
+              return Promise.resolve(testUrl);
+            }
+        );
 
-    const testUrl = 'https://testurl.com'
-    const expectedCreateUrl = 'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true'
+    const expectedCreateUrl =
+        'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true';
+    const expectedUpdateUrl =
+        'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
 
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
-    (getSignedUrl as jest.Mock).mockImplementation(() => testUrl)
     const actual = await service.buildTemplateUrlsForAccount(sampleExternalId);
 
     expect(actual.createUrl).toEqual(expectedCreateUrl);
+    expect(actual.updateUrl).toEqual(expectedUpdateUrl);
   });
 });
