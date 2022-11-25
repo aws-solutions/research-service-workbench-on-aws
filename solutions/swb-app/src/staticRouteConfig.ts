@@ -21,6 +21,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/awsAccountTemplateUrls': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AccountTemplate'
+      }
+    ]
+  },
   [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {

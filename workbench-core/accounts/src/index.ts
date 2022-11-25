@@ -5,6 +5,7 @@
 
 import AccountHandler from './handlers/accountHandler';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
@@ -25,6 +26,8 @@ export {
   ProjectService,
   CreateAccountSchema,
   UpdateAccountSchema,
+  AwsAccountTemplateUrls,
+  AwsAccountTemplateUrlsParser,
   CreateAccountMetadata,
   UpdateAccountMetadata,
   ListAccountRequest,

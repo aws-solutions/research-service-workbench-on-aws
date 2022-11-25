@@ -5,6 +5,7 @@
 
 import { Readable } from 'stream';
 
+import { PolicyDocument } from '@aws-cdk/aws-iam';
 import {
   CloudFormationClient,
   DescribeStacksCommand,
@@ -23,33 +24,42 @@ import {
 import { KMSClient, GetKeyPolicyCommand, PutKeyPolicyCommand } from '@aws-sdk/client-kms';
 import {
   GetObjectCommand,
+  S3,
   S3Client,
   GetBucketPolicyCommand,
   PutBucketPolicyCommand,
   NoSuchBucket
 } from '@aws-sdk/client-s3';
-
 import {
   AcceptPortfolioShareCommand,
   CreatePortfolioShareCommand,
   ServiceCatalogClient
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
+import { SdkStream } from '@aws-sdk/types';
 import { AwsService } from '@aws/workbench-core-base';
+import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import HostingAccountLifecycleService from './hostingAccountLifecycleService';
+
+const sampleArtifactsBucketName = 'sampleArtifactsBucketName';
+const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
-    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'SampleStatusHandlerArnOutput';
     process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
     process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
+    process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+    process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.AWS_REGION = 'us-east-1';
+    process.env.MAIN_ACCT_ID = '123456789012';
   });
 
   afterAll(() => {
@@ -60,7 +70,7 @@ describe('HostingAccountLifecycleService', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     cfMock: AwsStub<any, any>,
     stackStatus: string = 'CREATE_COMPLETE',
-    artifactBucketArn: string = 'arn:aws:s3:::sampleArtifactsBucketName'
+    artifactBucketArnCfn: string = artifactBucketArn
   ): void {
     cfMock.on(DescribeStacksCommand).resolves({
       Stacks: [
@@ -78,8 +88,16 @@ describe('HostingAccountLifecycleService', () => {
               OutputValue: 'arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va'
             },
             {
+              OutputKey: process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-accountHandlerLambdaServiceRole-XXXXXXXXXXE88`
+            },
+            {
+              OutputKey: process.env.API_HANDLER_ARN_OUTPUT_KEY!,
+              OutputValue: `arn:aws:iam::${process.env.MAIN_ACCT_ID}:role/${process.env.STACK_NAME}-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX`
+            },
+            {
               OutputKey: process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-              OutputValue: artifactBucketArn
+              OutputValue: artifactBucketArnCfn
             },
             {
               OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
@@ -158,7 +176,7 @@ describe('HostingAccountLifecycleService', () => {
     hostingAccountLifecycleService.updateMainAccountEncryptionKeyPolicy = jest.fn();
 
     const cfnMock = mockClient(CloudFormationClient);
-    const missingBucketNameArn = 'arn:aws:s3::::';
+    const missingBucketNameArn = 'arn:aws:s3:::';
     mockCloudformationOutputs(cfnMock, 'CREATE_COMPLETE', missingBucketNameArn);
 
     const mockDDB = mockClient(DynamoDBClient);
@@ -225,7 +243,7 @@ describe('HostingAccountLifecycleService', () => {
     ebMock.on(PutPermissionCommand).resolves({});
     ebMock.on(PutRuleCommand).resolves({});
     ebMock.on(PutTargetsCommand).resolves({});
-    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateBusPermissions('sampleStatusHandlerArn', '123456789012')
@@ -282,7 +300,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
@@ -299,7 +317,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -352,7 +370,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
@@ -369,7 +387,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -419,7 +437,7 @@ describe('HostingAccountLifecycleService', () => {
     const s3Mock = mockClient(S3Client);
     // Mocking expected template pulled from S3
     s3Mock.on(GetObjectCommand).resolves({
-      Body: readableStream
+      Body: readableStream as SdkStream<Readable>
     });
 
     // Mocking actual template pulled from CFN Stack
@@ -436,7 +454,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
         targetAccountId: '0123456789012',
-        targetAccountAwsService: new AwsService({ region: 'us-east-1' }),
+        targetAccountAwsService: new AwsService({ region: process.env.AWS_REGION! }),
         targetAccountStackName: 'swb-dev-va-hosting-account',
         portfolioId: 'port-1234',
         ssmDocNameSuffix: 'SSMDocOutput',
@@ -465,11 +483,11 @@ describe('HostingAccountLifecycleService', () => {
     // Mock S3 calls
     const s3Mock = mockClient(S3Client);
     s3Mock.on(PutBucketPolicyCommand).resolves({});
-    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {} }));
+    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, '123456789012')
-    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {} }));
+    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {}, message: '' }));
   });
 
   test('updateArtifactsBucketPolicy update works when bucket policy does not contain account ID', async () => {
@@ -599,5 +617,126 @@ describe('HostingAccountLifecycleService', () => {
         '123456789012'
       )
     ).resolves.not.toThrowError();
+  });
+
+  test('updatePolicyDocumentWithAllStatements works when adding new statements', async () => {
+    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
+    const sampleBucketName = 'randomBucketName';
+    const sampleBucketArn = `arn:aws:s3:::${sampleBucketName}`;
+    const sampleAccountId = '123456789012';
+
+    // Mock S3 calls
+    const s3Mock = mockClient(S3Client);
+    s3Mock.on(PutBucketPolicyCommand).resolves({});
+    const basePolicy = PolicyDocument.fromJson(
+      JSON.parse(`{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            }
+        ]
+    }`)
+    );
+
+    const expectedPolicy = PolicyDocument.fromJson(
+      JSON.parse(`
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "Deny requests that do not use SigV4",
+                "Effect": "Deny",
+                "Principal": {
+                    "AWS": "*"
+                },
+                "Action": "s3:*",
+                "Resource": "${sampleBucketArn}/*",
+                "Condition": {
+                    "StringNotEquals": {
+                        "s3:signatureversion": "AWS4-HMAC-SHA256"
+                    }
+                }
+            },
+            {
+                "Sid": "List:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::${sampleAccountId}:root"
+                },
+                "Action": "s3:ListBucket",
+                "Resource": "${sampleBucketArn}",
+                "Condition": {
+                    "StringLike": {
+                        "s3:prefix": "environment-files*"
+                    }
+                }
+            },
+            {
+                "Sid": "Get:environment-files",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::${sampleAccountId}:root"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "${sampleBucketArn}/environment-files*"
+            }
+        ]
+    }`)
+    );
+
+    const postUpdatedPolicy = hostingAccountLifecycleService['_updateBucketPolicyDocumentWithAllStatements'](
+      sampleBucketArn,
+      sampleAccountId,
+      basePolicy
+    );
+    expect(postUpdatedPolicy).toEqual(expectedPolicy);
+  });
+
+  test('buildTemplateURLForAccount basic unit test', async () => {
+    const service = new HostingAccountLifecycleService();
+    const sampleExternalId = 'sample';
+    const region = process.env.AWS_REGION!;
+
+    service['_aws'].clients.s3 = new S3({
+      region: region,
+      credentials: {
+        accessKeyId: 'EXAMPLE',
+        secretAccessKey: 'EXAMPLEKEY'
+      }
+    });
+    const testUrl = 'https://testurl.com';
+    jest
+      .spyOn(S3Service.prototype, 'getPresignedUrl')
+      .mockImplementationOnce(
+        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
+          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
+          expect(key).toEqual('onboard-account.cfn.yaml');
+          return Promise.resolve(testUrl);
+        }
+      );
+
+    const expectedCreateUrl =
+      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*';
+    const expectedUpdateUrl =
+      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
+
+    const cfnMock = mockClient(CloudFormationClient);
+    mockCloudformationOutputs(cfnMock);
+    const actual = await service.buildTemplateUrlsForAccount(sampleExternalId);
+
+    expect(actual.createUrl).toEqual(expectedCreateUrl);
+    expect(actual.updateUrl).toEqual(expectedUpdateUrl);
   });
 });

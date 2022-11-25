@@ -39,6 +39,12 @@ describe('AccountService', () => {
     const stackName = 'swb-swbv2-va';
     process.env.STACK_NAME = stackName;
 
+    process.env.MAIN_ACCT_ID = '123456789012';
+    process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+    process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
+
     accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
 
     accountMetadata = {
@@ -423,6 +429,15 @@ describe('AccountService', () => {
           `Could not find account ${noMatchId}`
         );
       });
+
+      test('throws an error when there is no Item associated with the accountId with metadata', async () => {
+        mockDDB.on(QueryCommand).resolves({ Count: 0 });
+        const noMatchId = 'noMatchId';
+        await expect(accountService.getAccount(noMatchId, true)).rejects.toThrowError(
+            `Could not find account ${noMatchId}`
+        );
+      });
+
     });
   });
 });

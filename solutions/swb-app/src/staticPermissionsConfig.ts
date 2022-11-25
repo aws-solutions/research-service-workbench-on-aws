@@ -24,6 +24,11 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
+    subject: 'AccountTemplate'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
     subject: 'CostCenter'
   },
   {
