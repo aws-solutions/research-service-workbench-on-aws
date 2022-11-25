@@ -7,11 +7,7 @@ import { Readable } from 'stream';
 import { PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { Output } from '@aws-sdk/client-cloudformation';
 import { ResourceNotFoundException } from '@aws-sdk/client-eventbridge';
-import {
-  GetBucketPolicyCommandOutput,
-  PutBucketPolicyCommandInput,
-  NoSuchBucket
-} from '@aws-sdk/client-s3';
+import { GetBucketPolicyCommandOutput, PutBucketPolicyCommandInput, NoSuchBucket } from '@aws-sdk/client-s3';
 import {
   addPaginationToken,
   AwsService,
@@ -85,17 +81,16 @@ export default class HostingAccountLifecycleService {
    */
   public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
-
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerRoleArn,
       [process.env.API_HANDLER_ARN_OUTPUT_KEY!]: apiHandlerRoleArn,
-      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+      [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn
     } = await this._aws.helpers.cloudformation.getCfnOutput(this._stackName, [
       process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!,
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.API_HANDLER_ARN_OUTPUT_KEY!,
-      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!
     ]);
 
     const templateParameters: AccountCfnTemplateParameters = {
@@ -111,12 +106,12 @@ export default class HostingAccountLifecycleService {
       statusHandlerRole: statusHandlerRoleArn
     };
 
-    const key = 'onboard-account.cfn.yaml'; // TODO: make this part of the post body
+    const key = 'onboard-account.cfn.yaml'; // TODO: Make this part configurable incase BYON need to provide a different template
     const parsedBucketArn = artifactBucketArn.replace('arn:aws:s3:::', '').split('/');
     const bucket = parsedBucketArn[0];
 
     const signedUrl = await this._aws.helpers.s3.getPresignedUrl(bucket, key, 15 * 60);
-    return  this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
+    return this._constructCreateAndUpdateUrls(templateParameters, signedUrl);
   }
   /**
    * Links hosting account with main account policies for cross account communication
@@ -205,7 +200,11 @@ export default class HostingAccountLifecycleService {
         throw e;
       }
     }
-    bucketPolicy = this._updateBucketPolicyDocumentWithAllStatements(artifactBucketArn, awsAccountId, bucketPolicy);
+    bucketPolicy = this._updateBucketPolicyDocumentWithAllStatements(
+      artifactBucketArn,
+      awsAccountId,
+      bucketPolicy
+    );
 
     const putPolicyParams: PutBucketPolicyCommandInput = {
       Bucket: bucketName,
@@ -217,9 +216,9 @@ export default class HostingAccountLifecycleService {
   }
 
   private _updateBucketPolicyDocumentWithAllStatements(
-      artifactBucketArn: string,
-      awsAccountId: string,
-      policyDocument: PolicyDocument
+    artifactBucketArn: string,
+    awsAccountId: string,
+    policyDocument: PolicyDocument
   ): PolicyDocument {
     const listStatement = PolicyStatement.fromJson(
       JSON.parse(`
@@ -651,8 +650,8 @@ export default class HostingAccountLifecycleService {
   }
 
   private _constructCreateAndUpdateUrls(
-      accountCfnTemplateParameters: AccountCfnTemplateParameters,
-      signedUrl: string
+    accountCfnTemplateParameters: AccountCfnTemplateParameters,
+    signedUrl: string
   ): TemplateResponse {
     // see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stacks-quick-create-links.html
 
@@ -686,11 +685,9 @@ export default class HostingAccountLifecycleService {
     const updateUrl = [
       `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/update/template`,
       `?stackId=${encodeURIComponent(stackName)}`,
-      `&templateURL=${encodeURIComponent(signedUrl)}`,
+      `&templateURL=${encodeURIComponent(signedUrl)}`
     ].join('');
 
     return { createUrl, updateUrl };
   }
-
-
 }
