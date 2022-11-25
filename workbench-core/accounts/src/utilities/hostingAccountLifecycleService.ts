@@ -662,8 +662,8 @@ export default class HostingAccountLifecycleService {
       apiHandlerRole,
       enableFlowLogs,
       externalId,
-      // launchConstraintPolicyPrefix,
-      // launchConstraintRolePrefix,
+      launchConstraintPolicyPrefix,
+      launchConstraintRolePrefix,
       mainAccountId,
       namespace,
       stackName,
@@ -679,7 +679,9 @@ export default class HostingAccountLifecycleService {
       `&param_AccountHandlerRoleArn=${accountHandlerRole}`,
       `&param_ApiHandlerRoleArn=${apiHandlerRole}`,
       `&param_StatusHandlerRoleArn=${statusHandlerRole}`,
-      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`
+      `&param_EnableFlowLogs=${enableFlowLogs || 'true'}`,
+      `&param_LaunchConstraintRolePrefix=${launchConstraintRolePrefix}`,
+      `&param_LaunchConstraintPolicyPrefix=${launchConstraintPolicyPrefix}`
     ].join('');
 
     const updateUrl = [
