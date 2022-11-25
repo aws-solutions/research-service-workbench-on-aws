@@ -77,6 +77,14 @@ export default class S3Service {
     await recursiveUpload(path, '');
   }
 
+  /**
+   * Get a presigned URL for a GetObjectCommand
+   * @param s3bucketName - name of the bucket
+   * @param key - name of the file to get from the bucket
+   * @param expirationSeconds - expiration in seconds of the presigned URL
+   *
+   * @returns A presigned URL
+   */
   public async getPresignedUrl(
     s3BucketName: string,
     key: string,
