@@ -6,7 +6,7 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const EnvironmentDatasetMetadataParser = z
+export const DatasetEnvironmentMetadataParser = z
   .object({
     id: z.string(),
     pk: z.string(),
@@ -14,4 +14,4 @@ export const EnvironmentDatasetMetadataParser = z
   })
   .strict();
 
-export type EnvironmentDatasetMetadata = z.infer<typeof EnvironmentDatasetMetadataParser>;
+export type DatasetEnvironmentMetadata = z.infer<typeof DatasetEnvironmentMetadataParser>;

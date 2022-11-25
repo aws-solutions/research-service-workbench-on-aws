@@ -15,9 +15,9 @@ import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
 import {
-  EnvironmentDatasetMetadata,
-  EnvironmentDatasetMetadataParser
-} from './schemas/environmentDatasetMetadataParser';
+  DatasetEnvironmentMetadata,
+  DatasetEnvironmentMetadataParser
+} from './schemas/datasetEnvironmentMetadataParser';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpDSRoutes(
@@ -97,11 +97,11 @@ export function setUpDSRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const checkDatasetDependencies = async (datasetId: string): Promise<void> => {
         const { data: environments } =
-          await metadataService.listDependentMetadata<EnvironmentDatasetMetadata>(
+          await metadataService.listDependentMetadata<DatasetEnvironmentMetadata>(
             resourceTypeToKey.dataset,
             datasetId,
             resourceTypeToKey.environment,
-            EnvironmentDatasetMetadataParser,
+            DatasetEnvironmentMetadataParser,
             { pageSize: 1 }
           );
 
