@@ -4,16 +4,13 @@
  */
 
 // Schema for GetTemplate API
-import { Schema } from 'jsonschema';
+import { z } from 'zod';
 
-const AwsAccountTemplateUrlsSchema: Schema = {
-    id: '/getTemplate',
-    type: 'object',
-    properties: {
-        externalId: { type: 'string' }
-    },
-    additionalProperties: false,
-    required: ['externalId']
-};
+// eslint-disable-next-line @rushstack/typedef-var
+export const AwsAccountTemplateUrlsParser = z
+  .object({
+    externalId: z.string()
+  })
+  .strict();
 
-export default AwsAccountTemplateUrlsSchema;
+export type AwsAccountTemplateUrls = z.infer<typeof AwsAccountTemplateUrlsParser>;

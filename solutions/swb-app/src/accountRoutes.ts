@@ -6,7 +6,7 @@
 // AWS Account management
 import {
   CreateAccountSchema,
-  AwsAccountTemplateUrlsSchema,
+  AwsAccountTemplateUrlsParser,
   UpdateAccountSchema,
   HostingAccountService,
   CreateAccountMetadata,
@@ -39,9 +39,8 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.post(
     '/awsAccountTemplateUrls',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, AwsAccountTemplateUrlsSchema));
-      const externalId = req.body.externalId;
-      res.send(await hostingAccountService.buildTemplateUrlsForAccount(externalId));
+      const req_validated = AwsAccountTemplateUrlsParser.parse(req.body);
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(req_validated.externalId));
     })
   );
 
