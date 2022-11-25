@@ -11,12 +11,7 @@ import {
   DescribeStacksCommand,
   GetTemplateCommand
 } from '@aws-sdk/client-cloudformation';
-import {
-  DynamoDBClient,
-  GetItemCommand,
-  QueryCommand,
-  UpdateItemCommand
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { EC2Client, ModifyImageAttributeCommand } from '@aws-sdk/client-ec2';
 import {
   EventBridgeClient,
@@ -723,19 +718,19 @@ describe('HostingAccountLifecycleService', () => {
     });
     const testUrl = 'https://testurl.com';
     jest
-        .spyOn(S3Service.prototype, 'getPresignedUrl')
-        .mockImplementationOnce(
-            (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
-              expect(s3BucketName).toEqual(sampleArtifactsBucketName);
-              expect(key).toEqual('onboard-account.cfn.yaml');
-              return Promise.resolve(testUrl);
-            }
-        );
+      .spyOn(S3Service.prototype, 'getPresignedUrl')
+      .mockImplementationOnce(
+        (s3BucketName: string, key: string, expirationMinutes: number): Promise<string> => {
+          expect(s3BucketName).toEqual(sampleArtifactsBucketName);
+          expect(key).toEqual('onboard-account.cfn.yaml');
+          return Promise.resolve(testUrl);
+        }
+      );
 
     const expectedCreateUrl =
-        'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true';
+      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*';
     const expectedUpdateUrl =
-        'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
+      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
 
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
