@@ -14,11 +14,12 @@ import {
   ProjectService
 } from '@aws/workbench-core-accounts';
 import CreateCostCenterSchema from '@aws/workbench-core-accounts/lib/schemas/createCostCenter';
+import { validateAndParse } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult, validateAndParse } from './validatorHelper';
+import { processValidatorResult } from './validatorHelper';
 
 export function setUpCostCenterRoutes(
   router: Router,

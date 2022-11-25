@@ -18,7 +18,12 @@ import { SortRequest } from './interfaces/sortRequest';
 
 import { MetadataService } from './services/metadataService';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
+import {
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE
+} from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -30,6 +35,7 @@ import {
   uuidRegExp,
   uuidRegExpAsString
 } from './utilities/textUtil';
+import { validateAndParse } from './utilities/validatorHelper';
 
 export {
   AuditLogger,
@@ -57,6 +63,8 @@ export {
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
   PaginatedResponse,
-  MetadataService
+  MetadataService,
+  validateAndParse
 };

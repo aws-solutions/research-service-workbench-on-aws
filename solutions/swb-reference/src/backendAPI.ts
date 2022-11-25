@@ -79,7 +79,7 @@ const apiRouteConfig: ApiRouteConfig = {
     },
     aws.helpers.ddb
   ),
-  metadataService: new MetadataService()
+  metadataService: new MetadataService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);
