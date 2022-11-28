@@ -1536,7 +1536,7 @@ describe('ProjectService', () => {
       });
 
       test('it should fail', async () => {
-        // TEST n CHECK
+        // OPERATE n CHECK
         await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
           `Could not find project ${request.projectId}`
         );
@@ -1567,7 +1567,7 @@ describe('ProjectService', () => {
           });
 
           test('it should fail', async () => {
-            // TEST n CHECK
+            // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
               `Project ${request.projectId} cannot be deleted because it has environments(s) associated with it`
             );
@@ -1584,7 +1584,7 @@ describe('ProjectService', () => {
           });
 
           test('it should fail', async () => {
-            // TEST n CHECK
+            // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
               `Project ${request.projectId} cannot be deleted because it has dataset(s) associated with it`
             );
@@ -1601,7 +1601,7 @@ describe('ProjectService', () => {
           });
 
           test('it should fail', async () => {
-            // TEST n CHECK
+            // OPERATE n CHECK
             await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
               `Project ${request.projectId} cannot be deleted because it has environment type config(s) associated with it`
             );
@@ -1627,7 +1627,7 @@ describe('ProjectService', () => {
             });
 
             test('it should pass', async () => {
-              // TEST n CHECK
+              // OPERATE n CHECK
               await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
             });
           });
@@ -1646,9 +1646,9 @@ describe('ProjectService', () => {
             });
 
             test('it should fail', async () => {
-              // TEST n CHECK
+              // OPERATE n CHECK
               await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-                'Could not delete project from DDB.'
+                'Could not delete Project'
               );
             });
           });
@@ -1670,7 +1670,7 @@ describe('ProjectService', () => {
       });
 
       test('evaluates to true', async () => {
-        // TEST
+        // OPERATE
         const result = await projService.checkDependency('environment', projectId);
 
         // CHECK
@@ -1687,7 +1687,7 @@ describe('ProjectService', () => {
           .mockImplementationOnce(() => queryMockResponse);
       });
       test('evaluates to false', async () => {
-        // TEST
+        // OPERATE
         const result = await projService.checkDependency('environment', projectId);
 
         // CHECK

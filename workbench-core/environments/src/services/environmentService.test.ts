@@ -1143,7 +1143,7 @@ describe('EnvironmentService', () => {
       });
 
       test('evaluates to true', async () => {
-        // TEST
+        // OPERATE
         const result = await envService.doesDependencyHaveEnvironments('dependency');
 
         // CHECK
@@ -1161,7 +1161,7 @@ describe('EnvironmentService', () => {
       });
 
       test('evaluates to false', async () => {
-        // TEST
+        // OPERATE
         const result = await envService.doesDependencyHaveEnvironments('dependency');
 
         // CHECK

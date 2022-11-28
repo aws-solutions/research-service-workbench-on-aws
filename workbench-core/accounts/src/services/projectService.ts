@@ -296,16 +296,16 @@ export default class ProjectService {
     // }
 
     // delete from DDB
-    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
-      key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
-      params: {
-        item: { resourceType: 'deleted_project', status: 'DELETED' },
-        return: 'ALL_NEW'
-      }
-    });
-
-    if (!response.Attributes) {
-      throw Boom.badImplementation('Could not delete project from DDB.');
+    try {
+      await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
+        params: {
+          item: { resourceType: `${this._resourceType}_deleted`, status: ProjectStatus.DELETED }
+        }
+      });
+    } catch (e) {
+      console.error(`Failed to delete project ${request.projectId}}`, e);
+      throw Boom.internal('Could not delete Project');
     }
   }
 

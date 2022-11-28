@@ -6,27 +6,6 @@
 import { z } from 'zod';
 import { ProjectStatus } from '../../constants/projectStatus';
 
-export interface Project {
-  id: string;
-  name: string;
-  description: string;
-  costCenterId: string;
-  status: ProjectStatus;
-  createdAt: string;
-  updatedAt: string;
-
-  // Account metadata
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  hostingAccountHandlerRoleArn: string;
-  vpcId: string;
-  subnetId: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
-  externalId: string;
-  accountId: string;
-}
-
 // eslint-disable-next-line @rushstack/typedef-var
 export const ProjectParser = z.object({
   id: z.string(),
@@ -48,3 +27,5 @@ export const ProjectParser = z.object({
   externalId: z.string(),
   accountId: z.string()
 });
+
+export type Project = z.infer<typeof ProjectParser>;
