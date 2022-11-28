@@ -962,12 +962,12 @@
             "url": {
               "raw": "{{API_URL}}/projects/:projectId/softDelete",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId"],
+              "path": ["projects", ":projectId", "softDelete"],
               "variable": [
                 {
                   "key": "projectId",
                   "value": null,
-                  "description": "ID of project to DELETE"
+                  "description": "ID of project to SOFT DELETE"
                 }
               ]
             }

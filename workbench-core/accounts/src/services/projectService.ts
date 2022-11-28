@@ -20,7 +20,8 @@ import {
   fromPaginationToken,
   validateSingleSortAndFilter,
   getFilterQueryParams,
-  getSortQueryParams
+  getSortQueryParams,
+  buildDynamoDbKey
 } from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
@@ -321,7 +322,8 @@ export default class ProjectService {
     projectId: string
   ): Promise<boolean> {
     const queryParams: QueryParams = {
-      key: { name: 'pk', value: buildDynamoDBPkSk(projectId, resourceTypeToKey.project) },
+      key: { name: 'pk', value: buildDynamoDbKey(projectId, resourceTypeToKey.project) },
+      sortKey: 'sk',
       begins: { S: resourceTypeToKey[resourceType] },
       limit: 1
     };
