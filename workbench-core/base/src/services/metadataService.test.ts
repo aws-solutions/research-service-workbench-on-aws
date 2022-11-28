@@ -137,7 +137,7 @@ describe('metadata service', () => {
           Array.from({ length: 51 }),
           { a: 1 }
         )
-      ).rejects.toThrow('Cannot add more than 50 dependencies in single batch.');
+      ).rejects.toThrow('Cannot add more than 50 dependencies in single transaction.');
     });
 
     test('updateRelationship calls transaction execute', async () => {
@@ -185,7 +185,7 @@ describe('metadata service', () => {
           resourceTypeToKey.dataset,
           Array.from({ length: 51 })
         )
-      ).rejects.toThrow('Cannot delete more than 50 dependencies in single batch.');
+      ).rejects.toThrow('Cannot delete more than 50 dependencies in single transaction.');
     });
 
     test('deleteRelationships calls transaction execute', async () => {

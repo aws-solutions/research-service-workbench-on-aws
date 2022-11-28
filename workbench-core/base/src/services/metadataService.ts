@@ -3,19 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { ZodTypeAny } from 'zod';
 import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import QueryParams from '../interfaces/queryParams';
-import {
-  addPaginationToken,
-  DEFAULT_API_PAGE_SIZE,
-  getPaginationToken,
-  MAX_API_PAGE_SIZE
-} from '../utilities/paginationHelper';
+import { addPaginationToken, DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import { validateAndParse } from '../utilities/validatorHelper';
 
-const MAX_BATCH_SIZE: number = 50;
+const MAX_TRANSACTION_SIZE: number = 50;
 
 export class MetadataService {
   private readonly _ddbService: DynamoDBService;
@@ -92,17 +86,13 @@ export class MetadataService {
 
     params = addPaginationToken(queryParams?.paginationToken, params);
 
-    const result: QueryCommandOutput = await this._ddbService.query(params).execute();
-    if (!result?.Items) {
-      return { data: [], paginationToken: undefined };
-    }
-
-    const data: DependencyMetadata[] = [];
-    result.Items.forEach((item) => {
-      data.push(validateAndParse<DependencyMetadata>(parser, item));
+    const { data, paginationToken } = await this._ddbService.getPaginatedItems(params);
+    const dependencyMetadata: DependencyMetadata[] = [];
+    data.forEach((item) => {
+      dependencyMetadata.push(validateAndParse<DependencyMetadata>(parser, item));
     });
 
-    return { data, paginationToken: getPaginationToken(result) };
+    return { data: dependencyMetadata, paginationToken };
   }
 
   public async updateRelationship<DependencyMetadata>(
@@ -116,8 +106,8 @@ export class MetadataService {
       return;
     }
 
-    if (dependentIds.length > MAX_BATCH_SIZE) {
-      throw new Error(`Cannot add more than ${MAX_BATCH_SIZE} dependencies in single batch.`);
+    if (dependentIds.length > MAX_TRANSACTION_SIZE) {
+      throw new Error(`Cannot add more than ${MAX_TRANSACTION_SIZE} dependencies in single transaction.`);
     }
 
     const pk = `${mainEntityResourceType}#${mainEntityId}`;
@@ -156,8 +146,8 @@ export class MetadataService {
       return;
     }
 
-    if (dependentIds.length > MAX_BATCH_SIZE) {
-      throw new Error(`Cannot delete more than ${MAX_BATCH_SIZE} dependencies in single batch.`);
+    if (dependentIds.length > MAX_TRANSACTION_SIZE) {
+      throw new Error(`Cannot delete more than ${MAX_TRANSACTION_SIZE} dependencies in single transaction.`);
     }
 
     const pk = `${mainEntityResourceType}#${mainEntityId}`;
