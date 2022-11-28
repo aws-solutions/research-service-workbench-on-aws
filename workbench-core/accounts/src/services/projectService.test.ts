@@ -1631,27 +1631,6 @@ describe('ProjectService', () => {
               await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
             });
           });
-
-          describe('and DDB update fails', () => {
-            beforeEach(() => {
-              // mock update project ddb call
-              updateItemResponse = {
-                Attributes: undefined,
-                $metadata: {}
-              };
-              jest
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .spyOn(Updater.prototype as any, 'execute')
-                .mockImplementationOnce(() => updateItemResponse);
-            });
-
-            test('it should fail', async () => {
-              // OPERATE n CHECK
-              await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
-                'Could not delete Project'
-              );
-            });
-          });
         });
       });
     });
