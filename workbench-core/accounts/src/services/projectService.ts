@@ -27,7 +27,7 @@ import {
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
-import CostCenter from '../models/costCenter';
+import { CostCenter } from '../models/costCenters/costCenter';
 import CreateProjectRequest from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import GetProjectRequest from '../models/projects/getProjectRequest';
