@@ -1132,7 +1132,7 @@ describe('EnvironmentService', () => {
     });
   });
 
-  describe('doesDpeendencyHaveEnvironments', () => {
+  describe('doesDependencyHaveEnvironments', () => {
     describe('when dependencies exist', () => {
       beforeEach(() => {
         const queryMockResponse = { data: ['someDependency'] };

@@ -105,7 +105,8 @@ export function setUpProjectRoutes(
         ...req.params
       });
       // delete project
-      res.status(204).send(await projectService.softDeleteProject(validatedRequest, checkDependencies));
+      await projectService.softDeleteProject(validatedRequest, checkDependencies);
+      res.status(204).send();
     })
   );
 }
