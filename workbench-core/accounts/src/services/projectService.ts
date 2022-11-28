@@ -435,6 +435,24 @@ export default class ProjectService {
     }
   }
 
+  /**
+   * Check whether a CostCenter have any projects associated with it
+   * @param costCenterId - id of CostCenter we want to check
+   * @returns Whether a CostCenter have any projects associated with it
+   */
+  public async doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'project' },
+      sortKey: 'dependency',
+      eq: { S: costCenterId },
+      limit: 1
+    };
+
+    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    return associatedProjResponse.data.length > 0;
+  }
+
   // TODO--implement after dynamic AuthZ
   // private _generateIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
   //   return [
