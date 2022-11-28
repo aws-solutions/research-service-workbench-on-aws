@@ -16,7 +16,7 @@ describe('paginationHelper', () => {
       // OPERATE
       const results = addPaginationToken(paginationToken, {});
 
-      // TEST
+      // OPERATE
       expect(results).toEqual({
         start: {
           createdAt: '2022-10-27T21:34:23.354Z',
@@ -33,7 +33,7 @@ describe('paginationHelper', () => {
       // OPERATE
       const results = addPaginationToken(paginationToken, {});
 
-      // TEST
+      // OPERATE
       expect(results).toEqual({});
     });
   });

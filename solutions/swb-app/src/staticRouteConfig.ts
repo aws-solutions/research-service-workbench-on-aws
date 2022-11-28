@@ -202,6 +202,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'DELETE',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {

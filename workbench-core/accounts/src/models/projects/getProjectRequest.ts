@@ -4,7 +4,6 @@
  */
 
 interface GetProjectRequest {
-  userId: string;
   projectId: string;
 }
 

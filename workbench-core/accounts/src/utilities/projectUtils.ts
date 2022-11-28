@@ -5,7 +5,7 @@
 
 import { FilterRequest, QueryParameterFilter, SortRequest } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import Project from '../models/project';
+import { Project } from '../models/projects/project';
 
 /**
  * Manually sorts a list of Projects. This is designed to be used following a batchGetItems call to get multiple
