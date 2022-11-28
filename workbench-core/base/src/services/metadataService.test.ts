@@ -137,7 +137,7 @@ describe('metadata service', () => {
           Array.from({ length: 51 }),
           { a: 1 }
         )
-      ).rejects.toThrow('Cannot delete more than 50 dependencies in single batch.');
+      ).rejects.toThrow('Cannot add more than 50 dependencies in single batch.');
     });
 
     test('updateRelationship calls transaction execute', async () => {
