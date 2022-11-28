@@ -53,8 +53,8 @@ export class SWBUIStack extends Stack {
       API_BASE_URL,
       AWS_REGION,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
-      MAIN_ACCT_ALB_ARN,
-      MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
+      SWB_DOMAIN_NAME,
+      MAIN_ACCT_ALB_LISTENER_ARN,
       S3_ARTIFACT_BUCKET_NAME,
       S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
       ACCESS_IDENTITY_ARTIFACT_NAME,
@@ -67,7 +67,7 @@ export class SWBUIStack extends Stack {
       COGNITO_DOMAIN_NAME_OUTPUT_KEY,
       COGNITO_DOMAIN_NAME,
       USE_CLOUD_FRONT,
-      ECR_REPOSITORY_NAME_OUTPUT_KEY,
+      ECR_REPOSITORY_NAME,
       VPC_ID
     } = getConstants();
     super(scope, STACK_NAME, props);
@@ -95,12 +95,10 @@ export class SWBUIStack extends Stack {
       const distribution = this._createDistribution(bucket);
       this._deployS3BucketAndInvalidateDistribution(bucket, distribution);
     } else {
-      const mainAccountLoadBalancerDnsNameValue = Fn.importValue(MAIN_ACCT_ALB_DNS_OUTPUT_KEY);
-      const repositoryName = Fn.importValue(ECR_REPOSITORY_NAME_OUTPUT_KEY);
       new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
-        value: `https://${mainAccountLoadBalancerDnsNameValue}`
+        value: `https://${SWB_DOMAIN_NAME}`
       });
-      createECSCluster(this, MAIN_ACCT_ALB_ARN, VPC_ID, repositoryName);
+      createECSCluster(this, MAIN_ACCT_ALB_LISTENER_ARN, ECR_REPOSITORY_NAME, VPC_ID);
     }
     this._addCognitoURLOutput();
   }

@@ -17,9 +17,10 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Repository } from 'aws-cdk-lib/aws-ecr';
+import { ListenerCondition } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -69,7 +70,8 @@ export class SWBStack extends Stack {
 
   private _accessLogsBucket: Bucket;
   private _s3AccessLogsPrefix: string;
-  private _mainAccountLoadBalancerDnsNameOutputKey: string;
+  private _swbDomainNameOutputKey: string;
+  private _mainAccountLoadBalancerListenerArnOutputKey: string;
 
   public constructor(app: App) {
     const {
@@ -99,12 +101,12 @@ export class SWBStack extends Stack {
       VPC_ID,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-      MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
+      SWB_DOMAIN_NAME_OUTPUT_KEY,
+      MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
       ECR_REPOSITORY_NAME_OUTPUT_KEY,
       VPC_ID_OUTPUT_KEY,
       SUBNET_IDS,
-      HOST_ZONE_ID,
-      CERTIFICATE_ID,
+      HOSTED_ZONE_ID,
       DOMAIN_NAME,
       USE_CLOUD_FRONT
     } = getConstants();
@@ -161,7 +163,8 @@ export class SWBStack extends Stack {
 
     this._createInitialOutputs(ACCOUNT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
-    this._mainAccountLoadBalancerDnsNameOutputKey = MAIN_ACCT_ALB_DNS_OUTPUT_KEY;
+    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
+    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
@@ -194,7 +197,7 @@ export class SWBStack extends Stack {
         exportName: VPC_ID_OUTPUT_KEY
       });
 
-      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOST_ZONE_ID, CERTIFICATE_ID);
+      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID);
 
       const repository = new Repository(this, 'Repository', {
         imageScanOnPush: true
@@ -203,6 +206,10 @@ export class SWBStack extends Stack {
         value: repository.repositoryName,
         exportName: ECR_REPOSITORY_NAME_OUTPUT_KEY
       });
+    } else {
+      new CfnOutput(this, 'apiUrlOutput', {
+        value: apiGwUrl
+      });
     }
   }
 
@@ -210,8 +217,7 @@ export class SWBStack extends Stack {
     swbVpc: SWBVpc,
     apiGwUrl: string,
     domainName: string,
-    hostZoneId: string,
-    certificateId: string
+    hostZoneId: string
   ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
@@ -219,54 +225,85 @@ export class SWBStack extends Stack {
       internetFacing: true // TODO: See if this is required if we are directly passing in subnets
     });
 
-    // const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
-    //   zoneName: domainName,
-    //   hostedZoneId: hostZoneId
+    const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
+      zoneName: domainName,
+      hostedZoneId: hostZoneId
+    });
+
+    // Add a Route 53 alias with the Load Balancer as the target
+    new ARecord(this, 'AliasRecord', {
+      zone,
+      target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
+    });
+
+    const proxyLambda = new Function(this, 'LambdaProxy', {
+      handler: 'proxyHandlerLambda.handler',
+      code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
+      runtime: Runtime.NODEJS_16_X,
+      environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
+      timeout: Duration.seconds(60),
+      memorySize: 256
+    });
+
+    // new Alias(this, 'LiveProxyLambdaAlias', {
+    //   aliasName: 'live',
+    //   version: proxyLambda.currentVersion,
+    //   provisionedConcurrentExecutions: 1
     // });
 
-    // // Add a Route 53 alias with the Load Balancer as the target
-    // new ARecord(this, 'AliasRecord', {
-    //   zone,
-    //   target: RecordTarget.fromAlias(new LoadBalancerTarget(alb.applicationLoadBalancer))
-    // });
-
-    // const proxyLambda = new Function(this, 'LambdaProxy', {
-    //   handler: 'proxyHandlerLambda.handler',
-    //   code: Code.fromAsset(join(__dirname, '../../build/proxyHandler')),
-    //   runtime: Runtime.NODEJS_16_X,
-    //   environment: { ...this.lambdaEnvVars, API_GW_URL: apiGwUrl },
-    //   timeout: Duration.seconds(60),
-    //   memorySize: 256
-    // });
-
-    // // Add a listener for HTTP calls
+    // Add a listener for HTTP calls
     // const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
     //   port: 80
     // });
 
+    // httpListener.addTargets('defaultTarget', {
+    //   targets: [new LambdaTarget(proxyLambda)]
+    // });
+
     // httpListener.addTargets('proxyLambda', {
+    //   priority: 1,
+    //   conditions: [ListenerCondition.pathPatterns(['/api/*'])],
     //   targets: [new LambdaTarget(proxyLambda)]
     // });
 
     // // Add a listener on port 443 for and use the certificate for HTTPS
     // const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
-    // const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
-    //   port: 443,
-    //   certificates: [certificate]
-    // });
+    const certificate = new Certificate(this, 'SWBCertificate', {
+      domainName: domainName,
+      validation: CertificateValidation.fromDns(zone)
+    });
+    const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
+      port: 443,
+      certificates: [certificate]
+    });
+    httpsListener.addTargets('proxyLambda', {
+      priority: 1,
+      conditions: [ListenerCondition.pathPatterns(['/api/*'])],
+      targets: [new LambdaTarget(proxyLambda)],
+      healthCheck: { enabled: true }
+    });
 
-    // httpsListener.addTargets('proxyLambda', {
-    //   targets: [new LambdaTarget(proxyLambda)],
-    //   healthCheck: { enabled: true }
-    // });
+    httpsListener.addTargets('defaultTarget', {
+      targets: [new LambdaTarget(proxyLambda)],
+      healthCheck: { enabled: true }
+    });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {
       value: alb.applicationLoadBalancer.loadBalancerArn
     });
 
-    new CfnOutput(this, this._mainAccountLoadBalancerDnsNameOutputKey, {
-      value: alb.applicationLoadBalancer.loadBalancerDnsName,
-      exportName: this._mainAccountLoadBalancerDnsNameOutputKey
+    new CfnOutput(this, this._swbDomainNameOutputKey, {
+      value: domainName,
+      exportName: this._swbDomainNameOutputKey
+    });
+
+    new CfnOutput(this, this._mainAccountLoadBalancerListenerArnOutputKey, {
+      value: alb.applicationLoadBalancer.listeners[0].listenerArn,
+      exportName: this._mainAccountLoadBalancerListenerArnOutputKey
+    });
+
+    new CfnOutput(this, 'apiUrlOutput', {
+      value: `https://${domainName}/api/`
     });
   }
 
@@ -871,10 +908,6 @@ export class SWBStack extends Stack {
         allowCredentials: true,
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
       }
-    });
-
-    new CfnOutput(this, 'apiUrlOutput', {
-      value: API.url
     });
 
     if (process.env.LOCAL_DEVELOPMENT === 'true') {

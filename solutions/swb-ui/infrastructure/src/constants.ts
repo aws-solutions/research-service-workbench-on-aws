@@ -14,8 +14,8 @@ function getConstants(): {
   STACK_NAME: string;
   S3_ACCESS_LOGS_BUCKET_PREFIX: string;
   S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
-  MAIN_ACCT_ALB_ARN: string;
-  MAIN_ACCT_ALB_DNS_OUTPUT_KEY: string;
+  SWB_DOMAIN_NAME: string;
+  MAIN_ACCT_ALB_LISTENER_ARN: string;
   S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
   S3_ARTIFACT_BUCKET_NAME: string;
   S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME: string;
@@ -30,7 +30,7 @@ function getConstants(): {
   COGNITO_DOMAIN_NAME: string;
   USE_CLOUD_FRONT: boolean;
   VPC_ID: string;
-  ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
+  ECR_REPOSITORY_NAME: string;
 } {
   const config = getAPIOutputs();
   const STAGE = process.env.STAGE || '';
@@ -51,16 +51,16 @@ function getConstants(): {
   const RESPONSE_HEADERS_ARTIFACT_NAME = `${namePrefix}-response-header-policy`;
   const RESPONSE_HEADERS_NAME = `${namePrefix}-SWBResponseHeadersPolicy`;
   const S3_ACCESS_LOGS_BUCKET_PREFIX = 'service-workbench-access-log';
-  const MAIN_ACCT_ALB_ARN = config.mainAccountAlbArn;
+  const MAIN_ACCT_ALB_LISTENER_ARN = config.mainAccountAlbListenerArn;
   const USE_CLOUD_FRONT = config.useCloudFront;
   const VPC_ID = config.vpcId;
+  const SWB_DOMAIN_NAME = config.swbDomainName;
+  const ECR_REPOSITORY_NAME = config.ecrRepositoryName;
 
   // CloudFormation Output Keys
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   // The output name below must match the value in swb-reference
   const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
-  const MAIN_ACCT_ALB_DNS_OUTPUT_KEY = 'MainAccountLoadBalancerDnsNameOutput';
-  const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
 
   return {
     STAGE,
@@ -70,8 +70,8 @@ function getConstants(): {
     STACK_NAME,
     S3_ACCESS_LOGS_BUCKET_PREFIX,
     S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
-    MAIN_ACCT_ALB_ARN,
-    MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
+    SWB_DOMAIN_NAME,
+    MAIN_ACCT_ALB_LISTENER_ARN,
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
     S3_ARTIFACT_BUCKET_NAME,
     S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME,
@@ -86,7 +86,7 @@ function getConstants(): {
     COGNITO_DOMAIN_NAME,
     USE_CLOUD_FRONT,
     VPC_ID,
-    ECR_REPOSITORY_NAME_OUTPUT_KEY
+    ECR_REPOSITORY_NAME
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,7 +96,9 @@ function getAPIOutputs(): {
   apiUrlOutput: string;
   awsRegion: string;
   cognitoDomainName: string;
-  mainAccountAlbArn: string;
+  ecrRepositoryName: string;
+  swbDomainName: string;
+  mainAccountAlbListenerArn: string;
   useCloudFront: boolean;
   vpcId: string;
 } {
@@ -109,9 +111,11 @@ function getAPIOutputs(): {
         apiUrlOutput: '',
         awsRegion: process.env.SYNTH_REGION,
         cognitoDomainName: '',
-        mainAccountAlbArn: '',
+        swbDomainName: '',
+        mainAccountAlbListenerArn: '',
         useCloudFront: false,
-        vpcId: ''
+        vpcId: '',
+        ecrRepositoryName: ''
       };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -125,11 +129,16 @@ function getAPIOutputs(): {
     // eslint-disable-next-line security/detect-object-injection
     const outputs = apiStackOutputs[apiStackName];
     const useCloudFront = outputs.useCloudFront === 'true';
-    const mainAccountAlbArn =
-      !outputs.MainAccountLoadBalancerArnOutput && useCloudFront
-        ? ''
-        : outputs.MainAccountLoadBalancerArnOutput;
-    const vpcId = !outputs.SwbVpcIdOutput && useCloudFront ? '' : outputs.SwbVpcIdOutput;
+    let ecrRepositoryName = '';
+    let mainAccountAlbListenerArn = '';
+    let swbDomainName = '';
+    let vpcId = '';
+    if (!useCloudFront) {
+      ecrRepositoryName = outputs.SwbEcrRepositoryNameOutput;
+      swbDomainName = outputs.SwbDomainNameOutput;
+      mainAccountAlbListenerArn = outputs.MainAccountLoadBalancerListenerArnOutput;
+      vpcId = outputs.SwbVpcIdOutput;
+    }
 
     if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
       throw new Error(
@@ -143,9 +152,11 @@ function getAPIOutputs(): {
       apiUrlOutput: outputs.apiUrlOutput,
       awsRegion: outputs.awsRegion,
       cognitoDomainName: outputs.cognitoDomainName,
-      mainAccountAlbArn: mainAccountAlbArn,
+      swbDomainName: swbDomainName,
+      mainAccountAlbListenerArn: mainAccountAlbListenerArn,
       useCloudFront: useCloudFront,
-      vpcId: vpcId
+      vpcId: vpcId,
+      ecrRepositoryName: ecrRepositoryName
     };
   } catch {
     console.error(

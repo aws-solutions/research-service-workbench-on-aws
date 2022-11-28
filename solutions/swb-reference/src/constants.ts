@@ -37,11 +37,12 @@ function getConstants(): {
   VPC_ID: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   MAIN_ACCT_ALB_ARN_OUTPUT_KEY: string;
-  MAIN_ACCT_ALB_DNS_OUTPUT_KEY: string;
+  SWB_DOMAIN_NAME_OUTPUT_KEY: string;
+  MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
   ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
   VPC_ID_OUTPUT_KEY: string;
   SUBNET_IDS: string[];
-  HOST_ZONE_ID: string;
+  HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
   CERTIFICATE_ID: string;
   USE_CLOUD_FRONT: string;
@@ -77,7 +78,7 @@ function getConstants(): {
   const VPC_ID = config.vpcId;
   const SUBNET_IDS = config.subnetIds;
 
-  const HOST_ZONE_ID = config.hostZoneId;
+  const HOSTED_ZONE_ID = config.hostedZoneId;
   const DOMAIN_NAME = config.domainName;
   const CERTIFICATE_ID = config.tlsCertificateId;
 
@@ -92,7 +93,8 @@ function getConstants(): {
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
-  const MAIN_ACCT_ALB_DNS_OUTPUT_KEY = 'MainAccountLoadBalancerDnsNameOutput';
+  const SWB_DOMAIN_NAME_OUTPUT_KEY = 'SwbDomainNameOutput';
+  const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
   const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
   const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
 
@@ -126,11 +128,12 @@ function getConstants(): {
     VPC_ID,
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-    MAIN_ACCT_ALB_DNS_OUTPUT_KEY,
+    SWB_DOMAIN_NAME_OUTPUT_KEY,
+    MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
     ECR_REPOSITORY_NAME_OUTPUT_KEY,
     VPC_ID_OUTPUT_KEY,
     SUBNET_IDS,
-    HOST_ZONE_ID,
+    HOSTED_ZONE_ID,
     DOMAIN_NAME,
     CERTIFICATE_ID,
     USE_CLOUD_FRONT
