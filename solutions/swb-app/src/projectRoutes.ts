@@ -102,13 +102,13 @@ export function setUpProjectRoutes(
           { pageSize: 1 }
         );
 
-        const [envBoolean, { data: datasets }, { data: envTypeConfigs }] = await Promise.all([
+        const [hasEnvironments, { data: datasets }, { data: envTypeConfigs }] = await Promise.all([
           projectHasEnvironments,
           datasetDependency,
           envTypeConfigDepedency
         ]);
 
-        if (envBoolean) {
+        if (hasEnvironments) {
           throw Boom.conflict(
             `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
           );
