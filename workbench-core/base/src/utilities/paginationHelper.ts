@@ -32,3 +32,5 @@ export function getPaginationToken(ddbQueryResponse: QueryCommandOutput): string
 }
 
 export const DEFAULT_API_PAGE_SIZE: number = 50;
+
+export const MAX_API_PAGE_SIZE: number = 1000;
