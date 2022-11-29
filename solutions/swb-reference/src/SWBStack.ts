@@ -5,7 +5,6 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
@@ -20,7 +19,11 @@ import {
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Repository } from 'aws-cdk-lib/aws-ecr';
-import { ListenerCondition } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import {
+  ApplicationTargetGroup,
+  ListenerCondition,
+  TargetType
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -245,28 +248,13 @@ export class SWBStack extends Stack {
       memorySize: 256
     });
 
-    // new Alias(this, 'LiveProxyLambdaAlias', {
-    //   aliasName: 'live',
-    //   version: proxyLambda.currentVersion,
-    //   provisionedConcurrentExecutions: 1
-    // });
+    new Alias(this, 'LiveProxyLambdaAlias', {
+      aliasName: 'live',
+      version: proxyLambda.currentVersion,
+      provisionedConcurrentExecutions: 1
+    });
 
-    // Add a listener for HTTP calls
-    // const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
-    //   port: 80
-    // });
-
-    // httpListener.addTargets('defaultTarget', {
-    //   targets: [new LambdaTarget(proxyLambda)]
-    // });
-
-    // httpListener.addTargets('proxyLambda', {
-    //   priority: 1,
-    //   conditions: [ListenerCondition.pathPatterns(['/api/*'])],
-    //   targets: [new LambdaTarget(proxyLambda)]
-    // });
-
-    // // Add a listener on port 443 for and use the certificate for HTTPS
+    // Add a listener on port 443 for and use the certificate for HTTPS
     // const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
     const certificate = new Certificate(this, 'SWBCertificate', {
       domainName: domainName,
@@ -276,16 +264,22 @@ export class SWBStack extends Stack {
       port: 443,
       certificates: [certificate]
     });
-    httpsListener.addTargets('proxyLambda', {
-      priority: 1,
-      conditions: [ListenerCondition.pathPatterns(['/api/*'])],
-      targets: [new LambdaTarget(proxyLambda)],
-      healthCheck: { enabled: true }
+
+    const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
+      targetType: TargetType.LAMBDA,
+      targets: [new LambdaTarget(proxyLambda)]
     });
 
-    httpsListener.addTargets('defaultTarget', {
-      targets: [new LambdaTarget(proxyLambda)],
-      healthCheck: { enabled: true }
+    targetGroup.setAttribute('lambda.multi_value_headers.enabled', 'true');
+
+    httpsListener.addTargetGroups('addProxyLambdaTargetGroup', {
+      priority: 1,
+      conditions: [ListenerCondition.pathPatterns(['/api/*'])],
+      targetGroups: [targetGroup]
+    });
+
+    httpsListener.addTargetGroups('addDefaultTargetGroup', {
+      targetGroups: [targetGroup]
     });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {

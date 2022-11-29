@@ -53,24 +53,6 @@ export function createECSCluster(
   });
   const fargateService = new FargateService(stack, 'SwbUi', { cluster, taskDefinition });
 
-  // const alb = ApplicationLoadBalancer.fromLookup(stack, 'SWBApplicationLoadBalancer', {
-  //   loadBalancerArn: albArn
-  // });
-
-  //  // Add a listener for HTTP calls
-  //  const albListener = alb.addListener('HTTPListener', {
-  //   port: 80
-  // });
-
-  // albListener.addTargets('uiContainer', {
-  //   port: 80,
-  //   targets: [ fargateService.loadBalancerTarget({
-  //     containerName: 'HostContainer',
-  //     containerPort: 3000,
-  //     protocol: Protocol.TCP
-  //   }) ]
-  // });
-
   const albListener = ApplicationListener.fromLookup(stack, 'SWBApplicationListener', {
     listenerArn: listenerArn
   });
@@ -79,20 +61,6 @@ export function createECSCluster(
     containerName: 'HostContainer',
     containerPort: 3000
   });
-
-  //   const targetGroup = new ApplicationTargetGroup(stack, 'UIContainerTargetGroup', {
-  //     port: 80,
-  //     targetType: TargetType.IP,
-  //     vpc: vpc
-  //   });
-
-  //   fargateServiceTarget.attachToApplicationTargetGroup(targetGroup);
-
-  //   albListener.addTargetGroups('uiContainer', {
-  //     conditions: [ListenerCondition.httpRequestMethods(['GET', 'OPTIONS'])],
-  //     priority: 3,
-  //     targetGroups: [targetGroup]
-  //   });
 
   const httpsTargetGroup = new ApplicationTargetGroup(stack, 'httpsUiContainerTargetGroup', {
     port: 80,
@@ -104,7 +72,7 @@ export function createECSCluster(
 
   albListener.addTargetGroups('httpsUiContainer', {
     conditions: [ListenerCondition.httpRequestMethods(['GET', 'OPTIONS'])],
-    priority: 3,
+    priority: 2,
     targetGroups: [httpsTargetGroup]
   });
 
