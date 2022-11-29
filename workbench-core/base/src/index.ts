@@ -16,6 +16,7 @@ import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { MetadataService } from './services/metadataService';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
+import { runInBatches } from './utilities/promiseUtils';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -25,7 +26,8 @@ import {
   uuidWithLowercasePrefix,
   uuidWithLowercasePrefixRegExp,
   uuidRegExp,
-  uuidRegExpAsString
+  uuidRegExpAsString,
+  validRolesRegExpAsString
 } from './utilities/textUtil';
 
 export {
@@ -42,6 +44,7 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
+  validRolesRegExpAsString,
   QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,
@@ -52,5 +55,6 @@ export {
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
-  MetadataService
+  MetadataService,
+  runInBatches
 };

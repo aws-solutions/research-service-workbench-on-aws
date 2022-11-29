@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
+import { resourceTypeToKey, validRolesRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
   '/aws-accounts': {
@@ -200,6 +200,15 @@ export const routesMap: RoutesMap = {
         {
           action: 'DELETE',
           subject: 'AssignUserToProject'
+        }
+      ]
+    },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/users/${validRolesRegExpAsString}`]:
+    {
+      GET: [
+        {
+          action: 'READ',
+          subject: 'Project'
         }
       ]
     },

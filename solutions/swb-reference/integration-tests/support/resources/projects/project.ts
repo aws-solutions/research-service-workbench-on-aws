@@ -23,6 +23,10 @@ export default class Project extends Resource {
     return this._axiosInstance.delete(`${this._api}/users/${userId}`);
   }
 
+  public async listUsersForProject(role: string): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/users/${role}`);
+  }
+
   protected async cleanup(): Promise<void> {
     // TODO: add delete project once delete API is implemented
     await this._setup.getDefaultAdminSession();

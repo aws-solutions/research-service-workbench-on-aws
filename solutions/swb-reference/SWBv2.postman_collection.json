@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "d189851e-f3f1-410b-8942-287e9f87656f",
+    "_postman_id": "3bfa952f-3b81-4946-ab26-6a602de8faec",
     "name": "SWBv2 Official",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -808,6 +808,113 @@
               "raw": "{{API_URL}}/projects",
               "host": ["{{API_URL}}"],
               "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Users By Role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/Admin",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", "Admin"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add User To Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"role\": \"Researcher\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove User From Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "users", ":userId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": ""
+                },
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
             }
           },
           "response": []

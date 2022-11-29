@@ -4,8 +4,9 @@
  */
 
 import { ProjectService } from '@aws/workbench-core-accounts';
-import { isUserNotFoundError, UserManagementService } from '@aws/workbench-core-authentication';
+import { isUserNotFoundError, User, UserManagementService } from '@aws/workbench-core-authentication';
 import { PermissionsService } from '@aws/workbench-core-authorization';
+import { runInBatches } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -108,6 +109,34 @@ export function setUpProjectRoutes(
         }
 
         throw Boom.badImplementation(`Could not remove user ${userId} from the project ${projectId}`);
+      }
+    })
+  );
+
+  // list users for role
+  router.get(
+    '/projects/:projectId/users/:role',
+    wrapAsync(async (req: Request, res: Response) => {
+      const projectId = req.params.projectId;
+      const role = req.params.role;
+      const groupId = `${projectId}#${role}`;
+
+      try {
+        // this call is needed to validate that project exists.
+        // If not - 404 will be returned
+        await projectService.getProject(projectId);
+
+        const { userIds } = await authService.getUsersFromGroup({ groupId });
+        const userPromises = userIds.map((userId) => userService.getUser(userId));
+
+        const users = await runInBatches<User>(userPromises, 10);
+        res.send({ users });
+      } catch (err) {
+        if (Boom.isBoom(err)) {
+          throw err;
+        }
+
+        throw Boom.badImplementation(`Could not list users for role ${role} for the project ${projectId}`);
       }
     })
   );
