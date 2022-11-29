@@ -895,6 +895,35 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Hosting Account Template Urls",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "default"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"externalId\": \"workbench\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{API_URL}}/awsAccountTemplateUrls"
+          },
+          "response": []
         }
       ]
     }

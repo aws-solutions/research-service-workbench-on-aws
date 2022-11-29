@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+// AWS Account management
 import {
   CreateAccountSchema,
+  AwsAccountTemplateUrlsParser,
   UpdateAccountSchema,
   HostingAccountService,
   CreateAccountMetadata,
@@ -31,6 +33,14 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       res.send(await hostingAccountService.get(req.params.id));
+    })
+  );
+
+  router.post(
+    '/awsAccountTemplateUrls',
+    wrapAsync(async (req: Request, res: Response) => {
+      const req_validated = AwsAccountTemplateUrlsParser.parse(req.body);
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(req_validated.externalId));
     })
   );
 
