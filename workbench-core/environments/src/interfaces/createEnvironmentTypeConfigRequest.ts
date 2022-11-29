@@ -6,21 +6,25 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const CreateEnvironmentTypeConfigRequestParser = z.object({
-  envTypeId: z.string(),
-  params: z.object({
-    type: z.string(),
-    description: z.string(),
-    name: z.string(),
-    estimatedCost: z.optional(z.string()),
-    projectIds: z.array(z.string()).optional(),
-    params: z.array(
-      z.object({
-        key: z.string(),
-        value: z.string()
+export const CreateEnvironmentTypeConfigRequestParser = z
+  .object({
+    envTypeId: z.string(),
+    params: z
+      .object({
+        type: z.string(),
+        description: z.string(),
+        name: z.string(),
+        estimatedCost: z.optional(z.string()),
+        projectIds: z.array(z.string()).optional(),
+        params: z.array(
+          z.object({
+            key: z.string(),
+            value: z.string()
+          })
+        )
       })
-    )
+      .strict()
   })
-});
+  .strict();
 
 export type CreateEnvironmentTypeConfigRequest = z.infer<typeof CreateEnvironmentTypeConfigRequestParser>;

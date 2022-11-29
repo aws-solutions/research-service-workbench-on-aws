@@ -8,12 +8,9 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentTypeConfigParser = z.object({
   id: z.string(),
-  productId: z.string(),
-  provisioningArtifactId: z.string(),
   type: z.string(),
   description: z.string(),
   name: z.string(),
-  resourceType: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
   estimatedCost: z.string().optional(),

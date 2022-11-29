@@ -31,6 +31,7 @@ export default class EnvironmentTypeConfigService {
 
   /**
    * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
+   * @param envTypeId - the environment type identifier
    * @param envTypeConfigId - the environment type config identifier
    *
    * @returns environment type config object
@@ -78,8 +79,7 @@ export default class EnvironmentTypeConfigService {
 
   /**
    * Create environment type config object in DDB
-   * @param envTypeId - the environment type identifier for this config
-   * @param params - the environment type config object attribute key value pairs
+   * @param request - object containing environmentTypeId and attributes to create environment type config
    *
    * @returns environment type config object
    */
@@ -105,16 +105,16 @@ export default class EnvironmentTypeConfigService {
 
     const newEnvTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse({
       id: envTypeConfigId,
-      productId,
-      provisioningArtifactId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      resourceType: this._resourceType,
       ...request.params
     });
     const dynamoItem: Record<string, unknown> = {
       ...newEnvTypeConfig,
-      dependency: request.envTypeId
+      resourceType: this._resourceType,
+      dependency: request.envTypeId,
+      productId,
+      provisioningArtifactId
     };
     const key = this._buildEnvTypeConfigPkSk(envTypeConfigId);
     const response = await this._dynamoDbService
@@ -131,10 +131,7 @@ export default class EnvironmentTypeConfigService {
 
   /**
    * Update environment type config object in DDB
-   * @param ownerId - the user requesting the update
-   * @param envTypeId - the environment type identifier
-   * @param envTypeConfigId - the environment type config identifier
-   * @param updatedValues - the attribute values to update for the given environment type config
+   * @param request - object containing environmentTypeId and params to update
    *
    * @returns environment type config object with updated attributes
    */
@@ -163,7 +160,6 @@ export default class EnvironmentTypeConfigService {
     const currentDate = new Date().toISOString();
     const updatedEnvTypeConfig = {
       ...params,
-      createdAt: currentDate,
       updatedAt: currentDate
     };
 

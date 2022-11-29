@@ -185,7 +185,9 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...env,
         provisionedProductId: '',
-        error: undefined
+        error: undefined,
+        createdBy: '',
+        updatedBy: ''
       });
     });
 
@@ -1050,7 +1052,9 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...env,
         provisionedProductId: '',
-        error: undefined
+        error: undefined,
+        createdBy: '',
+        updatedBy: ''
       });
     });
     test('failed because ETC does not exist', async () => {

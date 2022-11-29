@@ -64,7 +64,7 @@ export function setUpEnvTypeConfigRoutes(
   );
 
   // Update envTypeConfig
-  router.put(
+  router.patch(
     '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
       const envTypeConfigRequest = validateAndParse<UpdateEnvironmentTypeConfigRequest>(
