@@ -20,7 +20,8 @@ export const CostCenterParser = z.object({
   hostingAccountHandlerRoleArn: z.string(),
   awsAccountId: z.string(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
+  dependency: z.string().optional()
 });
 
 export type CostCenter = z.infer<typeof CostCenterParser>;

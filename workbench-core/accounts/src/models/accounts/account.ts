@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { HOSTING_ACCOUNT_STATUS } from '../../constants/hostingAccountStatus';
-import { CostCenterParser } from '../costCenter/costCenter';
+import { CostCenterParser } from '../costCenters/costCenter';
 
 // eslint-disable-next-line @rushstack/typedef-var
 const ErrorParser = z.object({

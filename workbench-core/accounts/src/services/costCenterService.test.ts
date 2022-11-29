@@ -13,9 +13,9 @@ import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
 import { ListCostCentersRequestParser } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequestParser } from '../models/costCenters/updateCostCenterRequest';
-import CreateCostCenter from '../models/createCostCenterRequest';
 import CostCenterService from './costCenterService';
 
 describe('CostCenterService', () => {
@@ -140,12 +140,12 @@ describe('CostCenterService', () => {
         name: 'CostCenter-1',
         dependency: accountId,
         description: 'Description for CostCenter-1',
-        subnetId: account.subnetId,
-        vpcId: account.vpcId,
+        subnetId: account.subnetId!,
+        vpcId: account.vpcId!,
         envMgmtRoleArn: account.envMgmtRoleArn,
         externalId: account.externalId,
-        encryptionKeyArn: account.encryptionKeyArn,
-        environmentInstanceFiles: account.environmentInstanceFiles,
+        encryptionKeyArn: account.encryptionKeyArn!,
+        environmentInstanceFiles: account.environmentInstanceFiles!,
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),
@@ -227,17 +227,14 @@ describe('CostCenterService', () => {
   describe('create', () => {
     describe('with a valid CreateCostCenter object', () => {
       let accountId: string;
-      let createCostCenter: CreateCostCenter;
+      let createCostCenter: CreateCostCenterRequest;
 
       beforeEach(() => {
         accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
-        const costCenterId = `cc-someId`;
         createCostCenter = {
           name: 'the name',
           description: 'the description',
-          accountId: accountId,
-          pk: `CC#${costCenterId}`,
-          sk: `CC#${costCenterId}`
+          accountId: accountId
         };
       });
 
@@ -266,9 +263,8 @@ describe('CostCenterService', () => {
             name: createCostCenter.name,
             description: createCostCenter.description,
             dependency: createCostCenter.accountId,
-            id: costCenterId,
-            pk: `CC#${costCenterId}`,
-            sk: `CC#${costCenterId}`
+            accountId: accountId,
+            id: costCenterId
           };
           ddbMock.on(UpdateItemCommand).resolves({ Attributes: marshall(costCenter) });
         });
@@ -310,12 +306,12 @@ describe('CostCenterService', () => {
         name: 'CostCenter 1',
         dependency: accountId,
         description: 'Cost Center 1 description',
-        subnetId: account.subnetId,
-        vpcId: account.vpcId,
+        subnetId: account.subnetId!,
+        vpcId: account.vpcId!,
         envMgmtRoleArn: account.envMgmtRoleArn,
         externalId: account.externalId,
-        encryptionKeyArn: account.encryptionKeyArn,
-        environmentInstanceFiles: account.environmentInstanceFiles,
+        encryptionKeyArn: account.encryptionKeyArn!,
+        environmentInstanceFiles: account.environmentInstanceFiles!,
         hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
         awsAccountId: account.awsAccountId,
         createdAt: mockDateObject.toISOString(),

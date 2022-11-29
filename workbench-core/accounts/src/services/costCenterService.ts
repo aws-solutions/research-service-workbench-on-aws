@@ -17,12 +17,12 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
-import { Account } from '../models/account';
+import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
 import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
-import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
@@ -183,7 +183,7 @@ export default class CostCenterService {
   }
 
   private async _getAccount(accountId: string): Promise<Account> {
-    const accountService = new AccountService(this._tableName);
+    const accountService = new AccountService(this._dynamoDbService);
     try {
       return await accountService.getAccount(accountId);
     } catch (e) {

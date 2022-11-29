@@ -18,7 +18,7 @@ import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { Account, AccountParser } from '../models/accounts/account';
-import { CostCenter } from '../models/costCenter/costCenter';
+import { CostCenter } from '../models/costCenters/costCenter';
 import AccountService from './accountService';
 
 describe('AccountService', () => {
@@ -434,10 +434,9 @@ describe('AccountService', () => {
         mockDDB.on(QueryCommand).resolves({ Count: 0 });
         const noMatchId = 'noMatchId';
         await expect(accountService.getAccount(noMatchId, true)).rejects.toThrowError(
-            `Could not find account ${noMatchId}`
+          `Could not find account ${noMatchId}`
         );
       });
-
     });
   });
 });

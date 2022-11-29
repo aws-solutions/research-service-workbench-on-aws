@@ -14,7 +14,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';
-import { CostCenterParser } from '../models/costCenter/costCenter';
+import { CostCenterParser } from '../models/costCenters/costCenter';
 
 export default class AccountService {
   private readonly _dynamoDBService: DynamoDBService;
