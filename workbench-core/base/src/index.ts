@@ -7,15 +7,15 @@ import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
 import CognitoTokenService from './cognitoTokenService';
-import QueryParams from './constants/queryParams';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
-import { QueryParameterFilter } from './interfaces/queryParameterFilter';
+import QueryParams from './interfaces/queryParams';
+
 import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
+
 import { MetadataService } from './services/metadataService';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import {
@@ -23,7 +23,8 @@ import {
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
   toPaginationToken,
-  fromPaginationToken
+  fromPaginationToken,
+  MAX_API_PAGE_SIZE
 } from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
@@ -36,6 +37,7 @@ import {
   uuidRegExp,
   uuidRegExpAsString
 } from './utilities/textUtil';
+import { validateAndParse } from './utilities/validatorHelper';
 
 export {
   AuditLogger,
@@ -55,16 +57,16 @@ export {
   QueryStringParamFilterParser,
   QueryNumberParamFilter,
   QueryNumberParamFilterParser,
-  QueryParameterFilter,
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
-  QueryParameterFilterSchema,
   FilterRequest,
   SortRequest,
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
+  validateAndParse,
   PaginatedResponse,
   MetadataService,
   toPaginationToken,

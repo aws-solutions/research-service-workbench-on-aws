@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { FilterRequest, QueryParameterFilter, SortRequest } from '@aws/workbench-core-base';
+import { FilterRequest, QueryStringParamFilter, SortRequest } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
+import _ from 'lodash';
 import { Project } from '../models/projects/project';
 
 /**
@@ -72,7 +73,7 @@ export function manualFilterProjects(filter: FilterRequest, projects: Project[])
 
   // get filter attribute, operator, and value
   const filterKey = Object.keys(filter)[0];
-  const filterValue = Object.values(filter)[0] as QueryParameterFilter<string>;
+  const filterValue = Object.values(filter)[0] as QueryStringParamFilter;
   if (filterValue === undefined) {
     throw Boom.badRequest('Filter contains invalid format');
   }
@@ -90,7 +91,7 @@ export function manualFilterProjects(filter: FilterRequest, projects: Project[])
 function compare(
   selectedFilter: string,
   selectedQualifier: string,
-  filterValue: QueryParameterFilter<string>,
+  filterValue: QueryStringParamFilter,
   project: Project
 ): boolean {
   const selectedValue = Object.values(filterValue)[0];
@@ -112,11 +113,17 @@ function compare(
     case 'gte':
       return projectValue >= selectedValue;
     case 'between':
-      if (!(selectedValue.value1 && selectedValue.value2)) {
+      if (!_.isObject(selectedValue)) {
+        throw Boom.badRequest('Need to pass object for between operation');
+      }
+      if (_.isObject(selectedValue) && !(selectedValue.value1 && selectedValue.value2)) {
         throw Boom.badRequest('Need two values for between operation');
       }
       return projectValue >= selectedValue.value1 && projectValue <= selectedValue.value2;
     case 'begins':
+      if (!_.isString(selectedValue)) {
+        throw Boom.badRequest('Need to pass string for begins operation');
+      }
       return selectedValue.startsWith(selectedValue);
     default:
       throw Boom.badRequest('You supplied an invalid comparison. Please try again');

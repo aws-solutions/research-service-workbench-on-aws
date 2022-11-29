@@ -27,7 +27,7 @@ import {
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
-import CostCenter from '../models/costCenter';
+import { CostCenter } from '../models/costCenters/costCenter';
 import CreateProjectRequest from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import GetProjectRequest from '../models/projects/getProjectRequest';
@@ -426,13 +426,31 @@ export default class ProjectService {
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const costCenterService = new CostCenterService({ TABLE_NAME: this._tableName });
+    const costCenterService = new CostCenterService({ TABLE_NAME: this._tableName }, this._aws.helpers.ddb);
 
     try {
       return costCenterService.getCostCenter(costCenterId);
     } catch (e) {
       throw Boom.badRequest(`Could not find cost center ${costCenterId}`);
     }
+  }
+
+  /**
+   * Check whether a CostCenter have any projects associated with it
+   * @param costCenterId - id of CostCenter we want to check
+   * @returns Whether a CostCenter have any projects associated with it
+   */
+  public async doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'project' },
+      sortKey: 'dependency',
+      eq: { S: costCenterId },
+      limit: 1
+    };
+
+    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    return associatedProjResponse.data.length > 0;
   }
 
   // TODO--implement after dynamic AuthZ

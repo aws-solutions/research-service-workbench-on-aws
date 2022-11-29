@@ -4,6 +4,18 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import {
+  DeleteCostCenterRequestParser,
+  DeleteCostCenterRequest
+} from './models/costCenters/deleteCostCenterRequest';
+import {
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
+} from './models/costCenters/listCostCentersRequest';
+import {
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
+} from './models/costCenters/updateCostCenterRequest';
 import CreateProjectRequest from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import GetProjectRequest from './models/projects/getProjectRequest';
@@ -28,5 +40,11 @@ export {
   ListProjectsRequestParser,
   GetProjectRequest,
   DeleteProjectRequest,
-  DeleteProjectRequestParser
+  DeleteProjectRequestParser,
+  ListCostCentersRequest,
+  ListCostCentersRequestParser,
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser,
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser
 };

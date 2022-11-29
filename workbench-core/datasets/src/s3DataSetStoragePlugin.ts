@@ -24,9 +24,9 @@ import {
   PutAccessPointPolicyCommandInput
 } from '@aws-sdk/client-s3-control';
 import { AwsService } from '@aws/workbench-core-base';
-import { EndpointConnectionStrings } from './dataSetsStoragePlugin';
-import { IamHelper, InsertStatementResult } from './iamHelper';
-import { DataSetsStoragePlugin } from '.';
+import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
+import { DataSet } from './dataSet';
+import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 
 /**
  * An implementation of the {@link DataSetStoragePlugin} to support DataSets stored in an S3 Bucket.
@@ -148,17 +148,18 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     throw new Error('Method not implemented.');
   }
 
-  public async createPresignedUploadUrl(
-    dataSetName: string,
-    timeToLiveMilliseconds: number
-  ): Promise<string> {
-    throw new Error('Method not implemented.');
+  public async createPresignedUploadUrl(dataset: DataSet, timeToLiveSeconds: number): Promise<string> {
+    return await this._aws.helpers.s3.createPresignedUploadUrl(
+      dataset.storageName,
+      dataset.name,
+      timeToLiveSeconds
+    );
   }
 
   public async createPresignedMultiPartUploadUrls(
     dataSetName: string,
     numberOfParts: number,
-    timeToLiveMilliseconds: number
+    timeToLiveSeconds: number
   ): Promise<string[]> {
     throw new Error('Method not implemented.');
   }

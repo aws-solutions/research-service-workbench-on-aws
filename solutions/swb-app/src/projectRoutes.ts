@@ -12,6 +12,7 @@ import {
   DeleteProjectRequest,
   DeleteProjectRequestParser
 } from '@aws/workbench-core-accounts';
+import { validateAndParse } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -19,7 +20,7 @@ import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
 import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
-import { processValidatorResult, validateAndParse } from './validatorHelper';
+import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectRoutes(
   router: Router,
