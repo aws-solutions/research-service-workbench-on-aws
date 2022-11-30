@@ -20,6 +20,21 @@ export interface DataSet {
   createdAt?: string;
 
   /**
+   * (optional) a description of the dataset
+   */
+  description?: string;
+
+  /**
+   * (optional) the owner of the dataset
+   */
+  owner?: string;
+
+  /**
+   * (optional) the type of the dataset
+   */
+  type?: string;
+
+  /**
    * a string which identifies the storage specific location such the URL to an S3 bucket.
    */
   storageName: string;

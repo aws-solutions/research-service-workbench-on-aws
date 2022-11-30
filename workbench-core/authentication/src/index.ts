@@ -9,7 +9,7 @@ import UpdateRoleSchema from './schemas/updateRole';
 
 export { AuthenticationPlugin } from './authenticationPlugin';
 export { AuthenticationService } from './authenticationService';
-export { User } from './user';
+export { Status, User, CreateUser } from './user';
 export { UserManagementPlugin } from './userManagementPlugin';
 export {
   CognitoAuthenticationPlugin,

@@ -12,9 +12,9 @@ import {
   GetRoleCommand,
   GetRolePolicyCommand,
   IAMClient,
-  IAMServiceException,
   ListAttachedRolePoliciesCommand,
   ListRolePoliciesCommand,
+  NoSuchEntityException,
   PutRolePolicyCommand
 } from '@aws-sdk/client-iam';
 import { mockClient } from 'aws-sdk-client-mock';
@@ -52,11 +52,9 @@ describe('iamRoleCloneService', () => {
         })
         // No target account role
         .rejectsOnce(
-          new IAMServiceException({
-            name: 'NoSuchEntity',
-            $service: '',
-            $fault: 'client',
-            $metadata: {}
+          new NoSuchEntityException({
+            $metadata: {},
+            message: ''
           })
         )
         .on(CreateRoleCommand)

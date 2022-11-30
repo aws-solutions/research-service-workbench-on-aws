@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-accounts",
   "version": "0.0.1",
   "description": "Access and management of resources helping in connecting to AWS hosting accounts.",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -40,17 +40,17 @@
   },
   "dependencies": {
     "@aws-cdk/aws-iam": "^1.159.0",
-    "@aws-sdk/client-cloudformation": "^3.118.1",
-    "@aws-sdk/client-dynamodb": "^3.118.1",
-    "@aws-sdk/client-ec2": "^3.119.0",
-    "@aws-sdk/client-eventbridge": "^3.118.1",
-    "@aws-sdk/client-kms": "^3.118.1",
-    "@aws-sdk/client-s3": "^3.118.1",
-    "@aws-sdk/client-s3-control": "^3.118.1",
-    "@aws-sdk/client-service-catalog": "^3.118.1",
-    "@aws-sdk/client-ssm": "^3.118.1",
-    "@aws-sdk/types": "^3.110.0",
-    "@aws-sdk/util-dynamodb": "^3.87.0",
+    "@aws-sdk/client-cloudformation": "^3.186.0",
+    "@aws-sdk/client-dynamodb": "^3.186.0",
+    "@aws-sdk/client-ec2": "^3.186.0",
+    "@aws-sdk/client-eventbridge": "^3.186.0",
+    "@aws-sdk/client-kms": "^3.186.0",
+    "@aws-sdk/client-s3": "^3.186.0",
+    "@aws-sdk/client-s3-control": "^3.186.0",
+    "@aws-sdk/client-service-catalog": "^3.186.0",
+    "@aws-sdk/client-ssm": "^3.186.0",
+    "@aws-sdk/types": "^3.186.0",
+    "@aws-sdk/util-dynamodb": "^3.186.0",
     "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
@@ -58,7 +58,8 @@
     "@hapi/boom": "^10.0.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

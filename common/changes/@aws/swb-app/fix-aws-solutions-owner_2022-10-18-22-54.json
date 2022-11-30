@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "change github owner to aws-solutions",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

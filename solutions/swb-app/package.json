@@ -2,10 +2,10 @@
   "name": "@aws/swb-app",
   "version": "0.1.2",
   "description": "This package sets up API routes for SWB",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -44,7 +44,8 @@
     "express": "^4.17.3",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

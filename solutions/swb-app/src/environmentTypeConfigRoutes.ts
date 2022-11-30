@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   CreateEnvironmentTypeConfigSchema,
   EnvironmentTypeConfigService,
@@ -45,7 +46,10 @@ export function setUpEnvTypeConfigRoutes(
         throw Boom.badRequest('envTypeId request parameter must be a valid uuid.');
       }
 
-      if (!uuidValidate(req.params.envTypeConfigId)) {
+      if (
+        req.params.envTypeConfigId.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.envTypeConfig)) ===
+        null
+      ) {
         throw Boom.badRequest('envTypeConfigId request parameter must be a valid uuid.');
       }
       const envTypeConfig = await environmentTypeConfigService.getEnvironmentTypeConfig(

@@ -8,9 +8,7 @@ import {
   verifyToken,
   AuthenticationService,
   CognitoAuthenticationPluginOptions,
-  CognitoAuthenticationPlugin,
-  UserManagementService,
-  CognitoUserManagementPlugin
+  CognitoAuthenticationPlugin
 } from '@aws/workbench-core-authentication';
 import {
   withAuth,
@@ -28,6 +26,7 @@ import express, { Router, Express, Request, Response } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
+import { setUpCostCenterRoutes } from './costCenterRoutes';
 import { setUpDSRoutes } from './datasetRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
@@ -97,15 +96,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     });
   });
 
-  const userManagementService: UserManagementService = new UserManagementService(
-    new CognitoUserManagementPlugin(cognitoPluginOptions.userPoolId)
-  );
-
+  setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
-  setUpUserRoutes(router, userManagementService);
+  setUpUserRoutes(router, apiRouteConfig.userManagementService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
   setUpProjectRoutes(router, apiRouteConfig.projectService);

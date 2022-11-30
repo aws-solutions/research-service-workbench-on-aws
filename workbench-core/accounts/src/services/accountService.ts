@@ -7,23 +7,8 @@ import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, resourceTypeToKey, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-import { HostingAccountStatus } from '../constants/hostingAccountStatus';
+import { Account, AccountParser } from '../models/account';
 
-interface Account {
-  id: string | undefined;
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  error: { type: string; value: string } | undefined;
-  hostingAccountHandlerRoleArn: string;
-  vpcId: string;
-  subnetId: string;
-  cidr: string;
-  environmentInstanceFiles: string;
-  encryptionKeyArn: string;
-  externalId?: string;
-  stackName: string;
-  status: HostingAccountStatus;
-}
 export default class AccountService {
   private _aws: AwsService;
 
@@ -76,14 +61,12 @@ export default class AccountService {
       index: 'getResourceByCreatedAt',
       key: { name: 'resourceType', value: 'account' }
     };
-    const response = await this._aws.helpers.ddb.query(queryParams).execute();
-    let accounts: Account[] = [];
-    if (response && response.Items) {
-      accounts = response.Items.map((item: unknown) => {
-        return item as unknown as Account;
-      });
-    }
-    return accounts;
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.map((item) => {
+      return AccountParser.parse(item);
+    });
   }
 
   /**
@@ -166,7 +149,7 @@ export default class AccountService {
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
 
     // Store Account row in DDB
-    await this._aws.helpers.ddb.update(accountKey, accountParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: accountKey, params: accountParams });
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
@@ -183,7 +166,7 @@ export default class AccountService {
       };
 
       // Store AWS Account row in DDB (for easier duplicate checks later on)
-      await this._aws.helpers.ddb.update(awsAccountKey, awsAccountParams).execute();
+      await this._aws.helpers.ddb.updateExecuteAndFormat({ key: awsAccountKey, params: awsAccountParams });
     }
 
     return accountMetadata.id;
