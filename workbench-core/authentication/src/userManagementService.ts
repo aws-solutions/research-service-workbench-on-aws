@@ -27,15 +27,15 @@ export class UserManagementService {
   /**
    * Get details for a particular user from the user/role data store.
    *
-   * @param uid - the identifier of a given user.
+   * @param id - the identifier of a given user.
    * @returns a {@link User} object containing the user's details
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  public async getUser(uid: string): Promise<User> {
-    return this._userManagementPlugin.getUser(uid);
+  public async getUser(id: string): Promise<User> {
+    return this._userManagementPlugin.getUser(id);
   }
   /**
    * Create a new user with the given details.
@@ -52,7 +52,7 @@ export class UserManagementService {
   }
   /**
    * Update a user with new details.
-   * @param uid - the ID of the user to update.
+   * @param id - the ID of the user to update.
    * @param user - the new details for the user.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -60,46 +60,46 @@ export class UserManagementService {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
    */
-  public async updateUser(uid: string, user: User): Promise<void> {
-    await this._userManagementPlugin.updateUser(uid, user);
+  public async updateUser(id: string, user: User): Promise<void> {
+    await this._userManagementPlugin.updateUser(id, user);
   }
 
   /**
    * Delete a user from the backing store.
-   * @param uid - the ID of the user to delete.
+   * @param id - the ID of the user to delete.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  public async deleteUser(uid: string): Promise<void> {
-    await this._userManagementPlugin.deleteUser(uid);
+  public async deleteUser(id: string): Promise<void> {
+    await this._userManagementPlugin.deleteUser(id);
   }
 
   /**
    * Activates an inactive user from the backing store.
    *
-   * @param uid - the id of the user to activate
+   * @param id - the id of the user to activate
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  public async activateUser(uid: string): Promise<void> {
-    await this._userManagementPlugin.activateUser(uid);
+  public async activateUser(id: string): Promise<void> {
+    await this._userManagementPlugin.activateUser(id);
   }
 
   /**
    * Deactivates an active user from the backing store.
    *
-   * @param uid - the id of the user to deactivate
+   * @param id - the id of the user to deactivate
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    */
-  public async deactivateUser(uid: string): Promise<void> {
-    await this._userManagementPlugin.deactivateUser(uid);
+  public async deactivateUser(id: string): Promise<void> {
+    await this._userManagementPlugin.deactivateUser(id);
   }
 
   /**
@@ -140,7 +140,7 @@ export class UserManagementService {
 
   /**
    * Add the given user to the given role.
-   * @param uid - the ID of the user to add to the role.
+   * @param id - the ID of the user to add to the role.
    * @param role - the name which identifies the role.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -148,12 +148,12 @@ export class UserManagementService {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  public async addUserToRole(uid: string, role: string): Promise<void> {
-    await this._userManagementPlugin.addUserToRole(uid, role);
+  public async addUserToRole(id: string, role: string): Promise<void> {
+    await this._userManagementPlugin.addUserToRole(id, role);
   }
   /**
    * Remove the given user from the given role.
-   * @param uid - the ID of the user to remove from the given role.
+   * @param id - the ID of the user to remove from the given role.
    * @param role - the role from which the user is to be removed.
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
@@ -161,8 +161,8 @@ export class UserManagementService {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
    */
-  public async removeUserFromRole(uid: string, role: string): Promise<void> {
-    await this._userManagementPlugin.removeUserFromRole(uid, role);
+  public async removeUserFromRole(id: string, role: string): Promise<void> {
+    await this._userManagementPlugin.removeUserFromRole(id, role);
   }
 
   /**

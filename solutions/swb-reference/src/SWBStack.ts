@@ -47,6 +47,8 @@ export class SWBStack extends Stack {
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
     S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY: string;
     S3_DATASETS_BUCKET_ARN_OUTPUT_KEY: string;
+    ACCT_HANDLER_ARN_OUTPUT_KEY: string;
+    API_HANDLER_ARN_OUTPUT_KEY: string;
     STATUS_HANDLER_ARN_OUTPUT_KEY: string;
     SC_PORTFOLIO_NAME: string;
     ALLOWED_ORIGINS: string;
@@ -55,6 +57,7 @@ export class SWBStack extends Stack {
     CLIENT_SECRET: string;
     USER_POOL_ID: string;
     MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+    MAIN_ACCT_ID: string;
   };
 
   private _accessLogsBucket: Bucket;
@@ -73,6 +76,8 @@ export class SWBStack extends Stack {
       STACK_NAME,
       SSM_DOC_OUTPUT_KEY_SUFFIX,
       AMI_IDS_TO_SHARE,
+      ACCT_HANDLER_ARN_OUTPUT_KEY,
+      API_HANDLER_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
@@ -118,6 +123,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const MAIN_ACCT_ID = `${this.account}`;
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -126,6 +132,8 @@ export class SWBStack extends Stack {
       LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
       S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY,
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
+      ACCT_HANDLER_ARN_OUTPUT_KEY,
+      API_HANDLER_ARN_OUTPUT_KEY,
       STATUS_HANDLER_ARN_OUTPUT_KEY,
       SC_PORTFOLIO_NAME,
       ALLOWED_ORIGINS,
@@ -133,7 +141,8 @@ export class SWBStack extends Stack {
       CLIENT_ID: clientId,
       CLIENT_SECRET: clientSecret,
       USER_POOL_ID: userPoolId,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      MAIN_ACCT_ID
     };
 
     this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);

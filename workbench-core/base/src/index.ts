@@ -11,13 +11,20 @@ import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
-import { QueryParameterFilter } from './interfaces/queryParameterFilter';
+import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
 import QueryParams from './interfaces/queryParams';
+import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
+
+import { MetadataService } from './services/metadataService';
 import JSONValue from './types/json';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from './utilities/paginationHelper';
+import {
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE
+} from './utilities/paginationHelper';
 import {
   getFilterQueryParams,
   getSortQueryParams,
@@ -29,6 +36,7 @@ import {
   uuidRegExp,
   uuidRegExpAsString
 } from './utilities/textUtil';
+import { validateAndParse } from './utilities/validatorHelper';
 
 export {
   AuditLogger,
@@ -44,17 +52,22 @@ export {
   uuidRegExp,
   uuidWithLowercasePrefixRegExp,
   uuidRegExpAsString,
-  QueryParameterFilter,
+  QueryStringParamFilter,
+  QueryStringParamFilterParser,
+  QueryNumberParamFilter,
+  QueryNumberParamFilterParser,
   validateSingleSortAndFilter,
   getFilterQueryParams,
   getSortQueryParams,
-  QueryParameterFilterSchema,
   FilterRequest,
   SortRequest,
   addPaginationToken,
   getPaginationToken,
   DEFAULT_API_PAGE_SIZE,
+  MAX_API_PAGE_SIZE,
   PaginatedResponse,
+  MetadataService,
+  validateAndParse,
   JSONValue,
   DynamoDBService
 };

@@ -4,7 +4,7 @@
  */
 
 /* eslint-disable no-new */
-import { Aws, CfnOutput } from 'aws-cdk-lib';
+import { Aws, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
 import { AccountPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
@@ -31,8 +31,10 @@ export class EncryptionKeyWithRotation extends Construct {
     });
 
     this.key = new Key(this, 'EncryptionKey', {
+      removalPolicy: RemovalPolicy.DESTROY,
       enableKeyRotation: true,
-      policy: mainKeyPolicy
+      policy: mainKeyPolicy,
+      alias: `alias/${id}`
     });
 
     const encryptionKeyOutputName: string = props ? props.encryptionKeyOutputName : 'EncryptionKeyOutput';

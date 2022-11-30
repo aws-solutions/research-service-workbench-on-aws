@@ -15,7 +15,9 @@
 #rootUserNameParamStorePath: ''
 #rootPasswordParamStorePath: ''
 
-## Pre-requisite for running awsAccounts integration test
+## Default Hosting Account
+#defaultHostingAccountId: ''     # exp: acc-2272f4a8-1791-419a-8e49-b926f3eb46f9
+
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:
 #awsAccountId: ''
 #envMgmtRoleArn: ''

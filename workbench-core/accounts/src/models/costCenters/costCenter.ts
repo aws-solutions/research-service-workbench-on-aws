@@ -9,10 +9,7 @@ import { z } from 'zod';
 export const CostCenterParser = z.object({
   id: z.string(),
   name: z.string(),
-  accountId: z.string(),
   description: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
   subnetId: z.string(),
   vpcId: z.string(),
   envMgmtRoleArn: z.string(),
@@ -20,7 +17,11 @@ export const CostCenterParser = z.object({
   encryptionKeyArn: z.string(),
   environmentInstanceFiles: z.string(),
   hostingAccountHandlerRoleArn: z.string(),
-  awsAccountId: z.string()
+  awsAccountId: z.string(),
+  accountId: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  dependency: z.string()
 });
 
 export type CostCenter = z.infer<typeof CostCenterParser>;
