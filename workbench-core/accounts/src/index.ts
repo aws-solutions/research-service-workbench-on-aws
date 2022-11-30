@@ -5,6 +5,19 @@
 
 import AccountHandler from './handlers/accountHandler';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
+import {
+  DeleteCostCenterRequestParser,
+  DeleteCostCenterRequest
+} from './models/costCenters/deleteCostCenterRequest';
+import {
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
+} from './models/costCenters/listCostCentersRequest';
+import {
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
+} from './models/costCenters/updateCostCenterRequest';
 import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
@@ -25,6 +38,13 @@ export {
   CostCenterService,
   ProjectService,
   CreateAccountSchema,
+  CreateCostCenterRequest,
+  ListCostCentersRequest,
+  ListCostCentersRequestParser,
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser,
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser,
   UpdateAccountSchema,
   AwsAccountTemplateUrls,
   AwsAccountTemplateUrlsParser,

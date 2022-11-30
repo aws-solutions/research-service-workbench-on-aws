@@ -63,7 +63,7 @@ export default class Setup {
   public getMainAwsClient(): AwsService {
     return new AwsService({
       region: this._settings.get('AwsRegion'),
-      ddbTableName: this.getStackName() // table name is same as stack name
+      ddbTableName: this._settings.get('ExampleDynamoDBTableName')
     });
   }
 

@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, S3, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export default class S3Service {
@@ -96,5 +96,29 @@ export default class S3Service {
       Key: key
     });
     return getSignedUrl(this._s3, command, { expiresIn: expirationSeconds });
+  }
+
+  /**
+   * Create a presigned URL for a signle-part file upload
+   * @param s3BucketName - the name of the s3 bucket
+   * @param prefix - the s3 prefix to upload to
+   * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
+   * @returns the presigned URL
+   */
+  public async createPresignedUploadUrl(
+    s3BucketName: string,
+    prefix: string,
+    timeToLiveSeconds: number
+  ): Promise<string> {
+    const config: S3ClientConfig = {
+      credentials: await this._s3.config.credentials(),
+      region: this._s3.config.region
+    };
+
+    return await getSignedUrl(
+      new S3Client(config),
+      new PutObjectCommand({ Bucket: s3BucketName, Key: prefix }),
+      { expiresIn: timeToLiveSeconds }
+    );
   }
 }

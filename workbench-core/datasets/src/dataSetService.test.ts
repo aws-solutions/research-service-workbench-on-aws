@@ -11,8 +11,11 @@ import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit
 import { AwsService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import Boom from '@hapi/boom';
+import { DataSet } from './dataSet';
+import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
-import { DataSet, DataSetService, S3DataSetStoragePlugin } from '.';
+import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -37,6 +40,7 @@ describe('DataSetService', () => {
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
   const mockDataSetObject = 'datasetObjectId';
+  const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -211,6 +215,9 @@ describe('DataSetService', () => {
     jest
       .spyOn(S3DataSetStoragePlugin.prototype, 'removeRoleFromExternalEndpoint')
       .mockImplementation(async () => {});
+    jest
+      .spyOn(S3DataSetStoragePlugin.prototype, 'createPresignedUploadUrl')
+      .mockImplementation(async () => mockPresignedSinglePartUploadURL);
   });
 
   describe('constructor', () => {
@@ -233,14 +240,14 @@ describe('DataSetService', () => {
 
     it('calls createStorage and addDataSet', async () => {
       await expect(
-        service.provisionDataSet(
-          mockDataSetName,
-          mockDataSetStorageName,
-          mockDataSetPath,
-          mockAwsAccountId,
-          mockAwsBucketRegion,
-          plugin
-        )
+        service.provisionDataSet({
+          name: mockDataSetName,
+          storageName: mockDataSetStorageName,
+          path: mockDataSetPath,
+          awsAccountId: mockAwsAccountId,
+          region: mockAwsBucketRegion,
+          storageProvider: plugin
+        })
       ).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
@@ -265,7 +272,14 @@ describe('DataSetService', () => {
 
     it('calls importStorage and addDataSet ', async () => {
       await expect(
-        service.importDataSet('name', 'storageName', 'path', 'accountId', 'bucketRegion', plugin)
+        service.importDataSet({
+          name: 'name',
+          storageName: 'storageName',
+          path: 'path',
+          awsAccountId: 'accountId',
+          region: 'bucketRegion',
+          storageProvider: plugin
+        })
       ).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
@@ -287,7 +301,23 @@ describe('DataSetService', () => {
     });
 
     it('returns nothing when the dataset is removed', async () => {
-      await expect(service.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      await expect(service.removeDataSet(mockDataSetId, () => Promise.resolve())).resolves.not.toThrow();
+    });
+
+    it('throws when an external endpoint exists on the DataSet.', async () => {
+      await expect(service.removeDataSet(mockDataSetWithEndpointId, () => Promise.resolve())).rejects.toThrow(
+        new DataSetHasEndpointError(
+          'External endpoints found on Dataset must be removed before DataSet can be removed.'
+        )
+      );
+    });
+
+    it('throws when preconditions are not met', async () => {
+      await expect(
+        service.removeDataSet(mockDataSetId, async () => {
+          await Promise.reject(new Error('Preconditions are not met'));
+        })
+      ).rejects.toThrow('Preconditions are not met');
     });
   });
 
@@ -585,6 +615,24 @@ describe('DataSetService', () => {
           region: mockAwsBucketRegion
         }
       ]);
+    });
+  });
+
+  describe('getSinglePartPresignedUrl', () => {
+    let service: DataSetService;
+    let plugin: S3DataSetStoragePlugin;
+
+    beforeEach(() => {
+      service = new DataSetService(audit, log, metaPlugin);
+      plugin = new S3DataSetStoragePlugin(aws);
+    });
+
+    it('returns a presigned URL.', async () => {
+      const ttlSeconds = 3600;
+
+      await expect(
+        service.getPresignedSinglePartUploadUrl(mockDataSetId, ttlSeconds, plugin)
+      ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
   });
 });

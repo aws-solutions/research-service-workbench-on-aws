@@ -14,7 +14,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';
-import { CostCenterParser } from '../models/costCenter/costCenter';
+import { CostCenterParser } from '../models/costCenters/costCenter';
 
 export default class AccountService {
   private readonly _dynamoDBService: DynamoDBService;
@@ -146,7 +146,7 @@ export default class AccountService {
     if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
 
     // Store Account row in DDB
-    await this._dynamoDBService.update(accountKey, accountParams).execute();
+    await this._dynamoDBService.updateExecuteAndFormat({ key: accountKey, params: accountParams });
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
@@ -163,7 +163,7 @@ export default class AccountService {
       };
 
       // Store AWS Account row in DDB (for easier duplicate checks later on)
-      await this._dynamoDBService.update(awsAccountKey, awsAccountParams).execute();
+      await this._dynamoDBService.updateExecuteAndFormat({ key: awsAccountKey, params: awsAccountParams });
     }
 
     return accountMetadata.id;
