@@ -11,8 +11,8 @@ on:
       pr_number:
         description: PR number to merge
         required: true
-      destination_feat_branch:
-        description: feat branch name to merge to (exclude 'feat/' from the name)
+      target_feat_branch:
+        description: feat branch name to merge to
         required: true
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
         uses: tj-actions/branch-names@v5.1
 
       - name: enable merge commits
-        if: steps.branch_name.outputs.base_ref_branch == "feat/${{ inputs.destination_feat_branch }}"
+        if: startsWith(steps.branch_name.outputs.base_ref_branch, 'feat/') && steps.branch_name.outputs.base_ref_branch == inputs.target_feat_branch
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: merge commit topic branches pr to feat/*
-        if: steps.branch_name.outputs.base_ref_branch == "feat/${{ inputs.destination_feat_branch }}"
+        if: startsWith(steps.branch_name.outputs.base_ref_branch, 'feat/') && steps.branch_name.outputs.base_ref_branch == inputs.target_feat_branch
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
