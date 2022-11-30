@@ -19,18 +19,25 @@ jobs:
   merge-commit-topic-branch-pr-to-feat-branches:
     runs-on: ubuntu-20.04
     steps:
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5.1
+      - name: Get PR info
+        id: pr_info
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/pulls/{pull_number}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          pull_number: ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: echo
         run: |
-          echo "${{ steps.branch_name.outputs.head_ref_branch }}"
-          echo "${{ steps.branch_name.outputs.base_ref_branch }}"
+          echo ${{ fromJson(steps.pr_info.outputs.data).head.ref }}
+          echo ${{ fromJson(steps.pr_info.outputs.data).base.ref }}
           echo "${{ inputs.target_feat_branch }}"
 
       - name: enable merge commits
-        if: startsWith(steps.branch_name.outputs.base_ref_branch, 'feat/') && steps.branch_name.outputs.base_ref_branch == inputs.target_feat_branch
+        if: startsWith(fromJson(steps.pr_info.outputs.data).base.ref, 'feat/') && fromJson(steps.pr_info.outputs.data).base.ref == inputs.target_feat_branch
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
@@ -41,7 +48,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: merge commit topic branches pr to feat/*
-        if: startsWith(steps.branch_name.outputs.base_ref_branch, 'feat/') && steps.branch_name.outputs.base_ref_branch == inputs.target_feat_branch
+        if: startsWith(fromJson(steps.pr_info.outputs.data).base.ref, 'feat/') && fromJson(steps.pr_info.outputs.data).base.ref == inputs.target_feat_branch
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
