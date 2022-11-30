@@ -7,8 +7,6 @@ name: Merge-commit-topic-branch-pr-to-feat-branches
 
 on:
   push:
-    branches:
-      - "allow-merge-commit-on-feat"
   workflow_dispatch:
     inputs:
       pr_number:
