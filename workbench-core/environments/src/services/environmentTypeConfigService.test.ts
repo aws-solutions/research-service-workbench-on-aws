@@ -2,33 +2,10 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';
-const envType = {
-  status: 'APPROVED',
-  createdAt: '2022-06-20T18:32:09.985Z',
-  updatedBy: 'owner-123',
-  createdBy: 'owner-123',
-  name: 'Jupyter Notebook',
-  resourceType: 'envType',
-  provisioningArtifactId: 'pa-dqwijdnwq12w2',
-  params: [],
-  updatedAt: '2022-06-20T18:36:14.358Z',
-  sk: `ET#${envTypeId}`,
-  owner: 'owner-123',
-  description: 'An Amazon SageMaker Jupyter Notebook',
-  id: envTypeId,
-  pk: `ET#${envTypeId}`,
-  productId: 'prod-dwqdqdqdwq2e3',
-  type: 'sagemaker'
-};
+
 const uuid = '40b01529-0c7f-4609-a1e2-715068da5f0e';
 const envTypeConfigId = `etc-${uuid}`;
 jest.mock('uuid', () => ({ v4: () => uuid }));
-jest.mock('./environmentTypeService', () => {
-  return jest.fn().mockImplementation(() => {
-    return { getEnvironmentType: (envTypeId: string) => envType };
-  });
-});
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -41,6 +18,8 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
+import { EnvironmentType } from '../models/environmentType';
+import { EnvironmentTypeConfig } from '../models/environmentTypeConfig';
 
 import EnvironmentTypeConfigService from './environmentTypeConfigService';
 import EnvironmentTypeService from './environmentTypeService';
@@ -51,19 +30,29 @@ describe('environmentTypeConfigService', () => {
   const envTypeMock = new EnvironmentTypeService({ TABLE_NAME });
   const envTypeConfigService = new EnvironmentTypeConfigService(envTypeMock, ddbServiceMock);
   const ddbMock = mockClient(DynamoDBClient);
-
-  const envTypeConfig = {
+  const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';
+  const envType: EnvironmentType = {
+    status: 'APPROVED',
+    createdAt: '2022-06-20T18:32:09.985Z',
+    name: 'Jupyter Notebook',
+    resourceType: 'envType',
+    provisioningArtifactId: 'pa-dqwijdnwq12w2',
+    params: {},
+    updatedAt: '2022-06-20T18:36:14.358Z',
+    sk: `ET#${envTypeId}`,
+    description: 'An Amazon SageMaker Jupyter Notebook',
+    id: envTypeId,
+    pk: `ET#${envTypeId}`,
+    productId: 'prod-dwqdqdqdwq2e3',
+    type: 'sagemaker'
+  };
+  const envTypeConfig: EnvironmentTypeConfig = {
     createdAt: '2022-06-17T16:28:40.360Z',
     name: 'config 1',
-    //
-    // provisioningArtifactId: 'pa-dewjn123',
     params: [],
     updatedAt: '2022-06-17T21:25:24.333Z',
-    //sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
     description: 'Example config 1',
     id: envTypeConfigId,
-    //pk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
-    // productId: 'prod-dasjk123',
     type: 'sagemaker'
   };
   const envTypeConfigDDBItem = {
@@ -192,9 +181,7 @@ describe('environmentTypeConfigService', () => {
 
       // OPERATE
       const actualResponse = await envTypeConfigService.updateEnvironmentTypeConfig({
-        params: {
-          description: 'FakeDescription'
-        },
+        description: 'FakeDescription',
         envTypeConfigId,
         envTypeId
       });
@@ -215,9 +202,7 @@ describe('environmentTypeConfigService', () => {
       // OPERATE & CHECK
       await expect(
         envTypeConfigService.updateEnvironmentTypeConfig({
-          params: {
-            description: 'FakeDescription'
-          },
+          description: 'FakeDescription',
           envTypeId: invalidEnvTypeId,
           envTypeConfigId: invalidEnvTypeConfigId
         })
@@ -242,19 +227,15 @@ describe('environmentTypeConfigService', () => {
       ddbMock.on(UpdateItemCommand).resolves({
         Attributes: marshall(envTypeConfig)
       });
-
+      jest.spyOn(EnvironmentTypeService.prototype, 'getEnvironmentType').mockResolvedValueOnce(envType);
       // OPERATE
       const actualResponse = await envTypeConfigService.createNewEnvironmentTypeConfig({
         envTypeId,
-        params: createParams
+        ...createParams
       });
 
       // CHECK
-      expect(actualResponse).toEqual({
-        ...envTypeConfig,
-        createdAt: actualResponse.createdAt,
-        updatedAt: actualResponse.updatedAt
-      });
+      expect(actualResponse).toEqual(envTypeConfig);
     });
 
     test('failed to create envTypeConfig', async () => {
@@ -262,11 +243,13 @@ describe('environmentTypeConfigService', () => {
       ddbMock.on(UpdateItemCommand).resolves({
         Attributes: undefined
       });
-
+      jest.spyOn(EnvironmentTypeService.prototype, 'getEnvironmentType').mockResolvedValueOnce(envType);
       // OPERATE & CHECK
       await expect(
-        envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, params: createParams })
-      ).rejects.toThrow(`Unable to create environment type with params: ${JSON.stringify(createParams)}`);
+        envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, ...createParams })
+      ).rejects.toThrow(
+        `Unable to create environment type with params: ${JSON.stringify({ envTypeId, ...createParams })}`
+      );
     });
   });
 });

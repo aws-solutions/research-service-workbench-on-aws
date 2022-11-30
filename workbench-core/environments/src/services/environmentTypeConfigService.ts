@@ -13,10 +13,10 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
-import { CreateEnvironmentTypeConfigRequest } from '../interfaces/createEnvironmentTypeConfigRequest';
-import { EnvironmentTypeConfig, EnvironmentTypeConfigParser } from '../interfaces/environmentTypeConfig';
-import { ListEnvironmentTypeConfigsRequest } from '../interfaces/listEnvironmentTypeConfigsRequest';
-import { UpdateEnvironmentTypeConfigRequest } from '../interfaces/updateEnvironmentTypeConfigsRequest';
+import { CreateEnvironmentTypeConfigRequest } from '../models/createEnvironmentTypeConfigRequest';
+import { EnvironmentTypeConfig, EnvironmentTypeConfigParser } from '../models/environmentTypeConfig';
+import { ListEnvironmentTypeConfigsRequest } from '../models/listEnvironmentTypeConfigsRequest';
+import { UpdateEnvironmentTypeConfigRequest } from '../models/updateEnvironmentTypeConfigsRequest';
 import EnvironmentTypeService from './environmentTypeService';
 
 export default class EnvironmentTypeConfigService {
@@ -107,7 +107,7 @@ export default class EnvironmentTypeConfigService {
       id: envTypeConfigId,
       createdAt: currentDate,
       updatedAt: currentDate,
-      ...request.params
+      ...request
     });
     const dynamoItem: Record<string, unknown> = {
       ...newEnvTypeConfig,
@@ -123,10 +123,10 @@ export default class EnvironmentTypeConfigService {
       })
       .execute();
     if (response.Attributes) {
-      return newEnvTypeConfig;
+      return EnvironmentTypeConfigParser.parse({ ...response.Attributes });
     }
     console.error('Unable to create environment type', newEnvTypeConfig);
-    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(request.params)}`);
+    throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(request)}`);
   }
 
   /**
@@ -138,14 +138,11 @@ export default class EnvironmentTypeConfigService {
   public async updateEnvironmentTypeConfig(
     request: UpdateEnvironmentTypeConfigRequest
   ): Promise<EnvironmentTypeConfig> {
-    const { envTypeId, envTypeConfigId, params } = request;
-    const attributesAllowedToUpdate = ['description', 'estimatedCost'];
-    const attributesNotAllowed = Object.keys(params).filter((key) => {
-      return !attributesAllowedToUpdate.includes(key);
-    });
-    if (attributesNotAllowed.length > 0) {
-      throw Boom.badRequest(`We do not support updating these attributes ${attributesNotAllowed}`);
-    }
+    const { envTypeId, envTypeConfigId } = request;
+    const updateETConfig = {
+      description: request.description,
+      estimatedCost: request.estimatedCost
+    };
     try {
       await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
     } catch (e) {
@@ -159,7 +156,7 @@ export default class EnvironmentTypeConfigService {
 
     const currentDate = new Date().toISOString();
     const updatedEnvTypeConfig = {
-      ...params,
+      ...updateETConfig,
       updatedAt: currentDate
     };
 
@@ -170,7 +167,7 @@ export default class EnvironmentTypeConfigService {
       return EnvironmentTypeConfigParser.parse(response.Attributes);
     }
     console.error('Unable to update environment type config', updatedEnvTypeConfig);
-    throw Boom.internal(`Unable to update environment type config with params: ${JSON.stringify(params)}`);
+    throw Boom.internal(`Unable to update environment type config with params: ${JSON.stringify(request)}`);
   }
 
   private _buildEnvTypeConfigPkSk(envTypeConfigId: string): { pk: string; sk: string } {

@@ -10,12 +10,8 @@ export const UpdateEnvironmentTypeConfigRequestParser = z
   .object({
     envTypeId: z.string(),
     envTypeConfigId: z.string(),
-    params: z
-      .object({
-        description: z.string().optional(),
-        estimatedCost: z.string().optional()
-      })
-      .strict()
+    description: z.string().optional(),
+    estimatedCost: z.string().optional()
   })
   .strict();
 

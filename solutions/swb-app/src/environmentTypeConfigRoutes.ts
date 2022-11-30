@@ -26,7 +26,7 @@ export function setUpEnvTypeConfigRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const envTypeConfigRequest = validateAndParse<CreateEnvironmentTypeConfigRequest>(
         CreateEnvironmentTypeConfigRequestParser,
-        { envTypeId: req.params.envTypeId, params: req.body }
+        { envTypeId: req.params.envTypeId, ...req.body }
       );
       const envTypeConfig = await environmentTypeConfigService.createNewEnvironmentTypeConfig(
         envTypeConfigRequest
@@ -69,7 +69,7 @@ export function setUpEnvTypeConfigRoutes(
     wrapAsync(async (req: Request, res: Response) => {
       const envTypeConfigRequest = validateAndParse<UpdateEnvironmentTypeConfigRequest>(
         UpdateEnvironmentTypeConfigRequestParser,
-        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, params: req.body }
+        { envTypeId: req.params.envTypeId, envTypeConfigId: req.params.envTypeConfigId, ...req.body }
       );
       const envTypeConfig = await environmentTypeConfigService.updateEnvironmentTypeConfig(
         envTypeConfigRequest

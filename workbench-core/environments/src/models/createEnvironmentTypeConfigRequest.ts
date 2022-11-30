@@ -9,21 +9,17 @@ import { z } from 'zod';
 export const CreateEnvironmentTypeConfigRequestParser = z
   .object({
     envTypeId: z.string(),
-    params: z
-      .object({
-        type: z.string(),
-        description: z.string(),
-        name: z.string(),
-        estimatedCost: z.optional(z.string()),
-        projectIds: z.array(z.string()).optional(),
-        params: z.array(
-          z.object({
-            key: z.string(),
-            value: z.string()
-          })
-        )
+    type: z.string(),
+    description: z.string(),
+    name: z.string(),
+    estimatedCost: z.optional(z.string()),
+    projectIds: z.array(z.string()).optional(),
+    params: z.array(
+      z.object({
+        key: z.string(),
+        value: z.string()
       })
-      .strict()
+    )
   })
   .strict();
 

@@ -15,23 +15,23 @@ import StatusHandler from './handlers/statusHandler';
 import {
   CreateEnvironmentTypeConfigRequest,
   CreateEnvironmentTypeConfigRequestParser
-} from './interfaces/createEnvironmentTypeConfigRequest';
-import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
-import EnvironmentConnectionService from './interfaces/environmentConnectionService';
-import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
-import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
+} from './models/createEnvironmentTypeConfigRequest';
+import EnvironmentConnectionLinkPlaceholder from './models/environmentConnectionLinkPlaceholder';
+import EnvironmentConnectionService from './models/environmentConnectionService';
+import EnvironmentLifecycleService from './models/environmentLifecycleService';
+import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import {
   ListEnvironmentTypeConfigsRequest,
   ListEnvironmentTypeConfigsRequestParser
-} from './interfaces/listEnvironmentTypeConfigsRequest';
+} from './models/listEnvironmentTypeConfigsRequest';
 import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
-} from './interfaces/listEnvironmentTypesRequest';
+} from './models/listEnvironmentTypesRequest';
 import {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser
-} from './interfaces/updateEnvironmentTypeConfigsRequest';
+} from './models/updateEnvironmentTypeConfigsRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
