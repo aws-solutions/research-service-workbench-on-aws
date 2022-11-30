@@ -1,0 +1,66 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-commit-topic-branch-pr-to-feat-branches
+
+on:
+  push:
+    branches:
+      - "allow-merge-commit-on-feat"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to merge
+        required: true
+        default: '9999'
+      feat_branch_name:
+        description: feat branch name to merge to (exclude 'feat/' from the name)
+        required: true
+        default: 'test'
+
+jobs:
+  merge-commit-topic-branch-pr-to-feat-branches:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+
+      - name: echo
+        run: |
+          echo ${{ steps.branch_name.outputs }}
+
+      # - name: enable merge commits
+      #   if: startsWith(steps.branch_name.outputs.base_ref_branch, "feat/${{ inputs.feat_branch }}")
+      #   uses: octokit/request-action@v2.x
+      #   with:
+      #     route: PATCH /repos/{owner}/{repo}
+      #     owner: aws-solutions
+      #     repo: solution-spark-on-aws
+      #     allow_merge_commit: true
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      # - name: merge commit topic branches pr to feat/*
+      #   if: startsWith(steps.branch_name.outputs.base_ref_branch, ${{ inputs.base_branch }})
+      #   uses: octokit/request-action@v2.x
+      #   with:
+      #     route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+      #     owner: aws-solutions
+      #     repo: solution-spark-on-aws
+      #     pull_number: ${{ inputs.pr_number }}
+      #     merge_method: 'merge'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      # - name: disable merge commits
+      #   uses: octokit/request-action@v2.x
+      #   with:
+      #     route: PATCH /repos/{owner}/{repo}
+      #     owner: aws-solutions
+      #     repo: solution-spark-on-aws
+      #     allow_merge_commit: false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
