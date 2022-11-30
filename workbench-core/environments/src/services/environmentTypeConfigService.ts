@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
   QueryParams,
   resourceTypeToKey,
@@ -40,9 +39,8 @@ export default class EnvironmentTypeConfigService {
     envTypeId: string,
     envTypeConfigId: string
   ): Promise<EnvironmentTypeConfig> {
-    const response = await this._dynamoDbService.get(this._buildEnvTypeConfigPkSk(envTypeConfigId)).execute();
-    const item = (response as GetItemCommandOutput).Item;
-    if (item === undefined || (item.dependency as unknown as string) !== envTypeId) {
+    const item = await this._dynamoDbService.getItem(this._buildEnvTypeConfigPkSk(envTypeConfigId));
+    if (item === undefined || (item.dependency as string) !== envTypeId) {
       throw Boom.notFound(`Could not find environment type config ${envTypeConfigId}`);
     } else {
       const envTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse(item);
