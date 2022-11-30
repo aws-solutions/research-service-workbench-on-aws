@@ -56,3 +56,4 @@ jobs:
           allow_merge_commit: false
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+          
