@@ -32,7 +32,8 @@ describe('aws-accounts create negative tests', () => {
     envMgmtRoleArn: randomTextGenerator.getFakeText('fakeEnvMgmtRoleArn'),
     hostingAccountHandlerRoleArn: randomTextGenerator.getFakeText('fakeHostingAccountHandlerRoleArn'),
     environmentInstanceFiles: randomTextGenerator.getFakeText('fakeEnvironmentInstanceFiles'),
-    encryptionKeyArn: randomTextGenerator.getFakeText('fakeEncryptionKeyArn')
+    encryptionKeyArn: randomTextGenerator.getFakeText('fakeEncryptionKeyArn'),
+    externalId: randomTextGenerator.getFakeText('fakeExternalId')
   };
 
   describe('Account already onboarded', () => {

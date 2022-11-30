@@ -10,7 +10,6 @@ import {
   UpdateItemCommandOutput,
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 
 /**
@@ -526,11 +525,7 @@ class Updater {
    * ```
    */
   public async execute(): Promise<UpdateItemCommandOutput> {
-    const result = await this._ddb.updateItem(this._internals.toParams());
-    if (result.Attributes) {
-      result.Attributes = unmarshall(result.Attributes);
-    }
-    return result;
+    return this._ddb.updateItem(this._internals.toParams());
   }
 }
 

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "add new ddb update method",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

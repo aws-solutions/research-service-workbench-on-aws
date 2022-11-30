@@ -53,7 +53,8 @@ describe('iamRoleCloneService', () => {
         // No target account role
         .rejectsOnce(
           new NoSuchEntityException({
-            $metadata: {}
+            $metadata: {},
+            message: ''
           })
         )
         .on(CreateRoleCommand)
