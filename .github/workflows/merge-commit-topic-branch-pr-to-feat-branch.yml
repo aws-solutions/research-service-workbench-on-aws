@@ -28,7 +28,7 @@ jobs:
 
       - name: echo
         run: |
-          echo ${{ steps.branch_name.outputs }}
+          echo "feat/${{ inputs.feat_branch_name }}"
 
       # - name: enable merge commits
       #   if: startsWith(steps.branch_name.outputs.base_ref_branch, "feat/${{ inputs.feat_branch }}")
