@@ -3,13 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { resourceTypeToKey } from '@aws/workbench-core-base';
-import _ from 'lodash';
 import ClientSession from '../../../support/clientSession';
-import { AccountHelper } from '../../../support/complex/accountHelper';
 import Account from '../../../support/resources/accounts/account';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
-import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('awsAccounts update negative tests', () => {
