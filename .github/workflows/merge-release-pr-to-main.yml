@@ -22,12 +22,19 @@ jobs:
           require: 'admin'
           username: ${{ github.triggering_actor }}
 
-      - name: Get branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v5.1
+      - name: Get PR info
+        id: pr_info
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/pulls/{pull_number}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          pull_number: ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: enable merge commits
-        if: steps.check_admin.outputs.require-result && startsWith(steps.branch_name.outputs.head_ref_branch, 'release/') && steps.branch_name.outputs.base_ref_branch == 'main'
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
@@ -38,7 +45,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: merge release branch pr to main
-        if: steps.check_admin.outputs.require-result && startsWith(steps.branch_name.outputs.head_ref_branch, 'release/') && steps.branch_name.outputs.base_ref_branch == 'main'
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         uses: octokit/request-action@v2.x
         with:
           route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
@@ -50,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: disable merge commits
-        if: steps.check_admin.outputs.require-result && startsWith(steps.branch_name.outputs.head_ref_branch, 'release/') && steps.branch_name.outputs.base_ref_branch == 'main'
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
         uses: octokit/request-action@v2.x
         with:
           route: PATCH /repos/{owner}/{repo}
