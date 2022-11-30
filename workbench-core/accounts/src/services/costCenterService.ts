@@ -119,7 +119,6 @@ export default class CostCenterService {
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     const response = (await this._dynamoDbService
-
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
@@ -141,6 +140,7 @@ export default class CostCenterService {
       createdAt: currentDateTime,
       updatedAt: currentDateTime,
       id: id,
+      dependency: request.accountId,
       accountId: request.accountId,
       description: request.description,
       name: request.name,

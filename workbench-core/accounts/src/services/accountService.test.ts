@@ -383,6 +383,7 @@ describe('AccountService', () => {
 
           costCenter = {
             accountId: '',
+            dependency: '',
             awsAccountId: '',
             createdAt: '',
             description: '',

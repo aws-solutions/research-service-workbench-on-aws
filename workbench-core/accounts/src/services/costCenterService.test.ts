@@ -86,6 +86,7 @@ describe('CostCenterService', () => {
           vpcId: account.vpcId!,
           name: 'a name',
           accountId: accountId,
+          dependency: accountId,
           description: 'a description',
           id: costCenterId
         };
@@ -420,6 +421,7 @@ describe('CostCenterService', () => {
           id: costCenterId,
           name: costCenterName,
           accountId: 'acc-someId',
+          dependency: 'acc-someId',
           description: costCenterDescription,
           subnetId: 'subnet-123',
           vpcId: 'vpc-123',
