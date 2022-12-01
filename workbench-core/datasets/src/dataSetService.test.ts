@@ -301,15 +301,23 @@ describe('DataSetService', () => {
     });
 
     it('returns nothing when the dataset is removed', async () => {
-      await expect(service.removeDataSet(mockDataSetId)).resolves.not.toThrow();
+      await expect(service.removeDataSet(mockDataSetId, () => Promise.resolve())).resolves.not.toThrow();
     });
 
     it('throws when an external endpoint exists on the DataSet.', async () => {
-      await expect(service.removeDataSet(mockDataSetWithEndpointId)).rejects.toThrow(
+      await expect(service.removeDataSet(mockDataSetWithEndpointId, () => Promise.resolve())).rejects.toThrow(
         new DataSetHasEndpointError(
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
         )
       );
+    });
+
+    it('throws when preconditions are not met', async () => {
+      await expect(
+        service.removeDataSet(mockDataSetId, async () => {
+          await Promise.reject(new Error('Preconditions are not met'));
+        })
+      ).rejects.toThrow('Preconditions are not met');
     });
   });
 

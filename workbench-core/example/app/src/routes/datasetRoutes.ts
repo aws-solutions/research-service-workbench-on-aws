@@ -156,7 +156,7 @@ export function setUpDSRoutes(
       }
 
       try {
-        await dataSetService.removeDataSet(req.params.datasetId);
+        await dataSetService.removeDataSet(req.params.datasetId, () => Promise.resolve());
       } catch (error) {
         if (isDataSetHasEndpointError(error)) {
           throw Boom.badRequest(error.message);
