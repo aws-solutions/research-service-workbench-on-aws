@@ -621,9 +621,10 @@ describe('DataSetService', () => {
 
     it('returns a presigned URL.', async () => {
       const ttlSeconds = 3600;
+      const fileName = 'test.txt';
 
       await expect(
-        service.getPresignedSinglePartUploadUrl(mockDataSetId, ttlSeconds, plugin)
+        service.getPresignedSinglePartUploadUrl(mockDataSetId, fileName, ttlSeconds, plugin)
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
   });
