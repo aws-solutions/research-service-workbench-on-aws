@@ -173,7 +173,7 @@ export const routesMap: RoutesMap = {
           subject: 'EnvironmentTypeConfig'
         }
       ],
-      PUT: [
+      PATCH: [
         {
           action: 'UPDATE',
           subject: 'EnvironmentTypeConfig'

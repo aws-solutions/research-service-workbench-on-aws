@@ -64,9 +64,12 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
-  environmentTypeConfigService: new EnvironmentTypeConfigService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeConfigService: new EnvironmentTypeConfigService(
+    new EnvironmentTypeService({
+      TABLE_NAME: process.env.STACK_NAME!
+    }),
+    aws.helpers.ddb
+  ),
   projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   }),

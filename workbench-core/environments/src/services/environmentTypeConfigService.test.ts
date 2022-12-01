@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
-jest.mock('uuid', () => ({ v4: () => envTypeConfigId }));
+const uuid = '40b01529-0c7f-4609-a1e2-715068da5f0e';
+const envTypeConfigId = `etc-${uuid}`;
+jest.mock('uuid', () => ({ v4: () => uuid }));
 import {
   DynamoDBClient,
   GetItemCommand,
@@ -15,53 +16,69 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import { mockClient } from 'aws-sdk-client-mock';
+import { EnvironmentType } from '../models/environmentType';
+import { EnvironmentTypeConfig } from '../models/environmentTypeConfig';
+
 import EnvironmentTypeConfigService from './environmentTypeConfigService';
+import EnvironmentTypeService from './environmentTypeService';
 
 describe('environmentTypeConfigService', () => {
+  const TABLE_NAME = 'exampleDDBTable';
+  const ddbServiceMock = new DynamoDBService({ region: 'us-east-1', table: TABLE_NAME });
+  const envTypeMock = new EnvironmentTypeService({ TABLE_NAME });
+  const envTypeConfigService = new EnvironmentTypeConfigService(envTypeMock, ddbServiceMock);
+  const ddbMock = mockClient(DynamoDBClient);
+  const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';
+  const envType: EnvironmentType = {
+    status: 'APPROVED',
+    createdAt: '2022-06-20T18:32:09.985Z',
+    name: 'Jupyter Notebook',
+    resourceType: 'envType',
+    provisioningArtifactId: 'pa-dqwijdnwq12w2',
+    params: {},
+    updatedAt: '2022-06-20T18:36:14.358Z',
+    sk: `ET#${envTypeId}`,
+    description: 'An Amazon SageMaker Jupyter Notebook',
+    id: envTypeId,
+    pk: `ET#${envTypeId}`,
+    productId: 'prod-dwqdqdqdwq2e3',
+    type: 'sagemaker'
+  };
+  const envTypeConfig: EnvironmentTypeConfig = {
+    createdAt: '2022-06-17T16:28:40.360Z',
+    name: 'config 1',
+    params: [],
+    updatedAt: '2022-06-17T21:25:24.333Z',
+    description: 'Example config 1',
+    id: envTypeConfigId,
+    type: 'sagemaker'
+  };
+  const envTypeConfigDDBItem = {
+    ...envTypeConfig,
+    dependency: envTypeId,
+    resourceType: 'envTypeConfig'
+  };
+
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
-  });
-  const ddbMock = mockClient(DynamoDBClient);
-  beforeEach(() => {
     jest.clearAllMocks();
     ddbMock.reset();
   });
-  const TABLE_NAME = 'exampleDDBTable';
-  const envTypeConfigService = new EnvironmentTypeConfigService({ TABLE_NAME });
-  const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';
-  const envTypeConfig = {
-    createdAt: '2022-06-17T16:28:40.360Z',
-    updatedBy: 'owner-123',
-    createdBy: 'owner-123',
-    name: 'config 1',
-    allowRoleIds: [],
-    resourceType: 'envTypeConfig',
-    // provisioningArtifactId: 'pa-dewjn123',
-    params: [],
-    updatedAt: '2022-06-17T21:25:24.333Z',
-    sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
-    owner: 'owner-123',
-    description: 'Example config 1',
-    id: envTypeConfigId,
-    pk: 'ETC',
-    // productId: 'prod-dasjk123',
-    type: 'sagemaker'
-  };
-
   describe('getEnvironmentTypeConfig', () => {
     test('valid id', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(envTypeConfig),
+        Item: marshall(envTypeConfigDDBItem),
         $metadata: {}
       };
       ddbMock
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: resourceTypeToKey.envTypeConfig,
-            sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+            pk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+            sk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
           })
         })
         .resolves(getItemResponse);
@@ -70,7 +87,7 @@ describe('environmentTypeConfigService', () => {
       const actualResponse = await envTypeConfigService.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
 
       // CHECK
-      expect(actualResponse).toEqual(getItemResponse.Item);
+      expect(actualResponse).toEqual(envTypeConfig);
     });
 
     test('invalid id', async () => {
@@ -119,11 +136,11 @@ describe('environmentTypeConfigService', () => {
         'eyJwayI6IkVUQyIsInNrIjoiRVQjMWIwNTAyZjMtMTIxZi00ZDYzLWIwM2EtNDRkYzc1NmU0YzIwRVRDIzQwYjAxNTI5LTBjN2YtNDYwOS1hMWUyLTcxNTA2OGRhNWYwZSJ9';
 
       // OPERATE
-      const actualResponse = await envTypeConfigService.listEnvironmentTypeConfigs(
-        envTypeId,
-        1,
-        validPaginationToken
-      );
+      const actualResponse = await envTypeConfigService.listEnvironmentTypeConfigs({
+        pageSize: 1,
+        paginationToken: validPaginationToken,
+        envTypeId
+      });
 
       // CHECK
       expect(actualResponse).toEqual({ data: [envTypeConfig] });
@@ -131,7 +148,11 @@ describe('environmentTypeConfigService', () => {
     test('invalidPaginationToken', async () => {
       // BUILD & OPERATE & CHECK
       await expect(
-        envTypeConfigService.listEnvironmentTypeConfigs(envTypeId, 1, 'invalidPaginationToken')
+        envTypeConfigService.listEnvironmentTypeConfigs({
+          pageSize: 1,
+          paginationToken: 'invalidPaginationToken',
+          envTypeId
+        })
       ).rejects.toThrow('Invalid paginationToken');
     });
   });
@@ -140,15 +161,15 @@ describe('environmentTypeConfigService', () => {
     test('valid id', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(envTypeConfig),
+        Item: marshall(envTypeConfigDDBItem),
         $metadata: {}
       };
       ddbMock
         .on(GetItemCommand, {
           TableName: TABLE_NAME,
           Key: marshall({
-            pk: resourceTypeToKey.envTypeConfig,
-            sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+            pk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+            sk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
           })
         })
         .resolves(getItemResponse);
@@ -156,18 +177,17 @@ describe('environmentTypeConfigService', () => {
       ddbMock
         .on(UpdateItemCommand)
         //@ts-ignore
-        .resolves({ Attributes: marshall({ ...envTypeConfig, name: 'FakeName' }) });
+        .resolves({ Attributes: marshall({ ...envTypeConfig, description: 'FakeDescription' }) });
 
       // OPERATE
-      const actualResponse = await envTypeConfigService.updateEnvironmentTypeConfig(
-        'owner-123',
-        envTypeId,
+      const actualResponse = await envTypeConfigService.updateEnvironmentTypeConfig({
+        description: 'FakeDescription',
         envTypeConfigId,
-        { name: 'FakeName' }
-      );
+        envTypeId
+      });
 
       // CHECK
-      expect(actualResponse).toEqual({ ...envTypeConfig, name: 'FakeName' });
+      expect(actualResponse).toEqual({ ...envTypeConfig, description: 'FakeDescription' });
     });
 
     test('invalid id', async () => {
@@ -181,38 +201,23 @@ describe('environmentTypeConfigService', () => {
       const invalidEnvTypeConfigId = 'invalidEnvTypeConfigId';
       // OPERATE & CHECK
       await expect(
-        envTypeConfigService.updateEnvironmentTypeConfig(
-          'owner-123',
-          invalidEnvTypeId,
-          invalidEnvTypeConfigId,
-          {
-            name: 'FakeName'
-          }
-        )
+        envTypeConfigService.updateEnvironmentTypeConfig({
+          description: 'FakeDescription',
+          envTypeId: invalidEnvTypeId,
+          envTypeConfigId: invalidEnvTypeConfigId
+        })
       ).rejects.toThrow(
         `Could not find envType ${invalidEnvTypeId} with envTypeConfig ${invalidEnvTypeConfigId} to update`
       );
-    });
-
-    test('update attributes that are not allowed', async () => {
-      // BUILD & OPERATE & CHECK
-      await expect(
-        envTypeConfigService.updateEnvironmentTypeConfig('owner-123', envTypeId, envTypeConfigId, {
-          productId: 'abc',
-          provisioningArtifactId: 'xyz'
-        })
-      ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
     });
   });
 
   describe('createNewEnvironmentTypeConfig', () => {
     const createParams = {
       name: 'config 1',
-      allowRoleIds: [],
       resourceType: 'envTypeConfig',
       provisioningArtifactId: 'pa-dewjn123',
       params: [],
-      owner: 'owner-123',
       description: 'Example config 1',
       productId: 'prod-dasjk123',
       type: 'sagemaker'
@@ -222,13 +227,12 @@ describe('environmentTypeConfigService', () => {
       ddbMock.on(UpdateItemCommand).resolves({
         Attributes: marshall(envTypeConfig)
       });
-
+      jest.spyOn(EnvironmentTypeService.prototype, 'getEnvironmentType').mockResolvedValueOnce(envType);
       // OPERATE
-      const actualResponse = await envTypeConfigService.createNewEnvironmentTypeConfig(
-        'owner-123',
+      const actualResponse = await envTypeConfigService.createNewEnvironmentTypeConfig({
         envTypeId,
-        createParams
-      );
+        ...createParams
+      });
 
       // CHECK
       expect(actualResponse).toEqual(envTypeConfig);
@@ -239,11 +243,13 @@ describe('environmentTypeConfigService', () => {
       ddbMock.on(UpdateItemCommand).resolves({
         Attributes: undefined
       });
-
+      jest.spyOn(EnvironmentTypeService.prototype, 'getEnvironmentType').mockResolvedValueOnce(envType);
       // OPERATE & CHECK
       await expect(
-        envTypeConfigService.createNewEnvironmentTypeConfig('owner-123', envTypeId, createParams)
-      ).rejects.toThrow(`Unable to create environment type with params: ${JSON.stringify(createParams)}`);
+        envTypeConfigService.createNewEnvironmentTypeConfig({ envTypeId, ...createParams })
+      ).rejects.toThrow(
+        `Unable to create environment type with params: ${JSON.stringify({ envTypeId, ...createParams })}`
+      );
     });
   });
 });

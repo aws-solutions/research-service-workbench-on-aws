@@ -12,21 +12,31 @@ import {
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
 import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
-import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnectionLinkPlaceholder';
-import EnvironmentConnectionService from './interfaces/environmentConnectionService';
-import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
-import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
+import {
+  CreateEnvironmentTypeConfigRequest,
+  CreateEnvironmentTypeConfigRequestParser
+} from './models/createEnvironmentTypeConfigRequest';
+import EnvironmentConnectionLinkPlaceholder from './models/environmentConnectionLinkPlaceholder';
+import EnvironmentConnectionService from './models/environmentConnectionService';
+import EnvironmentLifecycleService from './models/environmentLifecycleService';
+import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
+import {
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
+} from './models/listEnvironmentTypeConfigsRequest';
 import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
-} from './interfaces/listEnvironmentTypesRequest';
+} from './models/listEnvironmentTypesRequest';
+import {
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser
+} from './models/updateEnvironmentTypeConfigsRequest';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
-import CreateEnvironmentTypeConfigSchema from './schemas/createEnvironmentTypeConfig';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
-import UpdateEnvironmentTypeConfigSchema from './schemas/updateEnvironmentTypeConfig';
 import { EnvironmentService, Environment } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
@@ -52,12 +62,16 @@ export {
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
-  CreateEnvironmentTypeConfigSchema,
-  UpdateEnvironmentTypeConfigSchema,
   CreateEnvironmentTypeSchema,
   UpdateEnvironmentTypeSchema,
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeHandler,
   ListEnvironmentTypesRequest,
-  ListEnvironmentTypesRequestParser
+  ListEnvironmentTypesRequestParser,
+  CreateEnvironmentTypeConfigRequestParser,
+  CreateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequest,
+  UpdateEnvironmentTypeConfigRequestParser,
+  ListEnvironmentTypeConfigsRequest,
+  ListEnvironmentTypeConfigsRequestParser
 };

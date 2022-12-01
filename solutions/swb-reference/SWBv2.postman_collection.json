@@ -647,7 +647,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -661,7 +661,7 @@
               "variable": [
                 {
                   "key": "envTypeId",
-                  "value": "9a115bda-ab83-464b-ae94-c258370beeb6",
+                  "value": "",
                   "description": "ID of environment type associated with this config"
                 }
               ]
@@ -672,7 +672,7 @@
         {
           "name": "Update envTypeConfig",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
@@ -687,7 +687,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }",
               "options": {
                 "raw": {
                   "language": "json"
