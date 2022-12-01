@@ -225,6 +225,8 @@ Resources:
         rules_to_suppress:
           - id: W11
             reason: "For the EC2 and sagemaker actions listed above IAM does not support resource-level permissions and requires all resources to be chosen"
+          - id: W28
+            reason: "This role needs to have an explicit name for main account to assume specific role(s) in hosting account"
 
   EnvMgmtPermissionsBoundary:
     Type: AWS::IAM::ManagedPolicy
