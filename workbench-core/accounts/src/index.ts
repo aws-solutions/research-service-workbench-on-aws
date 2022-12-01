@@ -4,6 +4,18 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import {
+  DeleteCostCenterRequestParser,
+  DeleteCostCenterRequest
+} from './models/costCenters/deleteCostCenterRequest';
+import {
+  ListCostCentersRequest,
+  ListCostCentersRequestParser
+} from './models/costCenters/listCostCentersRequest';
+import {
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser
+} from './models/costCenters/updateCostCenterRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -18,5 +30,11 @@ export {
   AccountService,
   CostCenterService,
   ProjectService,
-  CreateAccountSchema
+  CreateAccountSchema,
+  ListCostCentersRequest,
+  ListCostCentersRequestParser,
+  UpdateCostCenterRequest,
+  UpdateCostCenterRequestParser,
+  DeleteCostCenterRequest,
+  DeleteCostCenterRequestParser
 };

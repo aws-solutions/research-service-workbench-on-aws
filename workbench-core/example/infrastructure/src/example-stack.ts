@@ -6,19 +6,29 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
-import { Aws, aws_cognito, CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
+  CfnDeployment,
+  CfnMethod,
+  CfnStage,
   LambdaIntegration,
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { AnyPrincipal, Effect, Policy, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { AttributeType, BillingMode, CfnTable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import {
+  AnyPrincipal,
+  CfnPolicy,
+  Effect,
+  Policy,
+  PolicyStatement,
+  ServicePrincipal
+} from 'aws-cdk-lib/aws-iam';
 import { Key } from 'aws-cdk-lib/aws-kms';
-import { Alias, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
-import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
+import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 import { EncryptionKeyWithRotation } from './constructs/encryptionKeyWithRotation';
@@ -39,11 +49,12 @@ export class ExampleStack extends Stack {
   public constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const domainSuffix = `${Aws.ACCOUNT_ID}-${Aws.REGION}`;
     const exampleCognito = this._createExampleCognitoResources(
-      'example-express-domain',
+      `example-app-domain-${domainSuffix}`,
       ['http://localhost:3000/'],
-      'example-express-userPool',
-      'example-express-userPoolClient'
+      `example-app-userPool`,
+      `example-app-userPoolClient`
     );
 
     this._exampleLambdaEnvVars = {
@@ -57,7 +68,7 @@ export class ExampleStack extends Stack {
     this._s3AccessLogsPrefix = 'example-access-log';
     const createEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
       this,
-      'Example-EncryptionKey'
+      'DataSetBucket-EncryptionKey'
     );
     const encryptionKey: Key = createEncryptionKey.key;
     this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
@@ -66,22 +77,55 @@ export class ExampleStack extends Stack {
       s3OutputId: 'ExampleS3BucketDatasetsArnOutput',
       encryptionKey: encryptionKey,
       serverAccessLogsBucket: this._accessLogsBucket,
-      serverAccessLogsPrefix: this._s3AccessLogsPrefix
+      serverAccessLogsPrefix: this._s3AccessLogsPrefix,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     });
     const datasetBucket: Bucket = createDatasetBucket.bucket;
+
+    new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
+      value: datasetBucket.bucketName
+    });
 
     this._addAccessPointDelegationStatement(datasetBucket);
 
     const exampleLambda: Function = this._createLambda(datasetBucket);
 
-    this._createDDBTable(exampleLambda);
+    const table = this._createDDBTable(exampleLambda);
+
+    exampleLambda.addEnvironment('DDB_TABLE_NAME', table.tableName);
 
     this._createRestApi(exampleLambda);
+
+    //CFN NAG Suppression
+    const customResourceLambdaNode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287');
+    const customResourceLambdaMetaDataNode = customResourceLambdaNode.node.defaultChild as CfnFunction;
+    customResourceLambdaMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            'AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs'
+        },
+        {
+          id: 'W89',
+          reason:
+            'AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'AWSCustomResource Lambda Function used for provisioning infrastructure, reserved concurrency is not required'
+        }
+      ]
+    });
 
     new CfnOutput(this, 'AwsRegion', {
       value: Aws.REGION
     });
 
+    //CDK NAG Suppression
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource',
@@ -98,7 +142,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/Resource',
-      [{ id: 'AwsSolutions-L1', reason: 'Should be fixed in the @aws/workbench-core-infrastructure package' }]
+      [{ id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }]
     );
 
     NagSuppressions.addResourceSuppressionsByPath(
@@ -115,7 +159,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
       {
         id: 'AwsSolutions-DDB3',
-        reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB'
+        reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app'
       }
     ]);
 
@@ -139,20 +183,36 @@ export class ExampleStack extends Stack {
         id: 'AwsSolutions-APIG6',
         reason: 'I am ok with not enabling Cloudwatch logging at stage level, this is an example App'
       },
-      { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authentication implemented' },
-      { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authentication implemented' }
+      { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authorization implemented at app level' },
+      { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authorization implemented at app level' }
     ]);
   }
 
   // DynamoDB Table
   private _createDDBTable(exampleLambda: Function): Table {
-    const tableName: string = `${this.stackName}`;
-    const table = new Table(this, tableName, {
+    const table = new Table(this, `${this.stackName}`, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
-      tableName: tableName,
+      // tableName: tableName,  W28: Resource found with an explicit name, this disallows updates that require replacement of this resource
       billingMode: BillingMode.PAY_PER_REQUEST
     });
+
+    //CFN NAG Suppression
+    const tableNode = table.node.defaultChild as CfnTable;
+    tableNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W78',
+          reason: 'This is an example app for integration test, backup is not required'
+        },
+        {
+          id: 'W74',
+          reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
+        }
+      ]
+    });
+
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({
       indexName: 'getResourceByName',
@@ -192,7 +252,9 @@ export class ExampleStack extends Stack {
     });
     // Grant the Lambda Functions read access to the DynamoDB table
     table.grantReadWriteData(exampleLambda);
+
     new CfnOutput(this, 'ExampleDynamoDBTableOutput', { value: table.tableArn });
+    new CfnOutput(this, 'ExampleDynamoDBTableName', { value: table.tableName });
     return table;
   }
 
@@ -213,18 +275,20 @@ export class ExampleStack extends Stack {
   }
 
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
-    const s3Bucket = new Bucket(this, 'ExampleS3AccessLogs', {
+    const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       encryption: BucketEncryption.S3_MANAGED,
-      enforceSSL: true
+      enforceSSL: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
     });
 
-    s3Bucket.addToResourcePolicy(
+    exampleS3AccessLogsBucket.addToResourcePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
         actions: ['s3:PutObject'],
-        resources: [`${s3Bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        resources: [`${exampleS3AccessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
             'aws:SourceAccount': Aws.ACCOUNT_ID
@@ -233,23 +297,50 @@ export class ExampleStack extends Stack {
       })
     );
 
+    //CFN NAG Suppression
+    const exampleS3AccessLogsBucketNode = exampleS3AccessLogsBucket.node.defaultChild as CfnBucket;
+    exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason:
+            "This is an access log bucket, we don't need to configure access logging for access log buckets"
+        }
+      ]
+    });
+
     new CfnOutput(this, bucketNameOutput, {
-      value: s3Bucket.bucketName,
+      value: exampleS3AccessLogsBucket.bucketName,
       exportName: bucketNameOutput
     });
 
-    NagSuppressions.addResourceSuppressions(s3Bucket, [
+    //CDK NAG Suppression
+    NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
       {
         id: 'AwsSolutions-S1',
-        reason: 'I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket'
+        reason:
+          "This is an access log bucket, we don't need to configure access logging for access log buckets"
       }
     ]);
 
-    return s3Bucket;
+    return exampleS3AccessLogsBucket;
   }
 
   private _createRestApi(exampleLambda: Function): void {
     const logGroup = new LogGroup(this, 'ExampleAPIGatewayAccessLogs');
+
+    const logGroupNode = logGroup.node.defaultChild as CfnLogGroup;
+    logGroupNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W84',
+          reason: 'Cloudwatch LogGroups are encrypted by default'
+        }
+      ]
+    });
+
     const API: RestApi = new RestApi(this, `ExampleRestApi`, {
       restApiName: 'ExampleRestAPI',
       description: 'Example Rest API',
@@ -270,7 +361,9 @@ export class ExampleStack extends Stack {
             sourceIp: '$context.identity.sourceIp',
             userAgent: '$context.identity.userAgent'
           })
-        )
+        ),
+        throttlingBurstLimit: 50,
+        throttlingRateLimit: 100
       },
       defaultCorsPreflightOptions: {
         allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'CSRF-Token'],
@@ -278,6 +371,32 @@ export class ExampleStack extends Stack {
         allowCredentials: true,
         allowOrigins: ['http://localhost:3000/']
       }
+    });
+
+    //CFN NAG Suppression
+    const deploymentNode = API.node.findChild('Deployment');
+    const deploymentMetaDataNode = deploymentNode.node.defaultChild as CfnDeployment;
+    deploymentMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W68',
+          reason: 'No need to enforce Usage Plan. This is an example App'
+        }
+      ]
+    });
+
+    //CFN NAG Suppression
+    const deploymentStageNode = API.node.findChild('DeploymentStage.dev');
+    const deploymentStageMetaDataNode = deploymentStageNode.node.defaultChild as CfnStage;
+    deploymentStageMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W64',
+          reason: 'No need to enforce Usage Plan. This is an example App'
+        }
+      ]
     });
 
     new CfnOutput(this, 'ExampleAPIEndpoint', {
@@ -294,26 +413,38 @@ export class ExampleStack extends Stack {
       defaultIntegration: new LambdaIntegration(alias)
     });
 
-    NagSuppressions.addResourceSuppressions(
-      API,
-      [
+    //CFN NAG Suppression
+    const anyMethodNode = API.node.findChild('Default').node.findChild('ANY');
+    const anyMethodMetaDataNode = anyMethodNode.node.defaultChild as CfnMethod;
+    anyMethodMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
         {
-          id: 'AwsSolutions-APIG2',
-          reason: 'I am OK with not enabling request validation for Rest API, this is an example App'
+          id: 'W59',
+          reason: 'Making use of custom Authorization at the App level, this is ok !'
         }
-      ],
-      true
-    );
+      ]
+    });
+
+    //CFN NAG Suppression
+    const anyProxyNode = API.node.findChild('Default').node.findChild('{proxy+}').node.findChild('ANY');
+    const anyProxyMetaDataNode = anyProxyNode.node.defaultChild as CfnMethod;
+    anyProxyMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W59',
+          reason: 'Making use of custom Authorization at the App level, this is ok !'
+        }
+      ]
+    });
 
     NagSuppressions.addResourceSuppressions(
       API,
       [
         {
           id: 'AwsSolutions-APIG2',
-          reason: 'I am OK with not enabling request validation for Rest API, this is an example App',
-          appliesTo: [
-            'Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs'
-          ]
+          reason: 'I am OK with not enabling request validation for Rest API, this is an example App'
         }
       ],
       true
@@ -359,8 +490,14 @@ export class ExampleStack extends Stack {
           sid: 'EventbridgeAccess'
         }),
         new PolicyStatement({
-          actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-          resources: ['*']
+          actions: ['logs:CreateLogGroup'],
+          resources: [`arn:${Aws.PARTITION}:logs:${Aws.REGION}:${Aws.ACCOUNT_ID}:*`]
+        }),
+        new PolicyStatement({
+          actions: ['logs:CreateLogStream', 'logs:PutLogEvents'],
+          resources: [
+            `arn:${Aws.PARTITION}:logs:${Aws.REGION}:${Aws.ACCOUNT_ID}:log-group:/aws/lambda/${exampleLambda.functionName}:*`
+          ]
         }),
         new PolicyStatement({
           sid: 'datasetS3Access',
@@ -397,6 +534,8 @@ export class ExampleStack extends Stack {
             'cognito-idp:AdminListGroupsForUser',
             'cognito-idp:AdminRemoveUserFromGroup',
             'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:AdminEnableUser',
+            'cognito-idp:AdminDisableUser',
             'cognito-idp:CreateGroup',
             'cognito-idp:DeleteGroup',
             'cognito-idp:ListGroups',
@@ -408,6 +547,39 @@ export class ExampleStack extends Stack {
       ]
     });
 
+    //CFN NAG Suppression
+    const exampleLambdaNode = exampleLambda.node.defaultChild as CfnFunction;
+    exampleLambdaNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'Lambda Function has permission to write to Cloudwatch Logs in exampleLambdaPolicy'
+        },
+        {
+          id: 'W89',
+          reason: 'This is an example Lambda Function for integration test and is not deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason: 'This is an example Lambda Function, reserved concurrency is not required'
+        }
+      ]
+    });
+
+    //CFN NAG Suppression
+    const exampleLambdaPolicyNode = exampleLambdaPolicy.node.defaultChild as CfnPolicy;
+    exampleLambdaPolicyNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W12',
+          reason: 'I am ok with using wildcard here !'
+        }
+      ]
+    });
+
+    //CDK NAG Suppression
     NagSuppressions.addResourceSuppressions(
       exampleLambdaPolicy,
       [
@@ -425,6 +597,7 @@ export class ExampleStack extends Stack {
       value: exampleLambda.role!.roleArn
     });
 
+    //CDK NAG Suppression
     NagSuppressions.addResourceSuppressions(
       exampleLambda,
       [
@@ -477,6 +650,7 @@ export class ExampleStack extends Stack {
       exportName: 'ExampleCognitoDomain'
     });
 
+    //CDK NAG Suppression
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/ExampleServiceWorkbenchCognito/WorkbenchUserPool/Resource',
