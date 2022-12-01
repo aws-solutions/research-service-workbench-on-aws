@@ -8,7 +8,7 @@
 import { join } from 'path';
 import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
 
-import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { App, CfnOutput, CfnResource, Duration, Stack } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
   LambdaIntegration,
@@ -155,6 +155,29 @@ export class SWBStack extends Stack {
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
+    const metadatanode = this.node.findChild('AWS679f53fac002430cb0da5b7982bd2287').node
+      .defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        },
+        {
+          id: 'W89',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        },
+        {
+          id: 'W92',
+          reason:
+            "Lambda created by using AWSCustomResource and is managed by CDK internals. We don't want to jeopardize it's functionality"
+        }
+      ]
+    });
+
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
   }
@@ -247,7 +270,7 @@ export class SWBStack extends Stack {
         }),
         new PolicyStatement({
           actions: ['cloudformation:GetTemplateSummary'],
-          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates teh product can deploy in different accounts, which we don't know at time of creation
+          resources: ['*'] // Needed to update SC Product. Must be wildcard to cover all possible templates the product can deploy in different accounts, which we don't know at time of creation
         }),
         new PolicyStatement({
           actions: ['s3:GetObject'],
@@ -339,6 +362,23 @@ export class SWBStack extends Stack {
     new CfnOutput(this, launchConstraintRoleNameOutput, {
       value: iamRole.roleName
     });
+
+    const metadatanode = iamRole.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W28',
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+        },
+        {
+          id: 'W11',
+          reason: 'TODO:triage IAM role should not allow * resource on its permissions policy'
+        }
+      ]
+    });
+
     return iamRole;
   }
 
@@ -372,6 +412,17 @@ export class SWBStack extends Stack {
     new CfnOutput(this, bucketNameOutput, {
       value: s3Bucket.bucketName,
       exportName: bucketNameOutput
+    });
+
+    const metadatanode = s3Bucket.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
+        }
+      ]
     });
 
     return s3Bucket;
@@ -422,6 +473,21 @@ export class SWBStack extends Stack {
         }
       })
     );
+
+    const metadatanode = s3Bucket.policy?.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'F15',
+          reason: 'TODO:triage S3 Bucket policy should not allow * action'
+        },
+        {
+          id: 'F16',
+          reason: 'TODO:triage S3 Bucket policy should not allow * principal'
+        }
+      ]
+    });
   }
 
   private _createS3ArtifactsBuckets(s3ArtifactName: string, mainAcctEncryptionKey: Key): Bucket {
@@ -432,6 +498,16 @@ export class SWBStack extends Stack {
     const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, mainAcctEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
 
+    const metadatanode = bucket.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W35',
+          reason: 'TODO:triage S3 Bucket should have access logging configured'
+        }
+      ]
+    });
     new CfnOutput(this, 'DataSetsBucketName', {
       value: bucket.bucketName
     });
@@ -510,6 +586,27 @@ export class SWBStack extends Stack {
       value: statusHandlerLambda.functionArn
     });
 
+    const metadatanode = statusHandlerLambda.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (statusHandlerLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (statusHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
+
     return statusHandlerLambda;
   }
 
@@ -584,6 +681,17 @@ export class SWBStack extends Stack {
       ]
     });
 
+    const lambdaPolicyMetaDataNode = lambdaPolicy.node.defaultChild as CfnResource;
+    lambdaPolicyMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W76',
+          reason: 'TODO:triage (AccountHandlerLambdaPolicy) SPCM for IAM policy document is higher than 25'
+        }
+      ]
+    });
+
     if (!_.isEmpty(amiIdsList)) {
       lambdaPolicy.addStatements(
         new PolicyStatement({
@@ -606,6 +714,27 @@ export class SWBStack extends Stack {
     });
     eventRule.addTarget(new targets.LambdaFunction(lambda));
 
+    const lambdaMetadataNode = lambda.node.defaultChild as CfnResource;
+    lambdaMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (AccountHandlerLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (AccountHandlerLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
+    });
+
     return lambda;
   }
 
@@ -620,102 +749,141 @@ export class SWBStack extends Stack {
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
       memorySize: 832
     });
-    apiLambda.role?.attachInlinePolicy(
-      new Policy(this, 'apiLambdaPolicy', {
-        statements: [
-          new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*'],
-            resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
-            sid: 'EventBridgeAccess'
-          }),
-          new PolicyStatement({
-            actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
-            resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
-            sid: 'CfnAccess'
-          }),
-          new PolicyStatement({
-            actions: ['servicecatalog:ListLaunchPaths'],
-            resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
-            sid: 'ScAccess'
-          }),
-          new PolicyStatement({
-            actions: ['cognito-idp:DescribeUserPoolClient'],
-            resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
-            sid: 'CognitoAccess'
-          }),
-          new PolicyStatement({
-            actions: ['sts:AssumeRole'],
-            resources: ['arn:aws:iam::*:role/*env-mgmt', 'arn:aws:iam::*:role/*hosting-account-role'],
-            sid: 'AssumeRole'
-          }),
-          new PolicyStatement({
-            actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
-            resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
-            sid: 'KMSAccess'
-          }),
-          new PolicyStatement({
-            actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
-            resources: ['*'],
-            sid: 'EventbridgeAccess'
-          }),
-          new PolicyStatement({
-            actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-            resources: ['*']
-          }),
-          new PolicyStatement({
-            sid: 'datasetS3Access',
-            actions: [
-              's3:GetObject',
-              's3:GetObjectVersion',
-              's3:GetObjectTagging',
-              's3:AbortMultipartUpload',
-              's3:ListMultipartUploadParts',
-              's3:GetBucketPolicy',
-              's3:PutBucketPolicy',
-              's3:PutObject',
-              's3:PutObjectAcl',
-              's3:PutObjectTagging',
-              's3:ListBucket',
-              's3:PutAccessPointPolicy',
-              's3:GetAccessPointPolicy',
-              's3:CreateAccessPoint',
-              's3:DeleteAccessPoint'
-            ],
-            resources: [
-              datasetBucket.bucketArn,
-              `${datasetBucket.bucketArn}/*`,
-              `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
-            ]
-          }),
-          new PolicyStatement({
-            sid: 'environmentBootstrapS3Access',
-            actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
-            resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
-          }),
-          new PolicyStatement({
-            sid: 'cognitoAccess',
-            actions: [
-              'cognito-idp:AdminAddUserToGroup',
-              'cognito-idp:AdminCreateUser',
-              'cognito-idp:AdminDeleteUser',
-              'cognito-idp:AdminGetUser',
-              'cognito-idp:AdminListGroupsForUser',
-              'cognito-idp:AdminRemoveUserFromGroup',
-              'cognito-idp:AdminUpdateUserAttributes',
-              'cognito-idp:CreateGroup',
-              'cognito-idp:DeleteGroup',
-              'cognito-idp:ListGroups',
-              'cognito-idp:ListUsers',
-              'cognito-idp:ListUsersInGroup'
-            ],
-            resources: ['*']
-          })
-        ]
-      })
-    );
+
+    const apiLambdaPolicy = new Policy(this, 'apiLambdaPolicy', {
+      statements: [
+        new PolicyStatement({
+          actions: ['events:DescribeRule', 'events:Put*'],
+          resources: [`arn:aws:events:${AWS_REGION}:${this.account}:event-bus/default`],
+          sid: 'EventBridgeAccess'
+        }),
+        new PolicyStatement({
+          actions: ['cloudformation:DescribeStacks', 'cloudformation:DescribeStackEvents'],
+          resources: [`arn:aws:cloudformation:${AWS_REGION}:*:stack/${this.stackName}*`],
+          sid: 'CfnAccess'
+        }),
+        new PolicyStatement({
+          actions: ['servicecatalog:ListLaunchPaths'],
+          resources: [`arn:aws:catalog:${AWS_REGION}:*:product/*`],
+          sid: 'ScAccess'
+        }),
+        new PolicyStatement({
+          actions: ['cognito-idp:DescribeUserPoolClient'],
+          resources: [`arn:aws:cognito-idp:${AWS_REGION}:${this.account}:userpool/*`],
+          sid: 'CognitoAccess'
+        }),
+        new PolicyStatement({
+          actions: ['sts:AssumeRole'],
+          resources: [
+            'arn:aws:iam::*:role/*EnvManagementRole*',
+            'arn:aws:iam::*:role/*HostingAccountHandlerRol*'
+          ],
+          sid: 'AssumeRole'
+        }),
+        new PolicyStatement({
+          actions: ['kms:GetKeyPolicy', 'kms:PutKeyPolicy', 'kms:GenerateDataKey'], //GenerateDataKey is required when creating a DS through the API
+          resources: [`arn:aws:kms:${AWS_REGION}:${this.account}:key/*`],
+          sid: 'KMSAccess'
+        }),
+        new PolicyStatement({
+          actions: ['events:DescribeRule', 'events:Put*', 'events:RemovePermission'],
+          resources: ['*'],
+          sid: 'EventbridgeAccess'
+        }),
+        new PolicyStatement({
+          actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+          resources: ['*']
+        }),
+        new PolicyStatement({
+          sid: 'datasetS3Access',
+          actions: [
+            's3:GetObject',
+            's3:GetObjectVersion',
+            's3:GetObjectTagging',
+            's3:AbortMultipartUpload',
+            's3:ListMultipartUploadParts',
+            's3:GetBucketPolicy',
+            's3:PutBucketPolicy',
+            's3:PutObject',
+            's3:PutObjectAcl',
+            's3:PutObjectTagging',
+            's3:ListBucket',
+            's3:PutAccessPointPolicy',
+            's3:GetAccessPointPolicy',
+            's3:CreateAccessPoint',
+            's3:DeleteAccessPoint'
+          ],
+          resources: [
+            datasetBucket.bucketArn,
+            `${datasetBucket.bucketArn}/*`,
+            `arn:aws:s3:${this.region}:${this.account}:accesspoint/*`
+          ]
+        }),
+        new PolicyStatement({
+          sid: 'environmentBootstrapS3Access',
+          actions: ['s3:GetObject', 's3:GetBucketPolicy', 's3:PutBucketPolicy'],
+          resources: [artifactS3Bucket.bucketArn, `${artifactS3Bucket.bucketArn}/*`]
+        }),
+        new PolicyStatement({
+          sid: 'cognitoAccess',
+          actions: [
+            'cognito-idp:AdminAddUserToGroup',
+            'cognito-idp:AdminCreateUser',
+            'cognito-idp:AdminDeleteUser',
+            'cognito-idp:AdminGetUser',
+            'cognito-idp:AdminListGroupsForUser',
+            'cognito-idp:AdminRemoveUserFromGroup',
+            'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:CreateGroup',
+            'cognito-idp:DeleteGroup',
+            'cognito-idp:ListGroups',
+            'cognito-idp:ListUsers',
+            'cognito-idp:ListUsersInGroup'
+          ],
+          resources: ['*']
+        })
+      ]
+    });
+
+    const apiLambdaPolicyMetadataNode = apiLambdaPolicy.node.defaultChild as CfnResource;
+    apiLambdaPolicyMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W76',
+          reason: 'TODO:triage (ApiLambdaPolicy) SPCM for IAM policy document is higher than 25'
+        },
+        {
+          id: 'W12',
+          reason: 'TODO:triage (ApiLambdaPolicy) IAM policy should not allow * resource'
+        }
+      ]
+    });
+
+    apiLambda.role?.attachInlinePolicy(apiLambdaPolicy);
 
     new CfnOutput(this, 'ApiLambdaRoleOutput', {
       value: apiLambda.role!.roleArn
+    });
+
+    const apiLambdaMetadataNode = apiLambda.node.defaultChild as CfnResource;
+    apiLambdaMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W58',
+          reason: 'TODO:triage (ApiLambda) Lambda functions require permission to write CloudWatch Logs'
+        },
+        {
+          id: 'W89',
+          reason: 'TODO:triage (ApiLambda) Lambda functions should be deployed inside a VPC'
+        },
+        {
+          id: 'W92',
+          reason:
+            'TODO:triage (ApiLambda) Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions'
+        }
+      ]
     });
 
     return apiLambda;
@@ -724,6 +892,17 @@ export class SWBStack extends Stack {
   // API Gateway
   private _createRestApi(apiLambda: Function): void {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
+    const metadatanode = logGroup.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W84', //was 68...
+          reason: 'TODO:triage CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data'
+        }
+      ]
+    });
+
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
       restApiName: 'Backend API Name',
       description: 'Backend API',
@@ -754,6 +933,17 @@ export class SWBStack extends Stack {
       }
     });
 
+    const metadatanode1 = API.latestDeployment?.node.defaultChild as CfnResource;
+    metadatanode1.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W68',
+          reason: 'placeholder2'
+        }
+      ]
+    });
+
     new CfnOutput(this, 'apiUrlOutput', {
       value: API.url
     });
@@ -774,6 +964,41 @@ export class SWBStack extends Stack {
         defaultIntegration: new LambdaIntegration(alias)
       });
     }
+    let childMetadataNode = API.node.findChild('DeploymentStage.dev').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W64',
+          reason: 'TODO:triage resources should be associated with an AWS::ApiGateway::UsagePlan.'
+        }
+      ]
+    });
+
+    childMetadataNode = API.node.findChild('Default').node.findChild('ANY').node.defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W59',
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
+      ]
+    });
+
+    childMetadataNode = API.node.findChild('Default').node.findChild('{proxy+}').node.findChild('ANY').node
+      .defaultChild as CfnResource;
+    childMetadataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W59',
+          reason:
+            "TODO:triage should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.."
+        }
+      ]
+    });
   }
 
   // DynamoDB Table
@@ -831,6 +1056,28 @@ export class SWBStack extends Stack {
     table.grantReadWriteData(statusHandler);
     table.grantReadWriteData(createAccountHandler);
     new CfnOutput(this, 'dynamoDBTableOutput', { value: table.tableArn });
+
+    const metadatanode = table.node.defaultChild as CfnResource;
+    metadatanode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        {
+          id: 'W28',
+          reason:
+            'TODO:triage Resource found with an explicit name, this disallows updates that require replacement of this resource'
+        },
+        {
+          id: 'W74',
+          reason: 'TODO:triage DynamoDB table should have encryption enabled using a CMK stored in KMS'
+        },
+        {
+          id: 'W78',
+          reason:
+            'TODO:triage DynamoDB table should have backup enabled, should be set using PointInTimeRecoveryEnabled'
+        }
+      ]
+    });
+
     return table;
   }
 
