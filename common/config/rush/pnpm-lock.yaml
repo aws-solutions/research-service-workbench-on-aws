@@ -267,6 +267,7 @@ importers:
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@vendia/serverless-express': 4.8.0
       aws-sdk-client-mock: 0.6.2_80f51e9f8ced5e411eb756f388f0cc3a
+      cdk-nag: 2.14.26_8d994d7bf27edab84c843ce1928354a1
       csrf: 3.1.0
       express: 4.18.1
       js-yaml: 4.1.0
@@ -8260,7 +8261,6 @@ packages:
     dependencies:
       aws-cdk-lib: 2.29.1_constructs@10.1.25
       constructs: 10.1.25
-    dev: true
 
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
