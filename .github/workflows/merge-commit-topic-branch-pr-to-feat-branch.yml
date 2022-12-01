@@ -30,12 +30,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
-      - name: echo
-        run: |
-          echo ${{ fromJson(steps.pr_info.outputs.data).head.ref }}
-          echo ${{ fromJson(steps.pr_info.outputs.data).base.ref }}
-          echo "${{ inputs.target_feat_branch }}"
-
       - name: enable merge commits
         if: startsWith(fromJson(steps.pr_info.outputs.data).base.ref, 'feat/') && fromJson(steps.pr_info.outputs.data).base.ref == inputs.target_feat_branch
         uses: octokit/request-action@v2.x
