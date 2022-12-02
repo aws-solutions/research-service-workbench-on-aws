@@ -74,6 +74,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/presignedUpload`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetFile'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}}/share/${endPointPrefix.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       DELETE: [

@@ -18,8 +18,8 @@ export default class Datasets extends CollectionResource {
     this._api = 'datasets';
   }
 
-  public dataset(params: DataSetCreateParams): Dataset {
-    return new Dataset(params);
+  public dataset(params: Omit<DataSetCreateParams, 'clientSession' | 'parentApi'>): Dataset {
+    return new Dataset({ ...params, clientSession: this._clientSession, parentApi: this._parentApi });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,10 +31,8 @@ export default class Datasets extends CollectionResource {
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
     const response: AxiosResponse = await this._axiosInstance.post(this._api, requestBody);
 
-    const createParams: DataSetCreateParams = {
+    const createParams = {
       id: response.data.id,
-      clientSession: this._clientSession,
-      parentApi: 'datasets',
       awsAccountId: response.data.awsAccountId,
       storageName: response.data.storageName,
       storagePath: response.data.path

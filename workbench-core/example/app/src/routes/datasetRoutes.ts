@@ -11,6 +11,7 @@ import {
   CreateExternalEndpointSchema,
   createRegisterExternalBucketRole,
   CreateRegisterExternalBucketRoleSchema,
+  CreatePresignedSinglePartFileUploadUrl,
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError
@@ -21,6 +22,8 @@ import { validate } from 'jsonschema';
 import { dataSetPrefix, endPointPrefix } from '../configs/constants';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
+
+const timeToLiveSeconds: number = 60 * 1; // 1 minute
 
 export function setUpDSRoutes(
   router: Router,
@@ -99,7 +102,26 @@ export function setUpDSRoutes(
     })
   );
 
-  // List storag locations
+  // Get presigned single part file upload URL
+  router.post(
+    '/datasets/:datasetId/presignedUpload',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetId request parameter is invalid');
+      }
+      processValidatorResult(validate(req.body, CreatePresignedSinglePartFileUploadUrl));
+
+      const url = await dataSetService.getPresignedSinglePartUploadUrl(
+        req.params.datasetId,
+        req.body.fileName,
+        timeToLiveSeconds,
+        dataSetStoragePlugin
+      );
+      res.status(200).send({ url });
+    })
+  );
+
+  // List storage locations
   router.get(
     '/datasets/storage',
     wrapAsync(async (req: Request, res: Response) => {
