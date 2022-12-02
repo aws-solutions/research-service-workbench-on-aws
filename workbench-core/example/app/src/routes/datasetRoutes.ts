@@ -6,9 +6,11 @@
 import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
   addDatasetPermissionsToRole,
+  AddDatasetPermissionsToRoleSchema,
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
   createRegisterExternalBucketRole,
+  CreateRegisterExternalBucketRoleSchema,
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError
@@ -147,32 +149,33 @@ export function setUpDSRoutes(
     })
   );
 
-  // creates new prefix in S3 (assumes S3 bucket exist already)
+  // creates new IAM role string to access an external bucket
   router.post(
     '/datasets/iam',
     wrapAsync(async (req: Request, res: Response) => {
-      // processValidatorResult(validate(req.body, CreateDataSetSchema));
+      processValidatorResult(validate(req.body, CreateRegisterExternalBucketRoleSchema));
       const role = createRegisterExternalBucketRole({
-        roleName: 'TODasdfasdfaO',
-        awsAccountId: 'sdertgeryhsedrthrsth',
-        awsBucketRegion: 'sdfgsdfg',
-        s3BucketArn: 'sdfgsdfgsdfg',
-        assumingAwsAccountId: 'sdfgsdfgsdfg',
-        externalId: 'sdfgsdfgsdfg'
+        roleName: req.body.roleName,
+        awsAccountId: req.body.awsAccountId,
+        awsBucketRegion: req.body.awsBucketRegion,
+        s3BucketArn: req.body.s3BucketArn,
+        assumingAwsAccountId: req.body.assumingAwsAccountId,
+        externalId: req.body.externalId,
+        kmsKeyArn: req.body.kmsKeyArn
       });
       res.status(201).send(role);
     })
   );
 
-  // creates new prefix in S3 (assumes S3 bucket exist already)
+  // updates an existing IAM role string to add permission to access a dataset
   router.patch(
     '/datasets/iam',
     wrapAsync(async (req: Request, res: Response) => {
-      // processValidatorResult(validate(req.body, CreateDataSetSchema));
+      processValidatorResult(validate(req.body, AddDatasetPermissionsToRoleSchema));
       const role = addDatasetPermissionsToRole({
-        roleString: 'adfgdfgadfgdf',
-        accessPointArn: 'adfgadfgadf',
-        datasetPrefix: 'adfsgghkjyhfredgh'
+        roleString: req.body.roleString,
+        accessPointArn: req.body.accessPointArn,
+        datasetPrefix: req.body.datasetPrefix
       });
       res.status(200).send(role);
     })

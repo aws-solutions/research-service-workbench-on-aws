@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import AddDatasetPermissionsToRoleSchema from './schemas/addDatasetPermissionsToRoleSchema';
 import CreateDataSetSchema from './schemas/createDataSet';
 import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
+import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExternalBucketRoleSchema';
 
 export { DataSet } from './dataSet';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -18,7 +20,12 @@ export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamR
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
-export { CreateDataSetSchema, CreateExternalEndpointSchema };
+export {
+  AddDatasetPermissionsToRoleSchema,
+  CreateDataSetSchema,
+  CreateExternalEndpointSchema,
+  CreateRegisterExternalBucketRoleSchema
+};
 export { StorageLocation } from './storageLocation';
 export {
   addDatasetPermissionsToRole,

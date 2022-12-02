@@ -34,13 +34,7 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
-        subject: 'DatasetRole'
-      }
-    ],
-    PATCH: [
-      {
-        action: 'UPDATE',
-        subject: 'DatasetRole'
+        subject: 'Dataset'
       }
     ]
   },
@@ -48,7 +42,13 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
-        subject: 'Dataset'
+        subject: 'DatasetRole'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'DatasetRole'
       }
     ]
   },
