@@ -101,6 +101,9 @@ solutions/swb-reference/integration-tests/config/*.yaml
 solutions/swb-reference/src/config/*.json
 solutions/swb-reference/.aws-sam/
 
+# prTest
+!solutions/swb-reference/src/config/testEnv.yaml
+
 
 
 # local environment variables

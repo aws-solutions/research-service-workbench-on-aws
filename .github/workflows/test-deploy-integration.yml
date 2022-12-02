@@ -1,0 +1,24 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Test-deploy-integration
+on: ['pull_request']
+
+jobs:
+  deploy-swb-reference:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-swb-reference.yml@github-oidc
+    secrets:
+      pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
+      pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
+      pr-test-aws-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}
+      CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
+      CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
+
+  deploy-example-app:
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-example-app.yml@github-oidc
+    secrets:
+      pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
+      pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
+      pr-test-aws-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}

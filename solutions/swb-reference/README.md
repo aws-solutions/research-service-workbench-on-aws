@@ -167,7 +167,7 @@ To run integration tests
 
     2. Choose the Environment Type that integration test will use as default when creating any Environment and copy the values from properties `id` and `type` from request.
 
-    3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in `<STAGE>.yaml` file 
+    3. In `./integration-tests/config` directory assign `id` value to `envTypeId` property and `type` value to `envType` property in `<STAGE>.yaml` file
 
 
 3. For `envTypeConfigId` open Postman Collection and select `List envTypeConfigs` inside `envTypeConfig` folder.
