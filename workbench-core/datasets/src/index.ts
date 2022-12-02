@@ -5,6 +5,7 @@
 
 import CreateDataSetSchema from './schemas/createDataSet';
 import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
+import CreatePresignedSinglePartFileUploadUrl from './schemas/createPresignedSinglePartFileUploadUrl';
 
 export { DataSet } from './dataSet';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -18,7 +19,7 @@ export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamR
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
-export { CreateDataSetSchema, CreateExternalEndpointSchema };
+export { CreateDataSetSchema, CreateExternalEndpointSchema, CreatePresignedSinglePartFileUploadUrl };
 export { StorageLocation } from './storageLocation';
 export {
   addDatasetPermissionsToRole,
