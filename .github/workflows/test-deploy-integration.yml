@@ -8,7 +8,7 @@ on: ['pull_request']
 
 jobs:
   deploy-swb-reference:
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-swb-reference.yml@github-oidc
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-swb-reference.yml@testPR
     secrets:
       pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
       pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
@@ -17,7 +17,7 @@ jobs:
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
 
   deploy-example-app:
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-example-app.yml@github-oidc
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-example-app.yml@testPR
     secrets:
       pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
       pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
