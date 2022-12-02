@@ -115,11 +115,10 @@ export default class EnvironmentTypeConfigService {
       provisioningArtifactId
     };
     const key = this._buildEnvTypeConfigPkSk(envTypeConfigId);
-    const response = await this._dynamoDbService
-      .update(key, {
-        item: dynamoItem
-      })
-      .execute();
+    const response = await this._dynamoDbService.updateExecuteAndFormat({
+      key,
+      params: { item: dynamoItem }
+    });
     if (response.Attributes) {
       return EnvironmentTypeConfigParser.parse({ ...response.Attributes });
     }
@@ -158,9 +157,10 @@ export default class EnvironmentTypeConfigService {
       updatedAt: currentDate
     };
 
-    const response = await this._dynamoDbService
-      .update(this._buildEnvTypeConfigPkSk(envTypeConfigId), { item: updatedEnvTypeConfig })
-      .execute();
+    const response = await this._dynamoDbService.updateExecuteAndFormat({
+      key: this._buildEnvTypeConfigPkSk(envTypeConfigId),
+      params: { item: updatedEnvTypeConfig }
+    });
     if (response.Attributes) {
       return EnvironmentTypeConfigParser.parse(response.Attributes);
     }
