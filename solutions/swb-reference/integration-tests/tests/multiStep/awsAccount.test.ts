@@ -23,10 +23,6 @@ describe('multiStep awsAccount integration test', () => {
     adminSession = await setup.getDefaultAdminSession();
   });
 
-  afterEach(async () => {
-    await setup.cleanup();
-  });
-
   test('it works', async () => {
     const dynamoDbService = new DynamoDBService({ region: 'us-east-1', table: 'swb-dev-va' });
     const accountService = new AccountService(dynamoDbService);
@@ -81,8 +77,6 @@ describe('multiStep awsAccount integration test', () => {
       const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name });
       expect(updateResponse.status).toEqual(200);
       expect(updateResponse.data.name).toEqual(name);
-
-      await accountService.delete(accountId);
     } catch (error) {
       console.error(error);
 
