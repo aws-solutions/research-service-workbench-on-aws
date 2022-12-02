@@ -96,7 +96,7 @@
     },
     {
       "name": "@aws/eslint-config-workbench-core-eslint-custom",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "@aws/swb-app",
@@ -248,23 +248,23 @@
     },
     {
       "name": "@microsoft/rush-lib",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "@rushstack/eslint-config",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "@rushstack/heft",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "@rushstack/heft-jest-plugin",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "@rushstack/heft-node-rig",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "@rushstack/heft-web-rig",
@@ -276,11 +276,11 @@
     },
     {
       "name": "@rushstack/node-core-library",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "@rushstack/ts-command-line",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "@testing-library/dom",
@@ -304,11 +304,11 @@
     },
     {
       "name": "aws-cdk",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "aws-cdk-lib",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "aws-jwt-verify",
@@ -340,7 +340,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -352,7 +352,7 @@
     },
     {
       "name": "constructs",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "cookie-parser",
@@ -380,11 +380,11 @@
     },
     {
       "name": "depcheck",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "diff",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "tools" ]
     },
     {
       "name": "esbuild",
@@ -392,7 +392,7 @@
     },
     {
       "name": "eslint",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "eslint-config-next",
@@ -400,11 +400,11 @@
     },
     {
       "name": "eslint-plugin-import",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "eslint-plugin-security",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "eslint-plugin-testing-library",
@@ -428,11 +428,11 @@
     },
     {
       "name": "istanbul-badges-readme",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "jest",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "jest-circus",
@@ -456,11 +456,11 @@
     },
     {
       "name": "license-check-and-add",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "license-checker",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "lodash",
@@ -496,11 +496,11 @@
     },
     {
       "name": "npm-package-json-lint",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "npm-package-json-lint-config-default",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "pkce-challenge",
@@ -528,11 +528,11 @@
     },
     {
       "name": "sort-package-json",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "source-map-support",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "swr",
@@ -544,7 +544,7 @@
     },
     {
       "name": "ts-jest",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "ts-node",
@@ -556,7 +556,7 @@
     },
     {
       "name": "typescript",
-      "allowedCategories": [ "production", "prototypes" ]
+      "allowedCategories": [ "production", "prototypes", "tools" ]
     },
     {
       "name": "uuid",
