@@ -5,8 +5,10 @@
 
 import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import {
+  addDatasetPermissionsToRole,
   CreateDataSetSchema,
   CreateExternalEndpointSchema,
+  createRegisterExternalBucketRole,
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError
@@ -142,6 +144,37 @@ export function setUpDSRoutes(
         throw error;
       }
       res.status(204).send();
+    })
+  );
+
+  // creates new prefix in S3 (assumes S3 bucket exist already)
+  router.post(
+    '/datasets/iam',
+    wrapAsync(async (req: Request, res: Response) => {
+      // processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const role = createRegisterExternalBucketRole({
+        roleName: 'TODasdfasdfaO',
+        awsAccountId: 'sdertgeryhsedrthrsth',
+        awsBucketRegion: 'sdfgsdfg',
+        s3BucketArn: 'sdfgsdfgsdfg',
+        assumingAwsAccountId: 'sdfgsdfgsdfg',
+        externalId: 'sdfgsdfgsdfg'
+      });
+      res.status(201).send(role);
+    })
+  );
+
+  // creates new prefix in S3 (assumes S3 bucket exist already)
+  router.patch(
+    '/datasets/iam',
+    wrapAsync(async (req: Request, res: Response) => {
+      // processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const role = addDatasetPermissionsToRole({
+        roleString: 'adfgdfgadfgdf',
+        accessPointArn: 'adfgadfgadf',
+        datasetPrefix: 'adfsgghkjyhfredgh'
+      });
+      res.status(200).send(role);
     })
   );
 }

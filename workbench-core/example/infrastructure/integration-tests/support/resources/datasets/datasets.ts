@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { CreateRegisterExternalBucketRoleRequest } from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -59,6 +60,9 @@ export default class Datasets extends CollectionResource {
     return this._axiosInstance.post(`${this._api}/import`, requestBody);
   }
   public async storageLocations(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/storage`);
+  }
+  public async createRole(body: CreateRegisterExternalBucketRoleRequest): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/storage`);
   }
 
