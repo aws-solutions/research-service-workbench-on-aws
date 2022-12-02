@@ -46,7 +46,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
           throw err;
         }
 
-        throw Boom.badImplementation(`Could not find create user`);
+        throw Boom.badImplementation(`Could not create user`);
       }
     })
   );
