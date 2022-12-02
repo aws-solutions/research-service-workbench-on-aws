@@ -940,9 +940,11 @@ describe('S3DataSetStoragePlugin', () => {
   describe('createPresignedUploadUrl', () => {
     it('returns a presigned url for a single part file upload', async () => {
       const ttl = 3600;
+      const fileName = 'test.txt';
 
       const url = await plugin.createPresignedUploadUrl(
         { name: path, storageName: name, path, storageType: 'S3' },
+        fileName,
         ttl
       );
 
