@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import CollectionResource from '../base/collectionResource';
 import Account from './account';
@@ -15,6 +16,10 @@ export default class Accounts extends CollectionResource {
 
   public account(id: string): Account {
     return new Account(id, this._clientSession, this._api);
+  }
+
+  public async hostingAccountTemplate(externalId: string): Promise<AxiosResponse> {
+    return await this._axiosInstance.post('/awsAccountTemplateUrls', { externalId });
   }
 
   protected _buildDefaults(resource: AccountCreateRequest): AccountCreateRequest {

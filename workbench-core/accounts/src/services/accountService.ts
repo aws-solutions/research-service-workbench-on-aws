@@ -94,7 +94,7 @@ export default class AccountService {
     return { ...accountMetadata, id };
   }
 
-  public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
+  public async _validateCreate(accountMetadata: Record<string, string>): Promise<void> {
     // Verify awsAccountId is specified
     if (_.isUndefined(accountMetadata.awsAccountId))
       throw Boom.badRequest('Missing AWS Account ID in request body');

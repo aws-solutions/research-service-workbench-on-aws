@@ -30,7 +30,7 @@ interface Arns {
   mainAcctEncryptionArn: string;
 }
 
-export interface CreateAccountMetadata {
+export interface CreateAccountData {
   name: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
@@ -38,7 +38,7 @@ export interface CreateAccountMetadata {
   externalId: string;
 }
 
-export interface UpdateAccountMetadata {
+export interface UpdateAccountData {
   id: string;
   name?: string;
   awsAccountId?: string;
@@ -119,7 +119,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async createAccount(accountMetadata: CreateAccountMetadata): Promise<{ [key: string]: string }> {
+  public async createAccount(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
     const arns = await this._getArns();
 
     await this._attachAwsAccount({
@@ -135,7 +135,7 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateAccount(accountMetadata: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
+  public async updateAccount(accountMetadata: UpdateAccountData): Promise<{ [key: string]: string }> {
     if (accountMetadata.awsAccountId) {
       await this._attachAwsAccount({
         awsAccountId: accountMetadata.awsAccountId,

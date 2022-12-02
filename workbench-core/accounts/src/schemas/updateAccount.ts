@@ -10,11 +10,7 @@ const UpdateAccountSchema: Schema = {
   id: '/updateAccount',
   type: 'object',
   properties: {
-    name: { type: 'string' },
-    awsAccountId: { type: 'string' },
-    envMgmtRoleArn: { type: 'string' },
-    hostingAccountHandlerRoleArn: { type: 'string' },
-    externalId: { type: 'string' }
+    name: { type: 'string' }
   },
   additionalProperties: false,
   required: []

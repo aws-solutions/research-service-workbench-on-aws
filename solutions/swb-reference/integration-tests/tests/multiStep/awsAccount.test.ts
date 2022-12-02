@@ -1,0 +1,94 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
+import { AccountService, CreateAccountData } from '@aws/workbench-core-accounts';
+import { Account } from '@aws/workbench-core-accounts/lib/models/accounts/account';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import ClientSession from '../../support/clientSession';
+import { AccountHelper } from '../../support/complex/accountHelper';
+import Setup from '../../support/setup';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
+import Settings from '../../support/utils/settings';
+
+describe('multiStep awsAccount integration test', () => {
+  const setup: Setup = new Setup();
+  const settings: Settings = setup.getSettings();
+  let adminSession: ClientSession;
+
+  beforeEach(async () => {
+    // expect.hasAssertions();
+    adminSession = await setup.getDefaultAdminSession();
+  });
+
+  afterEach(async () => {
+    await setup.cleanup();
+  });
+
+  test('it works', async () => {
+    const dynamoDbService = new DynamoDBService({ region: 'us-east-1', table: 'swb-dev-va' });
+    const accountService = new AccountService(dynamoDbService);
+    let accountId: string | undefined;
+
+    try {
+      const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+
+      const createAccountParams: CreateAccountData = {
+        hostingAccountHandlerRoleArn: settings.get('hostingAccountHandlerRoleArn'),
+        awsAccountId: settings.get('hostAwsAccountId'),
+        envMgmtRoleArn: settings.get('envMgmtRoleArn'),
+        name: randomTextGenerator.getFakeText('fakeName'),
+        externalId: randomTextGenerator.getFakeText('fakeExternalId')
+      };
+
+      const hostingAwsAccountId = `${resourceTypeToKey.awsAccount}#${createAccountParams.awsAccountId}`;
+      const query = { key: { name: 'pk', value: hostingAwsAccountId } };
+      const ddbEntries = await dynamoDbService.getPaginatedItems(query);
+      if (ddbEntries.data.length > 0) {
+        const accountId = ddbEntries.data[0].accountId.toString();
+        const awsAccountItemKey = {
+          pk: hostingAwsAccountId,
+          sk: `${resourceTypeToKey.account}#${accountId}`
+        };
+        await dynamoDbService.delete(awsAccountItemKey).execute();
+      }
+
+      const createResponse = await adminSession.resources.accounts.create(createAccountParams, false);
+      expect(createResponse.status).toEqual(201);
+
+      accountId = createResponse.data.id;
+      if (!accountId) {
+        throw new Error('no account id from create response');
+      }
+      expect(await new AccountHelper().verifyBusAllowsAccount(createAccountParams.awsAccountId)).toBe(true);
+
+      const hostingAccountTemplateResponse = await adminSession.resources.accounts.hostingAccountTemplate(
+        accountId
+      );
+      expect(hostingAccountTemplateResponse.status).toEqual(200);
+
+      const listResponse = await adminSession.resources.accounts.get({ pageSize: `100` });
+      expect(listResponse.status).toEqual(200);
+      expect(listResponse.data.data.map((item: Account) => item.id)).toContain(accountId);
+
+      const getResponse = await adminSession.resources.accounts.account(accountId).get();
+      expect(getResponse.status).toEqual(200);
+      expect(getResponse.data.id).toEqual(accountId);
+
+      const name = `integration-test-${new Date().toISOString()}`;
+      const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name });
+      expect(updateResponse.status).toEqual(200);
+      expect(updateResponse.data.name).toEqual(name);
+
+      await accountService.delete(accountId);
+    } catch (error) {
+      console.error(error);
+
+      if (accountId) {
+        await accountService.delete(accountId);
+      }
+    }
+  });
+});
