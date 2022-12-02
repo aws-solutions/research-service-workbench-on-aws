@@ -128,3 +128,6 @@ solutions/swb-ui/ui/end-to-end-tests/config/*.yaml
 solutions/swb-ui/ui/end-to-end-tests/cypress/screenshots
 solutions/swb-ui/ui/end-to-end-tests/cypress/videos
 solutions/swb-ui/ui/end-to-end-tests/cypress/downloads
+
+# prTest
+!solutions/swb-ui/ui/end-to-end-tests/config/prTest.yaml
