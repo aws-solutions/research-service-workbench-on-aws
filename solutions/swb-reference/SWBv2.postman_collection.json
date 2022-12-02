@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "c7f31b8c-0e10-4a2c-90f6-38fe38bfe8ed",
+    "_postman_id": "25fa19b0-59e4-464e-99cc-1798a7327954",
     "name": "SWBv2 Official",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "4320586"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -36,13 +35,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters/",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "costCenters",
-                ""
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ""]
             }
           },
           "response": []
@@ -77,13 +71,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "costCenters",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -121,14 +110,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters/:id/softDelete",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "costCenters",
-                ":id",
-                "softDelete"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id", "softDelete"],
               "variable": [
                 {
                   "key": "id",
@@ -166,13 +149,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "costCenters",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -213,12 +191,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/costCenters",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "costCenters"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["costCenters"],
               "query": [
                 {
                   "key": "filter[name][begins]",
@@ -310,13 +284,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/datasets/import",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "datasets",
-                "import"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "import"]
             }
           },
           "response": []
@@ -351,13 +320,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/datasets/id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "datasets",
-                "id"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", "id"]
             }
           },
           "response": []
@@ -380,13 +344,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/datasets/",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "datasets",
-                ""
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["datasets", ""]
             }
           },
           "response": []
@@ -414,14 +373,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/terminate",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "terminate"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "terminate"],
               "variable": [
                 {
                   "key": "id",
@@ -460,12 +413,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments"
-              ]
+              "host": ["{{API_URL}}"],
+              "path": ["environments"]
             }
           },
           "response": []
@@ -488,14 +437,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/start",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "start"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "start"],
               "variable": [
                 {
                   "key": "id",
@@ -525,14 +468,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/stop",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "stop"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "stop"],
               "variable": [
                 {
                   "key": "id",
@@ -562,13 +499,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -598,12 +530,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments"],
               "query": [
                 {
                   "key": "status",
@@ -683,14 +611,8 @@
             ],
             "url": {
               "raw": "{{API_URL}}/environments/:id/connections",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environments",
-                ":id",
-                "connections"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environments", ":id", "connections"],
               "variable": [
                 {
                   "key": "id",
@@ -767,13 +689,8 @@
             },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:id",
-              "host": [
-                "{{API_URL}}"
-              ],
-              "path": [
-                "environmentTypes",
-                ":id"
-              ],
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -1040,6 +957,167 @@
       ]
     },
     {
+      "name": "users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\",\n    \"roles\": [\"Admin\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Create Hosting Account",
       "request": {
         "method": "POST",
@@ -1065,7 +1143,7 @@
           }
         },
         "url": {
-          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
+          "raw": "{{API_URL}}/aws-accounts",
           "host": ["{{API_URL}}"],
           "path": ["aws-accounts"]
         }
