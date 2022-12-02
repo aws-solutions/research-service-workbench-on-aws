@@ -1,0 +1,7 @@
+# Stage Name
+stage: prTest
+awsRegion: us-east-1
+awsRegionShortName: va
+rootUserEmailParamStorePath: '/swb/prTest/rootUser/email'
+allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
+cognitoDomain: 'prTest-domain'

@@ -53,6 +53,11 @@ export class GitHubOIDCStack extends Stack {
               effect: Effect.ALLOW,
               actions: ['sts:AssumeRole'],
               resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-*`]
+            }),
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: ['cloudformation:DescribeStacks'],
+              resources: [`arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/*`]
             })
           ],
           roles: [githubOIDCRole]
