@@ -7,15 +7,17 @@
 import {
   CreateRoleSchema,
   CreateUserSchema,
-  UpdateUserSchema,
   Status,
   UpdateRoleSchema,
   UserManagementService,
   isUserNotFoundError,
   isRoleNotFoundError,
   isInvalidParameterError,
-  isUserAlreadyExistsError
+  isUserAlreadyExistsError,
+  UpdateUserRequest,
+  UpdateUserRequestParser
 } from '@aws/workbench-core-authentication';
+import { validateAndParse } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
@@ -99,27 +101,28 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
   router.patch(
     '/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateUserSchema));
+      const updateUserRequest = validateAndParse<UpdateUserRequest>(UpdateUserRequestParser, req.body);
+
       const userId = req.params.userId;
+      const { status, roles, ...rest } = updateUserRequest;
       try {
         const existingUser = await userService.getUser(userId);
 
-        if (!_.isUndefined(req.body.status)) {
-          if (req.body.status === 'ACTIVE' && existingUser.status === Status.INACTIVE)
+        if (!_.isUndefined(status)) {
+          if (status === 'ACTIVE' && existingUser.status === Status.INACTIVE)
             await userService.activateUser(userId);
-          if (req.body.status === 'INACTIVE' && existingUser.status === Status.ACTIVE)
+          if (status === 'INACTIVE' && existingUser.status === Status.ACTIVE)
             await userService.deactivateUser(userId);
-          delete req.body.status; // Status update is complete, and type is different than expected for further steps
         }
 
-        if (!_.isEmpty(req.body.roles) && !_.isEqual(existingUser.roles, req.body.roles)) {
-          const rolesToAdd = _.difference(req.body.roles, existingUser.roles);
+        if (!_.isEmpty(roles) && !_.isEqual(existingUser.roles, roles)) {
+          const rolesToAdd = _.difference(roles, existingUser.roles);
           await Promise.all(
             _.map(rolesToAdd, async (role) => {
               await userService.addUserToRole(userId, role);
             })
           );
-          const rolesToRemove = _.difference(existingUser.roles, req.body.roles);
+          const rolesToRemove = _.difference(existingUser.roles, roles ?? []);
           await Promise.all(
             _.map(rolesToRemove, async (role) => {
               await userService.removeUserFromRole(userId, role);
@@ -128,7 +131,7 @@ export function setUpUserRoutes(router: Router, userService: UserManagementServi
         }
 
         // Since updateUser() requires object of type User
-        await userService.updateUser(userId, { ...existingUser, ...req.body });
+        await userService.updateUser(userId, { ...existingUser, ...rest });
         res.status(204).send();
       } catch (err) {
         if (isUserNotFoundError(err)) throw Boom.notFound(`Could not find user ${userId}`);
