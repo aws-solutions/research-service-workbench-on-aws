@@ -164,7 +164,7 @@ describe('HostingAccountLifecycleService', () => {
     ebMock.on(PutPermissionCommand).resolves({});
     ebMock.on(PutRuleCommand).resolves({});
     ebMock.on(PutTargetsCommand).resolves({});
-    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+    ebMock.on(DescribeRuleCommand).rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateBusPermissions('sampleStatusHandlerArn', '123456789012')
@@ -404,11 +404,11 @@ describe('HostingAccountLifecycleService', () => {
     // Mock S3 calls
     const s3Mock = mockClient(S3Client);
     s3Mock.on(PutBucketPolicyCommand).resolves({});
-    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {} }));
+    s3Mock.on(GetBucketPolicyCommand).rejects(new NoSuchBucket({ $metadata: {}, message: '' }));
 
     await expect(
       hostingAccountLifecycleService.updateArtifactsBucketPolicy(sampleBucketArn, '123456789012')
-    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {} }));
+    ).rejects.toThrowError(new NoSuchBucket({ $metadata: {}, message: '' }));
   });
 
   test('updateArtifactsBucketPolicy update works when bucket policy does not contain account ID', async () => {
