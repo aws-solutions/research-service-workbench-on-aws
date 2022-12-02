@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "BREAKING CHANGE: User interface now uses `id` instead of `uid`",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

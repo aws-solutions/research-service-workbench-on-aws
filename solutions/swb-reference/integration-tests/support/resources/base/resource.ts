@@ -38,7 +38,10 @@ export default class Resource {
     return this._axiosInstance.get(this._api);
   }
 
-  public async update(body: { [key: string]: string }): Promise<AxiosResponse> {
+  public async update(body: { [key: string]: string }, isPatch: boolean = false): Promise<AxiosResponse> {
+    if (isPatch) {
+      return this._axiosInstance.patch(this._api, body);
+    }
     return this._axiosInstance.put(this._api, body);
   }
 

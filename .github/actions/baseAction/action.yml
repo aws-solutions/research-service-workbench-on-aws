@@ -43,7 +43,7 @@ runs:
     - name: Install dependecies
       shell: bash
       run: node common/scripts/install-run-rush.js install
-      
+    
     - name: Rush check
       shell: bash
       run: node common/scripts/install-run-rush.js check

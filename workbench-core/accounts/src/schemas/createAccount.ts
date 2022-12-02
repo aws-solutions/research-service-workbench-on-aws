@@ -26,7 +26,8 @@ const CreateAccountSchema: Schema = {
     'envMgmtRoleArn',
     'hostingAccountHandlerRoleArn',
     'environmentInstanceFiles',
-    'encryptionKeyArn'
+    'encryptionKeyArn',
+    'externalId'
   ]
 };
 

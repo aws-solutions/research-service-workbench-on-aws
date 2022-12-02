@@ -8,10 +8,12 @@ import {
   AwsService,
   QueryParams,
   resourceTypeToKey,
-  uuidWithLowercasePrefix
+  uuidWithLowercasePrefix,
+  addPaginationToken,
+  getPaginationToken,
+  DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
-import { addPaginationToken, getPaginationToken, DEFAULT_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import EnvironmentTypeService from './environmentTypeService';
 
 interface EnvironmentTypeConfig {
@@ -146,9 +148,10 @@ export default class EnvironmentTypeConfigService {
     };
 
     const item = newEnvTypeConfig as unknown as { [key: string]: unknown };
-    const response = await this._aws.helpers.ddb
-      .update(this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId), { item })
-      .execute();
+    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId),
+      params: { item }
+    });
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentTypeConfig;
     }
@@ -197,9 +200,10 @@ export default class EnvironmentTypeConfigService {
       updatedBy: ownerId
     };
 
-    const response = await this._aws.helpers.ddb
-      .update(this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId), { item: updatedEnvTypeConfig })
-      .execute();
+    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: this._buildEnvTypeConfigPkSk(envTypeId, envTypeConfigId),
+      params: { item: updatedEnvTypeConfig }
+    });
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentTypeConfig;
     }

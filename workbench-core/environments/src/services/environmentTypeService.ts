@@ -4,12 +4,19 @@
  */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  AwsService,
+  buildDynamoDBPkSk,
+  QueryParams,
+  resourceTypeToKey,
+  DEFAULT_API_PAGE_SIZE,
+  addPaginationToken,
+  getPaginationToken
+} from '@aws/workbench-core-base';
 
 import Boom from '@hapi/boom';
 import { v4 as uuidv4 } from 'uuid';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
-import { DEFAULT_API_PAGE_SIZE, addPaginationToken, getPaginationToken } from '../utilities/paginationHelper';
 
 interface EnvironmentType {
   pk: string;
@@ -131,9 +138,10 @@ export default class EnvironmentTypeService {
       updatedBy: ownerId
     };
 
-    const response = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType), { item: updatedEnvType })
-      .execute();
+    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType),
+      params: { item: updatedEnvType }
+    });
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentType;
     }
@@ -183,9 +191,10 @@ export default class EnvironmentTypeService {
       ...params
     };
     const item = newEnvType as unknown as { [key: string]: unknown };
-    const response = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(id, resourceTypeToKey.envType), { item })
-      .execute();
+    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(id, resourceTypeToKey.envType),
+      params: { item }
+    });
     if (response.Attributes) {
       return response.Attributes as unknown as EnvironmentType;
     }

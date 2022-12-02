@@ -18,7 +18,7 @@
     "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
   "repository": {
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git",
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git",
     "defaultBranch": "develop"
   },
   "eventHooks": {
@@ -126,8 +126,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@aws/workbench-core-example-express",
-      "projectFolder": "workbench-core/example/express",
+      "packageName": "@aws/workbench-core-example-app",
+      "projectFolder": "workbench-core/example/app",
       "reviewCategory": "prototypes",
       "shouldPublish": false
     },
@@ -139,7 +139,7 @@
     },
     {
       "packageName": "@aws/swb-ui",
-      "projectFolder": "solutions/swb-ui",
+      "projectFolder": "solutions/swb-ui/ui",
       "reviewCategory": "production",
       "shouldPublish": false
     },

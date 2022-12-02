@@ -4,13 +4,21 @@
  */
 
 /**
+ * An enum defining the status of a user
+ */
+export enum Status {
+  INACTIVE,
+  ACTIVE
+}
+
+/**
  * A record to represent a user.
  */
 export interface User {
   /**
    * A unique identifier for the user.
    */
-  uid: string;
+  id: string;
 
   /**
    * The user's first name.
@@ -28,7 +36,32 @@ export interface User {
   email: string;
 
   /**
+   * The user's {@link Status}
+   */
+  status: Status;
+
+  /**
    * The roles to which the user belongs.
    */
   roles: string[];
+}
+
+/**
+ * A record to represent a user to create.
+ */
+export interface CreateUser {
+  /**
+   * The user's first name.
+   */
+  firstName: string;
+
+  /**
+   * The user's last name.
+   */
+  lastName: string;
+
+  /**
+   * The user's email address.
+   */
+  email: string;
 }
