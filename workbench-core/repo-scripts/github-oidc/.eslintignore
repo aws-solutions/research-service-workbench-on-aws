@@ -3,7 +3,4 @@ node_modules
 lib
 temp
 cdk.out
-build
-buildLambda.js
-generateCognitoTokens.js
 jest.config.js

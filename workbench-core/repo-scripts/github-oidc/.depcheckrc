@@ -16,7 +16,6 @@ ignore-patterns: [
     'cdk.out',
     'lib',
     'node_modules',
-    'src/__tests__/__snapshots__',
     'temp',
   ]
 skip-missing: true
