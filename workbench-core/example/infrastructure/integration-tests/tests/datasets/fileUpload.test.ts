@@ -41,9 +41,9 @@ describe('datasets list integration test', () => {
       dataset = adminSession.resources.datasets.children.get(id) as Dataset;
     });
 
-    it('generates a presigned URL and uplaod a file using that URL', async () => {
+    it('generates a presigned URL and upload a file using that URL', async () => {
       const fileName = uuidv4();
-      const response = await dataset.singlePartFileUploadUrl({ fileName });
+      const response = await dataset.generateSinglePartFileUploadUrl({ fileName });
 
       await adminSession.getAxiosInstance().put(response.data.url, { fake: 'data' });
 
@@ -60,7 +60,9 @@ describe('datasets list integration test', () => {
         storageName: '',
         storagePath: ''
       });
-      await expect(dataset.singlePartFileUploadUrl({ fileName: '' })).rejects.toThrow(new HttpError(404, {}));
+      await expect(dataset.generateSinglePartFileUploadUrl({ fileName: '' })).rejects.toThrow(
+        new HttpError(404, {})
+      );
     });
 
     it('throws when generating a URL for a dataset with an invalid id', async () => {
@@ -70,21 +72,23 @@ describe('datasets list integration test', () => {
         storageName: '',
         storagePath: ''
       });
-      await expect(dataset.singlePartFileUploadUrl({ fileName: '' })).rejects.toThrow(new HttpError(403, {}));
+      await expect(dataset.generateSinglePartFileUploadUrl({ fileName: '' })).rejects.toThrow(
+        new HttpError(403, {})
+      );
     });
 
     it('throws when the fileName is missing in the request body', async () => {
       const invalidRequest: Record<string, unknown> = {};
-      await expect(dataset.singlePartFileUploadUrl(invalidRequest as { fileName: string })).rejects.toThrow(
-        new HttpError(400, {})
-      );
+      await expect(
+        dataset.generateSinglePartFileUploadUrl(invalidRequest as { fileName: string })
+      ).rejects.toThrow(new HttpError(400, {}));
     });
 
     it('throws when the fileName in the request body is not a string', async () => {
       const invalidRequest: Record<string, unknown> = { fileName: 123 };
-      await expect(dataset.singlePartFileUploadUrl(invalidRequest as { fileName: string })).rejects.toThrow(
-        new HttpError(400, {})
-      );
+      await expect(
+        dataset.generateSinglePartFileUploadUrl(invalidRequest as { fileName: string })
+      ).rejects.toThrow(new HttpError(400, {}));
     });
   });
 });

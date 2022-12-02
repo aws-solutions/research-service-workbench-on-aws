@@ -67,7 +67,7 @@ export default class Dataset extends Resource {
     return response;
   }
 
-  public async singlePartFileUploadUrl(body: { fileName: string }): Promise<AxiosResponse> {
+  public async generateSinglePartFileUploadUrl(body: { fileName: string }): Promise<AxiosResponse> {
     return await this._axiosInstance.post(`${this._api}/presignedUpload`, body);
   }
 
