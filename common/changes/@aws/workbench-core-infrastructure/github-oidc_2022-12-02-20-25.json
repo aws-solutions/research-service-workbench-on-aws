@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "aws-cdk-lib update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

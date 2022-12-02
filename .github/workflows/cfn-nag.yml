@@ -34,6 +34,11 @@ jobs:
           node ../../../common/scripts/install-run-rushx.js compile
           node ../../../common/scripts/install-run-rushx.js cdk synth
 
+      - name: cdk synth github-oidc
+        run: |
+          cd workbench-core/repo-scripts/github-oidc
+          node ../../../common/scripts/install-run-rushx.js cdk synth
+
       - name: Run cfn-nag on swb-reference cdk.out
         id: cdk-swb-reference
         uses: stelligent/cfn_nag@master
@@ -47,6 +52,13 @@ jobs:
         with:
           input_path: workbench-core/example/infrastructure/cdk.out/InfrastructureStack.template.json
           extra_args: --fail-on-warnings -o json
+
+      - name: Run cfn-nag on github-oidc cdk.out
+        id: cdk-github-oidc
+        uses: stelligent/cfn_nag@master
+        with:
+          input_path: workbench-core/repo-scripts/github-oidc/cdk.out
+          extra_args: -t ".template.json" --fail-on-warnings -o json
 
       - name: Run cfn-nag on onboarding template
         id: template

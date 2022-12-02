@@ -462,6 +462,14 @@ export class ExampleStack extends Stack {
       memorySize: 832
     });
 
+    //CDK NAG Suppression
+    NagSuppressions.addResourceSuppressions(exampleLambda, [
+      {
+        id: 'AwsSolutions-L1',
+        reason: 'We are using NODEJS_16'
+      }
+    ]);
+
     const exampleLambdaPolicy: Policy = new Policy(this, 'ExampleLambdaPolicy', {
       statements: [
         new PolicyStatement({
