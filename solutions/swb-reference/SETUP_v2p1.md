@@ -146,7 +146,7 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
     "subnetId": "<CFN_OUTPUT.VpcSubnet>",
     "vpcId": "<CFN_OUTPUT.VPC>",
     "externalId": "workbench",
-    "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files", 
+    "environmentInstanceFiles": "s3://<CFN_OUTPUT.S3BucketArtifactsArnOutput(Get just the bucketname of the arn)>/environment-files",
     "awsAccountId": "<12 Digit AWS Account ID of hosting account>",
     "createdAt": "2022-01-28T22:42:20.296Z",
     "createdBy": "abc",

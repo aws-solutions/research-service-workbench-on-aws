@@ -94,9 +94,7 @@ export class GitHubOIDCStack extends Stack {
               sid: 'SSMAccess',
               effect: Effect.ALLOW,
               actions: ['ssm:GetParameter*', 'ssm:PutParameter*', 'ssm:DeleteParameter*'],
-              resources: [
-                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/cdk-bootstrap/*`
-              ]
+              resources: [`arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/*`]
             })
           ],
           roles: [githubOIDCRole]
