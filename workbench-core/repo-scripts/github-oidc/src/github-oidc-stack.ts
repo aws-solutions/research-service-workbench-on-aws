@@ -50,14 +50,53 @@ export class GitHubOIDCStack extends Stack {
         {
           statements: [
             new PolicyStatement({
+              sid: 'StsAssumeRole',
               effect: Effect.ALLOW,
               actions: ['sts:AssumeRole'],
               resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-*`]
             }),
             new PolicyStatement({
+              sid: 'CloudformationAccess',
               effect: Effect.ALLOW,
-              actions: ['cloudformation:DescribeStacks'],
-              resources: [`arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/*`]
+              actions: [
+                'cloudformation:DescribeStacks',
+                'cloudformation:GetTemplate',
+                'cloudformation:CreateChangeSet',
+                'cloudformation:DescribeChangeSet',
+                'cloudformation:ExecuteChangeSet',
+                'cloudformation:DescribeStackEvents',
+                'cloudformation:DeleteChangeSet'
+              ],
+              resources: [
+                `arn:${Aws.PARTITION}:cloudformation:${Aws.REGION}:${Aws.ACCOUNT_ID}:stack/CDKToolkit/*`
+              ]
+            }),
+            new PolicyStatement({
+              sid: 'S3Access',
+              effect: Effect.ALLOW,
+              actions: ['s3:*Object', 's3:ListBucket', 's3:GetBucketLocation'],
+              resources: [`arn:${Aws.PARTITION}:s3:::cdktoolkit-stagingbucket-*`]
+            }),
+            new PolicyStatement({
+              sid: 'ECRAccess',
+              effect: Effect.ALLOW,
+              actions: [
+                'ecr:SetRepositoryPolicy',
+                'ecr:GetLifecyclePolicy',
+                'ecr:PutImageScanningConfiguration',
+                'ecr:DescribeRepositories',
+                'ecr:CreateRepository',
+                'ecr:DeleteRepository'
+              ],
+              resources: [`arn:${Aws.PARTITION}:ecr:${Aws.REGION}:${Aws.ACCOUNT_ID}:repository/cdk-*`]
+            }),
+            new PolicyStatement({
+              sid: 'SSMAccess',
+              effect: Effect.ALLOW,
+              actions: ['ssm:GetParameter*', 'ssm:PutParameter*', 'ssm:DeleteParameter*'],
+              resources: [
+                `arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/cdk-bootstrap/*`
+              ]
             })
           ],
           roles: [githubOIDCRole]
