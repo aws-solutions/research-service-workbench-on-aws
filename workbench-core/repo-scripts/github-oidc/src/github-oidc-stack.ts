@@ -3,15 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Aws, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
-import {
-  Effect,
-  FederatedPrincipal,
-  ManagedPolicy,
-  OpenIdConnectProvider,
-  PolicyStatement,
-  Role
-} from 'aws-cdk-lib/aws-iam';
+import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import { FederatedPrincipal, ManagedPolicy, OpenIdConnectProvider, Role } from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 
@@ -40,24 +33,9 @@ export class GitHubOIDCStack extends Stack {
             }
           },
           'sts:AssumeRoleWithWebIdentity'
-        )
+        ),
+        managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')]
       });
-
-      // eslint-disable-next-line no-new
-      const gitHubOIDCCustomManagedPolicy: ManagedPolicy = new ManagedPolicy(
-        this,
-        `${props.gitHubOrg}-${gitHubRepo}-GitHubOIDCCustomManagedPolicy`,
-        {
-          statements: [
-            new PolicyStatement({
-              effect: Effect.ALLOW,
-              actions: ['sts:AssumeRole'],
-              resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/cdk-*`]
-            })
-          ],
-          roles: [githubOIDCRole]
-        }
-      );
 
       // eslint-disable-next-line no-new
       new CfnOutput(this, `${props.gitHubOrg}-${gitHubRepo}-GithubOIDCRoleOutput`, {
@@ -65,10 +43,12 @@ export class GitHubOIDCStack extends Stack {
         value: githubOIDCRole.roleArn
       });
 
-      // Suppress AwsSolutions-IAM5[Resource::arn:<AWS::Partition>:iam::<AWS::AccountId>:role/cdk-*]: The IAM entity contains wildcard permissions
-      NagSuppressions.addResourceSuppressions(gitHubOIDCCustomManagedPolicy, [
-        { id: 'AwsSolutions-IAM5', reason: 'I am OK with using wildcard here' }
-      ]);
+      // Suppress AwsSolutions-IAM4[Policy::arn:<AWS::Partition>:iam::aws:policy/AdministratorAccess]: The IAM user, role, or group uses AWS managed policies
+      NagSuppressions.addResourceSuppressionsByPath(
+        this,
+        '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-GitHub-OIDC-Role/Resource',
+        [{ id: 'AwsSolutions-IAM4', reason: 'Admin access for deployment and integration test' }]
+      );
     });
   }
 }
