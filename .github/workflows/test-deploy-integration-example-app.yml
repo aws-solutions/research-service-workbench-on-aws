@@ -13,8 +13,6 @@ on:
         required: true
       aws-test-account-region:
         required: true
-      slack_webhook_url:
-        required: true
 
 jobs:
   deploy-and-integration-test-example:
@@ -48,9 +46,3 @@ jobs:
         run: |
           cd workbench-core/example/infrastructure
           node ../../../common/scripts/install-run-rushx.js integration-tests --verbose
-
-      - name: Slack Failure Notification
-        if: failure()
-        uses: ./.github/actions/notification
-        with:
-          slack_webhook_url: ${{ secrets.slack_webhook_url }}

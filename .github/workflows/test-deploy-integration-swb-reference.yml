@@ -13,15 +13,10 @@ on:
         required: true
       aws-dev-account-region:
         required: true
-      slack_webhook_url:
-        required: true
       CYPRESS_ADMIN_PASSWORD:
         required: true
       CYPRESS_ADMIN_USER:
         required: true
-
-env:
-    CYPRESS_CACHE_FOLDER: cypress/cache
 
 jobs:
 # deploy only when files specific to swb package changed
@@ -78,9 +73,3 @@ jobs:
           # Cypress will strip the header and pass it to the tests
           CYPRESS_AdminPassword: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
           CYPRESS_AdminUser: ${{ secrets.CYPRESS_ADMIN_USER }}
-
-      - name: Slack Failure Notification
-        if: failure()
-        uses: ./.github/actions/notification
-        with:
-          slack_webhook_url: ${{ secrets.slack_webhook_url }}
