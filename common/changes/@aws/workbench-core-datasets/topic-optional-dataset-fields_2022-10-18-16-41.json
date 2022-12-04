@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Added optional `owner`, `type`, and `description` fields to `DataSet` interface.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

@@ -7,7 +7,6 @@ import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamo
 import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
-
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { ExternalEndpoint } from './externalEndpoint';
@@ -199,7 +198,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       endPointParams.item.endPointAlias = endPoint.endPointAlias;
     }
 
-    await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endPointKey, params: endPointParams });
 
     return endPoint.id!;
   }
@@ -214,6 +213,9 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
         id: dataSet.id!,
         name: dataSet.name,
         createdAt: dataSet.createdAt!,
+        description: dataSet.description,
+        owner: dataSet.owner,
+        type: dataSet.type,
         storageName: dataSet.storageName,
         path: dataSet.path,
         awsAccountId: dataSet.awsAccountId,
@@ -225,7 +227,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
 
     if (dataSet.externalEndpoints) dataSetParams.item.externalEndpoints = dataSet.externalEndpoints!;
 
-    await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: dataSetKey, params: dataSetParams });
 
     return dataSet.id!;
   }

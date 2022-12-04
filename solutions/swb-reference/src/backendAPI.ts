@@ -64,19 +64,25 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
-  environmentTypeConfigService: new EnvironmentTypeConfigService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeConfigService: new EnvironmentTypeConfigService(
+    new EnvironmentTypeService({
+      TABLE_NAME: process.env.STACK_NAME!
+    }),
+    aws.helpers.ddb
+  ),
   projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
-  costCenterService: new CostCenterService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
-  metadataService: new MetadataService()
+  costCenterService: new CostCenterService(
+    {
+      TABLE_NAME: process.env.STACK_NAME!
+    },
+    aws.helpers.ddb
+  ),
+  metadataService: new MetadataService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

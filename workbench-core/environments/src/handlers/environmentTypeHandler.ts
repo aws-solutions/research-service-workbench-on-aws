@@ -5,7 +5,7 @@
 
 import { ProductViewSummary, ProvisioningArtifactDetail } from '@aws-sdk/client-service-catalog';
 import { AwsService, resourceTypeToKey, CFNTemplateParameters } from '@aws/workbench-core-base';
-import { EnvironmentType } from '../interfaces/environmentType';
+import { EnvironmentType } from '../models/environmentType';
 import EnvironmentTypeService from '../services/environmentTypeService';
 
 export default class EnvironmentTypeHandler {

@@ -3,10 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, QueryCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, QueryCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import JSONValue from '../../../types/json';
+import { buildDynamoDBPkSk } from './ddbUtil';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -14,6 +15,35 @@ describe('DynamoDBService', () => {
   const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
+
+  describe('getItem', () => {
+    let unmarshalledData: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+
+      mockDDB.on(GetItemCommand).resolves({
+        Item: marshall(unmarshalledData)
+      });
+    });
+    // Get Item
+    test('returns unmarshalled item', async () => {
+      // BUILD
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
+      // OPERATE
+      const result = await dbService.getItem(key);
+      // CHECK
+      expect(result).toEqual(unmarshalledData);
+    });
+  });
 
   describe('getPaginatedItems', () => {
     let unmarshalledData: Record<string, JSONValue>;
@@ -1535,6 +1565,33 @@ describe('DynamoDBService', () => {
       expect(generatedParams).toEqual(expectedParams);
     });
   });
+
+  describe('updateExecuteAndFormat', () => {
+    let unmarshalledAttributes: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledAttributes = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+      mockDDB.on(UpdateItemCommand).resolves({
+        Attributes: marshall(unmarshalledAttributes)
+      });
+    });
+
+    test('returns unmarshalled data', async () => {
+      const result = await dbService.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk('sampleAccId', 'someType')
+      });
+      expect(result).toEqual({ Attributes: unmarshalledAttributes });
+    });
+  });
+
   describe('updater', () => {
     test('should succeed with no optional params', async () => {
       // BUILD
@@ -1546,7 +1603,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key).getParams();
+      const generatedParams = dbService.update({ key }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1572,7 +1629,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1600,7 +1657,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1628,7 +1685,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1652,7 +1709,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1680,7 +1737,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1696,7 +1753,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1712,7 +1769,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1728,7 +1785,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1744,7 +1801,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1760,7 +1817,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1777,7 +1834,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1794,7 +1851,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1811,7 +1868,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1828,7 +1885,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
@@ -1845,7 +1902,7 @@ describe('DynamoDBService', () => {
       };
 
       // OPERATE
-      const generatedParams = dbService.update(key, developerParams).getParams();
+      const generatedParams = dbService.update({ key, params: developerParams }).getParams();
 
       // CHECK
       expect(generatedParams).toEqual(expectedParams);
