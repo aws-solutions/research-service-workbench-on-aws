@@ -30,7 +30,7 @@ runs:
       with:
         path: |
           common/temp/pnpm-store
-          cypress/cache
+          ~/.cache/Cypress
         key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-
