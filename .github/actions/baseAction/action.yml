@@ -12,7 +12,7 @@ runs:
     - name: Use Node.js 16.x
       uses: actions/setup-node@v3
       with:
-        node-version: '16.13.2'
+        node-version: '16.x'
 
     - name: Cache Rush
       uses: actions/cache@v3
@@ -30,19 +30,10 @@ runs:
       with:
         path: |
           common/temp/pnpm-store
+          ~/.cache/Cypress
         key: ${{ runner.os }}-pnpm-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-
-          ${{ runner.os }}-
-
-    - name: Cache cypress binary
-      uses: actions/cache@v3
-      with:
-        path: |
-          cypress/cache
-        key: ${{ runner.os }}-cypress-binary-${{ hashFiles('common/config/rush/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-cypress-binary-
           ${{ runner.os }}-
 
     - name: install pnpm
