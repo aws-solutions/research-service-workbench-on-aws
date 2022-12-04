@@ -6,9 +6,6 @@
 name: Test-deploy-integration
 on: ['pull_request']
 
-env:
-  CYPRESS_CACHE_FOLDER: cypress/cache
-
 jobs:
   deploy-swb-reference:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/test-deploy-integration-swb-reference.yml@pnpm-audit-rush-update
