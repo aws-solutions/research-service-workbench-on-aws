@@ -36,7 +36,7 @@ export const routesMap: RoutesMap = {
         subject: 'Account'
       }
     ],
-    PUT: [
+    PATCH: [
       {
         action: 'UPDATE',
         subject: 'Account'

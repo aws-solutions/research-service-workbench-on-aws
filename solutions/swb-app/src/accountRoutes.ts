@@ -62,7 +62,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     })
   );
 
-  router.put(
+  router.patch(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
