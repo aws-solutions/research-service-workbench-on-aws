@@ -223,6 +223,10 @@
       "allowedCategories": [ "tools" ]
     },
     {
+      "name": "@next/eslint-plugin-next",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes", "tools" ]
     },
@@ -261,6 +265,10 @@
     {
       "name": "@testing-library/user-event",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@vendia/serverless-express",
@@ -351,8 +359,20 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "eslint-import-resolver-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "eslint-plugin-import",
       "allowedCategories": [ "production", "prototypes", "tools" ]
+    },
+    {
+      "name": "eslint-plugin-react",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "eslint-plugin-security",

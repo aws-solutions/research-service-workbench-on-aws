@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { UpdateUserRequest, UpdateUserRequestParser } from './models/updateUserRequest';
 import CreateRoleSchema from './schemas/createRole';
 import CreateUserSchema from './schemas/createUser';
 import UpdateRoleSchema from './schemas/updateRole';
@@ -44,4 +45,4 @@ export {
 } from './authenticationMiddleware';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';
 export { UserManagementService } from './userManagementService';
-export { CreateRoleSchema, CreateUserSchema, UpdateRoleSchema };
+export { CreateRoleSchema, CreateUserSchema, UpdateRoleSchema, UpdateUserRequest, UpdateUserRequestParser };
