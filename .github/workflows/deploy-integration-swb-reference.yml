@@ -20,9 +20,6 @@ on:
       CYPRESS_ADMIN_USER:
         required: true
 
-env:
-  CYPRESS_CACHE_FOLDER: cypress/cache
-
 jobs:
 # deploy only when files specific to swb package changed
   deploy-and-integration-test-swb-reference:
