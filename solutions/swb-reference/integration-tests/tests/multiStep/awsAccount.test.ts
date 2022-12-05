@@ -77,6 +77,8 @@ describe('multiStep awsAccount integration test', () => {
       const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name });
       expect(updateResponse.status).toEqual(200);
       expect(updateResponse.data.name).toEqual(name);
+
+      await accountService.delete(accountId);
     } catch (error) {
       console.error(error);
 
