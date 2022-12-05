@@ -108,10 +108,12 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
       ECR_REPOSITORY_NAME_OUTPUT_KEY,
       VPC_ID_OUTPUT_KEY,
-      SUBNET_IDS,
+      ALB_SUBNET_IDS,
+      ECS_SUBNET_IDS,
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
-      USE_CLOUD_FRONT
+      USE_CLOUD_FRONT,
+      ALB_INTERNET_FACING
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -188,19 +190,17 @@ export class SWBStack extends Stack {
     workflow.createSSMDocuments();
 
     new CfnOutput(this, 'useCloudFront', {
-      value: USE_CLOUD_FRONT
+      value: String(USE_CLOUD_FRONT)
     });
+
     if (!USE_CLOUD_FRONT) {
-      const swbVpc = new SWBVpc(this, 'SWBVpc', {
-        vpcId: VPC_ID,
-        subnetIds: SUBNET_IDS
-      });
+      const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
       new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
         value: swbVpc.vpc.vpcId,
         exportName: VPC_ID_OUTPUT_KEY
       });
 
-      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID);
+      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
 
       const repository = new Repository(this, 'Repository', {
         imageScanOnPush: true
@@ -216,21 +216,42 @@ export class SWBStack extends Stack {
     }
   }
 
+  private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
+    const swbVpc = new SWBVpc(this, 'SWBVpc', {
+      vpcId,
+      albSubnetIds,
+      ecsSubnetIds
+    });
+
+    new CfnOutput(this, 'vpcId', {
+      value: swbVpc.vpc.vpcId,
+      exportName: 'SWB-vpcId'
+    });
+
+    new CfnOutput(this, 'ecsSubnetIds', {
+      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(','),
+      exportName: 'SWB-ecsSubnetIds'
+    });
+
+    return swbVpc;
+  }
+
   private _createLoadBalancer(
     swbVpc: SWBVpc,
     apiGwUrl: string,
     domainName: string,
-    hostZoneId: string
+    hostedZoneId: string,
+    internetFacing: boolean
   ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
       vpc: swbVpc.vpc,
-      subnets: swbVpc.subnetSelection,
-      internetFacing: true // TODO: See if this is required if we are directly passing in subnets
+      subnets: swbVpc.albSubnetSelection,
+      internetFacing
     });
 
     const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
       zoneName: domainName,
-      hostedZoneId: hostZoneId
+      hostedZoneId: hostedZoneId
     });
 
     // Add a Route 53 alias with the Load Balancer as the target

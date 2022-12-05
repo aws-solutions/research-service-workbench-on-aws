@@ -2,11 +2,12 @@
 stage: testEnv
 awsRegion: us-east-1
 awsRegionShortName: va
-rootUserEmail: aws-chamonix-dev+testEnvRoot@amazon.com
+rootUserEmailParamStorePath: '/swb/testEnv/rootUser/email'
 allowedOrigins: ['http://localhost:3000', 'http://localhost:3002']
 cognitoDomain: 'chamonix-dev-test-domain'
 vpcId: ''
-subnetIds: []
+albSubnetIds: []
+ecsSubnetIds: []
+albInternetFacing: true
 domainName: 'chamonix-dev-test-domain.example.com'
 #hostZoneId: ''
-#tlsCertificateId: ''

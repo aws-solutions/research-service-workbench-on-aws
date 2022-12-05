@@ -3,8 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
+import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
+import { UserManagementService } from '@aws/workbench-core-authentication';
+import { MetadataService } from '@aws/workbench-core-base';
 import { DataSetService, DataSetsStoragePlugin } from '@aws/workbench-core-datasets';
+
 import {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
@@ -24,6 +27,9 @@ export interface ApiRouteConfig {
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;
   projectService: ProjectService;
+  userManagementService: UserManagementService;
+  costCenterService: CostCenterService;
+  metadataService: MetadataService;
 }
 
 export interface ApiRoute {

@@ -13,7 +13,7 @@ interface Setting {
   envType: string;
   runId: string;
   terminatedEnvId: string;
-  rootUsername: string;
+  rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
 
   // Main CFN template outputs
@@ -40,6 +40,9 @@ interface Setting {
   APIGatewayAPIEndpoint67A1C4AD: string;
   dynamoDBTableOutput: string;
   StatusHandlerLambdaRoleOutput: string;
+
+  // Default hosting account
+  defaultHostingAccountId: string;
 
   // Configs for AWS Account onboard test
   hostAwsAccountId: string;

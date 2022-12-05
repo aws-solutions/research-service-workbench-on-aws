@@ -161,7 +161,7 @@ export class SWBUIStack extends Stack {
   private _deployS3BucketAndInvalidateDistribution(bucket: Bucket, distribution: Distribution): void {
     new BucketDeployment(this, this.distributionEnvVars.S3_ARTIFACT_BUCKET_DEPLOYMENT_NAME, {
       destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../../out'))],
+      sources: [Source.asset(path.resolve(__dirname, '../../ui/out'))],
       distribution: distribution,
       distributionPaths: ['/*'] //invalidates cache for all routes so we can immediatly see updated code when deploying
     });

@@ -17,7 +17,7 @@ RUN git checkout $BRANCH
 RUN node common/scripts/install-run-rush.js install
 RUN node common/scripts/install-run-rush.js build
 
-WORKDIR '/solution-spark-on-aws/solutions/swb-ui'
+WORKDIR '/solution-spark-on-aws/solutions/swb-ui/ui'
 
 EXPOSE 3000
 

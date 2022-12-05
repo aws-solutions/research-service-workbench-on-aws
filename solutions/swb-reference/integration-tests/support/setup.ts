@@ -37,17 +37,17 @@ export default class Setup {
     if (this._defaultAdminSession === undefined) {
       const userPoolId = this._settings.get('cognitoUserPoolId');
       const clientId = this._settings.get('cognitoUserPoolClientId');
-      const rootUsername = this._settings.get('rootUsername');
+      const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
       const awsRegion = this._settings.get('awsRegion');
 
       const cognitoTokenService = new CognitoTokenService(awsRegion);
-      const { accessToken } = await cognitoTokenService.generateCognitoToken(
+      const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,
         clientId,
-        rootUsername,
+        rootUserNameParamStorePath,
         rootPasswordParamStorePath
-      );
+      });
 
       const session = this._getClientSession(accessToken);
       this._sessions.push(session);

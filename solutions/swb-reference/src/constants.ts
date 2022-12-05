@@ -5,9 +5,10 @@
 
 import fs from 'fs';
 import { join } from 'path';
+import { AwsService } from '@aws/workbench-core-base';
 import yaml from 'js-yaml';
 
-function getConstants(): {
+interface Constants {
   STAGE: string;
   STACK_NAME: string;
   SC_PORTFOLIO_NAME: string;
@@ -22,7 +23,6 @@ function getConstants(): {
   S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX: string;
   LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY: string;
   AMI_IDS_TO_SHARE: string;
-  ROOT_USER_EMAIL: string;
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
@@ -41,19 +41,21 @@ function getConstants(): {
   MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY: string;
   ECR_REPOSITORY_NAME_OUTPUT_KEY: string;
   VPC_ID_OUTPUT_KEY: string;
-  SUBNET_IDS: string[];
+  ALB_SUBNET_IDS: string[];
+  ECS_SUBNET_IDS: string[];
+  ALB_INTERNET_FACING: boolean;
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
-  CERTIFICATE_ID: string;
-  USE_CLOUD_FRONT: string;
-} {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const config: any = yaml.load(
-    // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-    // correct file
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
-  );
+  USE_CLOUD_FRONT: boolean;
+}
+
+interface SecretConstants {
+  ROOT_USER_EMAIL: string;
+}
+
+//CDK Constructs doesn't support Promises https://github.com/aws/aws-cdk/issues/8273
+function getConstants(): Constants {
+  const config = getConfig();
 
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
@@ -63,25 +65,23 @@ function getConstants(): {
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
   const S3_ARTIFACT_BUCKET_SC_PREFIX = 'service-catalog-cfn-templates/';
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
-  const ROOT_USER_EMAIL = config.rootUserEmail;
   const allowedOrigins: string[] = config.allowedOrigins || [];
-  const USE_CLOUD_FRONT = config.useCloudFront;
-  const uiClientURL = getUiClientUrl();
+  const USE_CLOUD_FRONT = config.useCloudFront || false;
+  const uiClientURL = getUiClientUrl(USE_CLOUD_FRONT);
   if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
   const WEBSITE_URLS = allowedOrigins;
-  const USER_POOL_ID = config.userPoolId;
-  const CLIENT_ID = config.clientId;
-  const CLIENT_SECRET = config.clientSecret;
-  const VPC_ID = config.vpcId;
-  const SUBNET_IDS = config.subnetIds;
-
-  const HOSTED_ZONE_ID = config.hostedZoneId;
-  const DOMAIN_NAME = config.domainName;
-  const CERTIFICATE_ID = config.tlsCertificateId;
-
+  const USER_POOL_ID = config.userPoolId || '';
+  const CLIENT_ID = config.clientId || '';
+  const CLIENT_SECRET = config.clientSecret || '';
+  const VPC_ID = config.vpcId || '';
+  const ALB_SUBNET_IDS = config.albSubnetIds || [''];
+  const ECS_SUBNET_IDS = config.ecsSubnetIds || [''];
+  const ALB_INTERNET_FACING = config.albInternetFacing || false;
+  const HOSTED_ZONE_ID = config.hostedZoneId || '';
+  const DOMAIN_NAME = config.domainName || '';
   const AMI_IDS: string[] = [];
 
   // These are the OutputKey for the SWB Main Account CFN stack
@@ -113,7 +113,6 @@ function getConstants(): {
     S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX,
     LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY,
     AMI_IDS_TO_SHARE: JSON.stringify(AMI_IDS),
-    ROOT_USER_EMAIL,
     USER_POOL_CLIENT_NAME,
     USER_POOL_NAME,
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
@@ -132,39 +131,87 @@ function getConstants(): {
     MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
     ECR_REPOSITORY_NAME_OUTPUT_KEY,
     VPC_ID_OUTPUT_KEY,
-    SUBNET_IDS,
     HOSTED_ZONE_ID,
     DOMAIN_NAME,
-    CERTIFICATE_ID,
-    USE_CLOUD_FRONT
+    USE_CLOUD_FRONT,
+    ALB_SUBNET_IDS,
+    ECS_SUBNET_IDS,
+    ALB_INTERNET_FACING
   };
 }
 
-function getUiClientUrl(): string {
-  //useCloudFront: string): string {
-  // if (useCloudFront) {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const uiClientOutput: any = JSON.parse(
-      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-      // correct file
-      // eslint-disable-next-line security/detect-non-literal-fs-filename
-      fs.readFileSync(
-        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
-        'utf8'
-      ) // nosemgrep
-    );
-    const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
-    // eslint-disable-next-line security/detect-object-injection
-    return uiClientOutput[uiClientStackName].WebsiteURL;
-  } catch {
-    console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
-    return '';
-  }
-  // } else {
-  //   console.log(`Using ALB and ECS for ${process.env.STAGE} UI Client.`);
-  //   return '';
-  // }
+async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
+  const config = getConfig();
+  const AWS_REGION = config.awsRegion;
+  const awsService = new AwsService({ region: AWS_REGION });
+  const rootUserParamStorePath = config.rootUserEmailParamStorePath;
+
+  const ROOT_USER_EMAIL = await getSSMParamValue(awsService, rootUserParamStorePath);
+  return { ...getConstants(), ROOT_USER_EMAIL };
 }
 
-export { getConstants };
+interface Config {
+  stage: string;
+  accountId: string;
+  awsRegion: string;
+  awsRegionShortName: string;
+  rootUserEmailParamStorePath: string;
+  allowedOrigins: string[];
+  cognitoDomain: string;
+  useCloudFront?: boolean;
+  userPoolId?: string;
+  clientId?: string;
+  clientSecret?: string;
+  vpcId?: string;
+  albSubnetIds?: string[];
+  ecsSubnetIds?: string[];
+  albInternetFacing?: boolean;
+  hostedZoneId?: string;
+  domainName?: string;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getConfig(): Config {
+  return yaml.load(
+    // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+    // correct file
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFileSync(join(__dirname, `../../src/config/${process.env.STAGE}.yaml`), 'utf8') // nosemgrep
+  ) as unknown as Config;
+}
+
+async function getSSMParamValue(awsService: AwsService, ssmParamName: string): Promise<string> {
+  const response = await awsService.clients.ssm.getParameter({
+    Name: ssmParamName,
+    WithDecryption: true
+  });
+
+  return response.Parameter!.Value!;
+}
+
+function getUiClientUrl(useCloudFront: boolean): string {
+  if (useCloudFront) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const uiClientOutput: any = JSON.parse(
+        // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+        // correct file
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFileSync(
+          join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
+          'utf8'
+        ) // nosemgrep
+      );
+      const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+      // eslint-disable-next-line security/detect-object-injection
+      return uiClientOutput[uiClientStackName].WebsiteURL;
+    } catch {
+      console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
+      return '';
+    }
+  } else {
+    console.log(`Using ALB and ECS for ${process.env.STAGE} UI Client.`);
+    return '';
+  }
+}
+
+export { getConstants, getConstantsWithSecrets };
