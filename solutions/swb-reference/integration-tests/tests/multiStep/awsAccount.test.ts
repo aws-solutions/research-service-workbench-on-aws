@@ -26,65 +26,56 @@ describe('multiStep awsAccount integration test', () => {
   test('it works', async () => {
     const dynamoDbService = new DynamoDBService({ region: 'us-east-1', table: 'swb-dev-va' });
     const accountService = new AccountService(dynamoDbService);
-    let accountId: string | undefined;
 
-    try {
-      const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
+    const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
-      const createAccountParams: CreateAccountData = {
-        hostingAccountHandlerRoleArn: settings.get('hostingAccountHandlerRoleArn'),
-        awsAccountId: settings.get('hostAwsAccountId'),
-        envMgmtRoleArn: settings.get('envMgmtRoleArn'),
-        name: randomTextGenerator.getFakeText('fakeName'),
-        externalId: randomTextGenerator.getFakeText('fakeExternalId')
+    const createAccountParams: CreateAccountData = {
+      hostingAccountHandlerRoleArn: settings.get('hostingAccountHandlerRoleArn'),
+      awsAccountId: settings.get('hostAwsAccountId'),
+      envMgmtRoleArn: settings.get('envMgmtRoleArn'),
+      name: randomTextGenerator.getFakeText('fakeName'),
+      externalId: randomTextGenerator.getFakeText('fakeExternalId')
+    };
+
+    const hostingAwsAccountId = `${resourceTypeToKey.awsAccount}#${createAccountParams.awsAccountId}`;
+    const query = { key: { name: 'pk', value: hostingAwsAccountId } };
+    const ddbEntries = await dynamoDbService.getPaginatedItems(query);
+    if (ddbEntries.data.length > 0) {
+      const accountId = ddbEntries.data[0].accountId.toString();
+      const awsAccountItemKey = {
+        pk: hostingAwsAccountId,
+        sk: `${resourceTypeToKey.account}#${accountId}`
       };
-
-      const hostingAwsAccountId = `${resourceTypeToKey.awsAccount}#${createAccountParams.awsAccountId}`;
-      const query = { key: { name: 'pk', value: hostingAwsAccountId } };
-      const ddbEntries = await dynamoDbService.getPaginatedItems(query);
-      if (ddbEntries.data.length > 0) {
-        const accountId = ddbEntries.data[0].accountId.toString();
-        const awsAccountItemKey = {
-          pk: hostingAwsAccountId,
-          sk: `${resourceTypeToKey.account}#${accountId}`
-        };
-        await dynamoDbService.delete(awsAccountItemKey).execute();
-      }
-
-      const createResponse = await adminSession.resources.accounts.create(createAccountParams, false);
-      expect(createResponse.status).toEqual(201);
-
-      accountId = createResponse.data.id;
-      if (!accountId) {
-        throw new Error('no account id from create response');
-      }
-      expect(await new AccountHelper().verifyBusAllowsAccount(createAccountParams.awsAccountId)).toBe(true);
-
-      const hostingAccountTemplateResponse = await adminSession.resources.accounts.hostingAccountTemplate(
-        accountId
-      );
-      expect(hostingAccountTemplateResponse.status).toEqual(200);
-
-      const listResponse = await adminSession.resources.accounts.get({ pageSize: `100` });
-      expect(listResponse.status).toEqual(200);
-      expect(listResponse.data.data.map((item: Account) => item.id)).toContain(accountId);
-
-      const getResponse = await adminSession.resources.accounts.account(accountId).get();
-      expect(getResponse.status).toEqual(200);
-      expect(getResponse.data.id).toEqual(accountId);
-
-      const name = `integration-test-${new Date().toISOString()}`;
-      const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name }, true);
-      expect(updateResponse.status).toEqual(200);
-      expect(updateResponse.data.name).toEqual(name);
-
-      await accountService.delete(accountId);
-    } catch (error) {
-      console.error(error);
-
-      if (accountId) {
-        await accountService.delete(accountId);
-      }
+      await dynamoDbService.delete(awsAccountItemKey).execute();
     }
+
+    const createResponse = await adminSession.resources.accounts.create(createAccountParams, false);
+    expect(createResponse.status).toEqual(201);
+
+    const accountId = createResponse.data.id;
+    if (!accountId) {
+      throw new Error('no account id from create response');
+    }
+    expect(await new AccountHelper().verifyBusAllowsAccount(createAccountParams.awsAccountId)).toBe(true);
+
+    const hostingAccountTemplateResponse = await adminSession.resources.accounts.hostingAccountTemplate(
+      accountId
+    );
+    expect(hostingAccountTemplateResponse.status).toEqual(200);
+
+    const listResponse = await adminSession.resources.accounts.get({ pageSize: `100` });
+    expect(listResponse.status).toEqual(200);
+    expect(listResponse.data.data.map((item: Account) => item.id)).toContain(accountId);
+
+    const getResponse = await adminSession.resources.accounts.account(accountId).get();
+    expect(getResponse.status).toEqual(200);
+    expect(getResponse.data.id).toEqual(accountId);
+
+    const name = `integration-test-${new Date().toISOString()}`;
+    const updateResponse = await adminSession.resources.accounts.account(accountId).update({ name }, true);
+    expect(updateResponse.status).toEqual(200);
+    expect(updateResponse.data.name).toEqual(name);
+
+    await accountService.delete(accountId);
   });
 });

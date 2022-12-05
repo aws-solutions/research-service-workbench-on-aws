@@ -36,14 +36,14 @@ describe('awsAccounts update negative tests', () => {
     describe('and the update params are invalid', () => {
       test('it throws a validation error', async () => {
         try {
-          const badValue = 1 as unknown as string;
+          const surpriseIntValue = 1 as unknown as string;
 
           await account.update({
-            name: badValue,
-            awsAccountId: badValue,
-            envMgmtRoleArn: badValue,
-            hostingAccountHandlerRoleArn: badValue,
-            externalId: badValue
+            name: surpriseIntValue,
+            awsAccountId: surpriseIntValue,
+            envMgmtRoleArn: surpriseIntValue,
+            hostingAccountHandlerRoleArn: surpriseIntValue,
+            externalId: surpriseIntValue
           });
         } catch (e) {
           checkHttpError(
