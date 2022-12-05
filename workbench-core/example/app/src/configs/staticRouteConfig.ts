@@ -38,6 +38,20 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/datasets/iam': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetRole'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'DatasetRole'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
