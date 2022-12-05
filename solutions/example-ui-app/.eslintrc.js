@@ -2,7 +2,13 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution');
 
 module.exports = {
-  extends: ['@aws/eslint-config-workbench-core-eslint-custom', 'next/core-web-vitals'],
+  extends: [
+    '@aws/eslint-config-workbench-core-eslint-custom',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:@next/next/recommended',
+    'plugin:react/jsx-runtime'
+  ],
   parserOptions: { tsconfigRootDir: __dirname },
   plugins: ['testing-library'],
   overrides: [
@@ -11,5 +17,10 @@ module.exports = {
       files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
       extends: ['plugin:testing-library/react']
     }
-  ]
+  ],
+  settings: {
+    react: {
+      version: 'detect'
+    }
+  }
 };

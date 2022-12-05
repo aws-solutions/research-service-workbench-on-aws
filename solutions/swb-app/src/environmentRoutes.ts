@@ -9,7 +9,7 @@ import {
   isSortAttribute,
   CreateEnvironmentSchema
 } from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { NextFunction, Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import _ from 'lodash';

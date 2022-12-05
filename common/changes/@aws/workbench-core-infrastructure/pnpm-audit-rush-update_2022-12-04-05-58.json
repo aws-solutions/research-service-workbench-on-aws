@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "eslint fixes",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

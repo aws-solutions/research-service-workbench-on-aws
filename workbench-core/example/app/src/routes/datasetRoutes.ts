@@ -12,7 +12,7 @@ import {
   DataSetsStoragePlugin,
   isDataSetHasEndpointError
 } from '@aws/workbench-core-datasets';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { dataSetPrefix, endPointPrefix } from '../configs/constants';
