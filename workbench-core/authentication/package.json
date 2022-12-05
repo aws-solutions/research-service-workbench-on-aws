@@ -37,7 +37,8 @@
     "axios": "^0.27.1",
     "csurf": "^1.11.0",
     "jsonschema": "^1.4.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.186.0",
