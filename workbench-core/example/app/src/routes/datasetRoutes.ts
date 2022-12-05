@@ -14,7 +14,8 @@ import {
   CreatePresignedSinglePartFileUploadUrl,
   DataSetService,
   DataSetsStoragePlugin,
-  isDataSetHasEndpointError
+  isDataSetHasEndpointError,
+  isInvalidIamRoleError
 } from '@aws/workbench-core-datasets';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -194,12 +195,19 @@ export function setUpDSRoutes(
     '/datasets/iam',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, AddDatasetPermissionsToRoleSchema));
-      const role = addDatasetPermissionsToRole({
-        roleString: req.body.roleString,
-        accessPointArn: req.body.accessPointArn,
-        datasetPrefix: req.body.datasetPrefix
-      });
-      res.status(200).send(role);
+      try {
+        const role = addDatasetPermissionsToRole({
+          roleString: req.body.roleString,
+          accessPointArn: req.body.accessPointArn,
+          datasetPrefix: req.body.datasetPrefix
+        });
+        res.status(200).send(role);
+      } catch (error) {
+        if (isInvalidIamRoleError(error)) {
+          throw Boom.badRequest('the roleString parameter does not represent a valid IAM role');
+        }
+        throw error;
+      }
     })
   );
 }
