@@ -3,7 +3,7 @@
 ⚠️ $\textcolor{red}{\text{Experimental}}$ ⚠️ : Not for use in any critical, production, or otherwise important deployments
 
 ## Description
-This package create the role that can be used to assume from a github workflow inorder to perform deployments. 2 stacks are created as part of this package:
+This package creates the roles in an AWS account that can be assumed from a github workflow. The permissions given to these roles enable the workflow to perform deployments in the specified AWS account. 2 CDK stacks are created as part of this package:
 1. `OIDCProviderStack`: Creates the Identity Provider
 2. `<GitHub-Org>-GitHubOIDCStack`: Creates the role-to-assume
 
