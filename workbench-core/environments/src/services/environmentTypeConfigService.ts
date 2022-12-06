@@ -54,6 +54,7 @@ export default class EnvironmentTypeConfigService {
         }
       });
     } catch (e) {
+      console.error(e);
       throw Boom.internal('Unable to delete Environment Type Config');
     }
   }
