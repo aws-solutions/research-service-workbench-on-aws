@@ -19,7 +19,7 @@ describe('multiStep awsAccount integration test', () => {
   let adminSession: ClientSession;
 
   beforeEach(async () => {
-    // expect.hasAssertions();
+    expect.hasAssertions();
     adminSession = await setup.getDefaultAdminSession();
   });
 
@@ -53,9 +53,8 @@ describe('multiStep awsAccount integration test', () => {
     expect(createResponse.status).toEqual(201);
 
     const accountId = createResponse.data.id;
-    if (!accountId) {
-      throw new Error('no account id from create response');
-    }
+    expect(accountId).toBeTruthy();
+
     expect(await new AccountHelper().verifyBusAllowsAccount(createAccountParams.awsAccountId)).toBe(true);
 
     const hostingAccountTemplateResponse = await adminSession.resources.accounts.hostingAccountTemplate(
@@ -65,7 +64,7 @@ describe('multiStep awsAccount integration test', () => {
 
     const listResponse = await adminSession.resources.accounts.get({ pageSize: `100` });
     expect(listResponse.status).toEqual(200);
-    expect(listResponse.data.data.map((item: Account) => item.id)).toContain(accountId);
+    expect(listResponse.data.data.some((item: Account) => item.id === accountId)).toBe(true);
 
     const getResponse = await adminSession.resources.accounts.account(accountId).get();
     expect(getResponse.status).toEqual(200);

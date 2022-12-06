@@ -59,11 +59,6 @@ describe('awsAccounts create negative tests', () => {
         const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
         const existingAccounts = await accountHelper.listOnboardedAccounts();
 
-        if (existingAccounts.length === 0) {
-          console.log('No hosting accounts have been onboarded. Skipping this test.');
-          return;
-        }
-
         invalidParam.awsAccountId = _.first(existingAccounts)!.awsAccountId;
         try {
           await adminSession.resources.accounts.create(invalidParam, false);
