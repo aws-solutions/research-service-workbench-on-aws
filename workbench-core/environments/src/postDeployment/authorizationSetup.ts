@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Action, isGroupAlreadyExistsError, PermissionsService } from '@aws/workbench-core-authorization';
+import { Action, isGroupAlreadyExistsError } from '@aws/workbench-core-authorization';
 import { IdentityPermission } from '@aws/workbench-core-authorization/lib/models/identityPermission';
+import { PermissionsService } from '@aws/workbench-core-authorization/lib/models/permissionsService';
 
 export default class AuthorizationSetup {
   private _authService: PermissionsService;

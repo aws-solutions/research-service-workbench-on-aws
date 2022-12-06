@@ -8,7 +8,7 @@ import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
-import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
 import { AwsService } from '@aws/workbench-core-base';
 import { AuthorizationSetup, CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
 import axios from 'axios';
