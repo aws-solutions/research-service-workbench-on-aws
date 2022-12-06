@@ -21,7 +21,6 @@ export class GitHubOIDCStack extends Stack {
     //Create GitHubOIDC Role
     props.gitHubRepos.forEach((gitHubRepo) => {
       const githubOIDCRole: Role = new Role(this, `${props.gitHubOrg}-${gitHubRepo}-GitHub-OIDC-Role`, {
-        // roleName: `${props.gitHubOrg}-${gitHubRepo}-GitHub-OIDC-Role`,
         assumedBy: new FederatedPrincipal(
           props.idp.openIdConnectProviderArn,
           {
