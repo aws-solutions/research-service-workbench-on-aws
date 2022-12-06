@@ -3,8 +3,10 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
+  Environment,
+  EnvironmentService,
   EnvironmentTypeConfigService,
   DeleteEnvironmentTypeConfigRequest,
   DeleteEnvironmentTypeConfigRequestParser,
@@ -13,9 +15,7 @@ import {
   ListEnvironmentTypeConfigsRequest,
   CreateEnvironmentTypeConfigRequestParser,
   UpdateEnvironmentTypeConfigRequestParser,
-  ListEnvironmentTypeConfigsRequestParser,
-  EnvironmentItemParser,
-  EnvironmentItem
+  ListEnvironmentTypeConfigsRequestParser
 } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -25,7 +25,7 @@ import { validateAndParse } from './validatorHelper';
 export function setUpEnvTypeConfigRoutes(
   router: Router,
   environmentTypeConfigService: EnvironmentTypeConfigService,
-  metadataService: MetadataService
+  environmentService: EnvironmentService
 ): void {
   // Create envTypeConfig
   router.post(
@@ -69,24 +69,29 @@ export function setUpEnvTypeConfigRoutes(
 
       async function checkDependency(envTypeId: string, envTypeConfigId: string): Promise<void> {
         const typeId = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
-        const dependencies = await metadataService.listResourceByDependency<EnvironmentItem>(
-          'environment',
-          typeId,
-          EnvironmentItemParser
-        );
-        if (dependencies?.data) {
-          const conflicEnvironments = dependencies.data.filter(
-            (e) => e.status !== 'TERMINATED' && e.status !== 'FAILED'
-          );
-          if (conflicEnvironments.length > 0) {
-            const conflicSummary = conflicEnvironments
-              .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
-              .join('\n');
-            throw Boom.conflict(
-              `There are active environments using this configuration: ${conflicSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
+        let paginationToken: string | undefined = undefined;
+
+        do {
+          const dependencies: { data: Environment[]; paginationToken: string | undefined } =
+            await environmentService.listEnvironments(
+              res.locals.user,
+              { type: typeId },
+              200,
+              paginationToken
             );
+          if (dependencies?.data) {
+            const conflicEnvironments = dependencies.data.filter((e) => e.status !== 'FAILED');
+            if (conflicEnvironments.length > 0) {
+              const conflicSummary = conflicEnvironments
+                .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
+                .join('\n');
+              throw Boom.conflict(
+                `There are active environments using this configuration: ${conflicSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
+              );
+            }
+            paginationToken = dependencies.paginationToken;
           }
-        }
+        } while (paginationToken !== undefined);
       }
       const envTypeConfig = await environmentTypeConfigService.softDeleteEnvironmentTypeConfig(
         validatedRequest,

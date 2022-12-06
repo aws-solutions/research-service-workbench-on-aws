@@ -15,7 +15,6 @@ import StatusHandler from './handlers/statusHandler';
 import EnvironmentConnectionLinkPlaceholder from './models/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './models/environmentConnectionService';
 import EnvironmentLifecycleService from './models/environmentLifecycleService';
-import { EnvironmentItem, EnvironmentItemParser } from './models/environments/environment';
 import {
   CreateEnvironmentTypeConfigRequest,
   CreateEnvironmentTypeConfigRequestParser
@@ -80,7 +79,5 @@ export {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser,
   ListEnvironmentTypeConfigsRequest,
-  ListEnvironmentTypeConfigsRequestParser,
-  EnvironmentItem,
-  EnvironmentItemParser
+  ListEnvironmentTypeConfigsRequestParser
 };
