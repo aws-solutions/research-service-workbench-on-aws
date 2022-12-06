@@ -1,5 +1,5 @@
 {
-  "app": "lib/src/index.js",
+  "app": "lib/index.js",
   "context": {
     "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
     "@aws-cdk/core:stackRelativeExports": true,

@@ -4,9 +4,8 @@
   "compilerOptions": {
     "types": ["heft-jest", "node"],
     "lib": ["es2017", "dom"],
-    "rootDirs": ["src", "integration-tests"],
-    "rootDir": ""
+    "rootDir": "src"
   },
-  "include": ["src/**/*.ts", "integration-tests/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "lib", "cdk.out"]
 }

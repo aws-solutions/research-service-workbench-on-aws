@@ -23,3 +23,9 @@ The command below will deploy and generate the assume-role-arn [here](./src/conf
 ```bash
 rushx cdk:deploy
 ```
+
+## Update GitHub secrets
+In GitHub secrets:
+
+    1. For Dev Account: update ASSUME_ROLE with the role arn
+    2. For Test Account: update TEST_ASSUME_ROLE with the role arn
