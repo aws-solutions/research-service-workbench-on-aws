@@ -110,6 +110,8 @@ export class SWBStack extends Stack {
       VPC_ID_OUTPUT_KEY,
       ALB_SUBNET_IDS,
       ECS_SUBNET_IDS,
+      ECS_SUBNET_IDS_OUTPUT_KEY,
+      ECS_SUBNET_AZS_OUTPUT_KEY,
       HOSTED_ZONE_ID,
       DOMAIN_NAME,
       USE_CLOUD_FRONT,
@@ -196,8 +198,15 @@ export class SWBStack extends Stack {
     if (!USE_CLOUD_FRONT) {
       const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
       new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
-        value: swbVpc.vpc.vpcId,
-        exportName: VPC_ID_OUTPUT_KEY
+        value: swbVpc.vpc.vpcId
+      });
+
+      new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
+        value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+      });
+
+      new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
+        value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
       });
 
       this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
@@ -221,16 +230,6 @@ export class SWBStack extends Stack {
       vpcId,
       albSubnetIds,
       ecsSubnetIds
-    });
-
-    new CfnOutput(this, 'vpcId', {
-      value: swbVpc.vpc.vpcId,
-      exportName: 'SWB-vpcId'
-    });
-
-    new CfnOutput(this, 'ecsSubnetIds', {
-      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(','),
-      exportName: 'SWB-ecsSubnetIds'
     });
 
     return swbVpc;

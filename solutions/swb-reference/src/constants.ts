@@ -43,6 +43,8 @@ interface Constants {
   VPC_ID_OUTPUT_KEY: string;
   ALB_SUBNET_IDS: string[];
   ECS_SUBNET_IDS: string[];
+  ECS_SUBNET_IDS_OUTPUT_KEY: string;
+  ECS_SUBNET_AZS_OUTPUT_KEY: string;
   ALB_INTERNET_FACING: boolean;
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
@@ -67,8 +69,6 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_BOOTSTRAP_PREFIX = 'environment-files/'; // Location of env bootstrap scripts in the artifacts bucket
   const allowedOrigins: string[] = config.allowedOrigins || [];
   const USE_CLOUD_FRONT = config.useCloudFront || false;
-  const uiClientURL = getUiClientUrl(USE_CLOUD_FRONT);
-  if (uiClientURL) allowedOrigins.push(uiClientURL);
   const USER_POOL_CLIENT_NAME = `swb-client-${config.stage}-${config.awsRegionShortName}`;
   const USER_POOL_NAME = `swb-userpool-${config.stage}-${config.awsRegionShortName}`;
   const COGNITO_DOMAIN = config.cognitoDomain;
@@ -77,11 +77,18 @@ function getConstants(): Constants {
   const CLIENT_ID = config.clientId || '';
   const CLIENT_SECRET = config.clientSecret || '';
   const VPC_ID = config.vpcId || '';
-  const ALB_SUBNET_IDS = config.albSubnetIds || [''];
-  const ECS_SUBNET_IDS = config.ecsSubnetIds || [''];
+  const ALB_SUBNET_IDS = config.albSubnetIds || [];
+  const ECS_SUBNET_IDS = config.ecsSubnetIds || [];
   const ALB_INTERNET_FACING = config.albInternetFacing || false;
   const HOSTED_ZONE_ID = config.hostedZoneId || '';
   const DOMAIN_NAME = config.domainName || '';
+  let uiClientURL = '';
+  if (DOMAIN_NAME) {
+    uiClientURL = `https://${DOMAIN_NAME}`;
+  } else {
+    uiClientURL = getUiClientUrl();
+  }
+  if (uiClientURL) allowedOrigins.push(uiClientURL);
   const AMI_IDS: string[] = [];
 
   // These are the OutputKey for the SWB Main Account CFN stack
@@ -97,6 +104,8 @@ function getConstants(): Constants {
   const MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerListenerArnOutput';
   const ECR_REPOSITORY_NAME_OUTPUT_KEY = 'SwbEcrRepositoryNameOutput';
   const VPC_ID_OUTPUT_KEY = 'SwbVpcIdOutput';
+  const ECS_SUBNET_IDS_OUTPUT_KEY = 'SwbEcsSubnetIdsOutput';
+  const ECS_SUBNET_AZS_OUTPUT_KEY = 'SwbEcsAzsOutput';
 
   return {
     STAGE: config.stage,
@@ -136,6 +145,8 @@ function getConstants(): Constants {
     USE_CLOUD_FRONT,
     ALB_SUBNET_IDS,
     ECS_SUBNET_IDS,
+    ECS_SUBNET_IDS_OUTPUT_KEY,
+    ECS_SUBNET_AZS_OUTPUT_KEY,
     ALB_INTERNET_FACING
   };
 }
@@ -188,28 +199,23 @@ async function getSSMParamValue(awsService: AwsService, ssmParamName: string): P
   return response.Parameter!.Value!;
 }
 
-function getUiClientUrl(useCloudFront: boolean): string {
-  if (useCloudFront) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const uiClientOutput: any = JSON.parse(
-        // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
-        // correct file
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFileSync(
-          join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
-          'utf8'
-        ) // nosemgrep
-      );
-      const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
-      // eslint-disable-next-line security/detect-object-injection
-      return uiClientOutput[uiClientStackName].WebsiteURL;
-    } catch {
-      console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
-      return '';
-    }
-  } else {
-    console.log(`Using ALB and ECS for ${process.env.STAGE} UI Client.`);
+function getUiClientUrl(): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const uiClientOutput: any = JSON.parse(
+      // __dirname is a variable that reference the current directory. We use it so we can dynamically navigate to the
+      // correct file
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      fs.readFileSync(
+        join(__dirname, `../../../swb-ui/infrastructure/src/config/${process.env.STAGE}.json`),
+        'utf8'
+      ) // nosemgrep
+    );
+    const uiClientStackName = Object.entries(uiClientOutput).map(([key, value]) => key)[0]; //output has a format { stackname: {...props} }
+    // eslint-disable-next-line security/detect-object-injection
+    return uiClientOutput[uiClientStackName].WebsiteURL;
+  } catch {
+    console.log(`No UI Client deployed found for ${process.env.STAGE}.`);
     return '';
   }
 }

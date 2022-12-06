@@ -68,7 +68,9 @@ export class SWBUIStack extends Stack {
       COGNITO_DOMAIN_NAME,
       USE_CLOUD_FRONT,
       ECR_REPOSITORY_NAME,
-      VPC_ID
+      VPC_ID,
+      ECS_SUBNET_IDS,
+      ECS_AZS
     } = getConstants();
     super(scope, STACK_NAME, props);
 
@@ -98,7 +100,14 @@ export class SWBUIStack extends Stack {
       new CfnOutput(this, this.distributionEnvVars.DISTRIBUTION_ARTIFACT_DOMAIN, {
         value: `https://${SWB_DOMAIN_NAME}`
       });
-      createECSCluster(this, MAIN_ACCT_ALB_LISTENER_ARN, ECR_REPOSITORY_NAME, VPC_ID);
+      createECSCluster(
+        this,
+        MAIN_ACCT_ALB_LISTENER_ARN,
+        ECR_REPOSITORY_NAME,
+        VPC_ID,
+        ECS_SUBNET_IDS,
+        ECS_AZS
+      );
     }
     this._addCognitoURLOutput();
   }

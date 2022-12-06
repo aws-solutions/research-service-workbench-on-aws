@@ -20,9 +20,15 @@ export function createECSCluster(
   stack: SWBUIStack,
   listenerArn: string,
   repositoryName: string,
-  vpcId: string
+  vpcId: string,
+  subnetIds: string[],
+  availabilityZones: string[]
 ): void {
-  const vpc = Vpc.fromLookup(stack, 'MainVPC', { vpcId });
+  const vpc = Vpc.fromVpcAttributes(stack, 'MainVPC', {
+    vpcId,
+    availabilityZones: availabilityZones,
+    privateSubnetIds: subnetIds
+  });
 
   // Create an ECS cluster
   const cluster = new Cluster(stack, 'Cluster', {
@@ -47,7 +53,6 @@ export function createECSCluster(
     image: ContainerImage.fromRegistry(
       `${stack.account}.dkr.ecr.${stack.region}.amazonaws.com/${repositoryName}:latest`
     ),
-    // image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
     memoryLimitMiB: 1024,
     portMappings: [{ containerPort: 3000 }]
   });

@@ -30,6 +30,8 @@ function getConstants(): {
   COGNITO_DOMAIN_NAME: string;
   USE_CLOUD_FRONT: boolean;
   VPC_ID: string;
+  ECS_SUBNET_IDS: string[];
+  ECS_AZS: string[];
   ECR_REPOSITORY_NAME: string;
 } {
   const config = getAPIOutputs();
@@ -54,6 +56,8 @@ function getConstants(): {
   const MAIN_ACCT_ALB_LISTENER_ARN = config.mainAccountAlbListenerArn;
   const USE_CLOUD_FRONT = config.useCloudFront;
   const VPC_ID = config.vpcId;
+  const ECS_SUBNET_IDS = config.ecsSubnetIds;
+  const ECS_AZS = config.ecsAzs;
   const SWB_DOMAIN_NAME = config.swbDomainName;
   const ECR_REPOSITORY_NAME = config.ecrRepositoryName;
 
@@ -86,6 +90,8 @@ function getConstants(): {
     COGNITO_DOMAIN_NAME,
     USE_CLOUD_FRONT,
     VPC_ID,
+    ECS_SUBNET_IDS,
+    ECS_AZS,
     ECR_REPOSITORY_NAME
   };
 }
@@ -96,11 +102,13 @@ function getAPIOutputs(): {
   apiUrlOutput: string;
   awsRegion: string;
   cognitoDomainName: string;
-  ecrRepositoryName: string;
   swbDomainName: string;
   mainAccountAlbListenerArn: string;
   useCloudFront: boolean;
   vpcId: string;
+  ecsSubnetIds: string[];
+  ecsAzs: string[];
+  ecrRepositoryName: string;
 } {
   try {
     if (process.env.aws_account_number && process.env.SYNTH_REGION_SHORTNAME && process.env.SYNTH_REGION)
@@ -115,6 +123,8 @@ function getAPIOutputs(): {
         mainAccountAlbListenerArn: '',
         useCloudFront: false,
         vpcId: '',
+        ecsSubnetIds: [],
+        ecsAzs: [],
         ecrRepositoryName: ''
       };
 
@@ -133,11 +143,15 @@ function getAPIOutputs(): {
     let mainAccountAlbListenerArn = '';
     let swbDomainName = '';
     let vpcId = '';
+    let ecsSubnetIds = [];
+    let ecsAzs = [];
     if (!useCloudFront) {
       ecrRepositoryName = outputs.SwbEcrRepositoryNameOutput;
       swbDomainName = outputs.SwbDomainNameOutput;
       mainAccountAlbListenerArn = outputs.MainAccountLoadBalancerListenerArnOutput;
       vpcId = outputs.SwbVpcIdOutput;
+      ecsSubnetIds = outputs.SwbEcsSubnetIdsOutput.split(',');
+      ecsAzs = outputs.SwbEcsAzsOutput.split(',');
     }
 
     if (!outputs.awsRegionShortName || !outputs.apiUrlOutput || !outputs.awsRegion) {
@@ -156,6 +170,8 @@ function getAPIOutputs(): {
       mainAccountAlbListenerArn: mainAccountAlbListenerArn,
       useCloudFront: useCloudFront,
       vpcId: vpcId,
+      ecsSubnetIds: ecsSubnetIds,
+      ecsAzs: ecsAzs,
       ecrRepositoryName: ecrRepositoryName
     };
   } catch {

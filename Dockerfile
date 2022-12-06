@@ -23,5 +23,5 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-CMD ["node", "../../common/scripts/install-run-rushx.js", "start"]
+CMD ["node", "../../../common/scripts/install-run-rushx.js", "start"]
 
