@@ -33,7 +33,7 @@ export default class EnvironmentTypeConfigService {
   }
 
   /**
-   * Soft Environment Type Configuration
+   * Soft Delete Environment Type Configuration
    * @param request - request for deleting environment type config
    * @param checkDependency - check whether we can delete the envTypeConfig. The function should throw a Boom error if envTypeConfig cannot be deleted
    * @returns void
