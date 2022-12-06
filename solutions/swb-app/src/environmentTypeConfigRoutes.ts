@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   EnvironmentTypeConfigService,
   DeleteEnvironmentTypeConfigRequest,
@@ -12,15 +13,19 @@ import {
   ListEnvironmentTypeConfigsRequest,
   CreateEnvironmentTypeConfigRequestParser,
   UpdateEnvironmentTypeConfigRequestParser,
-  ListEnvironmentTypeConfigsRequestParser
+  ListEnvironmentTypeConfigsRequestParser,
+  EnvironmentItemParser,
+  EnvironmentItem
 } from '@aws/workbench-core-environments';
+import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeConfigRoutes(
   router: Router,
-  environmentTypeConfigService: EnvironmentTypeConfigService
+  environmentTypeConfigService: EnvironmentTypeConfigService,
+  metadataService: MetadataService
 ): void {
   // Create envTypeConfig
   router.post(
@@ -50,8 +55,8 @@ export function setUpEnvTypeConfigRoutes(
   );
 
   // Soft Delete envTypeConfig
-  router.put(
-    '/environmentTypes/:envTypeId/configurations/:envTypeConfigId/softDelete',
+  router.delete(
+    '/environmentTypes/:envTypeId/configurations/:envTypeConfigId',
     wrapAsync(async (req: Request, res: Response) => {
       const envTypeConfigDeleteRequest = {
         envTypeId: req.params.envTypeId,
@@ -63,8 +68,25 @@ export function setUpEnvTypeConfigRoutes(
       );
 
       async function checkDependency(envTypeId: string, envTypeConfigId: string): Promise<void> {
-        // TODO: Implement this using metadataService
-        return Promise.resolve();
+        const typeId = `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`;
+        const dependencies = await metadataService.listResourceByDependency<EnvironmentItem>(
+          'environment',
+          typeId,
+          EnvironmentItemParser
+        );
+        if (dependencies?.data) {
+          const conflicEnvironments = dependencies.data.filter(
+            (e) => e.status !== 'TERMINATED' && e.status !== 'FAILED'
+          );
+          if (conflicEnvironments.length > 0) {
+            const conflicSummary = conflicEnvironments
+              .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
+              .join('\n');
+            throw Boom.conflict(
+              `There are active environments using this configuration: ${conflicSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
+            );
+          }
+        }
       }
       const envTypeConfig = await environmentTypeConfigService.softDeleteEnvironmentTypeConfig(
         validatedRequest,

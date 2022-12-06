@@ -884,6 +884,51 @@
           "response": []
         },
         {
+          "name": "Soft Delete envTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "List envTypeConfigs",
           "request": {
             "method": "GET",

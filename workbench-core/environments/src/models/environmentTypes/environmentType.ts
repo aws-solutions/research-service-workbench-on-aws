@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 import { CFNTemplateParameters } from '@aws/workbench-core-base';
-import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
+import { EnvironmentTypeStatus } from '../../constants/environmentTypeStatus';
 
 export interface EnvironmentType {
   pk: string;

@@ -12,36 +12,37 @@ import {
 import { SortAttribute, isSortAttribute } from './constants/sortAttributes';
 import EnvironmentTypeHandler from './handlers/environmentTypeHandler';
 import StatusHandler from './handlers/statusHandler';
-import {
-  CreateEnvironmentTypeConfigRequest,
-  CreateEnvironmentTypeConfigRequestParser
-} from './models/createEnvironmentTypeConfigRequest';
 import EnvironmentConnectionLinkPlaceholder from './models/environmentConnectionLinkPlaceholder';
 import EnvironmentConnectionService from './models/environmentConnectionService';
 import EnvironmentLifecycleService from './models/environmentLifecycleService';
+import { EnvironmentItem, EnvironmentItemParser } from './models/environments/environment';
+import {
+  CreateEnvironmentTypeConfigRequest,
+  CreateEnvironmentTypeConfigRequestParser
+} from './models/environmentTypeConfigs/createEnvironmentTypeConfigRequest';
 import {
   DeleteEnvironmentTypeConfigRequestParser,
   DeleteEnvironmentTypeConfigRequest
 } from './models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
-import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import {
   ListEnvironmentTypeConfigsRequest,
   ListEnvironmentTypeConfigsRequestParser
-} from './models/listEnvironmentTypeConfigsRequest';
-import {
-  ListEnvironmentTypesRequest,
-  ListEnvironmentTypesRequestParser
-} from './models/listEnvironmentTypesRequest';
+} from './models/environmentTypeConfigs/listEnvironmentTypeConfigsRequest';
 import {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser
-} from './models/updateEnvironmentTypeConfigsRequest';
+} from './models/environmentTypeConfigs/updateEnvironmentTypeConfigsRequest';
+import {
+  ListEnvironmentTypesRequest,
+  ListEnvironmentTypesRequestParser
+} from './models/environmentTypes/listEnvironmentTypesRequest';
+import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
 import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
 import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
-import { EnvironmentService, Environment } from './services/environmentService';
+import { Environment, EnvironmentService } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
 import EnvironmentLifecycleHelper from './utilities/environmentLifecycleHelper';
@@ -79,5 +80,7 @@ export {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser,
   ListEnvironmentTypeConfigsRequest,
-  ListEnvironmentTypeConfigsRequestParser
+  ListEnvironmentTypeConfigsRequestParser,
+  EnvironmentItem,
+  EnvironmentItemParser
 };

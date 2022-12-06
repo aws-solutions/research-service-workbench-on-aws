@@ -61,6 +61,42 @@ export class MetadataService {
   /**
    *
    * @param mainEntityResourceType - main entity resource type
+   * @param dependencyId - dependency entity id
+   * @param parser - Zod parser for metadata object
+   * @param queryParams - parameters to query metadata. Supported page size and pagination token.
+   * @returns object containind list of metadata objects and continuation token.
+   */
+  public async listResourceByDependency<DependencyMetadata extends { id: string }>(
+    mainEntityResourceType: string,
+    dependencyId: string,
+    parser: ZodTypeAny,
+    queryParams?: {
+      pageSize?: number;
+      paginationToken?: string;
+    }
+  ): Promise<{ data: DependencyMetadata[]; paginationToken: string | undefined }> {
+    let params: QueryParams = {
+      key: { name: 'resourceType', value: mainEntityResourceType },
+      index: 'getResourceByType',
+      sortKey: 'type',
+      eq: { S: `${dependencyId}` },
+      limit: Math.min(queryParams?.pageSize ?? DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE)
+    };
+
+    params = addPaginationToken(queryParams?.paginationToken, params);
+
+    const { data, paginationToken } = await this._ddbService.getPaginatedItems(params);
+    const dependencyMetadata: DependencyMetadata[] = [];
+    data.forEach((item) => {
+      dependencyMetadata.push(validateAndParse<DependencyMetadata>(parser, item));
+    });
+
+    return { data: dependencyMetadata, paginationToken };
+  }
+
+  /**
+   *
+   * @param mainEntityResourceType - main entity resource type
    * @param mainEntityId - main entity id
    * @param dependencyResourceType - dependency resource type
    * @param parser - Zod parser for metadata object
