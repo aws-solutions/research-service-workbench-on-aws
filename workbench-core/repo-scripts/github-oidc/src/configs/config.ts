@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export const gitHubOrgRepo: Record<string, string[]> = {
+/**
+ * Expected key:value - 'org': ['repo1', 'repo2']
+ */
+export const gitHubOrgToRepos: Record<string, string[]> = {
   'aws-solutions': ['solution-spark-on-aws']
-  //Add more "GitHub-Orgs": ["GitHub-Repo1", "GitHub-Repo2"]
 };

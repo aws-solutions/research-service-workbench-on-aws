@@ -30,7 +30,7 @@ export class OIDCProviderStack extends Stack {
         {
           id: 'W11',
           reason:
-            'This is a CustomResourceProviderRole created by OpenIdConnectProvider, I am OK with wildcard here'
+            'This is a CustomResourceProviderRole created by OpenIdConnectProvider construct, I am OK with wildcard here'
         }
       ]
     });
@@ -52,13 +52,13 @@ export class OIDCProviderStack extends Stack {
         {
           id: 'W89',
           reason:
-            'This Lambda Function is getting created internally by OpenIdConnectProvider module and is being used to create Infrastructure'
+            'This Lambda Function is getting created internally by OpenIdConnectProvider construct and is being used to create Infrastructure'
         },
         // Suppress: W92 - Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
         {
           id: 'W92',
           reason:
-            'This Lambda Function is getting created internally by OpenIdConnectProvider module, I am OK with no ReservedConcurrentExecutions'
+            'This Lambda Function is getting created internally by OpenIdConnectProvider construct, I am OK with no ReservedConcurrentExecutions'
         }
       ]
     });

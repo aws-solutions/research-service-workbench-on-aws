@@ -466,7 +466,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(exampleLambda, [
       {
         id: 'AwsSolutions-L1',
-        reason: 'We are using NODEJS_16'
+        reason: 'We are using NODEJS_16 instead of the latest NODEJS_18'
       }
     ]);
 
