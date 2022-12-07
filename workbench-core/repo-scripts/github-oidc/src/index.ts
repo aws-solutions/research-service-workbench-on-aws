@@ -7,8 +7,8 @@
 
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { App, Aspects, Environment } from 'aws-cdk-lib';
-import { AwsSolutionsChecks } from 'cdk-nag';
+import { App, Environment } from 'aws-cdk-lib';
+// import { AwsSolutionsChecks } from 'cdk-nag';
 import { gitHubOrgToRepos } from './configs/config';
 import { GitHubOIDCStack } from './github-oidc-stack';
 import { OIDCProviderStack } from './oidc-provider-stack';
@@ -34,4 +34,4 @@ Object.keys(gitHubOrgToRepos).forEach((gitHubOrg) => {
   });
 });
 
-Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+// Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

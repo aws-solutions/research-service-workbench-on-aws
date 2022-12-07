@@ -22,7 +22,7 @@ jobs:
 # deploy only when files specific to swb package changed
   deploy-and-integration-test-swb-reference:
     runs-on: ubuntu-20.04
-    environment: dev
+    environment: prTest
     permissions:
       id-token: write
       contents: read
@@ -47,27 +47,27 @@ jobs:
         run: |
           cd solutions/swb-reference
           node ../../common/scripts/install-run-rushx.js compile
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.pr-test-aws-account-region }} -v
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js cdk-deploy
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js run-postDeployment
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk bootstrap ${{ secrets.pr-test-aws-account-region }} -v
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js cdk-deploy
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js run-postDeployment
 
       - name: Deploy SWB-UI
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-ui/ui
-          STAGE='dev' node ../../../common/scripts/install-run-rushx.js deploy-ui-and-api
+          STAGE='testEnv' node ../../../common/scripts/install-run-rushx.js deploy-ui-and-api
 
       - name: Run Integration tests
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-reference
-          STAGE='dev' node ../../common/scripts/install-run-rushx.js integration-tests
+          STAGE='testEnv' node ../../common/scripts/install-run-rushx.js integration-tests
 
       - name: Run End To End tests
         # if: steps.changed-swb-files.outputs.any_changed == 'true'
         run: |
           cd solutions/swb-ui/ui
-          STAGE='dev' node ../../../common/scripts/install-run-rushx.js e2e-test
+          STAGE='testEnv' node ../../../common/scripts/install-run-rushx.js e2e-test
         env:
           # Env parameters for cypress tests need header 'CYPRESS_' or 'cypress_'
           # Cypress will strip the header and pass it to the tests
