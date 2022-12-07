@@ -10,15 +10,15 @@ jobs:
   deploy-swb-reference:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/testPR-deploy-integration-swb-reference.yml@github-oidc-least-privilege
     secrets:
-      aws-dev-region: ${{ secrets.PR_TEST_AWS_REGION }}
-      role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
-      aws-dev-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}
+      pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
+      pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
+      pr-test-aws-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}
       CYPRESS_ADMIN_PASSWORD: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
 
   deploy-example-app:
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/testPR-deploy-integration-example-app.yml@github-oidc-least-privilege
     secrets:
-      aws-test-region: ${{ secrets.PR_TEST_AWS_REGION }}
-      test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
-      aws-test-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}
+      pr-test-aws-region: ${{ secrets.PR_TEST_AWS_REGION }}
+      pr-test-role-to-assume: ${{ secrets.PR_TEST_ASSUME_ROLE }}
+      pr-test-aws-account-region: ${{ secrets.PR_TEST_AWS_ACCOUNT_REGION }}
