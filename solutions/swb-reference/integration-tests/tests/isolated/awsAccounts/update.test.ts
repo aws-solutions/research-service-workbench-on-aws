@@ -40,11 +40,7 @@ describe('awsAccounts update negative tests', () => {
 
           await account.update(
             {
-              name: surpriseIntValue,
-              awsAccountId: surpriseIntValue,
-              envMgmtRoleArn: surpriseIntValue,
-              hostingAccountHandlerRoleArn: surpriseIntValue,
-              externalId: surpriseIntValue
+              name: surpriseIntValue
             },
             true
           );
@@ -54,8 +50,7 @@ describe('awsAccounts update negative tests', () => {
             new HttpError(400, {
               statusCode: 400,
               error: 'Bad Request',
-              message:
-                "name is not of a type(s) string. is not allowed to have the additional property 'awsAccountId'. is not allowed to have the additional property 'envMgmtRoleArn'. is not allowed to have the additional property 'hostingAccountHandlerRoleArn'. is not allowed to have the additional property 'externalId'"
+              message: 'name is not of a type(s) string'
             })
           );
         }

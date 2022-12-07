@@ -41,10 +41,6 @@ export interface CreateAccountData {
 export interface UpdateAccountData {
   id: string;
   name?: string;
-  awsAccountId?: string;
-  envMgmtRoleArn?: string;
-  hostingAccountHandlerRoleArn?: string;
-  externalId?: string;
 }
 
 export default class HostingAccountLifecycleService {
@@ -135,13 +131,6 @@ export default class HostingAccountLifecycleService {
   }
 
   public async updateAccount(accountMetadata: UpdateAccountData): Promise<{ [key: string]: string }> {
-    if (accountMetadata.awsAccountId) {
-      await this._attachAwsAccount({
-        awsAccountId: accountMetadata.awsAccountId,
-        arns: await this._getArns()
-      });
-    }
-
     return this._accountService.update({
       ...accountMetadata
     });

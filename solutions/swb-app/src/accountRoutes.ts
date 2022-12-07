@@ -66,16 +66,10 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
-      const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
+      const { name } = req.body;
       const updateAccountMetadata: UpdateAccountData = {
         id: escape(req.params.id),
-        name: name!! ? escape(name) : undefined,
-        awsAccountId: awsAccountId!! ? escape(awsAccountId) : undefined,
-        envMgmtRoleArn: envMgmtRoleArn!! ? escape(envMgmtRoleArn) : undefined,
-        hostingAccountHandlerRoleArn: hostingAccountHandlerRoleArn!!
-          ? escape(hostingAccountHandlerRoleArn)
-          : undefined,
-        externalId: externalId!! ? escape(externalId) : undefined
+        name: name!! ? escape(name) : undefined
       };
 
       const updatedAccount = await hostingAccountService.update(updateAccountMetadata);
