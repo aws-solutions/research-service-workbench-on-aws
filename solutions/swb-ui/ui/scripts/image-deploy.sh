@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 BRANCH=$1
@@ -11,12 +11,10 @@ function upload_docker_image_ecr() {
   aws_account_number=$(aws sts get-caller-identity --query 'Account' --output text)
   apiUrl=$(cat ../../swb-reference/src/config/${STAGE}.json| grep apiUrlOutput | awk '{print $NF}' | sed 's/\"//g' | sed 's/,//g' ) ##Get value from swb-reference/src/config/{STAGE}.json and replace all '"' and ',' with empty.
 
-  pushd ../../.. > /dev/null
   docker build --no-cache -t $ecr_repository_name . --build-arg BRANCH=$BRANCH --build-arg STAGE=$STAGE --build-arg API_URL=$apiUrl
   aws ecr get-login-password --region $aws_region | docker login --username AWS --password-stdin $aws_account_number.dkr.ecr.$aws_region.amazonaws.com
   docker tag $ecr_repository_name:latest $aws_account_number.dkr.ecr.$aws_region.amazonaws.com/$ecr_repository_name:latest
   docker push $aws_account_number.dkr.ecr.$aws_region.amazonaws.com/$ecr_repository_name:latest
-  popd > /dev/null
 }
 
 printf "\nBuilding and deploying docker image for SWB v2.\n"
