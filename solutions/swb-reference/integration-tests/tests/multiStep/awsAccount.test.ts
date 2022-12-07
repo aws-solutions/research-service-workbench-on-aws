@@ -33,7 +33,7 @@ describe('multiStep awsAccount integration test', () => {
       awsAccountId: settings.get('hostAwsAccountId'),
       envMgmtRoleArn: settings.get('envMgmtRoleArn'),
       name: randomTextGenerator.getFakeText('fakeName'),
-      externalId: randomTextGenerator.getFakeText('fakeExternalId')
+      externalId: 'workbench'
     };
 
     const hostingAwsAccountId = `${resourceTypeToKey.awsAccount}#${createAccountParams.awsAccountId}`;
