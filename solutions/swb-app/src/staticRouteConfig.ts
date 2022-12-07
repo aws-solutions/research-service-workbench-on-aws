@@ -258,6 +258,26 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'User'
+      }
+    ]
+  },
   '/roles/Researcher': {
     PUT: [
       {

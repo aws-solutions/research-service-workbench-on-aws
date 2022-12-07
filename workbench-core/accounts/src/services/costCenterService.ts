@@ -16,7 +16,7 @@ import {
   addPaginationToken
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
 import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';

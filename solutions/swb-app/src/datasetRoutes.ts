@@ -10,7 +10,7 @@ import {
   DataSetService,
   DataSetsStoragePlugin
 } from '@aws/workbench-core-datasets';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';

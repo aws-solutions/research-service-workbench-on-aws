@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { ValidatorResult } from 'jsonschema';
 import { ZodTypeAny } from 'zod';
 

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "eslint fixes",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

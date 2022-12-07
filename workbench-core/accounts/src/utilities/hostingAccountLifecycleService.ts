@@ -16,7 +16,7 @@ import {
   PaginatedResponse
 } from '@aws/workbench-core-base';
 import { IamHelper } from '@aws/workbench-core-datasets';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
