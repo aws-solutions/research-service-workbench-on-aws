@@ -26,8 +26,8 @@ import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
 import HostingAccountLifecycleService, {
-  CreateAccountMetadata,
-  UpdateAccountMetadata
+  CreateAccountData,
+  UpdateAccountData
 } from './utilities/hostingAccountLifecycleService';
 
 export {
@@ -48,8 +48,8 @@ export {
   UpdateAccountSchema,
   AwsAccountTemplateUrls,
   AwsAccountTemplateUrlsParser,
-  CreateAccountMetadata,
-  UpdateAccountMetadata,
+  CreateAccountData,
+  UpdateAccountData,
   ListAccountRequest,
   ListAccountsRequestParser
 };

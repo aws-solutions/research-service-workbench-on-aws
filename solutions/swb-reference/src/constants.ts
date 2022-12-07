@@ -24,8 +24,8 @@ interface Constants {
   AMI_IDS_TO_SHARE: string;
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
-  ACCT_HANDLER_ARN_OUTPUT_KEY : string;
-  API_HANDLER_ARN_OUTPUT_KEY : string;
+  ACCT_HANDLER_ARN_OUTPUT_KEY: string;
+  API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
