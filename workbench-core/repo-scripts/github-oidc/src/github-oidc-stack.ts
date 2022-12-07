@@ -93,9 +93,20 @@ export class GitHubOIDCStack extends Stack {
             resources: [`arn:${Aws.PARTITION}:ssm:${Aws.REGION}:${Aws.ACCOUNT_ID}:parameter/*`]
           }),
           new PolicyStatement({
-            actions: ['cognito-idp:DescribeUserPoolClient', 'cognito-idp:AdminInitiateAuth'],
+            actions: [
+              'cognito-idp:DescribeUserPoolClient',
+              'cognito-idp:AdminInitiateAuth',
+              'cognito-idp:CreateGroup',
+              'cognito-idp:AdminCreateUser',
+              'cognito-idp:AdminAddUserToGroup'
+            ],
             resources: [`arn:aws:cognito-idp:${Aws.REGION}:${this.account}:userpool/*`],
             sid: 'CognitoAccess'
+          }),
+          new PolicyStatement({
+            actions: ['cognito-idp:ListUserPools'],
+            resources: ['*'],
+            sid: 'CognitoListUserPoolsAccess'
           }),
           new PolicyStatement({
             actions: [
@@ -122,6 +133,11 @@ export class GitHubOIDCStack extends Stack {
             actions: ['servicecatalog:CreatePortfolioShare', 'servicecatalog:ListPortfolios'],
             resources: [`arn:aws:servicecatalog:${Aws.REGION}:${this.account}:*/*`],
             sid: 'ServiceCatalogAccess'
+          }),
+          new PolicyStatement({
+            actions: ['kms:*'],
+            resources: [`arn:aws:kms:${Aws.REGION}:${this.account}:key/*`],
+            sid: 'KMSAccess'
           })
         ],
         roles: [githubOIDCRole]
