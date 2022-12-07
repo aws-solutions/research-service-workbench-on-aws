@@ -17,9 +17,10 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
-import { EnvironmentType } from '../models/environmentType';
-import { EnvironmentTypeConfig } from '../models/environmentTypeConfig';
+import { EnvironmentTypeConfig } from '../models/environmentTypeConfigs/environmentTypeConfig';
+import { EnvironmentType } from '../models/environmentTypes/environmentType';
 
 import EnvironmentTypeConfigService from './environmentTypeConfigService';
 import EnvironmentTypeService from './environmentTypeService';
@@ -250,6 +251,58 @@ describe('environmentTypeConfigService', () => {
       ).rejects.toThrow(
         `Unable to create environment type with params: ${JSON.stringify({ envTypeId, ...createParams })}`
       );
+    });
+  });
+
+  describe('softDeleteEnvironmentTypeConfig', () => {
+    test('successfully soft delete envTypeConfig', async () => {
+      // BUILD
+      const getItemResponse: GetItemCommandOutput = {
+        Item: marshall(envTypeConfigDDBItem),
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: TABLE_NAME,
+          Key: marshall({
+            pk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
+            sk: `${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`
+          })
+        })
+        .resolves(getItemResponse);
+
+      ddbMock
+        .on(UpdateItemCommand)
+        //@ts-ignore
+        .resolves({ Attributes: marshall({ ...envTypeConfig, resourceType: 'envTypeConfig_delete' }) });
+
+      // OPERATE
+      await expect(
+        envTypeConfigService.softDeleteEnvironmentTypeConfig(
+          {
+            envTypeId,
+            envTypeConfigId
+          },
+          (envTypeId: string, envTypeConfigId: string): Promise<void> => {
+            return Promise.resolve();
+          }
+        )
+      ).resolves.not.toThrow();
+    });
+
+    test('fails to soft delete envTypeConfig with dependencies', async () => {
+      // OPERATE
+      await expect(
+        envTypeConfigService.softDeleteEnvironmentTypeConfig(
+          {
+            envTypeId,
+            envTypeConfigId
+          },
+          (envTypeId: string, envTypeConfigId: string): Promise<void> => {
+            throw Boom.conflict('test dependency error');
+          }
+        )
+      ).rejects.toThrow('test dependency error');
     });
   });
 });

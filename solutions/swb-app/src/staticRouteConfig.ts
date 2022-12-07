@@ -198,6 +198,12 @@ export const routesMap: RoutesMap = {
           action: 'UPDATE',
           subject: 'EnvironmentTypeConfig'
         }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'EnvironmentTypeConfig'
+        }
       ]
     },
   '/projects': {

@@ -93,6 +93,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'EnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Project'
   },

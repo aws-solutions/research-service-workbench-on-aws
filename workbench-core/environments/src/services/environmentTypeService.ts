@@ -22,8 +22,8 @@ import {
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
-import { EnvironmentType } from '../models/environmentType';
-import { ListEnvironmentTypesRequest } from '../models/listEnvironmentTypesRequest';
+import { EnvironmentType } from '../models/environmentTypes/environmentType';
+import { ListEnvironmentTypesRequest } from '../models/environmentTypes/listEnvironmentTypesRequest';
 
 export default class EnvironmentTypeService {
   private _aws: AwsService;

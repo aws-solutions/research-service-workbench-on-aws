@@ -12,10 +12,14 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Boom from '@hapi/boom';
-import { CreateEnvironmentTypeConfigRequest } from '../models/createEnvironmentTypeConfigRequest';
-import { EnvironmentTypeConfig, EnvironmentTypeConfigParser } from '../models/environmentTypeConfig';
-import { ListEnvironmentTypeConfigsRequest } from '../models/listEnvironmentTypeConfigsRequest';
-import { UpdateEnvironmentTypeConfigRequest } from '../models/updateEnvironmentTypeConfigsRequest';
+import { CreateEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/createEnvironmentTypeConfigRequest';
+import { DeleteEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
+import {
+  EnvironmentTypeConfig,
+  EnvironmentTypeConfigParser
+} from '../models/environmentTypeConfigs/environmentTypeConfig';
+import { ListEnvironmentTypeConfigsRequest } from '../models/environmentTypeConfigs/listEnvironmentTypeConfigsRequest';
+import { UpdateEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/updateEnvironmentTypeConfigsRequest';
 import EnvironmentTypeService from './environmentTypeService';
 
 export default class EnvironmentTypeConfigService {
@@ -28,6 +32,32 @@ export default class EnvironmentTypeConfigService {
     this._dynamoDbService = dynamoDbService;
   }
 
+  /**
+   * Soft Delete Environment Type Configuration
+   * @param request - request for deleting environment type config
+   * @param checkDependency - check whether we can delete the envTypeConfig. The function should throw a Boom error if envTypeConfig cannot be deleted
+   * @returns void
+   */
+  public async softDeleteEnvironmentTypeConfig(
+    request: DeleteEnvironmentTypeConfigRequest,
+    checkDependency: (envTypeId: string, envTypeConfigId: string) => Promise<void>
+  ): Promise<void> {
+    const { envTypeId, envTypeConfigId } = request;
+    await checkDependency(envTypeId, envTypeConfigId);
+    await this.getEnvironmentTypeConfig(envTypeId, envTypeConfigId);
+
+    try {
+      await this._dynamoDbService.updateExecuteAndFormat({
+        key: this._buildEnvTypeConfigPkSk(envTypeConfigId),
+        params: {
+          item: { resourceType: `${this._resourceType}_deleted` }
+        }
+      });
+    } catch (e) {
+      console.error(e);
+      throw Boom.internal('Unable to delete Environment Type Config');
+    }
+  }
   /**
    * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
    * @param envTypeId - the environment type identifier

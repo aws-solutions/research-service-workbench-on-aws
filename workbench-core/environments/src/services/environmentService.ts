@@ -376,8 +376,8 @@ export class EnvironmentService {
     const itemsToGet = [
       // ETC
       {
-        pk: resourceTypeToKey.envTypeConfig,
-        sk: environmentTypeConfigSK
+        pk: `${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`,
+        sk: `${resourceTypeToKey.envTypeConfig}#${params.envTypeConfigId}`
       },
       // PROJ
       buildDynamoDBPkSk(params.projectId, resourceTypeToKey.project),
