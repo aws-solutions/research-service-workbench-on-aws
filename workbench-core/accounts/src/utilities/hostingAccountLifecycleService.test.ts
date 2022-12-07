@@ -149,11 +149,7 @@ describe('HostingAccountLifecycleService', () => {
     await expect(
       hostingAccountLifecycleService.updateAccount({
         id: 'abc-xyz',
-        name: 'someName',
-        awsAccountId: '123456789012',
-        envMgmtRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-env-mgmt',
-        hostingAccountHandlerRoleArn: 'arn:aws:iam::123456789012:role/swb-swbv2-va-hosting-account-role',
-        externalId: 'someExternalId'
+        name: 'someName'
       })
     ).resolves.not.toThrowError();
   });
