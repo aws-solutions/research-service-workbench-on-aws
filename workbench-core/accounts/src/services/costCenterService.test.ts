@@ -22,7 +22,6 @@ describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
   let account: Account;
   const costCenterService = new CostCenterService(
-    { TABLE_NAME: 'tableName' },
     new DynamoDBService({ region: 'us-east-1', table: 'tableName' })
   );
   const accountId = 'acc-someId';

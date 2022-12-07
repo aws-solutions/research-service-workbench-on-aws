@@ -44,6 +44,7 @@ interface Setting {
 
   // Configs for AWS Account test
   hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;
   hostingAccountHandlerRoleArn: string;
   encryptionKeyArn: string;

@@ -18,7 +18,7 @@ export default class Accounts extends CollectionResource {
     return new Account(id, this._clientSession, this._api);
   }
 
-  public async hostingAccountTemplate(externalId: string): Promise<AxiosResponse> {
+  public async getHostingAccountTemplate(externalId: string): Promise<AxiosResponse> {
     return await this._axiosInstance.post('/awsAccountTemplateUrls', { externalId });
   }
 

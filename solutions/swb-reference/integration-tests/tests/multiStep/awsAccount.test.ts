@@ -19,7 +19,6 @@ describe('multiStep awsAccount integration test', () => {
   let adminSession: ClientSession;
 
   beforeEach(async () => {
-    expect.hasAssertions();
     adminSession = await setup.getDefaultAdminSession();
   });
 
@@ -57,7 +56,7 @@ describe('multiStep awsAccount integration test', () => {
 
     expect(await new AccountHelper().verifyBusAllowsAccount(createAccountParams.awsAccountId)).toBe(true);
 
-    const hostingAccountTemplateResponse = await adminSession.resources.accounts.hostingAccountTemplate(
+    const hostingAccountTemplateResponse = await adminSession.resources.accounts.getHostingAccountTemplate(
       accountId
     );
     expect(hostingAccountTemplateResponse.status).toEqual(200);

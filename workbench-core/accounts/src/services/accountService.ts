@@ -184,9 +184,18 @@ export default class AccountService {
   }
 
   private async _getAccountWithoutMetadata(accountId: string): Promise<Account> {
+    console.log(
+      `getAccountWithoutMetadata ${JSON.stringify({ pk: `${resourceTypeToKey.account}#${accountId}` })}`
+    );
+
     const accountEntry = (await this._dynamoDBService
-      .get({ pk: `${resourceTypeToKey.account}#${accountId}` })
+      .get({
+        pk: `${resourceTypeToKey.account}#${accountId}`,
+        sk: `${resourceTypeToKey.account}#${accountId}`
+      })
       .execute()) as GetItemCommandOutput;
+
+    console.log(`accountEntry response ${JSON.stringify(accountEntry)}`);
 
     if (!accountEntry.Item) {
       throw Boom.notFound(`Could not find account ${accountId}`);
@@ -198,7 +207,10 @@ export default class AccountService {
   private async _getAccountWithMetadata(accountId: string): Promise<Account> {
     const pk = `${resourceTypeToKey.account}#${accountId}`;
 
+    console.log(`getAccountWithMetadata ${JSON.stringify({ pk: pk })}`);
+
     const data = await this._dynamoDBService.query({ key: { name: 'pk', value: pk } }).execute();
+    console.log(`data ${JSON.stringify(data)}`);
 
     if (data.Count === 0) {
       throw Boom.notFound(`Could not find account ${accountId}`);

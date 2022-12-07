@@ -27,12 +27,9 @@ import AccountService from './accountService';
 
 export default class CostCenterService {
   private _dynamoDbService: DynamoDBService;
-  private readonly _tableName: string;
   private _resourceType: string = 'costCenter';
 
-  public constructor(constants: { TABLE_NAME: string }, dynamoDbService: DynamoDBService) {
-    const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
+  public constructor(dynamoDbService: DynamoDBService) {
     this._dynamoDbService = dynamoDbService;
   }
 
@@ -132,8 +129,9 @@ export default class CostCenterService {
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
 
+    console.log(`getting account for request ${JSON.stringify(request)}`);
     const account = await this._getAccount(request.accountId);
-
+    console.log(`retrieved account ${account}`);
     const currentDateTime = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
@@ -159,6 +157,8 @@ export default class CostCenterService {
       resourceType: this._resourceType,
       dependency: request.accountId
     };
+
+    console.log(`dynamoItem created ${JSON.stringify(dynamoItem)}`);
 
     delete dynamoItem.accountId;
 
@@ -187,7 +187,8 @@ export default class CostCenterService {
     try {
       return await accountService.getAccount(accountId);
     } catch (e) {
-      throw Boom.badRequest(`Could not find account ${accountId}`);
+      console.log(`error getting account: ${e}`);
+      throw Boom.badRequest(`Could not retrieve account ${accountId}`);
     }
   }
 }

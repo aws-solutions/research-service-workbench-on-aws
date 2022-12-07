@@ -51,11 +51,10 @@ export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
   private _accountService: AccountService;
-  public constructor() {
-    this._stackName = process.env.STACK_NAME!;
-    const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
-    this._accountService = new AccountService(this._aws.helpers.ddb);
+  public constructor(stackName: string, awsService: AwsService, accountService: AccountService) {
+    this._stackName = stackName;
+    this._aws = awsService;
+    this._accountService = accountService;
   }
 
   public async listAccounts(listAccountRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {

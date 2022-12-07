@@ -17,6 +17,7 @@ import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfac
 import { SortRequest } from './interfaces/sortRequest';
 
 import { MetadataService } from './services/metadataService';
+import { SecretsService } from './services/secretsService';
 import JSONValue from './types/json';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import {
@@ -69,5 +70,6 @@ export {
   MetadataService,
   validateAndParse,
   JSONValue,
-  DynamoDBService
+  DynamoDBService,
+  SecretsService
 };
