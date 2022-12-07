@@ -286,7 +286,7 @@ describe('CostCenterService', () => {
 
         test('returns an error', async () => {
           await expect(costCenterService.create(createCostCenter)).rejects.toThrow(
-            `Could not find account ${accountId}`
+            `Failed to get account for cost center creation ${accountId}`
           );
         });
       });
