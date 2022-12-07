@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, PaginatedResponse } from '@aws/workbench-core-base';
+import { PaginatedResponse } from '@aws/workbench-core-base';
 import { TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
@@ -11,19 +11,24 @@ import HostingAccountLifecycleService, {
   CreateAccountData,
   UpdateAccountData
 } from '../utilities/hostingAccountLifecycleService';
-import AccountService from './accountService';
 
 export default class HostingAccountService {
+  private _lifecycleService: HostingAccountLifecycleService;
+
+  public constructor(lifecycleService: HostingAccountLifecycleService) {
+    this._lifecycleService = lifecycleService;
+  }
+
   public async list(listAccountsRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
-    return await this._lifecycleService().listAccounts(listAccountsRequest);
+    return await this._lifecycleService.listAccounts(listAccountsRequest);
   }
 
   public async get(accountId: string): Promise<Account> {
-    return await this._lifecycleService().getAccount(accountId, true);
+    return await this._lifecycleService.getAccount(accountId, true);
   }
 
   public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
-    return await this._lifecycleService().buildTemplateUrlsForAccount(externalId);
+    return await this._lifecycleService.buildTemplateUrlsForAccount(externalId);
   }
 
   /**
@@ -33,7 +38,7 @@ export default class HostingAccountService {
    * @returns account record in DDB
    */
   public async create(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
-    return await this._lifecycleService().createAccount(accountMetadata);
+    return await this._lifecycleService.createAccount(accountMetadata);
   }
 
   /**
@@ -43,17 +48,6 @@ export default class HostingAccountService {
    * @returns account record in DDB
    */
   public async update(accountMetadata: UpdateAccountData): Promise<Record<string, string>> {
-    return await this._lifecycleService().updateAccount(accountMetadata);
-  }
-
-  private _lifecycleService(): HostingAccountLifecycleService {
-    const stackName = process.env.STACK_NAME!;
-    const mainAccountAwsService = new AwsService({
-      region: process.env.AWS_REGION!,
-      ddbTableName: stackName
-    });
-    const accountService = new AccountService(mainAccountAwsService.helpers.ddb);
-
-    return new HostingAccountLifecycleService(stackName, mainAccountAwsService, accountService);
+    return await this._lifecycleService.updateAccount(accountMetadata);
   }
 }

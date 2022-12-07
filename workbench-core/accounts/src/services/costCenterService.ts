@@ -182,7 +182,7 @@ export default class CostCenterService {
     try {
       return await accountService.getAccount(accountId);
     } catch (e) {
-      console.log(`Failed to get account for cost center creation: ${e}`);
+      console.error(`Failed to get account for cost center creation: ${e}`);
       throw Boom.badRequest(`Failed to get account for cost center creation ${accountId}`);
     }
   }
