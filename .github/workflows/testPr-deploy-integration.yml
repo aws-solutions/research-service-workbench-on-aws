@@ -8,7 +8,6 @@ on: ['pull_request']
 
 jobs:
   deploy-swb-reference:
-    needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/testPR-deploy-integration-swb-reference.yml@github-oidc-least-privilege
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
@@ -18,7 +17,6 @@ jobs:
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
 
   deploy-example-app:
-    needs: [pre-deployment-check]
     uses: aws-solutions/solution-spark-on-aws/.github/workflows/testPR-deploy-integration-example-app.yml@github-oidc-least-privilege
     secrets:
       aws-test-region: ${{ secrets.AWS_TEST_REGION }}
