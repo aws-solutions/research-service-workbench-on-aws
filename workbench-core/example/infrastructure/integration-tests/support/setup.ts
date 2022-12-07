@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, CognitoTokenService } from '@aws/workbench-core-base';
+import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';
@@ -41,7 +41,13 @@ export default class Setup {
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
       const awsRegion = this._settings.get('AwsRegion');
 
-      const cognitoTokenService = new CognitoTokenService(awsRegion);
+      const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
+      const hostAwsAccountId = await secretsService.getSecret(
+        this._settings.get('hostAwsAccountIdParamStorePath')
+      );
+      this._settings.set('hostAwsAccountId', hostAwsAccountId);
+
+      const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
       const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,
         clientId,

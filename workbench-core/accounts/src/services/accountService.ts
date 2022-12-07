@@ -5,6 +5,7 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
+  buildDynamoDBPkSk,
   PaginatedResponse,
   QueryParams,
   resourceTypeToKey,
@@ -66,6 +67,15 @@ export default class AccountService {
   }
 
   /**
+   * Delete a hosting account record in DDB
+   * @param accountId - The ID of the account to delete
+   */
+  public async delete(accountId: string): Promise<void> {
+    const accountKey = buildDynamoDBPkSk(accountId, resourceTypeToKey.account);
+    await this._dynamoDBService.delete(accountKey).execute();
+  }
+
+  /**
    * Create hosting account record in DDB
    * @param accountMetadata - Attributes of account to create
    *
@@ -75,9 +85,13 @@ export default class AccountService {
     await this._validateCreate(accountMetadata);
     const id = uuidWithLowercasePrefix(resourceTypeToKey.account);
 
-    await this._storeToDdb({ id, ...accountMetadata });
+    await this._storeToDdb({
+      id,
+      status: 'PENDING',
+      ...accountMetadata
+    });
 
-    return { id, ...accountMetadata };
+    return { id, status: 'PENDING', ...accountMetadata };
   }
 
   /**
@@ -94,7 +108,7 @@ export default class AccountService {
     return { ...accountMetadata, id };
   }
 
-  public async _validateCreate(accountMetadata: { [key: string]: string }): Promise<void> {
+  public async _validateCreate(accountMetadata: Record<string, string>): Promise<void> {
     // Verify awsAccountId is specified
     if (_.isUndefined(accountMetadata.awsAccountId))
       throw Boom.badRequest('Missing AWS Account ID in request body');
@@ -171,7 +185,10 @@ export default class AccountService {
 
   private async _getAccountWithoutMetadata(accountId: string): Promise<Account> {
     const accountEntry = (await this._dynamoDBService
-      .get({ pk: `${resourceTypeToKey.account}#${accountId}` })
+      .get({
+        pk: `${resourceTypeToKey.account}#${accountId}`,
+        sk: `${resourceTypeToKey.account}#${accountId}`
+      })
       .execute()) as GetItemCommandOutput;
 
     if (!accountEntry.Item) {

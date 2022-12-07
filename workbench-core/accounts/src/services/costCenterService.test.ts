@@ -22,7 +22,6 @@ describe('CostCenterService', () => {
   const ORIGINAL_ENV = process.env;
   let account: Account;
   const costCenterService = new CostCenterService(
-    { TABLE_NAME: 'tableName' },
     new DynamoDBService({ region: 'us-east-1', table: 'tableName' })
   );
   const accountId = 'acc-someId';
@@ -287,7 +286,7 @@ describe('CostCenterService', () => {
 
         test('returns an error', async () => {
           await expect(costCenterService.create(createCostCenter)).rejects.toThrow(
-            `Could not find account ${accountId}`
+            `Failed to get account for cost center creation ${accountId}`
           );
         });
       });

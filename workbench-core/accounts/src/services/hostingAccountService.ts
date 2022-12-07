@@ -8,21 +8,27 @@ import { TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import HostingAccountLifecycleService, {
-  CreateAccountMetadata,
-  UpdateAccountMetadata
+  CreateAccountData,
+  UpdateAccountData
 } from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
+  private _lifecycleService: HostingAccountLifecycleService;
+
+  public constructor(lifecycleService: HostingAccountLifecycleService) {
+    this._lifecycleService = lifecycleService;
+  }
+
   public async list(listAccountsRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
-    return await new HostingAccountLifecycleService().listAccounts(listAccountsRequest);
+    return await this._lifecycleService.listAccounts(listAccountsRequest);
   }
 
   public async get(accountId: string): Promise<Account> {
-    return await new HostingAccountLifecycleService().getAccount(accountId, true);
+    return await this._lifecycleService.getAccount(accountId, true);
   }
 
   public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
-    return await new HostingAccountLifecycleService().buildTemplateUrlsForAccount(externalId);
+    return await this._lifecycleService.buildTemplateUrlsForAccount(externalId);
   }
 
   /**
@@ -31,8 +37,8 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async create(accountMetadata: CreateAccountMetadata): Promise<{ [key: string]: string }> {
-    return await new HostingAccountLifecycleService().createAccount(accountMetadata);
+  public async create(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
+    return await this._lifecycleService.createAccount(accountMetadata);
   }
 
   /**
@@ -41,7 +47,7 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async update(accountMetadata: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
-    return await new HostingAccountLifecycleService().updateAccount(accountMetadata);
+  public async update(accountMetadata: UpdateAccountData): Promise<Record<string, string>> {
+    return await this._lifecycleService.updateAccount(accountMetadata);
   }
 }

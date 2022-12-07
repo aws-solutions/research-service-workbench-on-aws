@@ -30,7 +30,7 @@ interface Arns {
   mainAcctEncryptionArn: string;
 }
 
-export interface CreateAccountMetadata {
+export interface CreateAccountData {
   name: string;
   awsAccountId: string;
   envMgmtRoleArn: string;
@@ -38,7 +38,7 @@ export interface CreateAccountMetadata {
   externalId: string;
 }
 
-export interface UpdateAccountMetadata {
+export interface UpdateAccountData {
   id: string;
   name?: string;
   awsAccountId?: string;
@@ -51,11 +51,10 @@ export default class HostingAccountLifecycleService {
   private _aws: AwsService;
   private _stackName: string;
   private _accountService: AccountService;
-  public constructor() {
-    this._stackName = process.env.STACK_NAME!;
-    const ddbTableName = process.env.STACK_NAME!; // The DDB table has the same name as the stackName
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName });
-    this._accountService = new AccountService(this._aws.helpers.ddb);
+  public constructor(stackName: string, awsService: AwsService, accountService: AccountService) {
+    this._stackName = stackName;
+    this._aws = awsService;
+    this._accountService = accountService;
   }
 
   public async listAccounts(listAccountRequest: ListAccountRequest): Promise<PaginatedResponse<Account>> {
@@ -119,7 +118,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async createAccount(accountMetadata: CreateAccountMetadata): Promise<{ [key: string]: string }> {
+  public async createAccount(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
     const arns = await this._getArns();
 
     await this._attachAwsAccount({
@@ -135,7 +134,7 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateAccount(accountMetadata: UpdateAccountMetadata): Promise<{ [key: string]: string }> {
+  public async updateAccount(accountMetadata: UpdateAccountData): Promise<{ [key: string]: string }> {
     if (accountMetadata.awsAccountId) {
       await this._attachAwsAccount({
         awsAccountId: accountMetadata.awsAccountId,

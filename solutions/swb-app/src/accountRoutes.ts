@@ -9,8 +9,8 @@ import {
   AwsAccountTemplateUrlsParser,
   UpdateAccountSchema,
   HostingAccountService,
-  CreateAccountMetadata,
-  UpdateAccountMetadata,
+  CreateAccountData,
+  UpdateAccountData,
   ListAccountRequest,
   ListAccountsRequestParser
 } from '@aws/workbench-core-accounts';
@@ -39,8 +39,8 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.post(
     '/awsAccountTemplateUrls',
     wrapAsync(async (req: Request, res: Response) => {
-      const req_validated = AwsAccountTemplateUrlsParser.parse(req.body);
-      res.send(await hostingAccountService.buildTemplateUrlsForAccount(req_validated.externalId));
+      const validatedRequest = AwsAccountTemplateUrlsParser.parse(req.body);
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest.externalId));
     })
   );
 
@@ -49,7 +49,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateAccountSchema));
       const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
-      const createAccountMetadata: CreateAccountMetadata = {
+      const createAccountMetadata: CreateAccountData = {
         name: escape(name),
         awsAccountId: escape(awsAccountId),
         envMgmtRoleArn: escape(envMgmtRoleArn),
@@ -58,7 +58,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
       };
 
       const createdAccount = await hostingAccountService.create(createAccountMetadata);
-      res.send(createdAccount);
+      res.status(201).send(createdAccount);
     })
   );
 
@@ -67,7 +67,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, UpdateAccountSchema));
       const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
-      const updateAccountMetadata: UpdateAccountMetadata = {
+      const updateAccountMetadata: UpdateAccountData = {
         id: escape(req.params.id),
         name: name!! ? escape(name) : undefined,
         awsAccountId: awsAccountId!! ? escape(awsAccountId) : undefined,

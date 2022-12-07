@@ -123,7 +123,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
-    const MAIN_ACCT_ID = `${this.account}`
+    const MAIN_ACCT_ID = `${this.account}`;
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
