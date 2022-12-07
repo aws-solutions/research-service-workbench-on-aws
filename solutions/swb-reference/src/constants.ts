@@ -12,7 +12,6 @@ interface Constants {
   STAGE: string;
   STACK_NAME: string;
   SC_PORTFOLIO_NAME: string;
-  ACCOUNT_ID: string;
   AWS_REGION: string;
   SSM_DOC_OUTPUT_KEY_SUFFIX: string;
   S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY: string;
@@ -61,7 +60,6 @@ function getConstants(): Constants {
 
   const STACK_NAME = `swb-${config.stage}-${config.awsRegionShortName}`;
   const SC_PORTFOLIO_NAME = `swb-${config.stage}-${config.awsRegionShortName}`; // Service Catalog Portfolio Name
-  const ACCOUNT_ID = config.accountId;
   const AWS_REGION = config.awsRegion;
   const AWS_REGION_SHORT_NAME = config.awsRegionShortName;
   const S3_ACCESS_BUCKET_PREFIX = 'service-workbench-access-log';
@@ -111,7 +109,6 @@ function getConstants(): Constants {
     STAGE: config.stage,
     STACK_NAME,
     SC_PORTFOLIO_NAME,
-    ACCOUNT_ID,
     AWS_REGION,
     SSM_DOC_OUTPUT_KEY_SUFFIX,
     S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
@@ -163,7 +160,6 @@ async function getConstantsWithSecrets(): Promise<Constants & SecretConstants> {
 
 interface Config {
   stage: string;
-  accountId: string;
   awsRegion: string;
   awsRegionShortName: string;
   rootUserEmailParamStorePath: string;

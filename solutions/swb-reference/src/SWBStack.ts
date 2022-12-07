@@ -79,7 +79,6 @@ export class SWBStack extends Stack {
   public constructor(app: App) {
     const {
       STAGE,
-      ACCOUNT_ID,
       AWS_REGION,
       AWS_REGION_SHORT_NAME,
       S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY,
@@ -149,6 +148,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const MAIN_ACCT_ID = `${this.account}`;
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -168,7 +168,7 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY
     };
 
-    this._createInitialOutputs(ACCOUNT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
     this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
@@ -275,7 +275,6 @@ export class SWBStack extends Stack {
     });
 
     // Add a listener on port 443 for and use the certificate for HTTPS
-    // const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
     const certificate = new Certificate(this, 'SWBCertificate', {
       domainName: domainName,
       validation: CertificateValidation.fromDns(zone)
