@@ -347,7 +347,6 @@ class Getter {
     let result;
     if (this._paramsItem) {
       result = await this._ddb.getItem(this._paramsItem);
-      console.log(`getter.execute() result ${JSON.stringify(result)}`);
       if (result.Item) {
         result.Item = unmarshall(result.Item);
       }
