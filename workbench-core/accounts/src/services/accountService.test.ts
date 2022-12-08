@@ -241,7 +241,6 @@ describe('AccountService', () => {
   test('getAllAccounts returns list of onboarded accounts', async () => {
     const account: Account = {
       name: '',
-      cidr: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
       environmentInstanceFiles: '',
