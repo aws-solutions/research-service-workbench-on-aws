@@ -21,9 +21,14 @@ printf "\nBuilding and deploying docker image for SWB v2.\n"
 upload_docker_image_ecr
 printf "\nCompleted deploying SWB v2 UI image to ECR.\n"
 
-printf "\nUpdating images for ECS tasks.\n"
-cluster_name="$(jq -r '.[].ecsClusterName' ../infrastructure/src/config/${STAGE}.json)"
-service_name="$(jq -r '.[].ecsServiceName' ../infrastructure/src/config/${STAGE}.json)"
-aws ecs update-service --cluster $cluster_name --service $service_name --force-new-deployment
-printf "\nCompleted updating images for ECS tasks. Exiting...\n"
+if [ ! -f ../infrastructure/src/config/${STAGE}.json ]
+then
+    printf "\nUI Infra has not been deployed yet. Skipping update on ECS tasks. Exiting...\n"
+else
+    printf "\nUpdating images for ECS tasks.\n"
+    cluster_name="$(jq -r '.[].ecsClusterName' ../infrastructure/src/config/${STAGE}.json)"
+    service_name="$(jq -r '.[].ecsServiceName' ../infrastructure/src/config/${STAGE}.json)"
+    aws ecs update-service --cluster $cluster_name --service $service_name --force-new-deployment
+    printf "\nCompleted updating images for ECS tasks. Exiting...\n"
+fi
 
