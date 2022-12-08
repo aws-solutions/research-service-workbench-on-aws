@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { SSM } from '@aws-sdk/client-ssm';
 
 export interface SecretsServiceInterface {
