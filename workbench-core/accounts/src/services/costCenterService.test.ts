@@ -9,7 +9,7 @@ import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from 
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { Account } from '../models/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';

@@ -8,7 +8,7 @@ import { withAuth } from '@aws/workbench-core-authorization';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Router, Express } from 'express';
+import express, { Router, Express, json } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
@@ -27,7 +27,7 @@ import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers
 export function generateRouter(): Express {
   const app: Express = express();
   app.disable('x-powered-by');
-  const router: Router = express.Router();
+  const router: Router = Router();
 
   //Adding rate limiting
   const limiter = rateLimit({
@@ -46,7 +46,7 @@ export function generateRouter(): Express {
     })
   );
   // parse application/json
-  app.use(express.json());
+  app.use(json());
   app.use(cookieParser());
   app.use(csurf('none'));
 

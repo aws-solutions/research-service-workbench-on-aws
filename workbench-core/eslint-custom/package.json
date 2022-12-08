@@ -30,7 +30,9 @@
   },
   "dependencies": {
     "@rushstack/eslint-config": "^3.0.0",
+    "@typescript-eslint/parser": "^5.43.0",
     "eslint": "^8.7.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-security": "^1.4.0"
   },

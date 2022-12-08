@@ -19,7 +19,7 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'UPDATE',
-    subject: 'CostCenter'
+    subject: 'Environment'
   },
   {
     effect: 'ALLOW',
@@ -28,8 +28,8 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
-    action: 'UPDATE',
-    subject: 'Dataset'
+    action: 'CREATE',
+    subject: 'Environment'
   },
   {
     effect: 'ALLOW',
@@ -129,6 +129,16 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'READ',
+    subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
     subject: 'User'
   }
 ];
