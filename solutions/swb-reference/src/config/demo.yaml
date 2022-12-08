@@ -12,4 +12,3 @@ albInternetFacing: true
 # TODO: once this branch in dev, provide appropriate values
 #hostZoneId: ''
 #domainName: ''
-#tlsCertificateId: ''

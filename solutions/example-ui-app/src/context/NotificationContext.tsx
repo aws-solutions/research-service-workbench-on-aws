@@ -3,8 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { createContext, useContext, Context, useState } from 'react';
 import { FlashbarProps } from '@awsui/components-react/flashbar';
+import { createContext, useContext, Context, useState } from 'react';
 
 export interface Notifications {
   [key: string]: FlashbarProps.MessageDefinition;

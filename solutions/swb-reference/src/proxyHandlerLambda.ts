@@ -11,22 +11,35 @@ export async function handler(event: any) {
   const baseUrl = process.env.API_GW_URL!.replace('/dev/', '/dev');
   let HTTP_METHOD = '';
 
-  const headers: { [id: string]: string } = {};
+  let reqHeaders: { [id: string]: string } = {};
+
   const response: {
     statusCode: number;
     statusDescription: string;
     body: unknown;
     isBase64Encoded: boolean;
-    headers: unknown;
+    multiValueHeaders: Record<string, Array<unknown>>;
+    headers: Record<string, unknown>;
   } = {
     statusCode: 200,
     statusDescription: '',
     body: undefined,
     isBase64Encoded: false,
+    multiValueHeaders: { 'Content-Type': ['application/json'] },
     headers: { 'Content-Type': 'application/json' }
   };
   let body: { [id: string]: string } = {};
   let params: { [id: string]: string } = {};
+
+  if (event.multiValueHeaders) {
+    // In order to support array of cookies for set-cookies, multiValueHeaders is enabled on the ALB target
+    // This makes all request headers come in under multiValueHeaders as arrays
+    event.headers = {};
+    Object.keys(event.multiValueHeaders).forEach((key) => {
+      // eslint-disable-next-line security/detect-object-injection
+      event.headers[key] = event.multiValueHeaders[key][0];
+    });
+  }
 
   // Short-circuit if this is a ALB health-check
   if (event.headers['user-agent'] && event.headers['user-agent'] === 'ELB-HealthChecker/2.0') return;
@@ -34,48 +47,109 @@ export async function handler(event: any) {
   // One more layer of logging incoming API calls
   console.log(`Proxy handler called with: ${JSON.stringify(event)}`);
 
-  const targetPath = event.path ? `${baseUrl}${event.path}` : baseUrl;
+  let apiPath = event.path ? event.path.replace('api/', '') : '';
+  if (apiPath[apiPath.length - 1] === '/') {
+    // SWB APIs do not have trailing slash, but this gets added when UI passes down the path
+    apiPath = apiPath.substring(0, apiPath.length - 1);
+  }
+  const targetPath = `${baseUrl}${apiPath}`;
 
   if (event.headers) {
-    headers['Content-Type'] = event.headers['content-type'] || 'application/json';
-    headers.Cookie = event.headers.cookie;
-    headers['csrf-token'] = event.headers['csrf-token'];
-    headers['x-forwarded-for'] = event.headers['x-forwarded-for'];
-    headers.connection = event.headers.connection;
-    headers['Access-Control-Allow-Credentials'] = 'true';
+    reqHeaders = event.headers;
+    if (reqHeaders.host) {
+      // Have to remove host if it is from the UI to avoid incorrect host being set when sending to Cognito
+      // (Should be API GW host, not UI)
+      delete reqHeaders.host;
+    }
+    if (!event.headers.origin && reqHeaders.referer) {
+      // Login page will not have origin set; use referer, but remove trailing slash
+      const referer = reqHeaders.referer;
+      const lastSlashIndex = referer.lastIndexOf('/');
+      reqHeaders.origin = referer.substring(0, lastSlashIndex) + referer.substring(lastSlashIndex + 1);
+    } else if (event.headers.origin) {
+      reqHeaders.origin = event.headers.origin;
+    }
   }
 
-  if (event.body && event.body!.length !== 0) body = JSON.parse(event.body);
-  if (event.queryStringParameters) params = event.queryStringParameters;
+  if (event.body && event.body!.length !== 0) {
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      body = event.body;
+    }
+  }
+  if (event.queryStringParameters) {
+    params = event.queryStringParameters;
+  } else if (event.multiValueQueryStringParameters) {
+    // Due to multiValueHeaders, queryStringParameters become multiValueQueryStringParameters
+    // with each value wrapped in an array
+    params = {};
+    Object.keys(event.multiValueQueryStringParameters).forEach((key) => {
+      // eslint-disable-next-line security/detect-object-injection
+      params[key] = event.multiValueQueryStringParameters[key][0];
+    });
+  }
   if (event.httpMethod) HTTP_METHOD = event.httpMethod;
+
+  function setupResponse(
+    response: {
+      statusCode: number;
+      statusDescription: string;
+      body: unknown;
+      isBase64Encoded: boolean;
+      multiValueHeaders: Record<string, Array<unknown>>;
+      headers: Record<string, unknown>;
+      cookies?: Array<string>;
+    },
+    data: unknown,
+    status: number,
+    statusText: string,
+    headers: Record<string, unknown>
+  ): void {
+    if (headers['set-cookie']) {
+      if (Array.isArray(headers['set-cookie'])) {
+        response.multiValueHeaders['set-cookie'] = headers['set-cookie'];
+      } else {
+        response.multiValueHeaders['set-cookie'] = [headers['set-cookie']];
+      }
+      response.headers['set-cookie'] = headers['set-cookie'];
+    }
+    response.statusCode = status;
+    response.statusDescription = statusText;
+    response.body = JSON.stringify(data);
+  }
 
   try {
     if (HTTP_METHOD === 'GET') {
-      const { data, status, statusText } = await axios.get(targetPath, { headers, params });
-      response.statusCode = status;
-      response.statusDescription = statusText;
-      response.body = JSON.stringify(data);
+      const { data, status, statusText, headers } = await axios.get(targetPath, {
+        headers: reqHeaders,
+        params
+      });
+      setupResponse(response, data, status, statusText, headers);
     }
 
     if (HTTP_METHOD === 'POST') {
-      const { data, status, statusText } = await axios.post(targetPath, body, { headers, params });
-      response.statusCode = status;
-      response.statusDescription = statusText;
-      response.body = JSON.stringify(data);
+      const { data, status, statusText, headers } = await axios.post(targetPath, body, {
+        headers: reqHeaders,
+        params
+      });
+      setupResponse(response, data, status, statusText, headers);
     }
 
     if (HTTP_METHOD === 'PUT') {
-      const { data, status, statusText } = await axios.put(targetPath, body, { headers, params });
-      response.statusCode = status;
-      response.statusDescription = statusText;
-      response.body = JSON.stringify(data);
+      const { data, status, statusText, headers } = await axios.put(targetPath, body, {
+        headers: reqHeaders,
+        params
+      });
+      setupResponse(response, data, status, statusText, headers);
     }
 
     if (HTTP_METHOD === 'DELETE') {
-      const { data, status, statusText } = await axios.delete(targetPath, { headers, params });
-      response.statusCode = status;
-      response.statusDescription = statusText;
-      response.body = JSON.stringify(data);
+      const { data, status, statusText, headers } = await axios.delete(targetPath, {
+        headers: reqHeaders,
+        params
+      });
+      setupResponse(response, data, status, statusText, headers);
     }
   } catch (err) {
     if (!(err instanceof AxiosError) || !err.response) {

@@ -16,8 +16,14 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
+import {
+  ApplicationTargetGroup,
+  ListenerCondition,
+  TargetType
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { LambdaTarget } from 'aws-cdk-lib/aws-elasticloadbalancingv2-targets';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
@@ -67,6 +73,8 @@ export class SWBStack extends Stack {
 
   private _accessLogsBucket: Bucket;
   private _s3AccessLogsPrefix: string;
+  private _swbDomainNameOutputKey: string;
+  private _mainAccountLoadBalancerListenerArnOutputKey: string;
 
   public constructor(app: App) {
     const {
@@ -92,14 +100,20 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
+      VPC_ID,
       MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY,
-      VPC_ID,
+      SWB_DOMAIN_NAME_OUTPUT_KEY,
+      MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY,
+      ECR_REPOSITORY_NAME_OUTPUT_KEY,
+      VPC_ID_OUTPUT_KEY,
       ALB_SUBNET_IDS,
       ECS_SUBNET_IDS,
-      HOST_ZONE_ID,
-      CERTIFICATE_ID,
+      ECS_SUBNET_IDS_OUTPUT_KEY,
+      ECS_SUBNET_AZS_OUTPUT_KEY,
+      HOSTED_ZONE_ID,
       DOMAIN_NAME,
+      USE_CLOUD_FRONT,
       ALB_INTERNET_FACING
     } = getConstants();
 
@@ -134,6 +148,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const MAIN_ACCT_ID = `${this.account}`;
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
@@ -153,8 +168,10 @@ export class SWBStack extends Stack {
       MAIN_ACCT_ALB_ARN_OUTPUT_KEY
     };
 
-    this._createInitialOutputs(AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
+    this._createInitialOutputs(MAIN_ACCT_ID, AWS_REGION, AWS_REGION_SHORT_NAME, UI_CLIENT_URL);
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
+    this._swbDomainNameOutputKey = SWB_DOMAIN_NAME_OUTPUT_KEY;
+    this._mainAccountLoadBalancerListenerArnOutputKey = MAIN_ACCT_ALB_LISTENER_ARN_OUTPUT_KEY;
     const mainAcctEncryptionKey = this._createEncryptionKey();
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
@@ -174,16 +191,38 @@ export class SWBStack extends Stack {
     const workflow = new Workflow(this);
     workflow.createSSMDocuments();
 
-    const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+    new CfnOutput(this, 'useCloudFront', {
+      value: String(USE_CLOUD_FRONT)
+    });
 
-    this._createLoadBalancer(
-      swbVpc,
-      apiGwUrl,
-      DOMAIN_NAME,
-      HOST_ZONE_ID,
-      CERTIFICATE_ID,
-      ALB_INTERNET_FACING
-    );
+    if (!USE_CLOUD_FRONT) {
+      const swbVpc = this._createVpc(VPC_ID, ALB_SUBNET_IDS, ECS_SUBNET_IDS);
+      new CfnOutput(this, VPC_ID_OUTPUT_KEY, {
+        value: swbVpc.vpc.vpcId
+      });
+
+      new CfnOutput(this, ECS_SUBNET_IDS_OUTPUT_KEY, {
+        value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(',')
+      });
+
+      new CfnOutput(this, ECS_SUBNET_AZS_OUTPUT_KEY, {
+        value: (swbVpc.vpc.availabilityZones?.map((az) => az) ?? []).join(',')
+      });
+
+      this._createLoadBalancer(swbVpc, apiGwUrl, DOMAIN_NAME, HOSTED_ZONE_ID, ALB_INTERNET_FACING);
+
+      const repository = new Repository(this, 'Repository', {
+        imageScanOnPush: true
+      });
+      new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
+        value: repository.repositoryName,
+        exportName: ECR_REPOSITORY_NAME_OUTPUT_KEY
+      });
+    } else {
+      new CfnOutput(this, 'apiUrlOutput', {
+        value: apiGwUrl
+      });
+    }
   }
 
   private _createVpc(vpcId: string, albSubnetIds: string[], ecsSubnetIds: string[]): SWBVpc {
@@ -193,16 +232,6 @@ export class SWBStack extends Stack {
       ecsSubnetIds
     });
 
-    new CfnOutput(this, 'vpcId', {
-      value: swbVpc.vpc.vpcId,
-      exportName: 'SWB-vpcId'
-    });
-
-    new CfnOutput(this, 'ecsSubnetIds', {
-      value: (swbVpc.ecsSubnetSelection.subnets?.map((subnet) => subnet.subnetId) ?? []).join(','),
-      exportName: 'SWB-ecsSubnetIds'
-    });
-
     return swbVpc;
   }
 
@@ -210,8 +239,7 @@ export class SWBStack extends Stack {
     swbVpc: SWBVpc,
     apiGwUrl: string,
     domainName: string,
-    hostZoneId: string,
-    certificateId: string,
+    hostedZoneId: string,
     internetFacing: boolean
   ): void {
     const alb = new SWBApplicationLoadBalancer(this, 'SWBApplicationLoadBalancer', {
@@ -222,7 +250,7 @@ export class SWBStack extends Stack {
 
     const zone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
       zoneName: domainName,
-      hostedZoneId: hostZoneId
+      hostedZoneId: hostedZoneId
     });
 
     // Add a Route 53 alias with the Load Balancer as the target
@@ -240,33 +268,67 @@ export class SWBStack extends Stack {
       memorySize: 256
     });
 
-    // Add a listener for HTTP calls
-    const httpListener = alb.applicationLoadBalancer.addListener('HTTPListener', {
-      port: 80
-    });
-
-    httpListener.addTargets('proxyLambda', {
-      targets: [new LambdaTarget(proxyLambda)]
+    new Alias(this, 'LiveProxyLambdaAlias', {
+      aliasName: 'live',
+      version: proxyLambda.currentVersion,
+      provisionedConcurrentExecutions: 1
     });
 
     // Add a listener on port 443 for and use the certificate for HTTPS
-    const certificate = Certificate.fromCertificateArn(this, 'Certificate', certificateId);
+    const certificate = new Certificate(this, 'SWBCertificate', {
+      domainName: domainName,
+      validation: CertificateValidation.fromDns(zone)
+    });
     const httpsListener = alb.applicationLoadBalancer.addListener('HTTPSListener', {
       port: 443,
       certificates: [certificate]
     });
 
-    httpsListener.addTargets('proxyLambda', {
-      targets: [new LambdaTarget(proxyLambda)],
-      healthCheck: { enabled: true }
+    const targetGroup = new ApplicationTargetGroup(this, 'proxyLambdaTargetGroup', {
+      targetType: TargetType.LAMBDA,
+      targets: [new LambdaTarget(proxyLambda)]
+    });
+
+    targetGroup.setAttribute('lambda.multi_value_headers.enabled', 'true');
+
+    httpsListener.addTargetGroups('addProxyLambdaTargetGroup', {
+      priority: 1,
+      conditions: [ListenerCondition.pathPatterns(['/api/*'])],
+      targetGroups: [targetGroup]
+    });
+
+    httpsListener.addTargetGroups('addDefaultTargetGroup', {
+      targetGroups: [targetGroup]
     });
 
     new CfnOutput(this, this.lambdaEnvVars.MAIN_ACCT_ALB_ARN_OUTPUT_KEY, {
       value: alb.applicationLoadBalancer.loadBalancerArn
     });
+
+    new CfnOutput(this, this._swbDomainNameOutputKey, {
+      value: domainName,
+      exportName: this._swbDomainNameOutputKey
+    });
+
+    new CfnOutput(this, this._mainAccountLoadBalancerListenerArnOutputKey, {
+      value: alb.applicationLoadBalancer.listeners[0].listenerArn,
+      exportName: this._mainAccountLoadBalancerListenerArnOutputKey
+    });
+
+    new CfnOutput(this, 'apiUrlOutput', {
+      value: `https://${domainName}/api/`
+    });
   }
 
-  private _createInitialOutputs(awsRegion: string, awsRegionName: string, uiClientURL: string): void {
+  private _createInitialOutputs(
+    accountId: string,
+    awsRegion: string,
+    awsRegionName: string,
+    uiClientURL: string
+  ): void {
+    new CfnOutput(this, 'accountId', {
+      value: accountId
+    });
     new CfnOutput(this, 'awsRegion', {
       value: awsRegion
     });
@@ -859,10 +921,6 @@ export class SWBStack extends Stack {
         allowCredentials: true,
         allowOrigins: JSON.parse(this.lambdaEnvVars.ALLOWED_ORIGINS || '[]')
       }
-    });
-
-    new CfnOutput(this, 'apiUrlOutput', {
-      value: API.url
     });
 
     if (process.env.LOCAL_DEVELOPMENT === 'true') {

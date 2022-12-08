@@ -4,23 +4,34 @@
  */
 
 /* eslint-disable no-new */
+import { CfnOutput } from 'aws-cdk-lib';
 import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { Cluster, ContainerImage, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
+import { Cluster, ContainerImage, FargateService, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
+import {
+  ApplicationListener,
+  ApplicationTargetGroup,
+  ListenerCondition,
+  TargetType
+} from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { SWBUIStack } from '../SWBUIStack';
 
 export function createECSCluster(
   stack: SWBUIStack,
-  apiGwUrl: string,
-  albArn: string,
-  vpcId: string = '',
-  isNetworkPublic: boolean = true
+  listenerArn: string,
+  repositoryName: string,
+  vpcId: string,
+  subnetIds: string[],
+  availabilityZones: string[]
 ): void {
-  // Create VPC, or use config-entered VPC
-  const vpc = vpcId === '' ? new Vpc(stack, 'MainVPC', {}) : Vpc.fromLookup(stack, 'MainVPC', { vpcId });
+  const vpc = Vpc.fromVpcAttributes(stack, 'MainVPC', {
+    vpcId,
+    availabilityZones: availabilityZones,
+    privateSubnetIds: subnetIds
+  });
 
   // Create an ECS cluster
-  new Cluster(stack, 'Cluster', {
+  const cluster = new Cluster(stack, 'Cluster', {
     vpc,
     capacity: { instanceType: new InstanceType('t2.xlarge') }
   });
@@ -38,10 +49,42 @@ export function createECSCluster(
       ]
     })
   });
-
   taskDefinition.addContainer('HostContainer', {
-    image: ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+    image: ContainerImage.fromRegistry(
+      `${stack.account}.dkr.ecr.${stack.region}.amazonaws.com/${repositoryName}:latest`
+    ),
     memoryLimitMiB: 1024,
-    portMappings: [{ containerPort: 80 }]
+    portMappings: [{ containerPort: 3000 }]
+  });
+  const fargateService = new FargateService(stack, 'SwbUi', { cluster, taskDefinition });
+
+  const albListener = ApplicationListener.fromLookup(stack, 'SWBApplicationListener', {
+    listenerArn: listenerArn
+  });
+
+  const fargateServiceTarget = fargateService.loadBalancerTarget({
+    containerName: 'HostContainer',
+    containerPort: 3000
+  });
+
+  const httpsTargetGroup = new ApplicationTargetGroup(stack, 'httpsUiContainerTargetGroup', {
+    port: 80,
+    targetType: TargetType.IP,
+    vpc: vpc
+  });
+
+  fargateServiceTarget.attachToApplicationTargetGroup(httpsTargetGroup);
+
+  albListener.addTargetGroups('httpsUiContainer', {
+    conditions: [ListenerCondition.httpRequestMethods(['GET', 'OPTIONS'])],
+    priority: 2,
+    targetGroups: [httpsTargetGroup]
+  });
+
+  new CfnOutput(stack, 'ecsClusterName', {
+    value: cluster.clusterName
+  });
+  new CfnOutput(stack, 'ecsServiceName', {
+    value: fargateService.serviceName
   });
 }
