@@ -119,6 +119,7 @@ export class SWBStack extends Stack {
 
     super(app, STACK_NAME, {
       env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
         region: AWS_REGION
       }
     });
@@ -215,8 +216,7 @@ export class SWBStack extends Stack {
         imageScanOnPush: true
       });
       new CfnOutput(this, ECR_REPOSITORY_NAME_OUTPUT_KEY, {
-        value: repository.repositoryName,
-        exportName: ECR_REPOSITORY_NAME_OUTPUT_KEY
+        value: repository.repositoryName
       });
     } else {
       new CfnOutput(this, 'apiUrlOutput', {
@@ -306,13 +306,11 @@ export class SWBStack extends Stack {
     });
 
     new CfnOutput(this, this._swbDomainNameOutputKey, {
-      value: domainName,
-      exportName: this._swbDomainNameOutputKey
+      value: domainName
     });
 
     new CfnOutput(this, this._mainAccountLoadBalancerListenerArnOutputKey, {
-      value: alb.applicationLoadBalancer.listeners[0].listenerArn,
-      exportName: this._mainAccountLoadBalancerListenerArnOutputKey
+      value: alb.applicationLoadBalancer.listeners[0].listenerArn
     });
 
     new CfnOutput(this, 'apiUrlOutput', {
