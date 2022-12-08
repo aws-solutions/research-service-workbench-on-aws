@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets-ui",
+      "comment": "Add new Template getting API, upgrade packages",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets-ui"
+}
