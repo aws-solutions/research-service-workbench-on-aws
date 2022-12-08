@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-environments",
+      "comment": "change audit logger import",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-environments"
+}
