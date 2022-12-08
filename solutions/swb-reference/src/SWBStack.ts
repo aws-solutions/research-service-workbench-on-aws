@@ -119,12 +119,20 @@ export class SWBStack extends Stack {
 
     const MAIN_ACCT_ID: string = process.env.CDK_DEFAULT_ACCOUNT || '';
 
-    super(app, STACK_NAME, {
-      env: {
-        account: MAIN_ACCT_ID,
-        region: AWS_REGION
-      }
-    });
+    if (MAIN_ACCT_ID) {
+      super(app, STACK_NAME, {
+        env: {
+          account: MAIN_ACCT_ID,
+          region: AWS_REGION
+        }
+      });
+    } else {
+      super(app, STACK_NAME, {
+        env: {
+          region: AWS_REGION
+        }
+      });
+    }
 
     const workbenchCognito = this._createCognitoResources(
       COGNITO_DOMAIN,
