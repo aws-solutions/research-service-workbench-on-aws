@@ -14,7 +14,7 @@ import {
 } from '@aws/workbench-core-accounts';
 import { validateAndParse, MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
