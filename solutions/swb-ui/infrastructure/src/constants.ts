@@ -64,7 +64,7 @@ function getConstants(): {
   // CloudFormation Output Keys
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   // The output name below must match the value in swb-reference
-  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = 'S3BucketAccessLogsNameOutput';
+  const S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY = `${STAGE}-S3BucketAccessLogsNameOutput`;
 
   return {
     STAGE,
