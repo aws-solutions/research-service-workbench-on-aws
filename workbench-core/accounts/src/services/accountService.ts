@@ -12,7 +12,7 @@ import {
   uuidWithLowercasePrefix
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';
 import { CostCenterParser } from '../models/costCenters/costCenter';

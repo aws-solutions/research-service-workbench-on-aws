@@ -708,6 +708,8 @@ export class SWBStack extends Stack {
               'cognito-idp:AdminCreateUser',
               'cognito-idp:AdminDeleteUser',
               'cognito-idp:AdminGetUser',
+              'cognito-idp:AdminEnableUser',
+              'cognito-idp:AdminDisableUser',
               'cognito-idp:AdminListGroupsForUser',
               'cognito-idp:AdminRemoveUserFromGroup',
               'cognito-idp:AdminUpdateUserAttributes',

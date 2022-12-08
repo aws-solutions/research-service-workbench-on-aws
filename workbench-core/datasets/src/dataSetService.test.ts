@@ -10,7 +10,7 @@ jest.mock('./dataSetMetadataPlugin');
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import { AwsService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
@@ -629,9 +629,10 @@ describe('DataSetService', () => {
 
     it('returns a presigned URL.', async () => {
       const ttlSeconds = 3600;
+      const fileName = 'test.txt';
 
       await expect(
-        service.getPresignedSinglePartUploadUrl(mockDataSetId, ttlSeconds, plugin)
+        service.getPresignedSinglePartUploadUrl(mockDataSetId, fileName, ttlSeconds, plugin)
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
     });
   });

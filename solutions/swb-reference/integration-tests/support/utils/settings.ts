@@ -42,7 +42,7 @@ interface Setting {
   // Default hosting account
   defaultHostingAccountId: string;
 
-  // Configs for AWS Account test
+  // Configs for AWS Account onboard test
   hostAwsAccountId: string;
   hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;

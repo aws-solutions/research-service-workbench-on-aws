@@ -15,7 +15,6 @@ import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfac
 import QueryParams from './interfaces/queryParams';
 import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-
 import { MetadataService } from './services/metadataService';
 import { SecretsService } from './services/secretsService';
 import JSONValue from './types/json';

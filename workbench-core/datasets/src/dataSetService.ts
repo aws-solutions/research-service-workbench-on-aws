@@ -5,7 +5,7 @@
 
 import { AuditService } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
@@ -327,18 +327,20 @@ export class DataSetService {
   /**
    * Create a presigned URL for a signle-part file upload
    * @param datasetId - the ID of the Dataset.
+   * @param fileName - the name of the file to upload.
    * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
    * @returns the presigned URL
    */
   public async getPresignedSinglePartUploadUrl(
     datasetId: string,
+    fileName: string,
     timeToLiveSeconds: number,
     storageProvider: DataSetsStoragePlugin
   ): Promise<string> {
     const dataset = await this.getDataSet(datasetId);
 
-    return await storageProvider.createPresignedUploadUrl(dataset, timeToLiveSeconds);
+    return await storageProvider.createPresignedUploadUrl(dataset, fileName, timeToLiveSeconds);
   }
 
   /**
