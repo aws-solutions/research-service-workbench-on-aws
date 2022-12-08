@@ -22,7 +22,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
@@ -40,7 +40,7 @@ import { setUpUserRoutes } from './userRoutes';
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   app.disable('x-powered-by');
-  const router: Router = express.Router();
+  const router: Router = Router();
 
   app.use(
     cors({
@@ -49,7 +49,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     })
   );
   // parse application/json
-  app.use(express.json());
+  app.use(json());
   app.use(cookieParser());
   app.use(csurf('none'));
 
@@ -96,7 +96,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     });
   });
 
-  setUpCostCenterRoutes(router, apiRouteConfig.costCenterService);
+  setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
   setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
   setUpAccountRoutes(router, apiRouteConfig.account);
@@ -104,7 +104,12 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
   setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
-  setUpProjectRoutes(router, apiRouteConfig.projectService);
+  setUpProjectRoutes(
+    router,
+    apiRouteConfig.projectService,
+    apiRouteConfig.environmentService,
+    apiRouteConfig.metadataService
+  );
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

@@ -3,6 +3,8 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DataSet } from './dataSet';
+
 export interface EndpointConnectionStrings {
   /**
    * a URL which can be used to access the storage endpoint.
@@ -127,12 +129,13 @@ export interface DataSetsStoragePlugin {
   /**
    * Create a presigned URL to be used to upload a file to a Dataset.
    *
-   * @param name - the name of the Dataset to which to make an upload.
-   * @param timeToLiveMilliseconds - the maximum time before the URL expires.
+   * @param dataset - the Dataset to which to make an upload.
+   * @param fileName - the name of the file to upload.
+   * @param timeToLiveSeconds - the maximum time before the URL expires.
    *
    * @returns a URL which can be used to upload a file directly to the DataSet destination.
    */
-  createPresignedUploadUrl(name: string, timeToLiveMilliseconds: number): Promise<string>;
+  createPresignedUploadUrl(dataset: DataSet, fileName: string, timeToLiveSeconds: number): Promise<string>;
 
   /**
    * Create a set of presigned URLs to be used to make a multipart upload to a DataSet.

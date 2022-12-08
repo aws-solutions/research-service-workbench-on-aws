@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Added `fileName` parameter to `createPresignedUploadUrl` function",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}

@@ -39,6 +39,9 @@ interface Setting {
   dynamoDBTableOutput: string;
   StatusHandlerLambdaRoleOutput: string;
 
+  // Default hosting account
+  defaultHostingAccountId: string;
+
   // Configs for AWS Account onboard test
   hostAwsAccountId: string;
   envMgmtRoleArn: string;

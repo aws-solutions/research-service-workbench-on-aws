@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "Added presigned URL creation helper for file upload.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

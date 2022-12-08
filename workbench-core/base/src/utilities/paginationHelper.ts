@@ -4,7 +4,7 @@
  */
 
 import { QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import QueryParams from '../interfaces/queryParams';
 
 export function addPaginationToken(
@@ -52,3 +52,5 @@ export function fromPaginationToken(token: string): Record<string, string> {
 }
 
 export const DEFAULT_API_PAGE_SIZE: number = 50;
+
+export const MAX_API_PAGE_SIZE: number = 1000;

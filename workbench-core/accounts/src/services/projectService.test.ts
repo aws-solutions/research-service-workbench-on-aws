@@ -14,13 +14,18 @@ import {
   GetItemCommandOutput,
   QueryCommand,
   QueryCommandOutput,
-  UpdateItemCommand
+  UpdateItemCommand,
+  UpdateItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
+import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
+import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { ProjectStatus } from '../constants/projectStatus';
-import Project from '../models/project';
+import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
+import { Project } from '../models/projects/project';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
@@ -29,6 +34,7 @@ describe('ProjectService', () => {
   const projService = new ProjectService({ TABLE_NAME });
   const timestamp = '2022-05-18T20:33:42.608Z';
   const mockDateObject = new Date(timestamp);
+  const userId = 'user-123';
   let projects: Project[];
   const project1: Project = {
     id: 'proj-123',
@@ -159,7 +165,7 @@ describe('ProjectService', () => {
     hostingAccountHandlerRoleArn: 'arn:aws:iam::1234566789:role/swb-dev-va-cross-account-role',
     awsAccountId: '123456789012',
     createdAt: timestamp,
-    desc: 'Example cost center',
+    description: 'Example cost center',
     dependency: 'acc-123',
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     environmentInstanceFiles: 's3://fake-s3-bucket-idvfndkjnwodw/environment-files',
@@ -176,10 +182,6 @@ describe('ProjectService', () => {
     test('should fail on list projects for negative pageSize', async () => {
       // BUILD
       const pageSize = -1;
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -188,24 +190,19 @@ describe('ProjectService', () => {
         .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
 
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
+      await expect(() => projService.listProjects({ userId, pageSize })).rejects.toThrow(
         'Please supply a non-negative page size.'
       );
     });
 
     test('list all projects with no group membership', async () => {
       // BUILD
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: []
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => []);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ userId });
 
       // CHECK
       expect(actualResponse).toEqual({ data: [] });
@@ -215,10 +212,6 @@ describe('ProjectService', () => {
       // BUILD
       const queryItemResponse: QueryCommandOutput = {
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -243,7 +236,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ userId });
 
       // CHECK
       expect(actualResponse.data).toEqual([]);
@@ -258,10 +251,6 @@ describe('ProjectService', () => {
         }),
         $metadata: {}
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -285,7 +274,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ userId });
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -299,10 +288,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -336,7 +321,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { createdAt: { between: { value1: 'date1', value2: 'date2' } } }
       });
 
@@ -352,10 +337,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -385,7 +366,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { dependency: { eq: 'cc-123' } }
       });
 
@@ -401,10 +382,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -434,7 +411,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { status: { eq: 'AVAILABLE' } }
       });
 
@@ -450,10 +427,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -483,7 +456,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { name: { eq: 'Example project' } }
       });
 
@@ -499,10 +472,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -529,7 +498,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { createdAt: 'asc' }
       });
 
@@ -545,10 +514,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -575,7 +540,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { dependency: 'asc' }
       });
 
@@ -591,10 +556,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -621,7 +582,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { status: 'asc' }
       });
 
@@ -637,10 +598,6 @@ describe('ProjectService', () => {
           return marshall(item);
         }),
         $metadata: {}
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -667,7 +624,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { name: 'asc' }
       });
 
@@ -694,10 +651,6 @@ describe('ProjectService', () => {
         LastEvaluatedKey: marshall(lastEvaluatedKey),
         $metadata: {}
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -721,7 +674,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ userId, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -746,10 +699,6 @@ describe('ProjectService', () => {
         LastEvaluatedKey: marshall(lastEvaluatedKey),
         $metadata: {}
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -773,7 +722,7 @@ describe('ProjectService', () => {
         .resolves(queryItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -781,11 +730,6 @@ describe('ProjectService', () => {
 
     test('list projects when user is only part of 1 groups', async () => {
       // BUILD
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -807,7 +751,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ userId });
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -818,10 +762,6 @@ describe('ProjectService', () => {
       const items = [projItem1, projItem2, projItem3];
       const pageSize = 4;
       const expectedResponse = { data: projects, paginationToken: undefined };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -841,7 +781,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ userId, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -858,11 +798,6 @@ describe('ProjectService', () => {
       const pageSize = 3;
       const expectedResponse = { data: projects, paginationToken: paginationToken };
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -881,7 +816,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ userId, pageSize });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -890,11 +825,6 @@ describe('ProjectService', () => {
     test('list all projects as user of multiple groups on 1 page with filter on createdAt', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
-
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -915,7 +845,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: {
           createdAt: { between: { value1: '2022-11-10T04:19:00.000Z', value2: '2022-11-10T04:20:00.000Z' } }
         }
@@ -928,11 +858,6 @@ describe('ProjectService', () => {
     test('list all projects as user of multiple groups on 1 page with filter on dependency', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
-
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -953,7 +878,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { dependency: { eq: 'cc-1' } }
       });
 
@@ -965,11 +890,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -989,7 +909,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { status: { eq: 'AVAILABLE' } }
       });
 
@@ -1001,11 +921,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1025,7 +940,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         filter: { name: { begins: 'name' } }
       });
 
@@ -1037,11 +952,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1061,7 +971,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { createdAt: 'asc' }
       });
 
@@ -1073,11 +983,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1097,7 +1002,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { dependency: 'asc' }
       });
 
@@ -1109,11 +1014,6 @@ describe('ProjectService', () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
-
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1133,7 +1033,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { status: 'asc' }
       });
 
@@ -1144,10 +1044,6 @@ describe('ProjectService', () => {
     test('list all projects as user of multiple groups on 1 page with sort on name', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -1168,7 +1064,7 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({
-        user,
+        userId,
         sort: { name: 'desc' }
       });
 
@@ -1186,10 +1082,6 @@ describe('ProjectService', () => {
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 2;
       const expectedResponse = { data: [project3], paginationToken: undefined };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -1209,7 +1101,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1230,10 +1122,6 @@ describe('ProjectService', () => {
           'base64'
         )
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -1253,7 +1141,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
+      const actualResponse = await projService.listProjects({ userId, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1268,10 +1156,6 @@ describe('ProjectService', () => {
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 1;
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
-      };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
       jest
@@ -1291,7 +1175,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE n CHECK
-      await expect(() => projService.listProjects({ user, pageSize, paginationToken })).rejects.toThrow(
+      await expect(() => projService.listProjects({ userId, pageSize, paginationToken })).rejects.toThrow(
         'Pagination token is invalid.'
       );
     });
@@ -1301,10 +1185,6 @@ describe('ProjectService', () => {
       const expectedResponse = {
         data: [],
         paginationToken: undefined
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['PA']
       };
 
       // mock getUserGroups--TODO update after dynamic AuthZ intergration
@@ -1321,7 +1201,7 @@ describe('ProjectService', () => {
       ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user });
+      const actualResponse = await projService.listProjects({ userId });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
@@ -1329,13 +1209,6 @@ describe('ProjectService', () => {
   });
 
   describe('getProject', () => {
-    let user: AuthenticatedUser;
-    beforeAll(() => {
-      user = {
-        id: 'user-123',
-        roles: []
-      };
-    });
     test('getting 1 project', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
@@ -1353,7 +1226,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject({ user, projectId: 'proj-123' });
+      const actualResponse = await projService.getProject({ projectId: 'proj-123' });
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1376,23 +1249,23 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject({ user, projectId: 'proj-123' })).rejects.toThrow(
+      await expect(projService.getProject({ projectId: 'proj-123' })).rejects.toThrow(
         'Could not find project proj-123'
       );
     });
   });
 
   describe('createProject', () => {
+    const user: AuthenticatedUser = {
+      id: 'user-456',
+      roles: []
+    };
     test('create a project with valid name', async () => {
       // BUILD
       const params = {
         name: proj.name,
         description: proj.description,
         costCenterId: proj.costCenterId
-      };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
       };
 
       // mock isProjectNameInUse call
@@ -1467,10 +1340,6 @@ describe('ProjectService', () => {
         description: proj.description,
         costCenterId: proj.costCenterId
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock isProjectNameInUse call
       const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
@@ -1526,10 +1395,6 @@ describe('ProjectService', () => {
         description: proj.description,
         costCenterId: proj.costCenterId
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock isProjectNameInUse call
       const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
@@ -1580,10 +1445,6 @@ describe('ProjectService', () => {
         description: proj.description,
         costCenterId: proj.costCenterId
       };
-      const user: AuthenticatedUser = {
-        id: 'user-123',
-        roles: ['ITAdmin']
-      };
 
       // mock isProjectNameInUse call
       const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
@@ -1630,6 +1491,147 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(projService.createProject(params, user)).rejects.toThrow('Failed to create project');
+    });
+  });
+
+  describe('softDeleteProject', () => {
+    const deletedProject1: Project = {
+      ...project1,
+      status: ProjectStatus.DELETED
+    };
+
+    const deletedProjItem1 = {
+      ...deletedProject1,
+      pk: `PROJ#${project1.id}`,
+      sk: `PROJ#${project1.id}`,
+      resourceType: 'deleted_project',
+      dependency: deletedProject1.costCenterId
+    };
+
+    let projectId: string;
+    let request: DeleteProjectRequest;
+    let checkDependency = async function (projectId: string): Promise<void> {
+      return;
+    };
+
+    beforeEach(() => {
+      request = { projectId };
+      checkDependency = async function (projectId: string): Promise<void> {
+        return;
+      };
+    });
+
+    describe('if project does not exist', () => {
+      beforeEach(() => {
+        request.projectId = 'invalid-proj-id';
+
+        // mock get project ddb call
+        const getItemResponse: GetItemCommandOutput = {
+          Item: undefined,
+          $metadata: {}
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+      });
+
+      test('it should fail', async () => {
+        // OPERATE n CHECK
+        await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+          `Could not find project ${request.projectId}`
+        );
+      });
+    });
+
+    describe('if projectId is valid', () => {
+      beforeEach(() => {
+        request.projectId = deletedProject1.id;
+
+        // mock get project ddb call
+        const getItemResponse: GetItemCommandOutput = {
+          Item: marshall(deletedProjItem1),
+          $metadata: {}
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+      });
+
+      describe('if dependencies exist', () => {
+        describe('of type environment', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environments(s) associated with it`
+            );
+          });
+        });
+
+        describe('of type dataset', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has dataset(s) associated with it`
+            );
+          });
+        });
+
+        describe('of type environment type config', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environment type config(s) associated with it`
+            );
+          });
+        });
+
+        describe('if dependencies do not exist', () => {
+          let updateItemResponse: UpdateItemCommandOutput;
+          beforeEach(() => {
+            jest
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .spyOn(Updater.prototype as any, 'execute')
+              .mockImplementationOnce(() => updateItemResponse);
+          });
+
+          describe('and DDB update succeeds', () => {
+            beforeEach(() => {
+              // mock update project ddb call
+              updateItemResponse = {
+                Attributes: marshall(deletedProjItem1),
+                $metadata: {}
+              };
+            });
+
+            test('it should pass', async () => {
+              // OPERATE n CHECK
+              await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
+            });
+          });
+        });
+      });
     });
   });
 });

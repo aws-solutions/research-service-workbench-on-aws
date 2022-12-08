@@ -18,7 +18,7 @@ import {
   addPaginationToken,
   getPaginationToken
 } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 
@@ -337,9 +337,10 @@ export class EnvironmentService {
       throw e;
     }
 
-    const updateResponse = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(envId, resourceTypeToKey.environment), { item: updatedValues })
-      .execute();
+    const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+      key: buildDynamoDBPkSk(envId, resourceTypeToKey.environment),
+      params: { item: updatedValues }
+    });
 
     return updateResponse.Attributes! as unknown as Environment;
   }
@@ -534,6 +535,32 @@ export class EnvironmentService {
   ): Promise<void> {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
-    await this._aws.helpers.ddb.update(key, { item: data }).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key, params: { item: data } });
+  }
+
+  /**
+   * Checks if there are dependencies with active environments.
+   * Pass the dependency id to see if there are any
+   * active environments linked to that resource.
+   * @param dependency - dependency id to check if there are any environments linked to
+   * @returns true if the dependency has active environments, false otherwise
+   *
+   * @example Use this method to check if project proj-123 has any active environments
+   * ```ts
+   * const doesProjectHaveEnvironment = await environmentService.doesDependencyHaveEnvironments(projectId);
+   * ```
+   */
+  public async doesDependencyHaveEnvironments(dependency: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'environment' },
+      sortKey: 'dependency',
+      eq: { S: dependency },
+      limit: 1
+    };
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.length > 0;
   }
 }

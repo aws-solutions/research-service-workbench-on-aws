@@ -21,12 +21,32 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'CostCenter'
       }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
     ]
   },
   [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
+        subject: 'CostCenter'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
         subject: 'CostCenter'
       }
     ]
@@ -202,6 +222,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'DELETE',
+        subject: 'Project'
+      }
+    ]
+  },
   '/roles': {
     POST: [
       {
@@ -220,6 +248,26 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
         subject: 'User'
       }
     ]
