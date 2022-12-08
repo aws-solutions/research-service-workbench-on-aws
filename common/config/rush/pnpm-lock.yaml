@@ -640,6 +640,7 @@ importers:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
@@ -660,6 +661,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
