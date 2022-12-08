@@ -117,22 +117,12 @@ export class SWBStack extends Stack {
       ALB_INTERNET_FACING
     } = getConstants();
 
-    const MAIN_ACCT_ID: string = process.env.CDK_DEFAULT_ACCOUNT || '';
-
-    if (MAIN_ACCT_ID) {
-      super(app, STACK_NAME, {
-        env: {
-          account: MAIN_ACCT_ID,
-          region: AWS_REGION
-        }
-      });
-    } else {
-      super(app, STACK_NAME, {
-        env: {
-          region: AWS_REGION
-        }
-      });
-    }
+    super(app, STACK_NAME, {
+      env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: AWS_REGION
+      }
+    });
 
     const workbenchCognito = this._createCognitoResources(
       COGNITO_DOMAIN,
@@ -159,6 +149,7 @@ export class SWBStack extends Stack {
 
     // We extract a subset of constants required to be set on Lambda
     // Note: AWS_REGION cannot be set since it's a reserved env variable
+    const MAIN_ACCT_ID = `${this.account}`;
     this.lambdaEnvVars = {
       STAGE,
       STACK_NAME,
