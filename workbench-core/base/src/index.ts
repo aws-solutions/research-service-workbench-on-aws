@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
 import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
@@ -39,7 +38,6 @@ import {
 import { validateAndParse } from './utilities/validatorHelper';
 
 export {
-  AuditLogger,
   AwsService,
   CognitoTokenService,
   QueryParams,

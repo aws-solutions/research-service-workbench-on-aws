@@ -11,9 +11,9 @@ import {
   HostingAccountService,
   ProjectService
 } from '@aws/workbench-core-accounts';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
-import { AwsService, AuditLogger, MetadataService } from '@aws/workbench-core-base';
+import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
