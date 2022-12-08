@@ -636,6 +636,7 @@ importers:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-authorization': workspace:*
+      '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
       '@rushstack/heft-jest-plugin': ^0.3.28
@@ -656,6 +657,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-authorization': link:../authorization
+      '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -16380,7 +16382,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1_ts-node@10.8.0
+      jest: 27.5.1
       jest-util: 27.5.1
       json5: 2.2.1
       lodash.memoize: 4.1.2
