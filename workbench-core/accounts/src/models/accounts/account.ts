@@ -23,7 +23,6 @@ export const AccountParser = z.object({
   hostingAccountHandlerRoleArn: z.string(),
   vpcId: z.string().optional(),
   subnetId: z.string().optional(),
-  cidr: z.string().optional(),
   environmentInstanceFiles: z.string().optional(),
   encryptionKeyArn: z.string().optional(),
   externalId: z.string(),
