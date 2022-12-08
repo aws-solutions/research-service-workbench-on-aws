@@ -21,7 +21,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
