@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "add Update Project API",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}
