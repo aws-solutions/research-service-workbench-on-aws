@@ -31,8 +31,8 @@ export default class CollectionResource {
     this._api = '';
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async create(
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     body: any = {},
     applyDefault: boolean = true,
     parentId: string = ''
