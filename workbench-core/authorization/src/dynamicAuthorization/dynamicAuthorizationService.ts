@@ -77,7 +77,7 @@ export class DynamicAuthorizationService {
     throw new Error('Not implemented');
   }
   /**
-   * Checks whether a {@link AuthenticatedUser} is authorized on route
+   * Checks whether a {@link AuthenticatedUser} is authorized on a route
    * @param isAuthorizedOnRouteRequest - {@link IsAuthorizedOnRouteRequest}
    *
    * @throws - {@link ForbiddenError} when {@link AuthenticatedUser} is not authorized.

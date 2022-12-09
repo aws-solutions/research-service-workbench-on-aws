@@ -22,5 +22,5 @@ export interface DoesGroupExistResponse {
   /**
    * Describes if group exist
    */
-  exists: boolean;
+  exist: boolean;
 }
