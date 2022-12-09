@@ -266,14 +266,10 @@ export default class ProjectService {
     const { projectId, updatedValues } = request;
 
     // disregard empty strings as valid input
-    console.log(updatedValues.name);
-    console.log('truth:', _.isEmpty(updatedValues.name), updatedValues.name !== undefined);
     if (updatedValues.name !== undefined && _.isEmpty(updatedValues.name)) {
-      console.log('HERE');
       updatedValues.name = undefined;
     }
     if (updatedValues.description !== undefined && _.isEmpty(updatedValues.description)) {
-      console.log('HERE');
       updatedValues.description = undefined;
     }
 
@@ -391,7 +387,6 @@ export default class ProjectService {
     const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
     itemWithoutValues.costCenterId = copyItem.dependency;
     const project: Project = itemWithoutValues as unknown as Project;
-    console.log(project);
     return project;
   }
 
