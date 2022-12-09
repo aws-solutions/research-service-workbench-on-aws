@@ -33,6 +33,7 @@ import GetProjectRequest from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
 import ListProjectsResponse from '../models/projects/listProjectsResponse';
 import { Project } from '../models/projects/project';
+import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
 
@@ -254,38 +255,57 @@ export default class ProjectService {
     return newProject;
   }
 
-  public async updateProject(
-    projectId: string,
-    user: AuthenticatedUser,
-    updatedValues: {
-      name?: string;
-      description?: string;
+  /**
+   * Update the name or description of an existing project.
+   *
+   * @param request - a {@link UpdateProjectRequest} object that contains the id of the project to update
+   *                  as well as the new field values
+   * @returns a {@link Project} object that reflects the changes requested
+   */
+  public async updateProject(request: UpdateProjectRequest): Promise<Project> {
+    const { projectId, updatedValues } = request;
+
+    // disregard empty strings as valid input
+    console.log(updatedValues.name);
+    console.log('truth:', _.isEmpty(updatedValues.name), updatedValues.name !== undefined);
+    if (updatedValues.name !== undefined && _.isEmpty(updatedValues.name)) {
+      console.log('HERE');
+      updatedValues.name = undefined;
     }
-  ): Promise<Project> {
+    if (updatedValues.description !== undefined && _.isEmpty(updatedValues.description)) {
+      console.log('HERE');
+      updatedValues.description = undefined;
+    }
+
     // verify at least one attribute is being updated
     if (!updatedValues.name && !updatedValues.description) {
-      throw Boom.badRequest('You must supply a new name and/or description to update the project.');
+      throw Boom.badRequest('You must supply a new nonempty name and/or description to update the project.');
     }
 
-    // verify project exists
-    await this.getProject({ projectId, user });
-
-    // if updating name, verify it is not in use
+    // if updating name, verify it is not in use and project exists
     if (updatedValues.name) {
-      await this._isProjectNameInUse(updatedValues.name);
+      await Promise.all([this._isProjectNameInUse(updatedValues.name), this.getProject({ projectId })]);
+    } else {
+      // else, verify project still exists
+      await this.getProject({ projectId });
     }
-
-    // TODO: update metadata of other collections that have project information as metadata?
 
     // update project DDB item
-    const updateResponse = await this._aws.helpers.ddb
-      .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), { item: updatedValues })
-      .execute();
+    try {
+      const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
+        params: { item: updatedValues, return: 'ALL_NEW' }
+      });
 
-    if (!updateResponse.Attributes) {
-      throw Boom.badImplementation('Could not update project.');
+      if (!updateResponse.Attributes) {
+        throw Boom.badImplementation('Could not update project.');
+      }
+
+      return this._mapToProjectFromDDBItem(updateResponse.Attributes);
+    } catch (e) {
+      console.error(`Failed to update project ${request.projectId}}`, e);
+      throw Boom.internal('Could not update project.');
     }
-    return this._mapToProjectFromDDBItem(updateResponse.Attributes);
   }
 
   /**

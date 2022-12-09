@@ -20,6 +20,7 @@ import CreateProjectRequest from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import GetProjectRequest from './models/projects/getProjectRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
@@ -38,6 +39,8 @@ export {
   CreateProjectRequest,
   ListProjectsRequest,
   ListProjectsRequestParser,
+  UpdateProjectRequest,
+  UpdateProjectRequestParser,
   GetProjectRequest,
   DeleteProjectRequest,
   DeleteProjectRequestParser,
