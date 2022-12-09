@@ -218,6 +218,7 @@ importers:
       '@types/js-yaml': ^4.0.5
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      '@types/qs': ^6.9.7
       '@types/uuid': ^8.3.4
       '@vendia/serverless-express': ^4.5.4
       aws-cdk: ^2.12.0
@@ -286,6 +287,7 @@ importers:
       '@types/js-yaml': 4.0.5
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      '@types/qs': 6.9.7
       '@types/uuid': 8.3.4
       aws-cdk: 2.26.0
       aws-cdk-lib: 2.29.1_constructs@10.1.25
@@ -3754,7 +3756,7 @@ packages:
       events: 3.3.0
       jws: 3.2.2
       msal: 1.4.16
-      qs: 6.10.3
+      qs: 6.11.0
       tslib: 1.14.1
       uuid: 3.4.0
     transitivePeerDependencies:
@@ -8958,6 +8960,11 @@ packages:
     engines: {node: '>=0.10'}
     dev: true
 
+  /decode-uri-component/0.2.2:
+    resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
+    engines: {node: '>=0.10'}
+    dev: true
+
   /decompress-response/6.0.0:
     resolution: {integrity: sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==}
     engines: {node: '>=10'}
@@ -13892,6 +13899,13 @@ packages:
     dependencies:
       side-channel: 1.0.4
 
+  /qs/6.11.0:
+    resolution: {integrity: sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.4
+    dev: false
+
   /qs/6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
     engines: {node: '>=0.6'}
@@ -14748,7 +14762,7 @@ packages:
     deprecated: See https://github.com/lydell/source-map-resolve#deprecated
     dependencies:
       atob: 2.1.2
-      decode-uri-component: 0.2.0
+      decode-uri-component: 0.2.2
       resolve-url: 0.2.1
       source-map-url: 0.4.1
       urix: 0.1.0

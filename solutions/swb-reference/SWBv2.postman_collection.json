@@ -631,39 +631,6 @@
       "name": "envType",
       "item": [
         {
-          "name": "Create envType",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemakerNotebook\",\n    \"params\": {\n       \"InstanceType\": {\n        \"Description\": \"EC2 instance type to launch\",\n        \"Default\": \"ml.t3.xlarge\",\n        \"AllowedValues\": [],\n         \"Type\": \"String\"\n         }\n       },\n    \"status\": \"NOT_APPROVED\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{API_URL}}/environmentTypes",
-              "host": ["{{API_URL}}"],
-              "path": ["environmentTypes"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update envType",
           "request": {
             "method": "PATCH",
