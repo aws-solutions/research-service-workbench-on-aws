@@ -59,7 +59,7 @@ export interface IdentityPermission {
   /**
    * Used to conditionally restrict a {@link User}'s action
    */
-  conditions?: { [key: string]: unknown };
+  conditions?: Record<string, unknown>;
 
   /**
    * Description of permission

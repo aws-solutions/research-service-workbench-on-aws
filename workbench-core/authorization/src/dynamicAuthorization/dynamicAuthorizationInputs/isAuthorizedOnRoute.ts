@@ -23,5 +23,5 @@ export interface IsAuthorizedOnRouteRequest {
   /**
    * Optional params for variable based operations
    */
-  params?: { [key: string]: unknown };
+  params?: Record<string, unknown>;
 }

@@ -23,5 +23,5 @@ export interface DynamicOperation {
   /**
    * Attributes associated to the subject
    */
-  subjectAttributes?: { [key: string]: unknown };
+  subjectAttributes?: Record<string, unknown>;
 }
