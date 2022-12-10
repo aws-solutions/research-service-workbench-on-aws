@@ -47,19 +47,20 @@ describe('multiStep environment type and environment type config test', () => {
 
     //Create Environment Type Config
     console.log('Creating Environment Type Config');
-    const { data: envTypeConfig } = await adminSession.resources.environmentTypeConfigs.create(
-      {},
-      true,
-      envType.id
-    );
+    const { data: envTypeConfig } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .create({}, true);
     expect(envTypeConfig).toMatchObject({
       id: expect.stringMatching(envTypeConfigRegExp)
     });
 
     //Update Environment Type Config
     console.log('Update Environment Type Config');
-    await adminSession.resources.environmentTypeConfigs
-      .environmentTypeConfig(envTypeConfig.id, envType.id)
+    await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
       .update(
         {
           description: 'new Description',
@@ -67,8 +68,10 @@ describe('multiStep environment type and environment type config test', () => {
         },
         true
       );
-    const { data: updatedEnvTypeConfig } = await adminSession.resources.environmentTypeConfigs
-      .environmentTypeConfig(envTypeConfig.id, envType.id)
+    const { data: updatedEnvTypeConfig } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .configurations()
+      .environmentTypeConfig(envTypeConfig.id)
       .get();
     expect(updatedEnvTypeConfig).toMatchObject({
       description: 'new Description',
@@ -77,8 +80,10 @@ describe('multiStep environment type and environment type config test', () => {
     //Delete Environment Type Config
     console.log('Delete Environment Type Config');
     await expect(
-      adminSession.resources.environmentTypeConfigs
-        .environmentTypeConfig(envTypeConfig.id, envType.id)
+      adminSession.resources.environmentTypes
+        .environmentType(envType.id)
+        .configurations()
+        .environmentTypeConfig(envTypeConfig.id)
         .delete()
     ).resolves;
 

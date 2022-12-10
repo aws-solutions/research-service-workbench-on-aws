@@ -24,14 +24,20 @@ describe('list environment type configs', () => {
     await setup.cleanup();
   });
 
-  test('list environments type configs when filter and sorting by name', async () => {
-    const { data: response } = await adminSession.resources.environmentTypeConfigs.get({}, envTypeId);
+  test('list environments type configs excecutes successfully', async () => {
+    const { data: response } = await adminSession.resources.environmentTypes
+      .environmentType(envTypeId)
+      .configurations()
+      .get({});
     expect(Array.isArray(response.data)).toBe(true);
   });
 
   test('list environments type configs fails when using invalid format envType Id', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.get({}, 'invalid-envType-id');
+      await adminSession.resources.environmentTypes
+        .environmentType('invalid-envType-id')
+        .configurations()
+        .get({});
     } catch (e) {
       checkHttpError(
         e,

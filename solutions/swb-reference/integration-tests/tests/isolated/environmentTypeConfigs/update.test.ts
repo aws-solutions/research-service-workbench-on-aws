@@ -27,8 +27,10 @@ describe('update environment type configs', () => {
 
   test('fails when trying to update invalid prop', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs
-        .environmentTypeConfig(envTypeConfigId, envTypeId)
+      await adminSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig(envTypeConfigId)
         .update(
           {
             invalidProp: 'invalidValue'
@@ -49,8 +51,10 @@ describe('update environment type configs', () => {
 
   test('fails when trying to update invalid environment Type Config', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs
-        .environmentTypeConfig('etc-12345678-1234-1234-1234-123456789012', envTypeId)
+      await adminSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig('etc-12345678-1234-1234-1234-123456789012')
         .update(
           {
             description: 'new Description'
@@ -71,8 +75,10 @@ describe('update environment type configs', () => {
 
   test('fails when trying to update invalid environment Type id format', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs
-        .environmentTypeConfig('wrong-format-id', envTypeId)
+      await adminSession.resources.environmentTypes
+        .environmentType(envTypeId)
+        .configurations()
+        .environmentTypeConfig('wrong-format-id')
         .update(
           {
             description: 'new Description'

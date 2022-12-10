@@ -26,14 +26,13 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create without name', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
+      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
         {
           type: 'typeTest',
           description: 'description',
           params: []
         },
-        false,
-        envTypeId
+        false
       );
     } catch (e) {
       checkHttpError(
@@ -49,14 +48,13 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create without type', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
+      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
         {
           name: 'name',
           description: 'description',
           params: []
         },
-        false,
-        envTypeId
+        false
       );
     } catch (e) {
       checkHttpError(
@@ -72,14 +70,13 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create without params', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
+      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
         {
           name: 'name',
           description: 'description',
           type: 'type'
         },
-        false,
-        envTypeId
+        false
       );
     } catch (e) {
       checkHttpError(
@@ -95,7 +92,7 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create with invalid prop', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
+      await adminSession.resources.environmentTypes.environmentType(envTypeId).configurations().create(
         {
           type: 'typeTest',
           description: 'description',
@@ -103,8 +100,7 @@ describe('create environment type configs', () => {
           invalidProp: 'invalidValue',
           params: []
         },
-        false,
-        envTypeId
+        false
       );
     } catch (e) {
       checkHttpError(
@@ -120,16 +116,18 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create with invalid environment Type Id', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
-        {
-          type: 'typeTest',
-          description: 'description',
-          name: 'name',
-          params: []
-        },
-        false,
-        'et-prod-1234567890124,pa-1234567890124'
-      );
+      await adminSession.resources.environmentTypes
+        .environmentType('et-prod-1234567890124,pa-1234567890124')
+        .configurations()
+        .create(
+          {
+            type: 'typeTest',
+            description: 'description',
+            name: 'name',
+            params: []
+          },
+          false
+        );
     } catch (e) {
       checkHttpError(
         e,
@@ -144,16 +142,18 @@ describe('create environment type configs', () => {
 
   test('fails when trying to create with invalid environment Type id format', async () => {
     try {
-      await adminSession.resources.environmentTypeConfigs.create(
-        {
-          type: 'typeTest',
-          description: 'description',
-          name: 'name',
-          params: []
-        },
-        false,
-        'wrong-foramt-env-type-id'
-      );
+      await adminSession.resources.environmentTypes
+        .environmentType('wrong-foramt-env-type-id')
+        .configurations()
+        .create(
+          {
+            type: 'typeTest',
+            description: 'description',
+            name: 'name',
+            params: []
+          },
+          false
+        );
     } catch (e) {
       checkHttpError(
         e,

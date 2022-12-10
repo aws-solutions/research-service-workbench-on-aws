@@ -8,14 +8,16 @@ import CollectionResource from '../base/collectionResource';
 import EnvironmentTypeConfig from './environmentTypeConfig';
 
 export default class EnvironmentTypeConfigs extends CollectionResource {
-  public constructor(clientSession: ClientSession) {
-    super(clientSession, 'environmentTypeConfigs', 'environmentTypeConfig', 'environmentTypes/:parentId/');
-    this._api = 'configurations';
+  private _parentId: string;
+  public constructor(clientSession: ClientSession, parentApi: string, parentId: string) {
+    super(clientSession, 'environmentTypeConfigs', 'environmentTypeConfig');
+    this._api = `${parentApi}/configurations`;
+    this._parentId = parentId;
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  public environmentTypeConfig(id: string, envTypeId: string): EnvironmentTypeConfig {
-    return new EnvironmentTypeConfig(id, this._clientSession, this._api, envTypeId);
+  public environmentTypeConfig(id: string): EnvironmentTypeConfig {
+    return new EnvironmentTypeConfig(id, this._clientSession, this._api, this._parentId);
   }
 
   protected _buildDefaults(resource: ETCCreateRequest): ETCCreateRequest {

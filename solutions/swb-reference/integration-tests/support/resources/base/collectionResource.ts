@@ -31,12 +31,8 @@ export default class CollectionResource {
     this._api = '';
   }
 
-  public async create(
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body: any = {},
-    applyDefault: boolean = true,
-    parentId: string = ''
-  ): Promise<AxiosResponse> {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async create(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
     // Because of the cleanup logic, before we do the create, we need to ensure that the extender of this collection
     // resource class has a method that returns the resource operations helper for the child resource.
     // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
@@ -47,10 +43,9 @@ export default class CollectionResource {
         `The collection resource ['${this._type}'] must have a method named [${this._childType}()]`
       );
     }
-    const prefix = parentId && this._parentApi ? this._parentApi.replace(':parentId', parentId) : '';
 
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
-    const response = await this._axiosInstance.post(`${prefix}${this._api}`, requestBody);
+    const response = await this._axiosInstance.post(this._api, requestBody);
     const id = response.data.id;
     const taskId = `${this._childType}-${id}`;
     // @ts-ignore
@@ -63,9 +58,8 @@ export default class CollectionResource {
   }
 
   // List call
-  public async get(queryParams: Record<string, JSONValue>, parentId: string = ''): Promise<AxiosResponse> {
-    const prefix = parentId && this._parentApi ? this._parentApi.replace(':parentId', parentId) : '';
-    return this._axiosInstance.get(`${prefix}${this._api}`, { params: queryParams });
+  public async get(queryParams: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(this._api, { params: queryParams });
   }
 
   // This method should be overridden by the class extending `CollectionResource`

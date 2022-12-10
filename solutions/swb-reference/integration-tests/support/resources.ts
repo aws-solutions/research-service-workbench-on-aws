@@ -7,7 +7,6 @@ import Accounts from './resources/accounts/accounts';
 import CostCenters from './resources/costCenters/costCenters';
 import Datasets from './resources/datasets/datasets';
 import Environments from './resources/environments/environments';
-import EnvironmentTypeConfigs from './resources/environmentTypeConfigs/environmentTypeConfigs';
 import EnvironmentTypes from './resources/environmentTypes/environmentTypes';
 
 function getResources(clientSession: ClientSession): Resources {
@@ -16,8 +15,7 @@ function getResources(clientSession: ClientSession): Resources {
     datasets: new Datasets(clientSession),
     accounts: new Accounts(clientSession),
     costCenters: new CostCenters(clientSession),
-    environmentTypes: new EnvironmentTypes(clientSession),
-    environmentTypeConfigs: new EnvironmentTypeConfigs(clientSession)
+    environmentTypes: new EnvironmentTypes(clientSession)
   };
 }
 
@@ -27,7 +25,6 @@ interface Resources {
   datasets: Datasets;
   costCenters: CostCenters;
   environmentTypes: EnvironmentTypes;
-  environmentTypeConfigs: EnvironmentTypeConfigs;
 }
 
 export { getResources, Resources };
