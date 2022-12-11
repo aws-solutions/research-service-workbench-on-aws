@@ -5,7 +5,13 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
+import {
+  WorkbenchCognito,
+  WorkbenchCognitoProps,
+  EncryptionKeyWithRotation,
+  SecureS3Bucket,
+  WorkbenchDynamodb
+} from '@aws/workbench-core-infrastructure';
 import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import {
   AccessLogFormat,
@@ -16,7 +22,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, CfnTable, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
   AnyPrincipal,
   CfnPolicy,
@@ -31,8 +37,8 @@ import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
 import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-import { EncryptionKeyWithRotation } from './constructs/encryptionKeyWithRotation';
-import { SecureS3Bucket } from './constructs/secureS3Bucket';
+// import { EncryptionKeyWithRotation } from '';
+// import { SecureS3Bucket } from './constructs/secureS3Bucket';
 
 export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
@@ -68,11 +74,14 @@ export class ExampleStack extends Stack {
     this._s3AccessLogsPrefix = 'example-access-log';
     const createEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
       this,
-      'DataSetBucket-EncryptionKey'
+      'DataSetBucket-EncryptionKey',
+      {
+        removalPolicy: RemovalPolicy.DESTROY
+      }
     );
     const encryptionKey: Key = createEncryptionKey.key;
     this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
-    const createDatasetBucket = new SecureS3Bucket(this, 'Example-S3Bucket', {
+    const secureS3Bucket = new SecureS3Bucket(this, 'Example-S3Bucket', {
       s3BucketId: 'example-s3-datasets',
       s3OutputId: 'ExampleS3BucketDatasetsArnOutput',
       encryptionKey: encryptionKey,
@@ -81,7 +90,7 @@ export class ExampleStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
-    const datasetBucket: Bucket = createDatasetBucket.bucket;
+    const datasetBucket: Bucket = secureS3Bucket.bucket;
 
     new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
       value: datasetBucket.bucketName
@@ -190,28 +199,40 @@ export class ExampleStack extends Stack {
 
   // DynamoDB Table
   private _createDDBTable(exampleLambda: Function): Table {
-    const table = new Table(this, `${this.stackName}`, {
+    //EncryptionKey for DynamoDB
+    const dynamodbEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
+      this,
+      'DynamoDB-EncryptionKey',
+      {
+        removalPolicy: RemovalPolicy.DESTROY
+      }
+    );
+
+    const dynamodb = new WorkbenchDynamodb(this, `${this.stackName}`, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
+      removalPolicy: RemovalPolicy.DESTROY,
+      encryptionKey: dynamodbEncryptionKey.key
       // tableName: tableName,  W28: Resource found with an explicit name, this disallows updates that require replacement of this resource
-      billingMode: BillingMode.PAY_PER_REQUEST
     });
 
+    const table = dynamodb.table;
+
     //CFN NAG Suppression
-    const tableNode = table.node.defaultChild as CfnTable;
-    tableNode.addMetadata('cfn_nag', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      rules_to_suppress: [
-        {
-          id: 'W78',
-          reason: 'This is an example app for integration test, backup is not required'
-        },
-        {
-          id: 'W74',
-          reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
-        }
-      ]
-    });
+    // const tableNode = table.node.defaultChild as CfnTable;
+    // tableNode.addMetadata('cfn_nag', {
+    //   // eslint-disable-next-line @typescript-eslint/naming-convention
+    //   rules_to_suppress: [
+    //     {
+    //       id: 'W78',
+    //       reason: 'This is an example app for integration test, backup is not required'
+    //     },
+    //     {
+    //       id: 'W74',
+    //       reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
+    //     }
+    //   ]
+    // });
 
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({

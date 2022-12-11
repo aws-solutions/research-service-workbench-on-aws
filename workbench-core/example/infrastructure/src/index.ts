@@ -10,11 +10,20 @@ import * as cdk from 'aws-cdk-lib';
 import { App, Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
 import { ExampleStack } from './example-stack';
+import { TestStack } from './test-stack';
 
 const app: App = new cdk.App();
 
 // eslint-disable-next-line no-new
 new ExampleStack(app, 'ExampleStack', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  }
+});
+
+// eslint-disable-next-line no-new
+new TestStack(app, 'TestStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION

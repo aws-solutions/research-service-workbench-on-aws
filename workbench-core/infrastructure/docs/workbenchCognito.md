@@ -7,12 +7,12 @@ A CDK Construct to create a Cognito user pool for use with the [authentication p
 
 ### Installing the package
 
-Using NPM: 
+Using NPM:
 ```bash
 npm install @aws/workbench-core-infrastructure
 ```
 
-Using Yarn: 
+Using Yarn:
 ```bash
 yarn add @aws/workbench-core-infrastructure
 ```

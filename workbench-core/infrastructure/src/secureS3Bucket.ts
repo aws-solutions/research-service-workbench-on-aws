@@ -5,53 +5,37 @@
 
 import { CfnOutput } from 'aws-cdk-lib';
 import { AnyPrincipal, Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Key } from 'aws-cdk-lib/aws-kms';
 import {
   BlockPublicAccess,
   Bucket,
   BucketAccessControl,
-  BucketEncryption,
   BucketProps,
   CfnBucketPolicy
 } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-
-export interface SecureBucketProps extends BucketProps {
-  s3BucketId: string;
-  s3OutputId: string;
-  encryptionKey: Key;
-  serverAccessLogsPrefix: string;
-  serverAccessLogsBucket: Bucket;
-}
+import { EncryptionKeyWithRotation } from './encryptionKeyWithRotation';
 
 export class SecureS3Bucket extends Construct {
-  public bucket: Bucket;
+  public readonly bucket: Bucket;
 
-  public constructor(scope: Construct, id: string, props: SecureBucketProps) {
+  public constructor(scope: Construct, id: string, props: BucketProps) {
     super(scope, id);
 
     const secureS3BucketProps: BucketProps = {
       ...props,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption:
-        props.encryption && props.encryption !== BucketEncryption.UNENCRYPTED
-          ? props.encryption
-          : BucketEncryption.KMS,
-      encryptionKey: props.encryptionKey,
+      encryptionKey: props.encryptionKey ?? new EncryptionKeyWithRotation(this, `${id}-EncryptionKey`).key,
       versioned: true,
       enforceSSL: true,
-      serverAccessLogsBucket: props.serverAccessLogsBucket,
-      serverAccessLogsPrefix: props.serverAccessLogsPrefix,
       accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
-      removalPolicy: props.removalPolicy,
-      autoDeleteObjects: props.autoDeleteObjects
+      serverAccessLogsPrefix: props.serverAccessLogsPrefix ?? `${id.toLowerCase()}-access-log`
     };
 
-    this.bucket = new Bucket(this, props.s3BucketId, secureS3BucketProps);
+    this.bucket = new Bucket(this, `${id}-Bucket`, secureS3BucketProps);
     this._addS3TLSSigV4BucketPolicy(this.bucket);
 
     // eslint-disable-next-line no-new
-    new CfnOutput(this, props.s3OutputId, {
+    new CfnOutput(this, `${id}-Output`, {
       value: this.bucket.bucketArn
     });
   }
