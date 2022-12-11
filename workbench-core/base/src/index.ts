@@ -3,20 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
+import DynamoDBService from './aws/helpers/dynamoDB/dynamoDBService';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
 import { FilterRequest } from './interfaces/filterRequest';
 import PaginatedResponse from './interfaces/paginatedResponse';
 import { QueryNumberParamFilterParser, QueryNumberParamFilter } from './interfaces/queryNumberParamFilter';
-
 import QueryParams from './interfaces/queryParams';
 import { QueryStringParamFilterParser, QueryStringParamFilter } from './interfaces/queryStringParamFilter';
 import { SortRequest } from './interfaces/sortRequest';
-
 import { MetadataService } from './services/metadataService';
+import { SecretsService } from './services/secretsService';
+import JSONValue from './types/json';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import {
   addPaginationToken,
@@ -38,7 +38,6 @@ import {
 import { validateAndParse } from './utilities/validatorHelper';
 
 export {
-  AuditLogger,
   AwsService,
   CognitoTokenService,
   QueryParams,
@@ -66,5 +65,8 @@ export {
   MAX_API_PAGE_SIZE,
   PaginatedResponse,
   MetadataService,
-  validateAndParse
+  validateAndParse,
+  JSONValue,
+  DynamoDBService,
+  SecretsService
 };

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Add template signing + parameters, upgrade packages",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}
