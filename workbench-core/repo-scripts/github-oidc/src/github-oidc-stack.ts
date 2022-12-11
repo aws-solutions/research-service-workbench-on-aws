@@ -3,8 +3,15 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
-import { FederatedPrincipal, ManagedPolicy, OpenIdConnectProvider, Role } from 'aws-cdk-lib/aws-iam';
+import { Aws, CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import {
+  Effect,
+  FederatedPrincipal,
+  ManagedPolicy,
+  OpenIdConnectProvider,
+  PolicyStatement,
+  Role
+} from 'aws-cdk-lib/aws-iam';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 
@@ -33,7 +40,32 @@ export class GitHubOIDCStack extends Stack {
           },
           'sts:AssumeRoleWithWebIdentity'
         ),
-        managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess')]
+        managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName('PowerUserAccess')]
+      });
+
+      // eslint-disable-next-line no-new
+      new ManagedPolicy(this, `${props.gitHubOrg}-${gitHubRepo}-GitHubOIDCCustomManagedPolicy`, {
+        statements: [
+          new PolicyStatement({
+            sid: 'iamAccess',
+            effect: Effect.ALLOW,
+            actions: ['iam:*Role*'],
+            resources: [`arn:${Aws.PARTITION}:iam::${Aws.ACCOUNT_ID}:role/*`]
+          }),
+          new PolicyStatement({
+            sid: 'DenySelfEscalation',
+            effect: Effect.DENY,
+            actions: [
+              'iam:AttachRolePolicy',
+              'iam:PutRolePolicy',
+              'iam:DeleteRolePolicy',
+              'iam:DeletePolicyVersion',
+              'iam:DetachRolePolicy'
+            ],
+            resources: [githubOIDCRole.roleArn]
+          })
+        ],
+        roles: [githubOIDCRole]
       });
 
       // eslint-disable-next-line no-new
@@ -42,11 +74,43 @@ export class GitHubOIDCStack extends Stack {
         value: githubOIDCRole.roleArn
       });
 
-      // Suppress AwsSolutions-IAM4[Policy::arn:<AWS::Partition>:iam::aws:policy/AdministratorAccess]: The IAM user, role, or group uses AWS managed policies
+      // Suppress: AwsSolutions-IAM4[Policy::arn:<AWS::Partition>:iam::aws:policy/PowerUserAccess]
       NagSuppressions.addResourceSuppressionsByPath(
         this,
         '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-GitHub-OIDC-Role/Resource',
-        [{ id: 'AwsSolutions-IAM4', reason: 'Admin access for deployment and integration test' }]
+        [
+          {
+            id: 'AwsSolutions-IAM4',
+            reason: 'I am ok to use PowerUserAccess for this role',
+            appliesTo: ['Policy::arn:<AWS::Partition>:iam::aws:policy/PowerUserAccess']
+          }
+        ]
+      );
+
+      // Suppress: AwsSolutions-IAM5[Action::iam:*Role*]
+      NagSuppressions.addResourceSuppressionsByPath(
+        this,
+        '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-GitHubOIDCCustomManagedPolicy/Resource',
+        [
+          {
+            id: 'AwsSolutions-IAM5',
+            reason: 'I am ok to use iam:*Role* Action for this role',
+            appliesTo: ['Action::iam:*Role*']
+          }
+        ]
+      );
+
+      // Suppress: AwsSolutions-IAM5[Resource::arn:<AWS::Partition>:iam::<AWS::AccountId>:role/*]
+      NagSuppressions.addResourceSuppressionsByPath(
+        this,
+        '/aws-solutions-GitHubOIDCStack/aws-solutions-solution-spark-on-aws-GitHubOIDCCustomManagedPolicy/Resource',
+        [
+          {
+            id: 'AwsSolutions-IAM5',
+            reason: 'I am ok to use wilcard for this resource',
+            appliesTo: ['Resource::arn:<AWS::Partition>:iam::<AWS::AccountId>:role/*']
+          }
+        ]
       );
     });
   }
