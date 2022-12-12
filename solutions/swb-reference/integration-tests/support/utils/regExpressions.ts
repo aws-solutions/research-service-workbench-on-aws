@@ -7,3 +7,5 @@ import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench
 export const envUuidRegExp: RegExp = uuidWithLowercasePrefixRegExp(resourceTypeToKey.environment);
 
 export const dsUuidRegExp: RegExp = uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset);
+
+export const envTypeConfigRegExp: RegExp = uuidWithLowercasePrefixRegExp(resourceTypeToKey.envTypeConfig);

@@ -149,12 +149,6 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'EnvironmentType'
       }
-    ],
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'EnvironmentType'
-      }
     ]
   },
   [`/environmentTypes/${envTypeIdRegExpString}`]: {

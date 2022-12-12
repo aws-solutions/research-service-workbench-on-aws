@@ -4,7 +4,6 @@
  */
 
 import {
-  CreateEnvironmentTypeSchema,
   EnvironmentTypeService,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
@@ -19,25 +18,6 @@ import { wrapAsync } from './errorHandlers';
 import { processValidatorResult, validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeRoutes(router: Router, environmentTypeService: EnvironmentTypeService): void {
-  // Create envType
-  router.post(
-    '/environmentTypes',
-    wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateEnvironmentTypeSchema));
-      const { status } = req.body;
-
-      if (!isEnvironmentTypeStatus(status)) {
-        throw Boom.badRequest(
-          `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
-        );
-      }
-      const envType = await environmentTypeService.createNewEnvironmentType({
-        ...req.body
-      });
-      res.status(201).send(envType);
-    })
-  );
-
   // Get envType
   router.get(
     '/environmentTypes/:id',

@@ -31,6 +31,7 @@ import {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser
 } from './models/environmentTypeConfigs/updateEnvironmentTypeConfigsRequest';
+import { EnvironmentType } from './models/environmentTypes/environmentType';
 import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
@@ -62,6 +63,7 @@ export {
   EnvironmentTypeService,
   Environment,
   EnvironmentTypeStatus,
+  EnvironmentType,
   isEnvironmentTypeStatus,
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
