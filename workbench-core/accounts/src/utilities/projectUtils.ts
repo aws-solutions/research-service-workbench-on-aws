@@ -74,7 +74,7 @@ export function manualFilterProjects(filter: FilterRequest, projects: Project[])
   // get filter attribute, operator, and value
   const filterKey = Object.keys(filter)[0];
   const filterValue = Object.values(filter)[0] as QueryStringParamFilter;
-  if (filterValue === undefined) {
+  if (filterValue === undefined || Object.values(filterValue)[0] === undefined) {
     throw Boom.badRequest('Filter contains invalid format');
   }
   const selectedQualifier = Object.keys(filterValue)[0];
