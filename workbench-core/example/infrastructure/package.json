@@ -51,6 +51,7 @@
     "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-example-app": "workspace:*",
     "@aws/workbench-core-infrastructure": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "aws-cdk-lib": "^2.29.1",
     "constructs": "^10.0.0",
     "cookie-parser": "^1.4.6",

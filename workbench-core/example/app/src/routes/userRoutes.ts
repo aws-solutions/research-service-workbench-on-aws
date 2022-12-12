@@ -12,7 +12,7 @@ import {
   isUserNotFoundError,
   UpdateRoleSchema,
   UserManagementService
-} from '@aws/workbench-core-authentication';
+} from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
