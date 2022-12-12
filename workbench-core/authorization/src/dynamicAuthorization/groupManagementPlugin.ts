@@ -1,12 +1,18 @@
-import { AddUserToGroupRequest, AddUserToGroupResponse } from './inputs/addUserToGroup';
-import { CreateGroupRequest, CreateGroupResponse } from './inputs/createGroup';
-import { DeleteGroupRequest, DeleteGroupResponse } from './inputs/deleteGroup';
-import { DoesGroupExistRequest, DoesGroupExistResponse } from './inputs/doesGroupExist';
-import { GetGroupUsersRequest, GetGroupUsersResponse } from './inputs/getGroupUsers';
-import { GetUserGroupsRequest, GetUserGroupsResponse } from './inputs/getUserGroups';
-import { IsUserAssignedToGroupRequest, IsUserAssignedToGroupResponse } from './inputs/isUserAssignedToGroup';
-import { RemoveUserFromGroupRequest, RemoveUserFromGroupResponse } from './inputs/removeUserFromGroup';
-import { SetGroupStatusRequest, SetGroupStatusResponse } from './inputs/setGroupStatus';
+import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
+import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
+import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
+import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
+import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
+import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
+import {
+  IsUserAssignedToGroupRequest,
+  IsUserAssignedToGroupResponse
+} from './dynamicAuthorizationInputs/isUserAssignedToGroup';
+import {
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupResponse
+} from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { SetGroupStatusRequest, SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 
 /**
  * Implement the `GroupManagementPlugin` interface to connect the DynamicAuthorizationService
