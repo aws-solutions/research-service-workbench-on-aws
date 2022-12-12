@@ -12,7 +12,6 @@ import {
   ProjectService
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
   DataSetService,
@@ -25,6 +24,7 @@ import {
   EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';

@@ -80,6 +80,12 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@aws/workbench-core-user-management",
+      "projectFolder": "workbench-core/user-management",
+      "reviewCategory": "production",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@aws/workbench-core-audit",
       "projectFolder": "workbench-core/audit",
       "reviewCategory": "production",
