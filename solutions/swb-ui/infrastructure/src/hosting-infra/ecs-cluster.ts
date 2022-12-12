@@ -4,8 +4,8 @@
  */
 
 /* eslint-disable no-new */
-import { CfnOutput } from 'aws-cdk-lib';
-import { InstanceType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Cluster, ContainerImage, FargateService, FargateTaskDefinition } from 'aws-cdk-lib/aws-ecs';
 import {
   ApplicationListener,
@@ -32,8 +32,7 @@ export function createECSCluster(
 
   // Create an ECS cluster
   const cluster = new Cluster(stack, 'Cluster', {
-    vpc,
-    capacity: { instanceType: new InstanceType('t2.xlarge') }
+    vpc
   });
 
   const taskDefinition = new FargateTaskDefinition(stack, 'TaskDefinition', {
@@ -56,7 +55,19 @@ export function createECSCluster(
     memoryLimitMiB: 1024,
     portMappings: [{ containerPort: 3000 }]
   });
-  const fargateService = new FargateService(stack, 'SwbUi', { cluster, taskDefinition });
+  const fargateService = new FargateService(stack, 'SwbUi', {
+    cluster,
+    taskDefinition,
+    desiredCount: 1
+  });
+  const scalableTaskCount = fargateService.autoScaleTaskCount({
+    maxCapacity: 20,
+    minCapacity: 1
+  });
+  scalableTaskCount.scaleOnCpuUtilization('CpuUtilizationScaling', {
+    targetUtilizationPercent: 50,
+    scaleInCooldown: Duration.seconds(60)
+  });
 
   const albListener = ApplicationListener.fromLookup(stack, 'SWBApplicationListener', {
     listenerArn: listenerArn
