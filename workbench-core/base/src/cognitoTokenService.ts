@@ -56,16 +56,6 @@ export default class CognitoTokenService {
     } else if (rootUserNameParamStorePath) {
       userName = await this._secretsService.getSecret(rootUserNameParamStorePath);
     }
-    let userName: string = rootUserName || '';
-    if (rootUserNameParamStorePath && rootUserName) {
-      throw new Error(
-        'Both "rootUserNameParamStorePath" and "rootUserName" are defined. Please pass in only one of the two parameters.'
-      );
-    } else if (rootUserNameParamStorePath === undefined && rootUserName === undefined) {
-      throw new Error('Either "rootUserNameParamStorePath" or "rootUserName" should be defined');
-    } else if (rootUserNameParamStorePath) {
-      userName = await this._getSSMParamValue(rootUserNameParamStorePath);
-    }
 
     const clientSecret = await this._getClientSecret(userPoolId, clientId);
     const secretHash = crypto
