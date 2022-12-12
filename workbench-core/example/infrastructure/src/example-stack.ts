@@ -112,16 +112,50 @@ export class ExampleStack extends Stack {
     customResourceLambdaMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // Lambda functions require permission to write CloudWatch Logs
         {
           id: 'W58',
           reason:
             'AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs'
         },
+        // Lambda functions should be deployed inside a VPC
         {
           id: 'W89',
           reason:
             'AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC'
         },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
+        {
+          id: 'W92',
+          reason:
+            'AWSCustomResource Lambda Function used for provisioning infrastructure, reserved concurrency is not required'
+        }
+      ]
+    });
+
+    //DataSetBucket autoDelete custom Lambda
+    const autoDeleteCustomResourceLambdaNode = this.node.findChild(
+      'Custom::S3AutoDeleteObjectsCustomResourceProvider'
+    );
+    const autoDeleteCustomResourceLambdaMetaDataNode = autoDeleteCustomResourceLambdaNode.node.findChild(
+      'Handler'
+    ) as CfnFunction;
+    autoDeleteCustomResourceLambdaMetaDataNode.addMetadata('cfn_nag', {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      rules_to_suppress: [
+        // // Lambda functions require permission to write CloudWatch Logs
+        {
+          id: 'W58',
+          reason:
+            'AWSCustomResource Lambda Function has AWSLambdaBasicExecutionRole policy attached which has the required permission to write to Cloudwatch Logs'
+        },
+        // Lambda functions should be deployed inside a VPC
+        {
+          id: 'W89',
+          reason:
+            'AWSCustomResource Lambda Function supports infrastructure deployment and is not deployed inside a VPC'
+        },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
         {
           id: 'W92',
           reason:
@@ -139,6 +173,7 @@ export class ExampleStack extends Stack {
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource',
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason:
@@ -151,13 +186,17 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/AWS679f53fac002430cb0da5b7982bd2287/Resource',
-      [{ id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }]
+      [
+        // The non-container Lambda function is not configured to use the latest runtime version.
+        { id: 'AwsSolutions-L1', reason: 'This is an AWSCustom Resource Lambda Function, I am ok with this' }
+      ]
     );
 
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/ExampleLambdaService/ServiceRole/DefaultPolicy/Resource',
       [
+        // The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.
         {
           id: 'AwsSolutions-IAM5',
           reason: 'I am OK with using wildcard here'
@@ -165,17 +204,11 @@ export class ExampleStack extends Stack {
       ]
     );
 
-    // NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
-    //   {
-    //     id: 'AwsSolutions-DDB3',
-    //     reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app'
-    //   }
-    // ]);
-
     NagSuppressions.addResourceSuppressionsByPath(
       this,
       '/ExampleStack/ExampleRestApi/CloudWatchRole/Resource',
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason: 'I am OK with using managed Policy here',
@@ -187,12 +220,16 @@ export class ExampleStack extends Stack {
     );
 
     NagSuppressions.addStackSuppressions(this, [
+      // The REST API stage is not associated with AWS WAFv2 web ACL.
       { id: 'AwsSolutions-APIG3', reason: 'I am ok with not using WAFv2, this is an example App' },
+      // The REST API Stage does not have CloudWatch logging enabled for all methods.
       {
         id: 'AwsSolutions-APIG6',
         reason: 'I am ok with not enabling Cloudwatch logging at stage level, this is an example App'
       },
+      // The API does not implement authorization.
       { id: 'AwsSolutions-APIG4', reason: '@aws/workbench-core-authorization implemented at app level' },
+      // The API GW method does not use a Cognito user pool authorizer.
       { id: 'AwsSolutions-COG4', reason: '@aws/workbench-core-authorization implemented at app level' }
     ]);
   }
@@ -303,6 +340,7 @@ export class ExampleStack extends Stack {
     exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // S3 Bucket should have access logging configured
         {
           id: 'W35',
           reason:
@@ -318,6 +356,7 @@ export class ExampleStack extends Stack {
 
     //CDK NAG Suppression
     NagSuppressions.addResourceSuppressions(exampleS3AccessLogsBucket, [
+      // The S3 Bucket has server access logs disabled.
       {
         id: 'AwsSolutions-S1',
         reason:
@@ -335,6 +374,7 @@ export class ExampleStack extends Stack {
     logGroupNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // CloudWatchLogs LogGroup should specify a KMS Key Id to encrypt the log data
         {
           id: 'W84',
           reason: 'Cloudwatch LogGroups are encrypted by default'
@@ -380,6 +420,7 @@ export class ExampleStack extends Stack {
     deploymentMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // resources should be associated with an AWS::ApiGateway::UsagePlan
         {
           id: 'W68',
           reason: 'No need to enforce Usage Plan. This is an example App'
@@ -393,6 +434,7 @@ export class ExampleStack extends Stack {
     deploymentStageMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Stage resources should be associated with an AWS::ApiGateway::UsagePlan
         {
           id: 'W64',
           reason: 'No need to enforce Usage Plan. This is an example App'
@@ -420,6 +462,7 @@ export class ExampleStack extends Stack {
     anyMethodMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Method should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.
         {
           id: 'W59',
           reason: 'Making use of custom Authorization at the App level, this is ok !'
@@ -433,6 +476,7 @@ export class ExampleStack extends Stack {
     anyProxyMetaDataNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // AWS::ApiGateway::Method should not have AuthorizationType set to 'NONE' unless it is of HttpMethod: OPTIONS.
         {
           id: 'W59',
           reason: 'Making use of custom Authorization at the App level, this is ok !'
@@ -443,6 +487,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       API,
       [
+        // The REST API does not have request validation enabled
         {
           id: 'AwsSolutions-APIG2',
           reason: 'I am OK with not enabling request validation for Rest API, this is an example App'
@@ -553,14 +598,17 @@ export class ExampleStack extends Stack {
     exampleLambdaNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
+        // Lambda functions require permission to write CloudWatch Logs
         {
           id: 'W58',
           reason: 'Lambda Function has permission to write to Cloudwatch Logs in exampleLambdaPolicy'
         },
+        // Lambda functions should be deployed inside a VPC
         {
           id: 'W89',
           reason: 'This is an example Lambda Function for integration test and is not deployed inside a VPC'
         },
+        // Lambda functions should define ReservedConcurrentExecutions to reserve simultaneous executions
         {
           id: 'W92',
           reason: 'This is an example Lambda Function, reserved concurrency is not required'
@@ -584,6 +632,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       exampleLambdaPolicy,
       [
+        // The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.
         {
           id: 'AwsSolutions-IAM5',
           reason: 'I am OK with using wildcard here'
@@ -602,6 +651,7 @@ export class ExampleStack extends Stack {
     NagSuppressions.addResourceSuppressions(
       exampleLambda,
       [
+        // The IAM user, role, or group uses AWS managed policies.
         {
           id: 'AwsSolutions-IAM4',
           reason: 'I am OK with using AWSLambdaBasicExecutionRole here',
@@ -657,7 +707,12 @@ export class ExampleStack extends Stack {
       this,
       '/ExampleStack/ExampleServiceWorkbenchCognito/WorkbenchUserPool/Resource',
       [
-        { id: 'AwsSolutions-COG1', reason: 'Should be fixed in @aws/workbench-core-infrastructure package' },
+        // The Cognito user pool does not have a password policy that minimally specify a password length of at least 8 characters, as well as requiring uppercase, numeric, and special characters.
+        {
+          id: 'AwsSolutions-COG1',
+          reason: 'Using the default configuration from @aws/workbench-core-infrastructure package'
+        },
+        // The Cognito user pool does not require MFA.
         {
           id: 'AwsSolutions-COG2',
           reason: 'This is an example package for integration test, selecting default MFA Optional'
