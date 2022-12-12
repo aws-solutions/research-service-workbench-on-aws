@@ -11,6 +11,6 @@ export {
 
 export * from './workbenchDynamodb';
 
-export * from './encryptionKeyWithRotation';
+export * from './workbenchEncryptionKeyWithRotation';
 
-export * from './secureS3Bucket';
+export * from './workbenchSecureS3Bucket';

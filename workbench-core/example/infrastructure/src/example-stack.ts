@@ -8,8 +8,8 @@
 import {
   WorkbenchCognito,
   WorkbenchCognitoProps,
-  EncryptionKeyWithRotation,
-  SecureS3Bucket,
+  WorkbenchEncryptionKeyWithRotation,
+  WorkbenchSecureS3Bucket,
   WorkbenchDynamodb
 } from '@aws/workbench-core-infrastructure';
 import { Aws, aws_cognito, CfnOutput, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
@@ -34,11 +34,9 @@ import {
 import { Key } from 'aws-cdk-lib/aws-kms';
 import { Alias, CfnFunction, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CfnLogGroup, LogGroup } from 'aws-cdk-lib/aws-logs';
-import { BlockPublicAccess, Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
+import { Bucket, CfnBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
-// import { EncryptionKeyWithRotation } from '';
-// import { SecureS3Bucket } from './constructs/secureS3Bucket';
 
 export class ExampleStack extends Stack {
   private _exampleLambdaEnvVars: {
@@ -72,25 +70,27 @@ export class ExampleStack extends Stack {
     };
 
     this._s3AccessLogsPrefix = 'example-access-log';
-    const createEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
+    const workbenchEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
       this,
       'DataSetBucket-EncryptionKey',
       {
         removalPolicy: RemovalPolicy.DESTROY
       }
     );
-    const encryptionKey: Key = createEncryptionKey.key;
-    this._accessLogsBucket = this._createAccessLogsBucket('ExampleS3BucketAccessLogsNameOutput');
-    const secureS3Bucket = new SecureS3Bucket(this, 'Example-S3Bucket', {
-      s3BucketId: 'example-s3-datasets',
-      s3OutputId: 'ExampleS3BucketDatasetsArnOutput',
+    const encryptionKey: Key = workbenchEncryptionKey.key;
+    this._accessLogsBucket = this._createAccessLogsBucket(
+      'ExampleS3BucketAccessLogsNameOutput',
+      encryptionKey
+    );
+    const workbenchSecureS3Bucket = new WorkbenchSecureS3Bucket(this, 'Example-S3Bucket', {
       encryptionKey: encryptionKey,
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true
     });
-    const datasetBucket: Bucket = secureS3Bucket.bucket;
+
+    const datasetBucket: Bucket = workbenchSecureS3Bucket.bucket;
 
     new CfnOutput(this, 'ExampleS3DataSetsBucketName', {
       value: datasetBucket.bucketName
@@ -165,12 +165,12 @@ export class ExampleStack extends Stack {
       ]
     );
 
-    NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
-      {
-        id: 'AwsSolutions-DDB3',
-        reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app'
-      }
-    ]);
+    // NagSuppressions.addResourceSuppressionsByPath(this, '/ExampleStack/ExampleStack/Resource', [
+    //   {
+    //     id: 'AwsSolutions-DDB3',
+    //     reason: 'I am OK with not having Point-in-time Recovery enabled for DynamoDB, this is an example app'
+    //   }
+    // ]);
 
     NagSuppressions.addResourceSuppressionsByPath(
       this,
@@ -200,7 +200,7 @@ export class ExampleStack extends Stack {
   // DynamoDB Table
   private _createDDBTable(exampleLambda: Function): Table {
     //EncryptionKey for DynamoDB
-    const dynamodbEncryptionKey: EncryptionKeyWithRotation = new EncryptionKeyWithRotation(
+    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
       this,
       'DynamoDB-EncryptionKey',
       {
@@ -213,26 +213,9 @@ export class ExampleStack extends Stack {
       sortKey: { name: 'sk', type: AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
       encryptionKey: dynamodbEncryptionKey.key
-      // tableName: tableName,  W28: Resource found with an explicit name, this disallows updates that require replacement of this resource
     });
 
     const table = dynamodb.table;
-
-    //CFN NAG Suppression
-    // const tableNode = table.node.defaultChild as CfnTable;
-    // tableNode.addMetadata('cfn_nag', {
-    //   // eslint-disable-next-line @typescript-eslint/naming-convention
-    //   rules_to_suppress: [
-    //     {
-    //       id: 'W78',
-    //       reason: 'This is an example app for integration test, backup is not required'
-    //     },
-    //     {
-    //       id: 'W74',
-    //       reason: 'default: server-side encryption is enabled with an AWS owned customer master key'
-    //     }
-    //   ]
-    // });
 
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({
@@ -295,21 +278,18 @@ export class ExampleStack extends Stack {
     );
   }
 
-  private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
-    const exampleS3AccessLogsBucket = new Bucket(this, 'ExampleS3AccessLogsBucket', {
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryption: BucketEncryption.S3_MANAGED,
-      enforceSSL: true,
-      removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true
+  private _createAccessLogsBucket(bucketNameOutput: string, encryptionKey: Key): Bucket {
+    const exampleS3AccessLogsBucket = new WorkbenchSecureS3Bucket(this, 'ExampleS3AccessLogsBucket', {
+      encryptionKey: encryptionKey,
+      removalPolicy: RemovalPolicy.DESTROY
     });
 
-    exampleS3AccessLogsBucket.addToResourcePolicy(
+    exampleS3AccessLogsBucket.bucket.addToResourcePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         principals: [new ServicePrincipal('logging.s3.amazonaws.com')],
         actions: ['s3:PutObject'],
-        resources: [`${exampleS3AccessLogsBucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
+        resources: [`${exampleS3AccessLogsBucket.bucket.bucketArn}/${this._s3AccessLogsPrefix}*`],
         conditions: {
           StringEquals: {
             'aws:SourceAccount': Aws.ACCOUNT_ID
@@ -319,7 +299,7 @@ export class ExampleStack extends Stack {
     );
 
     //CFN NAG Suppression
-    const exampleS3AccessLogsBucketNode = exampleS3AccessLogsBucket.node.defaultChild as CfnBucket;
+    const exampleS3AccessLogsBucketNode = exampleS3AccessLogsBucket.bucket.node.defaultChild as CfnBucket;
     exampleS3AccessLogsBucketNode.addMetadata('cfn_nag', {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       rules_to_suppress: [
@@ -332,7 +312,7 @@ export class ExampleStack extends Stack {
     });
 
     new CfnOutput(this, bucketNameOutput, {
-      value: exampleS3AccessLogsBucket.bucketName,
+      value: exampleS3AccessLogsBucket.bucket.bucketName,
       exportName: bucketNameOutput
     });
 
@@ -345,7 +325,7 @@ export class ExampleStack extends Stack {
       }
     ]);
 
-    return exampleS3AccessLogsBucket;
+    return exampleS3AccessLogsBucket.bucket;
   }
 
   private _createRestApi(exampleLambda: Function): void {
@@ -646,7 +626,8 @@ export class ExampleStack extends Stack {
       userPoolName: userPoolName,
       userPoolClientName: userPoolClientName,
       oidcIdentityProviders: [],
-      accessTokenValidity: Duration.minutes(60) // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      accessTokenValidity: Duration.minutes(60), // Extend access token expiration to 60 minutes to allow integration tests to run successfully. Once MAFoundation-310 has been implemented to allow multiple clientIds, we'll create a separate client for integration tests and the "main" client access token expiration time can be return to 15 minutes
+      removalPolicy: RemovalPolicy.DESTROY
     };
 
     const workbenchCognito = new WorkbenchCognito(this, 'ExampleServiceWorkbenchCognito', props);

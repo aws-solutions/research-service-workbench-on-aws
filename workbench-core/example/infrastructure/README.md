@@ -36,7 +36,7 @@ rushx cdk:deploy
 ```
 
 #### OR
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L15)
 
 ### Run Integration Test
 ```bash
@@ -60,17 +60,5 @@ rushx cdk:destroy -f
 
 ### Delete Cognito UserPool, DynamoDB Table and SSM Parameters
 ```bash
-./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
+./scripts/cleanup.sh -r <REGION> -p -c
 ```
-
-#### Get UserPool Id and DynamoDB Table
-```bash
-./scripts/getResources.sh -r <REGION> -i -t -g
-```
-
-#### OR
-After `rushx cdk:deploy` you can find:
-
-1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
-
-2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.json#L12)

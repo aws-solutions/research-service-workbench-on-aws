@@ -9,7 +9,7 @@ import { AccountPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/a
 import { Key, KeyProps } from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
-export class EncryptionKeyWithRotation extends Construct {
+export class WorkbenchEncryptionKeyWithRotation extends Construct {
   public readonly key: Key;
 
   public constructor(scope: Construct, id: string, props?: KeyProps) {

@@ -9,26 +9,29 @@ import {
   BlockPublicAccess,
   Bucket,
   BucketAccessControl,
+  BucketEncryption,
   BucketProps,
   CfnBucketPolicy
 } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { EncryptionKeyWithRotation } from './encryptionKeyWithRotation';
+import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
 
-export class SecureS3Bucket extends Construct {
+export class WorkbenchSecureS3Bucket extends Construct {
   public readonly bucket: Bucket;
 
-  public constructor(scope: Construct, id: string, props: BucketProps) {
+  public constructor(scope: Construct, id: string, props?: BucketProps) {
     super(scope, id);
 
     const secureS3BucketProps: BucketProps = {
       ...props,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      encryptionKey: props.encryptionKey ?? new EncryptionKeyWithRotation(this, `${id}-EncryptionKey`).key,
+      encryption: BucketEncryption.KMS,
+      encryptionKey:
+        props?.encryptionKey ?? new WorkbenchEncryptionKeyWithRotation(this, `${id}-EncryptionKey`).key,
       versioned: true,
       enforceSSL: true,
       accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
-      serverAccessLogsPrefix: props.serverAccessLogsPrefix ?? `${id.toLowerCase()}-access-log`
+      serverAccessLogsPrefix: props?.serverAccessLogsPrefix ?? `${id.toLowerCase()}-access-log`
     };
 
     this.bucket = new Bucket(this, `${id}-Bucket`, secureS3BucketProps);

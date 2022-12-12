@@ -1,6 +1,6 @@
 import { BillingMode, TableProps, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
-import { EncryptionKeyWithRotation } from './encryptionKeyWithRotation';
+import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
 
 export class WorkbenchDynamodb extends Construct {
   public readonly table: Table;
@@ -11,8 +11,9 @@ export class WorkbenchDynamodb extends Construct {
     this.table = new Table(this, `${id}`, {
       ...props,
       billingMode: props.billingMode ?? BillingMode.PAY_PER_REQUEST,
-      encryptionKey: props.encryptionKey ?? new EncryptionKeyWithRotation(this, `${id}-EncryptionKey`).key,
-      pointInTimeRecovery: props.pointInTimeRecovery ?? true
+      encryptionKey:
+        props.encryptionKey ?? new WorkbenchEncryptionKeyWithRotation(this, `${id}-EncryptionKey`).key,
+      pointInTimeRecovery: true
     });
   }
 }
