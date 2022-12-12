@@ -9,7 +9,7 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const ListProjectsRequestParser = z
   .object({
-    userId: z.string(), // TODO what should this value be?
+    userId: z.string(),
     pageSize: z
       .string()
       .transform((pageSizeString, ctx) => {
