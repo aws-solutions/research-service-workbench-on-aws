@@ -6,7 +6,9 @@ import { resourceTypeToKey } from '@aws/workbench-core-base';
 import ClientSession from '../../support/clientSession';
 import { EnvironmentTypeHelper } from '../../support/complex/environmentTypeHelper';
 import Setup from '../../support/setup';
+import { DEFLAKE_DELAY_IN_MILLISECONDS } from '../../support/utils/constants';
 import { envTypeConfigRegExp } from '../../support/utils/regExpressions';
+import { sleep } from '../../support/utils/utilities';
 
 describe('multiStep environment type and environment type config test', () => {
   const setup: Setup = new Setup();
@@ -43,6 +45,38 @@ describe('multiStep environment type and environment type config test', () => {
       .get();
     expect(approvedEnvType).toMatchObject({
       status: 'APPROVED'
+    });
+
+    //Update Name for Environment Type
+    console.log('Update Environment Type Name');
+    await adminSession.resources.environmentTypes.environmentType(envType.id).update(
+      {
+        name: 'updated name',
+        status: 'APPROVED'
+      },
+      true
+    );
+    const { data: updatedNameEnvType } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .get();
+    expect(updatedNameEnvType).toMatchObject({
+      name: 'updated name'
+    });
+
+    //Update description for Environment Type
+    console.log('Update Environment Type Description');
+    await adminSession.resources.environmentTypes.environmentType(envType.id).update(
+      {
+        description: 'updated description',
+        status: 'APPROVED'
+      },
+      true
+    );
+    const { data: updatedDescEnvType } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .get();
+    expect(updatedDescEnvType).toMatchObject({
+      description: 'updated description'
     });
 
     //Create Environment Type Config
@@ -86,6 +120,22 @@ describe('multiStep environment type and environment type config test', () => {
         .environmentTypeConfig(envTypeConfig.id)
         .delete()
     ).resolves;
+
+    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //avoid throttle and give time to ddb to soft delete ETC dependency
+    //Revoke Environment Type
+    console.log('Revoke Environment Type');
+    await adminSession.resources.environmentTypes.environmentType(envType.id).update(
+      {
+        status: 'NOT_APPROVED'
+      },
+      true
+    );
+    const { data: revokedEnvType } = await adminSession.resources.environmentTypes
+      .environmentType(envType.id)
+      .get();
+    expect(revokedEnvType).toMatchObject({
+      status: 'NOT_APPROVED'
+    });
 
     //Delete Environment Type
     console.log('Delete Environment Type');
