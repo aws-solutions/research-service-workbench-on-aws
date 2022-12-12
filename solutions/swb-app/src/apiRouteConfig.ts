@@ -4,10 +4,8 @@
  */
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
-import { UserManagementService } from '@aws/workbench-core-authentication';
 import { MetadataService } from '@aws/workbench-core-base';
 import { DataSetService, DataSetsStoragePlugin } from '@aws/workbench-core-datasets';
-
 import {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
@@ -15,6 +13,7 @@ import {
   EnvironmentTypeService,
   EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
+import { UserManagementService } from '@aws/workbench-core-user-management';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
