@@ -8,8 +8,9 @@ import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
+import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
 import { AwsService } from '@aws/workbench-core-base';
-import { CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
+import { AuthorizationSetup, CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
 import axios from 'axios';
 import { getConstants, getConstantsWithSecrets } from './constants';
 
@@ -38,9 +39,13 @@ async function run(): Promise<void> {
     USER_POOL_NAME
   });
 
+  const authService = new MockDynamicAuthorizationService();
+  const authSetup = new AuthorizationSetup(authService);
+
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../../src/environment'));
   await scSetup.run(cfnFilePaths);
   await cognitoSetup.run();
+  await authSetup.run();
   await uploadOnboardAccountCfnToS3();
   await uploadBootstrapScriptsToS3();
 }

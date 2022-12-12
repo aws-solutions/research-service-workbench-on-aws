@@ -29,7 +29,6 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.186.0",
     "@aws/workbench-core-authorization": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
@@ -41,8 +40,9 @@
     "zod": "^3.19.1"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.186.0",
-    "@aws-sdk/types": "^3.186.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
+    "@aws-sdk/client-s3": "^3.212.0",
+    "@aws-sdk/types": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",

@@ -4,6 +4,8 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
 import {
   DeleteCostCenterRequestParser,
   DeleteCostCenterRequest
@@ -21,12 +23,17 @@ import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/proje
 import GetProjectRequest from './models/projects/getProjectRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
+import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
 import CreateAccountSchema from './schemas/createAccount';
+import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
-import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
+import HostingAccountLifecycleService, {
+  CreateAccountData,
+  UpdateAccountData
+} from './utilities/hostingAccountLifecycleService';
 
 export {
   HostingAccountService,
@@ -44,10 +51,18 @@ export {
   GetProjectRequest,
   DeleteProjectRequest,
   DeleteProjectRequestParser,
+  CreateCostCenterRequest,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
-  DeleteCostCenterRequestParser
+  DeleteCostCenterRequestParser,
+  UpdateAccountSchema,
+  AwsAccountTemplateUrls,
+  AwsAccountTemplateUrlsParser,
+  CreateAccountData,
+  UpdateAccountData,
+  ListAccountRequest,
+  ListAccountsRequestParser
 };

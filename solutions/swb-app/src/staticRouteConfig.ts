@@ -7,11 +7,75 @@ import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidRegExpAsString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
-  '/aws-accounts': {
+  '/awsAccounts': {
     POST: [
       {
         action: 'CREATE',
         subject: 'Account'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/awsAccountTemplateUrls': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AccountTemplate'
+      }
+    ]
+  },
+  [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/costCenters': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'CostCenter'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
       }
     ]
   },

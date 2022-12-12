@@ -11,6 +11,8 @@
  2. `rush cinstall`
  3. `rush build:test -t @aws/workbench-core-example-infrastructure`
  4. Configure AWS Credentials locally for your AWS Account: either `export the credentials` or on the command line, set your [credential file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to have your `account` as the `default` profile
+ 5. Install [jq](https://stedolan.github.io/jq/) command line tool (required for `./scripts/getResources.sh` script) by running e.g. `brew install jq`
+ 6. Install [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
  ## Setup your environment for Integration Test
  Navigate to `workbench-core/example/infrastructure`
