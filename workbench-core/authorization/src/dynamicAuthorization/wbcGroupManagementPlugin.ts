@@ -1,6 +1,5 @@
 import { UserManagementService } from '@aws/workbench-core-user-management';
 
-import { GroupManagementPlugin } from './groupManagementPlugin';
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
@@ -16,6 +15,7 @@ import {
   RemoveUserFromGroupResponse
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { SetGroupStatusRequest, SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
+import { GroupManagementPlugin } from './groupManagementPlugin';
 
 /**
  * A WBCGroupManagementPlugin instance that interfaces with Workbench Core's UserManagementService to provide group management.
