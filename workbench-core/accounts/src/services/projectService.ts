@@ -265,14 +265,6 @@ export default class ProjectService {
   public async updateProject(request: UpdateProjectRequest): Promise<Project> {
     const { projectId, updatedValues } = request;
 
-    // disregard empty strings as valid input
-    if (updatedValues.name !== undefined && _.isEmpty(updatedValues.name)) {
-      updatedValues.name = undefined;
-    }
-    if (updatedValues.description !== undefined && _.isEmpty(updatedValues.description)) {
-      updatedValues.description = undefined;
-    }
-
     // verify at least one attribute is being updated
     if (!updatedValues.name && !updatedValues.description) {
       throw Boom.badRequest('You must supply a new nonempty name and/or description to update the project.');

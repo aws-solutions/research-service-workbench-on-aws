@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import _ from 'lodash';
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
@@ -10,8 +11,18 @@ export const UpdateProjectRequestParser = z
   .object({
     projectId: z.string(),
     updatedValues: z.object({
-      name: z.string().optional(),
-      description: z.string().optional()
+      name: z
+        .string()
+        .refine((val) => !_.isEmpty(val), {
+          message: 'name must be non empty'
+        })
+        .optional(),
+      description: z
+        .string()
+        .refine((val) => !_.isEmpty(val), {
+          message: 'description must be non empty'
+        })
+        .optional()
     })
   })
   .strict();

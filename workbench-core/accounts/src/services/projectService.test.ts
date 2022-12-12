@@ -1497,8 +1497,8 @@ describe('ProjectService', () => {
   });
 
   describe('updateProject', () => {
-    let projectName: string = project1.name;
-    let projectDescription: string = project1.description;
+    let projectName: string;
+    let projectDescription: string;
     let updatedProject1: Project;
     let updatedProjItem1: typeof projItem1;
 
@@ -1507,6 +1507,8 @@ describe('ProjectService', () => {
     let request: UpdateProjectRequest;
 
     beforeEach(() => {
+      projectName = project1.name;
+      projectDescription = project1.description;
       request = { projectId, updatedValues };
       updatedProject1 = {
         ...project1,
@@ -1550,6 +1552,8 @@ describe('ProjectService', () => {
     });
 
     describe('trying to update project name', () => {
+      let updateItemResponse: UpdateItemCommandOutput;
+
       describe('if project does not exist', () => {
         beforeEach(() => {
           projectName = 'New Project Name';
@@ -1622,8 +1626,6 @@ describe('ProjectService', () => {
         });
 
         describe('and name is not in use', () => {
-          let updateItemResponse: UpdateItemCommandOutput;
-
           beforeEach(() => {
             projectName = 'New Project Name';
             updatedProject1.name = projectName;
@@ -1688,6 +1690,7 @@ describe('ProjectService', () => {
       beforeEach(() => {
         projectDescription = 'New Project Description';
         updatedProject1.description = projectDescription;
+        updatedProjItem1.description = projectDescription;
         request.updatedValues = { description: projectDescription };
       });
 
@@ -1764,12 +1767,6 @@ describe('ProjectService', () => {
             );
           });
         });
-      });
-    });
-
-    describe('trying to update both project name and description', () => {
-      describe('if all input in valid', () => {
-        test('it should pass', async () => {});
       });
     });
   });
