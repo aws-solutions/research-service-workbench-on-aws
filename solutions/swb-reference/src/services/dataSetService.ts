@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { CreateProvisionDatasetRequest } from '@aws/swb-app/lib/datasets/createProvisionDatasetRequest';
 import { DataSet } from '@aws/swb-app/lib/datasets/dataSet';
 import { DatasetPluginInterface } from '@aws/swb-app/lib/datasets/datasetPluginInterface';
