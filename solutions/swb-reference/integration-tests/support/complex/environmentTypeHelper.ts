@@ -12,7 +12,7 @@ export class EnvironmentTypeHelper {
     const setup = new Setup();
     this._awsSdk = setup.getMainAwsClient();
     this._settings = setup.getSettings();
-    this._environmentTypeService = new EnvironmentTypeService({ TABLE_NAME: setup.getStackName() });
+    this._environmentTypeService = new EnvironmentTypeService(this._awsSdk.helpers.ddb);
   }
 
   public async createEnvironmentType(

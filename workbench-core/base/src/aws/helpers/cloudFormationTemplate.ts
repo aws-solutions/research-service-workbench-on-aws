@@ -3,21 +3,25 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface CFNTemplateParameters {
-  [key: string]: {
-    AllowedPattern?: string;
-    AllowedValues?: string[];
-    ConstraintDescription?: string;
-    Default?: string;
-    Description?: string;
-    MaxLength?: number;
-    MaxValue?: number;
-    MinLength?: number;
-    MinValue?: number;
-    NoEcho?: boolean;
-    Type: string;
-  };
-}
+import { z } from 'zod';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const CFNTemplateParametersParser = z.record(
+  z.object({
+    AllowedPattern: z.string().optional(),
+    AllowedValues: z.string().array().optional(),
+    ConstraintDescription: z.string().optional(),
+    Default: z.string().optional(),
+    Description: z.string().optional(),
+    MaxLength: z.number().optional(),
+    MaxValue: z.number().optional(),
+    MinLength: z.number().optional(),
+    MinValue: z.number().optional(),
+    NoEcho: z.boolean().optional(),
+    Type: z.string()
+  })
+);
+export type CFNTemplateParameters = z.infer<typeof CFNTemplateParametersParser>;
 
 export interface CFNTemplate {
   AWSTemplateFormatVersion?: string;

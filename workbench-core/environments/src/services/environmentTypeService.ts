@@ -5,7 +5,6 @@
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import {
-  AwsService,
   buildDynamoDBPkSk,
   QueryParams,
   resourceTypeToKey,
@@ -16,22 +15,22 @@ import {
   getSortQueryParams,
   getFilterQueryParams,
   DEFAULT_API_PAGE_SIZE,
-  addPaginationToken,
-  getPaginationToken
+  addPaginationToken
 } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 
 import Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
-import { EnvironmentType } from '../models/environmentTypes/environmentType';
+import { EnvironmentType, EnvironmentTypeParser } from '../models/environmentTypes/environmentType';
 import { ListEnvironmentTypesRequest } from '../models/environmentTypes/listEnvironmentTypesRequest';
+import { UpdateEnvironmentTypeRequest } from '../models/environmentTypes/updateEnvironmentTypeRequest';
 
 export default class EnvironmentTypeService {
-  private _aws: AwsService;
+  private _dynamoDbService: DynamoDBService;
   private _resourceType: string = 'envType';
 
-  public constructor(constants: { TABLE_NAME: string }) {
-    const { TABLE_NAME } = constants;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
+  public constructor(dynamoDbService: DynamoDBService) {
+    this._dynamoDbService = dynamoDbService;
   }
 
   /**
@@ -41,14 +40,14 @@ export default class EnvironmentTypeService {
    * @returns environment type object
    */
   public async getEnvironmentType(envTypeId: string): Promise<EnvironmentType> {
-    const response = await this._aws.helpers.ddb
+    const response = await this._dynamoDbService
       .get(buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType))
       .execute();
     const item = (response as GetItemCommandOutput).Item;
     if (item === undefined) {
       throw Boom.notFound(`Could not find environment type ${envTypeId}`);
     } else {
-      const envType = item as unknown as EnvironmentType;
+      const envType = EnvironmentTypeParser.parse(item);
       return Promise.resolve(envType);
     }
   }
@@ -75,36 +74,26 @@ export default class EnvironmentTypeService {
     queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
 
     queryParams = addPaginationToken(paginationToken, queryParams);
-    const envTypesResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-    const token = getPaginationToken(envTypesResponse);
+    const envTypesResponse = await this._dynamoDbService.getPaginatedItems(queryParams);
 
     return {
-      data: envTypesResponse.Items as unknown as EnvironmentType[],
-      paginationToken: token
+      data: envTypesResponse.data.map((item) => {
+        return EnvironmentTypeParser.parse(item);
+      }),
+      paginationToken: envTypesResponse.paginationToken
     };
   }
 
   /**
    * Update environment type object in DDB
-   * @param ownerId - the user requesting the update
    * @param envTypeId - the environment type identifier
    * @param updatedValues - the attribute values to update for the given environment type
    *
    * @returns environment type object with updated attributes
    */
-  public async updateEnvironmentType(
-    ownerId: string,
-    envTypeId: string,
-    updatedValues: { [key: string]: string }
-  ): Promise<EnvironmentType> {
+  public async updateEnvironmentType(request: UpdateEnvironmentTypeRequest): Promise<EnvironmentType> {
     let environmentType: EnvironmentType | undefined = undefined;
-    const attributesAllowedToUpdate = ['description', 'name', 'status'];
-    const attributesNotAllowed = Object.keys(updatedValues).filter((key) => {
-      return !attributesAllowedToUpdate.includes(key);
-    });
-    if (attributesNotAllowed.length > 0) {
-      throw Boom.badRequest(`We do not support updating these attributes ${attributesNotAllowed}`);
-    }
+    const { envTypeId, ...updatedValues } = request;
     try {
       environmentType = await this.getEnvironmentType(envTypeId);
     } catch (e) {
@@ -113,21 +102,20 @@ export default class EnvironmentTypeService {
       }
       throw e;
     }
-    await this._validateStatusChange(updatedValues, environmentType);
+    await this._validateStatusChange(updatedValues.status, environmentType);
     const currentDate = new Date().toISOString();
     const updatedEnvType = {
       ...updatedValues,
       createdAt: currentDate,
-      updatedAt: currentDate,
-      updatedBy: ownerId
+      updatedAt: currentDate
     };
 
-    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+    const response = await this._dynamoDbService.updateExecuteAndFormat({
       key: buildDynamoDBPkSk(envTypeId, resourceTypeToKey.envType),
       params: { item: updatedEnvType }
     });
     if (response.Attributes) {
-      return response.Attributes as unknown as EnvironmentType;
+      return EnvironmentTypeParser.parse(response.Attributes);
     }
     console.error('Unable to update environment type', updatedEnvType);
     throw Boom.internal(`Unable to update environment type with params: ${JSON.stringify(updatedValues)}`);
@@ -135,7 +123,6 @@ export default class EnvironmentTypeService {
 
   /**
    * Create environment type object in DDB
-   * @param ownerId - the user requesting the operation
    * @param params - the environment type object attribute key value pairs
    *
    * @returns environment type object
@@ -161,34 +148,28 @@ export default class EnvironmentTypeService {
       params.provisioningArtifactId
     }`;
     const currentDate = new Date().toISOString();
-    const newEnvType: EnvironmentType = {
+    const newEnvType: EnvironmentType = EnvironmentTypeParser.parse({
       id,
       ...buildDynamoDBPkSk(id, resourceTypeToKey.envType),
       createdAt: currentDate,
       updatedAt: currentDate,
       resourceType: this._resourceType,
       ...params
-    };
-    const item = newEnvType as unknown as { [key: string]: unknown };
-    const response = await this._aws.helpers.ddb.updateExecuteAndFormat({
+    });
+    const item = newEnvType as { [key: string]: unknown };
+    const response = await this._dynamoDbService.updateExecuteAndFormat({
       key: buildDynamoDBPkSk(id, resourceTypeToKey.envType),
       params: { item }
     });
     if (response.Attributes) {
-      return response.Attributes as unknown as EnvironmentType;
+      return EnvironmentTypeParser.parse(response.Attributes);
     }
     console.error('Unable to create environment type', newEnvType);
     throw Boom.internal(`Unable to create environment type with params: ${JSON.stringify(params)}`);
   }
-  private async _validateStatusChange(
-    updatedValues: { [key: string]: string },
-    environmentType?: EnvironmentType
-  ): Promise<void> {
-    if (
-      Object.entries(updatedValues).filter(([key, value]) => key === 'status' && value === 'NOT_APPROVED')
-        .length > 0 &&
-      environmentType?.status === 'APPROVED'
-    ) {
+
+  private async _validateStatusChange(status?: string, environmentType?: EnvironmentType): Promise<void> {
+    if (status === 'NOT_APPROVED' && environmentType?.status === 'APPROVED') {
       const etcQueryParams: QueryParams = {
         key: { name: 'resourceType', value: 'envTypeConfig' },
         index: 'getResourceByDependency',
@@ -196,8 +177,8 @@ export default class EnvironmentTypeService {
         eq: { S: environmentType.id },
         limit: DEFAULT_API_PAGE_SIZE
       };
-      const dependencies = await this._aws.helpers.ddb.query(etcQueryParams).execute();
-      if (dependencies?.Items?.length) {
+      const dependencies = await this._dynamoDbService.getPaginatedItems(etcQueryParams);
+      if (dependencies?.data?.length) {
         const errorMessage = `Unable to reovke environment type: ${environmentType.id}, Environment Type has active configurations`;
         console.error(errorMessage);
         throw Boom.conflict(errorMessage);

@@ -79,7 +79,7 @@ export default class EnvironmentTypeHandler {
         }', Provision Artifact: '${provisionArtifact?.Id ?? ''}'}`
       );
     }
-    const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
+    const envTypeService = new EnvironmentTypeService(this._mainAccountAwsService.helpers.ddb);
     await envTypeService.createNewEnvironmentType({
       productId: product.ProductId,
       provisioningArtifactId: provisionArtifact.Id,
@@ -92,7 +92,7 @@ export default class EnvironmentTypeHandler {
   }
 
   private async _getExistingEnvironmentType(envTypeId: string): Promise<EnvironmentType | undefined> {
-    const envTypeService = new EnvironmentTypeService({ TABLE_NAME: process.env.STACK_NAME! });
+    const envTypeService = new EnvironmentTypeService(this._mainAccountAwsService.helpers.ddb);
     try {
       console.log(`Searching for environment type: ${envTypeId}`);
       const envType = await envTypeService.getEnvironmentType(envTypeId);

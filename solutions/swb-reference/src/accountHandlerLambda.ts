@@ -9,7 +9,10 @@ import { EnvironmentTypeHandler } from '@aws/workbench-core-environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
-  const mainAccountAwsService = new AwsService({ region: process.env.AWS_REGION! });
+  const mainAccountAwsService = new AwsService({
+    region: process.env.AWS_REGION!,
+    ddbTableName: process.env.STACK_NAME!
+  });
   const accountHandler = new AccountHandler(mainAccountAwsService);
   const envTypeHandler = new EnvironmentTypeHandler(mainAccountAwsService);
   await accountHandler.execute(event);

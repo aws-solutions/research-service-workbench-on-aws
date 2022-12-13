@@ -61,13 +61,9 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   dataSetsStoragePlugin: new S3DataSetStoragePlugin(aws),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
-  environmentTypeService: new EnvironmentTypeService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeService: new EnvironmentTypeService(aws.helpers.ddb),
   environmentTypeConfigService: new EnvironmentTypeConfigService(
-    new EnvironmentTypeService({
-      TABLE_NAME: process.env.STACK_NAME!
-    }),
+    new EnvironmentTypeService(aws.helpers.ddb),
     aws.helpers.ddb
   ),
   projectService: new ProjectService({

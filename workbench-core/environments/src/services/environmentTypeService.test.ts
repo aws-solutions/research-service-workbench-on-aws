@@ -16,7 +16,7 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { debounce } from 'lodash';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 
@@ -30,19 +30,17 @@ describe('environmentTypeService', () => {
     ddbMock.reset();
   });
   const TABLE_NAME = 'exampleDDBTable';
-  const envTypeService = new EnvironmentTypeService({ TABLE_NAME });
+  const ddbServiceMock = new DynamoDBService({ region: 'us-east-1', table: TABLE_NAME });
+  const envTypeService = new EnvironmentTypeService(ddbServiceMock);
   const envType = {
     status: 'APPROVED',
     createdAt: '2022-06-20T18:32:09.985Z',
-    updatedBy: 'owner-123',
-    createdBy: 'owner-123',
     name: 'Jupyter Notebook',
     resourceType: 'envType',
     provisioningArtifactId: 'pa-dqwijdnwq12w2',
-    params: [],
+    params: {},
     updatedAt: '2022-06-20T18:36:14.358Z',
     sk: `ET#${envTypeId}`,
-    owner: 'owner-123',
     description: 'An Amazon SageMaker Jupyter Notebook',
     id: envTypeId,
     pk: `ET#${envTypeId}`,
@@ -331,7 +329,8 @@ describe('environmentTypeService', () => {
         .resolves({ Attributes: marshall({ ...envType, name: 'FakeName' }) });
 
       // OPERATE
-      const actualResponse = await envTypeService.updateEnvironmentType('owner-123', envTypeId, {
+      const actualResponse = await envTypeService.updateEnvironmentType({
+        envTypeId,
         name: 'FakeName'
       });
 
@@ -349,19 +348,10 @@ describe('environmentTypeService', () => {
       const invalidId = 'invalidId-1';
       // OPERATE & CHECK
       await expect(
-        envTypeService.updateEnvironmentType('owner-123', invalidId, { name: 'FakeName' })
+        envTypeService.updateEnvironmentType({ envTypeId: invalidId, name: 'FakeName' })
       ).rejects.toThrow(`Could not find environment type ${invalidId} to update`);
     });
 
-    test('update attributes that are not allowed', async () => {
-      // BUILD & OPERATE & CHECK
-      await expect(
-        envTypeService.updateEnvironmentType('owner-123', envTypeId, {
-          productId: 'prod-abcasdewedg42',
-          provisioningArtifactId: 'pa-ehksiu2735sha'
-        })
-      ).rejects.toThrow('We do not support updating these attributes productId,provisioningArtifactId');
-    });
     test('should throw exception when revoking environment type with dependencies', async () => {
       // BUILD & OPERATE & CHECK
       const getEnvTypeItemResponse: GetItemCommandOutput = {
@@ -374,8 +364,9 @@ describe('environmentTypeService', () => {
       };
       ddbMock.on(GetItemCommand, getEnvTypeCommandParams).resolves(getEnvTypeItemResponse);
       ddbMock.on(QueryCommand, listEnvTypeConfigCommandParams).resolves(configsItemResponse);
-      const updateBody = { status: 'NOT_APPROVED' };
-      await expect(envTypeService.updateEnvironmentType('owner-123', envTypeId, updateBody)).rejects.toThrow(
+      await expect(
+        envTypeService.updateEnvironmentType({ envTypeId, status: 'NOT_APPROVED' })
+      ).rejects.toThrow(
         `Unable to reovke environment type: ${envTypeId}, Environment Type has active configurations`
       );
     });
