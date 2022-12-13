@@ -4,6 +4,7 @@ import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthoriz
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
+import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import {
@@ -50,6 +51,9 @@ export class WBCGroupManagemntPlugin implements GroupManagementPlugin {
     throw new Error('Method not implemented.');
   }
   public removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse> {
+    throw new Error('Method not implemented.');
+  }
+  public getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse> {
     throw new Error('Method not implemented.');
   }
   public setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse> {

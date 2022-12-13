@@ -1,3 +1,5 @@
+import { Status } from '../status';
+
 /**
  * Request object for SetGroupStatus
  */
@@ -7,9 +9,9 @@ export interface SetGroupStatusRequest {
    */
   groupId: string;
   /**
-   * Status to set
+   *  {@link Status} to set
    */
-  status: string;
+  status: Status;
 }
 /**
  * Response object for SetGroupStatus

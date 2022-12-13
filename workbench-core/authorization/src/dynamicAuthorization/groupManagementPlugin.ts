@@ -2,6 +2,7 @@ import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthoriz
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
+import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import {
@@ -90,6 +91,15 @@ export interface GroupManagementPlugin {
    * @returns a {@link RemoveUserFromGroupResponse}
    */
   removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse>;
+
+  /**
+   * Get the status of the group
+   *
+   * @param request - {@link GetGroupStatusRequest}
+   *
+   * @returns a {@link GetGroupStatusResponse}
+   */
+  getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse>;
 
   /**
    * Set the status of the group
