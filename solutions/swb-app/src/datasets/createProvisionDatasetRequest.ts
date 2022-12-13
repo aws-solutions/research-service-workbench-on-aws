@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * This interface represents a contract consumed by the DataSets service to interact
  * with an underlying stroage provider. This interface should be implemented for each
