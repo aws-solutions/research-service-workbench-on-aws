@@ -9,15 +9,22 @@ import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycle
 
 export default class AccountHandler {
   private _mainAccountAwsService: AwsService;
+  private _hostingAccountLifecycleService: HostingAccountLifecycleService;
+  private _accountService: AccountService;
 
-  public constructor(mainAccountAwsService: AwsService) {
+  public constructor(
+    mainAccountAwsService: AwsService,
+    accountService: AccountService,
+    hostingAccountLifecycleService: HostingAccountLifecycleService
+  ) {
     this._mainAccountAwsService = mainAccountAwsService;
+    this._hostingAccountLifecycleService = hostingAccountLifecycleService;
+    this._accountService = accountService;
   }
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
   public async execute(event: any): Promise<void> {
     // eslint-disable-next-line
     const hostingAccounts = await this._getAccountMetadata();
-    const hostingAccountLifecycleService = new HostingAccountLifecycleService();
     const portfolioName = process.env.SC_PORTFOLIO_NAME!;
     const portfolioId = await this._mainAccountAwsService.helpers.serviceCatalog.getPortfolioId(
       portfolioName
@@ -47,13 +54,15 @@ export default class AccountHandler {
         });
       } catch (e) {
         console.log(
-          `Cannot assume role ${hostingAccount.hostingAccountHandlerRoleArn} for hosting account. Skipping setup for this account`
+          `Cannot assume role ${
+            hostingAccount.hostingAccountHandlerRoleArn
+          } for hosting account. Skipping setup for this account: \n${JSON.stringify(e)}`
         );
         continue;
       }
 
       const s3ArtifactBucketName = s3ArtifactBucketArn.split(':').pop() || '';
-      await hostingAccountLifecycleService.updateAccount({
+      await this._hostingAccountLifecycleService.updateHostingAccountData({
         ddbAccountId: hostingAccount.id,
         targetAccountId: hostingAccountId,
         targetAccountAwsService: hostingAccountAwsService,
@@ -88,10 +97,10 @@ export default class AccountHandler {
       externalId: string;
     }[]
   > {
-    const ddbTableName = process.env.STACK_NAME!;
-    const accountService = new AccountService(ddbTableName);
-
-    const accounts = await accountService.getAccounts();
+    const accounts = await this._accountService.getAllAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     return accounts.map((account) => {
       return {

@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Writer, AuditEntry } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
+import AuditEntry from './auditEntry';
+import Writer from './plugins/writer';
 
 export default class AuditLogger implements Writer {
   private _logger: LoggingService;
@@ -13,6 +14,6 @@ export default class AuditLogger implements Writer {
   }
 
   public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {
-    this._logger.info('test', {});
+    this._logger.info(JSON.stringify(auditEntry));
   }
 }

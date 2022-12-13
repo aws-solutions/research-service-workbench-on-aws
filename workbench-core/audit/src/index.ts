@@ -12,3 +12,4 @@ export { default as Metadata } from './metadata';
 export { Extractor } from './extractor';
 export { BaseExtractor } from './baseExtractor';
 export { WithAudit } from './auditMiddleware';
+export { default as AuditLogger } from './auditLogger';

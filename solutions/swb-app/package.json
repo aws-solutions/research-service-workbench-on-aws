@@ -38,6 +38,7 @@
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

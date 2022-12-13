@@ -88,7 +88,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in an equal expression using the sort key  "#<k> = :<k>".
    * You only want to supply the value of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -104,7 +104,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in a less than expression using the sort key  "#\<k\> \< :\<k\>".
    * You only want to supply the value of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -120,7 +120,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in a less than or equal expression using the sort key  "#\<k\> \<= :\<k\>".
    * You only want to supply the value of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -136,7 +136,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in a greater than expression using the sort key  "#\<k\> \> :\<k\>".
    * You only want to supply the value of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -152,7 +152,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in a greater than or equal to expression using the sort key  "#\<k\> \>= :\<k\>".
    * You only want to supply the value of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -168,12 +168,12 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in the between expression using the sort key  "#<k> BETWEEN :<v1> AND :<v2>".
    * You only want to supply the two between values of the sort key here since we assume you called .sortKey(name) before calling this one
    *
    * @param value1 - the first value to check for against the sort key
-   * @param value2 - the second value to check for agains the sort key
+   * @param value2 - the second value to check for against the sort key
    * @returns Query with populated params
    */
   public between(value1: AttributeValue, value2: AttributeValue): Query {
@@ -191,7 +191,7 @@ class Query {
   }
 
   /**
-   * Helps with setting up KeyCondidtionExpression for sort key only.
+   * Helps with setting up KeyConditionExpression for sort key only.
    * It results in a begins_with expression using the sort key  "begins_with( #<k> ,:<k> )".
    * You only want to supply the two between values of the sort key here since we assume you called .sortKey(name) before calling this one
    *
@@ -266,7 +266,7 @@ class Query {
    * @example Filtering on items that do not have the latest attribute
    * ```ts
    * # Usage
-   * Query.filter('attribute_not_exists(latest))
+   * Query.filter(attribute_not_exists(latest))
    * ```
    */
   public filter(str: string): Query {
@@ -378,7 +378,7 @@ class Query {
 
   /**
    * Sets the Select parameter of the command input. The valid values are:
-   *  ALL_ATTRIBUTES - Returns all of the item attributes from the specified table or index. If you query a local secondary index, then for each matching item in the index, DynamoDB fetches the entire item from the parent table. If the index is configured to project all item attributes, then all of the data can be obtained from the local secondary index, and no fetching is required.
+   *  ALL_ATTRIBUTES - Returns all item attributes from the specified table or index. If you query a local secondary index, then for each matching item in the index, DynamoDB fetches the entire item from the parent table. If the index is configured to project all item attributes, then all the data can be obtained from the local secondary index, and no fetching is required.
    *  ALL_PROJECTED_ATTRIBUTES - Allowed only when querying an index. Retrieves all attributes that have been projected into the index. If the index is configured to project all attributes, this return value is equivalent to specifying ALL_ATTRIBUTES.
    *  COUNT - Returns the number of matching items, rather than the matching items themselves.
    *  SPECIFIC_ATTRIBUTES - Returns only the attributes listed in AttributesToGet. This return value is equivalent to specifying AttributesToGet without specifying any value for Select.
@@ -391,7 +391,7 @@ class Query {
    * If you use the ProjectionExpression parameter, then the value for Select can only be SPECIFIC_ATTRIBUTES.
    * Any other value for Select will return an error.
    *
-   * @param str - ALL_ATTRIBUTES, ALL_PROJECTED_ATTRIBUTES, SPECIFIC_ATTRIBUTES, or COUNT (not case sensitive)
+   * @param str - ALL_ATTRIBUTES, ALL_PROJECTED_ATTRIBUTES, SPECIFIC_ATTRIBUTES, or COUNT (not case-sensitive)
    * @returns Query with populated params
    */
   public select(str: 'ALL_ATTRIBUTES' | 'ALL_PROJECTED_ATTRIBUTES' | 'SPECIFIC_ATTRIBUTES' | 'COUNT'): Query {
@@ -429,12 +429,12 @@ class Query {
 
   /**
    * Sets the ReturnConsumedCapacity of the command input.
-   * Determines the level of detail about either provisioned or on-demand throughput consumption that is returned in the response:
+   * Determines the level of detail about either provisioned or on-demand throughput consumption that is in the response:
    *  INDEXES - The response includes the aggregate ConsumedCapacity for the operation, together with ConsumedCapacity for each table and secondary index that was accessed.
    *  TOTAL - The response includes only the aggregate ConsumedCapacity for the operation.
    *  NONE - No ConsumedCapacity details are included in the response.
    *
-   * @param str - indexes, total, or none (non case sensitive strings)
+   * @param str - indexes, total, or none (non-case-sensitive strings)
    * @returns Query with populated params
    */
   public capacity(str: 'INDEXES' | 'TOTAL' | 'NONE'): Query {
@@ -453,7 +453,7 @@ class Query {
    * {
    *  Key: {},
    *  TableName: string,
-   *  ConsistenRead?: boolean,
+   *  ConsistentRead?: boolean,
    *  ExclusiveStartKey?: {},
    *  ExpressionAttributeNames?: {},
    *  ExpressionAttributeValues?: {},
