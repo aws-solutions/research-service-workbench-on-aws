@@ -49,6 +49,8 @@ rushx integration-tests
 Navigate to `workbench-core/example/infrastructure`
 
 ### Destroy the ExampleStack
+**This will destroy the DynamoDB Table, Cognito UserPool, S3Buckets and the encryption keys created by the stack.**
+**RemovalPolicy has been set to DESTROY for the mentioned resources**
 #### Require Approval
 ```bash
 rushx cdk:destroy
@@ -60,7 +62,7 @@ rushx cdk:destroy
 rushx cdk:destroy -f
 ```
 
-### Delete Cognito UserPool, DynamoDB Table and SSM Parameters
+### Delete Cognito SSM Parameters
 ```bash
 ./scripts/cleanup.sh -r <REGION> -p -c
 ```
