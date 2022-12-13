@@ -10,7 +10,6 @@ import * as cdk from 'aws-cdk-lib';
 import { App, Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
 import { ExampleStack } from './example-stack';
-// import { TestStack } from './test-stack';
 
 const app: App = new cdk.App();
 
