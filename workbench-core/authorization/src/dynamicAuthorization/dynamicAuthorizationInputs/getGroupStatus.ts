@@ -1,4 +1,4 @@
-import { Status } from '../status';
+import { GroupStatus } from '../groupStatus';
 
 /**
  * Request object for GetGroupStatus
@@ -14,7 +14,7 @@ export interface GetGroupStatusRequest {
  */
 export interface GetGroupStatusResponse {
   /**
-   * The group {@link Status}
+   * The group {@link GroupStatus}
    */
-  status: Status;
+  status: GroupStatus;
 }

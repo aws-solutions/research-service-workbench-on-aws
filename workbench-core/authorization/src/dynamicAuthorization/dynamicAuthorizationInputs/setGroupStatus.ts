@@ -1,4 +1,4 @@
-import { Status } from '../status';
+import { GroupStatus } from '../groupStatus';
 
 /**
  * Request object for SetGroupStatus
@@ -9,9 +9,9 @@ export interface SetGroupStatusRequest {
    */
   groupId: string;
   /**
-   *  {@link Status} to set
+   *  {@link GroupStatus} to set
    */
-  status: Status;
+  status: GroupStatus;
 }
 /**
  * Response object for SetGroupStatus
