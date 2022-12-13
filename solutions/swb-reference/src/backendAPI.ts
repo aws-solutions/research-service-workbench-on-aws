@@ -24,7 +24,7 @@ import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workben
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
-import { DataSetService } from './service/dataSetService';
+import { DataSetService } from './services/dataSetService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
