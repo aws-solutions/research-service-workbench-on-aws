@@ -13,11 +13,7 @@ import {
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
-import {
-  DataSetService,
-  S3DataSetStoragePlugin,
-  DdbDataSetMetadataPlugin
-} from '@aws/workbench-core-datasets';
+import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
 import {
   EnvironmentService,
   EnvironmentTypeService,
@@ -28,6 +24,7 @@ import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workben
 import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+import { DataSetService } from './service/dataSetService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
@@ -64,11 +61,11 @@ const apiRouteConfig: ApiRouteConfig = {
     TABLE_NAME: process.env.STACK_NAME!
   }),
   dataSetService: new DataSetService(
+    new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
     new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
   ),
-  dataSetsStoragePlugin: new S3DataSetStoragePlugin(aws),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService({
     TABLE_NAME: process.env.STACK_NAME!

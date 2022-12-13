@@ -5,7 +5,6 @@
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
 import { MetadataService } from '@aws/workbench-core-base';
-import { DataSetService, DataSetsStoragePlugin } from '@aws/workbench-core-datasets';
 import {
   EnvironmentConnectionService,
   EnvironmentLifecycleService,
@@ -14,14 +13,14 @@ import {
   EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
+import { DatasetPluginInterface } from './datasets/datasetPluginInterface';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
   account: HostingAccountService;
   environmentService: EnvironmentService;
-  dataSetService: DataSetService;
-  dataSetsStoragePlugin: DataSetsStoragePlugin;
+  dataSetService: DatasetPluginInterface;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;

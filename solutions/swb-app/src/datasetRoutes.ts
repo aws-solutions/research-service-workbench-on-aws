@@ -4,23 +4,15 @@
  */
 
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
-import {
-  CreateDataSetSchema,
-  CreateExternalEndpointSchema,
-  DataSetService,
-  DataSetsStoragePlugin
-} from '@aws/workbench-core-datasets';
+import { CreateDataSetSchema, CreateExternalEndpointSchema } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { DatasetPluginInterface } from './datasets/datasetPluginInterface';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
-export function setUpDSRoutes(
-  router: Router,
-  dataSetService: DataSetService,
-  dataSetStoragePlugin: DataSetsStoragePlugin
-): void {
+export function setUpDSRoutes(router: Router, dataSetService: DatasetPluginInterface): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
     '/datasets',
@@ -32,7 +24,7 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetService.storagePlugin
       });
 
       res.status(201).send(dataSet);
@@ -50,7 +42,7 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetService.storagePlugin
       });
       res.status(201).send(dataSet);
     })
@@ -67,7 +59,7 @@ export function setUpDSRoutes(
       await dataSetService.addDataSetExternalEndpoint(
         req.params.id,
         req.body.externalEndpointName,
-        dataSetStoragePlugin,
+        dataSetService.storagePlugin,
         req.body.externalRoleName
       );
       res.status(201).send();
