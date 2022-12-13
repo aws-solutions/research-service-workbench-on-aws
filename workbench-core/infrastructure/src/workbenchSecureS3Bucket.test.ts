@@ -74,25 +74,7 @@ describe('SecureS3Bucket Test', () => {
     });
   });
 
-  test('bucket encryption should always be enabled', () => {
-    const stack = new Stack();
-    new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket');
-
-    const template = Template.fromStack(stack);
-    template.hasResourceProperties('AWS::S3::Bucket', {
-      BucketEncryption: {
-        ServerSideEncryptionConfiguration: [
-          {
-            ServerSideEncryptionByDefault: {
-              SSEAlgorithm: 'aws:kms'
-            }
-          }
-        ]
-      }
-    });
-  });
-
-  test('should use custom encryption key passed', () => {
+  test('should use custom encryption key', () => {
     const stack = new Stack();
     const encryptionKey = new WorkbenchEncryptionKeyWithRotation(stack, 'test-EncryptionKey');
     new WorkbenchSecureS3Bucket(stack, 'TestS3Bucket', {

@@ -27,8 +27,9 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
     });
 
     this.key = new Key(this, `${id}-Key`, {
+      ...props,
       enableKeyRotation: true,
-      policy: mainKeyPolicy,
+      policy: props?.policy ?? mainKeyPolicy,
       alias: `alias/${id}`
     });
 

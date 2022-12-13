@@ -30,6 +30,7 @@ rushx cdk:deploy
 ### Cognito User/Group Setup and update SSM Parameters
 ```bash
 ./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c
+./scripts/setupCognito.sh -u 'us-east-1_pL8HrGwrc' -e 'issharan@amazon.com' -p 'Amm$ab^1234' -r 'us-east-1' -c
 ```
 
 #### Get UserPool Id

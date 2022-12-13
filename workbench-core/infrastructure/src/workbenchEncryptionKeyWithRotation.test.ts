@@ -1,5 +1,6 @@
-import { Stack } from 'aws-cdk-lib';
+import { RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
+import { AnyPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
 
 describe('encryptionKeyWithRotation Test', () => {
@@ -52,6 +53,53 @@ describe('encryptionKeyWithRotation Test', () => {
     const template = Template.fromStack(stack);
     template.hasResourceProperties('AWS::KMS::Key', {
       EnableKeyRotation: true
+    });
+  });
+
+  test('should set removalPolicy to Destroy', () => {
+    const stack = new Stack();
+    new WorkbenchEncryptionKeyWithRotation(stack, 'TestS3Bucket-EncryptionKey', {
+      removalPolicy: RemovalPolicy.DESTROY
+    });
+
+    const template = Template.fromStack(stack);
+    template.hasResource('AWS::KMS::Key', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete'
+    });
+  });
+
+  test('should use customKeyPolicy', () => {
+    const stack = new Stack();
+    const customKeyPolicy = new PolicyDocument({
+      statements: [
+        new PolicyStatement({
+          actions: ['kms:*'],
+          principals: [new AnyPrincipal()],
+          resources: ['*'],
+          sid: 'custom-key-share-statement'
+        })
+      ]
+    });
+    new WorkbenchEncryptionKeyWithRotation(stack, 'TestS3Bucket-EncryptionKey', {
+      policy: customKeyPolicy
+    });
+
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties('AWS::KMS::Key', {
+      KeyPolicy: {
+        Statement: [
+          {
+            Action: 'kms:*',
+            Effect: 'Allow',
+            Principal: {
+              AWS: '*'
+            },
+            Resource: '*',
+            Sid: 'custom-key-share-statement'
+          }
+        ]
+      }
     });
   });
 });

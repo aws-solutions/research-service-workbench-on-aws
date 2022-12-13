@@ -1,7 +1,8 @@
 import { Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { AttributeType, BillingMode } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { WorkbenchDynamodb } from './workbenchDynamodb';
+import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
 
 describe('workbenchDynamodb Test', () => {
   test('default values', () => {
@@ -18,11 +19,15 @@ describe('workbenchDynamodb Test', () => {
       BillingMode: 'PAY_PER_REQUEST',
       PointInTimeRecoverySpecification: {
         PointInTimeRecoveryEnabled: true
+      },
+      SSESpecification: {
+        SSEEnabled: true,
+        SSEType: 'KMS'
       }
     });
   });
 
-  test('should be able set BillingMode to Provisioned', () => {
+  test('should set the BillingMode to Provisioned', () => {
     const stack = new Stack();
 
     // eslint-disable-next-line no-new
@@ -41,6 +46,25 @@ describe('workbenchDynamodb Test', () => {
     });
   });
 
+  test('should always use Custom Managed Keys', () => {
+    const stack = new Stack();
+
+    // eslint-disable-next-line no-new
+    new WorkbenchDynamodb(stack, 'TestDynamodb', {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      encryption: TableEncryption.AWS_MANAGED
+    });
+
+    const template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::DynamoDB::Table', 1);
+    template.hasResourceProperties('AWS::DynamoDB::Table', {
+      SSESpecification: {
+        SSEEnabled: true,
+        SSEType: 'KMS'
+      }
+    });
+  });
+
   test('point in time recovery should always be enabled', () => {
     const stack = new Stack();
 
@@ -55,6 +79,29 @@ describe('workbenchDynamodb Test', () => {
     template.hasResourceProperties('AWS::DynamoDB::Table', {
       PointInTimeRecoverySpecification: {
         PointInTimeRecoveryEnabled: true
+      }
+    });
+  });
+
+  test('use custom encryption key', () => {
+    const stack = new Stack();
+
+    const encryptionKey = new WorkbenchEncryptionKeyWithRotation(stack, 'test-EncryptionKey');
+    // eslint-disable-next-line no-new
+    new WorkbenchDynamodb(stack, 'TestDynamodb', {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey.key
+    });
+
+    const template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::DynamoDB::Table', 1);
+    template.hasResourceProperties('AWS::DynamoDB::Table', {
+      SSESpecification: {
+        KMSMasterKeyId: {
+          'Fn::GetAtt': ['testEncryptionKeytestEncryptionKeyKey2FA1432D', 'Arn']
+        },
+        SSEEnabled: true,
+        SSEType: 'KMS'
       }
     });
   });
