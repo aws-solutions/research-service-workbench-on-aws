@@ -26,6 +26,9 @@ describe('workbenchDynamodb Test', () => {
         PointInTimeRecoveryEnabled: true
       },
       SSESpecification: {
+        KMSMasterKeyId: {
+          'Fn::GetAtt': ['TestDynamodbTestDynamodbEncryptionKeyTestDynamodbEncryptionKeyKey47CAE029', 'Arn']
+        },
         SSEEnabled: true,
         SSEType: 'KMS'
       }
@@ -51,25 +54,6 @@ describe('workbenchDynamodb Test', () => {
     });
   });
 
-  test('should always use Custom Managed Keys', () => {
-    const stack = new Stack();
-
-    // eslint-disable-next-line no-new
-    new WorkbenchDynamodb(stack, 'TestDynamodb', {
-      partitionKey: { name: 'pk', type: AttributeType.STRING },
-      encryption: TableEncryption.AWS_MANAGED
-    });
-
-    const template = Template.fromStack(stack);
-    template.resourceCountIs('AWS::DynamoDB::Table', 1);
-    template.hasResourceProperties('AWS::DynamoDB::Table', {
-      SSESpecification: {
-        SSEEnabled: true,
-        SSEType: 'KMS'
-      }
-    });
-  });
-
   test('point in time recovery should always be enabled', () => {
     const stack = new Stack();
 
@@ -88,14 +72,14 @@ describe('workbenchDynamodb Test', () => {
     });
   });
 
-  test('use custom encryption key', () => {
+  test('should use custom encryption key', () => {
     const stack = new Stack();
 
-    const encryptionKey = new WorkbenchEncryptionKeyWithRotation(stack, 'test-EncryptionKey');
+    const testEncryptionKey = new WorkbenchEncryptionKeyWithRotation(stack, 'Test-EncryptionKey');
     // eslint-disable-next-line no-new
-    new WorkbenchDynamodb(stack, 'TestDynamodb', {
-      partitionKey: { name: 'pk', type: AttributeType.STRING },
-      encryptionKey: encryptionKey.key
+    new WorkbenchDynamodb(stack, 'TestDynamodbKEY', {
+      partitionKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: testEncryptionKey.key
     });
 
     const template = Template.fromStack(stack);
@@ -103,10 +87,32 @@ describe('workbenchDynamodb Test', () => {
     template.hasResourceProperties('AWS::DynamoDB::Table', {
       SSESpecification: {
         KMSMasterKeyId: {
-          'Fn::GetAtt': ['testEncryptionKeytestEncryptionKeyKey2FA1432D', 'Arn']
+          'Fn::GetAtt': ['TestEncryptionKeyTestEncryptionKeyKey5573500C', 'Arn']
         },
         SSEEnabled: true,
         SSEType: 'KMS'
+      }
+    });
+  });
+
+  test('test replicationRegion param', () => {
+    const stack = new Stack();
+
+    // eslint-disable-next-line no-new
+    new WorkbenchDynamodb(stack, 'TestDynamodb', {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      encryption: TableEncryption.AWS_MANAGED,
+      replicationRegions: ['us-east-1', 'us-east-2']
+    });
+
+    const template = Template.fromStack(stack);
+    template.resourceCountIs('AWS::DynamoDB::Table', 1);
+    template.hasResourceProperties('AWS::DynamoDB::Table', {
+      SSESpecification: {
+        SSEEnabled: true
+      },
+      StreamSpecification: {
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
       }
     });
   });
