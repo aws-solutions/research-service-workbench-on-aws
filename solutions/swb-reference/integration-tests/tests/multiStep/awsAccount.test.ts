@@ -23,7 +23,10 @@ describe('multiStep awsAccount integration test', () => {
   });
 
   test('it works', async () => {
-    const dynamoDbService = new DynamoDBService({ region: 'us-east-1', table: 'swb-dev-va' });
+    const dynamoDbService = new DynamoDBService({
+      region: process.env.AWS_REGION!,
+      table: process.env.STACK_NAME!
+    });
     const accountService = new AccountService(dynamoDbService);
 
     const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
