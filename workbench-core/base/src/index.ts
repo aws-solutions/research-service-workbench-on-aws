@@ -5,7 +5,11 @@
 
 import AuditLogger from './auditLogger';
 import AwsService from './aws/awsService';
-import { CFNTemplate, CFNTemplateParameters } from './aws/helpers/cloudFormationTemplate';
+import {
+  CFNTemplate,
+  CFNTemplateParameters,
+  CFNTemplateParametersParser
+} from './aws/helpers/cloudFormationTemplate';
 import { buildDynamoDbKey, buildDynamoDBPkSk, removeDynamoDbKeys } from './aws/helpers/dynamoDB/ddbUtil';
 import CognitoTokenService from './cognitoTokenService';
 import resourceTypeToKey from './constants/resourceTypeToKey';
@@ -59,6 +63,7 @@ export {
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
   CFNTemplateParameters,
+  CFNTemplateParametersParser,
   CFNTemplate,
   QueryStringParamFilter,
   QueryStringParamFilterParser,

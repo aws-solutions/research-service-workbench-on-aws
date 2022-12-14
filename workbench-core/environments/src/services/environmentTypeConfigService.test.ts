@@ -28,7 +28,7 @@ import EnvironmentTypeService from './environmentTypeService';
 describe('environmentTypeConfigService', () => {
   const TABLE_NAME = 'exampleDDBTable';
   const ddbServiceMock = new DynamoDBService({ region: 'us-east-1', table: TABLE_NAME });
-  const envTypeMock = new EnvironmentTypeService({ TABLE_NAME });
+  const envTypeMock = new EnvironmentTypeService(ddbServiceMock);
   const envTypeConfigService = new EnvironmentTypeConfigService(envTypeMock, ddbServiceMock);
   const ddbMock = mockClient(DynamoDBClient);
   const envTypeId = '1b0502f3-121f-4d63-b03a-44dc756e4c20';

@@ -51,8 +51,7 @@ describe('multiStep environment type and environment type config test', () => {
     console.log('Update Environment Type Name');
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
       {
-        name: 'updated name',
-        status: 'APPROVED'
+        name: 'updated name'
       },
       true
     );
@@ -67,8 +66,7 @@ describe('multiStep environment type and environment type config test', () => {
     console.log('Update Environment Type Description');
     await adminSession.resources.environmentTypes.environmentType(envType.id).update(
       {
-        description: 'updated description',
-        status: 'APPROVED'
+        description: 'updated description'
       },
       true
     );

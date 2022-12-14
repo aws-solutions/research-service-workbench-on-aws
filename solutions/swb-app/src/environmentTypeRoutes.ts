@@ -5,17 +5,14 @@
 
 import {
   EnvironmentTypeService,
-  isEnvironmentTypeStatus,
-  ENVIRONMENT_TYPE_STATUS,
-  UpdateEnvironmentTypeSchema,
+  UpdateEnvironmentTypeRequest,
+  UpdateEnvironmentTypeRequestParser,
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
 } from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult, validateAndParse } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpEnvTypeRoutes(router: Router, environmentTypeService: EnvironmentTypeService): void {
   // Get envType
@@ -35,16 +32,8 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
         ListEnvironmentTypesRequestParser,
         req.query
       );
-      const { paginationToken, pageSize } = request;
-
-      if ((paginationToken && typeof paginationToken !== 'string') || (pageSize && Number(pageSize) <= 0)) {
-        res
-          .status(400)
-          .send('Invalid pagination token and/or page size. Please try again with valid inputs.');
-      } else {
-        const envType = await environmentTypeService.listEnvironmentTypes(request);
-        res.send(envType);
-      }
+      const envTypes = await environmentTypeService.listEnvironmentTypes(request);
+      res.send(envTypes);
     })
   );
 
@@ -52,15 +41,11 @@ export function setUpEnvTypeRoutes(router: Router, environmentTypeService: Envir
   router.patch(
     '/environmentTypes/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateEnvironmentTypeSchema));
-      const user = res.locals.user;
-      const { status } = req.body;
-      if (!isEnvironmentTypeStatus(status)) {
-        throw Boom.badRequest(
-          `Status provided is: ${status}. Status needs to be one of these values: ${ENVIRONMENT_TYPE_STATUS}`
-        );
-      }
-      const envType = await environmentTypeService.updateEnvironmentType(user.id, req.params.id, req.body);
+      const envTypeRequest = validateAndParse<UpdateEnvironmentTypeRequest>(
+        UpdateEnvironmentTypeRequestParser,
+        { envTypeId: req.params.id, ...req.body }
+      );
+      const envType = await environmentTypeService.updateEnvironmentType(envTypeRequest);
       res.status(200).send(envType);
     })
   );

@@ -37,7 +37,7 @@ describe('update environment types', () => {
         new HttpError(400, {
           statusCode: 400,
           error: 'Bad Request',
-          message: "is not allowed to have the additional property 'invalidProp'"
+          message: ": Unrecognized key(s) in object: 'invalidProp'"
         })
       );
     }

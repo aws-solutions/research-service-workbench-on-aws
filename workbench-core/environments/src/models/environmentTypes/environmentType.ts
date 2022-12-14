@@ -2,21 +2,24 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { CFNTemplateParameters } from '@aws/workbench-core-base';
-import { EnvironmentTypeStatus } from '../../constants/environmentTypeStatus';
+import { CFNTemplateParametersParser } from '@aws/workbench-core-base';
+import { z } from 'zod';
 
-export interface EnvironmentType {
-  pk: string;
-  sk: string;
-  id: string;
-  productId: string;
-  provisioningArtifactId: string;
-  description: string;
-  name: string;
-  type: string;
-  params: CFNTemplateParameters;
-  resourceType: string;
-  status: EnvironmentTypeStatus;
-  createdAt: string;
-  updatedAt: string;
-}
+// eslint-disable-next-line @rushstack/typedef-var
+export const EnvironmentTypeParser = z.object({
+  pk: z.string(),
+  sk: z.string(),
+  id: z.string(),
+  productId: z.string(),
+  provisioningArtifactId: z.string(),
+  description: z.string(),
+  name: z.string(),
+  type: z.string(),
+  params: CFNTemplateParametersParser,
+  resourceType: z.string(),
+  status: z.enum(['APPROVED', 'NOT_APPROVED']),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type EnvironmentType = z.infer<typeof EnvironmentTypeParser>;

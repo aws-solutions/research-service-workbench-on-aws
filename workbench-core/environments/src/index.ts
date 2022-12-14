@@ -36,12 +36,14 @@ import {
   ListEnvironmentTypesRequest,
   ListEnvironmentTypesRequestParser
 } from './models/environmentTypes/listEnvironmentTypesRequest';
+import {
+  UpdateEnvironmentTypeRequest,
+  UpdateEnvironmentTypeRequestParser
+} from './models/environmentTypes/updateEnvironmentTypeRequest';
 import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
-import CreateEnvironmentTypeSchema from './schemas/createEnvironmentType';
-import UpdateEnvironmentTypeSchema from './schemas/updateEnvironmentType';
 import { Environment, EnvironmentService } from './services/environmentService';
 import EnvironmentTypeConfigService from './services/environmentTypeConfigService';
 import EnvironmentTypeService from './services/environmentTypeService';
@@ -68,8 +70,6 @@ export {
   ENVIRONMENT_TYPE_STATUS,
   EnvironmentTypeConfigService,
   CreateEnvironmentSchema,
-  CreateEnvironmentTypeSchema,
-  UpdateEnvironmentTypeSchema,
   EnvironmentConnectionLinkPlaceholder,
   EnvironmentTypeHandler,
   ListEnvironmentTypesRequest,
@@ -81,5 +81,7 @@ export {
   UpdateEnvironmentTypeConfigRequest,
   UpdateEnvironmentTypeConfigRequestParser,
   ListEnvironmentTypeConfigsRequest,
-  ListEnvironmentTypeConfigsRequestParser
+  ListEnvironmentTypeConfigsRequestParser,
+  UpdateEnvironmentTypeRequest,
+  UpdateEnvironmentTypeRequestParser
 };
