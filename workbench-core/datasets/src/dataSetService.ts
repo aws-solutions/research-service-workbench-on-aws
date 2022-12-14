@@ -12,55 +12,8 @@ import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
+import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 import { StorageLocation } from './storageLocation';
-
-export interface CreateProvisionDatasetRequest {
-  /**
-   * the name of a DataSet
-   */
-  name: string;
-
-  /**
-   * (optional) a description of the dataset
-   */
-  description?: string;
-
-  /**
-   * (optional) the owner of the dataset
-   */
-  owner?: string;
-
-  /**
-   * (optional) the type of the dataset
-   */
-  type?: string;
-
-  /**
-   * a string which identifies the storage specific location such the URL to an S3 bucket.
-   */
-  storageName: string;
-
-  /**
-   * the storage path where the DataSet files can be found at the location.
-   */
-  path: string;
-
-  /**
-   * AWS Account ID of DataSet
-   */
-  awsAccountId?: string;
-
-  /**
-   * AWS region of the dataset storage
-   */
-  region?: string;
-
-  /**
-   * an instance of {@link DataSetsStoragePlugin} to provide the storage implementation
-   * for a particular platform, account, etc.
-   */
-  storageProvider: DataSetsStoragePlugin;
-}
 
 export class DataSetService {
   private _audit: AuditService;
