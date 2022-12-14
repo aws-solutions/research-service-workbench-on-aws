@@ -42,7 +42,6 @@ export default class Setup {
       const awsRegion = this._settings.get('AwsRegion');
 
       const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-
       const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
       const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,
