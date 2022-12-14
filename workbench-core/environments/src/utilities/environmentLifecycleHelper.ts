@@ -4,8 +4,8 @@
  */
 
 import { Output } from '@aws-sdk/client-cloudformation';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger, resourceTypeToKey } from '@aws/workbench-core-base';
+import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,

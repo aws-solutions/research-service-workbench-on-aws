@@ -5,6 +5,7 @@
 
 import * as Boom from '@hapi/boom';
 import { ValidatorResult } from 'jsonschema';
+import { ZodTypeAny } from 'zod';
 
 function processValidatorResult(validatorResult: ValidatorResult): void {
   if (!validatorResult.valid) {
@@ -21,4 +22,22 @@ function processValidatorResult(validatorResult: ValidatorResult): void {
   }
 }
 
-export { processValidatorResult };
+function validateAndParse<T>(parser: ZodTypeAny, data: unknown): T {
+  const parsed = parser.safeParse(data);
+
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  const errorMessages = parsed.error.issues.map((issue) => {
+    return `${issue.path.join('.')}: ${issue.message}`;
+  });
+
+  throw Boom.badRequest(
+    errorMessages.reduce((fullMessage, message) => {
+      return `${fullMessage}. ${message}`;
+    })
+  );
+}
+
+export { processValidatorResult, validateAndParse };

@@ -207,6 +207,14 @@ describe('projectUtils', () => {
       );
     });
 
+    test('should fail if filterValue is undefined', async () => {
+      // BUILD
+      filterRequest = { createdAt: { eq: undefined } };
+
+      // OPERATE n CHECK
+      expect(() => manualFilterProjects(filterRequest, projects)).toThrow('Filter contains invalid format');
+    });
+
     test('filter on eq createdAt', async () => {
       // BUILD
       filterRequest = {

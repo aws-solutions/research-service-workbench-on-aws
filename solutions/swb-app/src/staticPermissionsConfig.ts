@@ -13,6 +13,76 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Account'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Account'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'AccountTemplate'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'CostCenter'
   },

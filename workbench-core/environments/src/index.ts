@@ -15,6 +15,7 @@ import EnvironmentConnectionLinkPlaceholder from './interfaces/environmentConnec
 import EnvironmentConnectionService from './interfaces/environmentConnectionService';
 import EnvironmentLifecycleService from './interfaces/environmentLifecycleService';
 import EventBridgeEventToDDB from './interfaces/eventBridgeEventToDDB';
+import AuthorizationSetup from './postDeployment/authorizationSetup';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
@@ -39,6 +40,7 @@ export {
   isSortAttribute,
   ServiceCatalogSetup,
   CognitoSetup,
+  AuthorizationSetup,
   EnvironmentService,
   EnvironmentTypeService,
   Environment,

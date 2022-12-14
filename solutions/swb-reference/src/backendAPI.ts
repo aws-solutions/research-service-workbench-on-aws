@@ -4,10 +4,16 @@
  */
 
 import { generateRouter, ApiRouteConfig } from '@aws/swb-app';
-import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import {
+  AccountService,
+  CostCenterService,
+  HostingAccountLifecycleService,
+  HostingAccountService,
+  ProjectService
+} from '@aws/workbench-core-accounts';
+import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-authentication';
-import { AwsService, AuditLogger, MetadataService } from '@aws/workbench-core-base';
+import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
   DataSetService,
   S3DataSetStoragePlugin,
@@ -28,6 +34,7 @@ const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
   ddbTableName: process.env.STACK_NAME!
 });
+const accountService: AccountService = new AccountService(aws.helpers.ddb);
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -50,7 +57,9 @@ const apiRouteConfig: ApiRouteConfig = {
     //   connection: new <newEnvTypeName>EnvironmentConnectionService()
     // }
   },
-  account: new HostingAccountService(),
+  account: new HostingAccountService(
+    new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
+  ),
   environmentService: new EnvironmentService({
     TABLE_NAME: process.env.STACK_NAME!
   }),
@@ -73,12 +82,7 @@ const apiRouteConfig: ApiRouteConfig = {
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
-  costCenterService: new CostCenterService(
-    {
-      TABLE_NAME: process.env.STACK_NAME!
-    },
-    aws.helpers.ddb
-  ),
+  costCenterService: new CostCenterService(aws.helpers.ddb),
   metadataService: new MetadataService(aws.helpers.ddb)
 };
 

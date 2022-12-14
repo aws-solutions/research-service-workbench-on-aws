@@ -442,7 +442,7 @@ export default class ProjectService {
   }
 
   private async _getCostCenter(costCenterId: string): Promise<CostCenter> {
-    const costCenterService = new CostCenterService({ TABLE_NAME: this._tableName }, this._aws.helpers.ddb);
+    const costCenterService = new CostCenterService(this._aws.helpers.ddb);
 
     try {
       return costCenterService.getCostCenter(costCenterId);

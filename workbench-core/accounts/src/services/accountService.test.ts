@@ -5,21 +5,48 @@
 
 jest.mock('uuid', () => ({ v4: () => 'sampleAccId' }));
 
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  QueryCommand,
+  QueryCommandOutput,
+  UpdateItemCommand
+} from '@aws-sdk/client-dynamodb';
+import { ServiceInputTypes, ServiceOutputTypes } from '@aws-sdk/client-s3';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { resourceTypeToKey } from '@aws/workbench-core-base';
-import { mockClient } from 'aws-sdk-client-mock';
-import { Account } from '../models/account';
+import { JSONValue, resourceTypeToKey } from '@aws/workbench-core-base';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
+import { Account, AccountParser } from '../models/accounts/account';
+import { CostCenter } from '../models/costCenters/costCenter';
 import AccountService from './accountService';
 
 describe('AccountService', () => {
   const ORIGINAL_ENV = process.env;
+
   let accountMetadata: { [id: string]: string } = {};
+  let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
+  let accountService: AccountService;
+
   beforeEach(() => {
-    jest.resetModules(); // Most important - it clears the cache
+    jest.resetModules();
+    mockDDB = mockClient(DynamoDBClient);
     process.env = { ...ORIGINAL_ENV }; // Make a copy
-    process.env.AWS_REGION = 'us-east-1';
-    process.env.STACK_NAME = 'swb-swbv2-va';
+
+    const region = 'us-east-1';
+    process.env.AWS_REGION = region;
+
+    const stackName = 'swb-swbv2-va';
+    process.env.STACK_NAME = stackName;
+
+    process.env.MAIN_ACCT_ID = '123456789012';
+    process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+    process.env.API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
+    process.env.STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
+    process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
+
+    accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
+
     accountMetadata = {
       envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
       accountHandlerRoleArn: 'sampleAccountHandlerRoleArn',
@@ -39,11 +66,7 @@ describe('AccountService', () => {
 
   const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
-  test('createOrUpdate follows create account path as expected', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('create follows create account path as expected', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(QueryCommand).resolves({ Count: 0 });
 
@@ -51,7 +74,7 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.create(accountMetadata);
 
     // CHECK
     expect(response).toEqual({
@@ -60,11 +83,7 @@ describe('AccountService', () => {
     });
   });
 
-  test('createOrUpdate follows update account path as expected', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('update follows update account path as expected', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
@@ -82,17 +101,13 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('createOrUpdate follows update account path as expected without awsAccountId or externalId', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('update follows update account path as expected without awsAccountId or externalId', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
@@ -108,17 +123,13 @@ describe('AccountService', () => {
     accountMetadata.accountId = 'sampleAccId';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('createOrUpdate throws error when update process finds account with different aws account id', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('update throws error when update process finds account with different aws account id', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
@@ -136,16 +147,12 @@ describe('AccountService', () => {
     accountMetadata.externalId = 'workbench';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.update(accountMetadata)).rejects.toThrow(
       'The AWS Account mapped to this accountId is different than the one provided'
     );
   });
 
-  test('createOrUpdate throws error when update process cannot find account', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('update throws error when update process cannot find account', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({});
 
@@ -154,49 +161,38 @@ describe('AccountService', () => {
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.update(accountMetadata)).rejects.toThrow(
       `Could not find account ${accountMetadata.accountId}`
     );
   });
 
-  test('createOrUpdate throws error when create process finds a duplicate entry', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('create throws error when create process finds a duplicate entry', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(QueryCommand).resolves({ Count: 1 });
 
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.create(accountMetadata)).rejects.toThrow(
       'This AWS Account was found in DDB. Please provide the correct id value in request body'
     );
   });
 
-  test('createOrUpdate throws error when create has missing aws account ID', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
+  test('create throws error when create has missing aws account ID', async () => {
     // OPERATE & CHECK
-    await expect(accountService.createOrUpdate(accountMetadata)).rejects.toThrow(
+    await expect(accountService.create(accountMetadata)).rejects.toThrow(
       'Missing AWS Account ID in request body'
     );
   });
 
-  test('createOrUpdate follows create account path as expected', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('create follows create account path as expected', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(QueryCommand).resolves({ Count: 0 });
 
     accountMetadata.awsAccountId = '123456789012';
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.create(accountMetadata);
 
     // CHECK
     expect(response).toEqual({
@@ -205,11 +201,7 @@ describe('AccountService', () => {
     });
   });
 
-  test('createOrUpdate follows update account path as expected when aws account not provided in metadata', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('update follows update account path as expected when aws account not provided in metadata', async () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
@@ -227,32 +219,28 @@ describe('AccountService', () => {
     };
 
     // OPERATE
-    const response = await accountService.createOrUpdate(accountMetadata);
+    const response = await accountService.update(accountMetadata);
 
     // CHECK
     expect(response).toEqual({ ...accountMetadata, id: 'sampleAccId' });
   });
 
-  test('getAccounts returns no Items attribute', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
-    const mockDDB = mockClient(DynamoDBClient);
+  test('getAllAccounts returns no Items attribute', async () => {
     mockDDB.on(QueryCommand).resolves({});
 
     // OPERATE
-    const response = await accountService.getAccounts();
+    const response = await accountService.getAllAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     // CHECK
     expect(response).toEqual([]);
   });
 
-  test('getAccounts returns list of onboarded accounts', async () => {
-    // BUILD
-    const accountService = new AccountService(process.env.STACK_NAME!);
-
+  test('getAllAccounts returns list of onboarded accounts', async () => {
     const account: Account = {
-      cidr: '',
+      name: '',
       encryptionKeyArn: '',
       envMgmtRoleArn: '',
       environmentInstanceFiles: '',
@@ -263,22 +251,192 @@ describe('AccountService', () => {
       subnetId: '',
       vpcId: '',
       awsAccountId: '123456789012',
-      id: 'sampleAccId'
+      id: 'sampleAccId',
+      updatedAt: '',
+      createdAt: ''
     };
 
     const accounts = [marshall(account)];
 
     const expectedList = [account];
 
-    const mockDDB = mockClient(DynamoDBClient);
     mockDDB.on(QueryCommand).resolves({
       Items: accounts
     });
 
     // OPERATE
-    const response = await accountService.getAccounts();
+    const response = await accountService.getAllAccounts({
+      index: 'getResourceByCreatedAt',
+      key: { name: 'resourceType', value: 'account' }
+    });
 
     // CHECK
     expect(response).toEqual(expectedList);
+  });
+
+  describe('getAccounts', () => {
+    let accountJson: Record<string, JSONValue>;
+    let paginationToken: string | undefined;
+
+    beforeEach(() => {
+      accountJson = {
+        name: '',
+        cidr: '',
+        encryptionKeyArn: '',
+        envMgmtRoleArn: '',
+        environmentInstanceFiles: '',
+        externalId: '',
+        hostingAccountHandlerRoleArn: '',
+        stackName: '',
+        status: 'CURRENT',
+        subnetId: '',
+        vpcId: '',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        updatedAt: '',
+        createdAt: ''
+      };
+
+      paginationToken = 'paginationToken';
+
+      jest.spyOn(DynamoDBService.prototype, 'getPaginatedItems').mockImplementation(() => {
+        return Promise.resolve({
+          data: [accountJson],
+          paginationToken
+        });
+      });
+    });
+
+    test('returns a paginated response of accounts', async () => {
+      const actualResponse = await accountService.getPaginatedAccounts({});
+      expect(actualResponse).toEqual({
+        data: [AccountParser.parse(accountJson)],
+        paginationToken
+      });
+    });
+
+    describe('when there is no pagination token from dynamo', () => {
+      beforeEach(() => {
+        paginationToken = undefined;
+      });
+
+      test('it does not return a paginationToken', async () => {
+        const actualResponse = await accountService.getPaginatedAccounts({});
+        expect(actualResponse.paginationToken).toEqual(undefined);
+      });
+    });
+  });
+
+  describe('getAccount', () => {
+    describe('when there is a matching accountId', () => {
+      let expectedAccountId: string;
+      let account: Account;
+      let dynamoAccountItem: Account & { pk: string; sk: string };
+
+      beforeEach(() => {
+        expectedAccountId = 'acc-expectedAccountId';
+        account = AccountParser.parse({
+          envMgmtRoleArn: '',
+          vpcId: '',
+          subnetId: '',
+          encryptionKeyArn: '',
+          environmentInstanceFiles: '',
+          stackName: '',
+          status: 'CURRENT',
+          name: '',
+          awsAccountId: '',
+          externalId: '',
+          id: expectedAccountId,
+          hostingAccountHandlerRoleArn: '',
+          cidr: '',
+          updatedAt: '',
+          createdAt: ''
+        });
+
+        dynamoAccountItem = {
+          ...account,
+          sk: `ACC#${expectedAccountId}`,
+          pk: `ACC#${expectedAccountId}`
+        };
+      });
+
+      describe('and metadata is NOT requested', () => {
+        test('returns the matching account', async () => {
+          mockDDB.on(GetItemCommand).resolves({
+            Item: marshall(dynamoAccountItem)
+          });
+
+          const actualAccount = await accountService.getAccount(expectedAccountId, false);
+          expect(actualAccount.id).toEqual(expectedAccountId);
+        });
+      });
+
+      describe('and metadata is requested', () => {
+        let costCenter: CostCenter & { pk: string; sk: string };
+        let costCenterPK: string;
+        let expectedCCId: string;
+
+        beforeEach(() => {
+          expectedCCId = 'cc-12345';
+          costCenterPK = `CC#${expectedCCId}`;
+
+          costCenter = {
+            accountId: '',
+            dependency: '',
+            awsAccountId: '',
+            createdAt: '',
+            description: '',
+            encryptionKeyArn: '',
+            envMgmtRoleArn: '',
+            environmentInstanceFiles: '',
+            externalId: '',
+            hostingAccountHandlerRoleArn: '',
+            subnetId: '',
+            updatedAt: '',
+            vpcId: '',
+            pk: costCenterPK,
+            sk: costCenterPK,
+            id: expectedCCId,
+            name: 'cost center 1'
+          };
+        });
+
+        test('returns the matching account and its metadata', async () => {
+          const items = [dynamoAccountItem, costCenter];
+
+          const queryCommandOutput: QueryCommandOutput = {
+            Items: items.map((item) => {
+              return marshall(item);
+            }),
+            $metadata: {}
+          };
+          mockDDB.on(QueryCommand).resolves(queryCommandOutput);
+
+          const actualAccount = await accountService.getAccount(expectedAccountId, true);
+          expect(actualAccount.id).toEqual(expectedAccountId);
+          expect(actualAccount.costCenter!.id).toEqual(expectedCCId);
+        });
+      });
+    });
+
+    describe('when there is no matching accountId', () => {
+      test('throws an error when there is no Item associated with the accountId', async () => {
+        mockDDB.on(GetItemCommand).resolves({
+          Item: undefined
+        });
+        const noMatchId = 'noMatchId';
+        await expect(accountService.getAccount(noMatchId)).rejects.toThrowError(
+          `Could not find account ${noMatchId}`
+        );
+      });
+
+      test('throws an error when there is no Item associated with the accountId with metadata', async () => {
+        mockDDB.on(QueryCommand).resolves({ Count: 0 });
+        const noMatchId = 'noMatchId';
+        await expect(accountService.getAccount(noMatchId, true)).rejects.toThrowError(
+          `Could not find account ${noMatchId}`
+        );
+      });
+    });
   });
 });
