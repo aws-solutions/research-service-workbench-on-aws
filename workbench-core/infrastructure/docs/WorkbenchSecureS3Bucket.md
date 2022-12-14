@@ -1,7 +1,7 @@
 # WorkbenchSecureS3Bucket CDK Construct
 
 ## Description
-**A CDK Construct with some default values and is intended solely for use in our integration tests**:
+**An S3Bucket CDK Construct with some default values**:
 1. BlockPublicAccess.BLOCK_ALL // always
 1. encryption: BucketEncryption.KMS // always
 1. encryptionKey: Either provide your own encryption key or it creates an encryptionKey with rotation enabled

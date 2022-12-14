@@ -1,7 +1,7 @@
 # WorkbenchDynamodb CDK Construct
 
 ## Description
-**A CDK Construct with some default values and is intended solely for use in our integration tests**:
+**A DynamoDB CDK Construct with some default values**:
 1. billingMode: Either provide your billingMode or it sets the default to BillingMode.PAY_PER_REQUEST
 1. encryption: TableEncryption.CUSTOMER_MANAGED // default (TableEncryption.CUSTOMER_MANAGED is not supported by DynamoDB Global Tables (when you use replicationRegions))
 1. encryptionKey: Either provide your own encryption key or it creates an encryptionKey with rotation enabled

@@ -1,7 +1,7 @@
 # WorkbenchEncryptionKeyWithRotation CDK Construct
 
 ## Description
-**A CDK Construct with some default values and is intended solely for use in our integration tests**:
+**An EncryptionKey CDK Construct with some default values**:
 1. enableKeyRotation: true // always
 1. Sets default Key Policy to allow the AccountPrincipal for 'kms:*' actions
 
