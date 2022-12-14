@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CreateUser } from '@aws/workbench-core-authentication';
+import { CreateUser } from '@aws/workbench-core-user-management';
 import ClientSession from '../../clientSession';
 import CollectionResource from '../base/collectionResource';
 import User from './user';

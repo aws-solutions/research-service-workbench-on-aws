@@ -52,6 +52,7 @@
     "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-infrastructure": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@vendia/serverless-express": "^4.5.4",
     "aws-sdk-client-mock": "^0.6.2",
     "csrf": "^3.1.0",
