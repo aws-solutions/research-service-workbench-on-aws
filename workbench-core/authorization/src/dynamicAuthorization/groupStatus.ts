@@ -1,7 +1,4 @@
 /**
- * Enum of the status of a group
+ * Type for the status of a group
  */
-export enum GroupStatus {
-  ACTIVE = 'active',
-  DELETE_PENDING = 'delete pending'
-}
+export type GroupStatus = 'active' | 'delete_pending';
