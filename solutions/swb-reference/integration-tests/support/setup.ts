@@ -40,17 +40,9 @@ export default class Setup {
       const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
       const awsRegion = this._settings.get('awsRegion');
-
       const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-      const hostAwsAccountId = await secretsService.getSecret(
-        this._settings.get('hostAwsAccountIdParamStorePath')
-      );
-      this._settings.set('hostAwsAccountId', hostAwsAccountId);
 
-      const hostingAccountHandlerRoleArn = await secretsService.getSecret(
-        this._settings.get('hostingAccountHandlerRoleArnParamStorePath')
-      );
-      this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
+      await this._loadSecrets(secretsService);
 
       const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
       const { accessToken } = await cognitoTokenService.generateCognitoToken({
@@ -99,5 +91,25 @@ export default class Setup {
 
   private _getClientSession(accessToken?: string): ClientSession {
     return new ClientSession(this, accessToken);
+  }
+
+  private async _loadSecrets(secretsService: SecretsService): Promise<void> {
+    const hostAwsAccountId = await secretsService.getSecret(
+      this._settings.get('hostAwsAccountIdParamStorePath')
+    );
+    this._settings.set('hostAwsAccountId', hostAwsAccountId);
+
+    const hostingAccountHandlerRoleArn = await secretsService.getSecret(
+      this._settings.get('hostingAccountHandlerRoleArnParamStorePath')
+    );
+    this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
+
+    const envMgmtRoleArn = await secretsService.getSecret(this._settings.get('envMgmtRoleArnParamStorePath'));
+    this._settings.set('envMgmtRoleArn', envMgmtRoleArn);
+
+    const encryptionKeyArn = await secretsService.getSecret(
+      this._settings.get('encryptionKeyArnParamStorePath')
+    );
+    this._settings.set('encryptionKeyArn', encryptionKeyArn);
   }
 }
