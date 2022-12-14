@@ -94,22 +94,17 @@ export default class Setup {
   }
 
   private async _loadSecrets(secretsService: SecretsService): Promise<void> {
-    const hostAwsAccountId = await secretsService.getSecret(
-      this._settings.get('hostAwsAccountIdParamStorePath')
-    );
+    const [hostAwsAccountId, hostingAccountHandlerRoleArn, envMgmtRoleArn, encryptionKeyArn] =
+      await Promise.all([
+        await secretsService.getSecret(this._settings.get('hostAwsAccountIdParamStorePath')),
+        await secretsService.getSecret(this._settings.get('hostingAccountHandlerRoleArnParamStorePath')),
+        await secretsService.getSecret(this._settings.get('envMgmtRoleArnParamStorePath')),
+        await secretsService.getSecret(this._settings.get('encryptionKeyArnParamStorePath'))
+      ]);
+
     this._settings.set('hostAwsAccountId', hostAwsAccountId);
-
-    const hostingAccountHandlerRoleArn = await secretsService.getSecret(
-      this._settings.get('hostingAccountHandlerRoleArnParamStorePath')
-    );
     this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
-
-    const envMgmtRoleArn = await secretsService.getSecret(this._settings.get('envMgmtRoleArnParamStorePath'));
     this._settings.set('envMgmtRoleArn', envMgmtRoleArn);
-
-    const encryptionKeyArn = await secretsService.getSecret(
-      this._settings.get('encryptionKeyArnParamStorePath')
-    );
     this._settings.set('encryptionKeyArn', encryptionKeyArn);
   }
 }
