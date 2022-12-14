@@ -18,6 +18,5 @@ export default class CustomAuditPlugin extends BaseAuditPlugin {
     auditEntry.actor = metadata.actor;
     auditEntry.source = metadata.source;
     auditEntry.body = metadata.body && typeof metadata.body === 'object' ? metadata.body : undefined;
-    auditEntry.query = metadata.query && typeof metadata.query === 'object' ? metadata.query : undefined;
   }
 }
