@@ -47,6 +47,11 @@ export default class Setup {
       );
       this._settings.set('hostAwsAccountId', hostAwsAccountId);
 
+      const hostingAccountHandlerRoleArn = await secretsService.getSecret(
+        this._settings.get('hostingAccountHandlerRoleArnParamStorePath')
+      );
+      this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
+
       const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
       const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,

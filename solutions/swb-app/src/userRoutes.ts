@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-// User management
+import { validateAndParse } from '@aws/workbench-core-base';
 import {
   CreateRoleSchema,
   CreateUserSchema,
@@ -16,9 +16,7 @@ import {
   isUserAlreadyExistsError,
   UpdateUserRequest,
   UpdateUserRequestParser
-} from '@aws/workbench-core-authentication';
-
-import { validateAndParse } from '@aws/workbench-core-base';
+} from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-user-management",
+      "comment": "BREAKING CHANGE - refactored user management into its own package",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-user-management"
+}

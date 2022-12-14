@@ -167,6 +167,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-user-management",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },

@@ -47,6 +47,7 @@ interface Setting {
   hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;
   hostingAccountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArnParamStorePath: string;
   encryptionKeyArn: string;
 
   // Derived
