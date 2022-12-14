@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
 import { PermissionsResponse } from './models/permissionsResponse';
