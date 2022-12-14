@@ -34,6 +34,7 @@
     "@aws/workbench-core-accounts": "workspace:*",
     "@aws/workbench-core-authentication": "workspace:*",
     "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
@@ -46,7 +47,8 @@
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "uuid": "^8.3.2",
-    "zod": "^3.19.1"
+    "zod": "^3.19.1",
+    "@vendia/serverless-express": "^4.5.4"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

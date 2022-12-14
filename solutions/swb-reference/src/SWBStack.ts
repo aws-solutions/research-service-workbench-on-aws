@@ -355,7 +355,7 @@ export class SWBStack extends Stack {
    * Create bucket for S3 access logs.
    * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
    * Note this bucket uses S3 Managed encryption as a requirement for access logging.
-   * @param bucketName - Name of Access Logs Bucket.
+   * @param bucketNameOutput - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
@@ -736,14 +736,16 @@ export class SWBStack extends Stack {
   private _createRestApi(apiLambda: Function): void {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
-      restApiName: 'Backend API Name',
-      description: 'Backend API',
+      restApiName: this.stackName,
+      description: 'SWB API',
       deployOptions: {
         stageName: 'dev',
         accessLogDestination: new LogGroupLogDestination(logGroup),
         accessLogFormat: AccessLogFormat.custom(
           JSON.stringify({
             stage: '$context.stage',
+            requestTime: '$context.requestTime',
+            user: '$context.identity.user',
             requestId: '$context.requestId',
             integrationRequestId: '$context.integration.requestId',
             status: '$context.status',

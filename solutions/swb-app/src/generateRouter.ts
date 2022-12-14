@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuditService, BaseAuditPlugin, WithAudit, Writer } from '@aws/workbench-core-audit';
 import {
   csurf,
   verifyToken,
@@ -25,6 +26,9 @@ import cors from 'cors';
 import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import CustomAuditLogger from './audit/customAuditLogger';
+import CustomAuditPlugin from './audit/customAuditPlugin';
+import CustomAuditExtractor from './audit/extractor';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
 import { setUpDSRoutes } from './datasetRoutes';
@@ -83,6 +87,19 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
   app.use(withAuth(authorizationService, { logger: logger }));
+
+  // Auditing
+  const continueOnError = false;
+  const requiredAuditValues = ['actor', 'source'];
+  const fieldsToMask = ['user', 'password'];
+  // TODO: Create a logger to write audit logs to an immutable logstream. Can logstream be set so they can't be deleted
+  // const writer: Writer = new CustomAuditLogger(logger);
+  const writer: Writer = new CustomAuditLogger();
+  const baseAuditPlugin: BaseAuditPlugin = new CustomAuditPlugin(writer);
+  const auditService = new AuditService(baseAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
+  // const excludePaths = ['login','signin'];
+  const excludePaths: string[] = [];
+  app.use(WithAudit({ auditService, excludePaths, extractor: new CustomAuditExtractor() }));
 
   // Dynamic routes
   apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
