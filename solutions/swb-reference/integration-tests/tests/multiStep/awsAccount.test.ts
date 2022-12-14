@@ -24,8 +24,8 @@ describe('multiStep awsAccount integration test', () => {
 
   test('it works', async () => {
     const dynamoDbService = new DynamoDBService({
-      region: process.env.AWS_REGION!,
-      table: process.env.STACK_NAME!
+      region: settings.get('awsRegion'),
+      table: setup.getStackName()
     });
     const accountService = new AccountService(dynamoDbService);
 
