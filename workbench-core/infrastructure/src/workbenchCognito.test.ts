@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Duration, Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { Mfa, ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
 import {
@@ -104,7 +104,8 @@ describe('WorkbenchCognito tests', () => {
       accessTokenValidity: Duration.minutes(5),
       idTokenValidity: Duration.hours(1),
       refreshTokenValidity: Duration.hours(24),
-      mfa: Mfa.REQUIRED
+      mfa: Mfa.REQUIRED,
+      removalPolicy: RemovalPolicy.DESTROY
     };
     const stack = new Stack();
     new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
@@ -148,6 +149,12 @@ describe('WorkbenchCognito tests', () => {
         CaseSensitive: false
       },
       UserPoolName: workbenchCognitoProps.userPoolName
+    });
+
+    // test removal policy
+    template.hasResource('AWS::Cognito::UserPool', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete'
     });
 
     // User Pool Domain
