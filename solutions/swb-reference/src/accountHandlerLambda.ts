@@ -3,17 +3,29 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AccountHandler } from '@aws/workbench-core-accounts';
+import { AccountHandler, AccountService, HostingAccountLifecycleService } from '@aws/workbench-core-accounts';
 import { AwsService } from '@aws/workbench-core-base';
 import { EnvironmentTypeHandler } from '@aws/workbench-core-environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
+  const stackName = process.env.STACK_NAME!;
   const mainAccountAwsService = new AwsService({
     region: process.env.AWS_REGION!,
-    ddbTableName: process.env.STACK_NAME!
+    ddbTableName: stackName
   });
-  const accountHandler = new AccountHandler(mainAccountAwsService);
+  const accountService = new AccountService(mainAccountAwsService.helpers.ddb);
+  const hostingAccountLifecycleService = new HostingAccountLifecycleService(
+    stackName,
+    mainAccountAwsService,
+    accountService
+  );
+
+  const accountHandler = new AccountHandler(
+    mainAccountAwsService,
+    accountService,
+    hostingAccountLifecycleService
+  );
   const envTypeHandler = new EnvironmentTypeHandler(mainAccountAwsService);
   await accountHandler.execute(event);
   await envTypeHandler.execute(event);

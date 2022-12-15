@@ -6,7 +6,7 @@
 import fs from 'fs';
 import { join } from 'path';
 import { Readable } from 'stream';
-import { PutObjectCommand, S3, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import yaml from 'js-yaml';
 import { schema } from 'yaml-cfn';
@@ -112,6 +112,27 @@ export default class S3Service {
   }
 
   /**
+   * Get a presigned URL for a GetObjectCommand
+   * @param s3bucketName - name of the bucket
+   * @param key - name of the file to get from the bucket
+   * @param expirationSeconds - expiration in seconds of the presigned URL
+   *
+   * @returns A presigned URL
+   */
+  public async getPresignedUrl(
+    s3BucketName: string,
+    key: string,
+    expirationSeconds: number
+  ): Promise<string> {
+    // Sign the url
+    const command = new GetObjectCommand({
+      Bucket: s3BucketName,
+      Key: key
+    });
+    return getSignedUrl(this._s3, command, { expiresIn: expirationSeconds });
+  }
+
+  /**
    * Create a presigned URL for a signle-part file upload
    * @param s3BucketName - the name of the s3 bucket
    * @param prefix - the s3 prefix to upload to
@@ -123,15 +144,8 @@ export default class S3Service {
     prefix: string,
     timeToLiveSeconds: number
   ): Promise<string> {
-    const config: S3ClientConfig = {
-      credentials: await this._s3.config.credentials(),
-      region: this._s3.config.region
-    };
-
-    return await getSignedUrl(
-      new S3Client(config),
-      new PutObjectCommand({ Bucket: s3BucketName, Key: prefix }),
-      { expiresIn: timeToLiveSeconds }
-    );
+    return await getSignedUrl(this._s3, new PutObjectCommand({ Bucket: s3BucketName, Key: prefix }), {
+      expiresIn: timeToLiveSeconds
+    });
   }
 }

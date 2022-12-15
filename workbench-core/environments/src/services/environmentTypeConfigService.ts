@@ -11,7 +11,7 @@ import {
   DEFAULT_API_PAGE_SIZE
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { CreateEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/createEnvironmentTypeConfigRequest';
 import { DeleteEnvironmentTypeConfigRequest } from '../models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
 import {

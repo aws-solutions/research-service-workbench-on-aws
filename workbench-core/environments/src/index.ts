@@ -41,6 +41,7 @@ import {
   UpdateEnvironmentTypeRequestParser
 } from './models/environmentTypes/updateEnvironmentTypeRequest';
 import EventBridgeEventToDDB from './models/eventBridgeEventToDDB';
+import AuthorizationSetup from './postDeployment/authorizationSetup';
 import CognitoSetup from './postDeployment/cognitoSetup';
 import ServiceCatalogSetup from './postDeployment/serviceCatalogSetup';
 import CreateEnvironmentSchema from './schemas/createEnvironment';
@@ -61,6 +62,7 @@ export {
   isSortAttribute,
   ServiceCatalogSetup,
   CognitoSetup,
+  AuthorizationSetup,
   EnvironmentService,
   EnvironmentTypeService,
   Environment,

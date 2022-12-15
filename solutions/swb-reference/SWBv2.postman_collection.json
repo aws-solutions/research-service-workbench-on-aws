@@ -1,9 +1,8 @@
 {
   "info": {
-    "_postman_id": "c7f31b8c-0e10-4a2c-90f6-38fe38bfe8ed",
+    "_postman_id": "25fa19b0-59e4-464e-99cc-1798a7327954",
     "name": "SWBv2 Official",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "4320586"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -970,37 +969,337 @@
       ]
     },
     {
-      "name": "Create Hosting Account",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Cookie",
-            "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-            "type": "text"
-          },
-          {
-            "key": "csrf-token",
-            "value": "{{CSRF_TOKEN}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"]
             }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{API_URL}}/aws-accounts?Authorization={{ACCESS_TOKEN}}",
-          "host": ["{{API_URL}}"],
-          "path": ["aws-accounts"]
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users",
+              "host": ["{{API_URL}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"status\": \"ACTIVE\",\n    \"roles\": [\"Admin\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/users/:userId",
+              "host": ["{{API_URL}}"],
+              "path": ["users", ":userId"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "hosting accounts",
+      "items": [
+        {
+          "name": "Create Hosting Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"awsAccountId\": \"\",\n    \"envMgmtRoleArn\": \"\",\n    \"hostingAccountHandlerRoleArn\": \"\",\n    \"externalId\": \"workbench\",\n    \"encryptionKeyArn\": \"\",\n    \"environmentInstanceFiles\": \"s3://<S3_BUCKET_NAME>/environment-files\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts?Authorization={{ACCESS_TOKEN}}",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Hosting Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts/:accountId",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts", ":accountId"],
+              "variable": [
+                {
+                  "key": "accountId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hosting Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"sampleName\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/awsAccount/:accountId",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccount", ":accountId"],
+              "variable": [
+                {
+                  "key": "accountId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Hosting Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/awsAccounts",
+              "host": ["{{API_URL}}"],
+              "path": ["awsAccounts"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hosting Account Template Urls",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "default"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "default"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"externalId\": \"workbench\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{API_URL}}/awsAccountTemplateUrls"
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

@@ -17,7 +17,7 @@ import {
   UpdateEnvironmentTypeConfigRequestParser,
   ListEnvironmentTypeConfigsRequestParser
 } from '@aws/workbench-core-environments';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
 import { validateAndParse } from './validatorHelper';

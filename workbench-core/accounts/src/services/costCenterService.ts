@@ -16,23 +16,20 @@ import {
   addPaginationToken
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import Boom from '@hapi/boom';
-import { Account } from '../models/account';
+import * as Boom from '@hapi/boom';
+import { Account } from '../models/accounts/account';
 import { CostCenter, CostCenterParser } from '../models/costCenters/costCenter';
+import CreateCostCenterRequest from '../models/costCenters/createCostCenterRequest';
 import { DeleteCostCenterRequest } from '../models/costCenters/deleteCostCenterRequest';
 import { ListCostCentersRequest } from '../models/costCenters/listCostCentersRequest';
 import { UpdateCostCenterRequest } from '../models/costCenters/updateCostCenterRequest';
-import CreateCostCenterRequest from '../models/createCostCenterRequest';
 import AccountService from './accountService';
 
 export default class CostCenterService {
   private _dynamoDbService: DynamoDBService;
-  private readonly _tableName: string;
   private _resourceType: string = 'costCenter';
 
-  public constructor(constants: { TABLE_NAME: string }, dynamoDbService: DynamoDBService) {
-    const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
+  public constructor(dynamoDbService: DynamoDBService) {
     this._dynamoDbService = dynamoDbService;
   }
 
@@ -119,7 +116,6 @@ export default class CostCenterService {
 
   public async getCostCenter(costCenterId: string): Promise<CostCenter> {
     const response = (await this._dynamoDbService
-
       .get(buildDynamoDBPkSk(costCenterId, resourceTypeToKey.costCenter))
       .execute()) as GetItemCommandOutput;
 
@@ -132,27 +128,25 @@ export default class CostCenterService {
 
   public async create(request: CreateCostCenterRequest): Promise<CostCenter> {
     const id = uuidWithLowercasePrefix(resourceTypeToKey.costCenter);
-
     const account = await this._getAccount(request.accountId);
-
     const currentDateTime = new Date(Date.now()).toISOString();
 
     const costCenter: CostCenter = {
       createdAt: currentDateTime,
       updatedAt: currentDateTime,
       id: id,
+      dependency: request.accountId,
       accountId: request.accountId,
       description: request.description,
       name: request.name,
-      // Account data
       awsAccountId: account.awsAccountId,
-      encryptionKeyArn: account.encryptionKeyArn,
-      envMgmtRoleArn: account.envMgmtRoleArn,
-      environmentInstanceFiles: account.environmentInstanceFiles,
-      externalId: account.externalId,
       hostingAccountHandlerRoleArn: account.hostingAccountHandlerRoleArn,
-      subnetId: account.subnetId,
-      vpcId: account.vpcId
+      envMgmtRoleArn: account.envMgmtRoleArn,
+      encryptionKeyArn: account.encryptionKeyArn!,
+      subnetId: account.subnetId!,
+      vpcId: account.vpcId!,
+      environmentInstanceFiles: account.environmentInstanceFiles!,
+      externalId: account.externalId
     };
 
     const dynamoItem: { [key: string]: string } = {
@@ -184,12 +178,12 @@ export default class CostCenterService {
   }
 
   private async _getAccount(accountId: string): Promise<Account> {
-    const accountService = new AccountService(this._tableName);
-
+    const accountService = new AccountService(this._dynamoDbService);
     try {
       return await accountService.getAccount(accountId);
     } catch (e) {
-      throw Boom.badRequest(`Could not find account ${accountId}`);
+      console.error(`Failed to get account for cost center creation: ${e}`);
+      throw Boom.badRequest(`Failed to get account for cost center creation ${accountId}`);
     }
   }
 }

@@ -18,6 +18,12 @@ export class DatasetHelper {
     return response.AccessPointList!;
   }
 
+  public async listDatasetFileNames(bucket: string, dir: string): Promise<string[]> {
+    const response = await this._awsSdk.clients.s3.listObjectsV2({ Bucket: bucket, Prefix: dir });
+
+    return response.Contents?.map((file) => file.Key ?? '') ?? [];
+  }
+
   public async deleteS3AccessPoint(name: string, bucketAccount: string): Promise<void> {
     await this._awsSdk.clients.s3Control.deleteAccessPoint({
       Name: name,

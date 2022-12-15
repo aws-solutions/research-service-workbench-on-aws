@@ -5,62 +5,15 @@
 
 import { AuditService } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
+import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 import { StorageLocation } from './storageLocation';
-
-export interface CreateProvisionDatasetRequest {
-  /**
-   * the name of a DataSet
-   */
-  name: string;
-
-  /**
-   * (optional) a description of the dataset
-   */
-  description?: string;
-
-  /**
-   * (optional) the owner of the dataset
-   */
-  owner?: string;
-
-  /**
-   * (optional) the type of the dataset
-   */
-  type?: string;
-
-  /**
-   * a string which identifies the storage specific location such the URL to an S3 bucket.
-   */
-  storageName: string;
-
-  /**
-   * the storage path where the DataSet files can be found at the location.
-   */
-  path: string;
-
-  /**
-   * AWS Account ID of DataSet
-   */
-  awsAccountId?: string;
-
-  /**
-   * AWS region of the dataset storage
-   */
-  region?: string;
-
-  /**
-   * an instance of {@link DataSetsStoragePlugin} to provide the storage implementation
-   * for a particular platform, account, etc.
-   */
-  storageProvider: DataSetsStoragePlugin;
-}
 
 export class DataSetService {
   private _audit: AuditService;
@@ -327,18 +280,20 @@ export class DataSetService {
   /**
    * Create a presigned URL for a signle-part file upload
    * @param datasetId - the ID of the Dataset.
+   * @param fileName - the name of the file to upload.
    * @param timeToLiveSeconds - length of time (in seconds) the URL is valid.
    * @param storageProvider - an instance of DataSetsStoragePlugin intialized to access the endpoint.
    * @returns the presigned URL
    */
   public async getPresignedSinglePartUploadUrl(
     datasetId: string,
+    fileName: string,
     timeToLiveSeconds: number,
     storageProvider: DataSetsStoragePlugin
   ): Promise<string> {
     const dataset = await this.getDataSet(datasetId);
 
-    return await storageProvider.createPresignedUploadUrl(dataset, timeToLiveSeconds);
+    return await storageProvider.createPresignedUploadUrl(dataset, fileName, timeToLiveSeconds);
   }
 
   /**

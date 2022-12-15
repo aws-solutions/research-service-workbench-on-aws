@@ -7,10 +7,38 @@ import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { resourceTypeToKey, uuidRegExpAsString, envTypeIdRegExpString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
-  '/aws-accounts': {
+  '/awsAccounts': {
     POST: [
       {
         action: 'CREATE',
+        subject: 'Account'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/awsAccountTemplateUrls': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AccountTemplate'
+      }
+    ]
+  },
+  [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
         subject: 'Account'
       }
     ]
@@ -226,6 +254,26 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
         subject: 'User'
       }
     ]
