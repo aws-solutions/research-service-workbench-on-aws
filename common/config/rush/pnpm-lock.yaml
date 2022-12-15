@@ -696,7 +696,6 @@ importers:
       '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-authorization': workspace:*
-      '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -723,7 +722,6 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-authorization': link:../authorization
-      '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       aws-jwt-verify: 3.1.0
       axios: 0.27.2
