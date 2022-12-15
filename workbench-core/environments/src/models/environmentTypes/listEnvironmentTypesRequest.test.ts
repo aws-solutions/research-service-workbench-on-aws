@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import JSONValue from '@aws/workbench-core-base/lib/types/json';
 import { ListEnvironmentTypesRequestParser } from './listEnvironmentTypesRequest';
 
