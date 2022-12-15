@@ -39,8 +39,16 @@ export class WBCGroupManagemntPlugin implements GroupManagementPlugin {
   public getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     throw new Error('Method not implemented.');
   }
-  public addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
+    const { groupId, userId } = request;
+
+    try {
+      await this._userManagementService.addUserToRole(userId, groupId);
+      return { added: true };
+    } catch (e) {
+      // ToDo: Add logging
+      return { added: false };
+    }
   }
   public isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
