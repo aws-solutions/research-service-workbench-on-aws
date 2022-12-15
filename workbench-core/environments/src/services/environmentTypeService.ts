@@ -19,7 +19,7 @@ import {
 } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import { EnvironmentTypeStatus } from '../constants/environmentTypeStatus';
 import { EnvironmentType, EnvironmentTypeParser } from '../models/environmentTypes/environmentType';
 import { ListEnvironmentTypesRequest } from '../models/environmentTypes/listEnvironmentTypesRequest';

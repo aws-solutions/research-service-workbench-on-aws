@@ -5,7 +5,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import Csrf from 'csrf';
 import _ from 'lodash';
-import Qs from 'qs';
+import * as Qs from 'qs';
 import { getResources, Resources } from './resources';
 import Setup from './setup';
 import HttpError from './utils/HttpError';

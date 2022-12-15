@@ -5,12 +5,15 @@
 
 import crypto from 'crypto';
 import AwsService from './aws/awsService';
+import { SecretsServiceInterface } from './services/secretsService';
 
 export default class CognitoTokenService {
   private _aws: AwsService;
+  private _secretsService: SecretsServiceInterface;
 
-  public constructor(awsRegion: string) {
+  public constructor(awsRegion: string, secretsService: SecretsServiceInterface) {
     this._aws = new AwsService({ region: awsRegion });
+    this._secretsService = secretsService;
   }
 
   public async generateCognitoToken(params: {
@@ -41,7 +44,7 @@ export default class CognitoTokenService {
     } else if (rootPasswordParamStorePath === undefined && rootPassword === undefined) {
       throw new Error('Either "rootPasswordParamStorePath" or "rootPassword" should be defined');
     } else if (rootPasswordParamStorePath) {
-      password = await this._getSSMParamValue(rootPasswordParamStorePath);
+      password = await this._secretsService.getSecret(rootPasswordParamStorePath);
     }
     let userName: string = rootUserName || '';
     if (rootUserNameParamStorePath && rootUserName) {
@@ -51,7 +54,7 @@ export default class CognitoTokenService {
     } else if (rootUserNameParamStorePath === undefined && rootUserName === undefined) {
       throw new Error('Either "rootUserNameParamStorePath" or "rootUserName" should be defined');
     } else if (rootUserNameParamStorePath) {
-      userName = await this._getSSMParamValue(rootUserNameParamStorePath);
+      userName = await this._secretsService.getSecret(rootUserNameParamStorePath);
     }
 
     const clientSecret = await this._getClientSecret(userPoolId, clientId);
@@ -76,15 +79,6 @@ export default class CognitoTokenService {
       refreshToken: response.AuthenticationResult!.RefreshToken!,
       idToken: response.AuthenticationResult!.IdToken!
     };
-  }
-
-  private async _getSSMParamValue(ssmParamName: string): Promise<string> {
-    const response = await this._aws.clients.ssm.getParameter({
-      Name: ssmParamName,
-      WithDecryption: true
-    });
-
-    return response.Parameter!.Value!;
   }
 
   private async _getClientSecret(userPoolId: string, clientId: string): Promise<string> {

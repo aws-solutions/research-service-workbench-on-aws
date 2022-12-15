@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "add template api/route",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

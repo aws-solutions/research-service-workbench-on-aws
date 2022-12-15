@@ -20,7 +20,7 @@
 
 ## Pre-requisite for running aws-accounts integration test
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:
-#awsAccountId: ''
-#envMgmtRoleArn: ''
-#hostingAccountHandlerRoleArn: ''
-#encryptionKeyArn: ''
+# hostAwsAccountIdParamStorePath: ''
+# hostingAccountHandlerRoleArnParamStorePath: ''
+# envMgmtRoleArnParamStorePath: ''
+# encryptionKeyArnParamStorePath: ''

@@ -35,3 +35,8 @@ workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.te
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
 workbench-core/example/infrastructure/scripts/setupCognito.sh:44
+# Fake emails for UserManagementService integ tests
+solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivateUser.test.ts:31
+solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
+solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
+solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83

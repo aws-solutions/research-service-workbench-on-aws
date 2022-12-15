@@ -5,7 +5,7 @@
 
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';

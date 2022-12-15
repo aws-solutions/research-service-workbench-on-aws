@@ -7,6 +7,8 @@
 import _ from 'lodash';
 
 interface Setting {
+  hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
   runId: string;
   rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;

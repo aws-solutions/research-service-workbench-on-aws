@@ -58,7 +58,7 @@ export default class CollectionResource {
   }
 
   // List call
-  public async get(queryParams: Record<string, JSONValue>): Promise<AxiosResponse> {
+  public async get(queryParams: Record<string, JSONValue> | undefined = undefined): Promise<AxiosResponse> {
     return this._axiosInstance.get(this._api, { params: queryParams });
   }
 

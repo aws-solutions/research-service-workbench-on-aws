@@ -2,6 +2,10 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import {
+  AddDatasetPermissionsToRoleRequest,
+  CreateRegisterExternalBucketRoleRequest
+} from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -14,8 +18,8 @@ export default class Datasets extends CollectionResource {
     this._api = 'datasets';
   }
 
-  public dataset(params: DataSetCreateParams): Dataset {
-    return new Dataset(params);
+  public dataset(params: Omit<DataSetCreateParams, 'clientSession' | 'parentApi'>): Dataset {
+    return new Dataset({ ...params, clientSession: this._clientSession, parentApi: this._parentApi });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,10 +31,8 @@ export default class Datasets extends CollectionResource {
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
     const response: AxiosResponse = await this._axiosInstance.post(this._api, requestBody);
 
-    const createParams: DataSetCreateParams = {
+    const createParams = {
       id: response.data.id,
-      clientSession: this._clientSession,
-      parentApi: 'datasets',
       awsAccountId: response.data.awsAccountId,
       storageName: response.data.storageName,
       storagePath: response.data.path
@@ -60,6 +62,12 @@ export default class Datasets extends CollectionResource {
   }
   public async storageLocations(): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/storage`);
+  }
+  public async createRole(body: CreateRegisterExternalBucketRoleRequest): Promise<AxiosResponse> {
+    return this._axiosInstance.post(`${this._api}/iam`, body);
+  }
+  public async updateRole(body: AddDatasetPermissionsToRoleRequest): Promise<AxiosResponse> {
+    return this._axiosInstance.patch(`${this._api}/iam`, body);
   }
 
   protected _buildDefaults(resource: DataSetCreateRequest): DataSetCreateRequest {

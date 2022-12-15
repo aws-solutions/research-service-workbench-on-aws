@@ -24,6 +24,8 @@ interface Constants {
   AMI_IDS_TO_SHARE: string;
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
+  ACCT_HANDLER_ARN_OUTPUT_KEY: string;
+  API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
@@ -70,6 +72,8 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   const S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
+  const ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+  const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
 
@@ -92,6 +96,8 @@ function getConstants(): Constants {
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
     AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
     UI_CLIENT_URL: uiClientURL,
+    ACCT_HANDLER_ARN_OUTPUT_KEY,
+    API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
     COGNITO_DOMAIN,
     WEBSITE_URLS,

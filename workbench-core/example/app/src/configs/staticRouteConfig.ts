@@ -38,6 +38,20 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/datasets/iam': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetRole'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'DatasetRole'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
@@ -57,6 +71,14 @@ export const routesMap: RoutesMap = {
       {
         action: 'CREATE',
         subject: 'Endpoint'
+      }
+    ]
+  },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/presignedUpload`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetFile'
       }
     ]
   },

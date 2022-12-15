@@ -22,7 +22,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, { Router, Express, Request, Response } from 'express';
+import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
 import { setUpAuthRoutes } from './authRoutes';
@@ -40,7 +40,7 @@ import { setUpUserRoutes } from './userRoutes';
 export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const app: Express = express();
   app.disable('x-powered-by');
-  const router: Router = express.Router();
+  const router: Router = Router();
 
   app.use(
     cors({
@@ -49,7 +49,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
     })
   );
   // parse application/json
-  app.use(express.json());
+  app.use(json());
   app.use(cookieParser());
   app.use(csurf('none'));
 
