@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuditEntry, BaseAuditPlugin, Metadata } from '@aws/workbench-core-audit';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 
