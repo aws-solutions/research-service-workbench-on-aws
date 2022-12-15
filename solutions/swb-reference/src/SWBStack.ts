@@ -745,7 +745,6 @@ export class SWBStack extends Stack {
           JSON.stringify({
             stage: '$context.stage',
             requestTime: '$context.requestTime',
-            user: '$context.identity.user',
             requestId: '$context.requestId',
             integrationRequestId: '$context.integration.requestId',
             status: '$context.status',
