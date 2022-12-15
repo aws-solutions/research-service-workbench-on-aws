@@ -91,13 +91,13 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // Auditing
   const continueOnError = false;
   const requiredAuditValues = ['actor', 'source'];
-  const fieldsToMask = ['user', 'password'];
-  // TODO: Create a logger to write audit logs to an immutable logstream. Can logstream be set so they can't be deleted
-  // const writer: Writer = new CustomAuditLogger(logger);
+  // Masking fields 'codeVerifier' and 'code' because they're in the body of '/token' API
+  const fieldsToMask = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
   const writer: Writer = new CustomAuditLogger();
   const baseAuditPlugin: BaseAuditPlugin = new CustomAuditPlugin(writer);
   const auditService = new AuditService(baseAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
-  // const excludePaths = ['login','signin'];
+  // Excluding these paths since requesters will not be authenticated yet. Therefore, we cannot log their userId in the audit logs
+  // const excludePaths = ['/login', '/token', '/logout', '/refresh', '/loggedIn'];
   const excludePaths: string[] = [];
   app.use(WithAudit({ auditService, excludePaths, extractor: new CustomAuditExtractor() }));
 

@@ -12,6 +12,8 @@ export default class CustomAuditLogger implements Writer {
   // }
 
   public async write(metadata: unknown, auditEntry: AuditEntry): Promise<void> {
-    console.log(auditEntry);
+    const updatedAuditEntry = { ...auditEntry };
+    delete updatedAuditEntry.statusCode;
+    console.log(updatedAuditEntry);
   }
 }
