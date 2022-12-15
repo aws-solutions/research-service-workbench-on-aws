@@ -103,7 +103,7 @@ export interface DataSetMetadataPlugin {
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
 
   /**
-   * Lists the {@link StorageLocation}s being used by existing dataSets.
+   * Lists the {@link StorageLocation}s being used by existing datasets.
    *
    * @returns - a list of {@link StorageLocation}s
    */
