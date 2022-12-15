@@ -176,12 +176,6 @@ export default class DynamoDBService {
    * Queries the DynamoDB table.
    *
    * @param params - optional object of optional properties to generate a query request
-   * @returns Promise<PaginatedItemsResponse>
-
-  /**
-   * Queries the DynamoDB table.
-   *
-   * @param params - optional object of optional properties to generate a query request
    * @returns Promise<PaginatedJsonResponse>
    *
    * @example Use this to get paginated items from the DynamoDb table.

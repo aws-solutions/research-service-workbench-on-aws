@@ -4,5 +4,6 @@
   "compilerOptions": {
     "types": ["heft-jest", "node"],
     "lib": ["es2017", "dom"]
-  }
+  },
+  "exclude": ["node_modules", "lib"]
 }

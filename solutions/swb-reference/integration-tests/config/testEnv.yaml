@@ -19,7 +19,7 @@ rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
 defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
 
 ## Hosting account used for Account Creation tests
-hostAwsAccountIdParamStorePath: '/swb/dev/accountsTest/awsAccountId'
-hostingAccountHandlerRoleArnParamStorePath: '/swb/dev/accountsTest/hostingAccountHandlerRoleArn'
-envMgmtRoleArnParamStorePath: '/swb/dev/accountsTest/envMgmtRoleArn'
-encryptionKeyArnParamStorePath: '/swb/dev/accountsTest/encryptionKeyArn'
+hostAwsAccountIdParamStorePath: '/swb/testEnv/accountsTest/awsAccountId'
+hostingAccountHandlerRoleArnParamStorePath: '/swb/testEnv/accountsTest/hostingAccountHandlerRoleArn'
+envMgmtRoleArnParamStorePath: '/swb/testEnv/accountsTest/envMgmtRoleArn'
+encryptionKeyArnParamStorePath: '/swb/testEnv/accountsTest/encryptionKeyArn'
