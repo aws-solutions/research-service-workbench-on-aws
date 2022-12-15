@@ -26,9 +26,9 @@ import cors from 'cors';
 import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
-import CustomAuditLogger from './audit/customAuditLogger';
-import CustomAuditPlugin from './audit/customAuditPlugin';
-import CustomAuditExtractor from './audit/extractor';
+import SwbAuditExtractor from './audit/swbAuditExtractor';
+import SwbAuditLogger from './audit/swbAuditLogger';
+import SwbAuditPlugin from './audit/swbAuditPlugin';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
 import { setUpDSRoutes } from './datasetRoutes';
@@ -93,13 +93,11 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const requiredAuditValues = ['actor', 'source'];
   // Masking fields 'codeVerifier' and 'code' because they're in the body of '/token' API
   const fieldsToMask = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
-  const writer: Writer = new CustomAuditLogger();
-  const baseAuditPlugin: BaseAuditPlugin = new CustomAuditPlugin(writer);
+  const writer: Writer = new SwbAuditLogger();
+  const baseAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
   const auditService = new AuditService(baseAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
-  // Excluding these paths since requesters will not be authenticated yet. Therefore, we cannot log their userId in the audit logs
-  // const excludePaths = ['/login', '/token', '/logout', '/refresh', '/loggedIn'];
   const excludePaths: string[] = [];
-  app.use(WithAudit({ auditService, excludePaths, extractor: new CustomAuditExtractor() }));
+  app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
 
   // Dynamic routes
   apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {

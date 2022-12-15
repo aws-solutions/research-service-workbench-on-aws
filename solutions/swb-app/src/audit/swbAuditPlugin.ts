@@ -1,7 +1,7 @@
 import { AuditEntry, BaseAuditPlugin, Metadata } from '@aws/workbench-core-audit';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 
-export default class CustomAuditPlugin extends BaseAuditPlugin {
+export default class SwbAuditPlugin extends BaseAuditPlugin {
   /**
    * Modifies the audit entry to include recommended values for auditing
    * and prepares the {@link AuditEntry} for output.
