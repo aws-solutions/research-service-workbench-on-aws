@@ -450,8 +450,14 @@ export default class DynamoDBService {
   }
 
   public transactEdit(params?: {
-    addPutRequest?: Record<string, unknown>[];
+    addPutRequests?: {
+      item: Record<string, unknown>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, unknown>;
+    }[];
     addDeleteRequests?: Record<string, unknown>[];
+    addPutItems?: Record<string, unknown>[];
   }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
     if (params?.addDeleteRequests) {
@@ -459,9 +465,21 @@ export default class DynamoDBService {
         params.addDeleteRequests.map((request) => marshall(request))
       );
     }
-    if (params?.addPutRequest) {
+    if (params?.addPutItems) {
+      transactEdit = transactEdit.addPutItems(
+        params.addPutItems.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
+    }
+    if (params?.addPutRequests) {
       transactEdit = transactEdit.addPutRequests(
-        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        params.addPutRequests.map((request) => {
+          return {
+            item: marshall(request.item, { removeUndefinedValues: true }),
+            conditionExpression: request.conditionExpression,
+            expressionAttributeNames: request.expressionAttributeNames,
+            expressionAttributeValues: marshall(request.expressionAttributeValues)
+          };
+        })
       );
     }
     return transactEdit;

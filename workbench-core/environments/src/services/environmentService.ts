@@ -509,7 +509,7 @@ export class EnvironmentService {
     try {
       await this._aws.helpers.ddb
         .transactEdit({
-          addPutRequest: items
+          addPutItems: items
         })
         .execute();
     } catch (e) {
