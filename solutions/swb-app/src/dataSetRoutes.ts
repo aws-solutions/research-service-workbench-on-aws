@@ -59,8 +59,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       await dataSetService.addDataSetExternalEndpoint({
         dataSetId: req.params.id,
         externalEndpointName: req.body.externalEndpointName,
-        dataSetStoragePlugin: dataSetService.storagePlugin,
-        externalRoleName: req.body.externalRoleName
+        externalRoleName: req.body.externalRoleName,
+        kmsKeyArn: req.body.kmsKeyArn,
+        vpcId: req.body.vpcId
       });
       res.status(201).send();
     })

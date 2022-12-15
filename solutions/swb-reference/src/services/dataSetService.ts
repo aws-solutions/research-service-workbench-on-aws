@@ -3,10 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { CreateProvisionDatasetRequest } from '@aws/swb-app/lib/datasets/createProvisionDatasetRequest';
-import { DataSet } from '@aws/swb-app/lib/datasets/dataSet';
-import { DatasetPluginInterface } from '@aws/swb-app/lib/datasets/datasetPluginInterface';
-import { DataSetsStoragePluginInterface } from '@aws/swb-app/lib/datasets/dataSetsStoragePluginInterface';
+import {
+  CreateProvisionDatasetRequest,
+  DataSet,
+  DataSetExternalEndpointRequest,
+  DataSetPlugin,
+  DataSetStoragePlugin
+} from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
 import {
   DataSetMetadataPlugin,
@@ -14,35 +17,34 @@ import {
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 
-export class DataSetService implements DatasetPluginInterface {
-  public readonly storagePlugin: DataSetsStoragePluginInterface;
+export class DataSetService implements DataSetPlugin {
+  public readonly storagePlugin: DataSetStoragePlugin;
   private _workbenchDataSetService: WorkbenchDataSetService;
 
   public constructor(
-    storagePlugin: DataSetsStoragePluginInterface,
-    audit: AuditService,
-    log: LoggingService,
-    masterDbProvider: DataSetMetadataPlugin
+    dataSetStoragePlugin: DataSetStoragePlugin,
+    auditService: AuditService,
+    loggingService: LoggingService,
+    dataSetMetadataPlugin: DataSetMetadataPlugin
   ) {
-    this._workbenchDataSetService = new WorkbenchDataSetService(audit, log, masterDbProvider);
-    this.storagePlugin = storagePlugin;
+    this._workbenchDataSetService = new WorkbenchDataSetService(
+      auditService,
+      loggingService,
+      dataSetMetadataPlugin
+    );
+    this.storagePlugin = dataSetStoragePlugin;
   }
 
   public addDataSetExternalEndpoint(
-    dataSetId: string,
-    externalEndpointName: string,
-    storageProvider: DataSetsStoragePluginInterface,
-    externalRoleName?: string,
-    kmsKeyArn?: string,
-    vpcId?: string
+    request: DataSetExternalEndpointRequest
   ): Promise<Record<string, string>> {
     return this._workbenchDataSetService.addDataSetExternalEndpoint(
-      dataSetId,
-      externalEndpointName,
-      storageProvider,
-      externalRoleName,
-      kmsKeyArn,
-      vpcId
+      request.dataSetId,
+      request.externalEndpointName,
+      this.storagePlugin,
+      request.externalRoleName,
+      request.kmsKeyArn,
+      request.vpcId
     );
   }
 
