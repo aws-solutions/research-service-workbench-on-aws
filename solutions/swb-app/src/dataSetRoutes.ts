@@ -8,11 +8,11 @@ import { CreateDataSetSchema, CreateExternalEndpointSchema } from '@aws/workbenc
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import { DatasetPluginInterface } from './datasets/datasetPluginInterface';
+import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
-export function setUpDSRoutes(router: Router, dataSetService: DatasetPluginInterface): void {
+export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
     '/datasets',
@@ -56,12 +56,12 @@ export function setUpDSRoutes(router: Router, dataSetService: DatasetPluginInter
         throw Boom.badRequest('id request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
-      await dataSetService.addDataSetExternalEndpoint(
-        req.params.id,
-        req.body.externalEndpointName,
-        dataSetService.storagePlugin,
-        req.body.externalRoleName
-      );
+      await dataSetService.addDataSetExternalEndpoint({
+        dataSetId: req.params.id,
+        externalEndpointName: req.body.externalEndpointName,
+        dataSetStoragePlugin: dataSetService.storagePlugin,
+        externalRoleName: req.body.externalRoleName
+      });
       res.status(201).send();
     })
   );
@@ -78,7 +78,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DatasetPluginInter
     })
   );
 
-  // List datasets
+  // List dataSets
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {

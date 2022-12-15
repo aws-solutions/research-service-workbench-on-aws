@@ -13,14 +13,14 @@ import {
   EnvironmentTypeConfigService
 } from '@aws/workbench-core-environments';
 import { UserManagementService } from '@aws/workbench-core-user-management';
-import { DatasetPluginInterface } from './datasets/datasetPluginInterface';
+import { DataSetPlugin } from './dataSets/dataSetPlugin';
 
 export interface ApiRouteConfig {
   routes: ApiRoute[];
   environments: { [key: string]: Environment };
   account: HostingAccountService;
   environmentService: EnvironmentService;
-  dataSetService: DatasetPluginInterface;
+  dataSetService: DataSetPlugin;
   allowedOrigins: string[];
   environmentTypeService: EnvironmentTypeService;
   environmentTypeConfigService: EnvironmentTypeConfigService;

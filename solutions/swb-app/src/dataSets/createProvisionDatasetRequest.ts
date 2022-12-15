@@ -5,10 +5,10 @@
 
 /**
  * This interface represents a contract consumed by the DataSets service to interact
- * with an underlying stroage provider. This interface should be implemented for each
+ * with an underlying storage provider. This interface should be implemented for each
  * underlying storage mechanism used for providing DataSets item storage.
  */
-import { DataSetsStoragePluginInterface } from './dataSetsStoragePluginInterface';
+import { DataSetStoragePlugin } from './dataSetStoragePlugin';
 
 export interface CreateProvisionDatasetRequest {
   /**
@@ -55,5 +55,5 @@ export interface CreateProvisionDatasetRequest {
    * an instance of {@link DataSetsStoragePlugin} to provide the storage implementation
    * for a particular platform, account, etc.
    */
-  storageProvider: DataSetsStoragePluginInterface;
+  storageProvider: DataSetStoragePlugin;
 }

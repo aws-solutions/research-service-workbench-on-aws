@@ -6,7 +6,7 @@
 import { DataSet } from './dataSet';
 import { EndpointConnectionStrings } from './endpointConnectionStrings';
 
-export interface DataSetsStoragePluginInterface {
+export interface DataSetStoragePlugin {
   /**
    * Returns a constient identifier for the type of storage associated with the plugin.
    * This value should be unique for each storage plugin type.
