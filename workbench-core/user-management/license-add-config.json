@@ -1,6 +1,6 @@
 {
-  "license": "../../../apache-license-header.txt",
-  "ignoreFile": "../../../.licenseignorefile",
+  "license": "../../apache-license-header.txt",
+  "ignoreFile": "../../.licenseignorefile",
   "defaultFormat": {
     "gitignore|npmignore|eslintignore|dockerignore|sh|py": {
       "eachLine": {
