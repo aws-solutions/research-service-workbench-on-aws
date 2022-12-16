@@ -154,7 +154,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
+      '@aws/workbench-core-datasets': link:../../workbench-core/dataSets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@aws/workbench-core-user-management': link:../../workbench-core/user-management
@@ -273,7 +273,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
+      '@aws/workbench-core-datasets': link:../../workbench-core/dataSets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-infrastructure': link:../../workbench-core/infrastructure
       '@aws/workbench-core-logging': link:../../workbench-core/logging
@@ -431,7 +431,7 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
     dependencies:
-      '@aws/workbench-core-datasets-ui': link:../../../workbench-core/datasets-ui
+      '@aws/workbench-core-datasets-ui': link:../../../workbench-core/dataSets-ui
       '@aws/workbench-core-environments': link:../../../workbench-core/environments
       '@aws/workbench-core-environments-ui': link:../../../workbench-core/environments-ui
       '@aws/workbench-core-swb-common-ui': link:../../../workbench-core/swb-common-ui
@@ -550,7 +550,7 @@ importers:
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../datasets
+      '@aws/workbench-core-datasets': link:../dataSets
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       jsonschema: 1.4.1
@@ -1123,7 +1123,7 @@ importers:
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../datasets
+      '@aws/workbench-core-datasets': link:../dataSets
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
@@ -1193,7 +1193,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-accounts-ui': link:../accounts-ui
-      '@aws/workbench-core-datasets-ui': link:../datasets-ui
+      '@aws/workbench-core-datasets-ui': link:../dataSets-ui
       '@aws/workbench-core-environments': link:../environments
       '@aws/workbench-core-swb-common-ui': link:../swb-common-ui
       next: 12.1.6_ov7bzw4rj4kycia6cjutehc2sq
@@ -1310,7 +1310,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../authentication
       '@aws/workbench-core-authorization': link:../../authorization
       '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../datasets
+      '@aws/workbench-core-datasets': link:../../dataSets
       '@aws/workbench-core-logging': link:../../logging
       '@aws/workbench-core-user-management': link:../../user-management
       '@hapi/boom': 10.0.0
@@ -1418,7 +1418,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../authentication
       '@aws/workbench-core-authorization': link:../../authorization
       '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../datasets
+      '@aws/workbench-core-datasets': link:../../dataSets
       '@aws/workbench-core-environments': link:../../environments
       '@aws/workbench-core-example-app': link:../app
       '@aws/workbench-core-infrastructure': link:../../infrastructure

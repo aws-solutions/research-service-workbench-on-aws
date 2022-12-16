@@ -31,7 +31,7 @@ import SwbAuditLogger from './audit/swbAuditLogger';
 import SwbAuditPlugin from './audit/swbAuditPlugin';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
-import { setUpDSRoutes } from './datasetRoutes';
+import { setUpDSRoutes } from './dataSetRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
@@ -112,7 +112,7 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
-  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
+  setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
