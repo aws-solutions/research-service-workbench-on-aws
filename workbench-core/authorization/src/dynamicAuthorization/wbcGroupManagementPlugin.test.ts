@@ -32,7 +32,7 @@ describe('WBCGroupManagemntPlugin', () => {
   afterEach(jest.resetAllMocks);
 
   test('Response from addUserToGroup has added equal to true on succesfull call', async () => {
-    const userManagementService: UserManagementService = new UserManagementService(mockUserManagementPlugin);
+    const userManagementService = new UserManagementService(mockUserManagementPlugin);
     const wBCGroupManagemntPlugin = new WBCGroupManagemntPlugin(userManagementService);
 
     const { added } = await wBCGroupManagemntPlugin.addUserToGroup({
@@ -47,7 +47,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   test('Response from addUserToGroup has added equal to false when UserManagementService throws exception', async () => {
     mockUserManagementPlugin.addUserToRole = jest.fn().mockRejectedValue(new Error('Test error'));
-    const userManagementService: UserManagementService = new UserManagementService(mockUserManagementPlugin);
+    const userManagementService = new UserManagementService(mockUserManagementPlugin);
 
     const wBCGroupManagemntPlugin = new WBCGroupManagemntPlugin(userManagementService);
 

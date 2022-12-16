@@ -777,11 +777,13 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
+      zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-logging': link:../logging
       '@aws/workbench-core-user-management': link:../user-management
       '@casl/ability': 5.4.4
       lodash: 4.17.21
+      zod: 3.19.1
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
@@ -2182,6 +2184,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.182.0:
     resolution: {integrity: sha512-ZevTQ0qnpZpdVN503Au0TugVLl6SD24r9zZzBUOKFxbV47LCwr2hexKat/wQKMCUrtQ8MEQP6DzdcbM51XBmdg==}
     engines: {node: '>= 14.15.0'}
+    dependencies:
+      jsonschema: 1.4.1
+      semver: 7.3.8
     dev: false
     bundledDependencies:
       - jsonschema
@@ -2225,7 +2230,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.182.0
       '@aws-cdk/cx-api': 1.182.0
       '@aws-cdk/region-info': 1.182.0
+      '@balena/dockerignore': 1.0.2
       constructs: 3.4.25
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -2264,6 +2273,7 @@ packages:
     engines: {node: '>= 14.15.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.182.0
+      semver: 7.3.8
     dev: false
     bundledDependencies:
       - semver

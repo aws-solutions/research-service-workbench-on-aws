@@ -32,8 +32,18 @@ import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { GroupManagementPlugin } from './groupManagementPlugin';
 
 export class DynamicAuthorizationService {
+  private readonly _groupManagementPlugin: GroupManagementPlugin;
+
+  /**
+   *
+   * @param groupManagementPlugin - A plugin that implements the {@link GroupManagementPlugin} interface
+   */
+  public constructor(groupManagementPlugin: GroupManagementPlugin) {
+    this._groupManagementPlugin = groupManagementPlugin;
+  }
   /**
    * Initialize Dynamic Authorization Service
    * @param initRequest - {@link InitRequest}
@@ -154,7 +164,7 @@ export class DynamicAuthorizationService {
    * @returns - {@link AddUserToGroupResponse}
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
   }
 
   /**

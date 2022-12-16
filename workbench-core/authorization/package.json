@@ -32,7 +32,8 @@
     "@aws/workbench-core-logging": "workspace:*",
     "@aws/workbench-core-user-management": "workspace:*",
     "@casl/ability": "^5.4.3",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
