@@ -26,26 +26,6 @@ import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupSta
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
 
 describe('WBCGroupManagemntPlugin', () => {
-  const mockUserManagementPlugin: UserManagementPlugin = {
-    getUser: jest.fn(),
-    createUser: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
-    activateUser: jest.fn(),
-    deactivateUser: jest.fn(),
-    listUsers: jest.fn(),
-    listUsersForRole: jest.fn(),
-    listRoles: jest.fn(),
-    addUserToRole: jest.fn(),
-    removeUserFromRole: jest.fn(),
-    createRole: jest.fn(),
-    deleteRole: jest.fn()
-  };
-
-  afterEach(jest.resetAllMocks);
-});
-
-describe('WBCGroupManagemntPlugin', () => {
   const region = 'region';
   const table = 'fakeTable';
   const userGroupKeyType = 'USERGROUP';
@@ -185,7 +165,7 @@ describe('WBCGroupManagemntPlugin', () => {
         authenticatedUser: mockUser
       });
 
-      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('groupId', 'userId');
+      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
       expect(added).toBeTruthy();
     });
 

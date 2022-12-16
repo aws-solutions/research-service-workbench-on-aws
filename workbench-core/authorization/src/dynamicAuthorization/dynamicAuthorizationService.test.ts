@@ -20,7 +20,6 @@ describe('DynamicAuthorizationService', () => {
     getGroupUsers: jest.fn(),
     addUserToGroup: jest.fn(),
     isUserAssignedToGroup: jest.fn(),
-    doesGroupExist: jest.fn(),
     removeUserFromGroup: jest.fn(),
     getGroupStatus: jest.fn(),
     setGroupStatus: jest.fn()

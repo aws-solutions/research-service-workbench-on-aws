@@ -5,8 +5,10 @@
 
 import { z } from 'zod';
 
+/**
+ * Schema for DynamicPermissionsPlugin's assignUserToGroup
+ */
 // eslint-disable-next-line @rushstack/typedef-var
-
 export const AssignUserToGroupRequestParser = z
   .object({
     /**
