@@ -4,19 +4,15 @@
  */
 
 /* eslint-disable no-new */
-import { Aws, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { Aws, CfnOutput } from 'aws-cdk-lib';
 import { AccountPrincipal, PolicyDocument, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Key } from 'aws-cdk-lib/aws-kms';
+import { Key, KeyProps } from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
-export interface EncryptionKeyWithRotationProps {
-  encryptionKeyOutputName: string;
-}
+export class WorkbenchEncryptionKeyWithRotation extends Construct {
+  public readonly key: Key;
 
-export class EncryptionKeyWithRotation extends Construct {
-  public key: Key;
-
-  public constructor(scope: Construct, id: string, props?: EncryptionKeyWithRotationProps) {
+  public constructor(scope: Construct, id: string, props?: KeyProps) {
     super(scope, id);
 
     const mainKeyPolicy = new PolicyDocument({
@@ -30,16 +26,14 @@ export class EncryptionKeyWithRotation extends Construct {
       ]
     });
 
-    this.key = new Key(this, 'EncryptionKey', {
-      removalPolicy: RemovalPolicy.DESTROY,
+    this.key = new Key(this, `${id}-Key`, {
+      ...props,
       enableKeyRotation: true,
-      policy: mainKeyPolicy,
+      policy: props?.policy ?? mainKeyPolicy,
       alias: `alias/${id}`
     });
 
-    const encryptionKeyOutputName: string = props ? props.encryptionKeyOutputName : 'EncryptionKeyOutput';
-
-    new CfnOutput(this, encryptionKeyOutputName, {
+    new CfnOutput(this, `${id}-Output`, {
       value: this.key.keyArn
     });
   }
