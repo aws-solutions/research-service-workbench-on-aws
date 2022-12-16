@@ -20,9 +20,18 @@
     "<rootDir>/src/staticPermissionsConfig.ts",
     "<rootDir>/src/staticRouteConfig.ts",
     "<rootDir>/src/userRoutes.ts",
+    "<rootDir>/src/createProvisionDatasetRequest.ts",
+    "<rootDir>/src/dataSet.ts",
+    "<rootDir>/src/dataSetExternalEndpointRequest.ts",
+    "<rootDir>/src/dataSetPlugin.ts",
+    "<rootDir>/src/dataSetStoragePlugin.ts",
+    "<rootDir>/src/endpointConnectionStrings.ts",
+    "<rootDir>/src/externalEndpoint.ts",
+    "<rootDir>/src/storageLocation.ts",
 
     "<rootDir>/src/validatorHelper.ts",
     "<rootDir>/src/errorHandlers.ts"
+
   ],
   "coverageThreshold": {
     "global": {
