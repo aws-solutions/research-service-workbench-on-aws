@@ -49,7 +49,7 @@ export function WithAudit(
     }
     const extractor = auditConfig.extractor ?? BaseExtractor;
     const metadata: Metadata = extractor.getMetadata(req, res);
-    // TODO: Correctly propogate statusCode. StatusCode is not correct when an error is thrown. The error handler is executed after audit log is written, therefore status code is inaccurate
+    // TODO: Correctly propagate statusCode. StatusCode is not correct when an error is thrown. The error handler is executed after audit log is written, therefore status code is inaccurate
     // next();
     // metadata.statusCode = res.statusCode;
 
