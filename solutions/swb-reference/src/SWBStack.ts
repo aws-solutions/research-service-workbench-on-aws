@@ -89,7 +89,8 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      FIELDS_TO_MASK_WHEN_AUDITING
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -160,7 +161,11 @@ export class SWBStack extends Stack {
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
-    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
+    const apiLambda: Function = this._createAPILambda(
+      datasetBucket,
+      artifactS3Bucket,
+      FIELDS_TO_MASK_WHEN_AUDITING
+    );
     this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
     this._createRestApi(apiLambda);
 
@@ -618,14 +623,21 @@ export class SWBStack extends Stack {
     return lambda;
   }
 
-  private _createAPILambda(datasetBucket: Bucket, artifactS3Bucket: Bucket): Function {
+  private _createAPILambda(
+    datasetBucket: Bucket,
+    artifactS3Bucket: Bucket,
+    fieldsToMaskWhenAuditing: string[]
+  ): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: this.lambdaEnvVars,
+      environment: {
+        ...this.lambdaEnvVars,
+        FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
+      },
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
       memorySize: 832
     });

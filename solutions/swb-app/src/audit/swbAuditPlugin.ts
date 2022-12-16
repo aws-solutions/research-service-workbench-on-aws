@@ -4,7 +4,6 @@
  */
 
 import { AuditEntry, BaseAuditPlugin, Metadata } from '@aws/workbench-core-audit';
-// import * as ServerlessExpress from '@vendia/serverless-express';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 
 export default class SwbAuditPlugin extends BaseAuditPlugin {
