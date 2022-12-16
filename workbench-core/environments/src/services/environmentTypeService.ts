@@ -150,16 +150,19 @@ export default class EnvironmentTypeService {
     const currentDate = new Date().toISOString();
     const newEnvType: EnvironmentType = EnvironmentTypeParser.parse({
       id,
-      ...buildDynamoDBPkSk(id, resourceTypeToKey.envType),
       createdAt: currentDate,
       updatedAt: currentDate,
-      resourceType: this._resourceType,
       ...params
     });
-    const item = newEnvType as { [key: string]: unknown };
+
+    const dynamoItem: Record<string, unknown> = {
+      ...newEnvType,
+      resourceType: this._resourceType
+    };
+
     const response = await this._dynamoDbService.updateExecuteAndFormat({
       key: buildDynamoDBPkSk(id, resourceTypeToKey.envType),
-      params: { item }
+      params: { item: dynamoItem }
     });
     if (response.Attributes) {
       return EnvironmentTypeParser.parse(response.Attributes);

@@ -17,6 +17,8 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import { EnvironmentTypeConfig } from '../models/environmentTypeConfigs/environmentTypeConfig';
+import { EnvironmentType } from '../models/environmentTypes/environmentType';
 const envTypeId = '6a00ee50-6274-4050-9357-1062caa5b916';
 jest.mock('uuid', () => ({ v4: () => envTypeId }));
 
@@ -32,38 +34,26 @@ describe('environmentTypeService', () => {
   const TABLE_NAME = 'exampleDDBTable';
   const ddbServiceMock = new DynamoDBService({ region: 'us-east-1', table: TABLE_NAME });
   const envTypeService = new EnvironmentTypeService(ddbServiceMock);
-  const envType = {
+  const envType: EnvironmentType = {
     status: 'APPROVED',
     createdAt: '2022-06-20T18:32:09.985Z',
     name: 'Jupyter Notebook',
-    resourceType: 'envType',
     provisioningArtifactId: 'pa-dqwijdnwq12w2',
     params: {},
     updatedAt: '2022-06-20T18:36:14.358Z',
-    sk: `ET#${envTypeId}`,
     description: 'An Amazon SageMaker Jupyter Notebook',
     id: envTypeId,
-    pk: `ET#${envTypeId}`,
     productId: 'prod-dwqdqdqdwq2e3',
     type: 'sagemaker'
   };
   const envTypeConfigId = '40b01529-0c7f-4609-a1e2-715068da5f0e';
-  const envTypeConfig = {
+  const envTypeConfig: EnvironmentTypeConfig = {
     createdAt: '2022-06-17T16:28:40.360Z',
-    updatedBy: 'owner-123',
-    createdBy: 'owner-123',
     name: 'config 1',
-    allowRoleIds: [],
-    resourceType: 'envTypeConfig',
-    // provisioningArtifactId: 'pa-dewjn123',
     params: [],
     updatedAt: '2022-06-17T21:25:24.333Z',
-    sk: `${resourceTypeToKey.envType}#${envTypeId}${resourceTypeToKey.envTypeConfig}#${envTypeConfigId}`,
-    owner: 'owner-123',
     description: 'Example config 1',
     id: envTypeConfigId,
-    pk: 'ETC',
-    // productId: 'prod-dasjk123',
     type: 'sagemaker'
   };
   const listEnvTypeConfigCommandParams = {

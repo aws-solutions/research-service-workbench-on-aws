@@ -36,14 +36,11 @@ describe('environmentTypeConfigService', () => {
     status: 'APPROVED',
     createdAt: '2022-06-20T18:32:09.985Z',
     name: 'Jupyter Notebook',
-    resourceType: 'envType',
     provisioningArtifactId: 'pa-dqwijdnwq12w2',
     params: {},
     updatedAt: '2022-06-20T18:36:14.358Z',
-    sk: `ET#${envTypeId}`,
     description: 'An Amazon SageMaker Jupyter Notebook',
     id: envTypeId,
-    pk: `ET#${envTypeId}`,
     productId: 'prod-dwqdqdqdwq2e3',
     type: 'sagemaker'
   };

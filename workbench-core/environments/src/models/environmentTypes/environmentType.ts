@@ -7,8 +7,6 @@ import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const EnvironmentTypeParser = z.object({
-  pk: z.string(),
-  sk: z.string(),
   id: z.string(),
   productId: z.string(),
   provisioningArtifactId: z.string(),
@@ -16,7 +14,6 @@ export const EnvironmentTypeParser = z.object({
   name: z.string(),
   type: z.string(),
   params: CFNTemplateParametersParser,
-  resourceType: z.string(),
   status: z.enum(['APPROVED', 'NOT_APPROVED']),
   createdAt: z.string(),
   updatedAt: z.string()
