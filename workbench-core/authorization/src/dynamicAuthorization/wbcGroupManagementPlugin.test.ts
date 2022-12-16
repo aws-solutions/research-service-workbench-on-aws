@@ -41,7 +41,7 @@ describe('WBCGroupManagemntPlugin', () => {
       authenticatedUser: mockUser
     });
 
-    expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('groupId', 'userId');
+    expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     expect(added).toBeTruthy();
   });
 
@@ -57,7 +57,7 @@ describe('WBCGroupManagemntPlugin', () => {
       authenticatedUser: mockUser
     });
 
-    expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('groupId', 'userId');
+    expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     expect(added).toBeFalsy();
   });
 });
