@@ -106,6 +106,7 @@ importers:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-accounts': workspace:*
+      '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-authentication': workspace:*
       '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-base': workspace:*
@@ -126,6 +127,7 @@ importers:
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       '@types/uuid': ^8.3.4
+      '@vendia/serverless-express': ^4.5.4
       concurrently: ^7.0.0
       cookie-parser: ^1.4.6
       cors: ^2.8.5
@@ -148,6 +150,7 @@ importers:
       zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-accounts': link:../../workbench-core/accounts
+      '@aws/workbench-core-audit': link:../../workbench-core/audit
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-base': link:../../workbench-core/base
@@ -156,6 +159,7 @@ importers:
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@aws/workbench-core-user-management': link:../../workbench-core/user-management
       '@hapi/boom': 10.0.0
+      '@vendia/serverless-express': 4.8.0
       cookie-parser: 1.4.6
       cors: 2.8.5
       express: 4.18.1
