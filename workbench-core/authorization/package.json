@@ -38,6 +38,8 @@
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.212.0",
+    "@aws-sdk/client-s3": "^3.212.0",
+    "@aws-sdk/types": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
@@ -47,6 +49,7 @@
     "@types/heft-jest": "1.0.2",
     "@types/lodash": "^4.14.181",
     "@types/node": "^14",
+    "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
     "fast-check": "^2.24.0",

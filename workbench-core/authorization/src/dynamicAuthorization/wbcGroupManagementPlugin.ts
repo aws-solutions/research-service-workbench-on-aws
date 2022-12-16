@@ -1,7 +1,9 @@
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import { UserManagementService } from '@aws/workbench-core-user-management';
+import { PluginConfigurationError, UserManagementService } from '@aws/workbench-core-user-management';
+import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -71,14 +73,20 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
         .execute()) as GetItemCommandOutput;
 
       if (!response.Item) {
-        throw new Error(); // TODO throw correct error
+        throw new GroupNotFoundError(`Group "${groupId}" doesnt exist in the provided DDB table.`);
       }
 
       const { status } = GroupMetadataParser.parse(response.Item);
 
       return { status };
     } catch (error) {
-      throw new Error(); // TODO throw correct error(s)
+      if (error.name === 'ResourceNotFoundException') {
+        throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'ProvisionedThroughputExceededException' || error.name === 'RequestLimitExceeded') {
+        throw new TooManyRequestsError(error.message);
+      }
+      throw error;
     }
   }
   public async setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse> {

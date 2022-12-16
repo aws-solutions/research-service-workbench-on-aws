@@ -753,6 +753,8 @@ importers:
   ../../workbench-core/authorization:
     specifiers:
       '@aws-sdk/client-dynamodb': ^3.212.0
+      '@aws-sdk/client-s3': ^3.212.0
+      '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
@@ -766,6 +768,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
       fast-check: ^2.24.0
@@ -789,6 +792,8 @@ importers:
       zod: 3.19.1
     devDependencies:
       '@aws-sdk/client-dynamodb': 3.226.0
+      '@aws-sdk/client-s3': 3.226.0
+      '@aws-sdk/types': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -798,6 +803,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       depcheck: 1.4.3
       eslint: 8.16.0
       fast-check: 2.25.0
