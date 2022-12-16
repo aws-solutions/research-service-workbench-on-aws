@@ -5,3 +5,6 @@ awsRegionShortName: oh
 rootUserEmailParamStorePath: '/swb/demo/rootUser/email'
 allowedOrigins: ['http://localhost:3000']
 cognitoDomain: 'chamonix-dev-demo-domain'
+
+# Auditing
+fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]
