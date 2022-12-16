@@ -752,7 +752,11 @@ importers:
 
   ../../workbench-core/authorization:
     specifiers:
+      '@aws-sdk/client-dynamodb': ^3.212.0
+      '@aws-sdk/client-s3': ^3.212.0
+      '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@aws/workbench-core-user-management': workspace:*
       '@casl/ability': ^5.4.3
@@ -764,6 +768,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': ^4.14.181
       '@types/node': ^14
+      aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
       fast-check: ^2.24.0
@@ -777,12 +782,18 @@ importers:
       npm-package-json-lint-config-default: ^5.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
+      zod: ^3.19.1
     dependencies:
+      '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@aws/workbench-core-user-management': link:../user-management
       '@casl/ability': 5.4.4
       lodash: 4.17.21
+      zod: 3.19.1
     devDependencies:
+      '@aws-sdk/client-dynamodb': 3.226.0
+      '@aws-sdk/client-s3': 3.226.0
+      '@aws-sdk/types': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -792,6 +803,7 @@ importers:
       '@types/heft-jest': 1.0.2
       '@types/lodash': 4.14.182
       '@types/node': 14.18.20
+      aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       depcheck: 1.4.3
       eslint: 8.16.0
       fast-check: 2.25.0
@@ -2182,6 +2194,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/1.182.0:
     resolution: {integrity: sha512-ZevTQ0qnpZpdVN503Au0TugVLl6SD24r9zZzBUOKFxbV47LCwr2hexKat/wQKMCUrtQ8MEQP6DzdcbM51XBmdg==}
     engines: {node: '>= 14.15.0'}
+    dependencies:
+      jsonschema: 1.4.1
+      semver: 7.3.8
     dev: false
     bundledDependencies:
       - jsonschema
@@ -2225,7 +2240,11 @@ packages:
       '@aws-cdk/cloud-assembly-schema': 1.182.0
       '@aws-cdk/cx-api': 1.182.0
       '@aws-cdk/region-info': 1.182.0
+      '@balena/dockerignore': 1.0.2
       constructs: 3.4.25
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      minimatch: 3.1.2
     dev: false
     bundledDependencies:
       - fs-extra
@@ -2264,6 +2283,7 @@ packages:
     engines: {node: '>= 14.15.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 1.182.0
+      semver: 7.3.8
     dev: false
     bundledDependencies:
       - semver
@@ -2487,7 +2507,6 @@ packages:
       uuid: 8.3.2
     transitivePeerDependencies:
       - aws-crt
-    dev: false
 
   /@aws-sdk/client-ec2/3.226.0:
     resolution: {integrity: sha512-kTif4h6vl26GFLjqs7OzST/q9AxFHT7uTz2CzVpmgDhYEdZ/sHx8QxtmFp4JYLe6SXhy2HbsaHt37dnXNq6ssw==}
@@ -3176,7 +3195,6 @@ packages:
     dependencies:
       mnemonist: 0.38.3
       tslib: 2.4.1
-    dev: false
 
   /@aws-sdk/eventstream-codec/3.226.0:
     resolution: {integrity: sha512-6uPtR8vSwz3fqoZk9hrb6qBYdp3PJ22+JxV5Wimdesvow4kJXSgDQXIxEkxbv6SxB9tNRB4uJHD84RetHEi15Q==}
@@ -3306,7 +3324,6 @@ packages:
       '@aws-sdk/protocol-http': 3.226.0
       '@aws-sdk/types': 3.226.0
       tslib: 2.4.1
-    dev: false
 
   /@aws-sdk/middleware-endpoint/3.226.0:
     resolution: {integrity: sha512-EvLFafjtUxTT0AC9p3aBQu1/fjhWdIeK58jIXaNFONfZ3F8QbEYUPuF/SqZvJM6cWfOO9qwYKkRDbCSTYhprIg==}
@@ -13681,7 +13698,6 @@ packages:
     resolution: {integrity: sha512-2K9QYubXx/NAjv4VLq1d1Ly8pWNC5L3BrixtdkyTegXWJIqY+zLNDhhX/A+ZwWt70tB1S8H4BE8FLYEFyNoOBw==}
     dependencies:
       obliterator: 1.6.1
-    dev: false
 
   /mnth/2.0.0:
     resolution: {integrity: sha512-3ZH4UWBGpAwCKdfjynLQpUDVZWMe6vRHwarIpMdGLUp89CVR9hjzgyWERtMyqx+fPEqQ/PsAxFwvwPxLFxW40A==}
@@ -14227,7 +14243,6 @@ packages:
 
   /obliterator/1.6.1:
     resolution: {integrity: sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==}
-    dev: false
 
   /on-finished/2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}

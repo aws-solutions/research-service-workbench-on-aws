@@ -1,7 +1,6 @@
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
-import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupStatusRequest, GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -73,15 +72,6 @@ export interface GroupManagementPlugin {
    * @returns a {@link IsUserAssignedToGroupResponse}
    */
   isUserAssignedToGroup(request: IsUserAssignedToGroupRequest): Promise<IsUserAssignedToGroupResponse>;
-
-  /**
-   * Check if a group exists
-   *
-   * @param request - {@link DoesGroupExistRequest}
-   *
-   * @returns a {@link DoesGroupExistResponse}
-   */
-  doesGroupExist(request: DoesGroupExistRequest): Promise<DoesGroupExistResponse>;
 
   /**
    * Remove a user from a group

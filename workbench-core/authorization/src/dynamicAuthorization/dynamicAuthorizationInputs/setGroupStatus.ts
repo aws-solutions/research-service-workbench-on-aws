@@ -1,4 +1,4 @@
-import { GroupStatus } from '../groupStatus';
+import { GroupStatus } from '../models/GroupMetadata';
 
 /**
  * Request object for SetGroupStatus
