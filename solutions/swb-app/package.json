@@ -21,6 +21,7 @@
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
+    "jest": "jest",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
@@ -29,6 +30,16 @@
     "start": "heft start --clean",
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
   },
   "dependencies": {
     "@aws/workbench-core-accounts": "workspace:*",

@@ -11,7 +11,6 @@ import { AuditConfig, WithAudit } from './auditMiddleware';
 import AuditPlugin from './auditPlugin';
 import AuditService from './auditService';
 import { BaseExtractor } from './baseExtractor';
-import Metadata from './metadata';
 
 describe('Audit Middleware', () => {
   const mockRequest: Request = {} as Request;

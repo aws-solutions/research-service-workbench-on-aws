@@ -4,6 +4,7 @@
  */
 
 import { AuditEntry, BaseAuditPlugin, Metadata } from '@aws/workbench-core-audit';
+// import * as ServerlessExpress from '@vendia/serverless-express';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 
 export default class SwbAuditPlugin extends BaseAuditPlugin {
@@ -18,7 +19,6 @@ export default class SwbAuditPlugin extends BaseAuditPlugin {
     const { context } = getCurrentInvoke();
     auditEntry.awsRequestId = context.awsRequestId;
     auditEntry.logEventType = 'audit';
-    auditEntry.statusCode = metadata.statusCode;
     auditEntry.action = metadata.action;
     auditEntry.actor = metadata.actor;
     auditEntry.source = metadata.source;
