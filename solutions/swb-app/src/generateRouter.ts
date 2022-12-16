@@ -92,7 +92,6 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   const continueOnError = false;
   const requiredAuditValues = ['actor', 'source'];
   const fieldsToMask = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
-  console.log('fieldsToMask', fieldsToMask);
   const writer: Writer = new SwbAuditLogger();
   const swbAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
   const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
