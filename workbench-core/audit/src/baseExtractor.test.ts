@@ -68,7 +68,7 @@ describe('BaseExtractor', () => {
     });
   });
 
-  test('getMetadata with no user should throw error', () => {
+  test('getMetadata with no user should not throw error', () => {
     const res: Response = {
       locals: {}
     } as unknown as Response;
@@ -80,11 +80,13 @@ describe('BaseExtractor', () => {
       method: mockMethod,
       originalUrl: mockUrl
     } as unknown as Request;
-    try {
-      baseExtractor.getMetadata(req, res);
-      expect.hasAssertions();
-    } catch (err) {
-      expect(err.message).toBe('Error extracting metadata');
-    }
+    const metadata: Metadata = baseExtractor.getMetadata(req, res);
+    expect(metadata.action).toStrictEqual('GET /sample');
+    expect(metadata.source).toStrictEqual({
+      ip: sampleIp
+    });
+    expect(metadata.actor).toStrictEqual({
+      uid: 'user not found'
+    });
   });
 });
