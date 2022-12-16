@@ -94,8 +94,8 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   // Masking fields 'codeVerifier' and 'code' because they're in the body of '/token' API
   const fieldsToMask = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
   const writer: Writer = new SwbAuditLogger();
-  const baseAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
-  const auditService = new AuditService(baseAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
+  const swbAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
+  const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
   const excludePaths: string[] = [];
   app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
 
