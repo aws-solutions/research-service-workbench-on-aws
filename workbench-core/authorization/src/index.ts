@@ -26,3 +26,4 @@ export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFound
 export { DynamicAuthorizationService } from './dynamicAuthorization/dynamicAuthorizationService';
 export { WBCGroupManagemntPlugin } from './dynamicAuthorization/wbcGroupManagementPlugin';
 export { AssignUserToGroupRequestParser, AssignUserToGroupRequest } from './models/assignUserToGroup';
+export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';

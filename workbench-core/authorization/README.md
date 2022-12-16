@@ -5,7 +5,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-90.9%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-78.37%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.94%25-yellow.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-89.78%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-100%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-73.86%25-red.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-88.83%25-yellow.svg?style=flat) |
 
 ## Description
 The authorization component is a flexible and extensible RBAC(role base access control) typescript library. It is designed using the plugin-architecture to allow for developers to easily implement and extend this library. This authorization component currently functions at the route based level.
