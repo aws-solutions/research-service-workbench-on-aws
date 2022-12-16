@@ -21,6 +21,7 @@
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
+    "jest": "jest",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
     "pkg-json-lint": "npmPkgJsonLint -c ../../.npmpackagejsonlintrc.json .",
@@ -30,10 +31,21 @@
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
   },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
+  },
   "dependencies": {
     "@aws/workbench-core-accounts": "workspace:*",
     "@aws/workbench-core-authentication": "workspace:*",
     "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
@@ -46,7 +58,8 @@
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "uuid": "^8.3.2",
-    "zod": "^3.19.1"
+    "zod": "^3.19.1",
+    "@vendia/serverless-express": "^4.5.4"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",

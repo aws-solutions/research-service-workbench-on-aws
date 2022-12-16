@@ -10,3 +10,6 @@
 #userPoolId: ''
 #clientId: ''
 #clientSecret: ''
+
+# Auditing
+#fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]

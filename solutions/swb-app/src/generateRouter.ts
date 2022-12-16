@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuditService, BaseAuditPlugin, WithAudit, Writer } from '@aws/workbench-core-audit';
 import {
   csurf,
   verifyToken,
@@ -25,6 +26,9 @@ import cors from 'cors';
 import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import SwbAuditExtractor from './audit/swbAuditExtractor';
+import SwbAuditLogger from './audit/swbAuditLogger';
+import SwbAuditPlugin from './audit/swbAuditPlugin';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
 import { setUpDSRoutes } from './datasetRoutes';
@@ -83,6 +87,16 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
   app.use(withAuth(authorizationService, { logger: logger }));
+
+  // Auditing
+  const continueOnError = false;
+  const requiredAuditValues = ['actor', 'source'];
+  const fieldsToMask = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
+  const writer: Writer = new SwbAuditLogger();
+  const swbAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
+  const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
+  const excludePaths: string[] = [];
+  app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
 
   // Dynamic routes
   apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
