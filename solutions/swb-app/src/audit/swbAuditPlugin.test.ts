@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 jest.mock('@vendia/serverless-express', () => ({
   ...jest.requireActual('@vendia/serverless-express'),
   getCurrentInvoke: jest.fn().mockReturnValue({ context: { awsRequestId: 'randomAwsRequestId' } })
