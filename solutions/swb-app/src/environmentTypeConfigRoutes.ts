@@ -80,13 +80,13 @@ export function setUpEnvTypeConfigRoutes(
               paginationToken
             );
           if (dependencies?.data) {
-            const conflicEnvironments = dependencies.data.filter((e) => e.status !== 'FAILED');
-            if (conflicEnvironments.length > 0) {
-              const conflicSummary = conflicEnvironments
+            const activeEnvironments = dependencies.data.filter((e) => e.status !== 'FAILED');
+            if (activeEnvironments.length > 0) {
+              const activeEnvironmentsSummary = activeEnvironments
                 .map((e) => `Environment:'${e.id}' Status:'${e.status}'`)
                 .join('\n');
               throw Boom.conflict(
-                `There are active environments using this configuration: ${conflicSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
+                `There are active environments using this configuration: ${activeEnvironmentsSummary}. Please Terminate environments or wait until environments are in 'TERMINATED' status before trying to delete configuration.`
               );
             }
             paginationToken = dependencies.paginationToken;

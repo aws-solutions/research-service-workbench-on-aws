@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import JSONValue from '../../types/json';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CFNTemplateParametersParser = z.record(
@@ -26,12 +27,12 @@ export type CFNTemplateParameters = z.infer<typeof CFNTemplateParametersParser>;
 export interface CFNTemplate {
   AWSTemplateFormatVersion?: string;
   Description?: string;
-  Metadata?: {};
+  Metadata?: Record<string, JSONValue>;
   Parameters?: CFNTemplateParameters;
-  Rules?: {};
-  Mappings?: {};
-  Conditions?: {};
-  Transform?: {};
-  Resources: {};
-  Outputs?: {};
+  Rules?: Record<string, JSONValue>;
+  Mappings?: Record<string, JSONValue>;
+  Conditions?: Record<string, JSONValue>;
+  Transform?: Record<string, JSONValue>;
+  Resources: Record<string, JSONValue>;
+  Outputs?: Record<string, JSONValue>;
 }

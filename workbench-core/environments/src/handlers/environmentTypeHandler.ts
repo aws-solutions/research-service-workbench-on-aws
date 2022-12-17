@@ -57,12 +57,16 @@ export default class EnvironmentTypeHandler {
             }
           } catch (e) {
             console.log(
-              `An error ocurred while trying to process Provision Artifact: ${provisionArtifact.Id} - ${e}`
+              `An error ocurred while trying to process Provision Artifact: ${
+                provisionArtifact.Id
+              } - ${JSON.stringify(e)}`
             ); //continue process when a provision artifact fails
           }
         }
       } catch (e) {
-        console.log(`An error ocurred while trying to process Product: ${product.ProductId} - ${e}`); //continue process when a product fails
+        console.log(
+          `An error ocurred while trying to process Product: ${product.ProductId} - ${JSON.stringify(e)}`
+        ); //continue process when a product fails
       }
     }
   }
