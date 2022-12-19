@@ -7,7 +7,7 @@ export class DatasetHelper {
   private _awsSdk: AwsService;
   public constructor() {
     const setup = new Setup();
-    this._awsSdk = setup.getMainAwsClient();
+    this._awsSdk = setup.getMainAwsClient('ExampleDataSetDDBTableName');
   }
 
   public async listAccessPoints(bucket: string, accountId: string): Promise<Array<AccessPoint>> {

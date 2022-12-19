@@ -38,7 +38,7 @@ rushx cdk:deploy
 ```
 
 #### OR
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L15)
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L17)
 
 ### Run Integration Test
 ```bash
