@@ -6,7 +6,7 @@
 import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
-import Settings from './utils/settings';
+import Settings, { Setting } from './utils/settings';
 
 export default class Setup {
   private _settings: Settings;
@@ -42,11 +42,6 @@ export default class Setup {
       const awsRegion = this._settings.get('AwsRegion');
 
       const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
-      const hostAwsAccountId = await secretsService.getSecret(
-        this._settings.get('hostAwsAccountIdParamStorePath')
-      );
-      this._settings.set('hostAwsAccountId', hostAwsAccountId);
-
       const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
       const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,
@@ -66,10 +61,10 @@ export default class Setup {
     return `ExampleStack`;
   }
 
-  public getMainAwsClient(): AwsService {
+  public getMainAwsClient(tableName: keyof Setting): AwsService {
     return new AwsService({
       region: this._settings.get('AwsRegion'),
-      ddbTableName: this._settings.get('ExampleDynamoDBTableName')
+      ddbTableName: this._settings.get(tableName)
     });
   }
 

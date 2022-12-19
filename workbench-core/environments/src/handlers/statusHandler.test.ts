@@ -6,7 +6,7 @@
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
 import { EnvironmentService, Environment } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';

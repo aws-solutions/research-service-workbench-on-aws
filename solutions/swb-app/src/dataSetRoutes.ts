@@ -4,23 +4,15 @@
  */
 
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
-import {
-  CreateDataSetSchema,
-  CreateExternalEndpointSchema,
-  DataSetService,
-  DataSetsStoragePlugin
-} from '@aws/workbench-core-datasets';
+import { CreateDataSetSchema, CreateExternalEndpointSchema } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
+import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { wrapAsync } from './errorHandlers';
 import { processValidatorResult } from './validatorHelper';
 
-export function setUpDSRoutes(
-  router: Router,
-  dataSetService: DataSetService,
-  dataSetStoragePlugin: DataSetsStoragePlugin
-): void {
+export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
     '/datasets',
@@ -32,7 +24,7 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetService.storagePlugin
       });
 
       res.status(201).send(dataSet);
@@ -50,7 +42,7 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetService.storagePlugin
       });
       res.status(201).send(dataSet);
     })
@@ -64,12 +56,13 @@ export function setUpDSRoutes(
         throw Boom.badRequest('id request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
-      await dataSetService.addDataSetExternalEndpoint(
-        req.params.id,
-        req.body.externalEndpointName,
-        dataSetStoragePlugin,
-        req.body.externalRoleName
-      );
+      await dataSetService.addDataSetExternalEndpoint({
+        dataSetId: req.params.id,
+        externalEndpointName: req.body.externalEndpointName,
+        externalRoleName: req.body.externalRoleName,
+        kmsKeyArn: req.body.kmsKeyArn,
+        vpcId: req.body.vpcId
+      });
       res.status(201).send();
     })
   );
@@ -86,7 +79,7 @@ export function setUpDSRoutes(
     })
   );
 
-  // List datasets
+  // List dataSets
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {

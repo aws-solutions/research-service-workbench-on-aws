@@ -5,11 +5,15 @@
 
 import { AccountHandler, AccountService, HostingAccountLifecycleService } from '@aws/workbench-core-accounts';
 import { AwsService } from '@aws/workbench-core-base';
+import { EnvironmentTypeHandler } from '@aws/workbench-core-environments';
 
 /* eslint-disable-next-line */
 export async function handler(event: any) {
   const stackName = process.env.STACK_NAME!;
-  const mainAccountAwsService = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: stackName });
+  const mainAccountAwsService = new AwsService({
+    region: process.env.AWS_REGION!,
+    ddbTableName: stackName
+  });
   const accountService = new AccountService(mainAccountAwsService.helpers.ddb);
   const hostingAccountLifecycleService = new HostingAccountLifecycleService(
     stackName,
@@ -22,5 +26,7 @@ export async function handler(event: any) {
     accountService,
     hostingAccountLifecycleService
   );
+  const envTypeHandler = new EnvironmentTypeHandler(mainAccountAwsService);
   await accountHandler.execute(event);
+  await envTypeHandler.execute(event);
 }
