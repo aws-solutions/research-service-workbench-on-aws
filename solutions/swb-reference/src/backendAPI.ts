@@ -67,12 +67,11 @@ const apiRouteConfig: ApiRouteConfig = {
     new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
-  environmentTypeService: new EnvironmentTypeService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
-  environmentTypeConfigService: new EnvironmentTypeConfigService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeService: new EnvironmentTypeService(aws.helpers.ddb),
+  environmentTypeConfigService: new EnvironmentTypeConfigService(
+    new EnvironmentTypeService(aws.helpers.ddb),
+    aws.helpers.ddb
+  ),
   projectService: new ProjectService({
     TABLE_NAME: process.env.STACK_NAME!
   }),

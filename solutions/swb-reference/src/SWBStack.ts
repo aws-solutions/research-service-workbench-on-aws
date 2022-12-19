@@ -558,6 +558,26 @@ export class SWBStack extends Stack {
           resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
         }),
         new PolicyStatement({
+          sid: 'SearchProductsAsAdmin',
+          actions: ['servicecatalog:SearchProductsAsAdmin'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+        }),
+        new PolicyStatement({
+          sid: 'ListProvisioningArtifacts',
+          actions: ['servicecatalog:ListProvisioningArtifacts'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:product/*`]
+        }),
+        new PolicyStatement({
+          sid: 'DescribeProvisioningArtifact',
+          actions: ['servicecatalog:DescribeProvisioningArtifact'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:product/*`]
+        }),
+        new PolicyStatement({
+          sid: 'GetObject',
+          actions: ['s3:GetObject'],
+          resources: [`arn:aws:s3:::${this.lambdaEnvVars.STACK_NAME}*`]
+        }),
+        new PolicyStatement({
           actions: ['kms:Decrypt', 'kms:GenerateDataKey', 'kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
           resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
           sid: 'KMSAccess'
