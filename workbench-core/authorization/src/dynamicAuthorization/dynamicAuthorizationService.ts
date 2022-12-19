@@ -32,8 +32,15 @@ import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { GroupManagementPlugin } from './groupManagementPlugin';
 
 export class DynamicAuthorizationService {
+  private _groupManagementPlugin: GroupManagementPlugin;
+
+  public constructor(config: { groupManagementPlugin: GroupManagementPlugin }) {
+    this._groupManagementPlugin = config.groupManagementPlugin;
+  }
+
   /**
    * Initialize Dynamic Authorization Service
    * @param initRequest - {@link InitRequest}
@@ -96,7 +103,25 @@ export class DynamicAuthorizationService {
    * @throws - {@link GroupAlreadyExistsError} Can not create a group that already exists
    */
   public async createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
-    throw new Error('Not implemented');
+    const { created } = await this._groupManagementPlugin.createGroup(createGroupRequest);
+    if (!created) {
+      return { created: false };
+    }
+
+    const { statusSet } = await this._groupManagementPlugin.setGroupStatus({
+      groupId: createGroupRequest.groupId,
+      status: 'active'
+    });
+    if (statusSet) {
+      return { created: true };
+    }
+
+    // group was created, but status was not set. Need to delete the group.
+    const { deleted } = await this._groupManagementPlugin.deleteGroup(createGroupRequest);
+    if (!deleted) {
+      // TODO this is bad. group was created, but could not be deleted. What to do?
+    }
+    return { created: false };
   }
 
   /**

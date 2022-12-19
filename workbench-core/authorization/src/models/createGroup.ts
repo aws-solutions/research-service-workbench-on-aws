@@ -3,21 +3,27 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { z } from 'zod';
+
 /**
  * Request object for DynamicPermissionsPlugin's createGroup
  */
-export interface CreateGroupRequest {
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const CreateGroupRequestParser = z.object({
   /**
    * GroupID being created
    * GroupID must be unique
    */
-  groupId: string;
+  groupId: z.string(),
 
   /**
    * Description of group
    */
-  description?: string;
-}
+  description: z.string().optional()
+});
+
+export type CreateGroupRequest = z.infer<typeof CreateGroupRequestParser>;
 
 /**
  * Response object for DynamicPermissionsPlugin's createGroup

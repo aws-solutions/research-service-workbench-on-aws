@@ -18,8 +18,10 @@ import {
   PluginConfigurationError
 } from '@aws/workbench-core-user-management';
 import { mockClient } from 'aws-sdk-client-mock';
+import { AuthenticatedUser } from '../authenticatedUser';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
+import { CreateGroupResponse } from '../models/createGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
@@ -28,6 +30,10 @@ describe('WBCGroupManagemntPlugin', () => {
   const region = 'region';
   const table = 'fakeTable';
   const userGroupKeyType = 'USERGROUP';
+  const mockUser: AuthenticatedUser = {
+    id: 'sampleId',
+    roles: []
+  };
 
   const mockUserManagementPlugin: UserManagementPlugin = {
     getUser: jest.fn(),
@@ -63,6 +69,25 @@ describe('WBCGroupManagemntPlugin', () => {
   afterEach(() => {
     jest.resetAllMocks();
     ddbMock.reset();
+  });
+
+  describe('createGroup', () => {
+    it('returns `created` as true when the group was successfully created', async () => {
+      const groupId = 'groupId';
+
+      const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<CreateGroupResponse>({ created: true });
+    });
+
+    it('returns `created` as false when an error is thrown creating the group', async () => {
+      const groupId = 'groupId';
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new Error());
+
+      const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<CreateGroupResponse>({ created: false });
+    });
   });
 
   describe('setGroupStatus', () => {

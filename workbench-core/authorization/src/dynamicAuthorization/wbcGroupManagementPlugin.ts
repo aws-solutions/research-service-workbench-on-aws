@@ -40,8 +40,14 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     this._ddbService = config.ddbService;
     this._userGroupKeyType = config.userGroupKeyType;
   }
-  public createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse> {
+    const { groupId } = request;
+    try {
+      await this._userManagementService.createRole(groupId);
+      return { created: true };
+    } catch (error) {
+      return { created: false };
+    }
   }
   public deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Method not implemented.');

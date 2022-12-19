@@ -90,6 +90,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'DELETE',
     subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'POST',
+    subject: 'AuthorizationGroup'
   }
 ];
 
