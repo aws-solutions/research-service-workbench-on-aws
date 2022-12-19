@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-authentication",
   "version": "0.1.1",
   "description": "Package to handle server-side authentication",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -29,18 +29,17 @@
     "test:only": "heft test --clean --no-build"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.118.1",
     "@aws/workbench-core-authorization": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1",
     "csurf": "^1.11.0",
-    "jsonschema": "^1.4.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.118.1",
-    "@aws-sdk/types": "^3.110.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
+    "@aws-sdk/client-s3": "^3.212.0",
+    "@aws-sdk/types": "^3.212.0",
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
@@ -54,7 +53,6 @@
     "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "license-check-and-add": "^4.0.5",
     "license-checker": "^25.0.1",

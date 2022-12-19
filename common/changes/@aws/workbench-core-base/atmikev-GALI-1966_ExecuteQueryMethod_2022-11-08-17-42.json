@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "Added new method to replace `query.execute()` because it's static return type doesn't match its runtime return type.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

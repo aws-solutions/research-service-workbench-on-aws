@@ -701,7 +701,9 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new NotAuthorizedException({ $metadata: {} }));
+      cognitoMock
+        .on(DescribeUserPoolClientCommand)
+        .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
 
       await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError(
@@ -711,7 +713,9 @@ describe('CognitoAuthenticationPlugin tests', () => {
     });
 
     it('should throw PluginConfigurationError when the service doesnt have correct permissions', async () => {
-      cognitoMock.on(DescribeUserPoolClientCommand).rejects(new ResourceNotFoundException({ $metadata: {} }));
+      cognitoMock
+        .on(DescribeUserPoolClientCommand)
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin['_getTokensExpirationinMS']()).rejects.toThrow(
         new PluginConfigurationError('invalid user pool id or client id')

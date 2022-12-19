@@ -130,7 +130,7 @@ const authorizationService:AuthorizationService = new AuthorizationService(
 );
 ```
 ### 6. Utilize isAuthorizedOnRoute from AuthorizationService
-`isAuthorizedOnRoute` requires a [AuthenticatedUser](https://github.com/awslabs/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) and the route and method they are trying to access. This request will throw an `Error` if a user is not authorized.
+`isAuthorizedOnRoute` requires a [AuthenticatedUser](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) and the route and method they are trying to access. This request will throw an `Error` if a user is not authorized.
 ```ts
 const guestUser:AuthenticatedUser = {
 	id: 'sampleId',
@@ -145,7 +145,7 @@ try {
 ```
 
 ## Integrating with ExpressJS using Middleware
-Authorization implemented as a middleware is a common use case. This library contains an authorization middleware that integrates with ExpressJS. The middleware expects an [AuthenticatedUser](https://github.com/awslabs/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) to be made availabe to it by using the [local variables](https://expressjs.com/en/api.html#res.locals) of ExpressJS. 
+Authorization implemented as a middleware is a common use case. This library contains an authorization middleware that integrates with ExpressJS. The middleware expects an [AuthenticatedUser](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/workbench-core/authentication/src/authenticatedUser.ts) to be made availabe to it by using the [local variables](https://expressjs.com/en/api.html#res.locals) of ExpressJS. 
 ```ts
 const app = express();
 

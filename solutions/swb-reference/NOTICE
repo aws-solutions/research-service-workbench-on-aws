@@ -1,68 +1,68 @@
 @aws/workbench-core-environments
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/eslint-config-workbench-core-eslint-custom
-0.0.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.0.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/swb-app
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-audit
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-authentication
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-authorization
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-base
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-datasets
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-infrastructure
-0.1.0 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.0 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
 ******************************
 
 @aws/workbench-core-logging
-0.1.1 <https://github.com/awslabs/solution-spark-on-aws>
+0.1.1 <https://github.com/aws-solutions/solution-spark-on-aws>
 license: Apache-2.0
 authors: Amazon Web Services <http://aws.amazon.com>
 
@@ -4505,7 +4505,7 @@ aws-cdk-lib
 ******************************
 
 aws-jwt-verify
-3.1.0 <https://github.com/awslabs/aws-jwt-verify>
+3.1.0 <https://github.com/aws-solutions/aws-jwt-verify>
 
                                  Apache License
                            Version 2.0, January 2004

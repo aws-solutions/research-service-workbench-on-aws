@@ -13,6 +13,106 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Account'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Account'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'AccountTemplate'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'CostCenter'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'Dataset'
+  },
+  {
+    effect: 'ALLOW',
     action: 'CREATE',
     subject: 'Environment'
   },
@@ -34,21 +134,6 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
-    subject: 'Dataset'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'READ',
-    subject: 'Dataset'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'UPDATE',
-    subject: 'Dataset'
-  },
-  {
-    effect: 'ALLOW',
-    action: 'CREATE',
     subject: 'EnvironmentType'
   },
   {
@@ -74,6 +159,11 @@ const adminPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'UPDATE',
+    subject: 'EnvironmentTypeConfig'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
     subject: 'EnvironmentTypeConfig'
   },
   {
@@ -100,6 +190,16 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'READ',
     subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'User'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'User'
   }
 ];
 
@@ -107,32 +207,32 @@ const researcherPermissions: Permission[] = [
   {
     effect: 'ALLOW',
     action: 'CREATE',
-    subject: 'Environment'
+    subject: 'Dataset'
   },
   {
     effect: 'ALLOW',
     action: 'READ',
-    subject: 'Environment'
+    subject: 'Dataset'
   },
   {
     effect: 'ALLOW',
     action: 'UPDATE',
-    subject: 'Environment'
+    subject: 'Dataset'
   },
   {
     effect: 'ALLOW',
     action: 'CREATE',
-    subject: 'Dataset'
+    subject: 'Environment'
   },
   {
     effect: 'ALLOW',
     action: 'READ',
-    subject: 'Dataset'
+    subject: 'Environment'
   },
   {
     effect: 'ALLOW',
     action: 'UPDATE',
-    subject: 'Dataset'
+    subject: 'Environment'
   },
   {
     effect: 'ALLOW',

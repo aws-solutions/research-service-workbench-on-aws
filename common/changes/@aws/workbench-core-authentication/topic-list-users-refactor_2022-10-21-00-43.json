@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authentication",
+      "comment": "BREAKING CHANGE: `listUsers` returns a list of `User` instead of a list of user ids.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authentication"
+}

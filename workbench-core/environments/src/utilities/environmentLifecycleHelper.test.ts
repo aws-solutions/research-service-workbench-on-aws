@@ -69,7 +69,6 @@ describe('EnvironmentLifecycleHelper', () => {
       outputs: [],
       projectId: '',
       status: 'PENDING',
-      datasetIds: [],
       envTypeConfigId: '',
       updatedAt: '',
       updatedBy: '',
@@ -112,7 +111,6 @@ describe('EnvironmentLifecycleHelper', () => {
       outputs: [],
       projectId: '',
       status: 'PENDING',
-      datasetIds: [],
       envTypeConfigId: '',
       updatedAt: '',
       updatedBy: '',
@@ -134,6 +132,7 @@ describe('EnvironmentLifecycleHelper', () => {
     helper.dataSetService.getDataSet = jest.fn(async () => {
       return {
         storageName: 'sampleStorageName',
+        storageType: 'sampleStorageType',
         path: 'sampleBucketPath',
         name: 'sampleDataset',
         externalEndpoints: []

@@ -4,13 +4,78 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
+import { resourceTypeToKey, uuidRegExpAsString, envTypeIdRegExpString } from '@aws/workbench-core-base';
 
 export const routesMap: RoutesMap = {
-  '/aws-accounts': {
+  '/awsAccounts': {
     POST: [
       {
         action: 'CREATE',
         subject: 'Account'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/awsAccountTemplateUrls': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AccountTemplate'
+      }
+    ]
+  },
+  [`/awsAccounts/${resourceTypeToKey.account.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Account'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'Account'
+      }
+    ]
+  },
+  '/costCenters': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'CostCenter'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'CostCenter'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
+      }
+    ]
+  },
+  [`/costCenters/${resourceTypeToKey.costCenter.toLowerCase()}-${uuidRegExpAsString}/softDelete`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'CostCenter'
       }
     ]
   },
@@ -28,7 +93,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/datasets/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/datasets/${resourceTypeToKey.dataset.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -66,7 +131,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -74,7 +139,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/connections': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -82,7 +147,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/start': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -90,7 +155,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/stop': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -98,7 +163,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/terminate': {
+  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -112,29 +177,23 @@ export const routesMap: RoutesMap = {
         action: 'READ',
         subject: 'EnvironmentType'
       }
-    ],
-    POST: [
-      {
-        action: 'CREATE',
-        subject: 'EnvironmentType'
-      }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}': {
+  [`/environmentTypes/${envTypeIdRegExpString}`]: {
     GET: [
       {
         action: 'READ',
         subject: 'EnvironmentType'
       }
     ],
-    PUT: [
+    PATCH: [
       {
         action: 'UPDATE',
         subject: 'EnvironmentType'
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations': {
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations`]: {
     GET: [
       {
         action: 'READ',
@@ -148,7 +207,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environmentTypes/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/configurations/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+  [`/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}`]:
     {
       GET: [
         {
@@ -156,9 +215,15 @@ export const routesMap: RoutesMap = {
           subject: 'EnvironmentTypeConfig'
         }
       ],
-      PUT: [
+      PATCH: [
         {
           action: 'UPDATE',
+          subject: 'EnvironmentTypeConfig'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
           subject: 'EnvironmentTypeConfig'
         }
       ]
@@ -189,6 +254,26 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'User'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'User'
+      }
+    ],
+    GET: [
+      {
+        action: 'READ',
         subject: 'User'
       }
     ]

@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "Added object parsing and changed db method",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

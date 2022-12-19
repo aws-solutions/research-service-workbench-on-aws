@@ -32,8 +32,13 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
 
     const { datasetsBucketArn, mainAccountRegion, mainAccountId, mainAcctEncryptionArn } =
       await this.helper.getCfnOutputs();
+
+    const datasetIds: string[] =
+      envMetadata.DATASETS?.map((dataSet: { id: string }) => {
+        return dataSet.id;
+      }) || [];
     const { s3Mounts, iamPolicyDocument } = await this.helper.getDatasetsToMount(
-      envMetadata.datasetIds,
+      datasetIds,
       envMetadata,
       mainAcctEncryptionArn
     );

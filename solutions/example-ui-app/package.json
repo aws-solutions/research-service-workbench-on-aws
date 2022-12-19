@@ -2,10 +2,10 @@
   "name": "@aws/example-ui-app",
   "version": "0.0.1",
   "description": "This is a prototype app and you should modify the source code to reflect your project needs",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -49,6 +49,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@next/eslint-plugin-next": "^13.0.3",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",
@@ -62,8 +63,8 @@
     "babel-jest": "27.5.1",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-config-next": "12.1.5",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-testing-library": "5.0.1",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",

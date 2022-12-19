@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-datasets",
   "version": "0.1.2",
   "description": "Access and management of data files for the purpose of connecting to various AWS environments.",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -40,11 +40,11 @@
   },
   "dependencies": {
     "@aws-cdk/aws-iam": "^1.159.0",
-    "@aws-sdk/client-dynamodb": "^3.118.1",
-    "@aws-sdk/client-kms": "^3.118.1",
-    "@aws-sdk/client-s3": "^3.118.1",
-    "@aws-sdk/client-s3-control": "^3.118.1",
-    "@aws-sdk/types": "^3.110.0",
+    "@aws-sdk/client-dynamodb": "^3.212.0",
+    "@aws-sdk/client-kms": "^3.212.0",
+    "@aws-sdk/client-s3": "^3.212.0",
+    "@aws-sdk/client-s3-control": "^3.212.0",
+    "@aws-sdk/types": "^3.212.0",
     "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
@@ -67,7 +67,6 @@
     "aws-sdk-client-mock": "^0.6.2",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "fast-check": "^2.24.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",

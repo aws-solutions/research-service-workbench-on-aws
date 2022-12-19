@@ -6,6 +6,6 @@
 export interface EnvTypeConfigItem {
   id: string;
   name: string;
-  estimatedCost: number;
+  estimatedCost: string;
   type: string;
 }

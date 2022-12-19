@@ -2,10 +2,10 @@
   "name": "@aws/workbench-core-swb-common-ui",
   "version": "0.0.1",
   "description": "Package that contains common SWB UI components.",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -45,6 +45,7 @@
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
     "@cloudscape-design/components": "^3.0.27",
+    "@next/eslint-plugin-next": "^13.0.3",
     "@rushstack/eslint-config": "^3.0.0",
     "@rushstack/heft": "^0.47.5",
     "@rushstack/heft-jest-plugin": "^0.3.28",
@@ -55,7 +56,8 @@
     "@types/uuid": "^8.3.4",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "istanbul-badges-readme": "1.8.1",
     "license-check-and-add": "^4.0.5",
     "license-checker": "^25.0.1",

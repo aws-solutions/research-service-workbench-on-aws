@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AwsService, CognitoTokenService } from '@aws/workbench-core-base';
+import { AwsService, CognitoTokenService, SecretsService } from '@aws/workbench-core-base';
 import _ from 'lodash';
 import ClientSession from './clientSession';
 import Settings from './utils/settings';
@@ -37,17 +37,20 @@ export default class Setup {
     if (this._defaultAdminSession === undefined) {
       const userPoolId = this._settings.get('cognitoUserPoolId');
       const clientId = this._settings.get('cognitoUserPoolClientId');
-      const rootUsername = this._settings.get('rootUsername');
+      const rootUserNameParamStorePath = this._settings.get('rootUserNameParamStorePath');
       const rootPasswordParamStorePath = this._settings.get('rootPasswordParamStorePath');
       const awsRegion = this._settings.get('awsRegion');
+      const secretsService = new SecretsService(new AwsService({ region: awsRegion }).clients.ssm);
 
-      const cognitoTokenService = new CognitoTokenService(awsRegion);
-      const { accessToken } = await cognitoTokenService.generateCognitoToken(
+      await this._loadSecrets(secretsService);
+
+      const cognitoTokenService = new CognitoTokenService(awsRegion, secretsService);
+      const { accessToken } = await cognitoTokenService.generateCognitoToken({
         userPoolId,
         clientId,
-        rootUsername,
+        rootUserNameParamStorePath,
         rootPasswordParamStorePath
-      );
+      });
 
       const session = this._getClientSession(accessToken);
       this._sessions.push(session);
@@ -88,5 +91,20 @@ export default class Setup {
 
   private _getClientSession(accessToken?: string): ClientSession {
     return new ClientSession(this, accessToken);
+  }
+
+  private async _loadSecrets(secretsService: SecretsService): Promise<void> {
+    const [hostAwsAccountId, hostingAccountHandlerRoleArn, envMgmtRoleArn, encryptionKeyArn] =
+      await Promise.all([
+        secretsService.getSecret(this._settings.get('hostAwsAccountIdParamStorePath')),
+        secretsService.getSecret(this._settings.get('hostingAccountHandlerRoleArnParamStorePath')),
+        secretsService.getSecret(this._settings.get('envMgmtRoleArnParamStorePath')),
+        secretsService.getSecret(this._settings.get('encryptionKeyArnParamStorePath'))
+      ]);
+
+    this._settings.set('hostAwsAccountId', hostAwsAccountId);
+    this._settings.set('hostingAccountHandlerRoleArn', hostingAccountHandlerRoleArn);
+    this._settings.set('envMgmtRoleArn', envMgmtRoleArn);
+    this._settings.set('encryptionKeyArn', encryptionKeyArn);
   }
 }

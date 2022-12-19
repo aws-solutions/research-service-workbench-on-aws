@@ -8,7 +8,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 
-import { join } from 'path';
+import { join, basename } from 'path';
 import { Readable } from 'stream';
 import { _Object } from '@aws-sdk/client-s3';
 import { InvalidParametersException, ProductViewDetail } from '@aws-sdk/client-service-catalog';
@@ -157,7 +157,7 @@ export default class ServiceCatalogSetup {
 
   private async _uploadTemplateToS3(s3Bucket: string, prefix: string, filePaths: string[]): Promise<void> {
     for (const filePath of filePaths) {
-      const fileName = filePath.split('/').pop();
+      const fileName = basename(filePath);
       // nosemgrep
       const fileContent = fs.readFileSync(filePath);
       const putObjectParam = {
@@ -212,7 +212,7 @@ export default class ServiceCatalogSetup {
     }
     const envsToFilePath: { [key: string]: string } = {};
     cfnFilePaths.forEach((filePath: string) => {
-      const fileName = filePath.split('/').pop();
+      const fileName = basename(filePath);
       if (fileName) {
         const localCfnTemplateMd5Sum = md5File.sync(cfnFilePaths[0]);
         // eslint-disable-next-line security/detect-object-injection

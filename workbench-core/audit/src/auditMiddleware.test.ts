@@ -11,7 +11,6 @@ import { AuditConfig, WithAudit } from './auditMiddleware';
 import AuditPlugin from './auditPlugin';
 import AuditService from './auditService';
 import { BaseExtractor } from './baseExtractor';
-import Metadata from './metadata';
 
 describe('Audit Middleware', () => {
   const mockRequest: Request = {} as Request;
@@ -19,7 +18,6 @@ describe('Audit Middleware', () => {
   const next: NextFunction = jest.fn(() => {
     mockResponse.statusCode = 200;
   });
-  const metadata: Metadata = Object.assign(mockMetadata, { statusCode: 200 });
 
   let auditMiddleware: (req: Request, res: Response, next: NextFunction) => Promise<void>;
   let auditConfig: AuditConfig;
@@ -41,7 +39,6 @@ describe('Audit Middleware', () => {
       excludePaths
     };
     auditMiddleware = WithAudit(auditConfig);
-    metadata.statusCode = 200;
     jest.clearAllMocks();
   });
 

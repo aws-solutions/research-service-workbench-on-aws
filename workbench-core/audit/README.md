@@ -5,7 +5,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-98.41%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-92.3%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-97.01%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-92.3%25-brightgreen.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-100%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-98.43%25-brightgreen.svg?style=flat) |
 
 ## Description
 The audit component is a flexible and extensible auditing library. It is designed with the plugin-architecture to allow developers to decide and implement their own process of storing audit logs.
@@ -120,7 +120,7 @@ extractor?: Extractor;
 ```
 - **auditService**: A configured audit service
 - **excludePaths**: An array string with paths to exclude from auditing
-- **extractor**: An extractor used to extract the metadata. This gives developers flexibility in the way they want to extract the metadata from the Request and Response. The default is set to [BaseExtractor](https://github.com/awslabs/solution-spark-on-aws/blob/main/workbench-core/audit/src/baseExtractor.ts).
+- **extractor**: An extractor used to extract the metadata. This gives developers flexibility in the way they want to extract the metadata from the Request and Response. The default is set to [BaseExtractor](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/workbench-core/audit/src/baseExtractor.ts).
 ```ts
 const app = express();
 const excludePaths = ['\login','\signin'];

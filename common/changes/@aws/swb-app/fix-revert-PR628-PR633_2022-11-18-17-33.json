@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "revert to 2ae2a9a",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

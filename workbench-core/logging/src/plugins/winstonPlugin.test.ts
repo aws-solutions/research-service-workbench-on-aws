@@ -26,7 +26,7 @@ jest.mock('winston', () => ({
 jest.mock('./winstonTransports/consoleTransport');
 
 import { fc, itProp } from 'jest-fast-check';
-import winston, { LoggerOptions, transports } from 'winston';
+import { LoggerOptions, transports, createLogger } from 'winston';
 import { ConsoleTransport, LogMessageObject, WinstonPlugin } from '..';
 
 describe('WinstonPlugin tests', () => {
@@ -34,7 +34,7 @@ describe('WinstonPlugin tests', () => {
     it('should use defaults when transports is undefined', () => {
       new WinstonPlugin();
 
-      expect(winston.createLogger).lastReturnedWith(
+      expect(createLogger).lastReturnedWith(
         expect.objectContaining({
           transports: expect.arrayContaining([expect.any(ConsoleTransport)])
         })
@@ -46,7 +46,7 @@ describe('WinstonPlugin tests', () => {
 
       new WinstonPlugin(userTransports);
 
-      expect(winston.createLogger).lastReturnedWith(
+      expect(createLogger).lastReturnedWith(
         expect.objectContaining({
           transports: expect.arrayContaining([...userTransports])
         })

@@ -13,7 +13,7 @@ These manual steps will not be required in the final implementation of SWBv2.
 * An AWS account for hosting environments. This account will be called the `Hosting Account`.
 * Software
   * [Rush](https://rushjs.io/pages/developer/new_developer/) v5.62.1 or later. We'll be using this tool to manage the packages in our mono-repo
-  * Node 14.x or 16.x [(compatible node versions)](https://github.com/awslabs/solution-spark-on-aws/blob/main/rush.json#L9)
+  * Node 14.x or 16.x [(compatible node versions)](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/rush.json#L9)
   * [POSTMAN](https://www.postman.com/) (Optional) This is used for making API requests to the server. POSTMAN is not needed if you already have a preferred API client. 
 * The requirements below are for running the lambda locally 
    * Install SAM CLI ([link](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html))
@@ -155,77 +155,107 @@ Custom values that needed to be provided by you will be `<INSIDE THIS>`
 }
 ```
 
-**Create Environment Type**
+**Retrieve Environment Type**
 
-Log into AWS `Main Account`, and navigate to `Service Catalog`. Find the portfolio `swb-<stage>-<awsRegionShortName>`, and make note of the following values
-* productId: `Product ID` of `sagemakerNotebook` product
-* provisioningArtifactId: This value can be found by clicking on the `sagemakerNotebook` product. There should be one version of the
-  `sagemakerNotebook` product. Copy that version's id. It should be in the format `pa-<random letter and numbers>`
-
-In POSTMAN, uses the `envType` => `Create envType` request to make a request with the following `body`
+In POSTMAN, use the `envType` => `List envTypes` request to retrieve the `id` property for the environment type.
+If there aren't any environment types displaying in the response wait for account handler to run. It runs once every 5 minutes.
+Once the account handler finishes, running the `List envTypes` request in postman should return a json with the following format
 ```json
 {
-    "status": "APPROVED",
-    "name": "Sagemaker Jupyter Notebook",
+    "id": "et-<productId>,<provisioningArtifactId>",
     "productId": "<productId>",
     "provisioningArtifactId": "<provisioningArtifactId>",
-    "allowedRoleIds": [],
-    "params": [
+    "description": "description",
+    "name": "name",
+    "type": "sagemakerNotebook",
+    "status": "NOT_APPROVED",
+    "createdAt": "2022-07-21T21:24:57.171Z",
+    "updatedAt": "2022-07-21T21:24:57.171Z",
+    "params": 
         {
-            "DefaultValue": "ml.t3.xlarge",
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "EC2 instance type to launch",
-            "ParameterKey": "InstanceType"
-        },
-        {
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "Number",
-            "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
-            "ParameterKey": "AutoStopIdleTimeInMinutes"
-        },
-        {
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "The IAM policy to be associated with the launched workstation",
-            "ParameterKey": "IamPolicyDocument"
-        },
-        {
-            "DefaultValue": "1.1.1.1/1",
-            "IsNoEcho": false,
-            "ParameterConstraints": {
-                "AllowedValues": []
-            },
-            "ParameterType": "String",
-            "Description": "CIDR to restrict IPs that can access the environment",
-            "ParameterKey": "CIDR"
+            "DatasetsBucketArn": {
+                    "Description": "Name of the datasets bucket in the main account",
+                    "Type": "String"
+                },
+                "EncryptionKeyArn": {
+                    "Description": "The ARN of the KMS encryption Key used to encrypt data in the notebook",
+                    "Type": "String"
+                },
+                "AccessFromCIDRBlock": {
+                    "Default": "10.0.0.0/19",
+                    "Description": "The CIDR used to access sagemaker notebook",
+                    "Type": "String"
+                },
+                "VPC": {
+                    "Description": "VPC for Sagemaker Notebook",
+                    "Type": "AWS::EC2::VPC::Id"
+                },
+                "S3Mounts": {
+                    "Description": "A JSON array of objects with name, bucket and prefix properties used to mount data",
+                    "Type": "String"
+                },
+                "Namespace": {
+                    "Description": "An environment name that will be prefixed to resource names",
+                    "Type": "String"
+                },
+                "MainAccountId": {
+                    "Description": "The Main Account ID where application is deployed",
+                    "Type": "String"
+                },
+                "MainAccountKeyArn": {
+                    "Description": "The ARN of main account bucket encryption key",
+                    "Type": "String"
+                },
+                "IamPolicyDocument": {
+                    "Description": "The IAM policy to be associated with the launched workstation",
+                    "Type": "String"
+                },
+                "EnvironmentInstanceFiles": {
+                    "Description": "An S3 URI (starting with \"s3://\") that specifies the location of files to be copied to the environment instance, including any bootstrap scripts",
+                    "Type": "String"
+                },
+                "MainAccountRegion": {
+                    "Description": "The region of application deployment in main account",
+                    "Type": "String"
+                },
+                "InstanceType": {
+                    "Default": "ml.t3.xlarge",
+                    "Description": "EC2 instance type to launch",
+                    "Type": "String"
+                },
+                "Subnet": {
+                    "Description": "Subnet for Sagemaker Notebook, from the VPC selected above",
+                    "Type": "AWS::EC2::Subnet::Id"
+                },
+                "AutoStopIdleTimeInMinutes": {
+                    "Description": "Number of idle minutes for auto stop to shutdown the instance (0 to disable auto-stop)",
+                    "Type": "Number"
+                }
         }
-    ],
-    "description": "An Amazon SageMaker Jupyter Notebook",
-    "type": "sagemakerNotebook"
 }
 ```
 
 In the response make note of the `id` that was returned. We'll need it for the next step. We'll call this `id` value as `ENV_TYPE_ID`.
 
+**Approve Environment Type**
+
+In POSTMAN, use the `envType` => `Update envType` request to change the `status` of environemnt type to `APPROVED`.
+For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+```json
+{
+    "status": "APPROVED"
+}
+```
+
 **Create Environment Type Config**
 
-In POSTMAN, uses the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
+In POSTMAN, use the `envTypeConfig` => `Create envTypeConfig` request to make a request. For the path variable `envTypeId`, use `ENV_TYPE_ID` from the previous step. Make a request with the following `body`. 
 ```json
 {
     "type": "sagemakerNotebook",
     "description": "Description for config 1",
     "name": "Config 1",
-    "allowedRoleIds": [], 
+    "estimatedCost": "estimated cost",
     "params": [
      {
       "key": "IamPolicyDocument",
@@ -251,7 +281,7 @@ If you would like to launch a sagemaker notebook instance with a different insta
 
 ### Setup Account Resources
 #### Onboard hosting account
-Start by going over to `solutions/swb-ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
+Start by going over to `solutions/swb-ui/ui` and run `rushx start`. This will allow you to access the SWB UI by going to `http://localhost:3000` in your web browser. From here, click `Login` and setup your admin user (a temporary password should have been sent to the rootUserEmail defined in your `<STAGE>.yaml` file). Once logged in, go to dev tools and grab the accessToken in localStorage. This will need to be added to all POSTMAN request headers as `Authorization`. Note: Be very careful not to share the accessToken with anyone else!!
 
 Use POSTMAN or your favorite API client to hit this API. Remember to replace `API_URL` with the `APIGatewayAPIEndpoint` when you deployed SWBv2 to your main account.
 
@@ -271,9 +301,9 @@ POST `{{API_URL}}/aws-accounts`
 Wait for account handler to run. It runs once every 5 minutes. You'll know that it's completed when the account status 
 is listed as `CURRENT` in DDB. You can find cloudwatch logs for the account handler in the `Main account`. It's at `aws/lambda/swb-<stage>-<awsRegionShortName>-accountHandlerLambda`
 
-## Setup UI 
+## Setup UI
 
-Follow the instructions [here](../swb-ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS. 
+Follow the instructions [here](../swb-ui/ui/README.md#deploy-ui-to-aws) to deploy the SWB UI to AWS.
 
 # Test the API
 
@@ -363,7 +393,7 @@ Replace `:id` with the `id` value from launching the environment. You should rec
 
 # User Management
 Going to the SWB UI `http:localhost:3000/users` (or your CloudFront distribution if you deployed swb-ui) allows you to see and create additional Researchers.
-In order to create new Admins: 
+In order to create new Admins:
 1. You must go to the Cognito console in your AWS Console.
 1. Under "User pools", look for and click on `swb-userpool-<stage>-<abbreviation>`.
 1. Under the Users tab, click the "Create user" button to create a new user.

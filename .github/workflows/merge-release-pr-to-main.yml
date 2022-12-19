@@ -1,0 +1,68 @@
+#
+#  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#  SPDX-License-Identifier: Apache-2.0
+#
+
+name: Merge-release-pr-to-main
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to merge
+        required: true
+
+jobs:
+  merge-release-pr-to-main:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions-cool/check-user-permission@v2
+        id: check_admin
+        with:
+          require: 'admin'
+          username: ${{ github.triggering_actor }}
+
+      - name: Get PR info
+        id: pr_info
+        uses: octokit/request-action@v2.x
+        with:
+          route: GET /repos/{owner}/{repo}/pulls/{pull_number}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          pull_number: ${{ inputs.pr_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: enable merge commits
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: merge release branch pr to main
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          pull_number: ${{ inputs.pr_number }}
+          merge_method: 'merge'
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: disable merge commits
+        if: steps.check_admin.outputs.require-result && startsWith(fromJson(steps.pr_info.outputs.data).head.ref, 'release/') && fromJson(steps.pr_info.outputs.data).base.ref == 'main'
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}

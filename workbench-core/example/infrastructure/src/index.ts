@@ -9,10 +9,16 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { App, Aspects } from 'aws-cdk-lib';
 import { AwsSolutionsChecks } from 'cdk-nag';
-import { InfrastructureStack } from './infrastructure-stack';
+import { ExampleStack } from './example-stack';
 
 const app: App = new cdk.App();
+
 // eslint-disable-next-line no-new
-new InfrastructureStack(app, 'InfrastructureStack');
+new ExampleStack(app, 'ExampleStack', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  }
+});
 
 Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));

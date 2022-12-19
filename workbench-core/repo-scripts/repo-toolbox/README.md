@@ -8,7 +8,7 @@ Most mono-repositories contain a top-level `README.md` file which outlines the c
 - Package: the `package.json` defined `name` for each package.
 - README: a link to the `README.md` file for that package.
 
-The following example is a snapshot from the [solution-spark-on-aws README.md](https://github.com/awslabs/solution-spark-on-aws/blob/main/README.md).
+The following example is a snapshot from the [solution-spark-on-aws README.md](https://github.com/aws-solutions/solution-spark-on-aws/blob/main/README.md).
 
 ### --- Begin Example ---
 <!-- GENERATED PROJECT SUMMARY START -->

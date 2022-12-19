@@ -10,7 +10,7 @@ import {
   ENVIRONMENT_STOP_MAX_WAITING_SECONDS,
   ENVIRONMENT_TERMINATE_MAX_WAITING_SECONDS
 } from '../../support/utils/constants';
-import { uuidRegExp } from '../../support/utils/regExpressions';
+import { envUuidRegExp } from '../../support/utils/regExpressions';
 import { poll } from '../../support/utils/utilities';
 
 describe('multiStep environment test', () => {
@@ -30,7 +30,7 @@ describe('multiStep environment test', () => {
     console.log('Creating Environment A');
     const { data: environmentA } = await adminSession.resources.environments.create();
     expect(environmentA).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
       provisionedProductId: '', // empty string because provisionedProductId  has not been propagated by statusHandler yet
       status: 'PENDING',
@@ -42,7 +42,7 @@ describe('multiStep environment test', () => {
     console.log('Creating Environment B');
     const { data: environmentB } = await adminSession.resources.environments.create();
     expect(environmentB).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       instanceId: '', // empty string because instanceId value has not been propagated by statusHandler yet
       provisionedProductId: '', // empty string because provisionedProductId  has not been propagated by statusHandler yet
       status: 'PENDING',
@@ -61,7 +61,7 @@ describe('multiStep environment test', () => {
       .environment(environmentA.id)
       .get();
     expect(environmentACompleted).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'COMPLETED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
@@ -79,7 +79,7 @@ describe('multiStep environment test', () => {
       .environment(environmentB.id)
       .get();
     expect(environmentBCompleted).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'COMPLETED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
@@ -110,7 +110,7 @@ describe('multiStep environment test', () => {
       .environment(environmentA.id)
       .get();
     expect(environmentAStopped).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
@@ -170,7 +170,7 @@ describe('multiStep environment test', () => {
       .environment(environmentA.id)
       .get();
     expect(environmentAStarted).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'COMPLETED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
@@ -193,7 +193,7 @@ describe('multiStep environment test', () => {
       .environment(environmentA.id)
       .get();
     expect(environmentAStopped2).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined
@@ -210,7 +210,7 @@ describe('multiStep environment test', () => {
       .environment(environmentB.id)
       .get();
     expect(environmentBStopped).toMatchObject({
-      id: expect.stringMatching(uuidRegExp),
+      id: expect.stringMatching(envUuidRegExp),
       status: 'STOPPED',
       ETC: expect.anything(), //ETC should be defined
       PROJ: expect.anything() // PROJ should be defined

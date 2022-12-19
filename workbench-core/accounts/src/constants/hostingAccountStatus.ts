@@ -4,7 +4,7 @@
  */
 
 // https://www.damirscorner.com/blog/posts/20200619-StringLiteralTypeGuardInTypescript.html
-// This file is structured this way so we can verify whether a user input is of type `EnvironmentStatus`
+// This file is structured this way so we can verify whether a user input is of type `HostingAccountStatus`
 export const HOSTING_ACCOUNT_STATUS: string[] = [
   'CURRENT',
   'NEEDS_UPDATE',

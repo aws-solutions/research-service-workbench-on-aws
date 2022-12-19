@@ -3,9 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Stack } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
+import { Mfa, ProviderAttribute } from 'aws-cdk-lib/aws-cognito';
 import {
   WorkbenchCognito,
   WorkbenchCognitoProps,
@@ -13,16 +13,16 @@ import {
 } from './workbenchCognito';
 
 describe('WorkbenchCognito tests', () => {
-  it('has the correct user pool properties', () => {
+  it('correctly uses default values', () => {
     const workbenchCognitoProps: WorkbenchCognitoProps = {
       domainPrefix: 'test-domain',
-      websiteUrls: ['https://www.example.com'],
-      userPoolName: 'test-user-pool'
+      websiteUrls: ['https://www.example.com']
     };
     const stack = new Stack();
     new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
     const template = Template.fromStack(stack);
 
+    // User Pool
     template.resourceCountIs('AWS::Cognito::UserPool', 1);
     template.hasResourceProperties('AWS::Cognito::UserPool', {
       AccountRecoverySetting: {
@@ -37,7 +37,96 @@ describe('WorkbenchCognito tests', () => {
         AllowAdminCreateUserOnly: true
       },
       AutoVerifiedAttributes: ['email'],
-      MfaConfiguration: 'OFF',
+      MfaConfiguration: 'OPTIONAL',
+      Schema: [
+        {
+          Mutable: true,
+          Name: 'given_name',
+          Required: true
+        },
+        {
+          Mutable: true,
+          Name: 'family_name',
+          Required: true
+        },
+        {
+          Mutable: true,
+          Name: 'email',
+          Required: true
+        }
+      ],
+      UsernameAttributes: ['email'],
+      UsernameConfiguration: {
+        CaseSensitive: false
+      }
+    });
+
+    // User Pool Domain
+    template.resourceCountIs('AWS::Cognito::UserPoolDomain', 1);
+    template.hasResourceProperties('AWS::Cognito::UserPoolDomain', {
+      Domain: workbenchCognitoProps.domainPrefix
+    });
+
+    // User Pool Client
+    template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
+    template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
+      AllowedOAuthFlows: ['code'],
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthScopes: ['openid'],
+      CallbackURLs: workbenchCognitoProps.websiteUrls,
+      EnableTokenRevocation: true,
+      GenerateSecret: true,
+      LogoutURLs: workbenchCognitoProps.websiteUrls,
+      PreventUserExistenceErrors: 'ENABLED',
+      IdTokenValidity: 15,
+      AccessTokenValidity: 15,
+      RefreshTokenValidity: 10080,
+      TokenValidityUnits: {
+        IdToken: 'minutes',
+        AccessToken: 'minutes',
+        RefreshToken: 'minutes'
+      },
+      ExplicitAuthFlows: [
+        'ALLOW_ADMIN_USER_PASSWORD_AUTH',
+        'ALLOW_CUSTOM_AUTH',
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH'
+      ]
+    });
+  });
+
+  it('correctly uses provided optional values', () => {
+    const workbenchCognitoProps: WorkbenchCognitoProps = {
+      domainPrefix: 'test-domain',
+      websiteUrls: ['https://www.example.com'],
+      userPoolName: 'Sample-User-Pool-Name',
+      userPoolClientName: 'Sample-User-Pool-Client-Name',
+      accessTokenValidity: Duration.minutes(5),
+      idTokenValidity: Duration.hours(1),
+      refreshTokenValidity: Duration.hours(24),
+      mfa: Mfa.REQUIRED,
+      removalPolicy: RemovalPolicy.DESTROY
+    };
+    const stack = new Stack();
+    new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
+    const template = Template.fromStack(stack);
+
+    // User Pool
+    template.resourceCountIs('AWS::Cognito::UserPool', 1);
+    template.hasResourceProperties('AWS::Cognito::UserPool', {
+      AccountRecoverySetting: {
+        RecoveryMechanisms: [
+          {
+            Name: 'verified_email',
+            Priority: 1
+          }
+        ]
+      },
+      AdminCreateUserConfig: {
+        AllowAdminCreateUserOnly: true
+      },
+      AutoVerifiedAttributes: ['email'],
+      MfaConfiguration: 'ON',
       Schema: [
         {
           Mutable: true,
@@ -61,33 +150,20 @@ describe('WorkbenchCognito tests', () => {
       },
       UserPoolName: workbenchCognitoProps.userPoolName
     });
-  });
 
-  it('has the correct user pool domain properties', () => {
-    const workbenchCognitoProps: WorkbenchCognitoProps = {
-      domainPrefix: 'test-domain',
-      websiteUrls: ['https://www.example.com']
-    };
-    const stack = new Stack();
-    new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
-    const template = Template.fromStack(stack);
+    // test removal policy
+    template.hasResource('AWS::Cognito::UserPool', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete'
+    });
 
+    // User Pool Domain
     template.resourceCountIs('AWS::Cognito::UserPoolDomain', 1);
     template.hasResourceProperties('AWS::Cognito::UserPoolDomain', {
       Domain: workbenchCognitoProps.domainPrefix
     });
-  });
 
-  it('has the correct user pool client properties', () => {
-    const workbenchCognitoProps: WorkbenchCognitoProps = {
-      domainPrefix: 'test-domain',
-      websiteUrls: ['https://www.example.com'],
-      userPoolClientName: 'test-user-pool-client'
-    };
-    const stack = new Stack();
-    new WorkbenchCognito(stack, 'TestWorkbenchCognito', workbenchCognitoProps);
-    const template = Template.fromStack(stack);
-
+    // User Pool Client
     template.resourceCountIs('AWS::Cognito::UserPoolClient', 1);
     template.hasResourceProperties('AWS::Cognito::UserPoolClient', {
       AllowedOAuthFlows: ['code'],
@@ -98,9 +174,9 @@ describe('WorkbenchCognito tests', () => {
       GenerateSecret: true,
       LogoutURLs: workbenchCognitoProps.websiteUrls,
       PreventUserExistenceErrors: 'ENABLED',
-      IdTokenValidity: 15,
-      AccessTokenValidity: 15,
-      RefreshTokenValidity: 43200,
+      IdTokenValidity: 60,
+      AccessTokenValidity: 5,
+      RefreshTokenValidity: 1440,
       TokenValidityUnits: {
         IdToken: 'minutes',
         AccessToken: 'minutes',
@@ -111,7 +187,8 @@ describe('WorkbenchCognito tests', () => {
         'ALLOW_CUSTOM_AUTH',
         'ALLOW_USER_SRP_AUTH',
         'ALLOW_REFRESH_TOKEN_AUTH'
-      ]
+      ],
+      ClientName: workbenchCognitoProps.userPoolClientName
     });
   });
 

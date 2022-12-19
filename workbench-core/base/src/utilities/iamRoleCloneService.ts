@@ -6,10 +6,10 @@
 import {
   AttachedPolicy,
   GetRolePolicyCommandInput,
-  IAMServiceException,
   ListAttachedRolePoliciesCommandOutput,
   ListRolePoliciesCommandOutput,
-  Role
+  Role,
+  NoSuchEntityException
 } from '@aws-sdk/client-iam';
 import AwsService from '../aws/awsService';
 
@@ -79,9 +79,11 @@ export class IamRoleCloneService {
       const response = await this._targetAccount.clients.iam.getRole({
         RoleName: roleName
       });
+
       targetRole = response.Role!;
     } catch (e) {
-      if (e instanceof IAMServiceException && e.name === 'NoSuchEntity') {
+      console.warn(e);
+      if (e instanceof NoSuchEntityException) {
         console.log('Creating target role because target role does not exist in hosting account');
         if (sourceRole) {
           const response = await this._targetAccount.clients.iam.createRole({

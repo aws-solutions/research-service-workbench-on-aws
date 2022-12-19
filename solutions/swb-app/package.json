@@ -2,10 +2,10 @@
   "name": "@aws/swb-app",
   "version": "0.1.2",
   "description": "This package sets up API routes for SWB",
-  "homepage": "https://github.com/awslabs/solution-spark-on-aws",
+  "homepage": "https://github.com/aws-solutions/solution-spark-on-aws",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awslabs/solution-spark-on-aws.git"
+    "url": "https://github.com/aws-solutions/solution-spark-on-aws.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -20,6 +20,7 @@
     "build:test": "heft test --clean && rushx pkg-json-lint && rushx make-badges",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",
+    "jest": "jest",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
@@ -30,20 +31,35 @@
     "test": "rushx test:only && rushx make-badges",
     "test:only": "heft test --clean --no-build"
   },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "testRegex": ".test.ts",
+    "transform": {
+      "\\.(ts)$": "ts-jest"
+    }
+  },
   "dependencies": {
     "@aws/workbench-core-accounts": "workspace:*",
+    "@aws/workbench-core-audit": "workspace:*",
     "@aws/workbench-core-authentication": "workspace:*",
     "@aws/workbench-core-authorization": "workspace:*",
+    "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@hapi/boom": "^10.0.0",
+    "@vendia/serverless-express": "^4.5.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws/eslint-config-workbench-core-eslint-custom": "workspace:*",
@@ -62,7 +78,6 @@
     "concurrently": "^7.0.0",
     "depcheck": "^1.4.3",
     "eslint": "^8.7.0",
-    "eslint-plugin-import": "^2.26.0",
     "istanbul-badges-readme": "1.8.1",
     "jest": "^27.5.1",
     "license-check-and-add": "^4.0.5",

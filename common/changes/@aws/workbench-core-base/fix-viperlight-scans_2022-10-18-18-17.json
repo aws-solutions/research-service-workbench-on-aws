@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "update generateCognitoToken to allow param rootUserNameParamStorePath",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

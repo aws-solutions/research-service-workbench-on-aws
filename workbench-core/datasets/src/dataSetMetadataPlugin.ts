@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSet, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { ExternalEndpoint } from './externalEndpoint';
+import { StorageLocation } from './storageLocation';
 
 export interface DataSetMetadataPlugin {
   /**
@@ -99,4 +101,11 @@ export interface DataSetMetadataPlugin {
    * @returns the updated details of the Endpoint.
    */
   updateExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint>;
+
+  /**
+   * Lists the {@link StorageLocation}s being used by existing datasets.
+   *
+   * @returns - a list of {@link StorageLocation}s
+   */
+  listStorageLocations(): Promise<StorageLocation[]>;
 }

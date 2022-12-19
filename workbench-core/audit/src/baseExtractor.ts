@@ -33,10 +33,14 @@ export const BaseExtractor: Extractor = {
       };
 
       // Sets actor to be the AuthenticatedUser's id.
-      const authenticatedUser: AuthenticatedUser = retrieveUser(res);
-      const actor = {
-        uid: authenticatedUser.id
-      };
+      let actor = { uid: 'user not found' };
+      try {
+        const authenticatedUser: AuthenticatedUser = retrieveUser(res);
+        actor = {
+          uid: authenticatedUser.id
+        };
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
 
       const metadata: Metadata = {
         action,

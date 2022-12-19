@@ -7,12 +7,12 @@ A CDK Construct to create a Cognito user pool for use with the [authentication p
 
 ### Installing the package
 
-Using NPM: 
+Using NPM:
 ```bash
 npm install @aws/workbench-core-infrastructure
 ```
 
-Using Yarn: 
+Using Yarn:
 ```bash
 yarn add @aws/workbench-core-infrastructure
 ```
@@ -51,6 +51,12 @@ const cognitoProps: WorkbenchCognitoProps = {
   oidcIdentityProviders = [ myWorkbenchUserPoolOidcIdentityProvider ]
   // If an access token validity of 15 minutes is insufficient, you may change it here
   accessTokenValidity: Duration.minutes(60) // 1 hour
+  // If an id token validity of 15 minutes is insufficient, you may change it here
+  idTokenValidity: Duration.minutes(60) // 1 hour
+  // If a refresh token validity of 7 days is insufficient, you may change it here
+  refreshTokenValidity: Duration.days(30) // 30 days
+  // If you could like to change the MFA requirements from OPTIONAL, you may change it here
+  mfa: Mfa.REQUIRED
 };
 
 this.myWorkbenchCognito = new WorkbenchCognito(this, 'my-workbench-cognito', cognitoProps);

@@ -6,8 +6,8 @@
 /* eslint-disable security/detect-object-injection */
 
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, buildDynamoDBPkSk, resourceTypeToKey } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import { AwsService, buildDynamoDBPkSk, QueryParams, resourceTypeToKey } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 
 interface Project {
   pk: string;
@@ -46,7 +46,7 @@ export default class ProjectService {
 
   /**
    * Get project
-   * @param projectID - Project Id of project to retrieve
+   * @param projectId - Project Id of project to retrieve
    *
    * @returns Project entry in DDB
    */
@@ -79,5 +79,23 @@ export default class ProjectService {
     const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
 
     return Promise.resolve({ data: projectsResponse.Items as unknown as Project[] });
+  }
+
+  /**
+   * Check whether a CostCenter have any projects associated with it
+   * @param costCenterId - id of CostCenter we want to check
+   * @returns Whether a CostCenter have any projects associated with it
+   */
+  public async doesCostCenterHaveProjects(costCenterId: string): Promise<boolean> {
+    const queryParams: QueryParams = {
+      index: 'getResourceByDependency',
+      key: { name: 'resourceType', value: 'project' },
+      sortKey: 'dependency',
+      eq: { S: costCenterId },
+      limit: 1
+    };
+
+    const associatedProjResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+    return associatedProjResponse.data.length > 0;
   }
 }

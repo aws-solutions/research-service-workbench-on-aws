@@ -6,7 +6,7 @@
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
 import { AwsService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
 import { EnvironmentService, Environment } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
@@ -57,7 +57,6 @@ describe('StatusHandler', () => {
       outputs: [],
       projectId: '123',
       PROJ: { envMgmtRoleArn: 'sampleEnvMgmtRoleArn' },
-      datasetIds: [],
       envTypeConfigId: 'ETC-123',
       provisionedProductId: '123',
       owner: 'blah',

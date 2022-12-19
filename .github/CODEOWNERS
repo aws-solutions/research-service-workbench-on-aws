@@ -1,5 +1,5 @@
-*                                                     @awslabs/aws-ma-foundation
-rush.json                                             @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
+*                                                     @aws-solutions/sb-ma-foundation
+rush.json                                             @aws-solutions/sb-ma-foundation @aws-solutions/sb-ma-swb
 common/config/rush/browser-approved-packages.json
 common/config/rush/nonbrowser-approved-packages.json
 common/config/rush/pnpm-lock.yaml
@@ -7,22 +7,22 @@ common/config/rush/pnpm-lock.yaml
 .gitattributes
 .gitignore
 common/changes/
-solutions/swb-ui                                      @awslabs/aws-ma-swb
-common/changes/@aws/swb-ui                            @awslabs/aws-ma-swb
-solutions/swb-reference                               @awslabs/aws-ma-swb
-common/changes/@aws/swb-reference                     @awslabs/aws-ma-swb
-solutions/swb-app                                     @awslabs/aws-ma-swb
-common/changes/@aws/swb-app                           @awslabs/aws-ma-swb
-workbench-core/base                                   @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-base               @awslabs/aws-ma-swb
-workbench-core/environments                           @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-environments       @awslabs/aws-ma-swb
-workbench-core/environments-ui                        @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-environments-ui    @awslabs/aws-ma-swb
-workbench-core/accounts                               @awslabs/aws-ma-swb
-workbench-core/accounts-ui                            @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-accounts-ui        @awslabs/aws-ma-swb
-workbench-core/datasets                               @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-datasets           @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
-workbench-core/datasets-ui                            @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
-common/changes/@aws/workbench-core-datasets-ui        @awslabs/aws-ma-foundation @awslabs/aws-ma-swb
+solutions/swb-ui                                      @aws-solutions/sb-ma-swb
+common/changes/@aws/swb-ui                            @aws-solutions/sb-ma-swb
+solutions/swb-reference                               @aws-solutions/sb-ma-swb
+common/changes/@aws/swb-reference                     @aws-solutions/sb-ma-swb
+solutions/swb-app                                     @aws-solutions/sb-ma-swb
+common/changes/@aws/swb-app                           @aws-solutions/sb-ma-swb
+workbench-core/base                                   @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-base               @aws-solutions/sb-ma-swb
+workbench-core/environments                           @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-environments       @aws-solutions/sb-ma-swb
+workbench-core/environments-ui                        @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-environments-ui    @aws-solutions/sb-ma-swb
+workbench-core/accounts                               @aws-solutions/sb-ma-swb
+workbench-core/accounts-ui                            @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-accounts-ui        @aws-solutions/sb-ma-swb
+workbench-core/datasets                               @aws-solutions/sb-ma-foundation @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-datasets           @aws-solutions/sb-ma-foundation @aws-solutions/sb-ma-swb
+workbench-core/datasets-ui                            @aws-solutions/sb-ma-foundation @aws-solutions/sb-ma-swb
+common/changes/@aws/workbench-core-datasets-ui        @aws-solutions/sb-ma-foundation @aws-solutions/sb-ma-swb

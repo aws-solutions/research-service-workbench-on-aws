@@ -19,6 +19,7 @@ import {
   DescribeProductAsAdminCommand,
   CreateProvisioningArtifactCommand
 } from '@aws-sdk/client-service-catalog';
+import { SdkStream } from '@aws-sdk/types';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import md5File from 'md5-file';
 import ServiceCatalogSetup from './serviceCatalogSetup';
@@ -265,7 +266,7 @@ describe('ServiceCatalogSetup', () => {
       readableStream.push(null);
 
       s3Mock.on(GetObjectCommand).resolves({
-        Body: readableStream
+        Body: readableStream as SdkStream<Readable>
       });
 
       // MD5 Sum of S3 file

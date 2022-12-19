@@ -8,10 +8,11 @@ import fs, { createWriteStream } from 'fs';
 import { join } from 'path';
 import * as stream from 'stream';
 import { promisify } from 'util';
+import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
 import { AwsService } from '@aws/workbench-core-base';
-import { CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
-import Axios from 'axios';
-import { getConstants } from './constants';
+import { AuthorizationSetup, CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
+import axios from 'axios';
+import { getConstants, getConstantsWithSecrets } from './constants';
 
 async function run(): Promise<void> {
   const {
@@ -23,7 +24,7 @@ async function run(): Promise<void> {
     STACK_NAME,
     ROOT_USER_EMAIL,
     USER_POOL_NAME
-  } = getConstants();
+  } = await getConstantsWithSecrets();
   const scSetup = new ServiceCatalogSetup({
     AWS_REGION,
     S3_ARTIFACT_BUCKET_SC_PREFIX,
@@ -38,9 +39,13 @@ async function run(): Promise<void> {
     USER_POOL_NAME
   });
 
+  const authService = new MockDynamicAuthorizationService();
+  const authSetup = new AuthorizationSetup(authService);
+
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../../src/environment'));
   await scSetup.run(cfnFilePaths);
   await cognitoSetup.run();
+  await authSetup.run();
   await uploadOnboardAccountCfnToS3();
   await uploadBootstrapScriptsToS3();
 }
@@ -62,7 +67,7 @@ async function uploadOnboardAccountCfnToS3(): Promise<void> {
 async function downloadFile(fileUrl: string, outputLocationPath: string): Promise<void> {
   const finished = promisify(stream.finished);
   const writer = createWriteStream(outputLocationPath);
-  return Axios({
+  return axios({
     method: 'get',
     url: fileUrl,
     responseType: 'stream'

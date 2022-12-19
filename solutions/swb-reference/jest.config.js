@@ -9,7 +9,10 @@ const options = {
   },
   moduleFileExtensions: ['ts', 'js'],
   testEnvironment: 'node',
-  testTimeout: 30 * 60 * 1000
+  testTimeout: 30 * 60 * 1000,
+  moduleNameMapper: {
+    '#node-web-compat': './node-web-compat-node.js'
+  }
 };
 
 let settings;

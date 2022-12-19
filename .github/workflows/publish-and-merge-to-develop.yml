@@ -6,7 +6,7 @@ on:
     branches:
       - main
 
-jobs:  
+jobs:
   rush-publish:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
@@ -37,13 +37,14 @@ jobs:
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
-          
+
       - name: Rush Publish
         run: |
           PUBLISH_CMD="--add-commit-details --apply --npm-auth-token ${{ secrets.NPM_AUTH_TOKEN }} --ignore-git-hooks --include-all --set-access-level public --target-branch main --publish"
           node common/scripts/install-run-rush.js publish $PUBLISH_CMD
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+          
   merge-to-develop:
     runs-on: ubuntu-20.04
     needs: [rush-publish]
@@ -63,24 +64,34 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-      
+
       # There's no way for github actions to push to a protected branch. This is a workaround
       # See https://github.community/t/how-to-push-to-protected-branches-in-a-github-action/16101/30
       - name: Temporarily disable branch protection on develop
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: develop
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
-      
+
       - name: Set git config
         run: |
           git config user.email ${{ secrets.BOT-USER-EMAIL }}
           git config user.name ${{ secrets.BOT-USER }}
           git config commit.gpgsign true
+
+      - name: enable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
       - name: Merge to develop
         run: |
@@ -93,13 +104,23 @@ jobs:
           echo
           git merge $COMMIT_ID --ff --no-edit -m "Merge main to develop"
           git push origin develop
-      
+
+      - name: disable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
       - name: Enable branch protection on develop
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: develop
         env:

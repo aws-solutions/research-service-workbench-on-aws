@@ -3,9 +3,8 @@
   "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
   "compilerOptions": {
     "types": ["heft-jest", "node"],
-    "lib": ["dom"],
     "rootDir": "src"
   },
-  "include": ["src/*", "src/test/*"],
-  "exclude": ["./node_modules", "./lib", "./cdk.out", "./bin"]
+  "include": ["src/*", "src/__tests__/*"],
+  "exclude": ["./node_modules", "./lib", "./cdk.out"]
 }

@@ -24,11 +24,11 @@
     },
     {
       "name": "@aws-cdk/aws-iam",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-cloudformation",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-cognito-identity-provider",
@@ -60,31 +60,35 @@
     },
     {
       "name": "@aws-sdk/client-s3",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-s3-control",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-sagemaker",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-service-catalog",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-ssm",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/client-sts",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@aws-sdk/s3-request-presigner",
       "allowedCategories": [ "production" ]
     },
     {
       "name": "@aws-sdk/types",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws-sdk/util-dynamodb",
@@ -112,19 +116,19 @@
     },
     {
       "name": "@aws/workbench-core-authentication",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-authorization",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-base",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-datasets",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-datasets-ui",
@@ -132,11 +136,15 @@
     },
     {
       "name": "@aws/workbench-core-environments",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-environments-ui",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-example-app",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-example-express",
@@ -144,7 +152,7 @@
     },
     {
       "name": "@aws/workbench-core-infrastructure",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@aws/workbench-core-logging",
@@ -157,6 +165,10 @@
     {
       "name": "@aws/workbench-core-swb-datasets-ui",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@aws/workbench-core-user-management",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@awsui/collection-hooks",
@@ -236,11 +248,15 @@
     },
     {
       "name": "@hapi/boom",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@microsoft/rush-lib",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "@next/eslint-plugin-next",
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "@rushstack/eslint-config",
@@ -291,6 +307,10 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "@typescript-eslint/parser",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "@vendia/serverless-express",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -332,7 +352,7 @@
     },
     {
       "name": "cdk-nag",
-      "allowedCategories": [ "prototypes" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cdk-ssm-document",
@@ -348,15 +368,15 @@
     },
     {
       "name": "cookie-parser",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "cors",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "csrf",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "csurf",
@@ -391,7 +411,19 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "eslint-import-resolver-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "eslint-plugin-import",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
@@ -405,6 +437,10 @@
     {
       "name": "express",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "express-rate-limit",
+      "allowedCategories": [ "prototypes" ]
     },
     {
       "name": "fast-check",
@@ -432,11 +468,11 @@
     },
     {
       "name": "js-yaml",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jsonschema",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "jwt-decode",
@@ -548,7 +584,7 @@
     },
     {
       "name": "uuid",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     },
     {
       "name": "web-vitals",
@@ -564,6 +600,14 @@
     },
     {
       "name": "winston-transport",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "yaml-cfn",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "zod",
       "allowedCategories": [ "production" ]
     }
   ]

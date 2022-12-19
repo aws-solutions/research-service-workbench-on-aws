@@ -82,4 +82,52 @@ describe('transactEdit', () => {
     };
     expect(response).toMatchObject(expectedResponse);
   });
+  test('addDeleteRequest', async () => {
+    const transactEdit = new TransactEdit({ region: 'us-east-2' }, 'swb-dev-oh');
+    //BUILD
+    const etc = {
+      pk: {
+        S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b'
+      },
+      sk: {
+        S: 'ETC#envTypeConfig-123'
+      }
+    };
+    const proj = {
+      pk: {
+        S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b'
+      },
+      sk: {
+        S: 'PROJ#proj-123'
+      }
+    };
+    // OPERATE
+    transactEdit.addDeleteRequests([etc, proj]);
+    // CHECK
+    const response = transactEdit.getParams();
+
+    const expectedResponse = {
+      TransactItems: [
+        {
+          Delete: {
+            TableName: 'swb-dev-oh',
+            Key: {
+              pk: { S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b' },
+              sk: { S: 'ETC#envTypeConfig-123' }
+            }
+          }
+        },
+        {
+          Delete: {
+            TableName: 'swb-dev-oh',
+            Key: {
+              pk: { S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b' },
+              sk: { S: 'PROJ#proj-123' }
+            }
+          }
+        }
+      ]
+    };
+    expect(response).toMatchObject(expectedResponse);
+  });
 });

@@ -8,10 +8,10 @@ on:
   push:
     branches:
       - 'develop'
-  
+
 jobs:
   readme-commit:
-    uses: awslabs/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/readme-commit.yml@develop
     secrets:
       gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
       passphrase: ${{ secrets.PASSPHRASE }}
@@ -34,7 +34,7 @@ jobs:
 
   deploy-swb-reference:
     needs: [pre-deployment-check]
-    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
@@ -44,28 +44,26 @@ jobs:
       CYPRESS_ADMIN_USER: ${{ secrets.CYPRESS_ADMIN_USER }}
 
   deploy-swb-demo:
-    needs: [ deploy-swb-reference]
-    uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
+    needs: [deploy-swb-reference]
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-swb-reference-demo.yml@develop
     secrets:
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
-  # deploy-example:
-  #   needs: [pre-deployment-check]
-  #   uses: awslabs/solution-spark-on-aws/.github/workflows/deploy-integration-example.yml@develop
-  #   secrets:
-  #     aws-dev-region: ${{ secrets.AWS_DEV_REGION }}
-  #     role-to-assume: ${{ secrets.ASSUME_ROLE }}
-  #     aws-dev-account-region: ${{ secrets.AWS_DEV_ACCOUNT_REGION }}
-  #     cognito-username: "${{ secrets.COGNITO_USERNAME }}"
-  #     cognito-password: "${{ secrets.COGNITO_PASSWORD }}"
-  #     cognito-client-id: "${{ secrets.COGNITO_CLIENT_ID }}"
+  deploy-example-app:
+    needs: [pre-deployment-check]
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-example-app.yml@develop
+    secrets:
+      aws-test-region: ${{ secrets.AWS_TEST_REGION }}
+      test-role-to-assume: ${{ secrets.TEST_ASSUME_ROLE }}
+      aws-test-account-region: ${{ secrets.AWS_TEST_ACCOUNT_REGION }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK }}
 
   merge-develop-to-stage:
     name: Merge develop to stage
     runs-on: ubuntu-20.04
-    needs: [readme-commit, deploy-swb-reference]
-    env: 
+    needs: [readme-commit, deploy-swb-reference, deploy-example-app]
+    env:
       COMMIT_HASH: "${{ needs.readme-commit.outputs.commit_hash }}"
       CHANGES_DETECTED: "${{ needs.readme-commit.outputs.changes_detected }}"
     steps:
@@ -80,9 +78,19 @@ jobs:
         uses: octokit/request-action@v2.x
         with:
           route: DELETE /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: stage
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
+      - name: enable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: true
         env:
           GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
 
@@ -104,13 +112,23 @@ jobs:
           echo
           git merge $COMMIT_ID --ff-only --no-edit
           git push origin stage
-          
+
+      - name: disable merge commits
+        uses: octokit/request-action@v2.x
+        with:
+          route: PATCH /repos/{owner}/{repo}
+          owner: aws-solutions
+          repo: solution-spark-on-aws
+          allow_merge_commit: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.MERGE_TOKEN }}
+
       - name: Enable branch protection on stage
         uses: octokit/request-action@v2.x
         if: always() # Make sure to enable branch protection even if other steps fail
         with:
           route: POST /repos/{owner}/{repo}/branches/{branch}/protection/enforce_admins
-          owner: awslabs
+          owner: aws-solutions
           repo: solution-spark-on-aws
           branch: stage
         env:

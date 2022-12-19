@@ -4,11 +4,13 @@
  */
 
 import { GetItemCommandOutput, QueryCommandOutput } from '@aws-sdk/client-dynamodb';
-import { AwsService, QueryParams } from '@aws/workbench-core-base';
-import Boom from '@hapi/boom';
+import { AwsService, QueryParams, uuidWithLowercasePrefix } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
-import { DataSet, DataSetMetadataPlugin, ExternalEndpoint } from '.';
+import { DataSet } from './dataSet';
+import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { ExternalEndpoint } from './externalEndpoint';
+import { StorageLocation } from './storageLocation';
 
 export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   private _aws: AwsService;
@@ -71,7 +73,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addDataSet(dataSet: DataSet): Promise<DataSet> {
     const dataSetParam: DataSet = dataSet;
     await this._validateCreateDataSet(dataSet);
-    dataSetParam.id = uuidv4();
+    dataSetParam.id = uuidWithLowercasePrefix(this._dataSetKeyType);
     if (_.isUndefined(dataSetParam.createdAt)) dataSetParam.createdAt = new Date().toISOString();
     await this._storeDataSetToDdb(dataSetParam);
 
@@ -99,7 +101,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
   public async addExternalEndpoint(endPoint: ExternalEndpoint): Promise<ExternalEndpoint> {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._validateCreateExternalEndpoint(endPoint);
-    endPointParam.id = uuidv4();
+    endPointParam.id = uuidWithLowercasePrefix(this._endPointKeyType);
     if (_.isUndefined(endPointParam.createdAt)) endPointParam.createdAt = new Date().toISOString();
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
@@ -122,6 +124,21 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
     const endPointParam: ExternalEndpoint = endPoint;
     await this._storeEndPointToDdb(endPointParam);
     return endPointParam;
+  }
+
+  public async listStorageLocations(): Promise<StorageLocation[]> {
+    const datasets = await this.listDataSets();
+
+    const map = new Map<string, StorageLocation>();
+    datasets.forEach((dataset) =>
+      map.set(dataset.storageName, {
+        name: dataset.storageName,
+        awsAccountId: dataset.awsAccountId,
+        type: dataset.storageType,
+        region: dataset.region
+      })
+    );
+    return Array.from(map.values());
   }
 
   private async _validateCreateExternalEndpoint(endPoint: ExternalEndpoint): Promise<void> {
@@ -181,7 +198,7 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       endPointParams.item.endPointAlias = endPoint.endPointAlias;
     }
 
-    await this._aws.helpers.ddb.update(endPointKey, endPointParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: endPointKey, params: endPointParams });
 
     return endPoint.id!;
   }
@@ -191,22 +208,26 @@ export class DdbDataSetMetadataPlugin implements DataSetMetadataPlugin {
       pk: `${this._dataSetKeyType}#${dataSet.id}`,
       sk: `${this._dataSetKeyType}#${dataSet.id}`
     };
-    const dataSetParams: { item: { [key: string]: string | string[] } } = {
+    const dataSetParams: { item: { [key: string]: string | string[] | undefined } } = {
       item: {
         id: dataSet.id!,
         name: dataSet.name,
         createdAt: dataSet.createdAt!,
+        description: dataSet.description,
+        owner: dataSet.owner,
+        type: dataSet.type,
         storageName: dataSet.storageName,
         path: dataSet.path,
-        awsAccountId: dataSet.awsAccountId!,
-        storageType: dataSet.storageType!,
+        awsAccountId: dataSet.awsAccountId,
+        region: dataSet.region,
+        storageType: dataSet.storageType,
         resourceType: 'dataset'
       }
     };
 
     if (dataSet.externalEndpoints) dataSetParams.item.externalEndpoints = dataSet.externalEndpoints!;
 
-    await this._aws.helpers.ddb.update(dataSetKey, dataSetParams).execute();
+    await this._aws.helpers.ddb.updateExecuteAndFormat({ key: dataSetKey, params: dataSetParams });
 
     return dataSet.id!;
   }

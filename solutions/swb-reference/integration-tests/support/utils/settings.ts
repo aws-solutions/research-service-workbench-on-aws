@@ -13,7 +13,7 @@ interface Setting {
   envType: string;
   runId: string;
   terminatedEnvId: string;
-  rootUsername: string;
+  rootUserNameParamStorePath: string;
   rootPasswordParamStorePath: string;
 
   // Main CFN template outputs
@@ -39,11 +39,18 @@ interface Setting {
   dynamoDBTableOutput: string;
   StatusHandlerLambdaRoleOutput: string;
 
+  // Default hosting account
+  defaultHostingAccountId: string;
+
   // Configs for AWS Account onboard test
   hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;
+  envMgmtRoleArnParamStorePath: string;
   hostingAccountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArnParamStorePath: string;
   encryptionKeyArn: string;
+  encryptionKeyArnParamStorePath: string;
 
   // Derived
   mainAccountId: string;

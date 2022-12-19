@@ -109,7 +109,7 @@ const EnvironmentsPage: NextPage = () => {
   ];
 
   // Date filter constants
-  const [dateFilter, setDateFilter] = React.useState<DateRangePickerProps.RelativeValue | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateRangePickerProps.RelativeValue | null>(null);
 
   // Property and date filter collections
   const { items, filteredItemsCount, collectionProps, propertyFilterProps } = useCollection(environments, {
@@ -311,7 +311,6 @@ const EnvironmentsPage: NextPage = () => {
       ...prevState,
       paginationTokens: prevState.paginationTokens.set(prevState.currentPageIndex + 1, paginationToken)
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paginationToken]);
 
   const getContent = (): JSX.Element => {

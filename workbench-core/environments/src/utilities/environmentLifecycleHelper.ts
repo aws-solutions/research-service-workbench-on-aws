@@ -4,8 +4,8 @@
  */
 
 import { Output } from '@aws-sdk/client-cloudformation';
-import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { AwsService, AuditLogger, resourceTypeToKey } from '@aws/workbench-core-base';
+import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
@@ -145,7 +145,7 @@ export default class EnvironmentLifecycleHelper {
    * @param envMetadata - the environment for which access point(s) were created
    */
   public async removeAccessPoints(envMetadata: Environment): Promise<void> {
-    if (_.isEmpty(envMetadata.datasetIds)) return;
+    if (_.isEmpty(envMetadata.DATASETS)) return;
 
     await Promise.all(
       _.map(envMetadata.ENDPOINTS, async (endpoint) => {
@@ -181,7 +181,7 @@ export default class EnvironmentLifecycleHelper {
 
     const datasetsToMount = await Promise.all(
       _.map(datasetIds, async (datasetId) => {
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 13)}`;
+        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
         const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
           datasetId,
           datasetEndPointName,

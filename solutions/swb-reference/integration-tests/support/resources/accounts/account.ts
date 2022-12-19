@@ -10,7 +10,7 @@ import Resource from '../base/resource';
 
 export default class Account extends Resource {
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
-    super(clientSession, 'aws-accounts', id, parentApi);
+    super(clientSession, 'awsAccounts', id, parentApi);
   }
 
   protected async cleanup(): Promise<void> {
