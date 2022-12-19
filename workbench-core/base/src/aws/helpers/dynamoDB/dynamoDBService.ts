@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
@@ -143,6 +144,32 @@ export default class DynamoDBService {
       }
     }
     return getter;
+  }
+
+  /**
+   * retrieves item from DynamoDB table.
+   *
+   * @param key - single object of key to get for single get item
+   * @param params - optional object of optional properties to generate a get item request
+   * @returns Promise\<Record\<string,JSONValue\>\>
+   *
+   * @example Use this method to retrieve an item from ddb by Id
+   * ```ts
+   * const item = await dynamoDBService.getItem({'pk': 'pk', 'sk': 'sk'}, {projection: 'valueIWant'});
+   * ```
+   */
+  public async getItem(
+    key: Record<string, unknown>,
+    params?: {
+      strong?: boolean;
+      names?: { [key: string]: string };
+      projection?: string | string[];
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+    }
+  ): Promise<Record<string, JSONValue>> {
+    const response = await this.get(key, params).execute();
+    const item = (response as GetItemCommandOutput).Item;
+    return item as unknown as Record<string, JSONValue>;
   }
 
   /**

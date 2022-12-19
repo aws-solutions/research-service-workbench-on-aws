@@ -3,7 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { ServiceCatalog, ListPortfoliosCommandInput, PortfolioDetail } from '@aws-sdk/client-service-catalog';
+import {
+  ServiceCatalog,
+  ListPortfoliosCommandInput,
+  PortfolioDetail,
+  ProductViewSummary,
+  ProvisioningArtifactDetail,
+  SearchProductsAsAdminCommandInput,
+  ProductViewDetail,
+  DescribeProvisioningArtifactCommandOutput
+} from '@aws-sdk/client-service-catalog';
 
 export default class ServiceCatalogService {
   private _serviceCatalog: ServiceCatalog;
@@ -37,5 +46,57 @@ export default class ServiceCatalogService {
     });
 
     return portfolio ? portfolio.Id : undefined;
+  }
+
+  /**
+   * Get portfolio products
+   * @param portfolioId - Id of the portfolio
+   */
+  public async getProductsByPortfolioId(portfolioId: string): Promise<ProductViewSummary[]> {
+    let productsDetails: ProductViewDetail[] = [];
+    let pageToken: string | undefined = undefined;
+    // Get all products within portfolio
+    do {
+      const productsFilter: SearchProductsAsAdminCommandInput = {
+        PageToken: pageToken,
+        PageSize: 20,
+        SortBy: 'CreationDate',
+        SortOrder: 'DESCENDING',
+        PortfolioId: portfolioId
+      };
+      const productList = await this._serviceCatalog.searchProductsAsAdmin(productsFilter);
+      pageToken = productList.NextPageToken;
+      if (productList.ProductViewDetails) {
+        productsDetails = productsDetails.concat(productList.ProductViewDetails);
+      }
+    } while (pageToken);
+    return productsDetails.filter((p) => !!p.ProductViewSummary).map((p) => p.ProductViewSummary || {});
+  }
+
+  /**
+   * Get provision artifacts by product
+   * @param productId - Id of the portfolio
+   */
+  public async getProvisionArtifactsByProductId(productId: string): Promise<ProvisioningArtifactDetail[]> {
+    const provisionArtifactList = await this._serviceCatalog.listProvisioningArtifacts({
+      ProductId: productId
+    });
+    return provisionArtifactList.ProvisioningArtifactDetails || [];
+  }
+
+  /**
+   * Get provision artifacts details
+   * @param productId - Id of the product
+   * @param provisionArtifactId - Id of the provision Artifact
+   */
+  public async getProvisionArtifactDetails(
+    productId: string,
+    provisionArtifactId: string
+  ): Promise<DescribeProvisioningArtifactCommandOutput> {
+    const provisionArtifactList = await this._serviceCatalog.describeProvisioningArtifact({
+      ProductId: productId,
+      ProvisioningArtifactId: provisionArtifactId
+    });
+    return provisionArtifactList;
   }
 }

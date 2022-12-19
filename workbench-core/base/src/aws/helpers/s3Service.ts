@@ -5,8 +5,12 @@
 
 import fs from 'fs';
 import { join } from 'path';
-import { GetObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
+import { PutObjectCommand, S3, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import yaml from 'js-yaml';
+import { schema } from 'yaml-cfn';
+import { CFNTemplate } from './cloudFormationTemplate';
 
 export default class S3Service {
   private _s3: S3;
@@ -75,6 +79,36 @@ export default class S3Service {
     };
 
     await recursiveUpload(path, '');
+  }
+
+  /**
+   * Read Template from Bucket
+   * @param s3BucketURL - URL of provision artifact template
+   * @returns json object containing yaml file configuration
+   */
+  public async getTemplateByURL(s3BucketURL: string): Promise<CFNTemplate> {
+    const s3BucketParams = s3BucketURL.split('.s3.amazonaws.com/');
+    if (s3BucketParams.length !== 2) throw new Error(`Invalid S3 URL format ${s3BucketURL}`);
+    const s3Bucket = s3BucketParams[0].replace('https://', '');
+    const key = s3BucketParams[1];
+    const stream = await this._s3.getObject({ Bucket: s3Bucket, Key: key });
+    const streamString = await this._streamToString(stream.Body! as Readable);
+    const yamlFile = await yaml.load(streamString, { schema: schema });
+    return yamlFile as CFNTemplate;
+  }
+
+  /**
+   * Parse stream into string with utf8
+   * @param stream - stream to parse
+   * @returns string with stream content
+   */
+  private async _streamToString(stream: Readable): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const chunks: Uint8Array[] = [];
+      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('error', reject);
+      stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
   }
 
   /**
