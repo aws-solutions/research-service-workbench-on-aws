@@ -40,7 +40,7 @@ async function init() {
     );
   }
 
-  const mainAccountId = outputs.ExampleDynamoDBTableOutput.split(':')[4];
+  const mainAccountId = outputs.ExampleDataSetDDBTableArn.split(':')[4];
 
   settings = {
     ...config,

@@ -36,6 +36,7 @@ interface Constants {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
 interface SecretConstants {
@@ -63,6 +64,8 @@ function getConstants(): Constants {
   const USER_POOL_ID = config.userPoolId || '';
   const CLIENT_ID = config.clientId || '';
   const CLIENT_SECRET = config.clientSecret || '';
+
+  const FIELDS_TO_MASK_WHEN_AUDITING: string[] = config.fieldsToMaskWhenAuditing;
 
   const AMI_IDS: string[] = [];
 
@@ -104,7 +107,8 @@ function getConstants(): Constants {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    FIELDS_TO_MASK_WHEN_AUDITING
   };
 }
 
@@ -128,6 +132,7 @@ interface Config {
   userPoolId?: string;
   clientId?: string;
   clientSecret?: string;
+  fieldsToMaskWhenAuditing: string[];
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getConfig(): Config {

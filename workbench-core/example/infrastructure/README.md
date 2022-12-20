@@ -38,7 +38,7 @@ rushx cdk:deploy
 ```
 
 #### OR
-After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L13)
+After `rushx cdk:deploy` you can find the USER_POOL_ID [here](./src/config/testEnv.json#L17)
 
 ### Run Integration Test
 ```bash
@@ -49,6 +49,8 @@ rushx integration-tests
 Navigate to `workbench-core/example/infrastructure`
 
 ### Destroy the ExampleStack
+**This will destroy the DynamoDB Table, Cognito UserPool, S3Buckets and the encryption keys created by the stack.**
+**RemovalPolicy has been set to DESTROY for the mentioned resources**
 #### Require Approval
 ```bash
 rushx cdk:destroy
@@ -60,19 +62,7 @@ rushx cdk:destroy
 rushx cdk:destroy -f
 ```
 
-### Delete Cognito UserPool, DynamoDB Table and SSM Parameters
+### Delete Cognito SSM Parameters
 ```bash
-./scripts/cleanup.sh -u <USER_POOL_ID> -d <DYNAMO_DB_TABLE_NAME> -r <REGION> -p -c
+./scripts/cleanup.sh -r <REGION> -p -c
 ```
-
-#### Get UserPool Id and DynamoDB Table
-```bash
-./scripts/getResources.sh -r <REGION> -i -t -g
-```
-
-#### OR
-After `rushx cdk:deploy` you can find:
-
-1. USER_POOL_ID [here](./src/config/testEnv.json#L13)
-
-2. DYNAMO_DB_TABLE_NAME [here](./src/config/testEnv.json#L12)

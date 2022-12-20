@@ -6,7 +6,7 @@
 /* eslint-disable security/detect-object-injection */
 import _ from 'lodash';
 
-interface Setting {
+export interface Setting {
   hostAwsAccountId: string;
   hostAwsAccountIdParamStorePath: string;
   runId: string;
@@ -22,11 +22,13 @@ interface Setting {
   ExampleRestApiEndpoint9C6D55BB: string;
   ExampleAPIEndpoint: string;
   ExampleCognitoDomainName: string;
-  ExampleDynamoDBTableOutput: string;
   ExampleCognitoUserPoolId: string;
   ExampleLambdaRoleOutput: string;
-  ExampleDynamoDBTableName: string;
   ExampleS3DataSetsBucketName: string;
+  ExampleDataSetDDBTableArn: string;
+  ExampleDataSetDDBTableName: string;
+  ExampleDynamicAuthDDBTableArn: string;
+  ExampleDynamicAuthDDBTableName: string;
 
   // Derived
   mainAccountId: string;
