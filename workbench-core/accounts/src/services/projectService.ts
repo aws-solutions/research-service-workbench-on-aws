@@ -27,7 +27,7 @@ import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
 import { CostCenter } from '../models/costCenters/costCenter';
-import CreateProjectRequest from '../models/projects/createProjectRequest';
+import { CreateProjectRequest } from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import GetProjectRequest from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
@@ -175,7 +175,7 @@ export default class ProjectService {
    * @returns Project object of new project
    */
   public async createProject(params: CreateProjectRequest, user: AuthenticatedUser): Promise<Project> {
-    // Verify caller is an IT Admin--TODO implement after dynamic AuthZ
+    // Verify caller is an IT Admin--TODO implement after dynamic AuthZ--this can happen in the middleware during integration but keeping here so this code gets moved properly
     // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(user.id);
     // if(userGroupsForCurrentUser.length !== 1 || userGroupsForCurrentUser[0] !== 'ITAdmin') {
     //   throw Boom.forbidden('Only IT Admins are allowed to create new Projects.');

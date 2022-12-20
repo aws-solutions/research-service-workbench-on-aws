@@ -6,6 +6,7 @@
 import {
   ProjectService,
   CreateProjectRequest,
+  CreateProjectRequestParser,
   ListProjectsRequest,
   ListProjectsRequestParser,
   UpdateProjectRequest,
@@ -20,7 +21,6 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
 import {
   ProjectDatasetMetadata,
@@ -68,13 +68,10 @@ export function setUpProjectRoutes(
   router.post(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateProjectSchema));
-      const request: CreateProjectRequest = {
-        name: req.body.name,
-        description: req.body.description,
-        costCenterId: req.body.costCenterId
-      };
-      res.send(await projectService.createProject(request, res.locals.user));
+      const validatedRequest = validateAndParse<CreateProjectRequest>(CreateProjectRequestParser, {
+        ...req.body
+      });
+      res.send(await projectService.createProject(validatedRequest, res.locals.user));
     })
   );
 
