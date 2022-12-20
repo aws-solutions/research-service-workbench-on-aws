@@ -31,7 +31,7 @@ export default class EnvironmentLifecycleHelper {
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
     );
-    this.environmentService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
   }
 
   /**
