@@ -12,6 +12,7 @@ import {
   UpdateProjectRequest,
   UpdateProjectRequestParser,
   GetProjectRequest,
+  GetProjectRequestParser,
   DeleteProjectRequest,
   DeleteProjectRequestParser
 } from '@aws/workbench-core-accounts';
@@ -19,16 +20,13 @@ import { validateAndParse, MetadataService, resourceTypeToKey } from '@aws/workb
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
-import GetProjectSchema from './schemas/projects/getProjectSchema';
 import {
   ProjectDatasetMetadata,
   ProjectDatasetMetadataParser,
   ProjectEnvTypeConfigMetadata,
   ProjectEnvTypeConfigMetadataParser
 } from './schemas/projects/projectMetadataParser';
-import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectRoutes(
   router: Router,
@@ -40,14 +38,10 @@ export function setUpProjectRoutes(
   router.get(
     '/projects/:projectId',
     wrapAsync(async (req: Request, res: Response) => {
-      const objectToValidate = {
-        userId: res.locals.user.id,
+      const validatedRequest = validateAndParse<GetProjectRequest>(GetProjectRequestParser, {
         projectId: req.params.projectId
-      };
-      processValidatorResult(validate(objectToValidate, GetProjectSchema));
-      const request: GetProjectRequest = objectToValidate as GetProjectRequest;
-
-      res.send(await projectService.getProject(request));
+      });
+      res.send(await projectService.getProject(validatedRequest));
     })
   );
 

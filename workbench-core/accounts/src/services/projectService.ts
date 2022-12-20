@@ -29,7 +29,7 @@ import { ProjectStatus } from '../constants/projectStatus';
 import { CostCenter } from '../models/costCenters/costCenter';
 import { CreateProjectRequest } from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
-import GetProjectRequest from '../models/projects/getProjectRequest';
+import { GetProjectRequest } from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
 import ListProjectsResponse from '../models/projects/listProjectsResponse';
 import { Project } from '../models/projects/project';

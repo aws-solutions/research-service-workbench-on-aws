@@ -20,7 +20,7 @@ import {
 } from './models/costCenters/updateCostCenterRequest';
 import { CreateProjectRequest, CreateProjectRequestParser } from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
-import GetProjectRequest from './models/projects/getProjectRequest';
+import { GetProjectRequest, GetProjectRequestParser } from './models/projects/getProjectRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
 import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
@@ -50,6 +50,7 @@ export {
   UpdateProjectRequest,
   UpdateProjectRequestParser,
   GetProjectRequest,
+  GetProjectRequestParser,
   DeleteProjectRequest,
   DeleteProjectRequestParser,
   CreateCostCenterRequest,
