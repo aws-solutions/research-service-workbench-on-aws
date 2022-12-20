@@ -11,7 +11,7 @@ export async function handler(event: any) {
   const baseUrl = process.env.API_GW_URL!.replace('/dev/', '/dev');
   let HTTP_METHOD = '';
 
-  let reqHeaders: { [id: string]: string } = {};
+  const reqHeaders: { [id: string]: string } = {};
 
   const response: {
     statusCode: number;
@@ -54,20 +54,22 @@ export async function handler(event: any) {
   }
   const targetPath = `${baseUrl}${apiPath}`;
 
+  if (event.httpMethod) HTTP_METHOD = event.httpMethod;
   if (event.headers) {
-    reqHeaders = event.headers;
+    reqHeaders['Content-Type'] = event.headers['content-type'] || 'application/json';
+    reqHeaders.Cookie = event.headers.cookie;
+    reqHeaders['csrf-token'] = event.headers['csrf-token'];
+    reqHeaders['x-forwarded-for'] = event.headers['x-forwarded-for'];
+    reqHeaders.connection = event.headers.connection;
+    reqHeaders['Access-Control-Allow-Credentials'] = 'true';
+    reqHeaders.accept = 'application/json, text/plain, */*';
+    reqHeaders.connection = event.headers.connection || 'keep-alive';
+    if (!reqHeaders.origin) reqHeaders.origin = `https://${event.headers.host}`;
+
     if (reqHeaders.host) {
       // Have to remove host if it is from the UI to avoid incorrect host being set when sending to Cognito
       // (Should be API GW host, not UI)
       delete reqHeaders.host;
-    }
-    if (!event.headers.origin && reqHeaders.referer) {
-      // Login page will not have origin set; use referer, but remove trailing slash
-      const referer = reqHeaders.referer;
-      const lastSlashIndex = referer.lastIndexOf('/');
-      reqHeaders.origin = referer.substring(0, lastSlashIndex) + referer.substring(lastSlashIndex + 1);
-    } else if (event.headers.origin) {
-      reqHeaders.origin = event.headers.origin;
     }
   }
 
@@ -89,7 +91,6 @@ export async function handler(event: any) {
       params[key] = event.multiValueQueryStringParameters[key][0];
     });
   }
-  if (event.httpMethod) HTTP_METHOD = event.httpMethod;
 
   function setupResponse(
     response: {
