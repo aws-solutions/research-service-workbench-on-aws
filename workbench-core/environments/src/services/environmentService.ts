@@ -89,48 +89,48 @@ export class EnvironmentService {
    * @param includeMetadata - If true we get all entries where pk = envId, instead of just the entry where pk = envId and sk = envId
    */
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
-    if (includeMetadata) {
-      const data = await this._dynamoDBService
-        .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
-        .execute();
-      if (data.Count === 0) {
-        throw Boom.notFound(`Could not find environment ${envId}`);
-      }
-      const items = data.Items!.map((item) => {
-        return item;
-      });
-      let envWithMetadata: Environment = { ...defaultEnv };
-      envWithMetadata.DATASETS = [];
-      envWithMetadata.ENDPOINTS = [];
-      for (const item of items) {
-        // parent environment item
-        const sk = item.sk as unknown as string;
-        if (sk === buildDynamoDbKey(envId, resourceTypeToKey.environment)) {
-          envWithMetadata = { ...envWithMetadata, ...item };
-        } else {
-          const envKey = sk.split('#')[0];
-          if (envKey === 'DATASET') {
-            envWithMetadata.DATASETS!.push(item);
-          } else if (envKey === 'ENDPOINT') {
-            envWithMetadata.ENDPOINTS!.push(item);
-          } else {
-            // metadata of environment item
-            // @ts-ignore
-            envWithMetadata[sk.split('#')[0]] = item;
-          }
-        }
-      }
-      return envWithMetadata;
-    } else {
+    if (!includeMetadata) {
       const data = (await this._dynamoDBService
         .get(buildDynamoDBPkSk(envId, resourceTypeToKey.environment))
         .execute()) as GetItemCommandOutput;
-      if (data.Item) {
-        return data.Item! as unknown as Environment;
-      } else {
+      if (!data.Item) {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
+
+      return data.Item! as unknown as Environment;
     }
+
+    const data = await this._dynamoDBService
+      .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
+      .execute();
+    if (data.Count === 0) {
+      throw Boom.notFound(`Could not find environment ${envId}`);
+    }
+    const items = data.Items!.map((item) => {
+      return item;
+    });
+    let envWithMetadata: Environment = { ...defaultEnv };
+    envWithMetadata.DATASETS = [];
+    envWithMetadata.ENDPOINTS = [];
+    for (const item of items) {
+      // parent environment item
+      const sk = item.sk as unknown as string;
+      if (sk === buildDynamoDbKey(envId, resourceTypeToKey.environment)) {
+        envWithMetadata = { ...envWithMetadata, ...item };
+      } else {
+        const envKey = sk.split('#')[0];
+        if (envKey === 'DATASET') {
+          envWithMetadata.DATASETS!.push(item);
+        } else if (envKey === 'ENDPOINT') {
+          envWithMetadata.ENDPOINTS!.push(item);
+        } else {
+          // metadata of environment item
+          // @ts-ignore
+          envWithMetadata[sk.split('#')[0]] = item;
+        }
+      }
+    }
+    return envWithMetadata;
   }
 
   /**

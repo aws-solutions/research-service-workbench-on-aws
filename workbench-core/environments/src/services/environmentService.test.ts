@@ -33,7 +33,8 @@ describe('EnvironmentService', () => {
     ddbMock.reset();
   });
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
-  const dynamoDBService = new DynamoDBService({ region: 'us-east-1', table: 'tableName' });
+  const tableName = 'tableName';
+  const dynamoDBService = new DynamoDBService({ region: process.env.AWS_REGION!, table: tableName });
   const envService = new EnvironmentService(dynamoDBService);
   const dateString = '2021-02-26T22:42:16.652Z';
   const mockDateObject = new Date(dateString);
@@ -143,7 +144,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -170,7 +171,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           KeyConditionExpression: '#pk = :pk',
           ExpressionAttributeNames: {
             '#pk': 'pk'
@@ -209,7 +210,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           KeyConditionExpression: '#pk = :pk',
           ExpressionAttributeNames: {
             '#pk': 'pk'
@@ -236,7 +237,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -262,7 +263,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByStatus',
           KeyConditionExpression: '#resourceType = :resourceType AND #status = :status',
           ExpressionAttributeNames: {
@@ -302,7 +303,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
           ExpressionAttributeNames: {
@@ -342,7 +343,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression:
             '#resourceType = :resourceType AND #createdAt BETWEEN :createdAt1 AND :createdAt2',
@@ -387,7 +388,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByDependency',
           KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
           ExpressionAttributeNames: {
@@ -427,7 +428,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType AND #owner = :owner',
           ExpressionAttributeNames: {
@@ -467,7 +468,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByType',
           KeyConditionExpression: '#resourceType = :resourceType AND #type = :type',
           ExpressionAttributeNames: {
@@ -517,7 +518,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByStatus',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -557,7 +558,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -597,7 +598,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -637,7 +638,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -677,7 +678,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByDependency',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -717,7 +718,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -757,7 +758,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByType',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -807,7 +808,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -840,7 +841,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType AND #owner = :owner',
           ExpressionAttributeNames: {
@@ -885,7 +886,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -941,7 +942,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -961,7 +962,7 @@ describe('EnvironmentService', () => {
       // CHECK
       const updateCall = ddbMock.commandCalls(UpdateItemCommand)[0];
       expect(updateCall.args[0].input).toMatchObject({
-        TableName: 'exampleDDBTable',
+        TableName: tableName,
         Key: {
           pk: {
             S: `ENV#${envId}`
@@ -1071,44 +1072,36 @@ describe('EnvironmentService', () => {
       });
 
       test('creates association objects for the mounted datasets', async () => {
-        jest
-          .spyOn(DynamoDBService.prototype, 'commitTransaction')
-          .mockImplementation(
-            (
-              params:
-                | {
-                    addPutRequest?: Record<string, JSONValue>[] | undefined;
-                    addDeleteRequests?: Record<string, JSONValue>[] | undefined;
-                  }
-                | undefined
-            ): Promise<void> => {
-              const dataSetWithEnvironment = params!.addPutRequest!.find((item) => {
-                const pk = item.pk as string;
-                const sk = item.sk as string;
+        jest.spyOn(DynamoDBService.prototype, 'commitTransaction').mockImplementation(
+          (
+            params:
+              | {
+                  addPutRequest?: Record<string, JSONValue>[] | undefined;
+                  addDeleteRequests?: Record<string, JSONValue>[] | undefined;
+                }
+              | undefined
+          ): Promise<void> => {
+            const dataSetWithEnvironment = params!.addPutRequest!.find((item) => {
+              const pk = item.pk as string;
+              const sk = item.sk as string;
 
-                return pk === dataSetKey && sk === environmentKey;
-              });
+              return pk === dataSetKey && sk === environmentKey;
+            });
 
-              expect(dataSetWithEnvironment).toEqual({
-                pk: dataSetKey,
-                sk: environmentKey,
-                id: 'env-44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
-                projectId,
-                createdAt: dateString,
-                updatedAt: dateString
-              });
+            expect(dataSetWithEnvironment).toEqual({
+              pk: dataSetKey,
+              sk: environmentKey,
+              id: 'env-44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
+              projectId,
+              createdAt: dateString,
+              updatedAt: dateString
+            });
 
-              return Promise.resolve();
-            }
-          );
+            return Promise.resolve();
+          }
+        );
 
-        try {
-          await envService.createEnvironment(createEnvReq, authenticateUser);
-        } catch (e) {
-          throw new Error(
-            "The expected 'DataSet With Env' object was not found in the database transaction."
-          );
-        }
+        await envService.createEnvironment(createEnvReq, authenticateUser);
       });
     });
 
