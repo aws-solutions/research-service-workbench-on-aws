@@ -478,10 +478,10 @@ export default class DynamoDBService {
 
   public transactEdit(params?: {
     addPutRequests?: {
-      item: Record<string, unknown>;
+      item: Record<string, JSONValue | Set<JSONValue>>;
       conditionExpression?: string;
       expressionAttributeNames?: Record<string, string>;
-      expressionAttributeValues?: Record<string, unknown>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
     }[];
     addDeleteRequests?: Record<string, unknown>[];
     addPutItems?: Record<string, unknown>[];
