@@ -28,17 +28,10 @@ describe('EnvironmentService', () => {
     process.env.AWS_REGION = 'us-east-1';
   });
   const ddbMock = mockClient(DynamoDBClient);
-  beforeEach(() => {
-    jest.clearAllMocks();
-    ddbMock.reset();
-  });
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
   const tableName = 'exampleDDBTable';
   const dynamoDBService = new DynamoDBService({ region: process.env.AWS_REGION!, table: tableName });
   const envService = new EnvironmentService(dynamoDBService);
-  const dateString = '2021-02-26T22:42:16.652Z';
-  const mockDateObject = new Date(dateString);
-  jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
   const envTypeConfigItem = {
     provisioningArtifactId: 'pa-3cwcuxmksf2xy',
@@ -134,6 +127,14 @@ describe('EnvironmentService', () => {
     pk: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
     id: projectId
   };
+
+  const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
+  beforeEach(() => {
+    jest.clearAllMocks();
+    ddbMock.reset();
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
+  });
 
   describe('getEnvironment', () => {
     test('includeMetadata = false', async () => {
@@ -1093,15 +1094,20 @@ describe('EnvironmentService', () => {
               sk: environmentKey,
               id: 'env-44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
               projectId,
-              createdAt: dateString,
-              updatedAt: dateString
+              createdAt: mockDateObject.toISOString(),
+              updatedAt: mockDateObject.toISOString()
             });
 
             return Promise.resolve();
           }
         );
 
-        await envService.createEnvironment(createEnvReq, authenticateUser);
+        try {
+          await envService.createEnvironment(createEnvReq, authenticateUser);
+        } catch (e) {
+          console.error(e);
+          throw new Error('Failed to create expected Dataset With Environment object');
+        }
       });
     });
 
