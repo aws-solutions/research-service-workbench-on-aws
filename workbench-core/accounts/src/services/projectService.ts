@@ -20,7 +20,8 @@ import {
   fromPaginationToken,
   validateSingleSortAndFilter,
   getFilterQueryParams,
-  getSortQueryParams
+  getSortQueryParams,
+  PaginatedResponse
 } from '@aws/workbench-core-base';
 
 import * as Boom from '@hapi/boom';
@@ -31,7 +32,6 @@ import { CreateProjectRequest } from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { GetProjectRequest } from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
-import ListProjectsResponse from '../models/projects/listProjectsResponse';
 import { Project } from '../models/projects/project';
 import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
@@ -52,7 +52,6 @@ export default class ProjectService {
     // this._dynamicAuthorizationService = new DynamicAuthorizationService();
   }
 
-  // TODO--fix tests
   /**
    * Get project
    * @param request - the request object for getting a project
@@ -82,9 +81,9 @@ export default class ProjectService {
    * List projects
    *
    * @param request - the request object for listing projects
-   * @returns Project entries in DDB
+   * @returns Project entries in DDB, with optional pagination token
    */
-  public async listProjects(request: ListProjectsRequest): Promise<ListProjectsResponse> {
+  public async listProjects(request: ListProjectsRequest): Promise<PaginatedResponse<Project>> {
     // Get the values from request
     const { filter, sort } = request;
     let { pageSize, paginationToken } = request;
@@ -395,7 +394,7 @@ export default class ProjectService {
     paginationToken: string | undefined,
     projectsOnPage: Project[],
     pageSize: number
-  ): Promise<ListProjectsResponse> {
+  ): Promise<PaginatedResponse<Project>> {
     if (paginationToken) {
       const manualExclusiveStartKey = fromPaginationToken(paginationToken);
       const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
