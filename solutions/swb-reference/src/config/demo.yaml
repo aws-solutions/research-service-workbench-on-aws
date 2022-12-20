@@ -7,4 +7,4 @@ allowedOrigins: ['http://localhost:3000']
 cognitoDomain: 'chamonix-dev-demo-domain'
 
 # Auditing
-fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']
