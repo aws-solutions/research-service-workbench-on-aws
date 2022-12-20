@@ -20,9 +20,6 @@ describe('ListProjectsRequestParser', () => {
         // BUILD
         expectedPageSize = 5;
         requestObject.pageSize = `${expectedPageSize}`;
-        // requestObject = {
-        //   pageSize: `${expectedPageSize}`
-        // };
       });
 
       test('it parses the page size into a number', () => {
@@ -41,9 +38,6 @@ describe('ListProjectsRequestParser', () => {
       beforeEach(() => {
         // BUILD
         requestObject.pageSize = 'nonNumber';
-        // requestObject = {
-        //   pageSize: 'nonNumber'
-        // };
       });
 
       test('it returns an error', () => {
@@ -69,9 +63,6 @@ describe('ListProjectsRequestParser', () => {
         // BUILD
         expectedPageSize = -1;
         requestObject.pageSize = `${expectedPageSize}`;
-        // requestObject = {
-        //   pageSize: `${expectedPageSize}`
-        // };
       });
 
       test('it returns an error', () => {
@@ -100,11 +91,6 @@ describe('ListProjectsRequestParser', () => {
         requestObject.sort = {
           name: 'asc'
         };
-        // requestObject = {
-        //   sort: {
-        //     name: 'asc'
-        //   }
-        // };
       });
 
       test('it parses the sort request correctly', () => {
@@ -124,11 +110,6 @@ describe('ListProjectsRequestParser', () => {
         requestObject.sort = {
           name: 'invalidValue'
         };
-        // requestObject = {
-        //   sort: {
-        //     name: 'invalidValue'
-        //   }
-        // };
       });
 
       test('it returns an error', () => {
@@ -159,11 +140,6 @@ describe('ListProjectsRequestParser', () => {
         requestObject.filter = {
           name: { eq: 'abc' }
         };
-        // requestObject = {
-        //   filter: {
-        //     name: { eq: 'abc' }
-        //   }
-        // };
       });
 
       test('it parses the filter request correctly', () => {
@@ -183,11 +159,6 @@ describe('ListProjectsRequestParser', () => {
         requestObject.filter = {
           name: { invalidKey: 'abc' }
         };
-        // requestObject = {
-        //   filter: {
-        //     name: { invalidKey: 'abc' }
-        //   }
-        // };
       });
 
       test('it returns an error', () => {
