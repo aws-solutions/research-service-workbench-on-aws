@@ -18,6 +18,7 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { EnvironmentService } from './environmentService';
@@ -32,8 +33,11 @@ describe('EnvironmentService', () => {
     ddbMock.reset();
   });
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
-  const TABLE_NAME = 'exampleDDBTable';
-  const envService = new EnvironmentService({ TABLE_NAME });
+  const dynamoDBService = new DynamoDBService({ region: 'us-east-1', table: 'tableName' });
+  const envService = new EnvironmentService(dynamoDBService);
+  const dateString = '2021-02-26T22:42:16.652Z';
+  const mockDateObject = new Date(dateString);
+  jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
 
   const envTypeConfigItem = {
     provisioningArtifactId: 'pa-3cwcuxmksf2xy',
@@ -59,6 +63,8 @@ describe('EnvironmentService', () => {
     productId: 'prod-t5q2vqlgvd76o'
   };
 
+  const projectId = 'proj-123';
+
   const env = {
     pk: `ENV#${envId}`,
     sk: `ENV#${envId}`,
@@ -73,7 +79,7 @@ describe('EnvironmentService', () => {
     name: 'testEnv',
     outputs: [],
     owner: 'owner-123',
-    projectId: 'proj-123',
+    projectId: projectId,
     status: 'PENDING',
     studyIds: ['study-123'],
     type: envTypeConfigItem.sk,
@@ -81,8 +87,11 @@ describe('EnvironmentService', () => {
     resourceType: 'environment',
     instanceId: 'instance-123',
     provisionedProductId: '',
-    dependency: 'proj-123'
+    dependency: projectId
   };
+
+  const dataSetKey = 'DATASET#dataset-123';
+  const environmentKey = `ENV#${envId}`;
 
   const datasetItem = {
     resources: [
@@ -92,8 +101,8 @@ describe('EnvironmentService', () => {
     ],
     updatedAt: '2022-05-18T20:33:42.608Z',
     createdAt: '2022-05-18T20:33:42.608Z',
-    sk: 'DATASET#dataset-123',
-    pk: `ENV#${envId}`,
+    sk: dataSetKey,
+    pk: environmentKey,
     id: 'dataset-123',
     name: 'Study 1'
   };
@@ -120,9 +129,9 @@ describe('EnvironmentService', () => {
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     externalId: 'workbench',
     updatedAt: '2022-05-18T20:33:42.608Z',
-    sk: 'PROJ#proj-123',
+    sk: `PROJ#${projectId}`,
     pk: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
-    id: 'proj-123'
+    id: projectId
   };
 
   describe('getEnvironment', () => {
@@ -390,7 +399,7 @@ describe('EnvironmentService', () => {
               S: 'environment'
             },
             ':dependency': {
-              S: 'proj-123'
+              S: projectId
             }
           }
         })
@@ -399,7 +408,7 @@ describe('EnvironmentService', () => {
       // OPERATE
       const actualResponse = await envService.listEnvironments(
         { roles: ['Admin'], id: 'owner-123' },
-        { project: 'proj-123' }
+        { project: projectId }
       );
 
       // CHECK
@@ -995,7 +1004,7 @@ describe('EnvironmentService', () => {
       outputs: [],
       envTypeId: 'envType-123',
       envTypeConfigId: 'envTypeConfig-123',
-      projectId: 'proj-123',
+      projectId: projectId,
       datasetIds: ['dataset-123'],
       status: 'PENDING'
     };
@@ -1016,47 +1025,93 @@ describe('EnvironmentService', () => {
         });
       return {
         Responses: {
-          [TABLE_NAME]: batchResponses // Order is important
+          [dynamoDBService.getTableName()]: batchResponses // Order is important
         }
       };
     }
 
-    test('successfully', async () => {
-      // BUILD
-      // Get env metadata
-      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project', 'dataset']);
-      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+    describe('with a valid request', () => {
+      beforeEach(() => {
+        // BUILD
+        // Get env metadata
+        const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project', 'dataset']);
+        ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
-      // Write data to DDB
-      ddbMock.on(TransactWriteItemsCommand).resolves({});
+        // Write data to DDB
+        ddbMock.on(TransactWriteItemsCommand).resolves({});
 
-      // Get environment from DDB
-      const metaData = [datasetItem, envTypeConfigItem, projItem];
-      const envWithMetadata = [env, ...metaData];
-      const queryItemResponse: QueryCommandOutput = {
-        Items: envWithMetadata.map((item) => {
-          return marshall(item);
-        }),
-        $metadata: {}
-      };
-      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+        // Get environment from DDB
+        const metaData = [datasetItem, envTypeConfigItem, projItem];
+        const envWithMetadata = [env, ...metaData];
+        const queryItemResponse: QueryCommandOutput = {
+          Items: envWithMetadata.map((item) => {
+            return marshall(item);
+          }),
+          $metadata: {}
+        };
+        ddbMock.on(QueryCommand).resolves(queryItemResponse);
+      });
 
-      // OPERATE
-      const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
+      test('creates a new environment', async () => {
+        // OPERATE
+        const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
 
-      // CHECK
-      expect(actualResponse).toEqual({
-        DATASETS: [datasetItem],
-        ENDPOINTS: [],
-        ETC: envTypeConfigItem,
-        PROJ: projItem,
-        ...env,
-        provisionedProductId: '',
-        error: undefined,
-        createdBy: '',
-        updatedBy: ''
+        // CHECK
+        expect(actualResponse).toEqual({
+          DATASETS: [datasetItem],
+          ENDPOINTS: [],
+          ETC: envTypeConfigItem,
+          PROJ: projItem,
+          ...env,
+          provisionedProductId: '',
+          error: undefined,
+          createdBy: '',
+          updatedBy: ''
+        });
+      });
+
+      test('creates association objects for the mounted datasets', async () => {
+        jest
+          .spyOn(DynamoDBService.prototype, 'commitTransaction')
+          .mockImplementation(
+            (
+              params:
+                | {
+                    addPutRequest?: Record<string, JSONValue>[] | undefined;
+                    addDeleteRequests?: Record<string, JSONValue>[] | undefined;
+                  }
+                | undefined
+            ): Promise<void> => {
+              const dataSetWithEnvironment = params!.addPutRequest!.find((item) => {
+                const pk = item.pk as string;
+                const sk = item.sk as string;
+
+                return pk === dataSetKey && sk === environmentKey;
+              });
+
+              expect(dataSetWithEnvironment).toEqual({
+                pk: dataSetKey,
+                sk: environmentKey,
+                id: 'env-44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
+                projectId,
+                createdAt: dateString,
+                updatedAt: dateString
+              });
+
+              return Promise.resolve();
+            }
+          );
+
+        try {
+          await envService.createEnvironment(createEnvReq, authenticateUser);
+        } catch (e) {
+          throw new Error(
+            "The expected 'DataSet With Env' object was not found in the database transaction."
+          );
+        }
       });
     });
+
     test('failed because ETC does not exist', async () => {
       // BUILD
       const filteredBatchItems = getBatchItemsWith(['project', 'dataset']);
@@ -1104,7 +1159,7 @@ describe('EnvironmentService', () => {
 
       // OPERATE && CHECK
       await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
-        Boom.badRequest('projectId proj-123 does not exist')
+        Boom.badRequest(`projectId ${projectId} does not exist`)
       );
     });
     test('failed because Dataset does not exist', async () => {

@@ -476,6 +476,23 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
+  /**
+   * Commits transactions to the table
+   *
+   * @param params - the items for the transaction
+   */
+  public async commitTransaction(params?: {
+    addPutRequest?: Record<string, JSONValue>[];
+    addDeleteRequests?: Record<string, JSONValue>[];
+  }): Promise<void> {
+    await this.transactEdit(params).execute();
+  }
+
+  /**
+   * @deprecated Use `commitTransaction` instead
+   * @param params - the items for the transaction
+   * @returns A TransactEdit object
+   */
   public transactEdit(params?: {
     addPutRequest?: Record<string, unknown>[];
     addDeleteRequests?: Record<string, unknown>[];
@@ -492,5 +509,12 @@ export default class DynamoDBService {
       );
     }
     return transactEdit;
+  }
+
+  /**
+   * @returns the table name
+   */
+  public getTableName() {
+    return this._tableName;
   }
 }
