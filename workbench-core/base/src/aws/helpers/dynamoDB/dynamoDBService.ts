@@ -514,7 +514,7 @@ export default class DynamoDBService {
   /**
    * @returns the table name
    */
-  public getTableName() {
+  public getTableName(): string {
     return this._tableName;
   }
 }
