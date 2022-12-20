@@ -476,6 +476,29 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
+  /**
+   * Commits transactions to the table
+   *
+   * @param params - the items for the transaction
+   */
+  public async commitTransaction(params?: {
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+  }): Promise<void> {
+    await this.transactEdit(params).execute();
+  }
+
+  /**
+   * @deprecated Use `commitTransaction` instead
+   * @param params - the items for the transaction
+   * @returns A TransactEdit object
+   */
   public transactEdit(params?: {
     addPutRequests?: {
       item: Record<string, JSONValue | Set<JSONValue>>;
@@ -483,8 +506,8 @@ export default class DynamoDBService {
       expressionAttributeNames?: Record<string, string>;
       expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
     }[];
-    addDeleteRequests?: Record<string, unknown>[];
-    addPutItems?: Record<string, unknown>[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
   }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
     if (params?.addDeleteRequests) {
@@ -510,5 +533,12 @@ export default class DynamoDBService {
       );
     }
     return transactEdit;
+  }
+
+  /**
+   * @returns the table name
+   */
+  public getTableName(): string {
+    return this._tableName;
   }
 }
