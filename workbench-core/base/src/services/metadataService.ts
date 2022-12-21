@@ -138,7 +138,7 @@ export class MetadataService {
 
     await this._ddbService
       .transactEdit({
-        addPutRequest: items
+        addPutItems: items
       })
       .execute();
   }

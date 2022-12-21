@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-infrastructure",
+      "comment": "dynamicAuth infrastructure update",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-infrastructure"
+}

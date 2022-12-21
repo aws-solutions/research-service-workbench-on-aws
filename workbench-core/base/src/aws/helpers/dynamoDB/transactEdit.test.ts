@@ -6,7 +6,7 @@
 import TransactEdit from './transactEdit';
 
 describe('transactEdit', () => {
-  test('addPutRequests', async () => {
+  test('addPutItems', async () => {
     const transactEdit = new TransactEdit({ region: 'us-east-2' }, 'swb-dev-oh');
     //BUILD
     const etc = {
@@ -42,7 +42,7 @@ describe('transactEdit', () => {
       }
     };
     // OPERATE
-    transactEdit.addPutRequests([etc, proj]);
+    transactEdit.addPutItems([etc, proj]);
 
     // CHECK
     const response = transactEdit.getParams();
@@ -82,6 +82,93 @@ describe('transactEdit', () => {
     };
     expect(response).toMatchObject(expectedResponse);
   });
+
+  test('addPutRequests', async () => {
+    const transactEdit = new TransactEdit({ region: 'us-east-2' }, 'swb-dev-oh');
+    //BUILD
+    const etc = {
+      pk: {
+        S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b'
+      },
+      sk: {
+        S: 'ETC#envTypeConfig-123'
+      },
+      id: {
+        S: 'envTypeConfig-123'
+      },
+      productId: {
+        S: 'prod-t5q2vqlgvd76o'
+      },
+      provisioningArtifactId: {
+        S: 'pa-3cwcuxmksf2xy'
+      }
+    };
+
+    const proj = {
+      pk: {
+        S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b'
+      },
+      sk: {
+        S: 'PROJ#proj-123'
+      },
+      id: {
+        S: 'proj-123'
+      },
+      name: {
+        S: 'Example project'
+      }
+    };
+
+    const putRequestsParams = [
+      {
+        item: etc,
+        conditionExpression: 'attribute_not_exists(pk)'
+      },
+
+      {
+        item: proj,
+        conditionExpression: 'attribute_not_exists(pk)'
+      }
+    ];
+
+    // OPERATE
+    transactEdit.addPutRequests(putRequestsParams);
+
+    // CHECK
+    const response = transactEdit.getParams();
+
+    const expectedResponse = {
+      TransactItems: [
+        {
+          Put: {
+            TableName: 'swb-dev-oh',
+            Item: {
+              pk: { S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b' },
+              sk: { S: 'ETC#envTypeConfig-123' },
+              id: { S: 'envTypeConfig-123' },
+              productId: { S: 'prod-t5q2vqlgvd76o' },
+              provisioningArtifactId: { S: 'pa-3cwcuxmksf2xy' }
+            },
+            ConditionExpression: 'attribute_not_exists(pk)'
+          }
+        },
+        {
+          Put: {
+            TableName: 'swb-dev-oh',
+            Item: {
+              pk: { S: 'ENV#82c56cf2-75b7-43ce-884a-aee45f91866b' },
+              sk: { S: 'PROJ#proj-123' },
+              id: { S: 'proj-123' },
+              name: { S: 'Example project' }
+            },
+            ConditionExpression: 'attribute_not_exists(pk)'
+          }
+        }
+      ]
+    };
+    expect(response).toMatchObject(expectedResponse);
+  });
+
   test('addDeleteRequest', async () => {
     const transactEdit = new TransactEdit({ region: 'us-east-2' }, 'swb-dev-oh');
     //BUILD
