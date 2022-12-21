@@ -10,6 +10,9 @@ import {
   DataSetPlugin,
   DataSetStoragePlugin
 } from '@aws/swb-app';
+import { AddRemoveAccessPermissionRequest } from '@aws/swb-app/lib/dataSets/addRemoveAccessPermissionRequest';
+import { GetAccessPermissionRequest } from '@aws/swb-app/lib/dataSets/getAccessPermissionRequestParser';
+import { PermissionsResponse } from '@aws/swb-app/lib/dataSets/permissionsResponseParser';
 import { AuditService } from '@aws/workbench-core-audit';
 import {
   DataSetMetadataPlugin,
@@ -62,5 +65,25 @@ export class DataSetService implements DataSetPlugin {
 
   public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
     return this._workbenchDataSetService.provisionDataSet(request);
+  }
+
+  addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
+    return Promise.resolve(undefined);
+  }
+
+  getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse> {
+    return Promise.resolve(undefined);
+  }
+
+  getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
+    return Promise.resolve(undefined);
+  }
+
+  removeAccessPermissions(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
+    return Promise.resolve(undefined);
+  }
+
+  removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
+    return Promise.resolve(undefined);
   }
 }
