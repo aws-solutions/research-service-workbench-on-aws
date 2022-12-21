@@ -26,23 +26,19 @@ export default class Datasets extends CollectionResource {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const dataSetName = randomTextGenerator.getFakeText('test-DS');
     return {
-      name: resource.name ?? dataSetName,
+      datasetName: resource.datasetName ?? dataSetName,
       path: resource.path ?? dataSetName,
       storageName: resource.storageName,
       awsAccountId: resource.awsAccountId,
-      region: resource.region,
-      owner: resource.owner,
-      type: resource.type
+      region: resource.region
     };
   }
 }
 
 interface DataSetCreateRequest {
-  name: string;
+  datasetName: string;
   storageName: string;
   path: string;
   awsAccountId: string;
   region: string;
-  owner: string;
-  type: string;
 }

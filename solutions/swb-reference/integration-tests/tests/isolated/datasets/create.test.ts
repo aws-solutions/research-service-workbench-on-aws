@@ -5,11 +5,13 @@
 import ClientSession from '../../../support/clientSession';
 import Setup from '../../../support/setup';
 import HttpError from '../../../support/utils/HttpError';
+import RandomTextGenerator from '../../../support/utils/randomTextGenerator';
 import { checkHttpError } from '../../../support/utils/utilities';
 
 describe('datasets create negative tests', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -23,8 +25,101 @@ describe('datasets create negative tests', () => {
     await setup.cleanup();
   });
 
+  const validLaunchParameters = {
+    datasetName: randomTextGenerator.getFakeText('fakeName'),
+    storageName: randomTextGenerator.getFakeText('fakeBucket'),
+    path: randomTextGenerator.getFakeText('fakePath'),
+    awsAccountId: randomTextGenerator.getFakeText('fakeAccount'),
+    region: randomTextGenerator.getFakeText('fakeRegion')
+  };
+
   describe('missing parameters', () => {
-    test('returns an error specifying the missing parameters', async () => {
+    test('datasetName', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.datasetName;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'datasetName'"
+          })
+        );
+      }
+    });
+
+    test('path', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.path;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'path'"
+          })
+        );
+      }
+    });
+
+    test('storageName', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.storageName;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'storageName'"
+          })
+        );
+      }
+    });
+
+    test('awsAccountId', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.awsAccountId;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'awsAccountId'"
+          })
+        );
+      }
+    });
+
+    test('region', async () => {
+      try {
+        const invalidParam: { [id: string]: string } = { ...validLaunchParameters };
+        delete invalidParam.region;
+        await adminSession.resources.datasets.create(invalidParam, false);
+      } catch (e) {
+        checkHttpError(
+          e,
+          new HttpError(400, {
+            statusCode: 400,
+            error: 'Bad Request',
+            message: "requires property 'region'"
+          })
+        );
+      }
+    });
+
+    test('all parameters', async () => {
       try {
         await adminSession.resources.datasets.create({}, false);
       } catch (e) {
@@ -34,7 +129,7 @@ describe('datasets create negative tests', () => {
             statusCode: 400,
             error: 'Bad Request',
             message:
-              "requires property 'name'. requires property 'storageName'. requires property 'path'. requires property 'awsAccountId'. requires property 'region'. requires property 'type'. requires property 'owner'"
+              "requires property 'datasetName'. requires property 'storageName'. requires property 'path'. requires property 'awsAccountId'. requires property 'region'"
           })
         );
       }
