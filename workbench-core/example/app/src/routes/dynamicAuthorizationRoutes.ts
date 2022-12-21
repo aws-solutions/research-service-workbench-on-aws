@@ -18,9 +18,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   router.post(
     '/authorization/group',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);
-
       try {
+        const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);
+
         const { data } = await dynamicAuthorizationService.createGroup({
           authenticatedUser: res.locals.user,
           ...validatedRequest
@@ -28,14 +28,15 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         res.status(201).send(data);
       } catch (error) {
         if (isGroupAlreadyExistsError(error)) {
-          Boom.badRequest('Group already exists');
-        } else if (isPluginConfigurationError(error)) {
-          Boom.internal('An internal error occurred');
-        } else if (isTooManyRequestsError(error)) {
-          Boom.tooManyRequests('Too many requests');
-        } else {
-          throw error;
+          throw Boom.badRequest('Group already exists');
         }
+        if (isPluginConfigurationError(error)) {
+          throw Boom.internal('An internal error occurred');
+        }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests('Too many requests');
+        }
+        throw error;
       }
     })
   );
