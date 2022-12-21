@@ -23,3 +23,4 @@ export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors
 export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
+export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
