@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "Added GroupManagementPlugin interface and reference implementation.",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
