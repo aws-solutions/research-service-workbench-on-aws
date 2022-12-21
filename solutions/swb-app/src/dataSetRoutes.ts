@@ -4,29 +4,32 @@
  */
 
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
-import { CreateDataSetSchema, CreateExternalEndpointSchema } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
+import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
+import {
+  CreateExternalEndpointRequest,
+  CreateExternalEndpointRequestParser
+} from './dataSets/createExternalEndpointRequestParser';
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
       const dataSet = await dataSetService.provisionDataSet({
-        name: req.body.name,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
+        name: validatedRequest.name,
+        storageName: validatedRequest.storageName,
+        path: validatedRequest.path,
+        awsAccountId: validatedRequest.awsAccountId,
+        region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: req.body.owner,
-        type: req.body.type
+        owner: validatedRequest.owner,
+        type: validatedRequest.type
       });
 
       res.status(201).send(dataSet);
@@ -37,16 +40,16 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
   router.post(
     '/datasets/import',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateDataSetSchema));
+      const validatedRequest = validateAndParse<CreateDataSetRequest>(req.body, CreateDataSetRequestParser);
       const dataSet = await dataSetService.importDataSet({
-        name: req.body.name,
-        storageName: req.body.storageName,
-        path: req.body.path,
-        awsAccountId: req.body.awsAccountId,
-        region: req.body.region,
+        name: validatedRequest.name,
+        storageName: validatedRequest.storageName,
+        path: validatedRequest.path,
+        awsAccountId: validatedRequest.awsAccountId,
+        region: validatedRequest.region,
         storageProvider: dataSetService.storagePlugin,
-        owner: req.body.owner,
-        type: req.body.type
+        owner: validatedRequest.owner,
+        type: validatedRequest.type
       });
       res.status(201).send(dataSet);
     })
@@ -59,13 +62,16 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       if (req.params.id.match(uuidWithLowercasePrefixRegExp(resourceTypeToKey.dataset)) === null) {
         throw Boom.badRequest('id request parameter is invalid');
       }
-      processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
+      const validatedRequest = validateAndParse<CreateExternalEndpointRequest>(
+        req.body,
+        CreateExternalEndpointRequestParser
+      );
       await dataSetService.addDataSetExternalEndpoint({
         dataSetId: req.params.id,
-        externalEndpointName: req.body.externalEndpointName,
-        externalRoleName: req.body.externalRoleName,
-        kmsKeyArn: req.body.kmsKeyArn,
-        vpcId: req.body.vpcId
+        externalEndpointName: validatedRequest.externalEndpointName,
+        externalRoleName: validatedRequest.externalRoleName,
+        kmsKeyArn: validatedRequest.kmsKeyArn,
+        vpcId: validatedRequest.vpcId
       });
       res.status(201).send();
     })

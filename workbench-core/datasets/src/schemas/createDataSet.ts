@@ -14,12 +14,10 @@ const CreateDataSetSchema: Schema = {
     storageName: { type: 'string' },
     path: { type: 'string' },
     awsAccountId: { type: 'string' },
-    region: { type: 'string' },
-    type: { type: 'string' },
-    owner: { type: 'string' }
+    region: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['name', 'storageName', 'path', 'awsAccountId', 'region', 'type', 'owner']
+  required: ['name', 'storageName', 'path', 'awsAccountId', 'region']
 };
 
 export default CreateDataSetSchema;
