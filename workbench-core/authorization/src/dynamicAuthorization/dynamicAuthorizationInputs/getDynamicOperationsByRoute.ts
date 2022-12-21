@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { HTTPMethod } from '../../routesMap';
 import { DynamicOperation } from './dynamicOperation';
 /**
