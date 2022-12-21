@@ -33,6 +33,18 @@ export interface UserManagementPlugin {
   getUser(id: string): Promise<User>;
 
   /**
+   * Gets the roles for a certain user.
+   *
+   * @param id - the user id to get roles for
+   * @returns an array of the user's roles
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   */
+  getUserRoles(id: string): Promise<string[]>;
+
+  /**
    * Create a new user with the given details.
    * @param user - the details of the user to create.
    * @returns the created {@link User}
