@@ -78,8 +78,9 @@ describe('multiStep dataset integration test', () => {
     // Verify dataset has env access point listed in its external endpoints
     const { data: dataSetDetails } = await adminSession.resources.datasets.dataset(dataSet.id).get();
     // Dataset was created just for this test case, so we expect only one endpoint
-    expect(dataSetDetails.externalEndpoints).toMatchObject([
-      envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]
-    ]);
+    expect(dataSetDetails).toMatchObject({
+      ...dataSetBody,
+      externalEndpoints: [envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]]
+    });
   });
 });

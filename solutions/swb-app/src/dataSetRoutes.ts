@@ -24,7 +24,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetService.storagePlugin
+        storageProvider: dataSetService.storagePlugin,
+        owner: req.body.owner,
+        type: req.body.type
       });
 
       res.status(201).send(dataSet);
@@ -42,7 +44,9 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetService.storagePlugin
+        storageProvider: dataSetService.storagePlugin,
+        owner: req.body.owner,
+        type: req.body.type
       });
       res.status(201).send(dataSet);
     })
