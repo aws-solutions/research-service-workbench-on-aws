@@ -9,7 +9,7 @@ import { z } from 'zod';
 export const DataSetPermissionParser = z
   .object({
     subject: z.string(),
-    accessLevel: z.enum(['read-only', 'write-only'])
+    accessLevel: z.union([z.literal('read-only'), z.literal('read-write')])
   })
   .strict();
 

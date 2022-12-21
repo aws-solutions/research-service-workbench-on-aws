@@ -4,31 +4,35 @@
  */
 
 import {
+  AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
   DataSet,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
-  DataSetStoragePlugin
+  DataSetStoragePlugin,
+  GetAccessPermissionRequest,
+  PermissionsResponse,
+  PermissionsResponseParser
 } from '@aws/swb-app';
-import { AddRemoveAccessPermissionRequest } from '@aws/swb-app/lib/dataSets/addRemoveAccessPermissionRequest';
-import { GetAccessPermissionRequest } from '@aws/swb-app/lib/dataSets/getAccessPermissionRequestParser';
-import { PermissionsResponse } from '@aws/swb-app/lib/dataSets/permissionsResponseParser';
 import { AuditService } from '@aws/workbench-core-audit';
 import {
   DataSetMetadataPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
+import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import { LoggingService } from '@aws/workbench-core-logging';
 
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
+  private _dataSetsAuthService: DataSetsAuthorizationPlugin;
   private _workbenchDataSetService: WorkbenchDataSetService;
 
   public constructor(
     dataSetStoragePlugin: DataSetStoragePlugin,
     auditService: AuditService,
     loggingService: LoggingService,
-    dataSetMetadataPlugin: DataSetMetadataPlugin
+    dataSetMetadataPlugin: DataSetMetadataPlugin,
+    dataSetAuthService: DataSetsAuthorizationPlugin
   ) {
     this._workbenchDataSetService = new WorkbenchDataSetService(
       auditService,
@@ -36,6 +40,7 @@ export class DataSetService implements DataSetPlugin {
       dataSetMetadataPlugin
     );
     this.storagePlugin = dataSetStoragePlugin;
+    this._dataSetsAuthService = dataSetAuthService;
   }
 
   public addDataSetExternalEndpoint(
@@ -67,23 +72,30 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.provisionDataSet(request);
   }
 
-  addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
-    return Promise.resolve(undefined);
+  public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.addAccessPermission(params);
+    return PermissionsResponseParser.parse(response);
   }
 
-  getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse> {
-    return Promise.resolve(undefined);
+  public async getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.getAccessPermissions(params);
+    return PermissionsResponseParser.parse(response);
   }
 
-  getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    return Promise.resolve(undefined);
+  public async getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.getAllDataSetAccessPermissions(datasetId);
+    return PermissionsResponseParser.parse(response);
   }
 
-  removeAccessPermissions(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
-    return Promise.resolve(undefined);
+  public async removeAccessPermissions(
+    params: AddRemoveAccessPermissionRequest
+  ): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.removeAccessPermissions(params);
+    return PermissionsResponseParser.parse(response);
   }
 
-  removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    return Promise.resolve(undefined);
+  public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
+    const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId);
+    return PermissionsResponseParser.parse(response);
   }
 }

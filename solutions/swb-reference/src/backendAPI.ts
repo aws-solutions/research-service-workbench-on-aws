@@ -14,6 +14,7 @@ import {
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
+import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import {
   EnvironmentService,
   EnvironmentTypeService,
@@ -62,7 +63,8 @@ const apiRouteConfig: ApiRouteConfig = {
     new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
-    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
+    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT'),
+    {} as DataSetsAuthorizationPlugin //TODO: REPLACE WITH ACTUAL IMPLEMENTATION ONCE ITS AVAILABLE
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService(aws.helpers.ddb),

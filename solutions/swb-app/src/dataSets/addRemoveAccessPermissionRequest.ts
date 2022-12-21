@@ -10,7 +10,7 @@ import { DataSetPermissionParser } from './dataSetPermissionParser';
 export const AddRemoveAccessPermissionRequestParser = z
   .object({
     dataSetId: z.string(),
-    permissions: DataSetPermissionParser
+    permission: DataSetPermissionParser
   })
   .strict();
 
