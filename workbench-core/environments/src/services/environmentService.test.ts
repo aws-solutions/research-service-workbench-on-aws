@@ -1077,12 +1077,18 @@ describe('EnvironmentService', () => {
           (
             params:
               | {
-                  addPutRequest?: Record<string, JSONValue>[] | undefined;
-                  addDeleteRequests?: Record<string, JSONValue>[] | undefined;
+                  addPutRequests?: {
+                    item: Record<string, JSONValue | Set<JSONValue>>;
+                    conditionExpression?: string;
+                    expressionAttributeNames?: Record<string, string>;
+                    expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+                  }[];
+                  addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+                  addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
                 }
               | undefined
           ): Promise<void> => {
-            const dataSetWithEnvironment = params!.addPutRequest!.find((item) => {
+            const dataSetWithEnvironment = params!.addPutItems!.find((item) => {
               const pk = item.pk as string;
               const sk = item.sk as string;
 

@@ -519,7 +519,7 @@ export class EnvironmentService {
 
     try {
       await this._dynamoDBService.commitTransaction({
-        addPutRequest: items
+        addPutItems: items
       });
     } catch (e) {
       console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
