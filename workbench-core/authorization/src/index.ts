@@ -108,3 +108,13 @@ export {
   SetGroupStatusResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/setGroupStatus';
 export { GroupMetadata, GroupMetadataParser, GroupStatus } from './dynamicAuthorization/models/GroupMetadata';
+
+// re-export userManagement package errors that are thrown
+export {
+  IdpUnavailableError,
+  isIdpUnavailableError,
+  PluginConfigurationError,
+  isPluginConfigurationError,
+  UserNotFoundError,
+  isUserNotFoundError
+} from '@aws/workbench-core-user-management';
