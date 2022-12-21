@@ -30,13 +30,11 @@ describe('multiStep dataset integration test', () => {
       storageName: settings.get('DataSetsBucketName'),
       awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
-      name: datasetName,
-      region: settings.get('awsRegion'),
-      owner: `${settings.get('projectId')}#PA`,
-      type: 'internal'
+      datasetName,
+      region: settings.get('awsRegion')
     };
 
-    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
+    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);
     expect(dataSet).toMatchObject({
       id: expect.stringMatching(dsUuidRegExp)
     });
@@ -78,9 +76,8 @@ describe('multiStep dataset integration test', () => {
     // Verify dataset has env access point listed in its external endpoints
     const { data: dataSetDetails } = await adminSession.resources.datasets.dataset(dataSet.id).get();
     // Dataset was created just for this test case, so we expect only one endpoint
-    expect(dataSetDetails).toMatchObject({
-      ...dataSetBody,
-      externalEndpoints: [envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]]
-    });
+    expect(dataSetDetails.externalEndpoints).toMatchObject([
+      envDetails.ENDPOINTS[0].sk.split('ENDPOINT#')[1]
+    ]);
   });
 });

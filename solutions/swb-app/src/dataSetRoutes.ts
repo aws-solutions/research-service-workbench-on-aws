@@ -19,14 +19,12 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.provisionDataSet({
-        name: req.body.name,
+        name: req.body.datasetName,
         storageName: req.body.storageName,
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetService.storagePlugin,
-        owner: req.body.owner,
-        type: req.body.type
+        storageProvider: dataSetService.storagePlugin
       });
 
       res.status(201).send(dataSet);
@@ -39,14 +37,12 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.importDataSet({
-        name: req.body.name,
+        name: req.body.datasetName,
         storageName: req.body.storageName,
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetService.storagePlugin,
-        owner: req.body.owner,
-        type: req.body.type
+        storageProvider: dataSetService.storagePlugin
       });
       res.status(201).send(dataSet);
     })

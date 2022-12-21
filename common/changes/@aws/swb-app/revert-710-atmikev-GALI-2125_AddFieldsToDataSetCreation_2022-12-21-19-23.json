@@ -2,7 +2,7 @@
   "changes": [
     {
       "packageName": "@aws/swb-app",
-      "comment": "adding `type` and `owner` to dataset creation API",
+      "comment": "revert",
       "type": "patch"
     }
   ],
