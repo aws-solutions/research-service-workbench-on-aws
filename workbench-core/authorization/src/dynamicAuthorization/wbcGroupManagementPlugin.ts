@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
