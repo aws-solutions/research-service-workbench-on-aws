@@ -154,7 +154,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/dataSets
+      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-logging': link:../../workbench-core/logging
       '@aws/workbench-core-user-management': link:../../workbench-core/user-management
@@ -273,7 +273,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../workbench-core/authentication
       '@aws/workbench-core-authorization': link:../../workbench-core/authorization
       '@aws/workbench-core-base': link:../../workbench-core/base
-      '@aws/workbench-core-datasets': link:../../workbench-core/dataSets
+      '@aws/workbench-core-datasets': link:../../workbench-core/datasets
       '@aws/workbench-core-environments': link:../../workbench-core/environments
       '@aws/workbench-core-infrastructure': link:../../workbench-core/infrastructure
       '@aws/workbench-core-logging': link:../../workbench-core/logging
@@ -431,7 +431,7 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
     dependencies:
-      '@aws/workbench-core-datasets-ui': link:../../../workbench-core/dataSets-ui
+      '@aws/workbench-core-datasets-ui': link:../../../workbench-core/datasets-ui
       '@aws/workbench-core-environments': link:../../../workbench-core/environments
       '@aws/workbench-core-environments-ui': link:../../../workbench-core/environments-ui
       '@aws/workbench-core-swb-common-ui': link:../../../workbench-core/swb-common-ui
@@ -550,7 +550,7 @@ importers:
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../dataSets
+      '@aws/workbench-core-datasets': link:../datasets
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       jsonschema: 1.4.1
@@ -790,6 +790,7 @@ importers:
       typescript: ^4.5.2
       zod: ^3.19.1
     dependencies:
+      '@aws-sdk/client-dynamodb': 3.226.0
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@aws/workbench-core-user-management': link:../user-management
@@ -797,7 +798,6 @@ importers:
       lodash: 4.17.21
       zod: 3.19.1
     devDependencies:
-      '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/types': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
@@ -1133,7 +1133,7 @@ importers:
       '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
-      '@aws/workbench-core-datasets': link:../dataSets
+      '@aws/workbench-core-datasets': link:../datasets
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
@@ -1203,7 +1203,7 @@ importers:
       typescript: ^4.5.2
     dependencies:
       '@aws/workbench-core-accounts-ui': link:../accounts-ui
-      '@aws/workbench-core-datasets-ui': link:../dataSets-ui
+      '@aws/workbench-core-datasets-ui': link:../datasets-ui
       '@aws/workbench-core-environments': link:../environments
       '@aws/workbench-core-swb-common-ui': link:../swb-common-ui
       next: 12.1.6_ov7bzw4rj4kycia6cjutehc2sq
@@ -1320,7 +1320,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../authentication
       '@aws/workbench-core-authorization': link:../../authorization
       '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../dataSets
+      '@aws/workbench-core-datasets': link:../../datasets
       '@aws/workbench-core-logging': link:../../logging
       '@aws/workbench-core-user-management': link:../../user-management
       '@hapi/boom': 10.0.0
@@ -1428,7 +1428,7 @@ importers:
       '@aws/workbench-core-authentication': link:../../authentication
       '@aws/workbench-core-authorization': link:../../authorization
       '@aws/workbench-core-base': link:../../base
-      '@aws/workbench-core-datasets': link:../../dataSets
+      '@aws/workbench-core-datasets': link:../../datasets
       '@aws/workbench-core-environments': link:../../environments
       '@aws/workbench-core-example-app': link:../app
       '@aws/workbench-core-infrastructure': link:../../infrastructure
@@ -2519,6 +2519,7 @@ packages:
       uuid: 8.3.2
     transitivePeerDependencies:
       - aws-crt
+    dev: false
 
   /@aws-sdk/client-ec2/3.226.0:
     resolution: {integrity: sha512-kTif4h6vl26GFLjqs7OzST/q9AxFHT7uTz2CzVpmgDhYEdZ/sHx8QxtmFp4JYLe6SXhy2HbsaHt37dnXNq6ssw==}
@@ -3207,6 +3208,7 @@ packages:
     dependencies:
       mnemonist: 0.38.3
       tslib: 2.4.1
+    dev: false
 
   /@aws-sdk/eventstream-codec/3.226.0:
     resolution: {integrity: sha512-6uPtR8vSwz3fqoZk9hrb6qBYdp3PJ22+JxV5Wimdesvow4kJXSgDQXIxEkxbv6SxB9tNRB4uJHD84RetHEi15Q==}
@@ -3336,6 +3338,7 @@ packages:
       '@aws-sdk/protocol-http': 3.226.0
       '@aws-sdk/types': 3.226.0
       tslib: 2.4.1
+    dev: false
 
   /@aws-sdk/middleware-endpoint/3.226.0:
     resolution: {integrity: sha512-EvLFafjtUxTT0AC9p3aBQu1/fjhWdIeK58jIXaNFONfZ3F8QbEYUPuF/SqZvJM6cWfOO9qwYKkRDbCSTYhprIg==}
@@ -13715,6 +13718,7 @@ packages:
     resolution: {integrity: sha512-2K9QYubXx/NAjv4VLq1d1Ly8pWNC5L3BrixtdkyTegXWJIqY+zLNDhhX/A+ZwWt70tB1S8H4BE8FLYEFyNoOBw==}
     dependencies:
       obliterator: 1.6.1
+    dev: false
 
   /mnth/2.0.0:
     resolution: {integrity: sha512-3ZH4UWBGpAwCKdfjynLQpUDVZWMe6vRHwarIpMdGLUp89CVR9hjzgyWERtMyqx+fPEqQ/PsAxFwvwPxLFxW40A==}
@@ -14260,6 +14264,7 @@ packages:
 
   /obliterator/1.6.1:
     resolution: {integrity: sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==}
+    dev: false
 
   /on-finished/2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}

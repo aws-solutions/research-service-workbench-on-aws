@@ -1,3 +1,4 @@
+import { JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../../action';
 import { Effect } from '../../permission';
 
@@ -59,7 +60,7 @@ export interface IdentityPermission {
   /**
    * Used to conditionally restrict a {@link User}'s action
    */
-  conditions?: Record<string, unknown>;
+  conditions?: Record<string, JSONValue>;
 
   /**
    * Description of permission

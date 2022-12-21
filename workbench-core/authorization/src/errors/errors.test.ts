@@ -19,6 +19,11 @@ import {
   TooManyRequestsError,
   isTooManyRequestsError
 } from '../';
+import {
+  IdentityPermissionAlreadyExistError,
+  isIdentityPermissionAlreadyExistError
+} from './identityPermissionAlreadyExistError';
+import { isThroughputExceededError, ThroughputExceededError } from './throughputExceededError';
 
 const error = new Error();
 
@@ -75,5 +80,21 @@ describe('custom error tests', () => {
   });
   test('not TooManyRequestsError', () => {
     expect(isTooManyRequestsError(error)).toBe(false);
+  });
+
+  test('IdentityPermissionAlreadyExistError', () => {
+    const identityPermissionAlreadyExistError = new IdentityPermissionAlreadyExistError();
+    expect(isIdentityPermissionAlreadyExistError(identityPermissionAlreadyExistError)).toBe(true);
+  });
+  test('not IdentityPermissionAlreadyExistError', () => {
+    expect(isIdentityPermissionAlreadyExistError(error)).toBe(false);
+  });
+
+  test('ThroughputExceededError', () => {
+    const throughputExceededError = new ThroughputExceededError();
+    expect(isThroughputExceededError(throughputExceededError)).toBe(true);
+  });
+  test('not IdentityPermissionAlreadyExistError', () => {
+    expect(isThroughputExceededError(error)).toBe(false);
   });
 });

@@ -81,7 +81,6 @@ class TransactEdit {
         ExpressionAttributeValues: putRequest.expressionAttributeValues
       };
       const additonalParams = _.omitBy(conditionalParams, _.isNil);
-
       this._params.TransactItems!.push({
         Put: {
           ...requriedParams,
