@@ -110,11 +110,12 @@ export class DynamicAuthorizationService {
    * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
+    const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
     await this._groupManagementPlugin.setGroupStatus({
       groupId: createGroupRequest.groupId,
       status: 'active'
     });
-    return this._groupManagementPlugin.createGroup(createGroupRequest);
+    return response;
   }
 
   /**

@@ -7,28 +7,33 @@ import { AuthenticatedUser } from '../authenticatedUser';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
+import { GroupStatus } from './models/GroupMetadata';
 
 describe('WBCGroupManagemntPlugin', () => {
-  const mockUser: AuthenticatedUser = {
-    id: 'sampleId',
-    roles: []
-  };
-
-  const mockGroupManagementPlugin: GroupManagementPlugin = {
-    createGroup: jest.fn(),
-    deleteGroup: jest.fn(),
-    getUserGroups: jest.fn(),
-    getGroupUsers: jest.fn(),
-    addUserToGroup: jest.fn(),
-    isUserAssignedToGroup: jest.fn(),
-    removeUserFromGroup: jest.fn(),
-    getGroupStatus: jest.fn(),
-    setGroupStatus: jest.fn()
-  };
-
+  let mockUser: AuthenticatedUser;
+  let mockGroupManagementPlugin: GroupManagementPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
 
+  beforeAll(() => {
+    mockGroupManagementPlugin = {
+      createGroup: jest.fn(),
+      deleteGroup: jest.fn(),
+      getUserGroups: jest.fn(),
+      getGroupUsers: jest.fn(),
+      addUserToGroup: jest.fn(),
+      isUserAssignedToGroup: jest.fn(),
+      removeUserFromGroup: jest.fn(),
+      getGroupStatus: jest.fn(),
+      setGroupStatus: jest.fn()
+    };
+  });
+
   beforeEach(() => {
+    mockUser = {
+      id: 'sampleId',
+      roles: []
+    };
+
     dynamicAuthzService = new DynamicAuthorizationService({
       groupManagementPlugin: mockGroupManagementPlugin
     });
@@ -39,9 +44,15 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('createGroup', () => {
-    it('returns `created` as true when the group was successfully created', async () => {
-      const groupId = 'groupId';
-      const status = 'active';
+    let groupId: string;
+    let status: GroupStatus;
+
+    beforeEach(() => {
+      groupId = 'groupId';
+      status = 'active';
+    });
+
+    it('returns the groupID in the data object when the group was successfully created', async () => {
       mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ data: { groupId } });
       mockGroupManagementPlugin.setGroupStatus = jest.fn().mockResolvedValue({ data: { status } });
 
@@ -51,7 +62,6 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws when the group is not successfully created', async () => {
-      const groupId = 'groupId';
       mockGroupManagementPlugin.createGroup = jest.fn().mockRejectedValue(new Error());
 
       await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
@@ -60,7 +70,6 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws when the group status is not successfully set', async () => {
-      const groupId = 'groupId';
       mockGroupManagementPlugin.setGroupStatus = jest.fn().mockRejectedValue(new Error());
 
       await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
