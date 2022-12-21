@@ -26,7 +26,12 @@ export interface CreateGroupRequest {
  */
 export interface CreateGroupResponse {
   /**
-   * States whether the group was successfully created
+   * The data object returned
    */
-  created: boolean;
+  data: {
+    /**
+     * The created group ID
+     */
+    groupId: string;
+  };
 }

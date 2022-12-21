@@ -4,7 +4,7 @@
  */
 
 import { AuthenticatedUser } from '../authenticatedUser';
-import { CreateGroupResponse } from '../models/createGroup';
+import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
 
@@ -41,32 +41,31 @@ describe('WBCGroupManagemntPlugin', () => {
   describe('createGroup', () => {
     it('returns `created` as true when the group was successfully created', async () => {
       const groupId = 'groupId';
-      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ created: true });
-      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockResolvedValue({ statusSet: true });
+      const status = 'active';
+      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ data: { groupId } });
+      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockResolvedValue({ data: { status } });
 
       const response = await dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<CreateGroupResponse>({ created: true });
+      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
     });
 
-    it('returns `created` as false when the group is not successfully created', async () => {
+    it('throws when the group is not successfully created', async () => {
       const groupId = 'groupId';
-      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ created: false });
+      mockGroupManagementPlugin.createGroup = jest.fn().mockRejectedValue(new Error());
 
-      const response = await dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser });
-
-      expect(response).toMatchObject<CreateGroupResponse>({ created: false });
+      await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
+        Error
+      );
     });
 
-    it('returns `created` as false when the group status is not successfully set', async () => {
+    it('throws when the group status is not successfully set', async () => {
       const groupId = 'groupId';
-      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ created: true });
-      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockResolvedValue({ statusSet: false });
-      mockGroupManagementPlugin.deleteGroup = jest.fn().mockResolvedValue({ deleted: true });
+      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockRejectedValue(new Error());
 
-      const response = await dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser });
-
-      expect(response).toMatchObject<CreateGroupResponse>({ created: false });
+      await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
+        Error
+      );
     });
   });
 });

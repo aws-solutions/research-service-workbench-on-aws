@@ -1,4 +1,9 @@
-import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import { isPluginConfigurationError } from '@aws/workbench-core-authentication';
+import {
+  DynamicAuthorizationService,
+  isGroupAlreadyExistsError,
+  isTooManyRequestsError
+} from '@aws/workbench-core-authorization';
 import {
   CreateGroupRequest,
   CreateGroupRequestParser
@@ -15,15 +20,22 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);
 
-      const { created } = await dynamicAuthorizationService.createGroup({
-        authenticatedUser: res.locals.user,
-        ...validatedRequest
-      });
-
-      if (created) {
-        res.sendStatus(201);
-      } else {
-        Boom.badRequest('Could not create the group.');
+      try {
+        const { data } = await dynamicAuthorizationService.createGroup({
+          authenticatedUser: res.locals.user,
+          ...validatedRequest
+        });
+        res.status(201).send(data);
+      } catch (error) {
+        if (isGroupAlreadyExistsError(error)) {
+          Boom.badRequest('Group already exists');
+        } else if (isPluginConfigurationError(error)) {
+          Boom.internal('An internal error occurred');
+        } else if (isTooManyRequestsError(error)) {
+          Boom.tooManyRequests('Too many requests');
+        } else {
+          throw error;
+        }
       }
     })
   );

@@ -93,7 +93,7 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
-    action: 'POST',
+    action: 'CREATE',
     subject: 'AuthorizationGroup'
   }
 ];

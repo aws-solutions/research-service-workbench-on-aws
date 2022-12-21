@@ -98,30 +98,18 @@ export class DynamicAuthorizationService {
    * Create an authorization group
    * @param createGroupRequest - {@link CreateGroupRequest}
    *
-   * @returns - {@link CreateGroupResponse}
+   * @returns a {@link CreateGroupResponse}
    *
-   * @throws - {@link GroupAlreadyExistsError} Can not create a group that already exists
+   * @throws {@link GroupAlreadyExistsError} - Can not create a group that already exists
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
-    const { created } = await this._groupManagementPlugin.createGroup(createGroupRequest);
-    if (!created) {
-      return { created: false };
-    }
-
-    const { statusSet } = await this._groupManagementPlugin.setGroupStatus({
+    await this._groupManagementPlugin.setGroupStatus({
       groupId: createGroupRequest.groupId,
       status: 'active'
     });
-    if (statusSet) {
-      return { created: true };
-    }
-
-    // group was created, but status was not set. Need to delete the group.
-    const { deleted } = await this._groupManagementPlugin.deleteGroup(createGroupRequest);
-    if (!deleted) {
-      // TODO this is bad. group was created, but could not be deleted. What to do?
-    }
-    return { created: false };
+    return this._groupManagementPlugin.createGroup(createGroupRequest);
   }
 
   /**

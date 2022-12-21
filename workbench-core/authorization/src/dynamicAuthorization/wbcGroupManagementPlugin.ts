@@ -1,7 +1,12 @@
 import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
-import { PluginConfigurationError, UserManagementService } from '@aws/workbench-core-user-management';
+import {
+  isRoleAlreadyExistsError,
+  PluginConfigurationError,
+  UserManagementService
+} from '@aws/workbench-core-user-management';
+import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 
@@ -42,11 +47,15 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   }
   public async createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse> {
     const { groupId } = request;
+
     try {
       await this._userManagementService.createRole(groupId);
-      return { created: true };
+      return { data: { groupId } };
     } catch (error) {
-      return { created: false };
+      if (isRoleAlreadyExistsError(error)) {
+        throw new GroupAlreadyExistsError(error.message);
+      }
+      throw error;
     }
   }
   public deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
@@ -84,7 +93,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
 
       const { status } = GroupMetadataParser.parse(response.Item);
 
-      return { status };
+      return { data: { status } };
     } catch (error) {
       if (error.name === 'ResourceNotFoundException') {
         throw new PluginConfigurationError(error.message);
@@ -113,10 +122,15 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
         })
         .execute();
 
-      return { statusSet: true };
+      return { data: { status } };
     } catch (error) {
-      // TODO should we be logging errors? Or just returning that the call failed?
-      return { statusSet: false };
+      if (error.name === 'ResourceNotFoundException') {
+        throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'ProvisionedThroughputExceededException' || error.name === 'RequestLimitExceeded') {
+        throw new TooManyRequestsError(error.message);
+      }
+      throw error;
     }
   }
 }

@@ -18,7 +18,12 @@ export interface SetGroupStatusRequest {
  */
 export interface SetGroupStatusResponse {
   /**
-   * States whether the status was successfully set
+   * The data object returned
    */
-  statusSet: boolean;
+  data: {
+    /**
+     * The set status
+     */
+    status: GroupStatus;
+  };
 }

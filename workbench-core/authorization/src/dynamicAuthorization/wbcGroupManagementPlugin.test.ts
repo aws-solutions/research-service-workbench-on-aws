@@ -15,13 +15,16 @@ import { DynamoDBService } from '@aws/workbench-core-base';
 import {
   UserManagementService,
   UserManagementPlugin,
-  PluginConfigurationError
+  PluginConfigurationError,
+  IdpUnavailableError,
+  RoleAlreadyExistsError
 } from '@aws/workbench-core-user-management';
 import { mockClient } from 'aws-sdk-client-mock';
 import { AuthenticatedUser } from '../authenticatedUser';
+import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
-import { CreateGroupResponse } from '../models/createGroup';
+import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
@@ -77,16 +80,34 @@ describe('WBCGroupManagemntPlugin', () => {
 
       const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<CreateGroupResponse>({ created: true });
+      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
     });
 
-    it('returns `created` as false when an error is thrown creating the group', async () => {
+    it('throws IdpUnavailableError when the IdP encounters an error', async () => {
       const groupId = 'groupId';
-      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new Error());
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new IdpUnavailableError());
 
-      const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(IdpUnavailableError);
+    });
 
-      expect(response).toMatchObject<CreateGroupResponse>({ created: false });
+    it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
+      const groupId = 'groupId';
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new PluginConfigurationError());
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(PluginConfigurationError);
+    });
+
+    it('throws GroupAlreadyExistsError when the group already exists', async () => {
+      const groupId = 'groupId';
+      mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupAlreadyExistsError);
     });
   });
 
@@ -98,17 +119,47 @@ describe('WBCGroupManagemntPlugin', () => {
 
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status });
 
-      expect(response).toMatchObject<SetGroupStatusResponse>({ statusSet: true });
+      expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status } });
     });
 
-    it('returns `setStatus` as false when an error is thrown setting the status', async () => {
+    it('throws PluginConfigurationError when the ddb table doesnt exist', async () => {
       const groupId = 'groupId';
       const status = 'active';
-      ddbMock.on(UpdateItemCommand).rejects({});
+      ddbMock.on(UpdateItemCommand).rejects(new ResourceNotFoundException({ message: '', $metadata: {} }));
 
-      const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status });
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
+        PluginConfigurationError
+      );
+    });
 
-      expect(response).toMatchObject<SetGroupStatusResponse>({ statusSet: false });
+    it('throws TooManyRequestsError when the provisioned throughput is exceeded', async () => {
+      const groupId = 'groupId';
+      const status = 'active';
+      ddbMock
+        .on(UpdateItemCommand)
+        .rejects(new ProvisionedThroughputExceededException({ message: '', $metadata: {} }));
+
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
+        TooManyRequestsError
+      );
+    });
+
+    it('throws TooManyRequestsError when the request limit is exceeded', async () => {
+      const groupId = 'groupId';
+      const status = 'active';
+      ddbMock.on(UpdateItemCommand).rejects(new RequestLimitExceeded({ message: '', $metadata: {} }));
+
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
+        TooManyRequestsError
+      );
+    });
+
+    it('rethrows an unexpected error', async () => {
+      const groupId = 'groupId';
+      const status = 'active';
+      ddbMock.on(UpdateItemCommand).rejects(new Error());
+
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(Error);
     });
   });
 
@@ -129,7 +180,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
       const response = await wbcGroupManagementPlugin.getGroupStatus({ groupId });
 
-      expect(response).toMatchObject<GetGroupStatusResponse>({ status });
+      expect(response).toMatchObject<GetGroupStatusResponse>({ data: { status } });
     });
 
     it('throws GroupNotFoundError when the group doesnt exist', async () => {
