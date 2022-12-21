@@ -30,7 +30,9 @@ export default class Datasets extends CollectionResource {
       path: resource.path ?? dataSetName,
       storageName: resource.storageName,
       awsAccountId: resource.awsAccountId,
-      region: resource.region
+      region: resource.region,
+      owner: resource.owner,
+      type: resource.type
     };
   }
 }
@@ -41,4 +43,6 @@ interface DataSetCreateRequest {
   path: string;
   awsAccountId: string;
   region: string;
+  owner: string;
+  type: string;
 }

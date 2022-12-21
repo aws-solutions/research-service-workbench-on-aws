@@ -31,10 +31,12 @@ describe('multiStep dataset integration test', () => {
       awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
       datasetName,
-      region: settings.get('awsRegion')
+      region: settings.get('awsRegion'),
+      owner: `${settings.get('projectId')}#PA`,
+      type: 'internal'
     };
 
-    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody);
+    const { data: dataSet } = await adminSession.resources.datasets.create(dataSetBody, false);
     expect(dataSet).toMatchObject({
       id: expect.stringMatching(dsUuidRegExp)
     });
