@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "changed AddPutRequests, add addPutItems",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

@@ -14,7 +14,7 @@
 # Code Coverage
 | Statements                  | Branches                | Functions                 | Lines             |
 | --------------------------- | ----------------------- | ------------------------- | ----------------- |
-| ![Statements](https://img.shields.io/badge/statements-90.03%25-brightgreen.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.35%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-90.06%25-brightgreen.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-90.31%25-brightgreen.svg?style=flat) |
+| ![Statements](https://img.shields.io/badge/statements-89.26%25-yellow.svg?style=flat) | ![Branches](https://img.shields.io/badge/branches-87.21%25-yellow.svg?style=flat) | ![Functions](https://img.shields.io/badge/functions-87.69%25-yellow.svg?style=flat) | ![Lines](https://img.shields.io/badge/lines-89.63%25-yellow.svg?style=flat) |
 
 # Contributing Guidelines
 
@@ -48,6 +48,7 @@ In order to start developement please refer to [Development Instructions](./DEVE
 | [workbench-core/infrastructure](./workbench-core/infrastructure/) | [@aws/workbench-core-infrastructure] | [README](./workbench-core/infrastructure/README.md)
 | [workbench-core/logging](./workbench-core/logging/) | [@aws/workbench-core-logging] | [README](./workbench-core/logging/README.md)
 | [workbench-core/swb-common-ui](./workbench-core/swb-common-ui/) | [@aws/workbench-core-swb-common-ui] | [README](./workbench-core/swb-common-ui/README.md)
+| [workbench-core/user-management](./workbench-core/user-management/) | [@aws/workbench-core-user-management] | [README](./workbench-core/user-management/README.md)
 <!-- GENERATED PROJECT SUMMARY END -->
 
 ## Finding contributions to work on

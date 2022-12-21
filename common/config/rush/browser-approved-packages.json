@@ -603,6 +603,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "yaml-cfn",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "zod",
       "allowedCategories": [ "production" ]
     }

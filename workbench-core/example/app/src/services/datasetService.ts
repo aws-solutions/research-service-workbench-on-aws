@@ -10,15 +10,15 @@ import {
   S3DataSetStoragePlugin
 } from '@aws/workbench-core-datasets';
 import { dataSetPrefix, endPointPrefix } from '../configs/constants';
-import { aws } from './awsService';
+import { datasetAws } from './awsService';
 import { logger } from './loggingService';
 
 const dataSetService: DataSetService = new DataSetService(
   new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
   logger,
-  new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix)
+  new DdbDataSetMetadataPlugin(datasetAws, dataSetPrefix, endPointPrefix)
 );
 
-const dataSetsStoragePlugin: S3DataSetStoragePlugin = new S3DataSetStoragePlugin(aws);
+const dataSetsStoragePlugin: S3DataSetStoragePlugin = new S3DataSetStoragePlugin(datasetAws);
 
 export { dataSetService, dataSetsStoragePlugin };

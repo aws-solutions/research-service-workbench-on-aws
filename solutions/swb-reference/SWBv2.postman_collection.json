@@ -630,42 +630,9 @@
       "name": "envType",
       "item": [
         {
-          "name": "Create envType",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemakerNotebook\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{API_URL}}/environmentTypes",
-              "host": ["{{API_URL}}"],
-              "path": ["environmentTypes"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update envType",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
@@ -779,7 +746,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -793,7 +760,7 @@
               "variable": [
                 {
                   "key": "envTypeId",
-                  "value": "9a115bda-ab83-464b-ae94-c258370beeb6",
+                  "value": "",
                   "description": "ID of environment type associated with this config"
                 }
               ]
@@ -804,7 +771,7 @@
         {
           "name": "Update envTypeConfig",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
@@ -819,7 +786,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -862,6 +829,51 @@
                 "type": "text"
               }
             ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete envTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
               "host": ["{{API_URL}}"],

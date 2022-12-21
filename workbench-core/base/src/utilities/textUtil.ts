@@ -4,11 +4,18 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import resourceTypeToKey from '../constants/resourceTypeToKey';
 
 function uuidWithLowercasePrefix(prefix: string): string {
   return `${prefix.toLowerCase()}-${uuidv4()}`;
 }
 const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+
+const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
+
+const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
+
+const envTypeIdRegExpString: string = `${resourceTypeToKey.envType.toLowerCase()}-${productIdRegExpString},${provisionArtifactIdRegExpString}`;
 
 // eslint-disable-next-line @rushstack/security/no-unsafe-regexp,security/detect-non-literal-regexp
 const uuidRegExp: RegExp = new RegExp(uuidRegExpAsString);
@@ -18,4 +25,12 @@ function uuidWithLowercasePrefixRegExp(prefix: string): RegExp {
   return new RegExp(prefix.toLowerCase() + '-' + uuidRegExpAsString);
 }
 
-export { uuidWithLowercasePrefix, uuidRegExp, uuidWithLowercasePrefixRegExp, uuidRegExpAsString };
+export {
+  uuidWithLowercasePrefix,
+  uuidRegExp,
+  uuidWithLowercasePrefixRegExp,
+  uuidRegExpAsString,
+  productIdRegExpString,
+  provisionArtifactIdRegExpString,
+  envTypeIdRegExpString
+};

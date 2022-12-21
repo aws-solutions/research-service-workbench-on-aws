@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
@@ -143,6 +144,32 @@ export default class DynamoDBService {
       }
     }
     return getter;
+  }
+
+  /**
+   * retrieves item from DynamoDB table.
+   *
+   * @param key - single object of key to get for single get item
+   * @param params - optional object of optional properties to generate a get item request
+   * @returns Promise\<Record\<string,JSONValue\>\>
+   *
+   * @example Use this method to retrieve an item from ddb by Id
+   * ```ts
+   * const item = await dynamoDBService.getItem({'pk': 'pk', 'sk': 'sk'}, {projection: 'valueIWant'});
+   * ```
+   */
+  public async getItem(
+    key: Record<string, unknown>,
+    params?: {
+      strong?: boolean;
+      names?: { [key: string]: string };
+      projection?: string | string[];
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+    }
+  ): Promise<Record<string, JSONValue>> {
+    const response = await this.get(key, params).execute();
+    const item = (response as GetItemCommandOutput).Item;
+    return item as unknown as Record<string, JSONValue>;
   }
 
   /**
@@ -449,9 +476,38 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
+  /**
+   * Commits transactions to the table
+   *
+   * @param params - the items for the transaction
+   */
+  public async commitTransaction(params?: {
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+  }): Promise<void> {
+    await this.transactEdit(params).execute();
+  }
+
+  /**
+   * @deprecated Use `commitTransaction` instead
+   * @param params - the items for the transaction
+   * @returns A TransactEdit object
+   */
   public transactEdit(params?: {
-    addPutRequest?: Record<string, unknown>[];
-    addDeleteRequests?: Record<string, unknown>[];
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
   }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
     if (params?.addDeleteRequests) {
@@ -459,11 +515,30 @@ export default class DynamoDBService {
         params.addDeleteRequests.map((request) => marshall(request))
       );
     }
-    if (params?.addPutRequest) {
+    if (params?.addPutItems) {
+      transactEdit = transactEdit.addPutItems(
+        params.addPutItems.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
+    }
+    if (params?.addPutRequests) {
       transactEdit = transactEdit.addPutRequests(
-        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        params.addPutRequests.map((request) => {
+          return {
+            item: marshall(request.item, { removeUndefinedValues: true }),
+            conditionExpression: request.conditionExpression,
+            expressionAttributeNames: request.expressionAttributeNames,
+            expressionAttributeValues: marshall(request.expressionAttributeValues)
+          };
+        })
       );
     }
     return transactEdit;
+  }
+
+  /**
+   * @returns the table name
+   */
+  public getTableName(): string {
+    return this._tableName;
   }
 }
