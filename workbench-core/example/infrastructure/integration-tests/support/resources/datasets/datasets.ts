@@ -78,7 +78,7 @@ export default class Datasets extends CollectionResource {
     const region = this._settings.get('AwsRegion');
 
     return {
-      datasetName: resource.datasetName ?? dataSetName,
+      name: resource.name ?? dataSetName,
       path: resource.path ?? dataSetName,
       storageName: resource.storageName ?? storageName,
       awsAccountId: resource.awsAccountId ?? awsAccountId,
@@ -88,7 +88,7 @@ export default class Datasets extends CollectionResource {
 }
 
 interface DataSetCreateRequest {
-  datasetName: string;
+  name: string;
   storageName: string;
   path: string;
   awsAccountId: string;

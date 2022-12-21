@@ -34,7 +34,7 @@ describe('datasets create negative tests', () => {
             statusCode: 400,
             error: 'Bad Request',
             message:
-              "requires property 'datasetName'. requires property 'storageName'. requires property 'path'. requires property 'awsAccountId'. requires property 'region'. requires property 'type'. requires property 'owner'"
+              "requires property 'name'. requires property 'storageName'. requires property 'path'. requires property 'awsAccountId'. requires property 'region'. requires property 'type'. requires property 'owner'"
           })
         );
       }

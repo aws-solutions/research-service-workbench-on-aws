@@ -19,7 +19,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.provisionDataSet({
-        name: req.body.datasetName,
+        name: req.body.name,
         storageName: req.body.storageName,
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
@@ -39,7 +39,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateDataSetSchema));
       const dataSet = await dataSetService.importDataSet({
-        name: req.body.datasetName,
+        name: req.body.name,
         storageName: req.body.storageName,
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,

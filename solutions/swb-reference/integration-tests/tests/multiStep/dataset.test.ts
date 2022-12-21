@@ -30,7 +30,7 @@ describe('multiStep dataset integration test', () => {
       storageName: settings.get('DataSetsBucketName'),
       awsAccountId: settings.get('mainAccountId'),
       path: datasetName, // using same name to help potential troubleshooting
-      datasetName,
+      name: datasetName,
       region: settings.get('awsRegion'),
       owner: `${settings.get('projectId')}#PA`,
       type: 'internal'
