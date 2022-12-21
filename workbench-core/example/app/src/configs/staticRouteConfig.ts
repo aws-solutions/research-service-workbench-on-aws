@@ -158,6 +158,14 @@ export const routesMap: RoutesMap = {
         subject: 'AuthorizationGroup'
       }
     ]
+  },
+  [`authorization/users/${uuidRegExpAsString}/group`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationUser'
+      }
+    ]
   }
 };
 
