@@ -12,6 +12,7 @@ import express, { Router, Express, json } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { setUpAuthRoutes } from './routes/authRoutes';
 import { setUpDSRoutes } from './routes/datasetRoutes';
+import { setUpDynamicAuthorizationRoutes } from './routes/dynamicAuthorizationRoutes';
 import { setupHelloWorldRoutes } from './routes/helloWorldRoutes';
 import { setUpUserRoutes } from './routes/userRoutes';
 import {
@@ -22,6 +23,7 @@ import {
   logger
 } from './services';
 import { authorizationService, staticRoutesIgnored } from './services/authorizationService';
+import { dynamicAuthorizationService } from './services/dynamicAuthorizationService';
 import { boomErrorHandler, unknownErrorHandler } from './utilities/errorHandlers';
 
 export function generateRouter(): Express {
@@ -57,6 +59,7 @@ export function generateRouter(): Express {
   setUpDSRoutes(router, dataSetService, dataSetsStoragePlugin);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, userManagementService);
+  setUpDynamicAuthorizationRoutes(router, dynamicAuthorizationService);
 
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);

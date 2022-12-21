@@ -19,7 +19,12 @@ export interface GetGroupStatusRequest {
  */
 export interface GetGroupStatusResponse {
   /**
-   * The group {@link GroupStatus}
+   * The data object returned
    */
-  status: GroupStatus;
+  data: {
+    /**
+     * The group {@link GroupStatus}
+     */
+    status: GroupStatus;
+  };
 }
