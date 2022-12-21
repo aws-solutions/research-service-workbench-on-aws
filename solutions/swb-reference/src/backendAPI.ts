@@ -57,9 +57,7 @@ const apiRouteConfig: ApiRouteConfig = {
   account: new HostingAccountService(
     new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  environmentService: new EnvironmentService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
