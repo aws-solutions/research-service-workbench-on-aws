@@ -37,8 +37,15 @@ import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { GroupManagementPlugin } from './groupManagementPlugin';
 
 export class DynamicAuthorizationService {
+  private _groupManagementPlugin: GroupManagementPlugin;
+
+  public constructor(config: { groupManagementPlugin: GroupManagementPlugin }) {
+    this._groupManagementPlugin = config.groupManagementPlugin;
+  }
+
   /**
    * Initialize Dynamic Authorization Service
    * @param initRequest - {@link InitRequest}
@@ -96,12 +103,19 @@ export class DynamicAuthorizationService {
    * Create an authorization group
    * @param createGroupRequest - {@link CreateGroupRequest}
    *
-   * @returns - {@link CreateGroupResponse}
+   * @returns a {@link CreateGroupResponse}
    *
-   * @throws - {@link GroupAlreadyExistsError} Can not create a group that already exists
+   * @throws {@link GroupAlreadyExistsError} - Can not create a group that already exists
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
-    throw new Error('Not implemented');
+    const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
+    await this._groupManagementPlugin.setGroupStatus({
+      groupId: createGroupRequest.groupId,
+      status: 'active'
+    });
+    return response;
   }
 
   /**

@@ -24,3 +24,87 @@ export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotS
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
 export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
+
+// dynamic authorization
+export { WBCGroupManagementPlugin } from './dynamicAuthorization/wbcGroupManagementPlugin';
+export { GroupManagementPlugin } from './dynamicAuthorization/groupManagementPlugin';
+export { DynamicAuthorizationService } from './dynamicAuthorization/dynamicAuthorizationService';
+export { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorization/dynamicAuthorizationPermissionsPlugin';
+export {
+  AddUserToGroupRequest,
+  AddUserToGroupResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/addUserToGroup';
+export {
+  CreateGroupRequest,
+  CreateGroupResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/createGroup';
+export {
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/createIdentityPermissions';
+export {
+  DeleteGroupRequest,
+  DeleteGroupResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/deleteGroup';
+export {
+  DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/deleteIdentityPermissions';
+export {
+  DoesGroupExistRequest,
+  DoesGroupExistResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/doesGroupExist';
+export { DynamicOperation } from './dynamicAuthorization/dynamicAuthorizationInputs/dynamicOperation';
+export {
+  GetDynamicOperationsByRouteRequest,
+  GetDynamicOperationsByRouteResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getDynamicOperationsByRoute';
+export {
+  GetGroupStatusRequest,
+  GetGroupStatusResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getGroupStatus';
+export {
+  GetGroupUsersRequest,
+  GetGroupUsersResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getGroupUsers';
+export {
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+export {
+  GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
+export {
+  GetUserGroupsRequest,
+  GetUserGroupsResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/getUserGroups';
+export {
+  Identity,
+  IdentityPermission,
+  IdentityType
+} from './dynamicAuthorization/dynamicAuthorizationInputs/identityPermission';
+export { InitRequest, InitResponse } from './dynamicAuthorization/dynamicAuthorizationInputs/init';
+export { IsAuthorizedOnRouteRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnRoute';
+export { IsAuthorizedOnSubjectRequest } from './dynamicAuthorization/dynamicAuthorizationInputs/isAuthorizedOnSubject';
+export {
+  IsRouteIgnoredRequest,
+  IsRouteIgnoredResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isRouteIgnored';
+export {
+  IsRouteProtectedRequest,
+  IsRouteProtectedResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isRouteProtected';
+export {
+  IsUserAssignedToGroupRequest,
+  IsUserAssignedToGroupResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/isUserAssignedToGroup';
+export {
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/removeUserFromGroup';
+export {
+  SetGroupStatusRequest,
+  SetGroupStatusResponse
+} from './dynamicAuthorization/dynamicAuthorizationInputs/setGroupStatus';
+export { GroupMetadata, GroupMetadataParser, GroupStatus } from './dynamicAuthorization/models/GroupMetadata';

@@ -30,6 +30,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link CreateGroupRequest}
    *
    * @returns a {@link CreateGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupAlreadyExistsError} - group already exists error
    */
   createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse>;
 
@@ -93,6 +97,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link GetGroupStatusRequest}
    *
    * @returns a {@link GetGroupStatusResponse}
+   *
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupNotFoundError} - group not found error
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse>;
 
@@ -102,6 +110,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link SetGroupStatusRequest}
    *
    * @returns a {@link SetGroupStatusResponse}
+   *
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupNotFoundError} - group not found error
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse>;
 }
