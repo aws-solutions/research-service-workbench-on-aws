@@ -16,7 +16,8 @@
     "<rootDir>/src/backendAPILambda.ts",
     "<rootDir>/src/constants.ts",
     "<rootDir>/src/postDeployment.ts",
-    "<rootDir>/src/services/dataSetService.ts"
+    "<rootDir>/src/services/dataSetService.ts",
+    "<rootDir>/src/services/projectEnvTypeConfigService.ts"
   ],
   "coverageThreshold": {
     "global": {

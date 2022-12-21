@@ -6,6 +6,7 @@
 import { ZodTypeAny } from 'zod';
 import DynamoDBService from '../aws/helpers/dynamoDB/dynamoDBService';
 import QueryParams from '../interfaces/queryParams';
+import JSONValue from '../types/json';
 import { addPaginationToken, DEFAULT_API_PAGE_SIZE, MAX_API_PAGE_SIZE } from '../utilities/paginationHelper';
 import { validateAndParse } from '../utilities/validatorHelper';
 
@@ -95,34 +96,40 @@ export class MetadataService {
     return { data: dependencyMetadata, paginationToken };
   }
 
-  public async updateRelationship<DependencyMetadata>(
+  public async updateRelationship(
     mainEntityResourceType: string,
-    mainEntityId: string,
+    mainEntity: { id: string; data?: Record<string, JSONValue> },
     dependencyResourceType: string,
-    dependentIds: string[],
-    data: DependencyMetadata
+    dependencies: { id: string; data?: Record<string, JSONValue> }[]
   ): Promise<void> {
-    if (!dependentIds.length) {
+    if (!dependencies.length) {
       return;
     }
 
-    if (dependentIds.length > MAX_TRANSACTION_SIZE) {
+    if (dependencies.length > MAX_TRANSACTION_SIZE) {
       throw new Error(`Cannot add more than ${MAX_TRANSACTION_SIZE} dependencies in single transaction.`);
     }
 
-    const pk = `${mainEntityResourceType}#${mainEntityId}`;
-    const items: Array<{ pk: string; sk: string } & DependencyMetadata> = [];
-    dependentIds.forEach((dependencyId: string) => {
+    const pk = `${mainEntityResourceType}#${mainEntity.id}`;
+    const items: Array<{ pk: string; sk: string } & Record<string, JSONValue>> = [];
+    dependencies.forEach((dependency) => {
+      const currentDate = new Date().toISOString();
       const mainWithDependency = {
         pk,
-        sk: `${dependencyResourceType}#${dependencyId}`,
-        ...data
+        sk: `${dependencyResourceType}#${dependency.id}`,
+        id: dependency.id,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+        ...(dependency.data ?? {})
       };
 
       const dependencyWithMain = {
-        pk: `${dependencyResourceType}#${dependencyId}`,
+        pk: `${dependencyResourceType}#${dependency.id}`,
         sk: pk,
-        ...data
+        id: mainEntity.id,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+        ...(mainEntity.data ?? {})
       };
 
       items.push(mainWithDependency);

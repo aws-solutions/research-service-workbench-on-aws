@@ -965,6 +965,140 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Associate project with EnvTypeConfig",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Association between project and EnvTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
+              "host": ["{{API_URL}}"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get EnvTypeConfigs associated with Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },

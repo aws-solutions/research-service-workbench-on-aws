@@ -58,6 +58,7 @@ export default class EnvironmentTypeConfigService {
       throw Boom.internal('Unable to delete Environment Type Config');
     }
   }
+
   /**
    * Get environment type config object from DDB for given envTypeId-envTypeConfigId combination
    * @param envTypeId - the environment type identifier
@@ -75,6 +76,25 @@ export default class EnvironmentTypeConfigService {
     } else {
       const envTypeConfig: EnvironmentTypeConfig = EnvironmentTypeConfigParser.parse(item);
       return Promise.resolve(envTypeConfig);
+    }
+  }
+
+  /**
+   * Get environment type configs by ids
+   * @param envTypeConfigIds - the environment type config identifiers
+   *
+   * @returns environment type config object array
+   */
+  public async getEnvironmentTypeConfigs(envTypeConfigIds: string[]): Promise<EnvironmentTypeConfig[]> {
+    const keys = envTypeConfigIds.map((envTypeId) => this._buildEnvTypeConfigPkSk(envTypeId));
+    const items = await this._dynamoDbService.getItems(keys);
+    if (items === undefined) {
+      throw Boom.notFound(`Could not find environment type configs`);
+    } else {
+      const envTypeConfigs: EnvironmentTypeConfig[] = items.map((envTypeConfig) =>
+        EnvironmentTypeConfigParser.parse(envTypeConfig)
+      );
+      return Promise.resolve(envTypeConfigs);
     }
   }
 
