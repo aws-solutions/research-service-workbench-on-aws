@@ -23,6 +23,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
+import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
@@ -44,9 +45,11 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
   ddbService: dynamicAuthAws.helpers.ddb,
-  userGroupKeyType: 'GROUP'
+  userGroupKeyType: authorizationGroupPrefix
 });
 
+// Commenting it for now, it will be integrated with SWB's definition of DynamicAuthorizationService
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin
 });
@@ -82,7 +85,7 @@ const apiRouteConfig: ApiRouteConfig = {
     new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
-    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
+    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix)
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: new EnvironmentTypeService(aws.helpers.ddb),
@@ -97,8 +100,7 @@ const apiRouteConfig: ApiRouteConfig = {
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
-  metadataService: new MetadataService(aws.helpers.ddb),
-  dynamicAuthorizationService: dynamicAuthorizationService
+  metadataService: new MetadataService(aws.helpers.ddb)
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

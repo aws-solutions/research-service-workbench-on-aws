@@ -172,12 +172,12 @@ export class SWBStack extends Stack {
       FIELDS_TO_MASK_WHEN_AUDITING
     );
 
-    // Create DataSet DynamoDB Table
-    this._createDataSetDDBTable(apiLambda, statusHandler, createAccountHandler);
+    // Create Application DynamoDB Table
+    this._createApplicationDDBTable(apiLambda, statusHandler, createAccountHandler);
 
     // DynamicAuth DynamoDB Encryption Key
     const dynamicAuthDynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation =
-      new WorkbenchEncryptionKeyWithRotation(this, 'DynamicAuthDynamodbEncryptionKey');
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-dynamicAuthDynamodbEncryptionKey`);
 
     // Create DynamicAuth DynamoDB Table
     const dynamicAuthTable = this._createDynamicAuthDDBTable(
@@ -187,9 +187,10 @@ export class SWBStack extends Stack {
       createAccountHandler
     );
 
-    apiLambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
-    statusHandler.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
-    createAccountHandler.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    // Add DynamicAuth DynamoDB Table name to lambda environment variable
+    _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
+      lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    });
 
     this._createRestApi(apiLambda);
 
@@ -870,7 +871,7 @@ export class SWBStack extends Stack {
     new CfnOutput(this, 'dynamicAuthDDBTableArn', {
       value: dynamicAuthDDBTable.table.tableArn
     });
-    // eslint-disable-next-line no-new
+
     new CfnOutput(this, 'dynamicAuthDDBTableName', {
       value: dynamicAuthDDBTable.table.tableName
     });
@@ -878,8 +879,8 @@ export class SWBStack extends Stack {
     return dynamicAuthDDBTable.table;
   }
 
-  // DynamoDB Table
-  private _createDataSetDDBTable(
+  // Application DynamoDB Table
+  private _createApplicationDDBTable(
     apiLambda: Function,
     statusHandler: Function,
     createAccountHandler: Function
