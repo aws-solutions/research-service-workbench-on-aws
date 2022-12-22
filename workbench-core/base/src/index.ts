@@ -24,6 +24,7 @@ import QueryParameterFilterSchema from './schemas/queryParameterFilterSchema';
 import { MetadataService } from './services/metadataService';
 import { SecretsService } from './services/secretsService';
 import JSONValue from './types/json';
+import { RelationshipDDBItem, RelationshipDDBItemParser } from './types/relationshipDDBItem';
 import { IamRoleCloneService } from './utilities/iamRoleCloneService';
 import {
   addPaginationToken,
@@ -86,5 +87,7 @@ export {
   validateAndParse,
   JSONValue,
   DynamoDBService,
-  SecretsService
+  SecretsService,
+  RelationshipDDBItemParser,
+  RelationshipDDBItem
 };

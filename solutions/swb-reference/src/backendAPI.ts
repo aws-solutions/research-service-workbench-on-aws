@@ -25,6 +25,7 @@ import { Express } from 'express';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
+import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
@@ -32,7 +33,15 @@ const aws: AwsService = new AwsService({
   ddbTableName: process.env.STACK_NAME!
 });
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
-
+const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
+const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
+  envTypeService,
+  aws.helpers.ddb
+);
+const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
+const projectService: ProjectService = new ProjectService({
+  TABLE_NAME: process.env.STACK_NAME!
+});
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
     {
@@ -65,19 +74,20 @@ const apiRouteConfig: ApiRouteConfig = {
     new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT')
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
-  environmentTypeService: new EnvironmentTypeService(aws.helpers.ddb),
-  environmentTypeConfigService: new EnvironmentTypeConfigService(
-    new EnvironmentTypeService(aws.helpers.ddb),
-    aws.helpers.ddb
-  ),
-  projectService: new ProjectService({
-    TABLE_NAME: process.env.STACK_NAME!
-  }),
+  environmentTypeService: envTypeService,
+  environmentTypeConfigService: envTypeConfigService,
+  projectService: projectService,
   userManagementService: new UserManagementService(
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
-  metadataService: new MetadataService(aws.helpers.ddb)
+  metadataService: metadataService,
+  projectEnvTypeConfigPlugin: new ProjectEnvTypeConfigService(
+    metadataService,
+    projectService,
+    envTypeConfigService,
+    envTypeService
+  )
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

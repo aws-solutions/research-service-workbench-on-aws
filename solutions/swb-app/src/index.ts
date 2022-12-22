@@ -10,6 +10,11 @@ import { DataSetExternalEndpointRequest } from './dataSets/dataSetExternalEndpoi
 import { DataSetPlugin } from './dataSets/dataSetPlugin';
 import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { generateRouter } from './generateRouter';
+import {
+  ListProjectEnvTypeConfigsRequest,
+  ListProjectEnvTypeConfigsRequestParser
+} from './projectEnvTypeConfigs/listProjectEnvTypeConfigsRequest';
+import { ProjectEnvTypeConfigPlugin } from './projectEnvTypeConfigs/projectEnvTypeConfigPlugin';
 
 export {
   generateRouter,
@@ -20,5 +25,8 @@ export {
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
-  HTTPMethod
+  HTTPMethod,
+  ProjectEnvTypeConfigPlugin,
+  ListProjectEnvTypeConfigsRequest,
+  ListProjectEnvTypeConfigsRequestParser
 };
