@@ -175,15 +175,13 @@ export class SWBStack extends Stack {
     // Create DataSet DynamoDB Table
     this._createDataSetDDBTable(apiLambda, statusHandler, createAccountHandler);
 
-    // Encryption Key
-    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
-      this,
-      'DynamicAuthDynamodbEncryptionKey'
-    );
+    // DynamicAuth DynamoDB Encryption Key
+    const dynamicAuthDynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, 'DynamicAuthDynamodbEncryptionKey');
 
     // Create DynamicAuth DynamoDB Table
     const dynamicAuthTable = this._createDynamicAuthDDBTable(
-      dynamodbEncryptionKey.key,
+      dynamicAuthDynamodbEncryptionKey.key,
       apiLambda,
       statusHandler,
       createAccountHandler
