@@ -105,6 +105,21 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     })
   );
 
+  router.get(
+    '/users/:userId/roles',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const roles = await service.getUserRoles(req.params.userId);
+        res.status(200).json(roles);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {

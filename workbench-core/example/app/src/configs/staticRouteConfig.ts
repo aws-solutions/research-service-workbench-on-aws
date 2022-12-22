@@ -151,6 +151,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/users/${uuidRegExpAsString}/roles`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'User'
+      }
+    ]
+  },
   '/authorization/group': {
     POST: [
       {
