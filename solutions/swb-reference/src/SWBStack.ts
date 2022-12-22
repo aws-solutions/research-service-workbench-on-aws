@@ -6,7 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
+import {
+  WorkbenchCognito,
+  WorkbenchCognitoProps,
+  WorkbenchDynamodb,
+  WorkbenchEncryptionKeyWithRotation
+} from '@aws/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import {
@@ -166,7 +171,28 @@ export class SWBStack extends Stack {
       artifactS3Bucket,
       FIELDS_TO_MASK_WHEN_AUDITING
     );
-    this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
+
+    // Create DataSet DynamoDB Table
+    this._createDataSetDDBTable(apiLambda, statusHandler, createAccountHandler);
+
+    // Encryption Key
+    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
+      this,
+      'DynamicAuthDynamodbEncryptionKey'
+    );
+
+    // Create DynamicAuth DynamoDB Table
+    const dynamicAuthTable = this._createDynamicAuthDDBTable(
+      dynamodbEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
+    apiLambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    statusHandler.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    createAccountHandler.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+
     this._createRestApi(apiLambda);
 
     const workflow = new Workflow(this);
@@ -820,8 +846,42 @@ export class SWBStack extends Stack {
     }
   }
 
+  //DynamicAuth DynamoDB Table
+  // Create DynamicAuthDDBTable
+  private _createDynamicAuthDDBTable(
+    encryptionKey: Key,
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
+    const dynamicAuthDDBTable = new WorkbenchDynamodb(this, `${this.stackName}-dynamic-auth`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey,
+      lambdas: [apiLambda, statusHandler, createAccountHandler],
+      gsis: [
+        {
+          indexName: 'getIdentityPermissionsByIdentity',
+          partitionKey: { name: 'Identity', type: AttributeType.STRING },
+          sortKey: { name: 'pk', type: AttributeType.STRING }
+        }
+      ]
+    });
+
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'dynamicAuthDDBTableArn', {
+      value: dynamicAuthDDBTable.table.tableArn
+    });
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'dynamicAuthDDBTableName', {
+      value: dynamicAuthDDBTable.table.tableName
+    });
+
+    return dynamicAuthDDBTable.table;
+  }
+
   // DynamoDB Table
-  private _createDDBTable(
+  private _createDataSetDDBTable(
     apiLambda: Function,
     statusHandler: Function,
     createAccountHandler: Function

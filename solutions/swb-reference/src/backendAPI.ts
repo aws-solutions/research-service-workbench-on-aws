@@ -12,6 +12,7 @@ import {
   ProjectService
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { DynamicAuthorizationService, WBCGroupManagementPlugin } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
 import {
@@ -31,6 +32,25 @@ const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
   ddbTableName: process.env.STACK_NAME!
 });
+
+// Dynamic Auth
+const dynamicAuthAws: AwsService = new AwsService({
+  region: process.env.AWS_REGION!,
+  ddbTableName: process.env.STACK_NAME!
+});
+
+const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  ),
+  ddbService: dynamicAuthAws.helpers.ddb,
+  userGroupKeyType: 'GROUP'
+});
+
+const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
+  groupManagementPlugin: wbcGroupManagementPlugin
+});
+
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
 
 const apiRouteConfig: ApiRouteConfig = {
@@ -77,7 +97,8 @@ const apiRouteConfig: ApiRouteConfig = {
     new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
-  metadataService: new MetadataService(aws.helpers.ddb)
+  metadataService: new MetadataService(aws.helpers.ddb),
+  dynamicAuthorizationService: dynamicAuthorizationService
 };
 
 const backendAPIApp: Express = generateRouter(apiRouteConfig);

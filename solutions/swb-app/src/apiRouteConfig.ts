@@ -4,6 +4,7 @@
  */
 
 import { CostCenterService, HostingAccountService, ProjectService } from '@aws/workbench-core-accounts';
+import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
 import { MetadataService } from '@aws/workbench-core-base';
 import {
   EnvironmentConnectionService,
@@ -28,6 +29,7 @@ export interface ApiRouteConfig {
   userManagementService: UserManagementService;
   costCenterService: CostCenterService;
   metadataService: MetadataService;
+  dynamicAuthorizationService: DynamicAuthorizationService;
 }
 
 export interface ApiRoute {
