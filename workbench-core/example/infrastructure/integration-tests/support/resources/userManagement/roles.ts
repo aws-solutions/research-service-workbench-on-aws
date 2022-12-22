@@ -6,16 +6,16 @@ import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import CollectionResource from '../base/collectionResource';
-import Group from './group';
+import Role from './role';
 
-export default class Groups extends CollectionResource {
+export default class Roles extends CollectionResource {
   public constructor(clientSession: ClientSession) {
-    super(clientSession, 'authorization', 'group');
-    this._api = 'authorization';
+    super(clientSession, 'roles', 'role');
+    this._api = 'roles';
   }
 
-  public group(id: string): Group {
-    return new Group(id, this._clientSession, this._parentApi);
+  public role(id: string): Role {
+    return new Role(id, this._clientSession, this._parentApi);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,10 +25,10 @@ export default class Groups extends CollectionResource {
     // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
     // a method called 'user()'.
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
-    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/group`, requestBody);
+    const response: AxiosResponse = await this._axiosInstance.post(this._api, requestBody);
 
-    const taskId = `${this._childType}-${requestBody.groupId}`;
-    const resourceNode = this.group(requestBody.groupId);
+    const taskId = `${this._childType}-${requestBody.roleName}`;
+    const resourceNode = this.role(requestBody.roleName);
     this.children.set(resourceNode.id, resourceNode);
     // We add a cleanup task to the cleanup queue for the session
     this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
@@ -36,22 +36,16 @@ export default class Groups extends CollectionResource {
     return response;
   }
 
-  public async getUserGroups(userId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/users/${userId}/groups`);
-  }
-
-  protected _buildDefaults(resource: CreateGroupRequest): CreateGroupRequest {
+  protected _buildDefaults(resource: CreateRoleRequest): CreateRoleRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
-    const groupId = randomTextGenerator.getFakeText('test-authZ-group');
+    const roleName = randomTextGenerator.getFakeText('test-user-role');
 
     return {
-      groupId: resource.groupId ?? groupId,
-      description: resource.description
+      roleName: resource.roleName ?? roleName
     };
   }
 }
 
-interface CreateGroupRequest {
-  groupId: string;
-  description?: string;
+interface CreateRoleRequest {
+  roleName: string;
 }

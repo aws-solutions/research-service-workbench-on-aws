@@ -63,12 +63,22 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'CREATE',
+    subject: 'Role'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Role'
   },
   {
     effect: 'ALLOW',
     action: 'UPDATE',
+    subject: 'Role'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'DELETE',
     subject: 'Role'
   },
   {

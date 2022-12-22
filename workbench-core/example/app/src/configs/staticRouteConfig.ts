@@ -107,6 +107,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/roles/S+': {
+    // Roles use the role name (which can be any string), not a guid
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'Role'
+      }
+    ]
+  },
   '/users': {
     GET: [
       {
@@ -167,7 +176,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`authorization/users/${uuidRegExpAsString}/group`]: {
+  [`/authorization/users/${uuidRegExpAsString}/groups`]: {
     GET: [
       {
         action: 'READ',

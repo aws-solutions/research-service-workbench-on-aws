@@ -8,14 +8,8 @@ import { DynamicAuthorizationHelper } from '../../complex/dynamicAuthorizationHe
 import Resource from '../base/resource';
 
 export default class Group extends Resource {
-  private _clientSession: ClientSession;
-  public id: string;
-
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
     super(clientSession, 'group', id, parentApi);
-    this.id = id;
-    this._api = `group/${id}`;
-    this._clientSession = clientSession;
   }
 
   public async cleanup(): Promise<void> {
