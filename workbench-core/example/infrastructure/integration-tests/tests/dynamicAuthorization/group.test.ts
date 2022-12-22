@@ -98,13 +98,13 @@ describe('dynamic authorization group integration tests', () => {
 
     it('returns a 404 error when the user doesnt exist', async () => {
       await expect(adminSession.resources.groups.getUserGroups(fakeUuid)).rejects.toThrow(
-        new HttpError(400, {})
+        new HttpError(404, {})
       );
     });
 
-    it('returns a 400 error when the userId parameter is not a uuid', async () => {
+    it('returns a 403 error when the userId parameter is not a uuid', async () => {
       await expect(adminSession.resources.groups.getUserGroups('not a UUID')).rejects.toThrow(
-        new HttpError(400, {})
+        new HttpError(403, {})
       );
     });
   });
