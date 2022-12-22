@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { ProjectEnvTypeConfigPlugin, ListProjectEnvTypeConfigsRequest } from '@aws/swb-app';
 import { ProjectService } from '@aws/workbench-core-accounts';
 import {
