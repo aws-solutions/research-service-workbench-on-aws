@@ -45,7 +45,7 @@ jobs:
 
   deploy-swb-reference-byon:
     needs: [pre-deployment-check]
-    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@feat/swb-byon
+    uses: aws-solutions/solution-spark-on-aws/.github/workflows/deploy-integration-swb-reference-byon.yml@develop
     secrets:
       aws-dev-region: ${{ secrets.AWS_DEV_REGION_BYON }}
       role-to-assume: ${{ secrets.ASSUME_ROLE }}
