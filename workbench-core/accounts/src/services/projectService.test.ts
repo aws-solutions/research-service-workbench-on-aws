@@ -742,15 +742,8 @@ describe('ProjectService', () => {
         Item: marshall(projItem),
         $metadata: {}
       };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: 'PROJ#proj-123',
-            sk: 'PROJ#proj-123'
-          })
-        })
-        .resolves(getItemResponse);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
       const actualResponse = await projService.listProjects({ userId });
@@ -888,7 +881,7 @@ describe('ProjectService', () => {
       expect(actualResponse.data).toEqual([project1]);
     });
 
-    test('list all projects as user of mutliple groups on 1 page with filter on status', async () => {
+    test('list all projects as user of multiple groups on 1 page with filter on status', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
@@ -1217,15 +1210,8 @@ describe('ProjectService', () => {
         Item: marshall(projItem),
         $metadata: {}
       };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: 'PROJ#proj-123',
-            sk: 'PROJ#proj-123'
-          })
-        })
-        .resolves(getItemResponse);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
       const actualResponse = await projService.getProject({ projectId: 'proj-123' });

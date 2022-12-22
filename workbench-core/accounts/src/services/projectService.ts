@@ -5,7 +5,8 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -15,7 +16,6 @@ import {
   uuidWithLowercasePrefix,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
-  getPaginationToken,
   toPaginationToken,
   fromPaginationToken,
   validateSingleSortAndFilter,
@@ -23,7 +23,6 @@ import {
   getSortQueryParams,
   PaginatedResponse
 } from '@aws/workbench-core-base';
-
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
@@ -32,7 +31,7 @@ import { CreateProjectRequest } from '../models/projects/createProjectRequest';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { GetProjectRequest } from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
-import { Project } from '../models/projects/project';
+import { Project, ProjectParser } from '../models/projects/project';
 import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
@@ -63,13 +62,11 @@ export default class ProjectService {
       .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
       .execute();
 
-    const item = (response as GetItemCommandOutput).Item;
-
-    if (item === undefined) {
+    if (!('Item' in response) || response.Item === undefined) {
       throw Boom.notFound(`Could not find project ${request.projectId}`);
-    } else {
-      return this._mapToProjectFromDDBItem(item);
     }
+
+    return this._mapDDBItemToProject(unmarshall(response.Item));
   }
 
   // TODO--delete after dynamic Authz
@@ -117,12 +114,12 @@ export default class ProjectService {
 
         queryParams = addPaginationToken(paginationToken, queryParams);
 
-        const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+        const projectsResponse = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
 
-        paginationToken = getPaginationToken(projectsResponse);
+        paginationToken = projectsResponse.paginationToken;
 
-        if (projectsResponse.Items) {
-          const items = projectsResponse.Items.map((item) => this._mapToProjectFromDDBItem(item));
+        if (projectsResponse.data) {
+          const items = projectsResponse.data.map((item) => this._mapDDBItemToProject(item));
           return { data: items, paginationToken: paginationToken };
         } else {
           return { data: [], paginationToken: undefined };
@@ -148,7 +145,7 @@ export default class ProjectService {
     }
     // parse responses from DDB
     const projects: Project[] = projectsResponse.Responses[this._tableName].map((item) =>
-      this._mapToProjectFromDDBItem(item)
+      this._mapDDBItemToProject(item)
     );
     // apply sort or filter
     let projectsOnPage: Project[] = projects;
@@ -288,7 +285,7 @@ export default class ProjectService {
         throw Boom.badImplementation('Could not update project.');
       }
 
-      return this._mapToProjectFromDDBItem(updateResponse.Attributes);
+      return this._mapDDBItemToProject(updateResponse.Attributes);
     } catch (e) {
       console.error(`Failed to update project ${request.projectId}}`, e);
       throw Boom.internal('Could not update project.');
@@ -373,12 +370,11 @@ export default class ProjectService {
    * @param item - the DDB item to conver to a Project object
    * @returns a Project object containing only project data from DDB attributes
    */
-  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue> | Record<string, string>): Project {
-    const copyItem = { ...item };
-    const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
-    itemWithoutValues.costCenterId = copyItem.dependency;
-    const project: Project = itemWithoutValues as unknown as Project;
-    return project;
+  private _mapDDBItemToProject(item: Record<string, unknown>): Project {
+    const project: Record<string, unknown> = { ...item, costCenterId: item.dependency };
+
+    // parse will remove pk and sk from the DDB item
+    return ProjectParser.parse(project);
   }
 
   /**
@@ -422,17 +418,16 @@ export default class ProjectService {
 
   private async _isProjectNameInUse(projectName: string): Promise<void> {
     // query by name
-    const response = await this._aws.helpers.ddb
-      .query({
-        key: { name: 'resourceType', value: 'project' },
-        index: 'getResourceByName',
-        sortKey: 'name',
-        eq: { S: projectName }
-      })
-      .execute();
+    const queryParams: QueryParams = {
+      key: { name: 'resourceType', value: 'project' },
+      index: 'getResourceByName',
+      sortKey: 'name',
+      eq: { S: projectName }
+    };
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
 
     // If anything is responded, name is in use so error
-    if (response.Count !== 0) {
+    if (response.data.length !== 0) {
       throw Boom.badRequest(
         `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
       );
