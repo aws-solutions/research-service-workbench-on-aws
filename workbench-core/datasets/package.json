@@ -46,6 +46,7 @@
     "@aws-sdk/client-s3-control": "^3.212.0",
     "@aws-sdk/types": "^3.212.0",
     "@aws/workbench-core-audit": "workspace:*",
+    "@aws/workbench-core-authorization": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
     "@hapi/boom": "^10.0.0",
