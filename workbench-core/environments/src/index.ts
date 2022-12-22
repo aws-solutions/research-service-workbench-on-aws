@@ -23,6 +23,7 @@ import {
   DeleteEnvironmentTypeConfigRequestParser,
   DeleteEnvironmentTypeConfigRequest
 } from './models/environmentTypeConfigs/deleteEnvironmentTypeConfigRequest';
+import { EnvironmentTypeConfig } from './models/environmentTypeConfigs/environmentTypeConfig';
 import {
   ListEnvironmentTypeConfigsRequest,
   ListEnvironmentTypeConfigsRequestParser
@@ -85,5 +86,6 @@ export {
   ListEnvironmentTypeConfigsRequest,
   ListEnvironmentTypeConfigsRequestParser,
   UpdateEnvironmentTypeRequest,
-  UpdateEnvironmentTypeRequestParser
+  UpdateEnvironmentTypeRequestParser,
+  EnvironmentTypeConfig
 };

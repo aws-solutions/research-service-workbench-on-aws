@@ -19,3 +19,5 @@ export function removeDynamoDbKeys(entry: { [key: string]: never }): { [key: str
 
   return entry;
 }
+
+export const MAX_GET_ITEMS_SIZE: number = 100;
