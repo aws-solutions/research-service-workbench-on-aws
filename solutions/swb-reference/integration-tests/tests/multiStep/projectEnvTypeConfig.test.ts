@@ -2,6 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { EnvironmentTypeConfig } from '@aws/workbench-core-environments';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 
@@ -32,6 +33,18 @@ describe('multiStep project-environmentTypeConfig relationship', () => {
         .environmentTypeConfig(envTypeConfigId)
         .associate()
     ).resolves.not.toThrow();
+
+    //Retrieve etc association from project
+    console.log('Retrieve etc association from project');
+    const { data: response } = await adminSession.resources.projects
+      .project(projectId)
+      .environmentTypes()
+      .environmentType(envTypeId)
+      .configurations()
+      .get({});
+    expect(
+      response.data.filter((projETC: EnvironmentTypeConfig) => projETC.id === envTypeConfigId).length
+    ).toBeTruthy();
 
     console.log('Disassociate Project with Environment Type Config');
     await expect(
