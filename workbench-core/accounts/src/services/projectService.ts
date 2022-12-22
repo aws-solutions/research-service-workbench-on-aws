@@ -6,7 +6,6 @@
 /* eslint-disable security/detect-object-injection */
 
 import { BatchGetItemCommandOutput } from '@aws-sdk/client-dynamodb';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -58,15 +57,16 @@ export default class ProjectService {
    * @returns Project entry in DDB
    */
   public async getProject(request: GetProjectRequest): Promise<Project> {
-    const response = await this._aws.helpers.ddb
-      .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
-      .execute();
+    const response = await this._aws.helpers.ddb.getItem({
+      key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project)
+    });
 
-    if (!('Item' in response) || response.Item === undefined) {
+    if (response === undefined) {
       throw Boom.notFound(`Could not find project ${request.projectId}`);
     }
 
-    return this._mapDDBItemToProject(unmarshall(response.Item));
+    console.log(response);
+    return this._mapDDBItemToProject(response);
   }
 
   // TODO--delete after dynamic Authz

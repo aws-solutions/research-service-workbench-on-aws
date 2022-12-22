@@ -2,8 +2,10 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
+import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
+import GetItemParams from '../../../interfaces/getItemParams';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
 import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
@@ -97,6 +99,27 @@ export default class DynamoDBService {
       }
     }
     return scanner;
+  }
+
+  /**
+   * Gets a single item from the DynamoDB table.
+   *
+   * @param params - optional object of optional properties to generate a query request
+   * @returns Promise<PaginatedJsonResponse>
+   *
+   * @example Use this to get paginated items from the DynamoDb table.
+   * ```ts
+   * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
+   * ```
+   */
+  public async getItem(params: GetItemParams): Promise<Record<string, JSONValue>> {
+    const result = (await this.get(params.key, params.params).execute()) as GetItemCommandOutput;
+    console.log(result);
+
+    const formattedResult = result.Item as unknown as Record<string, JSONValue>;
+    console.log('FORMATTED RESULT');
+    console.log(formattedResult);
+    return formattedResult;
   }
 
   /**
