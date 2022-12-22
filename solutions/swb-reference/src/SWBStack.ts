@@ -867,7 +867,6 @@ export class SWBStack extends Stack {
       ]
     });
 
-    // eslint-disable-next-line no-new
     new CfnOutput(this, 'dynamicAuthDDBTableArn', {
       value: dynamicAuthDDBTable.table.tableArn
     });
