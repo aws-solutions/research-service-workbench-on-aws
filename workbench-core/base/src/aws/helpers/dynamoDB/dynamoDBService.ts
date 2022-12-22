@@ -10,6 +10,7 @@ import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
 import { getPaginationToken } from '../../../utilities/paginationHelper';
 import BatchEdit from './batchEdit';
+import { MAX_GET_ITEMS_SIZE } from './ddbUtil';
 import Deleter from './deleter';
 import Getter from './getter';
 import { UpdateParams } from './interfaces/updateParams';
@@ -193,6 +194,8 @@ export default class DynamoDBService {
       capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
     }
   ): Promise<Record<string, JSONValue>[]> {
+    if (keys.length > MAX_GET_ITEMS_SIZE)
+      throw new Error(`Cannot retrieve more than ${MAX_GET_ITEMS_SIZE} items by request.`);
     const batchGetResult = (await this.get(keys, params).execute()) as BatchGetItemCommandOutput;
     return batchGetResult.Responses![this._tableName].map((item) => {
       return item as unknown as Record<string, JSONValue>;

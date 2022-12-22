@@ -86,6 +86,8 @@ export default class EnvironmentTypeConfigService {
    * @returns environment type config object array
    */
   public async getEnvironmentTypeConfigs(envTypeConfigIds: string[]): Promise<EnvironmentTypeConfig[]> {
+    if (envTypeConfigIds.length === 0) throw Boom.internal('envTypeConfigIds cannot be empty');
+
     const keys = envTypeConfigIds.map((envTypeId) => this._buildEnvTypeConfigPkSk(envTypeId));
     const items = await this._dynamoDbService.getItems(keys);
     if (items === undefined) {

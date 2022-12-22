@@ -83,7 +83,28 @@ describe('ListProjectEnvTypeConfigsRequestParser', () => {
           const expectedIssues = [
             {
               code: 'custom',
-              message: 'Must be 0 or larger',
+              message: 'Must be Between 1 and 100',
+              path: ['pageSize']
+            }
+          ];
+          expect(parsed.error.issues).toEqual(expectedIssues);
+        }
+      });
+
+      test('it returns an error when greater than 100', () => {
+        // OPERATE
+        const parsed = ListProjectEnvTypeConfigsRequestParser.safeParse({
+          ...requestObject,
+          pageSize: '101'
+        });
+
+        // CHECK
+        expect(parsed.success).toEqual(false);
+        if (!parsed.success) {
+          const expectedIssues = [
+            {
+              code: 'custom',
+              message: 'Must be Between 1 and 100',
               path: ['pageSize']
             }
           ];

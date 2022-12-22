@@ -22,10 +22,10 @@ export const ListProjectEnvTypeConfigsRequestParser = z
 
           return z.NEVER;
         }
-        if (pageSize < 0) {
+        if (pageSize < 0 || pageSize > 100) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Must be 0 or larger'
+            message: 'Must be Between 1 and 100'
           });
 
           return z.NEVER;
