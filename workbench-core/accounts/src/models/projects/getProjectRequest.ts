@@ -5,8 +5,10 @@
 import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const GetProjectRequestParser = z.object({
-  projectId: z.string()
-});
+export const GetProjectRequestParser = z
+  .object({
+    projectId: z.string()
+  })
+  .strict();
 
 export type GetProjectRequest = z.infer<typeof GetProjectRequestParser>;
