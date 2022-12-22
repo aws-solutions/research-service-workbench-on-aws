@@ -12,6 +12,7 @@ import {
   ProjectService
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
+import { DynamicAuthorizationService, WBCGroupManagementPlugin } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
 import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
@@ -23,6 +24,7 @@ import {
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import { Express } from 'express';
+import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
@@ -33,6 +35,27 @@ const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
   ddbTableName: process.env.STACK_NAME!
 });
+
+// Dynamic Auth
+const dynamicAuthAws: AwsService = new AwsService({
+  region: process.env.AWS_REGION!,
+  ddbTableName: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
+});
+
+const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
+  userManagementService: new UserManagementService(
+    new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, aws)
+  ),
+  ddbService: dynamicAuthAws.helpers.ddb,
+  userGroupKeyType: authorizationGroupPrefix
+});
+
+// Commenting it for now, it will be integrated with SWB's definition of DynamicAuthorizationService
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
+  groupManagementPlugin: wbcGroupManagementPlugin
+});
+
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
 const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
 const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
@@ -72,7 +95,7 @@ const apiRouteConfig: ApiRouteConfig = {
     new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
-    new DdbDataSetMetadataPlugin(aws, 'DATASET', 'ENDPOINT'),
+    new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
     {} as DataSetsAuthorizationPlugin //TODO: REPLACE WITH ACTUAL IMPLEMENTATION ONCE ITS AVAILABLE
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),

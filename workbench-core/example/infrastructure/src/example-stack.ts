@@ -255,7 +255,7 @@ export class ExampleStack extends Stack {
       sortKey: { name: 'sk', type: AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
       encryptionKey: encryptionKey,
-      lambda: lambda,
+      lambdas: [lambda],
       gsis: [
         {
           indexName: 'getResourceByName',
@@ -309,7 +309,7 @@ export class ExampleStack extends Stack {
       sortKey: { name: 'sk', type: AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
       encryptionKey: encryptionKey,
-      lambda: lambda,
+      lambdas: [lambda],
       gsis: [
         {
           indexName: 'getIdentityPermissionsByIdentity',
