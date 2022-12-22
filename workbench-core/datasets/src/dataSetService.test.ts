@@ -16,6 +16,7 @@ import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
+import { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
 describe('DataSetService', () => {
   let writer: Writer;
@@ -23,6 +24,7 @@ describe('DataSetService', () => {
   let log: LoggingService;
   let aws: AwsService;
   let metaPlugin: DdbDataSetMetadataPlugin;
+  let authzPlugin: WbcDataSetsAuthorizationPlugin;
 
   const mockDataSetId = 'sampleDataSetId';
   const mockDataSetName = 'Sample-DataSet';
@@ -56,8 +58,31 @@ describe('DataSetService', () => {
         secretAccessKey: 'fakeSecret'
       }
     });
+    const mockAuthService = {
+      init: jest.fn(),
+      isAuthorizedOnRoute: jest.fn(),
+      isAuthorizedOnSubject: jest.fn(),
+      isRouteIgnored: jest.fn(),
+      isRouteProtected: jest.fn(),
+      createGroup: jest.fn(),
+      deleteGroup: jest.fn(),
+      createIdentityPermissions: jest.fn(),
+      deleteIdentityPermissions: jest.fn(),
+      getIdentityPermissionsBySubject: jest.fn(),
+      removeUserFromGroup: jest.fn(),
+      addUserToGroup: jest.fn(),
+      getUserGroups: jest.fn(),
+      getGroupUsers: jest.fn(),
+      isUserAssignedToGroup: jest.fn(),
+      doesGroupExist: jest.fn(),
+      _groupManagementPlugin: jest.fn()
+    };
+
+    //@ts-ignore
+    authzPlugin = new WbcDataSetsAuthorizationPlugin(mockAuthService);
     log = new LoggingService();
     metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
+
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'listDataSets').mockImplementation(async () => {
       return [
         {
@@ -222,7 +247,7 @@ describe('DataSetService', () => {
 
   describe('constructor', () => {
     it('sets a private audit and log service', () => {
-      const service = new DataSetService(audit, log, metaPlugin);
+      const service = new DataSetService(audit, log, metaPlugin, authzPlugin);
 
       expect(service[`_audit`]).toBe(audit);
       expect(service[`_log`]).toBe(log);
@@ -234,7 +259,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -266,7 +291,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -297,7 +322,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it('returns nothing when the dataset is removed', async () => {
@@ -325,7 +350,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it("throws when called with a name that doesn't exists.", async () => {
@@ -429,7 +454,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it('returns an array of known DataSets.', async () => {
@@ -450,7 +475,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it('returns a the details of a DataSet.', async () => {
@@ -470,7 +495,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -511,7 +536,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -582,7 +607,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
@@ -603,7 +628,7 @@ describe('DataSetService', () => {
     let service: DataSetService;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
     });
 
     it('returns an array of known StorageLocations.', async () => {
@@ -623,7 +648,7 @@ describe('DataSetService', () => {
     let plugin: S3DataSetStoragePlugin;
 
     beforeEach(() => {
-      service = new DataSetService(audit, log, metaPlugin);
+      service = new DataSetService(audit, log, metaPlugin, authzPlugin);
       plugin = new S3DataSetStoragePlugin(aws);
     });
 
