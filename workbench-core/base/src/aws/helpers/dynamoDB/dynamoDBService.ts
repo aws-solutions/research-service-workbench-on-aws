@@ -104,22 +104,18 @@ export default class DynamoDBService {
   /**
    * Gets a single item from the DynamoDB table.
    *
-   * @param params - optional object of optional properties to generate a query request
-   * @returns Promise<PaginatedJsonResponse>
+   * @param params - {@link GetItemParams} object of properties to generate a get item request
+   * @returns Promise of a string, {@link JSONValue} paired object
    *
-   * @example Use this to get paginated items from the DynamoDb table.
+   * @example Use this to get a single item from the DynamoDb table.
    * ```ts
-   * const result = dynamoDBService.getPaginatedItems({sortKey: 'value', eq: {N: '5'}});
+   * const result = dynamoDBService.getItem({key: 'pk'});
    * ```
    */
   public async getItem(params: GetItemParams): Promise<Record<string, JSONValue>> {
     const result = (await this.get(params.key, params.params).execute()) as GetItemCommandOutput;
-    console.log(result);
 
-    const formattedResult = result.Item as unknown as Record<string, JSONValue>;
-    console.log('FORMATTED RESULT');
-    console.log(formattedResult);
-    return formattedResult;
+    return result.Item as unknown as Record<string, JSONValue>;
   }
 
   /**

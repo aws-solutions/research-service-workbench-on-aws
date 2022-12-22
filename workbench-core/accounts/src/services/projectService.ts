@@ -65,7 +65,6 @@ export default class ProjectService {
       throw Boom.notFound(`Could not find project ${request.projectId}`);
     }
 
-    console.log(response);
     return this._mapDDBItemToProject(response);
   }
 
