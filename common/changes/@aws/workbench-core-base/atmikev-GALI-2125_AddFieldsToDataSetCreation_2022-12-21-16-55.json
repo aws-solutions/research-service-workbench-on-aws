@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-base",
+      "comment": "adding `type` and `owner` to dataset creation API",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-base"
+}

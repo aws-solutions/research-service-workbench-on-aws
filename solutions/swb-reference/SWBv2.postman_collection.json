@@ -242,7 +242,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n,\n    \"owner\": \"proj-123#PA\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
