@@ -37,7 +37,7 @@ const aws: AwsService = new AwsService({
 // Dynamic Auth
 const dynamicAuthAws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
-  ddbTableName: process.env.STACK_NAME!
+  ddbTableName: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
 });
 
 const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagementPlugin({
