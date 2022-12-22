@@ -236,6 +236,29 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/projects/${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'ProjectEnvironmentTypeConfig'
+      }
+    ]
+  },
+  [`/projects/${uuidRegExpAsString}/environmentTypes/${envTypeIdRegExpString}/configurations/${resourceTypeToKey.envTypeConfig.toLowerCase()}-${uuidRegExpAsString}/relationships`]:
+    {
+      PUT: [
+        {
+          action: 'CREATE',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ],
+      DELETE: [
+        {
+          action: 'DELETE',
+          subject: 'ProjectEnvironmentTypeConfig'
+        }
+      ]
+    },
   '/roles': {
     POST: [
       {
