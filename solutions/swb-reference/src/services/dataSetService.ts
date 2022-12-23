@@ -37,7 +37,8 @@ export class DataSetService implements DataSetPlugin {
     this._workbenchDataSetService = new WorkbenchDataSetService(
       auditService,
       loggingService,
-      dataSetMetadataPlugin
+      dataSetMetadataPlugin,
+      dataSetAuthService
     );
     this.storagePlugin = dataSetStoragePlugin;
     this._dataSetsAuthService = dataSetAuthService;

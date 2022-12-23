@@ -1091,6 +1091,7 @@ importers:
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@aws/workbench-core-user-management': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -1138,6 +1139,7 @@ importers:
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-datasets': link:../datasets
       '@aws/workbench-core-logging': link:../logging
+      '@aws/workbench-core-user-management': link:../user-management
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
       jsonschema: 1.4.1

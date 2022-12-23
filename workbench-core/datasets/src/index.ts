@@ -10,6 +10,7 @@ import CreatePresignedSinglePartFileUploadUrl from './schemas/createPresignedSin
 import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExternalBucketRoleSchema';
 
 export { DataSet } from './dataSet';
+export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 export { DataSetService } from './dataSetService';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
@@ -29,6 +30,7 @@ export {
   CreateRegisterExternalBucketRoleSchema
 };
 export { StorageLocation } from './storageLocation';
+export { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 export {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleRequest,
