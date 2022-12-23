@@ -29,11 +29,8 @@ export {
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
-  GetAccessPermissionRequest,
   HTTPMethod,
+  ProjectEnvTypeConfigPlugin,
   ListProjectEnvTypeConfigsRequest,
-  ListProjectEnvTypeConfigsRequestParser,
-  PermissionsResponse,
-  PermissionsResponseParser,
-  ProjectEnvTypeConfigPlugin
+  ListProjectEnvTypeConfigsRequestParser
 };
