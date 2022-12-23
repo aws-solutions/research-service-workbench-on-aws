@@ -174,4 +174,8 @@ function getUiClientUrl(): string {
   }
 }
 
-export { getConstants, getConstantsWithSecrets };
+const dataSetPrefix: string = 'DATASET';
+const endPointPrefix: string = 'ENDPOINT';
+const authorizationGroupPrefix: string = 'GROUP';
+
+export { getConstants, getConstantsWithSecrets, dataSetPrefix, endPointPrefix, authorizationGroupPrefix };
