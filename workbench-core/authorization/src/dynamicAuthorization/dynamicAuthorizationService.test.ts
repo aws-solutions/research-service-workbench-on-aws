@@ -4,6 +4,7 @@
  */
 
 import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
+import { JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
@@ -109,33 +110,58 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('createIdentityPermissions', () => {
-    const sampleGroupId = 'sampleGroup';
-    const sampleGroupType: IdentityType = 'GROUP';
+    let sampleGroupId: string;
+    let sampleGroupType: IdentityType;
 
-    const sampleAction: Action = 'CREATE';
-    const sampleEffect: Effect = 'ALLOW';
-    const sampleSubjectType = 'sampleSubjectType';
-    const sampleSubjectId = 'sampleSubjectId';
-    const sampleConditions = {};
-    const sampleFields: string[] = [];
-    const sampleDescription: string = 'sampleDescription';
+    let sampleAction: Action;
+    let sampleEffect: Effect;
+    let sampleSubjectType: string;
+    let sampleSubjectId: string;
+    let sampleConditions: Record<string, JSONValue>;
+    let sampleFields: string[];
+    let sampleDescription: string;
 
-    const mockIdentityPermission: IdentityPermission = {
-      action: sampleAction,
-      effect: sampleEffect,
-      subjectType: sampleSubjectType,
-      subjectId: sampleSubjectId,
-      identityId: sampleGroupId,
-      identityType: sampleGroupType,
-      conditions: sampleConditions,
-      fields: sampleFields,
-      description: sampleDescription
-    } as const;
+    let mockIdentityPermission: IdentityPermission;
 
-    const mockIdentityPermissions = [mockIdentityPermission, mockIdentityPermission];
+    let mockIdentityPermissions: IdentityPermission[];
+
+    let actor: object;
+    let source: object;
+    let action: string;
 
     beforeAll(() => {
       jest.spyOn(auditService, 'write');
+    });
+
+    beforeEach(() => {
+      sampleGroupId = 'sampleGroup';
+      sampleGroupType = 'GROUP';
+      sampleAction = 'CREATE';
+      sampleEffect = 'ALLOW';
+      sampleSubjectType = 'sampleSubjectType';
+      sampleSubjectId = 'sampleSubjectId';
+      sampleConditions = {};
+      sampleFields = [];
+      sampleDescription = 'sampleDescription';
+      mockIdentityPermission = {
+        action: sampleAction,
+        effect: sampleEffect,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId,
+        identityId: sampleGroupId,
+        identityType: sampleGroupType,
+        conditions: sampleConditions,
+        fields: sampleFields,
+        description: sampleDescription
+      };
+
+      mockIdentityPermissions = [mockIdentityPermission, mockIdentityPermission];
+
+      action = 'createIdentityPermissions';
+      actor = mockUser;
+      source = {
+        serviceName: 'DynamicAuthorizationService'
+      };
     });
 
     test('create identity permissions for valid groups', async () => {
@@ -160,11 +186,9 @@ describe('WBCGroupManagemntPlugin', () => {
 
       expect(auditService.write).toBeCalledWith(
         {
-          actor: mockUser,
-          source: {
-            serviceName: 'DynamicAuthorizationService'
-          },
-          action: 'createIdentityPermissions',
+          actor,
+          source,
+          action,
           requestBody: params,
           statusCode: 'success'
         },
@@ -187,11 +211,9 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
       expect(auditService.write).toBeCalledWith(
         {
-          actor: mockUser,
-          source: {
-            serviceName: 'DynamicAuthorizationService'
-          },
-          action: 'createIdentityPermissions',
+          actor,
+          source,
+          action,
           requestBody: params,
           statusCode: 'failure'
         },
@@ -210,11 +232,9 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
       expect(auditService.write).toBeCalledWith(
         {
-          actor: mockUser,
-          source: {
-            serviceName: 'DynamicAuthorizationService'
-          },
-          action: 'createIdentityPermissions',
+          actor,
+          source,
+          action,
           requestBody: params,
           statusCode: 'failure'
         },
@@ -234,11 +254,9 @@ describe('WBCGroupManagemntPlugin', () => {
 
       expect(auditService.write).toBeCalledWith(
         {
-          actor: mockUser,
-          source: {
-            serviceName: 'DynamicAuthorizationService'
-          },
-          action: 'createIdentityPermissions',
+          actor,
+          source,
+          action,
           requestBody: params,
           statusCode: 'failure'
         },

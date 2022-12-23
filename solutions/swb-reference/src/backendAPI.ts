@@ -55,7 +55,7 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
 });
 const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
   new DDBDynamicAuthorizationPermissionsPlugin({
-    awsService: dynamicAuthAws
+    dynamoDBService: dynamicAuthAws.helpers.ddb
   });
 // Commenting it for now, it will be integrated with SWB's definition of DynamicAuthorizationService
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

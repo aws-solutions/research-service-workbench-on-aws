@@ -5,9 +5,10 @@ import {
   TransactWriteItemsCommand,
   TransactionCanceledException
 } from '@aws-sdk/client-dynamodb';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { Action } from '../action';
+import { AuthenticatedUser } from '../authenticatedUser';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { Effect } from '../permission';
@@ -15,47 +16,63 @@ import { DDBDynamicAuthorizationPermissionsPlugin } from './ddbDynamicAuthorizat
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
 
 describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
-  const region = 'us-east-1';
-  const ddbTableName = 'PermissionsTable';
-  const mockAuthenticatedUser = {
-    id: 'sampleUserId',
-    roles: []
-  };
+  let region: string;
+  let ddbTableName;
+  let mockAuthenticatedUser: AuthenticatedUser;
 
   let dynamoDBDynamicPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
   let awsService: AwsService;
   let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
 
-  const sampleGroupId = 'sampleGroup';
-  const sampleGroupType: IdentityType = 'GROUP';
+  let sampleGroupId: string;
+  let sampleGroupType: IdentityType;
 
-  const sampleAction: Action = 'CREATE';
-  const sampleEffect: Effect = 'ALLOW';
-  const sampleSubjectType = 'sampleSubjectType';
-  const sampleSubjectId = 'sampleSubjectId';
-  const sampleConditions = {};
-  const sampleFields: string[] = [];
-  const sampleDescription: string = 'sampleDescription';
+  let sampleAction: Action;
+  let sampleEffect: Effect;
+  let sampleSubjectType: string;
+  let sampleSubjectId: string;
+  let sampleConditions: Record<string, JSONValue>;
+  let sampleFields: string[];
+  let sampleDescription: string;
 
-  const mockIdentityPermission: IdentityPermission = {
-    action: sampleAction,
-    effect: sampleEffect,
-    subjectType: sampleSubjectType,
-    subjectId: sampleSubjectId,
-    identityId: sampleGroupId,
-    identityType: sampleGroupType,
-    conditions: sampleConditions,
-    fields: sampleFields,
-    description: sampleDescription
-  } as const;
+  let mockIdentityPermission: IdentityPermission;
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
+
+    ddbTableName = 'PermissionsTable';
+    region = 'us-east-1';
+    mockAuthenticatedUser = {
+      id: 'sampleUserId',
+      roles: []
+    };
+
     awsService = new AwsService({ region, ddbTableName });
     dynamoDBDynamicPermissionsPlugin = new DDBDynamicAuthorizationPermissionsPlugin({
-      awsService
+      dynamoDBService: awsService.helpers.ddb
     });
 
     mockDDB = mockClient(DynamoDBClient);
+
+    sampleGroupId = 'sampleGroup';
+    sampleGroupType = 'GROUP';
+    sampleAction = 'CREATE';
+    sampleEffect = 'ALLOW';
+    sampleSubjectType = 'sampleSubjectType';
+    sampleSubjectId = 'sampleSubjectId';
+    sampleConditions = {};
+    sampleFields = [];
+    sampleDescription = 'sampleDescription';
+    mockIdentityPermission = {
+      action: sampleAction,
+      effect: sampleEffect,
+      subjectType: sampleSubjectType,
+      subjectId: sampleSubjectId,
+      identityId: sampleGroupId,
+      identityType: sampleGroupType,
+      conditions: sampleConditions,
+      fields: sampleFields,
+      description: sampleDescription
+    };
   });
 
   describe('createIdentityPermissions tests', () => {

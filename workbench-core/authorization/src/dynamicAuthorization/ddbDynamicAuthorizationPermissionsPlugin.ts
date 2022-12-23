@@ -1,4 +1,4 @@
-import { AwsService, JSONValue } from '@aws/workbench-core-base';
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../action';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
@@ -32,10 +32,10 @@ import {
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 
 export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthorizationPermissionsPlugin {
-  private _awsService: AwsService;
+  private _dynamoDBService: DynamoDBService;
 
-  public constructor(config: { awsService: AwsService }) {
-    this._awsService = config.awsService;
+  public constructor(config: { dynamoDBService: DynamoDBService }) {
+    this._dynamoDBService = config.dynamoDBService;
   }
 
   public async isRouteIgnored(isRouteIgnoredRequest: IsRouteIgnoredRequest): Promise<IsRouteIgnoredResponse> {
@@ -81,7 +81,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
 
     // Will fail entire transaction if a single one fails
     try {
-      await this._awsService.helpers.ddb.commitTransaction({
+      await this._dynamoDBService.commitTransaction({
         addPutRequests: putRequests
       });
     } catch (err) {
@@ -131,7 +131,8 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const conditions = identityPermission.conditions ?? {};
     const fields = identityPermission.fields ?? [];
     const description = identityPermission.description ?? '';
-    return {
+
+    const item: Record<string, JSONValue | Set<JSONValue>> = {
       pk,
       sk,
       action,
@@ -141,6 +142,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
       fields,
       description
     };
+    return item;
   }
 
   private _createIdentityPermissionsPartitionKey(subjectType: string, subjectId: string): string {

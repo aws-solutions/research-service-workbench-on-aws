@@ -22,7 +22,7 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
 
 const ddbDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin =
   new DDBDynamicAuthorizationPermissionsPlugin({
-    awsService: dynamicAuthAws
+    dynamoDBService: dynamicAuthAws.helpers.ddb
   });
 
 export const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
