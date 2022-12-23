@@ -19,7 +19,9 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
+import { UpdateUnmarshalledOutput } from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/interfaces/updateUnmarshalledOutput';
 import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import * as Boom from '@hapi/boom';
@@ -738,19 +740,9 @@ describe('ProjectService', () => {
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
         .mockImplementation(() => ['proj-123#PA']);
 
-      const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(projItem),
-        $metadata: {}
-      };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: 'PROJ#proj-123',
-            sk: 'PROJ#proj-123'
-          })
-        })
-        .resolves(getItemResponse);
+      const getItemResponse: Record<string, JSONValue> = projItem;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(DynamoDBService.prototype as any, 'getItem').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
       const actualResponse = await projService.listProjects({ userId });
@@ -888,7 +880,7 @@ describe('ProjectService', () => {
       expect(actualResponse.data).toEqual([project1]);
     });
 
-    test('list all projects as user of mutliple groups on 1 page with filter on status', async () => {
+    test('list all projects as user of multiple groups on 1 page with filter on status', async () => {
       // BUILD
       const items = [projItem1, projItem2, projItem3];
 
@@ -1213,19 +1205,9 @@ describe('ProjectService', () => {
   describe('getProject', () => {
     test('getting 1 project', async () => {
       // BUILD
-      const getItemResponse: GetItemCommandOutput = {
-        Item: marshall(projItem),
-        $metadata: {}
-      };
-      ddbMock
-        .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
-          Key: marshall({
-            pk: 'PROJ#proj-123',
-            sk: 'PROJ#proj-123'
-          })
-        })
-        .resolves(getItemResponse);
+      const getItemResponse: Record<string, JSONValue> = projItem;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(DynamoDBService.prototype as any, 'getItem').mockImplementationOnce(() => getItemResponse);
 
       // OPERATE
       const actualResponse = await projService.getProject({ projectId: 'proj-123' });
@@ -1552,7 +1534,7 @@ describe('ProjectService', () => {
     });
 
     describe('trying to update project name', () => {
-      let updateItemResponse: UpdateItemCommandOutput;
+      let updateItemResponse: UpdateUnmarshalledOutput;
 
       describe('if project does not exist', () => {
         beforeEach(() => {
@@ -1594,12 +1576,11 @@ describe('ProjectService', () => {
           request.updatedValues = { name: projectName };
 
           // mock get project ddb call
-          const getItemResponse: GetItemCommandOutput = {
-            Item: marshall(projItem1),
-            $metadata: {}
-          };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+          const getItemResponse: Record<string, JSONValue> = projItem1;
+          jest
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .spyOn(DynamoDBService.prototype as any, 'getItem')
+            .mockImplementationOnce(() => getItemResponse);
         });
 
         describe('and name is already in use', () => {
@@ -1644,7 +1625,7 @@ describe('ProjectService', () => {
 
             jest
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .spyOn(Updater.prototype as any, 'execute')
+              .spyOn(DynamoDBService.prototype as any, 'updateExecuteAndFormat')
               .mockImplementationOnce(() => updateItemResponse);
           });
 
@@ -1652,8 +1633,7 @@ describe('ProjectService', () => {
             beforeEach(() => {
               // mock update project ddb call
               updateItemResponse = {
-                Attributes: marshall(updatedProjItem1),
-                $metadata: {}
+                Attributes: updatedProjItem1
               };
             });
 
@@ -1670,8 +1650,7 @@ describe('ProjectService', () => {
             beforeEach(() => {
               // mock update project ddb call
               updateItemResponse = {
-                Attributes: undefined,
-                $metadata: {}
+                Attributes: undefined
               };
             });
 
@@ -1715,21 +1694,20 @@ describe('ProjectService', () => {
       });
 
       describe('if projectId is valid', () => {
-        let updateItemResponse: UpdateItemCommandOutput;
+        let updateItemResponse: UpdateUnmarshalledOutput;
         beforeEach(() => {
           request.projectId = updatedProject1.id;
 
           // mock get project ddb call
-          const getItemResponse: GetItemCommandOutput = {
-            Item: marshall(projItem1),
-            $metadata: {}
-          };
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+          const getItemResponse: Record<string, JSONValue> = projItem1;
+          jest
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .spyOn(DynamoDBService.prototype as any, 'getItem')
+            .mockImplementationOnce(() => getItemResponse);
 
           jest
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .spyOn(Updater.prototype as any, 'execute')
+            .spyOn(DynamoDBService.prototype as any, 'updateExecuteAndFormat')
             .mockImplementationOnce(() => updateItemResponse);
         });
 
@@ -1737,8 +1715,7 @@ describe('ProjectService', () => {
           beforeEach(() => {
             // mock update project ddb call
             updateItemResponse = {
-              Attributes: marshall(updatedProjItem1),
-              $metadata: {}
+              Attributes: updatedProjItem1
             };
           });
 
@@ -1755,8 +1732,7 @@ describe('ProjectService', () => {
           beforeEach(() => {
             // mock update project ddb call
             updateItemResponse = {
-              Attributes: undefined,
-              $metadata: {}
+              Attributes: undefined
             };
           });
 
