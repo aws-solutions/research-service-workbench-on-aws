@@ -1,3 +1,8 @@
+/*
+ *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *  SPDX-License-Identifier: Apache-2.0
+ */
+
 import { AuditLogger, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import { logger } from './loggingService';
 
