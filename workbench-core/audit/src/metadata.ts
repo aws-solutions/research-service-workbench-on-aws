@@ -11,7 +11,7 @@ export default interface Metadata {
   /**
    * The status code of the request
    */
-  statusCode?: number;
+  statusCode?: number | string;
   /**
    * The requested action
    */

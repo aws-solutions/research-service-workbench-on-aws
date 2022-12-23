@@ -24,12 +24,18 @@ export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotS
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
 export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
+export { ThroughputExceededError, isThroughputExceededError } from './errors/throughputExceededError';
+export {
+  IdentityPermissionCreationError,
+  isIdentityPermissionCreationError
+} from './errors/identityPermissionCreationError';
 
 // dynamic authorization
 export { WBCGroupManagementPlugin } from './dynamicAuthorization/wbcGroupManagementPlugin';
 export { GroupManagementPlugin } from './dynamicAuthorization/groupManagementPlugin';
 export { DynamicAuthorizationService } from './dynamicAuthorization/dynamicAuthorizationService';
 export { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorization/dynamicAuthorizationPermissionsPlugin';
+export { DDBDynamicAuthorizationPermissionsPlugin } from './dynamicAuthorization/ddbDynamicAuthorizationPermissionsPlugin';
 export {
   AddUserToGroupRequest,
   AddUserToGroupResponse

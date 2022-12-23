@@ -25,7 +25,12 @@ export interface CreateIdentityPermissionsRequest {
  */
 export interface CreateIdentityPermissionsResponse {
   /**
-   * States whether the {@link IdentityPermission}s were successfully created
+   * The data object returned
    */
-  created: boolean;
+  data: {
+    /**
+     * An array of {@link IdentityPermission}s created
+     */
+    identityPermissions: IdentityPermission[];
+  };
 }

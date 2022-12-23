@@ -158,6 +158,14 @@ export const routesMap: RoutesMap = {
         subject: 'AuthorizationGroup'
       }
     ]
+  },
+  '/authorization/identitypermissions': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'IdentityPermission'
+      }
+    ]
   }
 };
 

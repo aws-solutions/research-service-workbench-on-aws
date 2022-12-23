@@ -3,6 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuditService, Metadata } from '@aws/workbench-core-audit';
+import { GroupNotFoundError } from '../errors/groupNotFoundError';
+import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import {
@@ -37,13 +40,22 @@ import {
   RemoveUserFromGroupRequest,
   RemoveUserFromGroupResponse
 } from './dynamicAuthorizationInputs/removeUserFromGroup';
+import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 import { GroupManagementPlugin } from './groupManagementPlugin';
 
 export class DynamicAuthorizationService {
   private _groupManagementPlugin: GroupManagementPlugin;
+  private _dynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
+  private _auditService: AuditService;
 
-  public constructor(config: { groupManagementPlugin: GroupManagementPlugin }) {
+  public constructor(config: {
+    groupManagementPlugin: GroupManagementPlugin;
+    dynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
+    auditService: AuditService;
+  }) {
     this._groupManagementPlugin = config.groupManagementPlugin;
+    this._dynamicAuthorizationPermissionsPlugin = config.dynamicAuthorizationPermissionsPlugin;
+    this._auditService = config.auditService;
   }
 
   /**
@@ -129,19 +141,42 @@ export class DynamicAuthorizationService {
   }
 
   /**
-   * Create identity permissions
+   * Create identity permissions, limited to 100 identity permissions
    * @param createIdentityPermissionsRequest - {@link CreateIdentityPermissionsRequest}
    *
    * @returns - {@link CreateIdentityPermissionsResponse}
    *
-   * @throws - {@link IdentityPermissionAlreadyExistsError} Can not create an identity permission that already exists.
+   * @throws - {@link IdentityPermissionAlreadyExistError} Can not create an identity permission that already exists.
+   * @throws - {@link ThroughputExceededError} Can not exceed 100 identity permissions
+   * @throws - {@link GroupNotValid} Can only create permissions for 'active' groups
    */
   public async createIdentityPermissions(
     createIdentityPermissionsRequest: CreateIdentityPermissionsRequest
   ): Promise<CreateIdentityPermissionsResponse> {
-    throw new Error('Not implemented');
-  }
+    const { authenticatedUser } = createIdentityPermissionsRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.createIdentityPermissions.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: createIdentityPermissionsRequest
+    };
+    try {
+      const response = await this._createIdentityPermissions(createIdentityPermissionsRequest);
 
+      //Write audit entry when success
+      metadata.statusCode = 'success';
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (err) {
+      //Write audit entry when failure
+      metadata.statusCode = 'failure';
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
+  }
   /**
    * Delete identity permissions
    * @param deleteIdentityPermissionsRequest - {@link DeleteIdentityPermissionsRequest}
@@ -226,5 +261,33 @@ export class DynamicAuthorizationService {
    */
   public async doesGroupExist(doesGroupExistRequest: DoesGroupExistRequest): Promise<DoesGroupExistResponse> {
     throw new Error('Not implemented');
+  }
+
+  private async _createIdentityPermissions(
+    createIdentityPermissionsRequest: CreateIdentityPermissionsRequest
+  ): Promise<CreateIdentityPermissionsResponse> {
+    const { identityPermissions } = createIdentityPermissionsRequest;
+    if (identityPermissions.length > 100)
+      throw new ThroughputExceededError('Exceeds 100 identity permissions');
+
+    //Verify all groups are valid to create identity permissions
+    const groupIds = new Set<string>();
+    identityPermissions.forEach((identityPermission) => {
+      if (identityPermission.identityType === 'GROUP') groupIds.add(identityPermission.identityId);
+    });
+    const promises = Array.from(groupIds).map((groupId) => {
+      return this._groupManagementPlugin.getGroupStatus({ groupId });
+    });
+    const groupStatusResponses = await Promise.all(promises);
+
+    groupStatusResponses.forEach((groupSatusResponse) => {
+      if (groupSatusResponse.data.status !== 'active')
+        throw new GroupNotFoundError('One or more groups are not found');
+    });
+
+    //Create identity permissions
+    return await this._dynamicAuthorizationPermissionsPlugin.createIdentityPermissions(
+      createIdentityPermissionsRequest
+    );
   }
 }

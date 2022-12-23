@@ -3,8 +3,14 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamicAuthorizationService, WBCGroupManagementPlugin } from '@aws/workbench-core-authorization';
+import {
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin
+} from '@aws/workbench-core-authorization';
 import { authorizationGroupPrefix } from '../configs/constants';
+import { auditService } from './auditService';
 import { dynamicAuthAws } from './awsService';
 import { userManagementService } from './userManagementService';
 
@@ -14,6 +20,13 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
   userGroupKeyType: authorizationGroupPrefix
 });
 
+const ddbDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin =
+  new DDBDynamicAuthorizationPermissionsPlugin({
+    awsService: dynamicAuthAws
+  });
+
 export const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
-  groupManagementPlugin: wbcGroupManagementPlugin
+  groupManagementPlugin: wbcGroupManagementPlugin,
+  dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
+  auditService
 });

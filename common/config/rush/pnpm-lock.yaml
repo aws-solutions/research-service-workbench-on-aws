@@ -649,7 +649,6 @@ importers:
   ../../workbench-core/audit:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -670,7 +669,6 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
@@ -762,6 +760,7 @@ importers:
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@aws/workbench-core-user-management': workspace:*
@@ -790,6 +789,7 @@ importers:
       typescript: ^4.5.2
       zod: ^3.19.1
     dependencies:
+      '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@aws/workbench-core-user-management': link:../user-management
@@ -16460,7 +16460,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1
+      jest: 27.5.1_ts-node@10.8.0
       jest-util: 27.5.1
       json5: 2.2.1
       lodash.memoize: 4.1.2

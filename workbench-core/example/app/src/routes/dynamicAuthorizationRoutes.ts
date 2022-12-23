@@ -7,7 +7,10 @@ import { isPluginConfigurationError } from '@aws/workbench-core-authentication';
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
-  isTooManyRequestsError
+  isTooManyRequestsError,
+  isThroughputExceededError,
+  isGroupNotFoundError,
+  isIdentityPermissionCreationError
 } from '@aws/workbench-core-authorization';
 import {
   CreateGroupRequest,
@@ -42,6 +45,26 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           throw Boom.tooManyRequests('Too many requests');
         }
         throw error;
+      }
+    })
+  );
+  router.post(
+    '/authorization/identitypermissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const params = req.body;
+        const { data } = await dynamicAuthorizationService.createIdentityPermissions({
+          authenticatedUser: res.locals.user,
+          ...params
+        });
+        res.status(201).send(data);
+      } catch (err) {
+        if (isGroupNotFoundError(err)) throw Boom.badRequest('One or more groups are not found');
+        if (isThroughputExceededError(err))
+          throw Boom.tooManyRequests('Exceed limit on creation of permissions');
+        if (isIdentityPermissionCreationError(err))
+          throw Boom.badRequest('One or more permissions already exist');
+        throw err;
       }
     })
   );
