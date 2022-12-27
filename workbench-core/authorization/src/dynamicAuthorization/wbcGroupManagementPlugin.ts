@@ -72,8 +72,14 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     throw new Error('Method not implemented.');
   }
-  public addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
+    const { groupId, userId } = request;
+
+    // ToDo: Any remapping of following exceptions returned from _userManagementService.addUserToRole needs to be performed?
+    // IdpUnavailableError, PluginConfigurationError, UserNotFoundError, RoleNotFoundError
+
+    await this._userManagementService.addUserToRole(userId, groupId);
+    return { data: { added: true } };
   }
   public isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest

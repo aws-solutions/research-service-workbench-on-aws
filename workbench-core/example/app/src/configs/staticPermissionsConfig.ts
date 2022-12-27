@@ -95,6 +95,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'CREATE',
     subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'AuthorizationGroup'
   }
 ];
 

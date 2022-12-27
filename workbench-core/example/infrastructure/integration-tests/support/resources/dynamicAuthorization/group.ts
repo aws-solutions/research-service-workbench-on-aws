@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DynamicAuthorizationHelper } from '../../complex/dynamicAuthorizationHelper';
 import Resource from '../base/resource';
@@ -12,9 +13,9 @@ export default class Group extends Resource {
   public id: string;
 
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
-    super(clientSession, 'group', id, parentApi);
+    super(clientSession, 'groups', id, parentApi);
     this.id = id;
-    this._api = `group/${id}`;
+    this._api = parentApi;
     this._clientSession = clientSession;
   }
 
@@ -26,5 +27,12 @@ export default class Group extends Resource {
     } catch (error) {
       console.warn(`Error caught in cleanup of authorization group '${this.id}': ${error}.`);
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public addUser(body: any = {}, applyDefault: boolean = true): Promise<AxiosResponse> {
+    const requestBody = applyDefault ? { groupId: this.id, ...body } : body;
+
+    return this._axiosInstance.post(`${this._api}/add-user`, requestBody);
   }
 }

@@ -9,7 +9,7 @@ import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
 import { GroupStatus } from './models/GroupMetadata';
 
-describe('WBCGroupManagemntPlugin', () => {
+describe('DynamicAuthorizationService', () => {
   let mockUser: AuthenticatedUser;
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
@@ -75,6 +75,30 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
         Error
       );
+    });
+  });
+
+  describe('addUserToGroup', () => {
+    test.each([
+      [{ added: true }, true],
+      [{ added: false }, false]
+    ])('Request %s to addUserToGroup returns %s', async (data, expected) => {
+      mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue({ data });
+      const dynamicAuthorizationService = new DynamicAuthorizationService({
+        groupManagementPlugin: mockGroupManagementPlugin
+      });
+      const request = {
+        groupId: 'groupId',
+        userId: 'userId',
+        authenticatedUser: mockUser
+      };
+
+      const {
+        data: { added }
+      } = await dynamicAuthorizationService.addUserToGroup(request);
+
+      expect(mockGroupManagementPlugin.addUserToGroup).toBeCalledWith(request);
+      expect(added).toBe(expected);
     });
   });
 });

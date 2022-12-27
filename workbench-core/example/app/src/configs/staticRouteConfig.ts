@@ -151,10 +151,18 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/authorization/group': {
+  '/authorization/groups': {
     POST: [
       {
         action: 'CREATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  ['/authorization/groups/add-user']: {
+    POST: [
+      {
+        action: 'UPDATE',
         subject: 'AuthorizationGroup'
       }
     ]
