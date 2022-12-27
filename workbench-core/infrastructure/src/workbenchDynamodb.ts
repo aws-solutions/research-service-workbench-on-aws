@@ -3,15 +3,29 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { BillingMode, TableProps, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import {
+  BillingMode,
+  TableProps,
+  Table,
+  TableEncryption,
+  GlobalSecondaryIndexProps
+} from 'aws-cdk-lib/aws-dynamodb';
 import { IKey } from 'aws-cdk-lib/aws-kms';
+import { Function } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
+import _ from 'lodash';
 import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWithRotation';
+
+export interface WorkbenchDynamodbProps extends TableProps {
+  gsis?: GlobalSecondaryIndexProps[];
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  lambdas?: Function[];
+}
 
 export class WorkbenchDynamodb extends Construct {
   public readonly table: Table;
 
-  public constructor(scope: Construct, id: string, props: TableProps) {
+  public constructor(scope: Construct, id: string, props: WorkbenchDynamodbProps) {
     super(scope, id);
 
     let encryptionKey: IKey | undefined = undefined;
@@ -28,5 +42,15 @@ export class WorkbenchDynamodb extends Construct {
       encryptionKey: encryptionKey,
       pointInTimeRecovery: true
     });
+
+    _.map(props.gsis, (gsi) => {
+      this.table.addGlobalSecondaryIndex(gsi);
+    });
+
+    if (props.lambdas?.length) {
+      _.map(props.lambdas, (lambda) => {
+        this.table.grantReadWriteData(lambda);
+      });
+    }
   }
 }

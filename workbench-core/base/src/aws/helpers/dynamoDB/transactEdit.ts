@@ -9,6 +9,7 @@ import {
   TransactWriteItemsCommandOutput,
   DynamoDB
 } from '@aws-sdk/client-dynamodb';
+import _ from 'lodash';
 
 /**
  * This class helps with batch writes or deletes.
@@ -28,7 +29,7 @@ class TransactEdit {
    *
    * @param items - Object of the items to add
    */
-  public addPutRequests(items: Record<string, AttributeValue>[]): TransactEdit {
+  public addPutItems(items: Record<string, AttributeValue>[]): TransactEdit {
     if (!this._params.TransactItems) {
       throw new Error(
         'TransactEdit needs to initialize the TransactItems property before adding new request'
@@ -51,6 +52,40 @@ class TransactEdit {
         Put: {
           TableName: this._tableName,
           Item: item
+        }
+      });
+    });
+    return this;
+  }
+  /**
+   * Add put requests
+   * @param putRequests - A list of put request to add
+   * @returns
+   */
+  public addPutRequests(
+    putRequests: {
+      item: Record<string, AttributeValue>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, AttributeValue>;
+    }[]
+  ): TransactEdit {
+    putRequests.forEach((putRequest) => {
+      const requriedParams = {
+        Item: putRequest.item,
+        TableName: this._tableName
+      };
+      const conditionalParams = {
+        ConditionExpression: putRequest.conditionExpression,
+        ExpressionAttributeNames: putRequest.expressionAttributeNames,
+        ExpressionAttributeValues: putRequest.expressionAttributeValues
+      };
+      const additonalParams = _.omitBy(conditionalParams, _.isNil);
+
+      this._params.TransactItems!.push({
+        Put: {
+          ...requriedParams,
+          ...additonalParams
         }
       });
     });

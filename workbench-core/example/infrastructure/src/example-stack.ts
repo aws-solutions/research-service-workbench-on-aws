@@ -72,17 +72,18 @@ export class ExampleStack extends Stack {
     this._s3AccessLogsPrefix = 'example-access-log';
     const workbenchEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
       this,
-      'DataSetBucket-EncryptionKey',
+      'DataSetBucketEncryptionKey',
       {
         removalPolicy: RemovalPolicy.DESTROY
       }
     );
     const encryptionKey: Key = workbenchEncryptionKey.key;
+
     this._accessLogsBucket = this._createAccessLogsBucket(
       'ExampleS3BucketAccessLogsNameOutput',
       encryptionKey
     );
-    const workbenchSecureS3Bucket = new WorkbenchSecureS3Bucket(this, 'Example-S3Bucket', {
+    const workbenchSecureS3Bucket = new WorkbenchSecureS3Bucket(this, 'ExampleS3Bucket', {
       encryptionKey: encryptionKey,
       serverAccessLogsBucket: this._accessLogsBucket,
       serverAccessLogsPrefix: this._s3AccessLogsPrefix,
@@ -100,9 +101,22 @@ export class ExampleStack extends Stack {
 
     const exampleLambda: Function = this._createLambda(datasetBucket);
 
-    const table = this._createDDBTable(exampleLambda);
+    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
+      this,
+      'DynamoDB-EncryptionKey',
+      {
+        removalPolicy: RemovalPolicy.DESTROY
+      }
+    );
 
-    exampleLambda.addEnvironment('DDB_TABLE_NAME', table.tableName);
+    // Create DatasetTable
+    const datasetTable = this._createDataSetDDBTable(dynamodbEncryptionKey.key, exampleLambda);
+
+    // Create DynamicAuthTable
+    const dynamicAuthTable = this._createDynamicAuthDDBTable(dynamodbEncryptionKey.key, exampleLambda);
+
+    exampleLambda.addEnvironment('DATASET_DDB_TABLE_NAME', datasetTable.tableName);
+    exampleLambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
 
     this._createRestApi(exampleLambda);
 
@@ -133,7 +147,7 @@ export class ExampleStack extends Stack {
       ]
     });
 
-    //DataSetBucket autoDelete custom Lambda
+    //DatasetBucket autoDelete custom Lambda
     const autoDeleteCustomResourceLambdaNode = this.node.findChild(
       'Custom::S3AutoDeleteObjectsCustomResourceProvider'
     );
@@ -234,69 +248,87 @@ export class ExampleStack extends Stack {
     ]);
   }
 
-  // DynamoDB Table
-  private _createDDBTable(exampleLambda: Function): Table {
-    //EncryptionKey for DynamoDB
-    const dynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
-      this,
-      'DynamoDB-EncryptionKey',
-      {
-        removalPolicy: RemovalPolicy.DESTROY
-      }
-    );
-
-    const dynamodb = new WorkbenchDynamodb(this, `${this.stackName}`, {
+  // Create DatasetDDBTable
+  private _createDataSetDDBTable(encryptionKey: Key, lambda: Function): Table {
+    const dataSetTable: WorkbenchDynamodb = new WorkbenchDynamodb(this, `ExampleDatasetTable`, {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
-      encryptionKey: dynamodbEncryptionKey.key
+      encryptionKey: encryptionKey,
+      lambdas: [lambda],
+      gsis: [
+        {
+          indexName: 'getResourceByName',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'name', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByStatus',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'status', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByCreatedAt',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'createdAt', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByDependency',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'dependency', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByOwner',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'owner', type: AttributeType.STRING }
+        },
+        {
+          indexName: 'getResourceByType',
+          partitionKey: { name: 'resourceType', type: AttributeType.STRING },
+          sortKey: { name: 'type', type: AttributeType.STRING }
+        }
+      ]
     });
 
-    const table = dynamodb.table;
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDataSetDDBTableArn', {
+      value: dataSetTable.table.tableArn
+    });
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDataSetDDBTableName', {
+      value: dataSetTable.table.tableName
+    });
 
-    // Add GSI for get resource by name
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByName',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'name', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by status
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByStatus',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'status', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by createdAt
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByCreatedAt',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'createdAt', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by dependency
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByDependency',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'dependency', type: AttributeType.STRING }
-    });
-    // Add GSI for get resource by owner
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByOwner',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'owner', type: AttributeType.STRING }
-    });
-    // TODO Add GSI for get resource by cost
-    // Add GSI for get resource by type
-    table.addGlobalSecondaryIndex({
-      indexName: 'getResourceByType',
-      partitionKey: { name: 'resourceType', type: AttributeType.STRING },
-      sortKey: { name: 'type', type: AttributeType.STRING }
-    });
-    // Grant the Lambda Functions read access to the DynamoDB table
-    table.grantReadWriteData(exampleLambda);
+    return dataSetTable.table;
+  }
 
-    new CfnOutput(this, 'ExampleDynamoDBTableOutput', { value: table.tableArn });
-    new CfnOutput(this, 'ExampleDynamoDBTableName', { value: table.tableName });
-    return table;
+  // Create DynamicAuthDDBTable
+  private _createDynamicAuthDDBTable(encryptionKey: Key, lambda: Function): Table {
+    const dynamicAuthDDBTable = new WorkbenchDynamodb(this, `ExampleDynamicAuthTable`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      removalPolicy: RemovalPolicy.DESTROY,
+      encryptionKey: encryptionKey,
+      lambdas: [lambda],
+      gsis: [
+        {
+          indexName: 'getIdentityPermissionsByIdentity',
+          partitionKey: { name: 'Identity', type: AttributeType.STRING },
+          sortKey: { name: 'pk', type: AttributeType.STRING }
+        }
+      ]
+    });
+
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDynamicAuthDDBTableArn', {
+      value: dynamicAuthDDBTable.table.tableArn
+    });
+    // eslint-disable-next-line no-new
+    new CfnOutput(this, 'ExampleDynamicAuthDDBTableName', {
+      value: dynamicAuthDDBTable.table.tableName
+    });
+
+    return dynamicAuthDDBTable.table;
   }
 
   private _addAccessPointDelegationStatement(s3Bucket: Bucket): void {

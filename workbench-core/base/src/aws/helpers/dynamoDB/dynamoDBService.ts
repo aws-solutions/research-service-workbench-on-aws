@@ -2,7 +2,7 @@
  *  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *  SPDX-License-Identifier: Apache-2.0
  */
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import _ from 'lodash';
 import PaginatedJsonResponse from '../../../interfaces/paginatedJsonResponse';
@@ -10,6 +10,7 @@ import QueryParams from '../../../interfaces/queryParams';
 import JSONValue from '../../../types/json';
 import { getPaginationToken } from '../../../utilities/paginationHelper';
 import BatchEdit from './batchEdit';
+import { MAX_GET_ITEMS_SIZE } from './ddbUtil';
 import Deleter from './deleter';
 import Getter from './getter';
 import { UpdateParams } from './interfaces/updateParams';
@@ -170,6 +171,35 @@ export default class DynamoDBService {
     const response = await this.get(key, params).execute();
     const item = (response as GetItemCommandOutput).Item;
     return item as unknown as Record<string, JSONValue>;
+  }
+
+  /**
+   * retrieves items from DynamoDB table.
+   *
+   * @param keys - array of keys to retrieve
+   * @param params - optional object of optional properties to generate a get item request
+   * @returns Promise\<Record\<string,JSONValue\>\>
+   *
+   * @example Use this method to retrieve an item from ddb by Id
+   * ```ts
+   * const item = await dynamoDBService.getItems([{'pk': 'pk', 'sk': 'sk'}, {'pk': 'pk2', 'sk': 'sk2'}], {projection: 'valueIWant'});
+   * ```
+   */
+  public async getItems(
+    keys: Record<string, unknown>[],
+    params?: {
+      strong?: boolean;
+      names?: { [key: string]: string };
+      projection?: string | string[];
+      capacity?: 'INDEXES' | 'TOTAL' | 'NONE';
+    }
+  ): Promise<Record<string, JSONValue>[]> {
+    if (keys.length > MAX_GET_ITEMS_SIZE)
+      throw new Error(`Cannot retrieve more than ${MAX_GET_ITEMS_SIZE} items by request.`);
+    const batchGetResult = (await this.get(keys, params).execute()) as BatchGetItemCommandOutput;
+    return batchGetResult.Responses![this._tableName].map((item) => {
+      return item as unknown as Record<string, JSONValue>;
+    });
   }
 
   /**
@@ -476,9 +506,38 @@ export default class DynamoDBService {
     return batchEdit;
   }
 
+  /**
+   * Commits transactions to the table
+   *
+   * @param params - the items for the transaction
+   */
+  public async commitTransaction(params?: {
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+  }): Promise<void> {
+    await this.transactEdit(params).execute();
+  }
+
+  /**
+   * @deprecated Use `commitTransaction` instead
+   * @param params - the items for the transaction
+   * @returns A TransactEdit object
+   */
   public transactEdit(params?: {
-    addPutRequest?: Record<string, unknown>[];
-    addDeleteRequests?: Record<string, unknown>[];
+    addPutRequests?: {
+      item: Record<string, JSONValue | Set<JSONValue>>;
+      conditionExpression?: string;
+      expressionAttributeNames?: Record<string, string>;
+      expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+    }[];
+    addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+    addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
   }): TransactEdit {
     let transactEdit = new TransactEdit({ region: this._awsRegion }, this._tableName);
     if (params?.addDeleteRequests) {
@@ -486,11 +545,30 @@ export default class DynamoDBService {
         params.addDeleteRequests.map((request) => marshall(request))
       );
     }
-    if (params?.addPutRequest) {
+    if (params?.addPutItems) {
+      transactEdit = transactEdit.addPutItems(
+        params.addPutItems.map((request) => marshall(request, { removeUndefinedValues: true }))
+      );
+    }
+    if (params?.addPutRequests) {
       transactEdit = transactEdit.addPutRequests(
-        params.addPutRequest.map((request) => marshall(request, { removeUndefinedValues: true }))
+        params.addPutRequests.map((request) => {
+          return {
+            item: marshall(request.item, { removeUndefinedValues: true }),
+            conditionExpression: request.conditionExpression,
+            expressionAttributeNames: request.expressionAttributeNames,
+            expressionAttributeValues: marshall(request.expressionAttributeValues)
+          };
+        })
       );
     }
     return transactEdit;
+  }
+
+  /**
+   * @returns the table name
+   */
+  public getTableName(): string {
+    return this._tableName;
   }
 }

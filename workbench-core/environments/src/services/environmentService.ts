@@ -8,7 +8,6 @@
 import { BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
-  AwsService,
   QueryParams,
   resourceTypeToKey,
   uuidWithLowercasePrefix,
@@ -16,7 +15,9 @@ import {
   buildDynamoDbKey,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
-  getPaginationToken
+  getPaginationToken,
+  DynamoDBService,
+  JSONValue
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -76,13 +77,10 @@ const defaultEnv: Environment = {
 };
 
 export class EnvironmentService {
-  private _aws: AwsService;
-  private _tableName: string;
+  private _dynamoDBService: DynamoDBService;
 
-  public constructor(constants: { TABLE_NAME: string }) {
-    const { TABLE_NAME } = constants;
-    this._tableName = TABLE_NAME;
-    this._aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: TABLE_NAME });
+  public constructor(dynamoDBService: DynamoDBService) {
+    this._dynamoDBService = dynamoDBService;
   }
 
   /**
@@ -91,48 +89,48 @@ export class EnvironmentService {
    * @param includeMetadata - If true we get all entries where pk = envId, instead of just the entry where pk = envId and sk = envId
    */
   public async getEnvironment(envId: string, includeMetadata: boolean = false): Promise<Environment> {
-    if (includeMetadata) {
-      const data = await this._aws.helpers.ddb
-        .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
-        .execute();
-      if (data.Count === 0) {
-        throw Boom.notFound(`Could not find environment ${envId}`);
-      }
-      const items = data.Items!.map((item) => {
-        return item;
-      });
-      let envWithMetadata: Environment = { ...defaultEnv };
-      envWithMetadata.DATASETS = [];
-      envWithMetadata.ENDPOINTS = [];
-      for (const item of items) {
-        // parent environment item
-        const sk = item.sk as unknown as string;
-        if (sk === buildDynamoDbKey(envId, resourceTypeToKey.environment)) {
-          envWithMetadata = { ...envWithMetadata, ...item };
-        } else {
-          const envKey = sk.split('#')[0];
-          if (envKey === 'DATASET') {
-            envWithMetadata.DATASETS!.push(item);
-          } else if (envKey === 'ENDPOINT') {
-            envWithMetadata.ENDPOINTS!.push(item);
-          } else {
-            // metadata of environment item
-            // @ts-ignore
-            envWithMetadata[sk.split('#')[0]] = item;
-          }
-        }
-      }
-      return envWithMetadata;
-    } else {
-      const data = (await this._aws.helpers.ddb
+    if (!includeMetadata) {
+      const data = (await this._dynamoDBService
         .get(buildDynamoDBPkSk(envId, resourceTypeToKey.environment))
         .execute()) as GetItemCommandOutput;
-      if (data.Item) {
-        return data.Item! as unknown as Environment;
-      } else {
+      if (!data.Item) {
         throw Boom.notFound(`Could not find environment ${envId}`);
       }
+
+      return data.Item! as unknown as Environment;
     }
+
+    const data = await this._dynamoDBService
+      .query({ key: { name: 'pk', value: buildDynamoDbKey(envId, resourceTypeToKey.environment) } })
+      .execute();
+    if (data.Count === 0) {
+      throw Boom.notFound(`Could not find environment ${envId}`);
+    }
+    const items = data.Items!.map((item) => {
+      return item;
+    });
+    let envWithMetadata: Environment = { ...defaultEnv };
+    envWithMetadata.DATASETS = [];
+    envWithMetadata.ENDPOINTS = [];
+    for (const item of items) {
+      // parent environment item
+      const sk = item.sk as unknown as string;
+      if (sk === buildDynamoDbKey(envId, resourceTypeToKey.environment)) {
+        envWithMetadata = { ...envWithMetadata, ...item };
+      } else {
+        const envKey = sk.split('#')[0];
+        if (envKey === 'DATASET') {
+          envWithMetadata.DATASETS!.push(item);
+        } else if (envKey === 'ENDPOINT') {
+          envWithMetadata.ENDPOINTS!.push(item);
+        } else {
+          // metadata of environment item
+          // @ts-ignore
+          envWithMetadata[sk.split('#')[0]] = item;
+        }
+      }
+    }
+    return envWithMetadata;
   }
 
   /**
@@ -262,7 +260,7 @@ export class EnvironmentService {
     queryParams = addPaginationToken(paginationToken, queryParams);
 
     try {
-      const data = await this._aws.helpers.ddb.query(queryParams).execute();
+      const data = await this._dynamoDBService.query(queryParams).execute();
 
       // check that Items is defined
       if (data && data.Items) {
@@ -337,7 +335,7 @@ export class EnvironmentService {
       throw e;
     }
 
-    const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+    const updateResponse = await this._dynamoDBService.updateExecuteAndFormat({
       key: buildDynamoDBPkSk(envId, resourceTypeToKey.environment),
       params: { item: updatedValues }
     });
@@ -386,9 +384,11 @@ export class EnvironmentService {
         return buildDynamoDBPkSk(dsId, resourceTypeToKey.dataset);
       })
     ];
-    const batchGetResult = (await this._aws.helpers.ddb
+    const batchGetResult = (await this._dynamoDBService
       .get(itemsToGet)
       .execute()) as BatchGetItemCommandOutput;
+
+    const createdAt = new Date(Date.now()).toISOString();
     const newEnv: Environment = {
       id: uuidWithLowercasePrefix(resourceTypeToKey.environment),
       instanceId: params.instanceId,
@@ -400,9 +400,9 @@ export class EnvironmentService {
       outputs: params.outputs,
       projectId: params.projectId,
       envTypeConfigId: params.envTypeConfigId,
-      updatedAt: new Date().toISOString(),
+      updatedAt: createdAt,
       updatedBy: user.id,
-      createdAt: new Date().toISOString(),
+      createdAt: createdAt,
       createdBy: user.id,
       owner: user.id,
       status: params.status || 'PENDING',
@@ -419,7 +419,7 @@ export class EnvironmentService {
       [key: string]: string;
     }
     let metadata: MetaData[] = [];
-    metadata = batchGetResult.Responses![this._tableName].map((item) => {
+    metadata = batchGetResult.Responses![this._dynamoDBService.getTableName()].map((item) => {
       return item as unknown as MetaData;
     });
 
@@ -455,7 +455,7 @@ export class EnvironmentService {
     }
 
     // WRITE metadata to DDB
-    const items: { [key: string]: unknown }[] = [];
+    const items: Record<string, JSONValue>[] = [];
     const buildEnvPkMetadataSk = (
       envId: string,
       metaDataType: string,
@@ -494,7 +494,18 @@ export class EnvironmentService {
         ...buildEnvPkMetadataSk(newEnv.id!, resourceTypeToKey.dataset, dataset.id),
         id: dataset.id,
         name: dataset.name,
-        resources: dataset.resources
+        resources: dataset.resources,
+        createdAt: createdAt,
+        updatedAt: createdAt
+      });
+
+      items.push({
+        pk: buildDynamoDbKey(dataset.id, resourceTypeToKey.dataset),
+        sk: buildDynamoDbKey(newEnv.id!, resourceTypeToKey.environment),
+        id: newEnv.id!,
+        projectId: project.id,
+        createdAt: createdAt,
+        updatedAt: createdAt
       });
     });
 
@@ -504,14 +515,12 @@ export class EnvironmentService {
       pk: buildDynamoDbKey(newEnv.id!, resourceTypeToKey.environment),
       sk: buildDynamoDbKey(newEnv.id!, resourceTypeToKey.environment),
       resourceType: 'environment'
-    });
+    } as Record<string, JSONValue>);
 
     try {
-      await this._aws.helpers.ddb
-        .transactEdit({
-          addPutRequest: items
-        })
-        .execute();
+      await this._dynamoDBService.commitTransaction({
+        addPutItems: items
+      });
     } catch (e) {
       console.log(`Failed to create environment. DDB Transact Items attribute: ${JSON.stringify(items)}`, e);
       console.error('Failed to create environment', e);
@@ -535,6 +544,6 @@ export class EnvironmentService {
   ): Promise<void> {
     const key = { pk: buildDynamoDbKey(pkId, pkType), sk: buildDynamoDbKey(metaId, metaType) };
 
-    await this._aws.helpers.ddb.updateExecuteAndFormat({ key, params: { item: data } });
+    await this._dynamoDBService.updateExecuteAndFormat({ key, params: { item: data } });
   }
 }
