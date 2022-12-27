@@ -25,7 +25,7 @@ import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpDynamicAuthorizationRoutes(router: Router, service: DynamicAuthorizationService): void {
   router.post(
-    '/authorization/group',
+    '/authorization/groups',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);

@@ -15,7 +15,7 @@ export default class Roles extends CollectionResource {
   }
 
   public role(id: string): Role {
-    return new Role(id, this._clientSession, this._parentApi);
+    return new Role(id, this._clientSession, this._api);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

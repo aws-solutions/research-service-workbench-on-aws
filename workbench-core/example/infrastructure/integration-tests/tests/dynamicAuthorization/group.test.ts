@@ -86,7 +86,6 @@ describe('dynamic authorization group integration tests', () => {
     });
 
     it('get the groups a user is in', async () => {
-      console.log(`/roles/${new RegExp(/\S+/).toString()}`);
       const { data: userData } = await adminSession.resources.users.create(user);
       const { data: groupData } = await adminSession.resources.groups.create();
       // TODO add user to group
