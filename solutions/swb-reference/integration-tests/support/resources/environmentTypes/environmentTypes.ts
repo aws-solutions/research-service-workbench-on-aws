@@ -7,9 +7,10 @@ import CollectionResource from '../base/collectionResource';
 import EnvironmentType from './environmentType';
 
 export default class EnvironmentTypes extends CollectionResource {
-  public constructor(clientSession: ClientSession) {
+  public constructor(clientSession: ClientSession, parentApi: string = '') {
     super(clientSession, 'environmentTypes', 'environmentType');
-    this._api = 'environmentTypes';
+    const parentRoute = parentApi ? `${parentApi}/` : '';
+    this._api = `${parentRoute}environmentTypes`;
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention

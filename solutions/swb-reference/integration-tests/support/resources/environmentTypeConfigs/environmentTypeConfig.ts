@@ -14,6 +14,16 @@ export default class EnvironmentTypeConfig extends Resource {
     this._parentId = parentId;
   }
 
+  public async associate(): Promise<void> {
+    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //Avoid throttling when starting multiple environments
+    return this._axiosInstance.put(`${this._api}/relationships`);
+  }
+
+  public async disassociate(): Promise<void> {
+    await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //Avoid throttling when starting multiple environments
+    return this._axiosInstance.delete(`${this._api}/relationships`);
+  }
+
   protected async cleanup(): Promise<void> {
     const defAdminSession = await this._setup.getDefaultAdminSession();
     await sleep(DEFLAKE_DELAY_IN_MILLISECONDS); //Avoid throttling when terminating multiple environment type configs

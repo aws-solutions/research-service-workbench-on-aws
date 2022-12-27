@@ -1,7 +1,11 @@
 {
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
-  "coveragePathIgnorePatterns": ["<rootDir>/src/aws/awsService.ts", "<rootDir>/src/aws/clients/*"],
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/src/aws/awsService.ts",
+    "<rootDir>/src/aws/clients/*",
+    "<rootDir>/src/types/relationshipDDBItem"
+  ],
   "coverageThreshold": {
     "global": {
       "branches": 70,

@@ -19,7 +19,7 @@ import { WorkbenchEncryptionKeyWithRotation } from './workbenchEncryptionKeyWith
 export interface WorkbenchDynamodbProps extends TableProps {
   gsis?: GlobalSecondaryIndexProps[];
   // eslint-disable-next-line @typescript-eslint/ban-types
-  lambda?: Function;
+  lambdas?: Function[];
 }
 
 export class WorkbenchDynamodb extends Construct {
@@ -47,8 +47,10 @@ export class WorkbenchDynamodb extends Construct {
       this.table.addGlobalSecondaryIndex(gsi);
     });
 
-    if (props.lambda) {
-      this.table.grantReadWriteData(props.lambda);
+    if (props.lambdas?.length) {
+      _.map(props.lambdas, (lambda) => {
+        this.table.grantReadWriteData(lambda);
+      });
     }
   }
 }

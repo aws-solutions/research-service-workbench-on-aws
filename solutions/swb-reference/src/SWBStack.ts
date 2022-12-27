@@ -6,7 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
+import {
+  WorkbenchCognito,
+  WorkbenchCognitoProps,
+  WorkbenchDynamodb,
+  WorkbenchEncryptionKeyWithRotation
+} from '@aws/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import {
@@ -166,7 +171,27 @@ export class SWBStack extends Stack {
       artifactS3Bucket,
       FIELDS_TO_MASK_WHEN_AUDITING
     );
-    this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
+
+    // Create Application DynamoDB Table
+    this._createApplicationDDBTable(apiLambda, statusHandler, createAccountHandler);
+
+    // DynamicAuth DynamoDB Encryption Key
+    const dynamicAuthDynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-dynamicAuthDynamodbEncryptionKey`);
+
+    // Create DynamicAuth DynamoDB Table
+    const dynamicAuthTable = this._createDynamicAuthDDBTable(
+      dynamicAuthDynamodbEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
+    // Add DynamicAuth DynamoDB Table name to lambda environment variable
+    _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
+      lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    });
+
     this._createRestApi(apiLambda);
 
     const workflow = new Workflow(this);
@@ -820,8 +845,41 @@ export class SWBStack extends Stack {
     }
   }
 
-  // DynamoDB Table
-  private _createDDBTable(
+  //DynamicAuth DynamoDB Table
+  // Create DynamicAuthDDBTable
+  private _createDynamicAuthDDBTable(
+    encryptionKey: Key,
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
+    const dynamicAuthDDBTable = new WorkbenchDynamodb(this, `${this.stackName}-dynamic-auth`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey,
+      lambdas: [apiLambda, statusHandler, createAccountHandler],
+      gsis: [
+        {
+          indexName: 'getIdentityPermissionsByIdentity',
+          partitionKey: { name: 'Identity', type: AttributeType.STRING },
+          sortKey: { name: 'pk', type: AttributeType.STRING }
+        }
+      ]
+    });
+
+    new CfnOutput(this, 'dynamicAuthDDBTableArn', {
+      value: dynamicAuthDDBTable.table.tableArn
+    });
+
+    new CfnOutput(this, 'dynamicAuthDDBTableName', {
+      value: dynamicAuthDDBTable.table.tableName
+    });
+
+    return dynamicAuthDDBTable.table;
+  }
+
+  // Application DynamoDB Table
+  private _createApplicationDDBTable(
     apiLambda: Function,
     statusHandler: Function,
     createAccountHandler: Function
@@ -831,7 +889,8 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       tableName: tableName,
-      billingMode: BillingMode.PAY_PER_REQUEST
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true
     });
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({
