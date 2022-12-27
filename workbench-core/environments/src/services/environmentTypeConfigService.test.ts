@@ -302,4 +302,27 @@ describe('environmentTypeConfigService', () => {
       ).rejects.toThrow('test dependency error');
     });
   });
+
+  describe('getEnvironmentTypeConfigs', () => {
+    test('valid ids', async () => {
+      // BUILD
+      jest.spyOn(DynamoDBService.prototype, 'getItems').mockResolvedValueOnce([envTypeConfigDDBItem]);
+
+      // OPERATE
+      const actualResponse = await envTypeConfigService.getEnvironmentTypeConfigs([envTypeConfigId]);
+
+      // CHECK
+      expect(actualResponse).toEqual([envTypeConfig]);
+    });
+
+    test('empty id', async () => {
+      // BUILD
+      jest.spyOn(DynamoDBService.prototype, 'getItems').mockResolvedValueOnce([]);
+
+      // OPERATE & CHECK
+      await expect(envTypeConfigService.getEnvironmentTypeConfigs([])).rejects.toThrow(
+        `envTypeConfigIds cannot be empty`
+      );
+    });
+  });
 });

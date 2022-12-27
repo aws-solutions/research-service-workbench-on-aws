@@ -90,9 +90,8 @@
      */
     "globalOverrides": {
       "trim-newlines": ">=3.0.1",
-      "got": ">=11.8.5"
-      // "d3-color@<3.1.0": ">=3.1.0"
-      // "example2": "npm:@company/example2@^1.0.0"
+      "got": ">=11.8.5",
+      "jsonwebtoken": ">=9.0.0"
     },
 
     /**
