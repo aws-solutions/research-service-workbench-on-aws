@@ -254,6 +254,8 @@ describe('WBCGroupManagemntPlugin', () => {
       expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
     });
 
+    // ToDo: add test for verifying throw role not found when role is pending delete
+
     test.each([
       [IdpUnavailableError, new IdpUnavailableError('test error')],
       [PluginConfigurationError, new PluginConfigurationError('test error')],

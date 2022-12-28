@@ -75,6 +75,10 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;
 
+    // ToDo: This requires a check to ensure status of group isn't in pending_delete
+    // ToDo: Will also require an audit trail after #725 is merged
+    // ToDo: Audit authenticatedUser which actor is performing operation
+
     try {
       await this._userManagementService.addUserToRole(userId, groupId);
       return { data: { userId, groupId } };
