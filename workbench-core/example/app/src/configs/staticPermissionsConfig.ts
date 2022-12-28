@@ -108,6 +108,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'UPDATE',
+    subject: 'AuthorizationGroup'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'AuthorizationUser'
   }

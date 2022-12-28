@@ -173,7 +173,7 @@ export class DynamicAuthorizationService {
    * @returns - {@link AddUserToGroupResponse}
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
   }
 
   /**

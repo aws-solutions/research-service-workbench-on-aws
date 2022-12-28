@@ -20,7 +20,8 @@ import {
   PluginConfigurationError,
   IdpUnavailableError,
   RoleAlreadyExistsError,
-  UserNotFoundError
+  UserNotFoundError,
+  RoleNotFoundError
 } from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { AuthenticatedUser } from '../authenticatedUser';
@@ -281,6 +282,48 @@ describe('WBCGroupManagemntPlugin', () => {
       ddbMock.on(GetItemCommand).rejects(new Error());
 
       await expect(wbcGroupManagementPlugin.getGroupStatus({ groupId })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('addUserToGroup', () => {
+    test('returns added equal to true on succesfull call', async () => {
+      const { data } = await wbcGroupManagementPlugin.addUserToGroup({
+        groupId: 'groupId',
+        userId: 'userId',
+        authenticatedUser: mockUser
+      });
+
+      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
+      expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
+    });
+
+    // ToDo: add test for verifying throw role not found when role is pending delete
+
+    test.each([
+      [IdpUnavailableError, new IdpUnavailableError('test error')],
+      [PluginConfigurationError, new PluginConfigurationError('test error')],
+      [UserNotFoundError, new UserNotFoundError('test error')],
+      [GroupNotFoundError, new RoleNotFoundError('test error')],
+      [Error, new Error('test error')]
+    ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
+      mockUserManagementPlugin.addUserToRole = jest.fn().mockRejectedValue(error);
+      const userManagementService = new UserManagementService(mockUserManagementPlugin);
+
+      const plugin = new WBCGroupManagementPlugin({
+        userManagementService,
+        ddbService,
+        userGroupKeyType
+      });
+
+      await expect(
+        plugin.addUserToGroup({
+          groupId: 'groupId',
+          userId: 'userId',
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(expected);
+
+      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     });
   });
 });

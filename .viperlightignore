@@ -33,6 +33,8 @@ workbench-core/example/infrastructure/integration-tests/tests/users/createUser.t
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
 workbench-core/example/infrastructure/integration-tests/tests/users/getUserRoles.test.ts:29
+# Fake emails for DynamicAuthorizationService integ tests
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:82
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
 workbench-core/example/infrastructure/scripts/setupCognito.sh:44
@@ -41,5 +43,3 @@ solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivat
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
-# Fake emails for UserManagementService integ tests
-workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:83

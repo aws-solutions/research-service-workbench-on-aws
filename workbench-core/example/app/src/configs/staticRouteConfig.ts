@@ -183,6 +183,14 @@ export const routesMap: RoutesMap = {
         subject: 'AuthorizationUser'
       }
     ]
+  },
+  ['/authorization/groups/add-user']: {
+    POST: [
+      {
+        action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
   }
 };
 

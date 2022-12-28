@@ -107,4 +107,63 @@ describe('dynamic authorization group integration tests', () => {
       );
     });
   });
+
+  describe('assignUserToGroup', () => {
+    let user: CreateUser;
+
+    beforeEach(() => {
+      user = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: `success+add-user-to-group-${uuidv4()}@simulator.amazonses.com`
+      };
+    });
+
+    it('assigns user to exiting group', async () => {
+      const { data: createUserData } = await adminSession.resources.users.create(user);
+      const { data: createGroupData } = await adminSession.resources.groups.create();
+
+      const group = adminSession.resources.groups.group(createGroupData.groupId);
+
+      const { data } = await group.addUser({ userId: createUserData.id });
+      expect(typeof data.added).toBeTruthy();
+    });
+
+    test.each([
+      {},
+      { groupId: 'testGroupId' },
+      { userId: 'testUserId' },
+      { groupId: 'testGroupId', userId: 123 },
+      { groupId: 123, userId: 'testUserId' },
+      { groupId: 'testGroupId', userId: 'testUserId', badParam: 'bad' }
+    ])('returns a 400 error for invalid body %s', async (body) => {
+      const group = adminSession.resources.groups.group('invalidGroupId');
+
+      await expect(group.addUser(body, false)).rejects.toThrow(new HttpError(400, {}));
+    });
+
+    test.each([
+      ['non-existing', 'non-existing'],
+      ['existing', 'non-existing'],
+      ['non-existing', 'existing']
+    ])('returns a 429 error when trying to assing %s user to %s group', async (userExists, groupExists) => {
+      let userId = 'invalidUserId';
+      let groupId = 'invalidGroupId';
+      if (userExists === 'existing') {
+        const {
+          data: { id }
+        } = await adminSession.resources.users.create(user);
+        userId = id;
+      }
+
+      if (groupExists === 'existing') {
+        const { data } = await adminSession.resources.groups.create();
+        groupId = data.groupId;
+      }
+
+      const group = adminSession.resources.groups.group(groupId);
+
+      await expect(group.addUser({ userId })).rejects.toThrow(new HttpError(429, {}));
+    });
+  });
 });

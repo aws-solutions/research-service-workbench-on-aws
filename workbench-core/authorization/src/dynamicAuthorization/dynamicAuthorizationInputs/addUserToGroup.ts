@@ -27,8 +27,14 @@ export interface AddUserToGroupRequest {
  * Response object for AddUserToGroup
  */
 export interface AddUserToGroupResponse {
-  /**
-   * States whether the user was successfully added to the group
-   */
-  added: boolean;
+  data: {
+    /**
+     * User id associated to user that was added to group
+     */
+    userId: string;
+    /**
+     * Group id associated to the group where user was added to
+     */
+    groupId: string;
+  };
 }

@@ -10,6 +10,10 @@ import {
   isUserNotFoundError
 } from '@aws/workbench-core-authorization';
 import {
+  AssignUserToGroupRequest,
+  AssignUserToGroupRequestParser
+} from '@aws/workbench-core-authorization/lib/models/assignUserToGroup';
+import {
   CreateGroupRequest,
   CreateGroupRequestParser
 } from '@aws/workbench-core-authorization/lib/models/createGroup';
@@ -18,6 +22,7 @@ import {
   GetUserGroupsRequestParser
 } from '@aws/workbench-core-authorization/lib/models/getUserGroups';
 import { validateAndParse } from '@aws/workbench-core-base';
+import { isRoleNotFoundError, isUserNotFoundError } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
 import { dynamicAuthorizationService } from '../services/dynamicAuthorizationService';
@@ -64,6 +69,34 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       } catch (error) {
         if (isUserNotFoundError(error)) {
           throw Boom.notFound(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.post(
+    '/authorization/groups/add-user',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const addUserToGroupRequest = validateAndParse<AssignUserToGroupRequest>(
+          AssignUserToGroupRequestParser,
+          req.body
+        );
+        await service.addUserToGroup({
+          ...addUserToGroupRequest,
+          authenticatedUser: res.locals.user
+        });
+        res.status(204).send();
+      } catch (error) {
+        if (isPluginConfigurationError(error)) {
+          throw Boom.internal('An internal error occurred');
+        }
+        if (isUserNotFoundError(error)) {
+          throw Boom.tooManyRequests('User not found');
+        }
+        if (isRoleNotFoundError(error)) {
+          throw Boom.tooManyRequests('Role not found');
         }
         throw error;
       }
