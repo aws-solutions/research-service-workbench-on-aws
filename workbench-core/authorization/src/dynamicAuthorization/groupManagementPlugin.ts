@@ -70,6 +70,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link AddUserToGroupRequest}
    *
    * @returns a {@link AddUserToGroupResponse}
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link RoleNotFoundError} - role could not be found
    */
   addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse>;
 

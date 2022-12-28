@@ -11,11 +11,11 @@ import Group from './group';
 export default class Groups extends CollectionResource {
   public constructor(clientSession: ClientSession) {
     super(clientSession, 'authorization', 'group');
-    this._api = 'authorization';
+    this._api = 'authorization/groups';
   }
 
   public group(id: string): Group {
-    return new Group(id, this._clientSession, this._parentApi);
+    return new Group(id, this._clientSession, this._api);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +25,7 @@ export default class Groups extends CollectionResource {
     // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
     // a method called 'user()'.
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
-    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/group`, requestBody);
+    const response: AxiosResponse = await this._axiosInstance.post(this._api, requestBody);
 
     const taskId = `${this._childType}-${requestBody.groupId}`;
     const resourceNode = this.group(requestBody.groupId);
