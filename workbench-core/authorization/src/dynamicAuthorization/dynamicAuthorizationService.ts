@@ -166,13 +166,13 @@ export class DynamicAuthorizationService {
       const response = await this._createIdentityPermissions(createIdentityPermissionsRequest);
 
       //Write audit entry when success
-      metadata.statusCode = 'success';
+      metadata.statusCode = 200;
       await this._auditService.write(metadata, response);
 
       return response;
     } catch (err) {
       //Write audit entry when failure
-      metadata.statusCode = 'failure';
+      metadata.statusCode = 400;
       await this._auditService.write(metadata, err);
       throw err;
     }

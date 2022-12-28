@@ -19,7 +19,7 @@ export default interface AuditEntry {
   /**
    * The status code of the request
    */
-  statusCode?: number | string;
+  statusCode?: number;
   /**
    * The requested action
    */

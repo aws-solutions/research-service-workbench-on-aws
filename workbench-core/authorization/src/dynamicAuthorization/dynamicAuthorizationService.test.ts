@@ -190,7 +190,7 @@ describe('WBCGroupManagemntPlugin', () => {
           source,
           action,
           requestBody: params,
-          statusCode: 'success'
+          statusCode: 200
         },
         mockReturnValue
       );
@@ -215,7 +215,7 @@ describe('WBCGroupManagemntPlugin', () => {
           source,
           action,
           requestBody: params,
-          statusCode: 'failure'
+          statusCode: 400
         },
         new GroupNotFoundError('One or more groups are not found')
       );
@@ -236,7 +236,7 @@ describe('WBCGroupManagemntPlugin', () => {
           source,
           action,
           requestBody: params,
-          statusCode: 'failure'
+          statusCode: 400
         },
         new GroupNotFoundError('Invalid group')
       );
@@ -258,7 +258,7 @@ describe('WBCGroupManagemntPlugin', () => {
           source,
           action,
           requestBody: params,
-          statusCode: 'failure'
+          statusCode: 400
         },
         new ThroughputExceededError('Exceeds 100 identity permissions')
       );
