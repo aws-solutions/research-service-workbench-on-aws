@@ -244,16 +244,14 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('addUserToGroup', () => {
     test('returns added equal to true on succesfull call', async () => {
-      const {
-        data: { added }
-      } = await wbcGroupManagementPlugin.addUserToGroup({
+      const { data } = await wbcGroupManagementPlugin.addUserToGroup({
         groupId: 'groupId',
         userId: 'userId',
         authenticatedUser: mockUser
       });
 
       expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
-      expect(added).toBeTruthy();
+      expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
     });
 
     test.each([

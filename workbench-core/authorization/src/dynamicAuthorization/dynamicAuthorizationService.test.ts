@@ -79,26 +79,21 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('addUserToGroup', () => {
-    test.each([
-      [{ added: true }, true],
-      [{ added: false }, false]
-    ])('Request %s to addUserToGroup returns %s', async (data, expected) => {
-      mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue({ data });
-      const dynamicAuthorizationService = new DynamicAuthorizationService({
-        groupManagementPlugin: mockGroupManagementPlugin
-      });
+    it('returns userID and groupID when user was successfully added to group', async () => {
+      mockGroupManagementPlugin.addUserToGroup = jest
+        .fn()
+        .mockResolvedValue({ data: { userId: 'userId', groupId: 'groupId' } });
+
       const request = {
         groupId: 'groupId',
         userId: 'userId',
         authenticatedUser: mockUser
       };
 
-      const {
-        data: { added }
-      } = await dynamicAuthorizationService.addUserToGroup(request);
+      const { data } = await dynamicAuthzService.addUserToGroup(request);
 
       expect(mockGroupManagementPlugin.addUserToGroup).toBeCalledWith(request);
-      expect(added).toBe(expected);
+      expect(data).toStrictEqual({ userId: 'userId', groupId: 'groupId' });
     });
   });
 });

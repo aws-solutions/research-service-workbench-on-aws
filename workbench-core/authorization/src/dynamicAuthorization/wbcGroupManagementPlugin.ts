@@ -79,7 +79,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     // IdpUnavailableError, PluginConfigurationError, UserNotFoundError, RoleNotFoundError
 
     await this._userManagementService.addUserToRole(userId, groupId);
-    return { data: { added: true } };
+    return { data: { userId, groupId } };
   }
   public isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
