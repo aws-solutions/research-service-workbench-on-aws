@@ -258,7 +258,7 @@ describe('WBCGroupManagemntPlugin', () => {
       [IdpUnavailableError, new IdpUnavailableError('test error')],
       [PluginConfigurationError, new PluginConfigurationError('test error')],
       [UserNotFoundError, new UserNotFoundError('test error')],
-      [RoleNotFoundError, new RoleNotFoundError('test error')],
+      [GroupNotFoundError, new RoleNotFoundError('test error')],
       [Error, new Error('test error')]
     ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
       mockUserManagementPlugin.addUserToRole = jest.fn().mockRejectedValue(error);
@@ -276,7 +276,7 @@ describe('WBCGroupManagemntPlugin', () => {
           userId: 'userId',
           authenticatedUser: mockUser
         })
-      ).rejects.toThrow();
+      ).rejects.toThrow(expected);
 
       expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     });

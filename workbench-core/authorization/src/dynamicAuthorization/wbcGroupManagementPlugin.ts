@@ -75,11 +75,16 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;
 
-    // ToDo: Any remapping of following exceptions returned from _userManagementService.addUserToRole needs to be performed?
-    // IdpUnavailableError, PluginConfigurationError, UserNotFoundError, RoleNotFoundError
+    try {
+      await this._userManagementService.addUserToRole(userId, groupId);
+      return { data: { userId, groupId } };
+    } catch (error) {
+      if (error.name === 'RoleNotFoundError') {
+        throw new GroupNotFoundError(error.message);
+      }
 
-    await this._userManagementService.addUserToRole(userId, groupId);
-    return { data: { userId, groupId } };
+      throw error;
+    }
   }
   public isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
