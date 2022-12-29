@@ -41,7 +41,7 @@ export default class Groups extends CollectionResource {
   }
 
   public async getGroupUsers(groupId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/groups/${groupId}`);
+    return this._axiosInstance.get(`${this._api}/${groupId}`);
   }
 
   public addUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
