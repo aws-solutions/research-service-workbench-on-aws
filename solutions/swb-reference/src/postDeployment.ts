@@ -10,7 +10,12 @@ import * as stream from 'stream';
 import { promisify } from 'util';
 import { MockDynamicAuthorizationService } from '@aws/workbench-core-authorization/lib/mockDynamicAuthorizationService';
 import { AwsService } from '@aws/workbench-core-base';
-import { AuthorizationSetup, CognitoSetup, ServiceCatalogSetup } from '@aws/workbench-core-environments';
+import {
+  AuthorizationSetup,
+  CognitoSetup,
+  ServiceCatalogSetup,
+  EnvironmentTypeSetup
+} from '@aws/workbench-core-environments';
 import axios from 'axios';
 import { getConstants, getConstantsWithSecrets } from './constants';
 
@@ -44,10 +49,25 @@ async function run(): Promise<void> {
 
   const cfnFilePaths: string[] = scSetup.getCfnTemplate(join(__dirname, '../../src/environment'));
   await scSetup.run(cfnFilePaths);
+  await setupEnvironmentTypes(AWS_REGION, STACK_NAME, SC_PORTFOLIO_NAME);
   await cognitoSetup.run();
   await authSetup.run();
   await uploadOnboardAccountCfnToS3();
   await uploadBootstrapScriptsToS3();
+}
+
+async function setupEnvironmentTypes(
+  awsRegion: string,
+  stackName: string,
+  portfolioName: string
+): Promise<void> {
+  console.log('Setting up Environment Types in the database');
+  const mainAccountAwsService = new AwsService({
+    region: awsRegion,
+    ddbTableName: stackName
+  });
+  const envTypeHandler = new EnvironmentTypeSetup(mainAccountAwsService);
+  await envTypeHandler.run(portfolioName);
 }
 
 async function uploadOnboardAccountCfnToS3(): Promise<void> {
