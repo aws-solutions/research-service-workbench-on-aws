@@ -133,7 +133,7 @@ describe('DynamicAuthorizationService', () => {
       userIds = ['123', '456', '789'];
     });
 
-    it('returns an array of groupID in the data object that the requested user is in', async () => {
+    it('returns an array of userID in the data object for the requested group', async () => {
       mockGroupManagementPlugin.getGroupUsers = jest.fn().mockResolvedValue({ data: { userIds } });
 
       const response = await dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser });
