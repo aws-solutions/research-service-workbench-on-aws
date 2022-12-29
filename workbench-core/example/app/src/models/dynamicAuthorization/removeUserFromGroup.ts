@@ -11,11 +11,7 @@ export const RemoveUserFromGroupRequestParser = z
     /**
      * User id associated to user to be removed from the group
      */
-    userId: z.string(),
-    /**
-     * Group id associated to the group the user is being removed from
-     */
-    groupId: z.string()
+    userId: z.string()
   })
   .strict();
 

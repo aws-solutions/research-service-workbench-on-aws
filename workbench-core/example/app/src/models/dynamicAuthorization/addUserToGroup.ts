@@ -11,11 +11,7 @@ export const AddUserToGroupRequestParser = z
     /**
      * User id associated to user to be added to the group
      */
-    userId: z.string(),
-    /**
-     * Group id associated to the group the user is being added to
-     */
-    groupId: z.string()
+    userId: z.string()
   })
   .strict();
 

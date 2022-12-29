@@ -5,7 +5,7 @@
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { uuidRegExpAsString } from '@aws/workbench-core-base';
-import { dataSetPrefix, endPointPrefix } from './constants';
+import { dataSetPrefix, endPointPrefix, groupIdRegExAsString } from './constants';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -107,8 +107,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/roles/\\S{1,128}': {
-    // Roles use the role name (which can be any string), not a guid
+  [`/roles/${groupIdRegExAsString}`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -184,7 +183,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/authorization/groups/add-user': {
+  [`/authorization/groups/${groupIdRegExAsString}/add-user`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -192,7 +191,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/authorization/groups/remove-user': {
+  [`/authorization/groups/${groupIdRegExAsString}/remove-user`]: {
     PUT: [
       {
         action: 'UPDATE',

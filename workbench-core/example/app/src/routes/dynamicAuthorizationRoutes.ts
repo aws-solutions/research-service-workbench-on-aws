@@ -67,7 +67,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.put(
-    '/authorization/groups/add-user',
+    '/authorization/groups/:groupId/add-user',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const addUserToGroupRequest = validateAndParse<AddUserToGroupRequest>(
@@ -76,6 +76,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         );
         const response = await service.addUserToGroup({
           ...addUserToGroupRequest,
+          groupId: req.params.groupId,
           authenticatedUser: res.locals.user
         });
         res.status(200).send(response.data);
@@ -90,7 +91,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.put(
-    '/authorization/groups/remove-user',
+    '/authorization/groups/:groupId/remove-user',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const removeUserFromGroupRequest = validateAndParse<RemoveUserFromGroupRequest>(
@@ -99,6 +100,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         );
         const response = await service.removeUserFromGroup({
           ...removeUserFromGroupRequest,
+          groupId: req.params.groupId,
           authenticatedUser: res.locals.user
         });
         res.status(200).send(response.data);

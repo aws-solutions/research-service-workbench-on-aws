@@ -6,7 +6,7 @@
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
-import { AddUserToGroupRequest } from '../../support/resources/dynamicAuthorization/groups';
+import { AddUserToGroupRequest } from '../../support/resources/dynamicAuthorization/group';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 
@@ -89,7 +89,7 @@ describe('dynamic authorization group integration tests', () => {
     it('get the groups a user is in', async () => {
       const { data: userData } = await adminSession.resources.users.create(user);
       const { data: groupData } = await adminSession.resources.groups.create();
-      await adminSession.resources.groups.addUser({ groupId: groupData.groupId, userId: userData.id });
+      await adminSession.resources.groups.group(groupData.groupId).addUser({ userId: userData.id });
 
       const { data } = await adminSession.resources.groups.getUserGroups(userData.id);
 
@@ -109,7 +109,7 @@ describe('dynamic authorization group integration tests', () => {
     });
   });
 
-  describe('assignUserToGroup', () => {
+  describe('addUserToGroup', () => {
     let user: CreateUser;
 
     beforeEach(() => {
@@ -123,25 +123,20 @@ describe('dynamic authorization group integration tests', () => {
     it('assigns user to exiting group', async () => {
       const { data: createUserData } = await adminSession.resources.users.create(user);
       const { data: createGroupData } = await adminSession.resources.groups.create();
-      const { data } = await adminSession.resources.groups.addUser({
-        groupId: createGroupData.groupId,
+      const { data } = await adminSession.resources.groups.group(createGroupData.groupId).addUser({
         userId: createUserData.id
       });
       expect(data).toMatchObject({ groupId: createGroupData.groupId, userId: createUserData.id });
     });
 
-    test.each([
-      {},
-      { groupId: 'testGroupId' },
-      { userId: 'testUserId' },
-      { groupId: 'testGroupId', userId: 123 },
-      { groupId: 123, userId: 'testUserId' },
-      { groupId: 'testGroupId', userId: 'testUserId', badParam: 'bad' }
-    ])('returns a 400 error for invalid body %s', async (body) => {
-      await expect(adminSession.resources.groups.addUser(body as AddUserToGroupRequest)).rejects.toThrow(
-        new HttpError(400, {})
-      );
-    });
+    test.each([{}, { userId: 123 }, { userId: 'testUserId', badParam: 'bad' }])(
+      'returns a 400 error for invalid body %s',
+      async (body) => {
+        await expect(
+          adminSession.resources.groups.group('fakeGroup').addUser(body as AddUserToGroupRequest)
+        ).rejects.toThrow(new HttpError(400, {}));
+      }
+    );
 
     test.each([
       ['non-existing', 'non-existing'],
@@ -162,7 +157,7 @@ describe('dynamic authorization group integration tests', () => {
         groupId = data.groupId;
       }
 
-      await expect(adminSession.resources.groups.addUser({ groupId, userId })).rejects.toThrow(
+      await expect(adminSession.resources.groups.group(groupId).addUser({ userId })).rejects.toThrow(
         new HttpError(404, {})
       );
     });
