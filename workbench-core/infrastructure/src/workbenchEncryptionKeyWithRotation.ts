@@ -21,7 +21,7 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
           actions: ['kms:*'],
           principals: [new AccountPrincipal(Aws.ACCOUNT_ID)],
           resources: ['*'],
-          sid: 'main-key-share-statement'
+          sid: `main-key-share-statement`
         })
       ]
     });
@@ -33,8 +33,9 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
       alias: `alias/${id}`
     });
 
-    new CfnOutput(this, `${id}-Output`, {
-      value: this.key.keyArn
+    new CfnOutput(this, id, {
+      value: this.key.keyArn,
+      exportName: id
     });
   }
 }
