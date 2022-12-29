@@ -40,9 +40,9 @@ describe('WBCGroupManagemntPlugin', () => {
   let mockUserManagementPlugin: UserManagementPlugin;
   let ddbMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
 
-  let region: string;
-  let table: string;
-  let userGroupKeyType: string;
+  let groupId: string;
+  let userId: string;
+  let status: GroupStatus;
   let mockUser: AuthenticatedUser;
 
   let userManagementService: UserManagementService;
@@ -70,20 +70,20 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   beforeEach(() => {
-    region = 'region';
-    table = 'fakeTable';
-    userGroupKeyType = 'USERGROUP';
+    groupId = 'groupId';
+    userId = 'userId';
+    status = 'active';
     mockUser = {
       id: 'sampleId',
       roles: []
     };
 
     userManagementService = new UserManagementService(mockUserManagementPlugin);
-    ddbService = new DynamoDBService({ region, table });
+    ddbService = new DynamoDBService({ region: 'region', table: 'fakeTable' });
     wbcGroupManagementPlugin = new WBCGroupManagementPlugin({
       userManagementService,
       ddbService,
-      userGroupKeyType
+      userGroupKeyType: 'USERGROUP'
     });
   });
 
@@ -93,12 +93,6 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('createGroup', () => {
-    let groupId: string;
-
-    beforeEach(() => {
-      groupId = 'groupId';
-    });
-
     it('returns the groupID in the data object when the group was successfully created', async () => {
       const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
 
@@ -131,19 +125,11 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('getUserGroups', () => {
-    let userId: string;
-    let groupIds: string[];
-
-    beforeEach(() => {
-      userId = 'userId';
-      groupIds = ['123', '456', '789'];
-    });
-
     it('returns an array of groupID in the data object that the requested user is in', async () => {
-      mockUserManagementPlugin.getUserRoles = jest.fn().mockResolvedValue(groupIds);
+      mockUserManagementPlugin.getUserRoles = jest.fn().mockResolvedValue([groupId]);
       const response = await wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds } });
+      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
     });
 
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
@@ -172,14 +158,6 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('removeUserFromGroup', () => {
-    let groupId: string;
-    let userId: string;
-
-    beforeEach(() => {
-      groupId = 'groupId';
-      userId = 'userId';
-    });
-
     it('returns the groupId and userId in the data object when the user was successfully removed', async () => {
       const response = await wbcGroupManagementPlugin.removeUserFromGroup({
         groupId,
@@ -226,14 +204,6 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('setGroupStatus', () => {
-    let groupId: string;
-    let status: GroupStatus;
-
-    beforeEach(() => {
-      groupId = 'groupId';
-      status = 'active';
-    });
-
     it('returns the status in the data object when the status was successfully set', async () => {
       ddbMock.on(UpdateItemCommand).resolves({});
 
@@ -276,14 +246,6 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('getGroupStatus', () => {
-    let groupId: string;
-    let status: GroupStatus;
-
-    beforeEach(() => {
-      groupId = 'groupId';
-      status = 'active';
-    });
-
     it('returns the status in the data object when the group exists', async () => {
       ddbMock.on(GetItemCommand).resolves({
         Item: {
@@ -343,12 +305,11 @@ describe('WBCGroupManagemntPlugin', () => {
   describe('addUserToGroup', () => {
     test('returns added equal to true on succesfull call', async () => {
       const { data } = await wbcGroupManagementPlugin.addUserToGroup({
-        groupId: 'groupId',
-        userId: 'userId',
+        groupId,
+        userId,
         authenticatedUser: mockUser
       });
 
-      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
       expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
     });
 
@@ -362,23 +323,14 @@ describe('WBCGroupManagemntPlugin', () => {
       [Error, new Error('test error')]
     ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
       mockUserManagementPlugin.addUserToRole = jest.fn().mockRejectedValue(error);
-      const userManagementService = new UserManagementService(mockUserManagementPlugin);
-
-      const plugin = new WBCGroupManagementPlugin({
-        userManagementService,
-        ddbService,
-        userGroupKeyType
-      });
 
       await expect(
-        plugin.addUserToGroup({
-          groupId: 'groupId',
-          userId: 'userId',
+        wbcGroupManagementPlugin.addUserToGroup({
+          groupId,
+          userId,
           authenticatedUser: mockUser
         })
       ).rejects.toThrow(expected);
-
-      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     });
   });
 });
