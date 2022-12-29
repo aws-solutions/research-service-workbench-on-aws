@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser } from '../authenticatedUser';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
+import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
 import { GroupStatus } from './models/GroupMetadata';
@@ -78,6 +79,31 @@ describe('DynamicAuthorizationService', () => {
     });
   });
 
+  describe('getUserGroups', () => {
+    let userId: string;
+    let groupIds: string[];
+
+    beforeEach(() => {
+      userId = 'userId';
+      groupIds = ['123', '456', '789'];
+    });
+
+    it('returns an array of groupID in the data object that the requested user is in', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest.fn().mockResolvedValue({ data: { groupIds } });
+
+      const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds } });
+    });
+
+    it('throws when the user cannot be found', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest.fn().mockRejectedValue(new Error());
+
+      await expect(
+        dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(Error);
+    });
+  });
   describe('addUserToGroup', () => {
     it('returns userID and groupID when user was successfully added to group', async () => {
       mockGroupManagementPlugin.addUserToGroup = jest

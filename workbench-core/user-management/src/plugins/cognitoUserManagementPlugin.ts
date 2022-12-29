@@ -52,10 +52,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
           Username: id
         });
 
-      const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
-        UserPoolId: this._userPoolId,
-        Username: id
-      });
+      const roles = await this.getUserRoles(id);
 
       return {
         id,
@@ -63,8 +60,49 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         lastName: userAttributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
         email: userAttributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
         status: enabled ? Status.ACTIVE : Status.INACTIVE,
-        roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
+        roles
       };
+    } catch (error) {
+      if (error.name === 'InternalErrorException') {
+        throw new IdpUnavailableError(error.message);
+      }
+      if (
+        error.name === 'AccessDeniedException' ||
+        error.name === 'NotAuthorizedException' ||
+        error.name === 'ResourceNotFoundException'
+      ) {
+        throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'UserNotFoundException') {
+        throw new UserNotFoundError(error.message);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Gets the roles for a certain user.
+   *
+   * @param id - the user id to get roles for
+   * @returns an array of the user's roles
+   *
+   * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
+   * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to get user info
+   * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   */
+  public async getUserRoles(id: string): Promise<string[]> {
+    try {
+      const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
+        UserPoolId: this._userPoolId,
+        Username: id
+      });
+
+      if (!groups) {
+        return [];
+      }
+
+      return groups.map((group) => group.GroupName ?? '').filter((group) => group);
     } catch (error) {
       if (error.name === 'InternalErrorException') {
         throw new IdpUnavailableError(error.message);
@@ -328,10 +366,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
 
       const users = await Promise.all(
         response.Users.map(async (user) => {
-          const { Groups: groups } = await this._aws.clients.cognito.adminListGroupsForUser({
-            UserPoolId: this._userPoolId,
-            Username: user.Username
-          });
+          const roles = await this.getUserRoles(user.Username ?? '');
 
           return {
             id: user.Username ?? '',
@@ -339,7 +374,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
             lastName: user.Attributes?.find((attr) => attr.Name === 'family_name')?.Value ?? '',
             email: user.Attributes?.find((attr) => attr.Name === 'email')?.Value ?? '',
             status: user.Enabled ? Status.ACTIVE : Status.INACTIVE,
-            roles: groups?.map((group) => group.GroupName ?? '').filter((group) => group) ?? []
+            roles
           };
         })
       );

@@ -3,12 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { isPluginConfigurationError } from '@aws/workbench-core-authentication';
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
+  isGroupNotFoundError,
   isTooManyRequestsError,
-  isGroupNotFoundError
+  isUserNotFoundError
 } from '@aws/workbench-core-authorization';
 import {
   AssignUserToGroupRequest,
@@ -18,11 +18,13 @@ import {
   CreateGroupRequest,
   CreateGroupRequestParser
 } from '@aws/workbench-core-authorization/lib/models/createGroup';
+import {
+  GetUserGroupsRequest,
+  GetUserGroupsRequestParser
+} from '@aws/workbench-core-authorization/lib/models/getUserGroups';
 import { validateAndParse } from '@aws/workbench-core-base';
-import { isUserNotFoundError } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
-import { dynamicAuthorizationService } from '../services/dynamicAuthorizationService';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpDynamicAuthorizationRoutes(router: Router, service: DynamicAuthorizationService): void {
@@ -32,20 +34,40 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       try {
         const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);
 
-        const { data } = await dynamicAuthorizationService.createGroup({
+        const { data } = await service.createGroup({
           authenticatedUser: res.locals.user,
           ...validatedRequest
         });
         res.status(201).send(data);
       } catch (error) {
         if (isGroupAlreadyExistsError(error)) {
-          throw Boom.badRequest('Group already exists');
-        }
-        if (isPluginConfigurationError(error)) {
-          throw Boom.internal('An internal error occurred');
+          throw Boom.badRequest(error.message);
         }
         if (isTooManyRequestsError(error)) {
-          throw Boom.tooManyRequests('Too many requests');
+          throw Boom.tooManyRequests(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/users/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const validatedRequest = validateAndParse<GetUserGroupsRequest>(
+          GetUserGroupsRequestParser,
+          req.params
+        );
+
+        const { data } = await service.getUserGroups({
+          authenticatedUser: res.locals.user,
+          ...validatedRequest
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isUserNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }
@@ -60,17 +82,14 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           AssignUserToGroupRequestParser,
           req.body
         );
-        await service.addUserToGroup({
+        const response = await service.addUserToGroup({
           ...addUserToGroupRequest,
           authenticatedUser: res.locals.user
         });
-        res.status(204).send();
+        res.status(200).send(response.data);
       } catch (error) {
-        if (isGroupNotFoundError(error)) {
-          throw Boom.notFound('Role not found');
-        }
-        if (isUserNotFoundError(error)) {
-          throw Boom.notFound('User not found');
+        if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
 
         throw error;
