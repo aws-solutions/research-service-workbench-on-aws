@@ -22,6 +22,10 @@ import {
   GetUserGroupsRequest,
   GetUserGroupsRequestParser
 } from '@aws/workbench-core-authorization/lib/models/getUserGroups';
+import {
+  GetUsersFromGroupRequest,
+  GetUsersFromGroupRequestParser
+} from '@aws/workbench-core-authorization/lib/models/getUsersFromGroup';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
@@ -92,6 +96,29 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           throw Boom.notFound(error.message);
         }
 
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/:groupId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const validatedRequest = validateAndParse<GetUsersFromGroupRequest>(
+          GetUsersFromGroupRequestParser,
+          req.params
+        );
+
+        const { data } = await service.getGroupUsers({
+          authenticatedUser: res.locals.user,
+          ...validatedRequest
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })

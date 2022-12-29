@@ -191,6 +191,14 @@ export const routesMap: RoutesMap = {
         subject: 'AuthorizationGroup'
       }
     ]
+  },
+  ['/authorization/groups/\\S+']: {
+    POST: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
   }
 };
 
