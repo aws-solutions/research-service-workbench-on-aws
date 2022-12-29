@@ -141,7 +141,7 @@ describe('DynamicAuthorizationService', () => {
       expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds } });
     });
 
-    it('throws when the user cannot be found', async () => {
+    it('throws when the group cannot be found', async () => {
       mockGroupManagementPlugin.getGroupUsers = jest.fn().mockRejectedValue(new Error());
 
       await expect(

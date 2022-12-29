@@ -8,6 +8,7 @@ import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   PluginConfigurationError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
@@ -68,6 +69,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     const { userId } = request;
+
     const groupIds = await this._userManagementService.getUserRoles(userId);
     return {
       data: {
@@ -77,12 +79,20 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   }
   public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
     const { groupId } = request;
-    const userIds = await this._userManagementService.listUsersForRole(groupId);
-    return {
-      data: {
-        userIds
+
+    try {
+      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      return {
+        data: {
+          userIds
+        }
+      };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
       }
-    };
+      throw error;
+    }
   }
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;
@@ -95,7 +105,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       await this._userManagementService.addUserToRole(userId, groupId);
       return { data: { userId, groupId } };
     } catch (error) {
-      if (error.name === 'RoleNotFoundError') {
+      if (isRoleNotFoundError(error)) {
         throw new GroupNotFoundError(error.message);
       }
 
