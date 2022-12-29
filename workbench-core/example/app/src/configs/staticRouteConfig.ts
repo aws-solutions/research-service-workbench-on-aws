@@ -176,7 +176,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/authorization/users/${uuidRegExpAsString}/groups`]: {
+  [`/authorization/groups/users/${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',

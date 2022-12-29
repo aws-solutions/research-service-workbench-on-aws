@@ -6,6 +6,7 @@
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
+  isGroupNotFoundError,
   isTooManyRequestsError,
   isUserNotFoundError
 } from '@aws/workbench-core-authorization';
@@ -22,10 +23,8 @@ import {
   GetUserGroupsRequestParser
 } from '@aws/workbench-core-authorization/lib/models/getUserGroups';
 import { validateAndParse } from '@aws/workbench-core-base';
-import { isRoleNotFoundError, isUserNotFoundError } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
-import { dynamicAuthorizationService } from '../services/dynamicAuthorizationService';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpDynamicAuthorizationRoutes(router: Router, service: DynamicAuthorizationService): void {
@@ -35,7 +34,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       try {
         const validatedRequest = validateAndParse<CreateGroupRequest>(CreateGroupRequestParser, req.body);
 
-        const { data } = await dynamicAuthorizationService.createGroup({
+        const { data } = await service.createGroup({
           authenticatedUser: res.locals.user,
           ...validatedRequest
         });
@@ -53,7 +52,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.get(
-    '/authorization/users/:userId/groups',
+    '/authorization/groups/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const validatedRequest = validateAndParse<GetUserGroupsRequest>(
@@ -61,7 +60,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           req.params
         );
 
-        const { data } = await dynamicAuthorizationService.getUserGroups({
+        const { data } = await service.getUserGroups({
           authenticatedUser: res.locals.user,
           ...validatedRequest
         });
@@ -83,20 +82,14 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           AssignUserToGroupRequestParser,
           req.body
         );
-        await service.addUserToGroup({
+        const response = await service.addUserToGroup({
           ...addUserToGroupRequest,
           authenticatedUser: res.locals.user
         });
-        res.status(204).send();
+        res.status(200).send(response.data);
       } catch (error) {
-        if (isPluginConfigurationError(error)) {
-          throw Boom.internal('An internal error occurred');
-        }
-        if (isUserNotFoundError(error)) {
-          throw Boom.tooManyRequests('User not found');
-        }
-        if (isRoleNotFoundError(error)) {
-          throw Boom.tooManyRequests('Role not found');
+        if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
         }
         throw error;
       }
