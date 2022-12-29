@@ -86,7 +86,6 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       if (error.name === 'RoleNotFoundError') {
         throw new GroupNotFoundError(error.message);
       }
-
       throw error;
     }
   }
@@ -95,8 +94,20 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   ): Promise<IsUserAssignedToGroupResponse> {
     throw new Error('Method not implemented.');
   }
-  public removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async removeUserFromGroup(
+    request: RemoveUserFromGroupRequest
+  ): Promise<RemoveUserFromGroupResponse> {
+    const { groupId, userId } = request;
+
+    try {
+      await this._userManagementService.removeUserFromRole(userId, groupId);
+      return { data: { userId, groupId } };
+    } catch (error) {
+      if (error.name === 'RoleNotFoundError') {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse> {
     const { groupId } = request;

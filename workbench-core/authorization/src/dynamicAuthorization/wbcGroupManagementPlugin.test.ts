@@ -30,6 +30,7 @@ import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
+import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { GroupStatus } from './models/GroupMetadata';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
@@ -124,6 +125,60 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+  });
+
+  describe('removeUserFromGroup', () => {
+    let groupId: string;
+    let userId: string;
+
+    beforeEach(() => {
+      groupId = 'groupId';
+      userId = 'userId';
+    });
+
+    it('returns the groupId and userId in the data object when the user was successfully removed', async () => {
+      const response = await wbcGroupManagementPlugin.removeUserFromGroup({
+        groupId,
+        userId,
+        authenticatedUser: mockUser
+      });
+
+      expect(response).toMatchObject<RemoveUserFromGroupResponse>({ data: { groupId, userId } });
+    });
+
+    it('throws IdpUnavailableError when the IdP encounters an error', async () => {
+      mockUserManagementPlugin.removeUserFromRole = jest.fn().mockRejectedValue(new IdpUnavailableError());
+
+      await expect(
+        wbcGroupManagementPlugin.removeUserFromGroup({ groupId, userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(IdpUnavailableError);
+    });
+
+    it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
+      mockUserManagementPlugin.removeUserFromRole = jest
+        .fn()
+        .mockRejectedValue(new PluginConfigurationError());
+
+      await expect(
+        wbcGroupManagementPlugin.removeUserFromGroup({ groupId, userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(PluginConfigurationError);
+    });
+
+    it('throws GroupNotFoundError when the group already exists', async () => {
+      mockUserManagementPlugin.removeUserFromRole = jest.fn().mockRejectedValue(new RoleNotFoundError());
+
+      await expect(
+        wbcGroupManagementPlugin.removeUserFromGroup({ groupId, userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupNotFoundError);
+    });
+
+    it('throws UserNotFoundError when the group already exists', async () => {
+      mockUserManagementPlugin.removeUserFromRole = jest.fn().mockRejectedValue(new UserNotFoundError());
+
+      await expect(
+        wbcGroupManagementPlugin.removeUserFromGroup({ groupId, userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(UserNotFoundError);
     });
   });
 

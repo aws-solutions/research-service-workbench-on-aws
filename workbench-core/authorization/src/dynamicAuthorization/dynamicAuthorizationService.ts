@@ -185,7 +185,7 @@ export class DynamicAuthorizationService {
   public async removeUserFromGroup(
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.removeUserFromGroup(removeUserFromGroupRequest);
   }
 
   /**
