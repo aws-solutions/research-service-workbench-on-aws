@@ -32,7 +32,7 @@ describe('EnvironmentTypeSetup', () => {
 
     // OPERATE
     await expect(environmentTypeHandler.run(portfolioName)).rejects.toThrowError(
-      new Error(`Could not find portfolioId for portfolio: ${process.env.SC_PORTFOLIO_NAME}`)
+      new Error(`Could not find portfolioId for portfolio: ${portfolioName}`)
     );
   });
 
