@@ -203,9 +203,13 @@ export class DynamicAuthorizationService {
    * @param getUserGroupsRequest - {@link GetUserGroupsRequest}
    *
    * @returns - {@link GetUserGroupsResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
    */
   public async getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
-    throw new Error('Not implemented');
+    return await this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);
   }
 
   /**
