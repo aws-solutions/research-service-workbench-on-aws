@@ -27,7 +27,7 @@ import AccountService from '../services/accountService';
 interface Arns {
   statusHandlerArn: string;
   artifactBucketArn: string;
-  mainAcctEncryptionArn: string;
+  s3DatasetsEncryptionArn: string;
 }
 
 export interface CreateAccountData {
@@ -604,17 +604,17 @@ export default class HostingAccountLifecycleService {
     const {
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
       [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
-      [process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: mainAcctEncryptionArn
+      [process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: s3DatasetsEncryptionArn
     } = await cfService.getCfnOutput(this._stackName, [
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
-      process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
+      process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     return {
       statusHandlerArn,
       artifactBucketArn,
-      mainAcctEncryptionArn
+      s3DatasetsEncryptionArn
     };
   }
 
@@ -625,7 +625,7 @@ export default class HostingAccountLifecycleService {
     awsAccountId: string;
     arns: Arns;
   }): Promise<void> {
-    const { statusHandlerArn, artifactBucketArn, mainAcctEncryptionArn } = arns;
+    const { statusHandlerArn, artifactBucketArn, s3DatasetsEncryptionArn } = arns;
 
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, awsAccountId);
@@ -634,7 +634,7 @@ export default class HostingAccountLifecycleService {
     await this.updateArtifactsBucketPolicy(artifactBucketArn, awsAccountId);
 
     // Update main account encryption key policy
-    await this.updateMainAccountEncryptionKeyPolicy(mainAcctEncryptionArn, awsAccountId);
+    await this.updateMainAccountEncryptionKeyPolicy(s3DatasetsEncryptionArn, awsAccountId);
   }
 
   private _constructCreateAndUpdateUrls(

@@ -35,7 +35,8 @@ interface Constants {
   USER_POOL_ID: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
-  MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
+  S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY: string;
   FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
@@ -78,7 +79,8 @@ function getConstants(): Constants {
   const ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
   const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
-  const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
+  const S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3DatasetsEncryptionKeyOutput';
+  const S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'S3ArtifactEncryptionKeyOutput';
 
   return {
     STAGE: config.stage,
@@ -107,7 +109,8 @@ function getConstants(): Constants {
     USER_POOL_ID,
     CLIENT_ID,
     CLIENT_SECRET,
-    MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+    S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
     FIELDS_TO_MASK_WHEN_AUDITING
   };
 }
