@@ -91,6 +91,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
+
         throw error;
       }
     })
