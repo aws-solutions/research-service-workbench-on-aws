@@ -4,11 +4,11 @@
  */
 
 import { isPluginConfigurationError } from '@aws/workbench-core-authentication';
-import { isGroupNotFoundError } from '@aws/workbench-core-authorization';
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
-  isTooManyRequestsError
+  isTooManyRequestsError,
+  isGroupNotFoundError
 } from '@aws/workbench-core-authorization';
 import {
   AssignUserToGroupRequest,
@@ -71,9 +71,6 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         }
         if (isUserNotFoundError(error)) {
           throw Boom.notFound('User not found');
-        }
-        if (isPluginConfigurationError(error)) {
-          throw Boom.internal(error.message);
         }
 
         throw error;
