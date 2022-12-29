@@ -360,12 +360,12 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(PluginConfigurationError);
     });
 
-    it('throws UserNotFoundError when the user doesnt exist', async () => {
-      mockUserManagementPlugin.listUsersForRole = jest.fn().mockRejectedValue(new UserNotFoundError());
+    it('throws GroupNotFoundError when the group doesnt exist', async () => {
+      mockUserManagementPlugin.listUsersForRole = jest.fn().mockRejectedValue(new GroupNotFoundError());
 
       await expect(
         wbcGroupManagementPlugin.getGroupUsers({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(UserNotFoundError);
+      ).rejects.toThrow(GroupNotFoundError);
     });
   });
 });
