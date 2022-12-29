@@ -41,7 +41,11 @@ export default class Groups extends CollectionResource {
   }
 
   public addUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/add-user`, body);
+    return this._axiosInstance.put(`${this._api}/add-user`, body);
+  }
+
+  public removeUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
+    return this._axiosInstance.put(`${this._api}/add-user`, body);
   }
 
   protected _buildDefaults(body: CreateGroupRequest): CreateGroupRequest {

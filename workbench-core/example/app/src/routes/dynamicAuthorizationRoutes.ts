@@ -10,21 +10,18 @@ import {
   isTooManyRequestsError,
   isUserNotFoundError
 } from '@aws/workbench-core-authorization';
-import {
-  AssignUserToGroupRequest,
-  AssignUserToGroupRequestParser
-} from '@aws/workbench-core-authorization/lib/models/assignUserToGroup';
-import {
-  CreateGroupRequest,
-  CreateGroupRequestParser
-} from '@aws/workbench-core-authorization/lib/models/createGroup';
-import {
-  GetUserGroupsRequest,
-  GetUserGroupsRequestParser
-} from '@aws/workbench-core-authorization/lib/models/getUserGroups';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
+import {
+  AddUserToGroupRequest,
+  AddUserToGroupRequestParser
+} from '../models/dynamicAuthorization/addUserToGroup';
+import { CreateGroupRequest, CreateGroupRequestParser } from '../models/dynamicAuthorization/createGroup';
+import {
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupRequestParser
+} from '../models/dynamicAuthorization/removeUserFromGroup';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpDynamicAuthorizationRoutes(router: Router, service: DynamicAuthorizationService): void {
@@ -55,14 +52,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     '/authorization/groups/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const validatedRequest = validateAndParse<GetUserGroupsRequest>(
-          GetUserGroupsRequestParser,
-          req.params
-        );
-
         const { data } = await service.getUserGroups({
           authenticatedUser: res.locals.user,
-          ...validatedRequest
+          userId: req.params.userId
         });
         res.status(200).send(data);
       } catch (error) {
@@ -74,16 +66,39 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     })
   );
 
-  router.post(
+  router.put(
     '/authorization/groups/add-user',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const addUserToGroupRequest = validateAndParse<AssignUserToGroupRequest>(
-          AssignUserToGroupRequestParser,
+        const addUserToGroupRequest = validateAndParse<AddUserToGroupRequest>(
+          AddUserToGroupRequestParser,
           req.body
         );
         const response = await service.addUserToGroup({
           ...addUserToGroupRequest,
+          authenticatedUser: res.locals.user
+        });
+        res.status(200).send(response.data);
+      } catch (error) {
+        if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+
+        throw error;
+      }
+    })
+  );
+
+  router.put(
+    '/authorization/groups/remove-user',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const removeUserFromGroupRequest = validateAndParse<RemoveUserFromGroupRequest>(
+          RemoveUserFromGroupRequestParser,
+          req.body
+        );
+        const response = await service.removeUserFromGroup({
+          ...removeUserFromGroupRequest,
           authenticatedUser: res.locals.user
         });
         res.status(200).send(response.data);

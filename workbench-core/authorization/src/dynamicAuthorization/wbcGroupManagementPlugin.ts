@@ -8,6 +8,7 @@ import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   PluginConfigurationError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
@@ -89,7 +90,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       await this._userManagementService.addUserToRole(userId, groupId);
       return { data: { userId, groupId } };
     } catch (error) {
-      if (error.name === 'RoleNotFoundError') {
+      if (isRoleNotFoundError(error)) {
         throw new GroupNotFoundError(error.message);
       }
       throw error;

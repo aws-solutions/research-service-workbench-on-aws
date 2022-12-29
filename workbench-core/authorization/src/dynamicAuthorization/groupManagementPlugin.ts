@@ -74,10 +74,11 @@ export interface GroupManagementPlugin {
    * @param request - {@link AddUserToGroupRequest}
    *
    * @returns a {@link AddUserToGroupResponse}
+   *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
-   * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
    */
   addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse>;
 
@@ -96,6 +97,11 @@ export interface GroupManagementPlugin {
    * @param request - {@link RemoveUserFromGroupRequest}
    *
    * @returns a {@link RemoveUserFromGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
    */
   removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse>;
 

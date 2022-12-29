@@ -107,7 +107,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/roles/\\S+': {
+  '/roles/\\S{1,128}': {
     // Roles use the role name (which can be any string), not a guid
     PUT: [
       {
@@ -184,8 +184,16 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  ['/authorization/groups/add-user']: {
-    POST: [
+  '/authorization/groups/add-user': {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  '/authorization/groups/remove-user': {
+    PUT: [
       {
         action: 'UPDATE',
         subject: 'AuthorizationGroup'

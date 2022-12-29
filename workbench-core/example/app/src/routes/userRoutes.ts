@@ -4,6 +4,7 @@
  */
 
 // User management
+import { validateAndParse } from '@aws/workbench-core-base';
 import {
   CreateRoleSchema,
   CreateUserSchema,
@@ -12,13 +13,12 @@ import {
   isRoleNotFoundError,
   isUserAlreadyExistsError,
   isUserNotFoundError,
-  UpdateRoleSchema,
   UserManagementService
 } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import _ from 'lodash';
+import { AddUserToRoleRequest, AddUserToRoleRequestParser } from '../models/user/addUserToRole';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -141,13 +141,12 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.put(
     '/roles/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateRoleSchema));
-      if (!_.isString(req.params.roleName)) {
-        throw Boom.badRequest('roleName must be a string.');
-      }
-
       try {
-        const response = await service.addUserToRole(req.body.username, req.params.roleName);
+        const addUserToRoleRequest = validateAndParse<AddUserToRoleRequest>(
+          AddUserToRoleRequestParser,
+          req.body
+        );
+        const response = await service.addUserToRole(addUserToRoleRequest.userId, req.params.roleName);
         res.send(response);
       } catch (e) {
         if (isUserNotFoundError(e) || isRoleNotFoundError(e)) {
