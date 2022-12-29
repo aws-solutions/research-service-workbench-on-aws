@@ -4,6 +4,7 @@
  */
 
 import { isPluginConfigurationError } from '@aws/workbench-core-authentication';
+import { isGroupNotFoundError } from '@aws/workbench-core-authorization';
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
@@ -18,7 +19,7 @@ import {
   CreateGroupRequestParser
 } from '@aws/workbench-core-authorization/lib/models/createGroup';
 import { validateAndParse } from '@aws/workbench-core-base';
-import { isRoleNotFoundError, isUserNotFoundError } from '@aws/workbench-core-user-management';
+import { isUserNotFoundError } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
 import { dynamicAuthorizationService } from '../services/dynamicAuthorizationService';
@@ -65,15 +66,16 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         });
         res.status(204).send();
       } catch (error) {
-        if (isPluginConfigurationError(error)) {
-          throw Boom.internal('An internal error occurred');
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound('Role not found');
         }
         if (isUserNotFoundError(error)) {
-          throw Boom.tooManyRequests('User not found');
+          throw Boom.notFound('User not found');
         }
-        if (isRoleNotFoundError(error)) {
-          throw Boom.tooManyRequests('Role not found');
+        if (isPluginConfigurationError(error)) {
+          throw Boom.internal(error.message);
         }
+
         throw error;
       }
     })

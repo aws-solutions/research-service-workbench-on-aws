@@ -110,7 +110,7 @@ describe('dynamic authorization group integration tests', () => {
       ['non-existing', 'non-existing'],
       ['existing', 'non-existing'],
       ['non-existing', 'existing']
-    ])('returns a 429 error when trying to assing %s user to %s group', async (userExists, groupExists) => {
+    ])('returns a 404 error when trying to assing %s user to %s group', async (userExists, groupExists) => {
       let userId = 'invalidUserId';
       let groupId = 'invalidGroupId';
       if (userExists === 'existing') {
@@ -127,7 +127,7 @@ describe('dynamic authorization group integration tests', () => {
 
       const group = adminSession.resources.groups.group(groupId);
 
-      await expect(group.addUser({ userId })).rejects.toThrow(new HttpError(429, {}));
+      await expect(group.addUser({ userId })).rejects.toThrow(new HttpError(404, {}));
     });
   });
 });
