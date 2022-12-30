@@ -557,7 +557,9 @@ export default class DynamoDBService {
             item: marshall(request.item, { removeUndefinedValues: true }),
             conditionExpression: request.conditionExpression,
             expressionAttributeNames: request.expressionAttributeNames,
-            expressionAttributeValues: marshall(request.expressionAttributeValues)
+            expressionAttributeValues: request.expressionAttributeValues
+              ? marshall(request.expressionAttributeValues, { removeUndefinedValues: true })
+              : undefined
           };
         })
       );
