@@ -67,6 +67,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link GetGroupUsersRequest}
    *
    * @returns a {@link GetGroupUsersResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupNotFoundError} - group could not be found
    */
   getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse>;
 

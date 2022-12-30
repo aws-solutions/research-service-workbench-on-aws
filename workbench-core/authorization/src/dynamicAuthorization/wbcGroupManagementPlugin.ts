@@ -69,6 +69,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     const { userId } = request;
+
     const groupIds = await this._userManagementService.getUserRoles(userId);
     return {
       data: {
@@ -76,8 +77,22 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       }
     };
   }
-  public getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
-    throw new Error('Method not implemented.');
+  public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
+    const { groupId } = request;
+
+    try {
+      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      return {
+        data: {
+          userIds
+        }
+      };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;

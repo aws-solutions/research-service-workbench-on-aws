@@ -4,8 +4,8 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidRegExpAsString } from '@aws/workbench-core-base';
-import { dataSetPrefix, endPointPrefix, groupIdRegExAsString } from './constants';
+import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
+import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -107,7 +107,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/roles/${groupIdRegExAsString}`]: {
+  [`/roles/${groupIDRegExpAsString}`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -183,7 +183,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/authorization/groups/${groupIdRegExAsString}/add-user`]: {
+  [`/authorization/groups/${groupIDRegExpAsString}/add-user`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -191,10 +191,18 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/authorization/groups/${groupIdRegExAsString}/remove-user`]: {
+  [`/authorization/groups/${groupIDRegExpAsString}/remove-user`]: {
     PUT: [
       {
         action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/getUsers`]: {
+    GET: [
+      {
+        action: 'READ',
         subject: 'AuthorizationGroup'
       }
     ]

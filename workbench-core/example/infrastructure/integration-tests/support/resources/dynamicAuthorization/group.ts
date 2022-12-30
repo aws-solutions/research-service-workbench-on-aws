@@ -30,6 +30,10 @@ export default class Group extends Resource {
       console.warn(`Error caught in cleanup of authorization group '${this.id}': ${error}.`);
     }
   }
+
+  public async getGroupUsers(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/getUsers`);
+  }
 }
 
 export interface AddUserToGroupRequest {
