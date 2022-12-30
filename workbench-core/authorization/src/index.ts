@@ -8,7 +8,8 @@ export { default as Operation } from './operation';
 export { default as AuthorizationPlugin } from './authorizationPlugin';
 export { default as StaticPermissionsPlugin } from './staticPermissionsPlugin';
 export { default as CASLAuthorizationPlugin } from './caslAuthorizationPlugin';
-export { default as Permission, PermissionsMap, Effect } from './permission';
+export { default as Permission, PermissionsMap } from './permission';
+export { Effect } from './effect';
 export { Action } from './action';
 export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
@@ -46,6 +47,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/createGroup';
 export {
   CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsRequestParser,
   CreateIdentityPermissionsResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/createIdentityPermissions';
 export {

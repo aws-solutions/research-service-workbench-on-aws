@@ -17,12 +17,12 @@ function createPermissionId(identityPermission: Permission): string {
 
 export default class IdentityPermissions extends CollectionResource {
   public constructor(clientSession: ClientSession) {
-    super(clientSession, 'identityPermissions', 'identityPermission');
-    this._api = 'authorization';
+    super(clientSession, 'identityPermissions', 'identityPermission', 'authorization');
+    this._api = `${this._parentApi}/identitypermissions`;
   }
 
   public identityPermission(identityPermission: Permission, id: string): IdentityPermission {
-    return new IdentityPermission(identityPermission, this._clientSession, this._parentApi, id);
+    return new IdentityPermission(identityPermission, this._clientSession, '', id);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,10 +32,7 @@ export default class IdentityPermissions extends CollectionResource {
     // For example, if the extender class is 'Users' and it provides childType = 'user', then Users class must have
     // a method called 'user()'.
     const requestBody = applyDefault ? this._buildDefaults(body) : body;
-    const response: AxiosResponse = await this._axiosInstance.post(
-      `${this._api}/identitypermissions`,
-      requestBody
-    );
+    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}`, requestBody);
 
     const { identityPermissions } = response.data;
 

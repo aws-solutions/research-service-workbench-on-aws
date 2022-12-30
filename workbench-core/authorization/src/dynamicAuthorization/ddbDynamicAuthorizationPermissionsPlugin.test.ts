@@ -14,9 +14,9 @@ import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
+import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { Effect } from '../permission';
 import { DDBDynamicAuthorizationPermissionsPlugin } from './ddbDynamicAuthorizationPermissionsPlugin';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
 
@@ -81,16 +81,19 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
   });
 
   describe('createIdentityPermissions tests', () => {
-    const failedIdentityPermission: IdentityPermission = {
-      action: sampleAction,
-      effect: sampleEffect,
-      subjectType: sampleSubjectType,
-      subjectId: sampleSubjectId,
-      identityId: sampleGroupId,
-      identityType: sampleGroupType,
-      conditions: sampleConditions,
-      fields: sampleFields
-    };
+    let failedIdentityPermission: IdentityPermission;
+    beforeAll(() => {
+      failedIdentityPermission = {
+        action: sampleAction,
+        effect: sampleEffect,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId,
+        identityId: sampleGroupId,
+        identityType: sampleGroupType,
+        conditions: sampleConditions,
+        fields: sampleFields
+      };
+    });
     test('Create identity permissions', async () => {
       const mockIdentityPermissions: IdentityPermission[] = [mockIdentityPermission];
       mockDDB.on(TransactWriteItemsCommand).resolvesOnce({});

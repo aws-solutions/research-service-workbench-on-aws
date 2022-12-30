@@ -5,9 +5,10 @@
 
 import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../action';
+import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { Effect } from '../permission';
+
 import {
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse
@@ -128,7 +129,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
    */
   private _transformIdentityPermissionsToItem(
     identityPermission: IdentityPermission
-  ): Record<string, JSONValue | Set<JSONValue>> {
+  ): Record<string, JSONValue> {
     const { subjectType, subjectId, action, effect, identityType, identityId } = identityPermission;
     const pk = this._createIdentityPermissionsPartitionKey(subjectType, subjectId);
     const sk = this._createIdentityPermissionsSortKey(action, effect, identityType, identityId);
@@ -137,7 +138,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     const fields = identityPermission.fields ?? [];
     const description = identityPermission.description ?? '';
 
-    const item: Record<string, JSONValue | Set<JSONValue>> = {
+    const item: Record<string, JSONValue> = {
       pk,
       sk,
       action,

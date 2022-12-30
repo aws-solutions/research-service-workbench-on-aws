@@ -1,3 +1,4 @@
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -5,12 +6,17 @@ import HttpError from '../../support/utils/HttpError';
 describe('dynamic authorization identity permission integration tests ', () => {
   const setup: Setup = new Setup();
   let adminSession: ClientSession;
+  let mockUser: AuthenticatedUser;
   beforeEach(() => {
     expect.hasAssertions();
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
+    mockUser = {
+      id: 'sampleId',
+      roles: []
+    };
   });
 
   afterAll(async () => {
@@ -18,10 +24,6 @@ describe('dynamic authorization identity permission integration tests ', () => {
   });
 
   describe('createIdentityPermissions', () => {
-    const mockUser = {
-      id: 'sampleId',
-      roles: []
-    };
     test('Create a group and create a permission for that group', async () => {
       const { data } = await adminSession.resources.groups.create();
       const { groupId } = data;

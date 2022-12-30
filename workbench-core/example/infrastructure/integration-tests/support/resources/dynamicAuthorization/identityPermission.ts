@@ -12,7 +12,6 @@ export default class IdentityPermission extends Resource {
     id: string
   ) {
     super(clientSession, 'identityPermission', id, parentApi);
-    this._api = 'identitypermission';
     this._identityPermission = identityPermission;
   }
 
@@ -21,7 +20,7 @@ export default class IdentityPermission extends Resource {
       const dynamicAuthorizationHelper = new DynamicAuthorizationHelper();
       await dynamicAuthorizationHelper.deleteIdentityPermissionDdbRecord(this._identityPermission);
     } catch (error) {
-      console.warn(`Error caught in cleanup of authorization group '${this.id}': ${error}.`);
+      console.warn(`Error caught in cleanup of authorization identity permission '${this.id}': ${error}.`);
     }
   }
 }

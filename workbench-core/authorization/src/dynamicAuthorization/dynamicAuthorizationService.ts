@@ -10,6 +10,7 @@ import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthoriz
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import {
   CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsRequestParser,
   CreateIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/createIdentityPermissions';
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
@@ -153,6 +154,9 @@ export class DynamicAuthorizationService {
   public async createIdentityPermissions(
     createIdentityPermissionsRequest: CreateIdentityPermissionsRequest
   ): Promise<CreateIdentityPermissionsResponse> {
+    createIdentityPermissionsRequest = CreateIdentityPermissionsRequestParser.parse(
+      createIdentityPermissionsRequest
+    );
     const { authenticatedUser } = createIdentityPermissionsRequest;
     const metadata: Metadata = {
       actor: authenticatedUser,

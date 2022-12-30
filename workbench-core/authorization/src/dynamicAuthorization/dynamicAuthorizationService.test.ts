@@ -7,9 +7,9 @@ import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workben
 import { JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
+import { Effect } from '../effect';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
-import { Effect } from '../permission';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
@@ -128,9 +128,9 @@ describe('WBCGroupManagemntPlugin', () => {
     let actor: object;
     let source: object;
     let action: string;
-
+    let auditServiceWriteSpy: jest.SpyInstance;
     beforeAll(() => {
-      jest.spyOn(auditService, 'write');
+      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
     });
 
     beforeEach(() => {
@@ -184,7 +184,7 @@ describe('WBCGroupManagemntPlugin', () => {
         identityPermissions: mockIdentityPermissions
       });
 
-      expect(auditService.write).toBeCalledWith(
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor,
           source,
@@ -209,7 +209,7 @@ describe('WBCGroupManagemntPlugin', () => {
         identityPermissions: mockIdentityPermissions
       };
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
-      expect(auditService.write).toBeCalledWith(
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor,
           source,
@@ -230,7 +230,7 @@ describe('WBCGroupManagemntPlugin', () => {
         identityPermissions: mockIdentityPermissions
       };
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
-      expect(auditService.write).toBeCalledWith(
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor,
           source,
@@ -252,7 +252,7 @@ describe('WBCGroupManagemntPlugin', () => {
         ThroughputExceededError
       );
 
-      expect(auditService.write).toBeCalledWith(
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
           actor,
           source,

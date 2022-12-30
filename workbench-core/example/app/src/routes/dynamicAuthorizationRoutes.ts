@@ -10,7 +10,9 @@ import {
   isTooManyRequestsError,
   isThroughputExceededError,
   isGroupNotFoundError,
-  isIdentityPermissionCreationError
+  isIdentityPermissionCreationError,
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsRequestParser
 } from '@aws/workbench-core-authorization';
 import {
   CreateGroupRequest,
@@ -52,10 +54,17 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     '/authorization/identitypermissions',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const params = req.body;
+        const authenticatedUser = res.locals.user;
+        const validatedRequest = validateAndParse<CreateIdentityPermissionsRequest>(
+          CreateIdentityPermissionsRequestParser,
+          {
+            ...req.body,
+            authenticatedUser
+          }
+        );
+
         const { data } = await dynamicAuthorizationService.createIdentityPermissions({
-          authenticatedUser: res.locals.user,
-          ...params
+          ...validatedRequest
         });
         res.status(201).send(data);
       } catch (err) {
