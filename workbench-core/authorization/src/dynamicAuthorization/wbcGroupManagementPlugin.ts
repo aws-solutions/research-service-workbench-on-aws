@@ -64,7 +64,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       throw error;
     }
   }
-  public deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
+  public async deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Method not implemented.');
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {

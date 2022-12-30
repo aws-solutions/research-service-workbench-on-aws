@@ -129,6 +129,8 @@ export class DynamicAuthorizationService {
       status: 'active'
     });
     return response;
+
+    // TODO audit
   }
 
   /**
@@ -139,6 +141,8 @@ export class DynamicAuthorizationService {
    */
   public async deleteGroup(deleteGroupRequest: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Not implemented');
+
+    // TODO audit
   }
 
   /**
@@ -191,6 +195,8 @@ export class DynamicAuthorizationService {
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse> {
     throw new Error('Not implemented');
+
+    // TODO audit
   }
 
   /**
@@ -219,6 +225,8 @@ export class DynamicAuthorizationService {
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
+
+    // TODO audit
   }
 
   /**
@@ -237,6 +245,8 @@ export class DynamicAuthorizationService {
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
     return this._groupManagementPlugin.removeUserFromGroup(removeUserFromGroupRequest);
+
+    // TODO audit
   }
 
   /**
@@ -271,6 +281,11 @@ export class DynamicAuthorizationService {
   /**
    * Check if a user is assigned to a group
    * @param isUserAssignedToGroupRequest - {@link IsUserAssignedToGroupRequest}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async isUserAssignedToGroup(
     isUserAssignedToGroupRequest: IsUserAssignedToGroupRequest

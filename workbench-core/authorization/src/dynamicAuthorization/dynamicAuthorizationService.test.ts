@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
+import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
@@ -24,11 +24,9 @@ describe('DynamicAuthorizationService', () => {
   let groupId: string;
   let userId: string;
   let status: GroupStatus;
-  let auditService: AuditService;
-  let auditPlugin: AuditPlugin;
-  let mockAuditWriter: Writer;
   let mockUser: AuthenticatedUser;
 
+  let auditService: AuditService;
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
@@ -55,12 +53,12 @@ describe('DynamicAuthorizationService', () => {
       getIdentityPermissionsByIdentity: jest.fn(),
       getIdentityPermissionsBySubject: jest.fn()
     };
-    mockAuditWriter = {
-      write: jest.fn()
-    };
-    auditPlugin = new BaseAuditPlugin(mockAuditWriter);
 
-    auditService = new AuditService(auditPlugin);
+    auditService = new AuditService(
+      new BaseAuditPlugin({
+        write: jest.fn()
+      })
+    );
   });
 
   beforeEach(() => {
@@ -81,6 +79,43 @@ describe('DynamicAuthorizationService', () => {
 
   afterEach(() => {
     jest.resetAllMocks();
+  });
+
+  describe('init', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.init({})).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isAuthorizedOnSubject', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.isAuthorizedOnSubject({
+          user: mockUser,
+          dynamicOperation: { action: 'CREATE', subjectId: '', subjectType: '' }
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isRouteIgnored', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.isRouteIgnored({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isRouteProtected', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.isRouteProtected({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isAuthorizedOnRoute', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.isAuthorizedOnRoute({ authenticatedUser: mockUser, route: '', method: 'GET' })
+      ).rejects.toThrow(Error);
+    });
   });
 
   describe('createGroup', () => {
@@ -110,23 +145,11 @@ describe('DynamicAuthorizationService', () => {
     });
   });
 
-  describe('getUserGroups', () => {
-    it('returns an array of groupID in the data object that the requested user is in', async () => {
-      mockGroupManagementPlugin.getUserGroups = jest
-        .fn()
-        .mockResolvedValue({ data: { groupIds: [groupId] } });
-
-      const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
-
-      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
-    });
-
-    it('throws when the user cannot be found', async () => {
-      mockGroupManagementPlugin.getUserGroups = jest.fn().mockRejectedValue(new GroupNotFoundError());
-
-      await expect(
-        dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser })
-      ).rejects.toThrow(GroupNotFoundError);
+  describe('deleteGroup', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.deleteGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
+        Error
+      );
     });
   });
 
@@ -286,6 +309,29 @@ describe('DynamicAuthorizationService', () => {
     });
   });
 
+  describe('deleteIdentityPermissions', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.deleteIdentityPermissions({
+          identityPermissions: [],
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getIdentityPermissionsBySubject', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.getIdentityPermissionsBySubject({
+          subjectType: '',
+          subjectId: '',
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
   describe('addUserToGroup', () => {
     it('returns userID and groupID when user was successfully added to the group', async () => {
       mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue({ data: { userId, groupId } });
@@ -333,20 +379,12 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('getGroupUsers', () => {
-    let groupId: string;
-    let userIds: string[];
-
-    beforeEach(() => {
-      groupId = 'userId';
-      userIds = ['123', '456', '789'];
-    });
-
     it('returns an array of userID in the data object for the requested group', async () => {
-      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockResolvedValue({ data: { userIds } });
+      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockResolvedValue({ data: { userIds: [userId] } });
 
       const response = await dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds } });
+      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds: [userId] } });
     });
 
     it('throws when the group cannot be found', async () => {
@@ -355,6 +393,42 @@ describe('DynamicAuthorizationService', () => {
       await expect(
         dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(GroupNotFoundError);
+    });
+  });
+
+  describe('getUserGroups', () => {
+    it('returns an array of groupID in the data object that the requested user is in', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest
+        .fn()
+        .mockResolvedValue({ data: { groupIds: [groupId] } });
+
+      const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
+    });
+
+    it('throws when the user cannot be found', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest.fn().mockRejectedValue(new GroupNotFoundError());
+
+      await expect(
+        dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupNotFoundError);
+    });
+  });
+
+  describe('isUserAssignedToGroup', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('doesGroupExist', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(Error);
     });
   });
 });
