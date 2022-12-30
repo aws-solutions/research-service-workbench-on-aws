@@ -5,6 +5,7 @@
 
 import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
+import { UserNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
@@ -15,6 +16,7 @@ import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
@@ -417,10 +419,26 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('isUserAssignedToGroup', () => {
-    it('throws a not implemented exception', async () => {
+    it('returns a boolean in the data object that tells if the user is in the group', async () => {
+      mockGroupManagementPlugin.isUserAssignedToGroup = jest
+        .fn()
+        .mockResolvedValue({ data: { isAssigned: true } });
+
+      const response = await dynamicAuthzService.isUserAssignedToGroup({
+        userId,
+        groupId,
+        authenticatedUser: mockUser
+      });
+
+      expect(response).toMatchObject<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
+    });
+
+    it('throws when the user cannot be found', async () => {
+      mockGroupManagementPlugin.isUserAssignedToGroup = jest.fn().mockRejectedValue(new UserNotFoundError());
+
       await expect(
-        dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(Error);
+        dynamicAuthzService.isUserAssignedToGroup({ userId, groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(UserNotFoundError);
     });
   });
 

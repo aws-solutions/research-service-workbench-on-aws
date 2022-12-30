@@ -114,16 +114,9 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
-    try {
-      const { data } = await this.getUserGroups(request);
-      const isAssigned = data.groupIds.includes(request.groupId);
-      return { data: { isAssigned } };
-    } catch (error) {
-      if (isRoleNotFoundError(error)) {
-        throw new GroupNotFoundError(error.message);
-      }
-      throw error;
-    }
+    const { data } = await this.getUserGroups(request);
+    const isAssigned = data.groupIds.includes(request.groupId);
+    return { data: { isAssigned } };
   }
   public async removeUserFromGroup(
     request: RemoveUserFromGroupRequest
