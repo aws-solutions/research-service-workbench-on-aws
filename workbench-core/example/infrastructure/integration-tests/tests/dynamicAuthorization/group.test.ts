@@ -185,13 +185,13 @@ describe('dynamic authorization group integration tests', () => {
       const { data: userData } = await adminSession.resources.users.create(user);
       const { data: groupData } = await adminSession.resources.groups.create();
       await adminSession.resources.groups.addUser({ groupId: groupData.groupId, userId: userData.id });
-      const { data } = await adminSession.resources.groups.getGroupUsers(groupData.groupId);
+      const { data } = await adminSession.resources.groups.group(groupData.groupId).getGroupUsers();
 
       expect(data).toMatchObject({ userIds: [userData.id] });
     });
 
     it('returns a 404 error when the Group doesnt exist', async () => {
-      await expect(adminSession.resources.groups.getGroupUsers(fakeGroupUuid)).rejects.toThrow(
+      await expect(adminSession.resources.groups.group(fakeGroupUuid).getGroupUsers()).rejects.toThrow(
         new HttpError(404, {})
       );
     });
