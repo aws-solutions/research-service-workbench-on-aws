@@ -199,7 +199,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/authorization/groups/${groupIDRegExpAsString}/getUsers`]: {
+  [`/authorization/groups/${groupIDRegExpAsString}/get-users`]: {
     GET: [
       {
         action: 'READ',
@@ -207,7 +207,15 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/authorization/identitypermissions': {
+  [`/authorization/groups/${groupIDRegExpAsString}/is-user-assigned`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  '/authorization/identity-permissions': {
     POST: [
       {
         action: 'CREATE',
