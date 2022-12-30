@@ -22,10 +22,6 @@ import {
   GetUserGroupsRequest,
   GetUserGroupsRequestParser
 } from '@aws/workbench-core-authorization/lib/models/getUserGroups';
-// import {
-//   GetUsersFromGroupRequest,
-//   GetUsersFromGroupRequestParser
-// } from '@aws/workbench-core-authorization/lib/models/getUsersFromGroup';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
