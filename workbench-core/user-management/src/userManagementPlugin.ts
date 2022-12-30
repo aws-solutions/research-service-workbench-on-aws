@@ -29,6 +29,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   getUser(id: string): Promise<User>;
 
@@ -41,6 +42,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   getUserRoles(id: string): Promise<string[]>;
 
@@ -53,6 +55,7 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   createUser(user: CreateUser): Promise<User>;
 
@@ -65,6 +68,7 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   updateUser(id: string, user: User): Promise<void>;
 
@@ -75,6 +79,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   deleteUser(id: string): Promise<void>;
 
@@ -86,6 +91,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   activateUser(id: string): Promise<void>;
 
@@ -97,6 +103,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   deactivateUser(id: string): Promise<void>;
 
@@ -106,6 +113,7 @@ export interface UserManagementPlugin {
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   listUsers(): Promise<User[]>;
 
@@ -117,6 +125,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   listUsersForRole(role: string): Promise<string[]>;
 
@@ -127,6 +136,7 @@ export interface UserManagementPlugin {
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   listRoles(): Promise<string[]>;
 
@@ -139,6 +149,7 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   addUserToRole(id: string, role: string): Promise<void>;
 
@@ -151,6 +162,7 @@ export interface UserManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   removeUserFromRole(id: string, role: string): Promise<void>;
 
@@ -161,6 +173,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleAlreadyExistsError} - role already exists error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   createRole(role: string): Promise<void>;
 
@@ -173,6 +186,7 @@ export interface UserManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   deleteRole(role: string): Promise<void>;
 }

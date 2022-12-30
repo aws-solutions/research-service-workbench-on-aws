@@ -11,11 +11,13 @@ import {
   isPluginConfigurationError,
   isRoleAlreadyExistsError,
   isRoleNotFoundError,
+  isTooManyRequestsError,
   isUserAlreadyExistsError,
   isUserNotFoundError,
   PluginConfigurationError,
   RoleAlreadyExistsError,
   RoleNotFoundError,
+  TooManyRequestsError,
   UserAlreadyExistsError,
   UserNotFoundError
 } from '../';
@@ -114,6 +116,20 @@ describe('custom error tests', () => {
 
     it('should be an instance of Error', () => {
       const error = new UserNotFoundError();
+
+      expect(error instanceof Error).toBe(true);
+    });
+  });
+
+  describe('TooManyRequestsError tests', () => {
+    it('should be an instance of itself', () => {
+      const error = new TooManyRequestsError();
+
+      expect(isTooManyRequestsError(error)).toBe(true);
+    });
+
+    it('should be an instance of Error', () => {
+      const error = new TooManyRequestsError();
 
       expect(error instanceof Error).toBe(true);
     });

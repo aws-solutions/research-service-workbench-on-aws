@@ -39,7 +39,7 @@ describe('userManagement get user roles integration test', () => {
     const roleName = `example-role-name-${uuidv4()}`; // TODO use roles.create() response once the route returns the created role name
     const { data: userData } = await adminSession.resources.users.create(user);
     await adminSession.resources.roles.create({ roleName });
-    await adminSession.resources.roles.role(roleName).addUser({ username: userData.id });
+    await adminSession.resources.roles.role(roleName).addUser({ userId: userData.id });
 
     const { data } = await adminSession.resources.users.user(userData.id).getRoles();
 
@@ -49,6 +49,12 @@ describe('userManagement get user roles integration test', () => {
   it('throws a 404 error when the user doesnt exist', async () => {
     await expect(adminSession.resources.users.user(fakeUuid).getRoles()).rejects.toThrow(
       new HttpError(404, {})
+    );
+  });
+
+  it('throws a 403 error when the user id is not a UUID', async () => {
+    await expect(adminSession.resources.users.user('not a UUID').getRoles()).rejects.toThrow(
+      new HttpError(403, {})
     );
   });
 });
