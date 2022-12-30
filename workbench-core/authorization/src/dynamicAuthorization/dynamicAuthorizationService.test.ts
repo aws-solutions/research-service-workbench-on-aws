@@ -4,6 +4,7 @@
  */
 
 import { AuthenticatedUser } from '../authenticatedUser';
+import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -142,11 +143,11 @@ describe('DynamicAuthorizationService', () => {
     });
 
     it('throws when the group cannot be found', async () => {
-      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockRejectedValue(new Error());
+      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockRejectedValue(new GroupNotFoundError());
 
       await expect(
         dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(Error);
+      ).rejects.toThrow(GroupNotFoundError);
     });
   });
 });
