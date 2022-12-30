@@ -17,7 +17,6 @@ import {
 import { isPermissionNotGrantedError, PermissionNotGrantedError } from './permissionNotGrantedError';
 import { isRouteNotSecuredError, RouteNotSecuredError } from './routeNotSecuredError';
 import { isThroughputExceededError, ThroughputExceededError } from './throughputExceededError';
-import { isTooManyRequestsError, TooManyRequestsError } from './tooManyRequestsError';
 
 const error = new Error();
 
@@ -66,14 +65,6 @@ describe('custom error tests', () => {
   });
   test('not GroupNotFoundError', () => {
     expect(isGroupNotFoundError(error)).toBe(false);
-  });
-
-  test('TooManyRequestsError', () => {
-    const tooManyRequestsError = new TooManyRequestsError();
-    expect(isTooManyRequestsError(tooManyRequestsError)).toBe(true);
-  });
-  test('not TooManyRequestsError', () => {
-    expect(isTooManyRequestsError(error)).toBe(false);
   });
 
   test('IdentityPermissionCreationError', () => {
