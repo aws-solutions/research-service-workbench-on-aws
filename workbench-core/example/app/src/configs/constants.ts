@@ -7,4 +7,3 @@ export const solutionPrefix: string = 'EXAMPLE';
 export const dataSetPrefix: string = `${solutionPrefix}-DS`;
 export const endPointPrefix: string = `${solutionPrefix}-EP`;
 export const authorizationGroupPrefix: string = `${solutionPrefix}-GROUP`;
-export const groupIDRegExpAsString: string = '[^\r\n\t\f\v/]+';

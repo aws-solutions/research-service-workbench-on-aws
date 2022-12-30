@@ -102,7 +102,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.get(
-    '/authorization/groups/:groupId',
+    '/authorization/groups/:groupId/getUsers',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const validatedRequest = validateAndParse<GetUsersFromGroupRequest>(

@@ -178,7 +178,7 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+get-group-users-${uuidv4()}@simulator.amazonses.com`
       };
-      fakeGroupUuid = '0000000000000-test-authZ-group-000';
+      fakeGroupUuid = '0000000000000-0000-0000-0000-000';
     });
 
     it('get all the users of a group', async () => {
