@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-accounts",
+      "comment": "change HostingAccountLifecycleService to attach host account to S3DatasetsEncryptionKey policy",
+      "type": "none"
+    }
+  ],
+  "packageName": "@aws/workbench-core-accounts"
+}

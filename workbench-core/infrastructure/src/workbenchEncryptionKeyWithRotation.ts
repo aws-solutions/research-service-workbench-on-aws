@@ -21,7 +21,7 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
           actions: ['kms:*'],
           principals: [new AccountPrincipal(Aws.ACCOUNT_ID)],
           resources: ['*'],
-          sid: `main-key-share-statement`
+          sid: 'main-key-share-statement'
         })
       ]
     });
