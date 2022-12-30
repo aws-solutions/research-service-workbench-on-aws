@@ -13,7 +13,7 @@ export default class Role extends Resource {
     super(clientSession, 'role', id, parentApi);
   }
 
-  public async addUser(requestBody: { username: string }): Promise<AxiosResponse> {
+  public async addUser(requestBody: { userId: string }): Promise<AxiosResponse> {
     return this._axiosInstance.put(`${this._api}`, requestBody);
   }
 

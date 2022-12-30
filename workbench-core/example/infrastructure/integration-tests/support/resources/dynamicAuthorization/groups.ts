@@ -40,14 +40,6 @@ export default class Groups extends CollectionResource {
     return this._axiosInstance.get(`${this._api}/users/${userId}`);
   }
 
-  public async getGroupUsers(groupId: string): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/${groupId}/getUsers`);
-  }
-
-  public addUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/add-user`, body);
-  }
-
   protected _buildDefaults(body: CreateGroupRequest): CreateGroupRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const groupId = randomTextGenerator.getFakeText('test-authZ-group');
@@ -57,11 +49,6 @@ export default class Groups extends CollectionResource {
       description: body.description
     };
   }
-}
-
-export interface AddUserToGroupRequest {
-  groupId: string;
-  userId: string;
 }
 
 interface CreateGroupRequest {

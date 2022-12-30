@@ -24,7 +24,6 @@ export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors
 export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
-export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
 export { ThroughputExceededError, isThroughputExceededError } from './errors/throughputExceededError';
 export {
   IdentityPermissionCreationError,
@@ -123,6 +122,8 @@ export {
   isIdpUnavailableError,
   PluginConfigurationError,
   isPluginConfigurationError,
+  TooManyRequestsError,
+  isTooManyRequestsError,
   UserNotFoundError,
   isUserNotFoundError
 } from '@aws/workbench-core-user-management';
