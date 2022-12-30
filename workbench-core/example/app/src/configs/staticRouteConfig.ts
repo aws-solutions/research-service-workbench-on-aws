@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidRegExpAsString } from '@aws/workbench-core-base';
+import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
 import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
@@ -188,6 +188,14 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/getUsers`]: {
+    GET: [
+      {
+        action: 'READ',
         subject: 'AuthorizationGroup'
       }
     ]

@@ -24,7 +24,7 @@
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "compile": "node scripts/buildLambda.js",
     "depcheck": "depcheck",
-    "integration-tests": "rushx build && jest lib/integration-tests -i",
+    "integration-tests": "rushx build && jest lib/integration-tests -i --verbose",
     "license-checker": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC; BSD'",
     "lint:fix": "eslint . --fix",
     "make-badges": "istanbul-badges-readme --coverageDir=./temp/coverage --exitCode=1",
