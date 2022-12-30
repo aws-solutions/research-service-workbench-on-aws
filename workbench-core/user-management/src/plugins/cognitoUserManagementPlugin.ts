@@ -10,6 +10,7 @@ import { InvalidParameterError } from '../errors/invalidParameterError';
 import { PluginConfigurationError } from '../errors/pluginConfigurationError';
 import { RoleAlreadyExistsError } from '../errors/roleAlreadyExistsError';
 import { RoleNotFoundError } from '../errors/roleNotFoundError';
+import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { UserAlreadyExistsError } from '../errors/userAlreadyExistsError';
 import { UserNotFoundError } from '../errors/userNotFoundError';
 import { CreateUser, Status, User } from '../user';
@@ -76,6 +77,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -116,6 +120,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
+      }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
       }
       throw error;
     }
@@ -185,6 +192,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'InvalidParameterException') {
         throw new InvalidParameterError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -239,6 +249,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'AliasExistsException' || error.name === 'InvalidParameterException') {
         throw new InvalidParameterError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -272,6 +285,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
+      }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
       }
       throw error;
     }
@@ -307,6 +323,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -340,6 +359,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       }
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
+      }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
       }
       throw error;
     }
@@ -391,6 +413,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       ) {
         throw new PluginConfigurationError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -427,6 +452,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         }
         throw new PluginConfigurationError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -457,6 +485,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
         error.name === 'ResourceNotFoundException'
       ) {
         throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
       }
       throw error;
     }
@@ -497,6 +528,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -536,6 +570,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'UserNotFoundException') {
         throw new UserNotFoundError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -570,6 +607,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
       if (error.name === 'GroupExistsException') {
         throw new RoleAlreadyExistsError(error.message);
       }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
+      }
       throw error;
     }
   }
@@ -602,6 +642,9 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
           throw new RoleNotFoundError(error.message);
         }
         throw new PluginConfigurationError(error.message);
+      }
+      if (error.name === 'TooManyRequestsException') {
+        throw new TooManyRequestsError(error.message);
       }
       throw error;
     }

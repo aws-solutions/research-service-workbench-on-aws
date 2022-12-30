@@ -23,7 +23,6 @@ export { PermissionNotGrantedError, isPermissionNotGrantedError } from './errors
 export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotSecuredError';
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
-export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
 
 // dynamic authorization
 export { WBCGroupManagementPlugin } from './dynamicAuthorization/wbcGroupManagementPlugin';
@@ -115,6 +114,8 @@ export {
   isIdpUnavailableError,
   PluginConfigurationError,
   isPluginConfigurationError,
+  TooManyRequestsError,
+  isTooManyRequestsError,
   UserNotFoundError,
   isUserNotFoundError
 } from '@aws/workbench-core-user-management';

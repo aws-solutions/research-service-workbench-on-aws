@@ -11,6 +11,7 @@ import {
   isInvalidParameterError,
   isRoleAlreadyExistsError,
   isRoleNotFoundError,
+  isTooManyRequestsError,
   isUserAlreadyExistsError,
   isUserNotFoundError,
   UserManagementService
@@ -34,6 +35,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserAlreadyExistsError(e) || isInvalidParameterError(e)) {
           throw Boom.badRequest(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -42,8 +46,15 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const users = await service.listUsers();
-      res.status(200).json(users);
+      try {
+        const users = await service.listUsers();
+        res.status(200).json(users);
+      } catch (e) {
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
+        throw e;
+      }
     })
   );
 
@@ -56,6 +67,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -72,6 +86,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -86,6 +103,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -102,6 +122,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -116,6 +139,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -132,6 +158,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isRoleAlreadyExistsError(e)) {
           throw Boom.badRequest(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -151,6 +180,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e) || isRoleNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }

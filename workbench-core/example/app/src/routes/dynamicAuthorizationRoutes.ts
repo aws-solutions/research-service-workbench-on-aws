@@ -61,6 +61,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isUserNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
@@ -84,7 +87,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
-
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
@@ -108,7 +113,9 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
-
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })

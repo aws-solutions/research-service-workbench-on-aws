@@ -176,6 +176,7 @@ export class DynamicAuthorizationService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
@@ -191,6 +192,7 @@ export class DynamicAuthorizationService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async removeUserFromGroup(
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
@@ -217,6 +219,7 @@ export class DynamicAuthorizationService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     return await this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);

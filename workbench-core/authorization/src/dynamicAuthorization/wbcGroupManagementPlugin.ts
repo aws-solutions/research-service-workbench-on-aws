@@ -10,11 +10,11 @@ import {
   isRoleAlreadyExistsError,
   isRoleNotFoundError,
   PluginConfigurationError,
+  TooManyRequestsError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
-import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -110,7 +110,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       await this._userManagementService.removeUserFromRole(userId, groupId);
       return { data: { userId, groupId } };
     } catch (error) {
-      if (error.name === 'RoleNotFoundError') {
+      if (isRoleNotFoundError(error)) {
         throw new GroupNotFoundError(error.message);
       }
       throw error;

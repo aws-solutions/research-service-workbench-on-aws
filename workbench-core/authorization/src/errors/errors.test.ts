@@ -15,9 +15,7 @@ import {
   GroupAlreadyExistsError,
   GroupNotFoundError,
   isGroupAlreadyExistsError,
-  isGroupNotFoundError,
-  TooManyRequestsError,
-  isTooManyRequestsError
+  isGroupNotFoundError
 } from '../';
 
 const error = new Error();
@@ -67,13 +65,5 @@ describe('custom error tests', () => {
   });
   test('not GroupNotFoundError', () => {
     expect(isGroupNotFoundError(error)).toBe(false);
-  });
-
-  test('TooManyRequestsError', () => {
-    const tooManyRequestsError = new TooManyRequestsError();
-    expect(isTooManyRequestsError(tooManyRequestsError)).toBe(true);
-  });
-  test('not TooManyRequestsError', () => {
-    expect(isTooManyRequestsError(error)).toBe(false);
   });
 });

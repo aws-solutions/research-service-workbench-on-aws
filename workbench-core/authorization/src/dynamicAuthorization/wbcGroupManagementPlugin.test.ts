@@ -20,6 +20,7 @@ import {
   PluginConfigurationError,
   IdpUnavailableError,
   RoleAlreadyExistsError,
+  TooManyRequestsError,
   UserNotFoundError,
   RoleNotFoundError
 } from '@aws/workbench-core-user-management';
@@ -27,7 +28,6 @@ import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
-import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -186,7 +186,7 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(PluginConfigurationError);
     });
 
-    it('throws GroupNotFoundError when the group already exists', async () => {
+    it('throws GroupNotFoundError when the group doesnt exist', async () => {
       mockUserManagementPlugin.removeUserFromRole = jest.fn().mockRejectedValue(new RoleNotFoundError());
 
       await expect(
@@ -194,7 +194,7 @@ describe('WBCGroupManagemntPlugin', () => {
       ).rejects.toThrow(GroupNotFoundError);
     });
 
-    it('throws UserNotFoundError when the group already exists', async () => {
+    it('throws UserNotFoundError when the user doesnt exist', async () => {
       mockUserManagementPlugin.removeUserFromRole = jest.fn().mockRejectedValue(new UserNotFoundError());
 
       await expect(
@@ -310,7 +310,7 @@ describe('WBCGroupManagemntPlugin', () => {
         authenticatedUser: mockUser
       });
 
-      expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
+      expect(data).toStrictEqual({ groupId, userId });
     });
 
     // ToDo: add test for verifying throw role not found when role is pending delete
