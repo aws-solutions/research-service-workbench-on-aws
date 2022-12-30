@@ -8,6 +8,8 @@ import {
   CreateRoleSchema,
   CreateUserSchema,
   isInvalidParameterError,
+  isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   isUserAlreadyExistsError,
   isUserNotFoundError,
   UpdateRoleSchema,
@@ -105,12 +107,34 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     })
   );
 
+  router.get(
+    '/users/:userId/roles',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const roles = await service.getUserRoles(req.params.userId);
+        res.status(200).json(roles);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
   router.post(
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateRoleSchema));
-      const response = await service.createRole(req.body.roleName);
-      res.status(201).send(response);
+      try {
+        const response = await service.createRole(req.body.roleName);
+        res.status(201).send(response);
+      } catch (e) {
+        if (isRoleAlreadyExistsError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        throw e;
+      }
     })
   );
 
@@ -121,8 +145,16 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       if (!_.isString(req.params.roleName)) {
         throw Boom.badRequest('roleName must be a string.');
       }
-      const response = await service.addUserToRole(req.body.username, req.params.roleName);
-      res.send(response);
+
+      try {
+        const response = await service.addUserToRole(req.body.username, req.params.roleName);
+        res.send(response);
+      } catch (e) {
+        if (isUserNotFoundError(e) || isRoleNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        throw e;
+      }
     })
   );
 }

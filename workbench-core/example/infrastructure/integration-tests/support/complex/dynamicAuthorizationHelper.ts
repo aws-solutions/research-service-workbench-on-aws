@@ -1,5 +1,6 @@
 import { IdentityPermission } from '@aws/workbench-core-authorization';
 import { AwsService } from '@aws/workbench-core-base';
+import { authorizationGroupPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
 import Setup from '../setup';
 
 export class DynamicAuthorizationHelper {
@@ -17,7 +18,7 @@ export class DynamicAuthorizationHelper {
 
   public async deleteGroupDdbRecord(groupId: string): Promise<void> {
     await this._awsSdk.helpers.ddb
-      .delete({ pk: `EXAMPLE-GROUP#${groupId}`, sk: `EXAMPLE-GROUP#${groupId}` })
+      .delete({ pk: `${authorizationGroupPrefix}#${groupId}`, sk: `${authorizationGroupPrefix}#${groupId}` })
       .execute();
   }
 

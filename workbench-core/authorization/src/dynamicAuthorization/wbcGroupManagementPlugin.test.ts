@@ -19,7 +19,9 @@ import {
   UserManagementPlugin,
   PluginConfigurationError,
   IdpUnavailableError,
-  RoleAlreadyExistsError
+  RoleAlreadyExistsError,
+  UserNotFoundError,
+  RoleNotFoundError
 } from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { AuthenticatedUser } from '../authenticatedUser';
@@ -28,6 +30,7 @@ import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
+import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { SetGroupStatusResponse } from './dynamicAuthorizationInputs/setGroupStatus';
 import { GroupStatus } from './models/GroupMetadata';
 import { WBCGroupManagementPlugin } from './wbcGroupManagementPlugin';
@@ -48,6 +51,7 @@ describe('WBCGroupManagemntPlugin', () => {
   beforeAll(() => {
     mockUserManagementPlugin = {
       getUser: jest.fn(),
+      getUserRoles: jest.fn(),
       createUser: jest.fn(),
       updateUser: jest.fn(),
       deleteUser: jest.fn(),
@@ -122,6 +126,47 @@ describe('WBCGroupManagemntPlugin', () => {
       await expect(
         wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+  });
+
+  describe('getUserGroups', () => {
+    let userId: string;
+    let groupIds: string[];
+
+    beforeEach(() => {
+      userId = 'userId';
+      groupIds = ['123', '456', '789'];
+    });
+
+    it('returns an array of groupID in the data object that the requested user is in', async () => {
+      mockUserManagementPlugin.getUserRoles = jest.fn().mockResolvedValue(groupIds);
+      const response = await wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds } });
+    });
+
+    it('throws IdpUnavailableError when the IdP encounters an error', async () => {
+      mockUserManagementPlugin.getUserRoles = jest.fn().mockRejectedValue(new IdpUnavailableError());
+
+      await expect(
+        wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(IdpUnavailableError);
+    });
+
+    it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
+      mockUserManagementPlugin.getUserRoles = jest.fn().mockRejectedValue(new PluginConfigurationError());
+
+      await expect(
+        wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(PluginConfigurationError);
+    });
+
+    it('throws UserNotFoundError when the user doesnt exist', async () => {
+      mockUserManagementPlugin.getUserRoles = jest.fn().mockRejectedValue(new UserNotFoundError());
+
+      await expect(
+        wbcGroupManagementPlugin.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(UserNotFoundError);
     });
   });
 
@@ -237,6 +282,48 @@ describe('WBCGroupManagemntPlugin', () => {
       ddbMock.on(GetItemCommand).rejects(new Error());
 
       await expect(wbcGroupManagementPlugin.getGroupStatus({ groupId })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('addUserToGroup', () => {
+    test('returns added equal to true on succesfull call', async () => {
+      const { data } = await wbcGroupManagementPlugin.addUserToGroup({
+        groupId: 'groupId',
+        userId: 'userId',
+        authenticatedUser: mockUser
+      });
+
+      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
+      expect(data).toStrictEqual({ groupId: 'groupId', userId: 'userId' });
+    });
+
+    // ToDo: add test for verifying throw role not found when role is pending delete
+
+    test.each([
+      [IdpUnavailableError, new IdpUnavailableError('test error')],
+      [PluginConfigurationError, new PluginConfigurationError('test error')],
+      [UserNotFoundError, new UserNotFoundError('test error')],
+      [GroupNotFoundError, new RoleNotFoundError('test error')],
+      [Error, new Error('test error')]
+    ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
+      mockUserManagementPlugin.addUserToRole = jest.fn().mockRejectedValue(error);
+      const userManagementService = new UserManagementService(mockUserManagementPlugin);
+
+      const plugin = new WBCGroupManagementPlugin({
+        userManagementService,
+        ddbService,
+        userGroupKeyType
+      });
+
+      await expect(
+        plugin.addUserToGroup({
+          groupId: 'groupId',
+          userId: 'userId',
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(expected);
+
+      expect(mockUserManagementPlugin.addUserToRole).toBeCalledWith('userId', 'groupId');
     });
   });
 });

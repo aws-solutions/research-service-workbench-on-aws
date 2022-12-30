@@ -7,20 +7,23 @@ import ClientSession from './clientSession';
 import Datasets from './resources/datasets/datasets';
 import Groups from './resources/dynamicAuthorization/groups';
 import IdentityPermissions from './resources/dynamicAuthorization/identityPermissions';
-import Users from './resources/users/users';
+import Roles from './resources/userManagement/roles';
+import Users from './resources/userManagement/users';
 
 function getResources(clientSession: ClientSession): Resources {
   return {
     datasets: new Datasets(clientSession),
     users: new Users(clientSession),
     groups: new Groups(clientSession),
-    identityPermissions: new IdentityPermissions(clientSession)
+    identityPermissions: new IdentityPermissions(clientSession),
+    roles: new Roles(clientSession)
   };
 }
 
 interface Resources {
   datasets: Datasets;
   users: Users;
+  roles: Roles;
   groups: Groups;
   identityPermissions: IdentityPermissions;
 }
