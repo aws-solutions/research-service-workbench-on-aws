@@ -5,18 +5,18 @@
 
 import {
   AuthenticatedUserNotFoundError,
-  isAuthenticatedUserNotFoundError,
-  ForbiddenError,
-  isForbiddenError,
-  PermissionNotGrantedError,
-  isPermissionNotGrantedError,
-  RouteNotSecuredError,
-  isRouteNotSecuredError,
-  GroupAlreadyExistsError,
-  GroupNotFoundError,
-  isGroupAlreadyExistsError,
-  isGroupNotFoundError
-} from '../';
+  isAuthenticatedUserNotFoundError
+} from './authenticatedUserNotFoundError';
+import { ForbiddenError, isForbiddenError } from './forbiddenError';
+import { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './groupAlreadyExistsError';
+import { GroupNotFoundError, isGroupNotFoundError } from './groupNotFoundError';
+import {
+  IdentityPermissionCreationError,
+  isIdentityPermissionCreationError
+} from './identityPermissionCreationError';
+import { isPermissionNotGrantedError, PermissionNotGrantedError } from './permissionNotGrantedError';
+import { isRouteNotSecuredError, RouteNotSecuredError } from './routeNotSecuredError';
+import { isThroughputExceededError, ThroughputExceededError } from './throughputExceededError';
 
 const error = new Error();
 
@@ -65,5 +65,21 @@ describe('custom error tests', () => {
   });
   test('not GroupNotFoundError', () => {
     expect(isGroupNotFoundError(error)).toBe(false);
+  });
+
+  test('IdentityPermissionCreationError', () => {
+    const identityPermissionCreationError = new IdentityPermissionCreationError();
+    expect(isIdentityPermissionCreationError(identityPermissionCreationError)).toBe(true);
+  });
+  test('not IdentityPermissionCreationError', () => {
+    expect(isIdentityPermissionCreationError(error)).toBe(false);
+  });
+
+  test('ThroughputExceededError', () => {
+    const throughputExceededError = new ThroughputExceededError();
+    expect(isThroughputExceededError(throughputExceededError)).toBe(true);
+  });
+  test('not ThroughputExceededError', () => {
+    expect(isThroughputExceededError(error)).toBe(false);
   });
 });
