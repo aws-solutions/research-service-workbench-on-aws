@@ -167,4 +167,33 @@ describe('dynamic authorization group integration tests', () => {
       );
     });
   });
+
+  describe('getGroupUsers', () => {
+    let fakeGroupUuid: string;
+    let user: CreateUser;
+
+    beforeEach(() => {
+      user = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: `success+get-group-users-${uuidv4()}@simulator.amazonses.com`
+      };
+      fakeGroupUuid = '0000000000000-0000-0000-0000-000';
+    });
+
+    it('get all the users of a group', async () => {
+      const { data: userData } = await adminSession.resources.users.create(user);
+      const { data: groupData } = await adminSession.resources.groups.create();
+      await adminSession.resources.groups.addUser({ groupId: groupData.groupId, userId: userData.id });
+      const { data } = await adminSession.resources.groups.group(groupData.groupId).getGroupUsers();
+
+      expect(data).toMatchObject({ userIds: [userData.id] });
+    });
+
+    it('returns a 404 error when the Group doesnt exist', async () => {
+      await expect(adminSession.resources.groups.group(fakeGroupUuid).getGroupUsers()).rejects.toThrow(
+        new HttpError(404, {})
+      );
+    });
+  });
 });

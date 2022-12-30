@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DynamicAuthorizationHelper } from '../../complex/dynamicAuthorizationHelper';
 import Resource from '../base/resource';
@@ -20,5 +21,9 @@ export default class Group extends Resource {
     } catch (error) {
       console.warn(`Error caught in cleanup of authorization group '${this.id}': ${error}.`);
     }
+  }
+
+  public async getGroupUsers(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/getUsers`);
   }
 }

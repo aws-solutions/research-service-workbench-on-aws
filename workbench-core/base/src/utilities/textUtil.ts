@@ -11,6 +11,8 @@ function uuidWithLowercasePrefix(prefix: string): string {
 }
 const uuidRegExpAsString: string = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
+const groupIDRegExpAsString: string = '\\S{1,128}';
+
 const productIdRegExpString: string = 'prod-[0-9a-zA-Z]{13}';
 
 const provisionArtifactIdRegExpString: string = 'pa-[0-9a-zA-Z]{13}';
@@ -32,5 +34,6 @@ export {
   uuidRegExpAsString,
   productIdRegExpString,
   provisionArtifactIdRegExpString,
-  envTypeIdRegExpString
+  envTypeIdRegExpString,
+  groupIDRegExpAsString
 };
