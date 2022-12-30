@@ -55,7 +55,7 @@ describe('HostingAccountLifecycleService', () => {
     jest.resetModules(); // Most important - it clears the cache
     process.env = { ...ORIGINAL_ENV }; // Make a copy
     process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'SampleArtifactBucketArnOutput';
-    process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'SampleMainKeyOutput';
+    process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'SampleMainKeyOutput';
     process.env.STACK_NAME = 'swb-swbv2-va';
     process.env.SSM_DOC_OUTPUT_KEY_SUFFIX = 'SSMDocOutput';
     process.env.ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
@@ -116,7 +116,7 @@ describe('HostingAccountLifecycleService', () => {
               OutputValue: artifactBucketArnCfn
             },
             {
-              OutputKey: process.env.MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
+              OutputKey: process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
               OutputValue: 'arn:aws:kms:::key/123-123-123'
             },
             { OutputKey: 'VPC', OutputValue: 'fakeVPC' },
