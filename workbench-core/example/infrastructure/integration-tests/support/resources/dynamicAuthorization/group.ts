@@ -11,7 +11,6 @@ import Resource from '../base/resource';
 export default class Group extends Resource {
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
     super(clientSession, 'group', id, parentApi);
-    this._api = parentApi;
   }
 
   public async cleanup(): Promise<void> {
@@ -25,6 +24,6 @@ export default class Group extends Resource {
   }
 
   public async getGroupUsers(): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/${this.id}/getUsers`);
+    return this._axiosInstance.get(`${this._api}/getUsers`);
   }
 }

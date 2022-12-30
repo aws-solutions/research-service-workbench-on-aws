@@ -3,7 +3,12 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-export interface AuthenticatedUser {
-  id: string;
-  roles: string[];
-}
+import { z } from 'zod';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const AuthenticatedUserParser = z.object({
+  id: z.string(),
+  roles: z.array(z.string())
+});
+
+export type AuthenticatedUser = z.infer<typeof AuthenticatedUserParser>;

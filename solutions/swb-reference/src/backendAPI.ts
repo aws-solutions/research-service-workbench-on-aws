@@ -12,7 +12,11 @@ import {
   ProjectService
 } from '@aws/workbench-core-accounts';
 import { AuditService, AuditLogger, BaseAuditPlugin } from '@aws/workbench-core-audit';
-import { DynamicAuthorizationService, WBCGroupManagementPlugin } from '@aws/workbench-core-authorization';
+import {
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin,
+  DDBDynamicAuthorizationPermissionsPlugin
+} from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
 import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
@@ -49,11 +53,16 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
   ddbService: dynamicAuthAws.helpers.ddb,
   userGroupKeyType: authorizationGroupPrefix
 });
-
+const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin =
+  new DDBDynamicAuthorizationPermissionsPlugin({
+    dynamoDBService: dynamicAuthAws.helpers.ddb
+  });
 // Commenting it for now, it will be integrated with SWB's definition of DynamicAuthorizationService
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
-  groupManagementPlugin: wbcGroupManagementPlugin
+  groupManagementPlugin: wbcGroupManagementPlugin,
+  dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
+  auditService: new AuditService(new BaseAuditPlugin(new AuditLogger(logger)))
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
