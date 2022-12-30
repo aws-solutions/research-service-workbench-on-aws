@@ -5,7 +5,7 @@
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
 import { uuidRegExpAsString } from '@aws/workbench-core-base';
-import { dataSetPrefix, endPointPrefix } from './constants';
+import { dataSetPrefix, endPointPrefix, groupIDRegExpAsString } from './constants';
 
 export const routesMap: RoutesMap = {
   '/hello-world': {
@@ -192,7 +192,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  ['/authorization/groups/\\S{1,128}']: {
+  [`/authorization/groups/${groupIDRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
