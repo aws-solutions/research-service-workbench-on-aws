@@ -27,7 +27,7 @@ import AccountService from '../services/accountService';
 interface Arns {
   statusHandlerArn: string;
   artifactBucketArn: string;
-  s3DatasetsEncryptionArn: string;
+  mainAccountEncryptionArnList: string[];
 }
 
 export interface CreateAccountData {
@@ -604,17 +604,19 @@ export default class HostingAccountLifecycleService {
     const {
       [process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!]: statusHandlerArn,
       [process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!]: artifactBucketArn,
+      [process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: s3ArtifactEncryptionArn,
       [process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!]: s3DatasetsEncryptionArn
     } = await cfService.getCfnOutput(this._stackName, [
       process.env.STATUS_HANDLER_ARN_OUTPUT_KEY!,
       process.env.S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY!,
+      process.env.S3_ARTIFACT_ENCRYPTION_KEY_ARN_OUTPUT_KEY!,
       process.env.S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY!
     ]);
 
     return {
       statusHandlerArn,
       artifactBucketArn,
-      s3DatasetsEncryptionArn
+      mainAccountEncryptionArnList: [s3ArtifactEncryptionArn, s3DatasetsEncryptionArn]
     };
   }
 
@@ -625,7 +627,7 @@ export default class HostingAccountLifecycleService {
     awsAccountId: string;
     arns: Arns;
   }): Promise<void> {
-    const { statusHandlerArn, artifactBucketArn, s3DatasetsEncryptionArn } = arns;
+    const { statusHandlerArn, artifactBucketArn, mainAccountEncryptionArnList } = arns;
 
     // Update main account default event bus to accept hosting account state change events
     await this.updateBusPermissions(statusHandlerArn, awsAccountId);
@@ -634,7 +636,11 @@ export default class HostingAccountLifecycleService {
     await this.updateArtifactsBucketPolicy(artifactBucketArn, awsAccountId);
 
     // Update main account encryption key policy
-    await this.updateMainAccountEncryptionKeyPolicy(s3DatasetsEncryptionArn, awsAccountId);
+    await Promise.all(
+      mainAccountEncryptionArnList.map(async (mainAccountEncryptionArn) => {
+        await this.updateMainAccountEncryptionKeyPolicy(mainAccountEncryptionArn, awsAccountId);
+      })
+    );
   }
 
   private _constructCreateAndUpdateUrls(
