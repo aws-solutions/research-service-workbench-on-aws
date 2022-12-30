@@ -209,7 +209,7 @@ export class DynamicAuthorizationService {
    * @throws {@link UserNotFoundError} - user could not be found
    */
   public async getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
-    return await this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);
+    return this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);
   }
 
   /**
@@ -219,7 +219,7 @@ export class DynamicAuthorizationService {
   public async isUserAssignedToGroup(
     isUserAssignedToGroupRequest: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.isUserAssignedToGroup(isUserAssignedToGroupRequest);
   }
 
   /**

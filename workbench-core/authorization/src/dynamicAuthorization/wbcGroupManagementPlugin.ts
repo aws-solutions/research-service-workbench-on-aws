@@ -8,6 +8,7 @@ import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   PluginConfigurationError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
@@ -96,10 +97,19 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       throw error;
     }
   }
-  public isUserAssignedToGroup(
+  public async isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
-    throw new Error('Method not implemented.');
+    try {
+      const { data } = await this.getUserGroups(request);
+      const isAssigned = data.groupIds.includes(request.groupId);
+      return { data: { isAssigned } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse> {
     throw new Error('Method not implemented.');
