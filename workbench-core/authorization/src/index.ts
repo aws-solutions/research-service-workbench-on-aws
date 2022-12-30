@@ -8,7 +8,8 @@ export { default as Operation } from './operation';
 export { default as AuthorizationPlugin } from './authorizationPlugin';
 export { default as StaticPermissionsPlugin } from './staticPermissionsPlugin';
 export { default as CASLAuthorizationPlugin } from './caslAuthorizationPlugin';
-export { default as Permission, PermissionsMap, Effect } from './permission';
+export { default as Permission, PermissionsMap } from './permission';
+export { Effect } from './effect';
 export { Action } from './action';
 export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
@@ -24,12 +25,18 @@ export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotS
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
 export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
+export { ThroughputExceededError, isThroughputExceededError } from './errors/throughputExceededError';
+export {
+  IdentityPermissionCreationError,
+  isIdentityPermissionCreationError
+} from './errors/identityPermissionCreationError';
 
 // dynamic authorization
 export { WBCGroupManagementPlugin } from './dynamicAuthorization/wbcGroupManagementPlugin';
 export { GroupManagementPlugin } from './dynamicAuthorization/groupManagementPlugin';
 export { DynamicAuthorizationService } from './dynamicAuthorization/dynamicAuthorizationService';
 export { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorization/dynamicAuthorizationPermissionsPlugin';
+export { DDBDynamicAuthorizationPermissionsPlugin } from './dynamicAuthorization/ddbDynamicAuthorizationPermissionsPlugin';
 export {
   AddUserToGroupRequest,
   AddUserToGroupResponse
@@ -40,6 +47,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/createGroup';
 export {
   CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsRequestParser,
   CreateIdentityPermissionsResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/createIdentityPermissions';
 export {

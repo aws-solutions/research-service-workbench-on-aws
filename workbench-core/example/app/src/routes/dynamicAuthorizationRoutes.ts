@@ -6,8 +6,12 @@
 import {
   DynamicAuthorizationService,
   isGroupAlreadyExistsError,
-  isGroupNotFoundError,
   isTooManyRequestsError,
+  isThroughputExceededError,
+  isGroupNotFoundError,
+  isIdentityPermissionCreationError,
+  CreateIdentityPermissionsRequest,
+  CreateIdentityPermissionsRequestParser,
   isUserNotFoundError
 } from '@aws/workbench-core-authorization';
 import {
@@ -93,6 +97,52 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         }
 
         throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/:groupId/getUsers',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const { data } = await service.getGroupUsers({
+          authenticatedUser: res.locals.user,
+          groupId: req.params.groupId
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.post(
+    '/authorization/identitypermissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const authenticatedUser = res.locals.user;
+        const validatedRequest = validateAndParse<CreateIdentityPermissionsRequest>(
+          CreateIdentityPermissionsRequestParser,
+          {
+            ...req.body,
+            authenticatedUser
+          }
+        );
+
+        const { data } = await service.createIdentityPermissions({
+          ...validatedRequest
+        });
+        res.status(201).send(data);
+      } catch (err) {
+        if (isGroupNotFoundError(err)) throw Boom.badRequest('One or more groups are not found');
+        if (isThroughputExceededError(err))
+          throw Boom.tooManyRequests('Exceed limit on creation of permissions');
+        if (isIdentityPermissionCreationError(err))
+          throw Boom.badRequest('One or more permissions already exist');
+        throw err;
       }
     })
   );

@@ -4,10 +4,7 @@
  */
 
 import { Action } from './action';
-/**
- * States whether a {@link Permission} should be ALLOW or DENY.
- */
-export type Effect = 'ALLOW' | 'DENY';
+import { Effect } from './effect';
 
 /**
  * Represents what a Permission contains.
