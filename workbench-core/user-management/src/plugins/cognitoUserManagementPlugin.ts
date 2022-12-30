@@ -44,6 +44,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to get user info
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async getUser(id: string): Promise<User> {
     try {
@@ -94,6 +95,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to get user info
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async getUserRoles(id: string): Promise<string[]> {
     try {
@@ -139,6 +141,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserAlreadyExistsError} if the email provided is already in use in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async createUser(user: CreateUser): Promise<User> {
     try {
@@ -211,6 +214,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
    * @throws {@link InvalidParameterError} if the email parameter is not in a valid format
    * @throws {@link InvalidParameterError} if the email parameter is already in use by a different account
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async updateUser(id: string, user: User): Promise<void> {
     try {
@@ -265,6 +269,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to delete a user from a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async deleteUser(id: string): Promise<void> {
     try {
@@ -302,6 +307,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to activate a user
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async activateUser(id: string): Promise<void> {
     try {
@@ -339,6 +345,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin dones't have permission to deactivate a user
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesnt exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async deactivateUser(id: string): Promise<void> {
     try {
@@ -375,6 +382,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async listUsers(): Promise<User[]> {
     try {
@@ -430,6 +438,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the users within a group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async listUsersForRole(role: string): Promise<string[]> {
     try {
@@ -467,6 +476,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link IdpUnavailableError} if Cognito encounters an internal error
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to list the groups in a user pool
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async listRoles(): Promise<string[]> {
     try {
@@ -504,6 +514,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async addUserToRole(id: string, role: string): Promise<void> {
     try {
@@ -546,6 +557,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link UserNotFoundError} if the user provided doesn't exist in the user pool
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async removeUserFromRole(id: string, role: string): Promise<void> {
     try {
@@ -586,6 +598,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to create a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link RoleAlreadyExistsError} if the group provided already exists in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async createRole(role: string): Promise<void> {
     try {
@@ -623,6 +636,7 @@ export class CognitoUserManagementPlugin implements UserManagementPlugin {
    * @throws {@link PluginConfigurationError} if the plugin doesn't have permission to delete a user pool group
    * @throws {@link PluginConfigurationError} if the user pool id is invalid
    * @throws {@link RoleNotFoundError} if the group provided doesn't exist in the user pool
+   * @throws {@link TooManyRequestsError} if the RPS limit was exceeded
    */
   public async deleteRole(role: string): Promise<void> {
     try {
