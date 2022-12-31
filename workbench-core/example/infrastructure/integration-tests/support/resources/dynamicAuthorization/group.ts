@@ -21,6 +21,14 @@ export default class Group extends Resource {
     return this._axiosInstance.put(`${this._api}/remove-user`, body);
   }
 
+  public async getGroupUsers(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/get-users`);
+  }
+
+  public async isUserAssigned(userId: string): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/is-user-assigned/${userId}`);
+  }
+
   public async cleanup(): Promise<void> {
     try {
       const authzHelper = new DynamicAuthorizationHelper();
@@ -29,10 +37,6 @@ export default class Group extends Resource {
     } catch (error) {
       console.warn(`Error caught in cleanup of authorization group '${this.id}': ${error}.`);
     }
-  }
-
-  public async getGroupUsers(): Promise<AxiosResponse> {
-    return this._axiosInstance.get(`${this._api}/getUsers`);
   }
 }
 
