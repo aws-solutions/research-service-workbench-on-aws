@@ -13,24 +13,21 @@ import {
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsRequestParser,
   isUserNotFoundError,
-  GetIdentityPermissionsByIdentityRequest
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityRequestParser
 } from '@aws/workbench-core-authorization';
-import { GetIdentityPermissionsByIdentityRequestParser } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
-import {
-  AssignUserToGroupRequest,
-  AssignUserToGroupRequestParser
-} from '@aws/workbench-core-authorization/lib/models/assignUserToGroup';
-import {
-  CreateGroupRequest,
-  CreateGroupRequestParser
-} from '@aws/workbench-core-authorization/lib/models/createGroup';
-import {
-  GetUserGroupsRequest,
-  GetUserGroupsRequestParser
-} from '@aws/workbench-core-authorization/lib/models/getUserGroups';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Router, Request, Response } from 'express';
+import {
+  AddUserToGroupRequest,
+  AddUserToGroupRequestParser
+} from '../models/dynamicAuthorization/addUserToGroup';
+import { CreateGroupRequest, CreateGroupRequestParser } from '../models/dynamicAuthorization/createGroup';
+import {
+  RemoveUserFromGroupRequest,
+  RemoveUserFromGroupRequestParser
+} from '../models/dynamicAuthorization/removeUserFromGroup';
 import { wrapAsync } from '../utilities/errorHandlers';
 
 export function setUpDynamicAuthorizationRoutes(router: Router, service: DynamicAuthorizationService): void {
@@ -61,35 +58,34 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     '/authorization/groups/users/:userId',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const validatedRequest = validateAndParse<GetUserGroupsRequest>(
-          GetUserGroupsRequestParser,
-          req.params
-        );
-
         const { data } = await service.getUserGroups({
           authenticatedUser: res.locals.user,
-          ...validatedRequest
+          userId: req.params.userId
         });
         res.status(200).send(data);
       } catch (error) {
         if (isUserNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
   );
 
-  router.post(
-    '/authorization/groups/add-user',
+  router.put(
+    '/authorization/groups/:groupId/add-user',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        const addUserToGroupRequest = validateAndParse<AssignUserToGroupRequest>(
-          AssignUserToGroupRequestParser,
+        const addUserToGroupRequest = validateAndParse<AddUserToGroupRequest>(
+          AddUserToGroupRequestParser,
           req.body
         );
         const response = await service.addUserToGroup({
           ...addUserToGroupRequest,
+          groupId: req.params.groupId,
           authenticatedUser: res.locals.user
         });
         res.status(200).send(response.data);
@@ -97,11 +93,58 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
-
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
   );
+
+  router.put(
+    '/authorization/groups/:groupId/remove-user',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const removeUserFromGroupRequest = validateAndParse<RemoveUserFromGroupRequest>(
+          RemoveUserFromGroupRequestParser,
+          req.body
+        );
+        const response = await service.removeUserFromGroup({
+          ...removeUserFromGroupRequest,
+          groupId: req.params.groupId,
+          authenticatedUser: res.locals.user
+        });
+        res.status(200).send(response.data);
+      } catch (error) {
+        if (isUserNotFoundError(error) || isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/:groupId/getUsers',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const { data } = await service.getGroupUsers({
+          authenticatedUser: res.locals.user,
+          groupId: req.params.groupId
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
   router.post(
     '/authorization/identitypermissions',
     wrapAsync(async (req: Request, res: Response) => {

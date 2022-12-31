@@ -44,7 +44,8 @@ import {
   uuidRegExpAsString,
   envTypeIdRegExpString,
   productIdRegExpString,
-  provisionArtifactIdRegExpString
+  provisionArtifactIdRegExpString,
+  groupIDRegExpAsString
 } from './utilities/textUtil';
 import { validateAndParse } from './utilities/validatorHelper';
 
@@ -64,6 +65,7 @@ export {
   productIdRegExpString,
   provisionArtifactIdRegExpString,
   envTypeIdRegExpString,
+  groupIDRegExpAsString,
   CFNTemplateParameters,
   CFNTemplateParametersParser,
   CFNTemplate,

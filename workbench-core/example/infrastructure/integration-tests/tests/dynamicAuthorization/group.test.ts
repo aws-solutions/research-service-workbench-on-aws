@@ -6,7 +6,10 @@
 import { CreateUser } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
-import { AddUserToGroupRequest } from '../../support/resources/dynamicAuthorization/groups';
+import {
+  AddUserToGroupRequest,
+  RemoveUserFromGroupRequest
+} from '../../support/resources/dynamicAuthorization/group';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
 
@@ -89,7 +92,7 @@ describe('dynamic authorization group integration tests', () => {
     it('get the groups a user is in', async () => {
       const { data: userData } = await adminSession.resources.users.create(user);
       const { data: groupData } = await adminSession.resources.groups.create();
-      await adminSession.resources.groups.addUser({ groupId: groupData.groupId, userId: userData.id });
+      await adminSession.resources.groups.group(groupData.groupId).addUser({ userId: userData.id });
 
       const { data } = await adminSession.resources.groups.getUserGroups(userData.id);
 
@@ -109,7 +112,7 @@ describe('dynamic authorization group integration tests', () => {
     });
   });
 
-  describe('assignUserToGroup', () => {
+  describe('addUserToGroup', () => {
     let user: CreateUser;
 
     beforeEach(() => {
@@ -123,31 +126,26 @@ describe('dynamic authorization group integration tests', () => {
     it('assigns user to exiting group', async () => {
       const { data: createUserData } = await adminSession.resources.users.create(user);
       const { data: createGroupData } = await adminSession.resources.groups.create();
-      const { data } = await adminSession.resources.groups.addUser({
-        groupId: createGroupData.groupId,
+      const { data } = await adminSession.resources.groups.group(createGroupData.groupId).addUser({
         userId: createUserData.id
       });
       expect(data).toMatchObject({ groupId: createGroupData.groupId, userId: createUserData.id });
     });
 
-    test.each([
-      {},
-      { groupId: 'testGroupId' },
-      { userId: 'testUserId' },
-      { groupId: 'testGroupId', userId: 123 },
-      { groupId: 123, userId: 'testUserId' },
-      { groupId: 'testGroupId', userId: 'testUserId', badParam: 'bad' }
-    ])('returns a 400 error for invalid body %s', async (body) => {
-      await expect(adminSession.resources.groups.addUser(body as AddUserToGroupRequest)).rejects.toThrow(
-        new HttpError(400, {})
-      );
-    });
+    test.each([{}, { userId: 123 }, { userId: 'testUserId', badParam: 'bad' }])(
+      'returns a 400 error for invalid body %s',
+      async (body) => {
+        await expect(
+          adminSession.resources.groups.group('fakeGroup').addUser(body as AddUserToGroupRequest)
+        ).rejects.toThrow(new HttpError(400, {}));
+      }
+    );
 
     test.each([
       ['non-existing', 'non-existing'],
       ['existing', 'non-existing'],
       ['non-existing', 'existing']
-    ])('returns a 404 error when trying to assing %s user to %s group', async (userExists, groupExists) => {
+    ])('returns a 404 error when trying to add a %s user to a %s group', async (userExists, groupExists) => {
       let userId = 'invalidUserId';
       let groupId = 'invalidGroupId';
       if (userExists === 'existing') {
@@ -162,9 +160,97 @@ describe('dynamic authorization group integration tests', () => {
         groupId = data.groupId;
       }
 
-      await expect(adminSession.resources.groups.addUser({ groupId, userId })).rejects.toThrow(
+      await expect(adminSession.resources.groups.group(groupId).addUser({ userId })).rejects.toThrow(
         new HttpError(404, {})
       );
+    });
+  });
+
+  describe('removeUserFromGroup', () => {
+    let user: CreateUser;
+
+    beforeEach(() => {
+      user = {
+        firstName: 'Test',
+        lastName: 'User',
+        email: `success+remove-user-from-group-${uuidv4()}@simulator.amazonses.com`
+      };
+    });
+
+    it('removes a user from a group', async () => {
+      const { data: userData } = await adminSession.resources.users.create(user);
+      const { data: groupData } = await adminSession.resources.groups.create();
+      await adminSession.resources.groups.group(groupData.groupId).addUser({
+        userId: userData.id
+      });
+      const { data } = await adminSession.resources.groups
+        .group(groupData.groupId)
+        .removeUser({ userId: userData.id });
+      expect(data).toMatchObject({ groupId: groupData.groupId, userId: userData.id });
+    });
+
+    test.each([{}, { userId: 123 }, { userId: 'testUserId', badParam: 'bad' }])(
+      'returns a 400 error for invalid body %s',
+      async (body) => {
+        await expect(
+          adminSession.resources.groups.group('fakeGroup').addUser(body as RemoveUserFromGroupRequest)
+        ).rejects.toThrow(new HttpError(400, {}));
+      }
+    );
+
+    test.each([
+      ['non-existing', 'non-existing'],
+      ['existing', 'non-existing'],
+      ['non-existing', 'existing']
+    ])(
+      'returns a 404 error when trying to remove a %s user from a %s group',
+      async (userExists, groupExists) => {
+        let userId = 'invalidUserId';
+        let groupId = 'invalidGroupId';
+
+        if (userExists === 'existing') {
+          const { data } = await adminSession.resources.users.create(user);
+          userId = data.id;
+        }
+
+        if (groupExists === 'existing') {
+          const { data } = await adminSession.resources.groups.create();
+          groupId = data.groupId;
+        }
+
+        await expect(adminSession.resources.groups.group(groupId).removeUser({ userId })).rejects.toThrow(
+          new HttpError(404, {})
+        );
+      }
+    );
+
+    describe('getGroupUsers', () => {
+      let fakeGroupUuid: string;
+      let user: CreateUser;
+
+      beforeEach(() => {
+        user = {
+          firstName: 'Test',
+          lastName: 'User',
+          email: `success+get-group-users-${uuidv4()}@simulator.amazonses.com`
+        };
+        fakeGroupUuid = '0000000000000-0000-0000-0000-000';
+      });
+
+      it('get all the users of a group', async () => {
+        const { data: userData } = await adminSession.resources.users.create(user);
+        const { data: groupData } = await adminSession.resources.groups.create();
+        await adminSession.resources.groups.group(groupData.groupId).addUser({ userId: userData.id });
+        const { data } = await adminSession.resources.groups.group(groupData.groupId).getGroupUsers();
+
+        expect(data).toMatchObject({ userIds: [userData.id] });
+      });
+
+      it('returns a 404 error when the Group doesnt exist', async () => {
+        await expect(adminSession.resources.groups.group(fakeGroupUuid).getGroupUsers()).rejects.toThrow(
+          new HttpError(404, {})
+        );
+      });
     });
   });
 });

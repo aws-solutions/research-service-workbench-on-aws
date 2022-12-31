@@ -15,6 +15,7 @@ export { IdpUnavailableError, isIdpUnavailableError } from './errors/idpUnavaila
 export { InvalidParameterError, isInvalidParameterError } from './errors/invalidParameterError';
 export { RoleAlreadyExistsError, isRoleAlreadyExistsError } from './errors/roleAlreadyExistsError';
 export { RoleNotFoundError, isRoleNotFoundError } from './errors/roleNotFoundError';
+export { TooManyRequestsError, isTooManyRequestsError } from './errors/tooManyRequestsError';
 export { UserAlreadyExistsError, isUserAlreadyExistsError } from './errors/userAlreadyExistsError';
 export { UserNotFoundError, isUserNotFoundError } from './errors/userNotFoundError';
 export { CognitoUserManagementPlugin } from './plugins/cognitoUserManagementPlugin';

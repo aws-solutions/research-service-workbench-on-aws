@@ -232,6 +232,12 @@ export class DynamicAuthorizationService {
    * @param addUserToGroupRequest - {@link AddUserToGroupRequest}
    *
    * @returns - {@link AddUserToGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
@@ -242,11 +248,17 @@ export class DynamicAuthorizationService {
    * @param removeUserFromGroupRequest - {@link RemoveUserFromGroupRequest}
    *
    * @returns - {@link RemoveUserFromGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async removeUserFromGroup(
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.removeUserFromGroup(removeUserFromGroupRequest);
   }
 
   /**
@@ -254,9 +266,13 @@ export class DynamicAuthorizationService {
    * @param getGroupUsersRequest - {@link GetGroupUsersRequest}
    *
    * @returns - {@link GetGroupUsersResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupNotFoundError} - group could not be found
    */
   public async getGroupUsers(getGroupUsersRequest: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
-    throw new Error('Not implemented');
+    return await this._groupManagementPlugin.getGroupUsers(getGroupUsersRequest);
   }
 
   /**
@@ -268,6 +284,7 @@ export class DynamicAuthorizationService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     return await this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);

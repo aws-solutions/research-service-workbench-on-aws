@@ -1319,6 +1319,7 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
       uuid: ^8.3.2
+      zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-audit': link:../../audit
       '@aws/workbench-core-authentication': link:../../authentication
@@ -1334,6 +1335,7 @@ importers:
       jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
+      zod: 3.19.1
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 3.0.0_vjep2yp2sits3sqnodefgcbnfi
