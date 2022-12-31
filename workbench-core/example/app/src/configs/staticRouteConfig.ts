@@ -199,6 +199,14 @@ export const routesMap: RoutesMap = {
         subject: 'IdentityPermission'
       }
     ]
+  },
+  '/authorization/identitypermissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
   }
 };
 

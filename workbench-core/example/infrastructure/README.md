@@ -32,6 +32,9 @@ rushx cdk:deploy
 ./scripts/setupCognito.sh -u <USER_POOL_ID> -e <EMAIL> -p <PASSWORD> -r <REGION> -c
 ```
 
+./scripts/setupCognito.sh -u us-east-1_rgeOK4Org -e htzhang@amazon.com -p <PASSWORD> -r us-east-1 -c
+
+
 #### Get UserPool Id
 ```bash
 ./scripts/getResources.sh -r <REGION> -i -g

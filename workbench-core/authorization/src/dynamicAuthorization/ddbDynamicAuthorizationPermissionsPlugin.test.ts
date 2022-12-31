@@ -8,8 +8,11 @@ import {
   ServiceInputTypes,
   ServiceOutputTypes,
   TransactWriteItemsCommand,
-  TransactionCanceledException
+  TransactionCanceledException,
+  QueryCommand,
+  AttributeValue
 } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { Action } from '../action';
@@ -132,6 +135,61 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(ThroughputExceededError);
+    });
+  });
+
+  describe('getIdentityPermissionsByIdentity', () => {
+    let mockIdentityPermissionItem: Record<string, AttributeValue>;
+    let samplePartitionKey: string;
+    let sampleSortKey;
+    let sampleGroupIdentity;
+    beforeEach(() => {
+      samplePartitionKey = `${sampleSubjectType}|${sampleSubjectId}`;
+      sampleSortKey = `${sampleAction}|${sampleEffect}|${sampleGroupType}|${sampleGroupId}`;
+      sampleGroupIdentity = `${sampleGroupType}|${sampleGroupId}`;
+      mockIdentityPermissionItem = {
+        pk: { S: samplePartitionKey },
+        sk: { S: sampleSortKey },
+        action: { S: sampleAction },
+        effect: { S: sampleEffect },
+        subjectType: { S: sampleSubjectType },
+        subjectId: { S: sampleSubjectId },
+        identity: { S: sampleGroupIdentity },
+        conditions: { M: marshall(sampleConditions) },
+        fields: { L: [] },
+        description: { S: sampleDescription }
+      };
+    });
+    test('Get identity permissions by identity', async () => {
+      mockDDB.on(QueryCommand).resolvesOnce({
+        Items: [mockIdentityPermissionItem]
+      });
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+
+    test('Get identity permissions by identity with pagination token', async () => {
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity'
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem]
+        });
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission, mockIdentityPermission]);
     });
   });
 });

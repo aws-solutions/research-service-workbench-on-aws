@@ -307,4 +307,56 @@ describe('DynamicAuthorizationService', () => {
       expect(data).toStrictEqual({ userId: 'userId', groupId: 'groupId' });
     });
   });
+
+  describe('getIdentityPermissionsByIdentity', () => {
+    let sampleGroupId: string;
+    let sampleGroupType: IdentityType;
+
+    let sampleAction: Action;
+    let sampleEffect: Effect;
+    let sampleSubjectType: string;
+    let sampleSubjectId: string;
+    let sampleConditions: Record<string, JSONValue>;
+    let sampleFields: string[];
+    let sampleDescription: string;
+    let mockIdentityPermission: IdentityPermission;
+    beforeEach(() => {
+      sampleGroupId = 'sampleGroup';
+      sampleGroupType = 'GROUP';
+      sampleAction = 'CREATE';
+      sampleEffect = 'ALLOW';
+      sampleSubjectType = 'sampleSubjectType';
+      sampleSubjectId = 'sampleSubjectId';
+      sampleConditions = {};
+      sampleFields = [];
+      sampleDescription = 'sampleDescription';
+      mockIdentityPermission = {
+        action: sampleAction,
+        effect: sampleEffect,
+        subjectType: sampleSubjectType,
+        subjectId: sampleSubjectId,
+        identityId: sampleGroupId,
+        identityType: sampleGroupType,
+        conditions: sampleConditions,
+        fields: sampleFields,
+        description: sampleDescription
+      };
+    });
+    test('get identity permissions by identity', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      const request = {
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      };
+
+      const { data } = await dynamicAuthzService.getIdentityPermissionsByIdentity(request);
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+  });
 });

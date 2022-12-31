@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
+import { DynamoDBService, JSONValue, addPaginationToken } from '@aws/workbench-core-base';
 import { Action } from '../action';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
@@ -38,6 +38,8 @@ import {
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 
 export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthorizationPermissionsPlugin {
+  private readonly _getIdentityPermissionsByIdentityIndex: string = 'getIdentityPermissionsByIdentity';
+  private readonly _getIdentityPermissionsByIdentityPartitionKey: string = 'identity';
   private _dynamoDBService: DynamoDBService;
 
   public constructor(config: { dynamoDBService: DynamoDBService }) {
@@ -60,7 +62,30 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async getIdentityPermissionsByIdentity(
     getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
   ): Promise<GetIdentityPermissionsByIdentityResponse> {
-    throw new Error('Method not implemented.');
+    const { identityId, identityType } = getIdentityPermissionsByIdentityRequest;
+    const identity = `${identityType}|${identityId}`;
+    const queryParams = {
+      index: this._getIdentityPermissionsByIdentityIndex,
+      key: {
+        name: this._getIdentityPermissionsByIdentityPartitionKey,
+        value: identity
+      }
+    };
+    let { data, paginationToken } = await this._dynamoDBService.getPaginatedItems(queryParams);
+
+    while (paginationToken) {
+      const nextQueryParams = addPaginationToken(paginationToken, queryParams);
+      const response = await this._dynamoDBService.getPaginatedItems(nextQueryParams);
+      data = data.concat(response.data);
+      paginationToken = response.paginationToken;
+    }
+    const identityPermissions = data.map((item) => this._transformItemToIdentityPermission(item));
+
+    return {
+      data: {
+        identityPermissions
+      }
+    };
   }
   public async getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
@@ -162,5 +187,50 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     identityId: string
   ): string {
     return `${action}|${effect}|${identityType}|${identityId}`;
+  }
+  private _transformItemToIdentityPermission(item: Record<string, JSONValue>): IdentityPermission {
+    const { pk, sk, conditions, fields, description } = item;
+    const { subjectType, subjectId } = this._decomposeIdentityPermissionsPartitionKey(pk as string);
+    const { action, effect, identityType, identityId } = this._decomposeIdentityPermissionsSortKey(
+      sk as string
+    );
+
+    return {
+      action,
+      effect,
+      subjectType,
+      subjectId,
+      identityType,
+      identityId,
+      conditions: conditions as Record<string, JSONValue>,
+      fields: fields as string[],
+      description: description as string
+    };
+  }
+
+  private _decomposeIdentityPermissionsPartitionKey(partitionKey: string): {
+    subjectType: string;
+    subjectId: string;
+  } {
+    const values = partitionKey.split('|');
+    return {
+      subjectType: values[0],
+      subjectId: values[1]
+    };
+  }
+
+  private _decomposeIdentityPermissionsSortKey(sortKey: string): {
+    action: Action;
+    effect: Effect;
+    identityType: IdentityType;
+    identityId: string;
+  } {
+    const values = sortKey.split('|');
+    return {
+      action: values[0] as Action,
+      effect: values[1] as Effect,
+      identityType: values[2] as IdentityType,
+      identityId: values[3]
+    };
   }
 }

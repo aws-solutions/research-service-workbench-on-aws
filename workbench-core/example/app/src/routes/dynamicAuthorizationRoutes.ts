@@ -12,8 +12,10 @@ import {
   isIdentityPermissionCreationError,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsRequestParser,
-  isUserNotFoundError
+  isUserNotFoundError,
+  GetIdentityPermissionsByIdentityRequest
 } from '@aws/workbench-core-authorization';
+import { GetIdentityPermissionsByIdentityRequestParser } from '@aws/workbench-core-authorization/lib/dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
 import {
   AssignUserToGroupRequest,
   AssignUserToGroupRequestParser
@@ -113,9 +115,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           }
         );
 
-        const { data } = await service.createIdentityPermissions({
-          ...validatedRequest
-        });
+        const { data } = await service.createIdentityPermissions(validatedRequest);
         res.status(201).send(data);
       } catch (err) {
         if (isGroupNotFoundError(err)) throw Boom.badRequest('One or more groups are not found');
@@ -125,6 +125,17 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           throw Boom.badRequest('One or more permissions already exist');
         throw err;
       }
+    })
+  );
+  router.get(
+    '/authorization/identitypermissions/identity',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetIdentityPermissionsByIdentityRequest>(
+        GetIdentityPermissionsByIdentityRequestParser,
+        req.query
+      );
+      const { data } = await service.getIdentityPermissionsByIdentity(validatedRequest);
+      res.status(201).send(data);
     })
   );
 }
