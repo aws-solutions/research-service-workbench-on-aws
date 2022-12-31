@@ -97,11 +97,13 @@ describe('dynamic authorization identity permission integration tests ', () => {
   });
 
   describe('getIdentityPermissionsByIdentity', () => {
-    let identityPermissions: IdentityPermission[];
     let groupId: string;
     beforeEach(async () => {
       const { data } = await adminSession.resources.groups.create();
       groupId = data.groupId;
+    });
+
+    test('get identity permissions by identity', async () => {
       const identityPermission: IdentityPermission = {
         identityId: groupId,
         identityType: 'GROUP',
@@ -113,22 +115,26 @@ describe('dynamic authorization identity permission integration tests ', () => {
         fields: [],
         description: 'sampleDescription'
       };
-      const response = await adminSession.resources.identityPermissions.create(
+      const { data } = await adminSession.resources.identityPermissions.create(
         {
           identityPermissions: [identityPermission],
           authenticatedUser: mockUser
         },
         false
       );
-      identityPermissions = response.data.identityPermissions;
-    });
-
-    test('get identity permissions by identity', async () => {
+      const { identityPermissions } = data;
       const response = await adminSession.resources.identityPermissions.getByIdentity({
         identityId: groupId,
         identityType: 'GROUP'
       });
       expect(response.data.identityPermissions).toStrictEqual(identityPermissions);
+    });
+    test('get identity permissions by identity with no permission', async () => {
+      const response = await adminSession.resources.identityPermissions.getByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP'
+      });
+      expect(response.data.identityPermissions).toStrictEqual([]);
     });
   });
 });
