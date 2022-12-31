@@ -172,6 +172,18 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
     });
 
+    test('Get identity permissions by identity with zero permissions', async () => {
+      mockDDB.on(QueryCommand).resolvesOnce({
+        Items: []
+      });
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([]);
+    });
+
     test('Get identity permissions by identity with pagination token', async () => {
       mockDDB
         .on(QueryCommand, {
