@@ -11,6 +11,7 @@ import {
   ApplicationListener,
   ApplicationTargetGroup,
   ListenerCondition,
+  Protocol,
   TargetType
 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
@@ -58,11 +59,11 @@ export function createECSCluster(
   const fargateService = new FargateService(stack, 'SwbUi', {
     cluster,
     taskDefinition,
-    desiredCount: 1
+    desiredCount: 2
   });
   const scalableTaskCount = fargateService.autoScaleTaskCount({
     maxCapacity: 20,
-    minCapacity: 1
+    minCapacity: 2
   });
   scalableTaskCount.scaleOnCpuUtilization('CpuUtilizationScaling', {
     targetUtilizationPercent: 50,
@@ -81,7 +82,14 @@ export function createECSCluster(
   const httpsTargetGroup = new ApplicationTargetGroup(stack, 'httpsUiContainerTargetGroup', {
     port: 80,
     targetType: TargetType.IP,
-    vpc: vpc
+    vpc,
+    healthCheck: {
+      path: '/',
+      port: '80',
+      protocol: Protocol.HTTP,
+      timeout: Duration.seconds(30),
+      interval: Duration.seconds(60)
+    }
   });
 
   fargateServiceTarget.attachToApplicationTargetGroup(httpsTargetGroup);

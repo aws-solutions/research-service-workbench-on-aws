@@ -24,9 +24,7 @@ Project `swb-ui` can be deployed on ECS in a VPC and Subnets that were created/u
 
 1. Navigate to `solutions/swb-ui/ui`
 
-2. Run command `./scripts/image-deploy.sh <GitHub branch name (e.g. develop)> <STAGE>`. This will require Docker to be running in order to build the image necessary for ECS.
-
-3. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`. Once this succeeds, the UI will be hosted at the domainName that was provided to swb-reference, which can also be found in the CloudFormation Output `WebsiteURL`.
+2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`. Once this succeeds, the UI will be hosted at the domainName that was provided to swb-reference, which can also be found in the CloudFormation Output `WebsiteURL`.
 
 
 #### CloudFront (not recommended)
