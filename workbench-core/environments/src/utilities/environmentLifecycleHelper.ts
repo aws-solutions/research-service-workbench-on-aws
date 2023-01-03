@@ -5,13 +5,20 @@
 
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
-import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
+import {
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin
+} from '@aws/workbench-core-authorization';
+import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
   DdbDataSetMetadataPlugin,
-  S3DataSetStoragePlugin
+  S3DataSetStoragePlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import _ from 'lodash';
 import { Environment, EnvironmentService } from '../services/environmentService';
 
@@ -19,17 +26,37 @@ export type Operation = 'Launch' | 'Terminate';
 
 export default class EnvironmentLifecycleHelper {
   public aws: AwsService;
+  public dynamoDbService: DynamoDBService;
   public ssmDocSuffix: string;
   public dataSetService: DataSetService;
   public environmentService: EnvironmentService;
   public constructor() {
     this.ssmDocSuffix = process.env.SSM_DOC_OUTPUT_KEY_SUFFIX!;
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
+    this.dynamoDbService = new DynamoDBService({
+      region: process.env.AWS_REGION!,
+      table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
+    });
     const logger: LoggingService = new LoggingService();
+    const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
+    const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
+      groupManagementPlugin: new WBCGroupManagementPlugin({
+        userManagementService: new UserManagementService(
+          new CognitoUserManagementPlugin(process.env.USER_POOL_ID!, this.aws)
+        ),
+        ddbService: this.dynamoDbService,
+        userGroupKeyType: 'GROUP'
+      }),
+      dynamicAuthorizationPermissionsPlugin: new DDBDynamicAuthorizationPermissionsPlugin({
+        dynamoDBService: this.dynamoDbService
+      }),
+      auditService: auditService
+    });
     this.dataSetService = new DataSetService(
-      new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+      auditService,
       logger,
-      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT')
+      new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
+      new WbcDataSetsAuthorizationPlugin(authzService)
     );
     this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
   }
