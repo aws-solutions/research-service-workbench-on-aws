@@ -5,6 +5,7 @@
 
 import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
+import { RoleNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
@@ -287,24 +288,74 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('addUserToGroup', () => {
-    it('returns userID and groupID when user was successfully added to the group', async () => {
-      mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue({ data: { userId, groupId } });
+    let auditServiceWriteSpy: jest.SpyInstance;
+    let actor: object;
+    let source: object;
+    let action: string;
 
-      const { data } = await dynamicAuthzService.addUserToGroup({
-        groupId,
-        userId,
-        authenticatedUser: mockUser
-      });
+    beforeAll(() => {
+      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
 
-      expect(data).toStrictEqual({ userId, groupId });
+      action = 'addUserToGroup';
+      actor = mockUser;
+      source = {
+        serviceName: 'DynamicAuthorizationService'
+      };
     });
 
-    it('throws when the user cannot be added', async () => {
-      mockGroupManagementPlugin.addUserToGroup = jest.fn().mockRejectedValue(new GroupNotFoundError());
+    afterEach(jest.resetAllMocks);
 
-      await expect(
-        dynamicAuthzService.addUserToGroup({ groupId, userId, authenticatedUser: mockUser })
-      ).rejects.toThrow(GroupNotFoundError);
+    it('returns userID and groupID when user was successfully added to group', async () => {
+      const mockReturnValue = { data: { userId: 'userId', groupId: 'groupId' } };
+      mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue(mockReturnValue);
+
+      const requestBody = {
+        groupId: 'groupId',
+        userId: 'userId',
+        authenticatedUser: mockUser
+      };
+
+      const { data } = await dynamicAuthzService.addUserToGroup(requestBody);
+
+      expect(mockGroupManagementPlugin.addUserToGroup).toBeCalledWith(requestBody);
+      expect(data).toStrictEqual(mockReturnValue.data);
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor,
+          source,
+          action,
+          requestBody,
+          statusCode: 200
+        },
+        mockReturnValue
+      );
+    });
+
+    it('throws and writes to audit service when user cannnot be added to group', async () => {
+      mockGroupManagementPlugin.addUserToGroup = jest
+        .fn()
+        .mockRejectedValue(new RoleNotFoundError('Role does not exist.'));
+
+      const requestBody = {
+        groupId: 'groupId',
+        userId: 'userId',
+        authenticatedUser: mockUser
+      };
+
+      await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(RoleNotFoundError);
+      expect(mockGroupManagementPlugin.addUserToGroup).toBeCalledWith(requestBody);
+
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor,
+          source,
+          action,
+          requestBody,
+          statusCode: 400
+        },
+        new RoleNotFoundError('Role does not exist.')
+      );
     });
   });
 

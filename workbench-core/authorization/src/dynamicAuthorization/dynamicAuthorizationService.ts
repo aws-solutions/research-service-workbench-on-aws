@@ -218,7 +218,29 @@ export class DynamicAuthorizationService {
    * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
+    const { authenticatedUser } = addUserToGroupRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.addUserToGroup.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: addUserToGroupRequest
+    };
+
+    try {
+      const response = await this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
+      //Write audit entry when success
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (err) {
+      //Write audit entry when failure
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
   }
 
   /**
