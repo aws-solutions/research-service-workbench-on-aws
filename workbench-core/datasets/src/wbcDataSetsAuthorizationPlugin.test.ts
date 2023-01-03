@@ -74,8 +74,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       dynamicAuthorizationPermissionsPlugin: permissionsPlugin,
       auditService: audit
     });
-
-    //@ts-ignore
     plugin = new WbcDataSetsAuthorizationPlugin(authzService);
   });
 
