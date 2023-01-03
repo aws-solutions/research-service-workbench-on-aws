@@ -95,6 +95,11 @@ export interface GroupManagementPlugin {
    * @param request - {@link IsUserAssignedToGroupRequest}
    *
    * @returns a {@link IsUserAssignedToGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   isUserAssignedToGroup(request: IsUserAssignedToGroupRequest): Promise<IsUserAssignedToGroupResponse>;
 

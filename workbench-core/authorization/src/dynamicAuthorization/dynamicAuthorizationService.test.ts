@@ -3,8 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
+import { AuditService, BaseAuditPlugin } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
+import { UserNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
@@ -15,20 +16,22 @@ import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
+import { IsUserAssignedToGroupResponse } from './dynamicAuthorizationInputs/isUserAssignedToGroup';
+import { RemoveUserFromGroupResponse } from './dynamicAuthorizationInputs/removeUserFromGroup';
 import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPermissionsPlugin';
 import { DynamicAuthorizationService } from './dynamicAuthorizationService';
 import { GroupManagementPlugin } from './groupManagementPlugin';
-import { GroupStatus } from './models/GroupMetadata';
 
 describe('DynamicAuthorizationService', () => {
   let groupId: string;
   let userId: string;
-  let status: GroupStatus;
-  let auditService: AuditService;
-  let auditPlugin: AuditPlugin;
-  let mockAuditWriter: Writer;
   let mockUser: AuthenticatedUser;
 
+  let auditSource: object;
+  let auditAction: string;
+  let auditServiceWriteSpy: jest.SpyInstance;
+
+  let auditService: AuditService;
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
@@ -55,21 +58,26 @@ describe('DynamicAuthorizationService', () => {
       getIdentityPermissionsByIdentity: jest.fn(),
       getIdentityPermissionsBySubject: jest.fn()
     };
-    mockAuditWriter = {
-      write: jest.fn()
-    };
-    auditPlugin = new BaseAuditPlugin(mockAuditWriter);
 
-    auditService = new AuditService(auditPlugin);
+    auditService = new AuditService(
+      new BaseAuditPlugin({
+        write: jest.fn()
+      })
+    );
+
+    auditServiceWriteSpy = jest.spyOn(auditService, 'write');
   });
 
   beforeEach(() => {
     groupId = 'groupId';
     userId = 'userId';
-    status = 'active';
     mockUser = {
       id: 'sampleId',
       roles: []
+    };
+
+    auditSource = {
+      serviceName: DynamicAuthorizationService.name
     };
 
     dynamicAuthzService = new DynamicAuthorizationService({
@@ -83,50 +91,113 @@ describe('DynamicAuthorizationService', () => {
     jest.resetAllMocks();
   });
 
+  describe('init', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.init({})).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isAuthorizedOnSubject', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.isAuthorizedOnSubject({
+          user: mockUser,
+          dynamicOperation: { action: 'CREATE', subjectId: '', subjectType: '' }
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isRouteIgnored', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.isRouteIgnored({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isRouteProtected', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.isRouteProtected({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isAuthorizedOnRoute', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.isAuthorizedOnRoute({ authenticatedUser: mockUser, route: '', method: 'GET' })
+      ).rejects.toThrow(Error);
+    });
+  });
+
   describe('createGroup', () => {
+    beforeEach(() => {
+      auditAction = 'createGroup';
+    });
+
     it('returns the groupID in the data object when the group was successfully created', async () => {
-      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue({ data: { groupId } });
-      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockResolvedValue({ data: { status } });
+      const mockReturnValue = { data: { groupId } };
+      mockGroupManagementPlugin.createGroup = jest.fn().mockResolvedValue(mockReturnValue);
 
-      const response = await dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser });
+      const params = { groupId, authenticatedUser: mockUser };
 
-      expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
+      const response = await dynamicAuthzService.createGroup(params);
+
+      expect(response).toMatchObject<CreateGroupResponse>(mockReturnValue);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        mockReturnValue
+      );
     });
 
     it('throws when the group is not successfully created', async () => {
-      mockGroupManagementPlugin.createGroup = jest.fn().mockRejectedValue(new GroupAlreadyExistsError());
+      const mockReturnValue = new GroupAlreadyExistsError();
+      mockGroupManagementPlugin.createGroup = jest.fn().mockRejectedValue(mockReturnValue);
 
-      await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
-        GroupAlreadyExistsError
+      const params = { groupId, authenticatedUser: mockUser };
+
+      await expect(dynamicAuthzService.createGroup(params)).rejects.toThrow(GroupAlreadyExistsError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        mockReturnValue
       );
     });
 
     it('throws when the group status is not successfully set', async () => {
-      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      const mockReturnValue = new GroupNotFoundError();
+      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockRejectedValue(mockReturnValue);
 
-      await expect(dynamicAuthzService.createGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
-        GroupNotFoundError
+      const params = { groupId, authenticatedUser: mockUser };
+
+      await expect(dynamicAuthzService.createGroup(params)).rejects.toThrow(GroupNotFoundError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        mockReturnValue
       );
     });
   });
 
-  describe('getUserGroups', () => {
-    it('returns an array of groupID in the data object that the requested user is in', async () => {
-      mockGroupManagementPlugin.getUserGroups = jest
-        .fn()
-        .mockResolvedValue({ data: { groupIds: [groupId] } });
-
-      const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
-
-      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
-    });
-
-    it('throws when the user cannot be found', async () => {
-      mockGroupManagementPlugin.getUserGroups = jest.fn().mockRejectedValue(new GroupNotFoundError());
-
-      await expect(
-        dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser })
-      ).rejects.toThrow(GroupNotFoundError);
+  describe('deleteGroup', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(dynamicAuthzService.deleteGroup({ groupId, authenticatedUser: mockUser })).rejects.toThrow(
+        Error
+      );
     });
   });
 
@@ -145,14 +216,6 @@ describe('DynamicAuthorizationService', () => {
     let mockIdentityPermission: IdentityPermission;
 
     let mockIdentityPermissions: IdentityPermission[];
-
-    let actor: object;
-    let source: object;
-    let action: string;
-    let auditServiceWriteSpy: jest.SpyInstance;
-    beforeAll(() => {
-      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
-    });
 
     beforeEach(() => {
       sampleGroupId = 'sampleGroup';
@@ -178,11 +241,7 @@ describe('DynamicAuthorizationService', () => {
 
       mockIdentityPermissions = [mockIdentityPermission, mockIdentityPermission];
 
-      action = 'createIdentityPermissions';
-      actor = mockUser;
-      source = {
-        serviceName: 'DynamicAuthorizationService'
-      };
+      auditAction = 'createIdentityPermissions';
     });
 
     test('create identity permissions for valid groups', async () => {
@@ -207,9 +266,9 @@ describe('DynamicAuthorizationService', () => {
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody: params,
           statusCode: 200
         },
@@ -232,9 +291,9 @@ describe('DynamicAuthorizationService', () => {
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody: params,
           statusCode: 400
         },
@@ -253,9 +312,9 @@ describe('DynamicAuthorizationService', () => {
       await expect(dynamicAuthzService.createIdentityPermissions(params)).rejects.toThrow(GroupNotFoundError);
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody: params,
           statusCode: 400
         },
@@ -275,14 +334,37 @@ describe('DynamicAuthorizationService', () => {
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody: params,
           statusCode: 400
         },
         new ThroughputExceededError('Exceeds 100 identity permissions')
       );
+    });
+  });
+
+  describe('deleteIdentityPermissions', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.deleteIdentityPermissions({
+          identityPermissions: [],
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getIdentityPermissionsBySubject', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.getIdentityPermissionsBySubject({
+          subjectType: '',
+          subjectId: '',
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(Error);
     });
   });
 
@@ -309,44 +391,58 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('removeUserFromGroup', () => {
+    beforeEach(() => {
+      auditAction = 'removeUserFromGroup';
+    });
+
     it('returns userID and groupID when user was successfully removed from the group', async () => {
-      mockGroupManagementPlugin.removeUserFromGroup = jest
-        .fn()
-        .mockResolvedValue({ data: { userId, groupId } });
+      const mockReturnValue = { data: { userId, groupId } };
+      mockGroupManagementPlugin.removeUserFromGroup = jest.fn().mockResolvedValue(mockReturnValue);
 
-      const { data } = await dynamicAuthzService.removeUserFromGroup({
-        groupId,
-        userId,
-        authenticatedUser: mockUser
-      });
+      const params = { groupId, userId, authenticatedUser: mockUser };
 
-      expect(data).toStrictEqual({ userId: 'userId', groupId: 'groupId' });
+      const response = await dynamicAuthzService.removeUserFromGroup(params);
+
+      expect(response).toMatchObject<RemoveUserFromGroupResponse>(mockReturnValue);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        mockReturnValue
+      );
     });
 
     it('throws when the user cannot be removed', async () => {
-      mockGroupManagementPlugin.removeUserFromGroup = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      const mockReturnValue = new GroupNotFoundError();
+      mockGroupManagementPlugin.removeUserFromGroup = jest.fn().mockRejectedValue(mockReturnValue);
 
-      await expect(
-        dynamicAuthzService.removeUserFromGroup({ groupId, userId, authenticatedUser: mockUser })
-      ).rejects.toThrow(GroupNotFoundError);
+      const params = { groupId, userId, authenticatedUser: mockUser };
+
+      await expect(dynamicAuthzService.removeUserFromGroup(params)).rejects.toThrow(GroupNotFoundError);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        mockReturnValue
+      );
     });
   });
 
   describe('getGroupUsers', () => {
-    let groupId: string;
-    let userIds: string[];
-
-    beforeEach(() => {
-      groupId = 'userId';
-      userIds = ['123', '456', '789'];
-    });
-
     it('returns an array of userID in the data object for the requested group', async () => {
-      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockResolvedValue({ data: { userIds } });
+      mockGroupManagementPlugin.getGroupUsers = jest.fn().mockResolvedValue({ data: { userIds: [userId] } });
 
       const response = await dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser });
 
-      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds } });
+      expect(response).toMatchObject<GetGroupUsersResponse>({ data: { userIds: [userId] } });
     });
 
     it('throws when the group cannot be found', async () => {
@@ -355,6 +451,58 @@ describe('DynamicAuthorizationService', () => {
       await expect(
         dynamicAuthzService.getGroupUsers({ groupId, authenticatedUser: mockUser })
       ).rejects.toThrow(GroupNotFoundError);
+    });
+  });
+
+  describe('getUserGroups', () => {
+    it('returns an array of groupID in the data object that the requested user is in', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest
+        .fn()
+        .mockResolvedValue({ data: { groupIds: [groupId] } });
+
+      const response = await dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<GetUserGroupsResponse>({ data: { groupIds: [groupId] } });
+    });
+
+    it('throws when the user cannot be found', async () => {
+      mockGroupManagementPlugin.getUserGroups = jest.fn().mockRejectedValue(new GroupNotFoundError());
+
+      await expect(
+        dynamicAuthzService.getUserGroups({ userId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupNotFoundError);
+    });
+  });
+
+  describe('isUserAssignedToGroup', () => {
+    it('returns a boolean in the data object that tells if the user is in the group', async () => {
+      mockGroupManagementPlugin.isUserAssignedToGroup = jest
+        .fn()
+        .mockResolvedValue({ data: { isAssigned: true } });
+
+      const response = await dynamicAuthzService.isUserAssignedToGroup({
+        userId,
+        groupId,
+        authenticatedUser: mockUser
+      });
+
+      expect(response).toMatchObject<IsUserAssignedToGroupResponse>({ data: { isAssigned: true } });
+    });
+
+    it('throws when the user cannot be found', async () => {
+      mockGroupManagementPlugin.isUserAssignedToGroup = jest.fn().mockRejectedValue(new UserNotFoundError());
+
+      await expect(
+        dynamicAuthzService.isUserAssignedToGroup({ userId, groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(UserNotFoundError);
+    });
+  });
+
+  describe('doesGroupExist', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamicAuthzService.doesGroupExist({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(Error);
     });
   });
 });
