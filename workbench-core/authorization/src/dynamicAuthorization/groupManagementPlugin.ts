@@ -34,6 +34,7 @@ export interface GroupManagementPlugin {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link GroupAlreadyExistsError} - group already exists error
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   createGroup(request: CreateGroupRequest): Promise<CreateGroupResponse>;
 
@@ -52,6 +53,11 @@ export interface GroupManagementPlugin {
    * @param request - {@link GetUserGroupsRequest}
    *
    * @returns a {@link GetUserGroupsResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse>;
 
@@ -61,6 +67,10 @@ export interface GroupManagementPlugin {
    * @param request - {@link GetGroupUsersRequest}
    *
    * @returns a {@link GetGroupUsersResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link GroupNotFoundError} - group could not be found
    */
   getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse>;
 
@@ -70,6 +80,12 @@ export interface GroupManagementPlugin {
    * @param request - {@link AddUserToGroupRequest}
    *
    * @returns a {@link AddUserToGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse>;
 
@@ -88,6 +104,12 @@ export interface GroupManagementPlugin {
    * @param request - {@link RemoveUserFromGroupRequest}
    *
    * @returns a {@link RemoveUserFromGroupResponse}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link GroupNotFoundError} - group could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse>;
 

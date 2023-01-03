@@ -33,9 +33,24 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async getUser(id: string): Promise<User> {
     return this._userManagementPlugin.getUser(id);
+  }
+  /**
+   * Gets the roles for a certain user.
+   *
+   * @param id - the user id to get roles for
+   * @returns an array of the user's roles
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
+   */
+  public async getUserRoles(id: string): Promise<string[]> {
+    return this._userManagementPlugin.getUserRoles(id);
   }
   /**
    * Create a new user with the given details.
@@ -46,6 +61,7 @@ export class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserAlreadyExistsError} - user already exists error
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async createUser(user: CreateUser): Promise<User> {
     return await this._userManagementPlugin.createUser(user);
@@ -59,6 +75,7 @@ export class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link InvalidParameterError} - {@link User} provided is invalid
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async updateUser(id: string, user: User): Promise<void> {
     await this._userManagementPlugin.updateUser(id, user);
@@ -71,6 +88,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async deleteUser(id: string): Promise<void> {
     await this._userManagementPlugin.deleteUser(id);
@@ -84,6 +102,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async activateUser(id: string): Promise<void> {
     await this._userManagementPlugin.activateUser(id);
@@ -97,6 +116,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async deactivateUser(id: string): Promise<void> {
     await this._userManagementPlugin.deactivateUser(id);
@@ -108,6 +128,7 @@ export class UserManagementService {
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async listUsers(): Promise<User[]> {
     return this._userManagementPlugin.listUsers();
@@ -121,6 +142,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async listUsersForRole(role: string): Promise<string[]> {
     return this._userManagementPlugin.listUsersForRole(role);
@@ -133,6 +155,7 @@ export class UserManagementService {
    *
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async listRoles(): Promise<string[]> {
     return this._userManagementPlugin.listRoles();
@@ -147,6 +170,7 @@ export class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async addUserToRole(id: string, role: string): Promise<void> {
     await this._userManagementPlugin.addUserToRole(id, role);
@@ -160,6 +184,7 @@ export class UserManagementService {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async removeUserFromRole(id: string, role: string): Promise<void> {
     await this._userManagementPlugin.removeUserFromRole(id, role);
@@ -172,6 +197,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleAlreadyExistsError} - role already exists error
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async createRole(role: string): Promise<void> {
     await this._userManagementPlugin.createRole(role);
@@ -185,6 +211,7 @@ export class UserManagementService {
    * @throws {@link IdpUnavailableError} - IdP encounters an error
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link RoleNotFoundError} - role could not be found
+   * @throws {@link TooManyRequestsError} - the request was rate limited
    */
   public async deleteRole(role: string): Promise<void> {
     await this._userManagementPlugin.deleteRole(role);

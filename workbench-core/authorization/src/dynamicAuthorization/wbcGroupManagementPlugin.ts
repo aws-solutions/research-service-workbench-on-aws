@@ -8,12 +8,13 @@ import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   PluginConfigurationError,
+  TooManyRequestsError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
-import { TooManyRequestsError } from '../errors/tooManyRequestsError';
 
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -66,22 +67,69 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Method not implemented.');
   }
-  public getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
-    throw new Error('Method not implemented.');
+  public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
+    const { userId } = request;
+
+    const groupIds = await this._userManagementService.getUserRoles(userId);
+    return {
+      data: {
+        groupIds
+      }
+    };
   }
-  public getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
-    throw new Error('Method not implemented.');
+  public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
+    const { groupId } = request;
+
+    try {
+      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      return {
+        data: {
+          userIds
+        }
+      };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
-  public addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
+    const { groupId, userId } = request;
+
+    // ToDo: This requires a check to ensure status of group isn't in pending_delete
+    // ToDo: Will also require an audit trail after #725 is merged
+    // ToDo: Audit authenticatedUser which actor is performing operation
+
+    try {
+      await this._userManagementService.addUserToRole(userId, groupId);
+      return { data: { userId, groupId } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
     throw new Error('Method not implemented.');
   }
-  public removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async removeUserFromGroup(
+    request: RemoveUserFromGroupRequest
+  ): Promise<RemoveUserFromGroupResponse> {
+    const { groupId, userId } = request;
+
+    try {
+      await this._userManagementService.removeUserFromRole(userId, groupId);
+      return { data: { userId, groupId } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse> {
     const { groupId } = request;

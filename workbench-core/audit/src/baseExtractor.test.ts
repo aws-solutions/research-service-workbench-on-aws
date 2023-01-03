@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { Request, Response } from 'express';
 import { BaseExtractor } from './baseExtractor';
 import { Extractor } from './extractor';
@@ -14,7 +13,7 @@ describe('BaseExtractor', () => {
   const mockMethod = 'GET';
   const mockUrl = '/sample';
   const sampleIp = 'sampleIP';
-  const mockUser: AuthenticatedUser = {
+  const mockUser = {
     id: 'sampleId',
     roles: []
   };
