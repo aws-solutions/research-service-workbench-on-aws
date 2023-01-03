@@ -5,7 +5,6 @@
 
 import { AuditPlugin, AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import { JSONValue } from '@aws/workbench-core-base';
-import { RoleNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
@@ -33,6 +32,11 @@ describe('DynamicAuthorizationService', () => {
   let mockGroupManagementPlugin: GroupManagementPlugin;
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
+
+  let auditServiceWriteSpy: jest.SpyInstance;
+  let actor: object;
+  let source: object;
+  let action: string;
 
   beforeAll(() => {
     mockGroupManagementPlugin = {
@@ -62,6 +66,14 @@ describe('DynamicAuthorizationService', () => {
     auditPlugin = new BaseAuditPlugin(mockAuditWriter);
 
     auditService = new AuditService(auditPlugin);
+
+    auditServiceWriteSpy = jest.spyOn(auditService, 'write');
+
+    action = 'addUserToGroup';
+    actor = mockUser;
+    source = {
+      serviceName: 'DynamicAuthorizationService'
+    };
   });
 
   beforeEach(() => {
@@ -146,14 +158,6 @@ describe('DynamicAuthorizationService', () => {
     let mockIdentityPermission: IdentityPermission;
 
     let mockIdentityPermissions: IdentityPermission[];
-
-    let actor: object;
-    let source: object;
-    let action: string;
-    let auditServiceWriteSpy: jest.SpyInstance;
-    beforeAll(() => {
-      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
-    });
 
     beforeEach(() => {
       sampleGroupId = 'sampleGroup';
@@ -288,30 +292,19 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('addUserToGroup', () => {
-    let auditServiceWriteSpy: jest.SpyInstance;
-    let actor: object;
-    let source: object;
-    let action: string;
-
     beforeAll(() => {
-      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
-
       action = 'addUserToGroup';
-      actor = mockUser;
-      source = {
-        serviceName: 'DynamicAuthorizationService'
-      };
     });
 
     afterEach(jest.resetAllMocks);
 
     it('returns userID and groupID when user was successfully added to group', async () => {
-      const mockReturnValue = { data: { userId: 'userId', groupId: 'groupId' } };
+      const mockReturnValue = { data: { userId, groupId } };
       mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue(mockReturnValue);
 
       const requestBody = {
-        groupId: 'groupId',
-        userId: 'userId',
+        userId,
+        groupId,
         authenticatedUser: mockUser
       };
 
@@ -335,15 +328,15 @@ describe('DynamicAuthorizationService', () => {
     it('throws and writes to audit service when user cannnot be added to group', async () => {
       mockGroupManagementPlugin.addUserToGroup = jest
         .fn()
-        .mockRejectedValue(new RoleNotFoundError('Role does not exist.'));
+        .mockRejectedValue(new GroupNotFoundError('Group does not exist.'));
 
       const requestBody = {
-        groupId: 'groupId',
-        userId: 'userId',
+        groupId,
+        userId,
         authenticatedUser: mockUser
       };
 
-      await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(RoleNotFoundError);
+      await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(GroupNotFoundError);
       expect(mockGroupManagementPlugin.addUserToGroup).toBeCalledWith(requestBody);
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
@@ -354,7 +347,7 @@ describe('DynamicAuthorizationService', () => {
           requestBody,
           statusCode: 400
         },
-        new RoleNotFoundError('Role does not exist.')
+        new GroupNotFoundError('Group does not exist.')
       );
     });
   });
