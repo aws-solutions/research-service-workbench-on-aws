@@ -13,19 +13,16 @@ else
         if [[ -z $websiteURL ]];
         then
             echo 'UI has not been deployed yet for STAGE='"'${STAGE}'"'. Check if custom network needs to be used...'
-            if [[ -z $ecsSubnetId ]];
+            ## TODO: Create and check for the useCloudFront flag from stage config. 
+            ## Perform next steps only if that is set to false
+            echo 'First time UI deployment for a custom network ECS will require Docker to be running in order to build the image necessary for ECS.'
+            ## Make sure docker is running
+            if curl -s --unix-socket /var/run/docker.sock http/_ping 2>&1 >/dev/null
             then
-                echo 'ECS creation does not use custom network for STAGE='"'${STAGE}'"'. Skipping ECR image deployment'
+                ./image-deploy.sh develop ${STAGE}
             else
-                ## Make sure docker is running
-                echo 'First time UI deployment for a custom network ECS will require Docker to be running in order to build the image necessary for ECS.'
-                if curl -s --unix-socket /var/run/docker.sock http/_ping 2>&1 >/dev/null
-                then
-                    ./image-deploy.sh develop ${STAGE}
-                else
-                    echo 'Docker server is not accessible. Please make sure Docker engine is running and connected, and then try again'
-                    exit 1
-                fi
+                echo 'Docker server is not accessible. Please make sure Docker engine is running and connected, and then try again'
+                exit 1
             fi
         fi
     )
