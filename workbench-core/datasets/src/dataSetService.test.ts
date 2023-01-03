@@ -4,12 +4,19 @@
  */
 
 jest.mock('@aws/workbench-core-audit');
+jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
-import { AwsService } from '@aws/workbench-core-base';
+import {
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin
+} from '@aws/workbench-core-authorization';
+import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
@@ -23,6 +30,10 @@ describe('DataSetService', () => {
   let audit: AuditService;
   let log: LoggingService;
   let aws: AwsService;
+  let ddbService: DynamoDBService;
+  let groupManagementPlugin: WBCGroupManagementPlugin;
+  let permissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
+  let authzService: DynamicAuthorizationService;
   let metaPlugin: DdbDataSetMetadataPlugin;
   let authzPlugin: WbcDataSetsAuthorizationPlugin;
   let s3Plugin: S3DataSetStoragePlugin;
@@ -60,28 +71,21 @@ describe('DataSetService', () => {
         secretAccessKey: 'fakeSecret'
       }
     });
-    const mockAuthService = {
-      init: jest.fn(),
-      isAuthorizedOnRoute: jest.fn(),
-      isAuthorizedOnSubject: jest.fn(),
-      isRouteIgnored: jest.fn(),
-      isRouteProtected: jest.fn(),
-      createGroup: jest.fn(),
-      deleteGroup: jest.fn(),
-      createIdentityPermissions: jest.fn(),
-      deleteIdentityPermissions: jest.fn(),
-      getIdentityPermissionsBySubject: jest.fn(),
-      removeUserFromGroup: jest.fn(),
-      addUserToGroup: jest.fn(),
-      getUserGroups: jest.fn(),
-      getGroupUsers: jest.fn(),
-      isUserAssignedToGroup: jest.fn(),
-      doesGroupExist: jest.fn(),
-      _groupManagementPlugin: jest.fn()
-    };
-
-    //@ts-ignore
-    authzPlugin = new WbcDataSetsAuthorizationPlugin(mockAuthService);
+    ddbService = new DynamoDBService({ region: 'us-east-1', table: 'fakeTable' });
+    groupManagementPlugin = new WBCGroupManagementPlugin({
+      userManagementService: new UserManagementService(new CognitoUserManagementPlugin('fakeUserPool', aws)),
+      ddbService: ddbService,
+      userGroupKeyType: 'GROUP'
+    });
+    permissionsPlugin = new DDBDynamicAuthorizationPermissionsPlugin({
+      dynamoDBService: ddbService
+    });
+    authzService = new DynamicAuthorizationService({
+      groupManagementPlugin: groupManagementPlugin,
+      dynamicAuthorizationPermissionsPlugin: permissionsPlugin,
+      auditService: audit
+    });
+    authzPlugin = new WbcDataSetsAuthorizationPlugin(authzService);
     log = new LoggingService();
     metaPlugin = new DdbDataSetMetadataPlugin(aws, 'DS', 'EP');
 

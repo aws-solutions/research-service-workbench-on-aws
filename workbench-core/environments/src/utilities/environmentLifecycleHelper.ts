@@ -5,7 +5,11 @@
 
 import { Output } from '@aws-sdk/client-cloudformation';
 import { AuditService, BaseAuditPlugin, AuditLogger } from '@aws/workbench-core-audit';
-import { DynamicAuthorizationService, WBCGroupManagementPlugin } from '@aws/workbench-core-authorization';
+import {
+  DDBDynamicAuthorizationPermissionsPlugin,
+  DynamicAuthorizationService,
+  WBCGroupManagementPlugin
+} from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetService,
@@ -34,6 +38,7 @@ export default class EnvironmentLifecycleHelper {
       table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
     });
     const logger: LoggingService = new LoggingService();
+    const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
     const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
       groupManagementPlugin: new WBCGroupManagementPlugin({
         userManagementService: new UserManagementService(
@@ -41,10 +46,14 @@ export default class EnvironmentLifecycleHelper {
         ),
         ddbService: this.dynamoDbService,
         userGroupKeyType: 'GROUP'
-      })
+      }),
+      dynamicAuthorizationPermissionsPlugin: new DDBDynamicAuthorizationPermissionsPlugin({
+        dynamoDBService: this.dynamoDbService
+      }),
+      auditService: auditService
     });
     this.dataSetService = new DataSetService(
-      new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+      auditService,
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
       new WbcDataSetsAuthorizationPlugin(authzService)
