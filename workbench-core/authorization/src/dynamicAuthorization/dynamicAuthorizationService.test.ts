@@ -172,25 +172,6 @@ describe('DynamicAuthorizationService', () => {
         mockReturnValue
       );
     });
-
-    it('throws when the group status is not successfully set', async () => {
-      const mockReturnValue = new GroupNotFoundError();
-      mockGroupManagementPlugin.setGroupStatus = jest.fn().mockRejectedValue(mockReturnValue);
-
-      const params = { groupId, authenticatedUser: mockUser };
-
-      await expect(dynamicAuthzService.createGroup(params)).rejects.toThrow(GroupNotFoundError);
-      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
-        {
-          actor: mockUser,
-          source: auditSource,
-          action: auditAction,
-          requestBody: params,
-          statusCode: 400
-        },
-        mockReturnValue
-      );
-    });
   });
 
   describe('deleteGroup', () => {

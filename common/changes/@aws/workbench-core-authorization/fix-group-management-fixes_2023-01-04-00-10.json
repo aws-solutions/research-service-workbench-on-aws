@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "Updated `createGroup` and `setGroupStatus` to not allow operations with incorrect statuses.",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
