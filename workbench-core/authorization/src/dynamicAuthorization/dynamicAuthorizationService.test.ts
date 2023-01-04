@@ -354,8 +354,6 @@ describe('DynamicAuthorizationService', () => {
       auditAction = 'addUserToGroup';
     });
 
-    afterEach(jest.resetAllMocks);
-
     it('returns userID and groupID when user was successfully added to group', async () => {
       const mockReturnValue = { data: { userId, groupId } };
       mockGroupManagementPlugin.addUserToGroup = jest.fn().mockResolvedValue(mockReturnValue);
@@ -366,9 +364,9 @@ describe('DynamicAuthorizationService', () => {
         authenticatedUser: mockUser
       };
 
-      const { data } = await dynamicAuthzService.addUserToGroup(requestBody);
+      const response = await dynamicAuthzService.addUserToGroup(requestBody);
 
-      expect(data).toStrictEqual(mockReturnValue.data);
+      expect(response).toStrictEqual(mockReturnValue);
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
