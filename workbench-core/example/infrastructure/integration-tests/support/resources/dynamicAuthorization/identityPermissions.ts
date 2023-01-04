@@ -18,7 +18,7 @@ function createPermissionId(identityPermission: Permission): string {
 export default class IdentityPermissions extends CollectionResource {
   public constructor(clientSession: ClientSession) {
     super(clientSession, 'identityPermissions', 'identityPermission', 'authorization');
-    this._api = `${this._parentApi}/identity-permissions`;
+    this._api = `${this._parentApi}/permissions`;
   }
 
   public identityPermission(identityPermission: Permission, id: string): IdentityPermission {
@@ -48,6 +48,10 @@ export default class IdentityPermissions extends CollectionResource {
     });
 
     return response;
+  }
+
+  public async getByIdentity(bodyParams?: Record<string, string>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/identity`, { params: bodyParams });
   }
 
   protected _buildDefaults(resource: CreateRequest): CreateIdentityPermissionsRequest {

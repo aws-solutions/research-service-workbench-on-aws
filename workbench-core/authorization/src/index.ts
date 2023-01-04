@@ -76,6 +76,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/getGroupUsers';
 export {
   GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityRequestParser,
   GetIdentityPermissionsByIdentityResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
 export {
