@@ -66,10 +66,8 @@ describe('DynamicAuthorizationService', () => {
     auditPlugin = new BaseAuditPlugin(mockAuditWriter);
 
     auditService = new AuditService(auditPlugin);
-
     auditServiceWriteSpy = jest.spyOn(auditService, 'write');
 
-    action = 'addUserToGroup';
     actor = mockUser;
     source = {
       serviceName: 'DynamicAuthorizationService'
