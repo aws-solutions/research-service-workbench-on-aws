@@ -134,10 +134,6 @@ export class DynamicAuthorizationService {
 
     try {
       const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
-      await this._groupManagementPlugin.setGroupStatus({
-        groupId: createGroupRequest.groupId,
-        status: 'active'
-      });
 
       metadata.statusCode = 200;
       await this._auditService.write(metadata, response);
