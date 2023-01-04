@@ -21,6 +21,11 @@ import {
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import {
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityRequestParser,
+  GetIdentityPermissionsByIdentityResponse
+} from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
@@ -223,6 +228,21 @@ export class DynamicAuthorizationService {
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
     throw new Error('Not implemented');
+  }
+
+  /**
+   * Get all identity permissions associated to a specific identity
+   * @param getIdentityPermissionsByIdentityRequest - {@link GetIdentityPermissionsByIdentityRequest}
+   *
+   * @returns - {@link GetIdentityPermissionsByIdentityResponse}
+   */
+  public async getIdentityPermissionsByIdentity(
+    getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
+  ): Promise<GetIdentityPermissionsByIdentityResponse> {
+    const validatedRequest = GetIdentityPermissionsByIdentityRequestParser.parse(
+      getIdentityPermissionsByIdentityRequest
+    );
+    return this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity(validatedRequest);
   }
 
   /**
