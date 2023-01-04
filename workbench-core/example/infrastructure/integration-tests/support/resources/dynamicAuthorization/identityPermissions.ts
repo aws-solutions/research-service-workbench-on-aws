@@ -18,7 +18,7 @@ function createPermissionId(identityPermission: Permission): string {
 export default class IdentityPermissions extends CollectionResource {
   public constructor(clientSession: ClientSession) {
     super(clientSession, 'identityPermissions', 'identityPermission', 'authorization');
-    this._api = `${this._parentApi}/identitypermissions`;
+    this._api = `${this._parentApi}/permissions`;
   }
 
   public identityPermission(identityPermission: Permission, id: string): IdentityPermission {

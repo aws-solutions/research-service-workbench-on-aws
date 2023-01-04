@@ -146,7 +146,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.post(
-    '/authorization/identitypermissions',
+    '/authorization/permissions',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;
@@ -171,7 +171,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     })
   );
   router.get(
-    '/authorization/identitypermissions/identity',
+    '/authorization/permissions/identity',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<GetIdentityPermissionsByIdentityRequest>(
         GetIdentityPermissionsByIdentityRequestParser,
