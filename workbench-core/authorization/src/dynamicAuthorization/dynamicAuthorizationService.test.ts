@@ -36,10 +36,6 @@ describe('DynamicAuthorizationService', () => {
   let mockDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin;
   let dynamicAuthzService: DynamicAuthorizationService;
 
-  let actor: object;
-  let source: object;
-  let action: string;
-
   beforeAll(() => {
     mockGroupManagementPlugin = {
       createGroup: jest.fn(),
@@ -355,7 +351,7 @@ describe('DynamicAuthorizationService', () => {
 
   describe('addUserToGroup', () => {
     beforeAll(() => {
-      action = 'addUserToGroup';
+      auditAction = 'addUserToGroup';
     });
 
     afterEach(jest.resetAllMocks);
@@ -376,9 +372,9 @@ describe('DynamicAuthorizationService', () => {
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody,
           statusCode: 200
         },
@@ -401,9 +397,9 @@ describe('DynamicAuthorizationService', () => {
 
       expect(auditServiceWriteSpy).toHaveBeenCalledWith(
         {
-          actor,
-          source,
-          action,
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
           requestBody,
           statusCode: 400
         },
