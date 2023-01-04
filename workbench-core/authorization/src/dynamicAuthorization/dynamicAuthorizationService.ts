@@ -123,12 +123,28 @@ export class DynamicAuthorizationService {
    * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async createGroup(createGroupRequest: CreateGroupRequest): Promise<CreateGroupResponse> {
-    const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
-    await this._groupManagementPlugin.setGroupStatus({
-      groupId: createGroupRequest.groupId,
-      status: 'active'
-    });
-    return response;
+    const metadata: Metadata = {
+      actor: createGroupRequest.authenticatedUser,
+      action: this.createGroup.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: createGroupRequest
+    };
+
+    try {
+      const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
+
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, error);
+
+      throw error;
+    }
   }
 
   /**
@@ -139,6 +155,8 @@ export class DynamicAuthorizationService {
    */
   public async deleteGroup(deleteGroupRequest: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Not implemented');
+
+    // TODO audit
   }
 
   /**
@@ -191,6 +209,8 @@ export class DynamicAuthorizationService {
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse> {
     throw new Error('Not implemented');
+
+    // TODO audit
   }
 
   /**
@@ -258,7 +278,28 @@ export class DynamicAuthorizationService {
   public async removeUserFromGroup(
     removeUserFromGroupRequest: RemoveUserFromGroupRequest
   ): Promise<RemoveUserFromGroupResponse> {
-    return this._groupManagementPlugin.removeUserFromGroup(removeUserFromGroupRequest);
+    const metadata: Metadata = {
+      actor: removeUserFromGroupRequest.authenticatedUser,
+      action: this.removeUserFromGroup.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: removeUserFromGroupRequest
+    };
+
+    try {
+      const response = await this._groupManagementPlugin.removeUserFromGroup(removeUserFromGroupRequest);
+
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, error);
+
+      throw error;
+    }
   }
 
   /**
@@ -287,17 +328,22 @@ export class DynamicAuthorizationService {
    * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async getUserGroups(getUserGroupsRequest: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
-    return await this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);
+    return this._groupManagementPlugin.getUserGroups(getUserGroupsRequest);
   }
 
   /**
    * Check if a user is assigned to a group
    * @param isUserAssignedToGroupRequest - {@link IsUserAssignedToGroupRequest}
+   *
+   * @throws {@link IdpUnavailableError} - IdP encounters an error
+   * @throws {@link PluginConfigurationError} - plugin has a configuration error
+   * @throws {@link UserNotFoundError} - user could not be found
+   * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async isUserAssignedToGroup(
     isUserAssignedToGroupRequest: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
-    throw new Error('Not implemented');
+    return this._groupManagementPlugin.isUserAssignedToGroup(isUserAssignedToGroupRequest);
   }
 
   /**

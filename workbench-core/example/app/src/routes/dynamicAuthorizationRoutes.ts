@@ -126,7 +126,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.get(
-    '/authorization/groups/:groupId/getUsers',
+    '/authorization/groups/:groupId/get-users',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const { data } = await service.getGroupUsers({
@@ -138,13 +138,38 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/:groupId/is-user-assigned/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const { data } = await service.isUserAssignedToGroup({
+          authenticatedUser: res.locals.user,
+          userId: req.params.userId,
+          groupId: req.params.groupId
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isUserNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
   );
 
   router.post(
-    '/authorization/identitypermissions',
+    '/authorization/identity-permissions',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;

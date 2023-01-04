@@ -80,6 +80,53 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     };
   });
 
+  describe('isRouteIgnored', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.isRouteIgnored({ route: '', method: 'GET' })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('isRouteProtected', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.isRouteProtected({ route: '', method: 'GET' })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getDynamicOperationsByRoute', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({ route: '', method: 'GET' })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getIdentityPermissionsByIdentity', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+          identityId: '',
+          identityType: 'GROUP'
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getIdentityPermissionsBySubject', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsBySubject({
+          authenticatedUser: mockAuthenticatedUser,
+          subjectId: '',
+          subjectType: ''
+        })
+      ).rejects.toThrow(Error);
+    });
+  });
+
   describe('createIdentityPermissions tests', () => {
     let failedIdentityPermission: IdentityPermission;
     beforeAll(() => {
@@ -132,6 +179,17 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(ThroughputExceededError);
+    });
+  });
+
+  describe('deleteIdentityPermissions', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
+          authenticatedUser: mockAuthenticatedUser,
+          identityPermissions: []
+        })
+      ).rejects.toThrow(Error);
     });
   });
 });
