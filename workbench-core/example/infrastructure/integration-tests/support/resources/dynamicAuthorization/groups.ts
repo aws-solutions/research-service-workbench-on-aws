@@ -10,8 +10,8 @@ import Group from './group';
 
 export default class Groups extends CollectionResource {
   public constructor(clientSession: ClientSession) {
-    super(clientSession, 'groups', 'group');
-    this._api = 'authorization/groups';
+    super(clientSession, 'groups', 'group', 'authorization');
+    this._api = `${this._parentApi}/groups`;
   }
 
   public group(id: string): Group {

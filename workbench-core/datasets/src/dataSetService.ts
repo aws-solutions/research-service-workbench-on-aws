@@ -9,6 +9,7 @@ import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
+import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
@@ -19,6 +20,7 @@ export class DataSetService {
   private _audit: AuditService;
   private _log: LoggingService;
   private _dbProvider: DataSetMetadataPlugin;
+  private _authzPlugin: DataSetsAuthorizationPlugin;
   /**
    * Constructs a {@link DataSetService} instance.
    *
@@ -29,10 +31,16 @@ export class DataSetService {
    * metadata resides in external accounts.
    * @returns - the intialized {@link DataSetService}.
    */
-  public constructor(audit: AuditService, log: LoggingService, masterDbProvider: DataSetMetadataPlugin) {
+  public constructor(
+    audit: AuditService,
+    log: LoggingService,
+    masterDbProvider: DataSetMetadataPlugin,
+    authorizationPlugin: DataSetsAuthorizationPlugin
+  ) {
     this._audit = audit;
     this._log = log;
     this._dbProvider = masterDbProvider;
+    this._authzPlugin = authorizationPlugin;
   }
 
   /**
