@@ -239,11 +239,6 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('createIdentityPermissions', () => {
-    let auditServiceWriteSpy: jest.SpyInstance;
-    beforeAll(() => {
-      auditServiceWriteSpy = jest.spyOn(auditService, 'write');
-    });
-
     beforeEach(() => {
       auditAction = 'createIdentityPermissions';
     });
@@ -348,7 +343,24 @@ describe('DynamicAuthorizationService', () => {
       );
     });
   });
+  describe('getIdentityPermissionsByIdentity', () => {
+    test('get identity permissions by identity', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      const request = {
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      };
 
+      const { data } = await dynamicAuthzService.getIdentityPermissionsByIdentity(request);
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+  });
   describe('deleteIdentityPermissions', () => {
     it('throws a not implemented exception', async () => {
       await expect(
@@ -458,20 +470,6 @@ describe('DynamicAuthorizationService', () => {
     });
   });
 
-  test('get identity permissions by identity', async () => {
-    mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity = jest.fn().mockResolvedValue({
-      data: {
-        identityPermissions: [mockIdentityPermission]
-      }
-    });
-    const request = {
-      identityId: sampleGroupId,
-      identityType: sampleGroupType
-    };
-
-    const { data } = await dynamicAuthzService.getIdentityPermissionsByIdentity(request);
-    expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
-  });
   describe('getUserGroups', () => {
     it('returns an array of groupID in the data object that the requested user is in', async () => {
       mockGroupManagementPlugin.getUserGroups = jest

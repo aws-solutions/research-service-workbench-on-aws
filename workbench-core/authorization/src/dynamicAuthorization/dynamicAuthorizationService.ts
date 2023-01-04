@@ -243,12 +243,10 @@ export class DynamicAuthorizationService {
   public async getIdentityPermissionsByIdentity(
     getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
   ): Promise<GetIdentityPermissionsByIdentityResponse> {
-    getIdentityPermissionsByIdentityRequest = GetIdentityPermissionsByIdentityRequestParser.parse(
+    const validatedRequest = GetIdentityPermissionsByIdentityRequestParser.parse(
       getIdentityPermissionsByIdentityRequest
     );
-    return this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity(
-      getIdentityPermissionsByIdentityRequest
-    );
+    return this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity(validatedRequest);
   }
 
   /**

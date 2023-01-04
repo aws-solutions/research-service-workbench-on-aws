@@ -40,6 +40,7 @@ import { DynamicAuthorizationPermissionsPlugin } from './dynamicAuthorizationPer
 export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthorizationPermissionsPlugin {
   private readonly _getIdentityPermissionsByIdentityIndex: string = 'getIdentityPermissionsByIdentity';
   private readonly _getIdentityPermissionsByIdentityPartitionKey: string = 'identity';
+  private readonly _delimiter: string = '|';
   private _dynamoDBService: DynamoDBService;
 
   public constructor(config: { dynamoDBService: DynamoDBService }) {
@@ -71,20 +72,16 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
         value: identity
       }
     };
-    let { data, paginationToken } = await this._dynamoDBService.getPaginatedItems(queryParams);
+    if (getIdentityPermissionsByIdentityRequest.paginationToken)
+      addPaginationToken(getIdentityPermissionsByIdentityRequest.paginationToken, queryParams);
+    const { data, paginationToken } = await this._dynamoDBService.getPaginatedItems(queryParams);
 
-    while (paginationToken) {
-      const nextQueryParams = addPaginationToken(paginationToken, queryParams);
-      const response = await this._dynamoDBService.getPaginatedItems(nextQueryParams);
-      data = data.concat(response.data);
-      paginationToken = response.paginationToken;
-    }
     const identityPermissions = data.map((item) => this._transformItemToIdentityPermission(item));
-
     return {
       data: {
         identityPermissions
-      }
+      },
+      paginationToken
     };
   }
   public async getIdentityPermissionsBySubject(
@@ -186,7 +183,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     identityType: IdentityType,
     identityId: string
   ): string {
-    return `${action}|${effect}|${identityType}|${identityId}`;
+    return `${action}${this._delimiter}${effect}${this._delimiter}${identityType}${this._delimiter}${identityId}`;
   }
   private _transformItemToIdentityPermission(item: Record<string, JSONValue>): IdentityPermission {
     const { pk, sk, conditions, fields, description } = item;
@@ -212,7 +209,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     subjectType: string;
     subjectId: string;
   } {
-    const values = partitionKey.split('|');
+    const values = partitionKey.split(this._delimiter);
     return {
       subjectType: values[0],
       subjectId: values[1]
@@ -225,7 +222,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     identityType: IdentityType;
     identityId: string;
   } {
-    const values = sortKey.split('|');
+    const values = sortKey.split(this._delimiter);
     return {
       action: values[0] as Action,
       effect: values[1] as Effect,

@@ -107,17 +107,6 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
   });
 
-  describe('getIdentityPermissionsByIdentity', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
-          identityId: '',
-          identityType: 'GROUP'
-        })
-      ).rejects.toThrow(Error);
-    });
-  });
-
   describe('getIdentityPermissionsBySubject', () => {
     it('throws a not implemented exception', async () => {
       await expect(
@@ -232,6 +221,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
 
     test('Get identity permissions by identity with pagination token', async () => {
+      const base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';
       mockDDB
         .on(QueryCommand, {
           IndexName: 'getIdentityPermissionsByIdentity'
@@ -244,11 +234,20 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
           Items: [mockIdentityPermissionItem]
         });
 
-      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+          identityId: sampleGroupId,
+          identityType: sampleGroupType
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
+      const nextResponse = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
         identityId: sampleGroupId,
-        identityType: sampleGroupType
+        identityType: sampleGroupType,
+        paginationToken
       });
-      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission, mockIdentityPermission]);
+      expect(nextResponse.data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(nextResponse.paginationToken).toBeUndefined();
     });
   });
   describe('deleteIdentityPermissions', () => {

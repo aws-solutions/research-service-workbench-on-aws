@@ -16,7 +16,11 @@ export const GetIdentityPermissionsByIdentityRequestParser = z
     /**
      * Identity id associated to the {@link IdentityPermission}s
      */
-    identityId: z.string()
+    identityId: z.string(),
+    /**
+     * Pagination token to retrieve the next set of results
+     */
+    paginationToken: z.string().optional()
   })
   .strict();
 /**
@@ -36,4 +40,8 @@ export interface GetIdentityPermissionsByIdentityResponse {
      */
     identityPermissions: IdentityPermission[];
   };
+  /**
+   * Pagination token to retrieve the next set of results, empty if there are no more results left
+   */
+  paginationToken?: string;
 }
