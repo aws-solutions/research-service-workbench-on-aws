@@ -3,7 +3,6 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser, retrieveUser } from '@aws/workbench-core-authorization';
 import { Request, Response } from 'express';
 import { Extractor } from './extractor';
 import Metadata from './metadata';
@@ -34,13 +33,12 @@ export const BaseExtractor: Extractor = {
 
       // Sets actor to be the AuthenticatedUser's id.
       let actor = { uid: 'user not found' };
-      try {
-        const authenticatedUser: AuthenticatedUser = retrieveUser(res);
+      if (res.locals.user) {
+        const authenticatedUser = res.locals.user;
         actor = {
           uid: authenticatedUser.id
         };
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      }
 
       const metadata: Metadata = {
         action,

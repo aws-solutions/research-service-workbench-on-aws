@@ -3,29 +3,38 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '../../authenticatedUser';
-import { IdentityPermission } from './identityPermission';
+import { z } from 'zod';
+import { AuthenticatedUserParser } from '../../authenticatedUser';
+import { IdentityPermission, IdentityPermissionsParser } from './identityPermission';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const CreateIdentityPermissionsRequestParser = z.object({
+  /**
+   * {@link AuthenticatedUser}
+   */
+  authenticatedUser: AuthenticatedUserParser,
+  /**
+   * An array of {@link IdentityPermission} to be created
+   */
+  identityPermissions: z.array(IdentityPermissionsParser)
+});
 
 /**
  * Request object for CreateIdentityPermissions
  */
-export interface CreateIdentityPermissionsRequest {
-  /**
-   * {@link AuthenticatedUser}
-   */
-  authenticatedUser: AuthenticatedUser;
-  /**
-   * An array of {@link IdentityPermission} to be created
-   */
-  identityPermissions: IdentityPermission[];
-}
+export type CreateIdentityPermissionsRequest = z.infer<typeof CreateIdentityPermissionsRequestParser>;
 
 /**
  * Response object for CreateIdentityPermissions
  */
 export interface CreateIdentityPermissionsResponse {
   /**
-   * States whether the {@link IdentityPermission}s were successfully created
+   * The data object returned
    */
-  created: boolean;
+  data: {
+    /**
+     * An array of {@link IdentityPermission}s created
+     */
+    identityPermissions: IdentityPermission[];
+  };
 }

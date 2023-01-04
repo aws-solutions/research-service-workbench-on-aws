@@ -8,12 +8,14 @@ import { buildDynamoDBPkSk } from '@aws/workbench-core-base/lib';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import {
   isRoleAlreadyExistsError,
+  isRoleNotFoundError,
   PluginConfigurationError,
+  TooManyRequestsError,
   UserManagementService
 } from '@aws/workbench-core-user-management';
+import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
-import { GroupNotFoundError } from '../errors/groupNotFoundError';
-import { TooManyRequestsError } from '../errors/tooManyRequestsError';
+import { GroupNotFoundError, isGroupNotFoundError } from '../errors/groupNotFoundError';
 
 import { AddUserToGroupRequest, AddUserToGroupResponse } from './dynamicAuthorizationInputs/addUserToGroup';
 import { CreateGroupRequest, CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -54,7 +56,20 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     const { groupId } = request;
 
     try {
+      const { data } = await this.getGroupStatus(request);
+      if (data.status === 'delete_pending') {
+        throw new GroupAlreadyExistsError(`Group '${groupId}' already exists.`);
+      }
+    } catch (error) {
+      if (!isGroupNotFoundError(error)) {
+        throw error;
+      }
+    }
+
+    try {
       await this._userManagementService.createRole(groupId);
+      await this.setGroupStatus({ groupId, status: 'active' });
+
       return { data: { groupId } };
     } catch (error) {
       if (isRoleAlreadyExistsError(error)) {
@@ -63,11 +78,12 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       throw error;
     }
   }
-  public deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
+  public async deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
     throw new Error('Method not implemented.');
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     const { userId } = request;
+
     const groupIds = await this._userManagementService.getUserRoles(userId);
     return {
       data: {
@@ -75,34 +91,60 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       }
     };
   }
-  public getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
-    throw new Error('Method not implemented.');
+  public async getGroupUsers(request: GetGroupUsersRequest): Promise<GetGroupUsersResponse> {
+    const { groupId } = request;
+
+    try {
+      const userIds = await this._userManagementService.listUsersForRole(groupId);
+      return {
+        data: {
+          userIds
+        }
+      };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;
 
     // ToDo: This requires a check to ensure status of group isn't in pending_delete
-    // ToDo: Will also require an audit trail after #725 is merged
     // ToDo: Audit authenticatedUser which actor is performing operation
 
     try {
       await this._userManagementService.addUserToRole(userId, groupId);
       return { data: { userId, groupId } };
     } catch (error) {
-      if (error.name === 'RoleNotFoundError') {
+      if (isRoleNotFoundError(error)) {
         throw new GroupNotFoundError(error.message);
       }
-
       throw error;
     }
   }
-  public isUserAssignedToGroup(
+  public async isUserAssignedToGroup(
     request: IsUserAssignedToGroupRequest
   ): Promise<IsUserAssignedToGroupResponse> {
-    throw new Error('Method not implemented.');
+    const { data } = await this.getUserGroups(request);
+    const isAssigned = data.groupIds.includes(request.groupId);
+    return { data: { isAssigned } };
   }
-  public removeUserFromGroup(request: RemoveUserFromGroupRequest): Promise<RemoveUserFromGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async removeUserFromGroup(
+    request: RemoveUserFromGroupRequest
+  ): Promise<RemoveUserFromGroupResponse> {
+    const { groupId, userId } = request;
+
+    try {
+      await this._userManagementService.removeUserFromRole(userId, groupId);
+      return { data: { userId, groupId } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async getGroupStatus(request: GetGroupStatusRequest): Promise<GetGroupStatusResponse> {
     const { groupId } = request;
@@ -131,14 +173,27 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     }
   }
   public async setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse> {
-    const { groupId, status } = request;
-
-    const item: GroupMetadata = {
-      id: groupId,
-      status
-    };
+    const { groupId, status: newStatus } = request;
 
     try {
+      const statusResult = await this.getGroupStatus(request);
+      const currentStatus = statusResult.data.status;
+
+      if (currentStatus === 'delete_pending' && newStatus === 'active') {
+        throw new ForbiddenError(`Cannot set group '${groupId}' status to active. It is pending delete.`);
+      }
+    } catch (error) {
+      if (!isGroupNotFoundError(error)) {
+        throw error;
+      }
+    }
+
+    try {
+      const item: GroupMetadata = {
+        id: groupId,
+        status: newStatus
+      };
+
       await this._ddbService
         .update({
           key: buildDynamoDBPkSk(groupId, this._userGroupKeyType),
@@ -148,7 +203,7 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
         })
         .execute();
 
-      return { data: { status } };
+      return { data: { status: newStatus } };
     } catch (error) {
       if (error.name === 'ResourceNotFoundException') {
         throw new PluginConfigurationError(error.message);

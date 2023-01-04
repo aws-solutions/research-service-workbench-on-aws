@@ -10,8 +10,8 @@ import Group from './group';
 
 export default class Groups extends CollectionResource {
   public constructor(clientSession: ClientSession) {
-    super(clientSession, 'groups', 'group');
-    this._api = 'authorization/groups';
+    super(clientSession, 'groups', 'group', 'authorization');
+    this._api = `${this._parentApi}/groups`;
   }
 
   public group(id: string): Group {
@@ -40,10 +40,6 @@ export default class Groups extends CollectionResource {
     return this._axiosInstance.get(`${this._api}/users/${userId}`);
   }
 
-  public addUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
-    return this._axiosInstance.post(`${this._api}/add-user`, body);
-  }
-
   protected _buildDefaults(body: CreateGroupRequest): CreateGroupRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const groupId = randomTextGenerator.getFakeText('test-authZ-group');
@@ -53,11 +49,6 @@ export default class Groups extends CollectionResource {
       description: body.description
     };
   }
-}
-
-export interface AddUserToGroupRequest {
-  groupId: string;
-  userId: string;
 }
 
 interface CreateGroupRequest {

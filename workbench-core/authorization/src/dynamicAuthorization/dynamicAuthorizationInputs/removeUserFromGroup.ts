@@ -27,7 +27,16 @@ export interface RemoveUserFromGroupRequest {
  */
 export interface RemoveUserFromGroupResponse {
   /**
-   * States whether the user was successfully removed from group
+   * The data object returned
    */
-  removed: boolean;
+  data: {
+    /**
+     * User id associated to user that was removed from the group
+     */
+    userId: string;
+    /**
+     * Group id associated to the group where user was removed from
+     */
+    groupId: string;
+  };
 }

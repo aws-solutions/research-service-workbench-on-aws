@@ -608,7 +608,7 @@
     },
     {
       "name": "zod",
-      "allowedCategories": [ "production" ]
+      "allowedCategories": [ "production", "prototypes" ]
     }
   ]
 }
