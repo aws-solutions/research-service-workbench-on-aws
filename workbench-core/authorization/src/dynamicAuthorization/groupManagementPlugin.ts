@@ -141,6 +141,7 @@ export interface GroupManagementPlugin {
    * @throws {@link PluginConfigurationError} - plugin has a configuration error
    * @throws {@link GroupNotFoundError} - group not found error
    * @throws {@link TooManyRequestsError} - too many requests error
+   * @throws {@link ForbiddenError} - invalid state transition
    */
   setGroupStatus(request: SetGroupStatusRequest): Promise<SetGroupStatusResponse>;
 }

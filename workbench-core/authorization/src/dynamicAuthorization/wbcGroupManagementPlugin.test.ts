@@ -26,6 +26,7 @@ import {
 } from '@aws/workbench-core-user-management';
 import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import { AuthenticatedUser } from '../authenticatedUser';
+import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
@@ -92,12 +93,26 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('createGroup', () => {
     it('returns the groupID in the data object when the group was successfully created', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
+      wbcGroupManagementPlugin.setGroupStatus = jest.fn();
+
       const response = await wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser });
 
       expect(response).toMatchObject<CreateGroupResponse>({ data: { groupId } });
     });
 
+    it('throws GroupAlreadyExistsError when the group is pending delete', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest
+        .fn()
+        .mockReturnValue({ data: { status: 'delete_pending' } });
+
+      await expect(
+        wbcGroupManagementPlugin.createGroup({ groupId, authenticatedUser: mockUser })
+      ).rejects.toThrow(GroupAlreadyExistsError);
+    });
+
     it('throws IdpUnavailableError when the IdP encounters an error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new IdpUnavailableError());
 
       await expect(
@@ -106,6 +121,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws PluginConfigurationError when the UserManagementService has a configuration error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new PluginConfigurationError());
 
       await expect(
@@ -114,6 +130,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws GroupAlreadyExistsError when the group already exists', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new RoleAlreadyExistsError());
 
       await expect(
@@ -122,6 +139,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws TooManyRequestsError when the request is rate limited', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new TooManyRequestsError());
 
       await expect(
@@ -130,6 +148,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('rethrows an unexpected error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       mockUserManagementPlugin.createRole = jest.fn().mockRejectedValue(new Error());
 
       await expect(
@@ -462,6 +481,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('setGroupStatus', () => {
     it('returns the status in the data object when the status was successfully set', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).resolves({});
 
       const response = await wbcGroupManagementPlugin.setGroupStatus({ groupId, status });
@@ -469,7 +489,18 @@ describe('WBCGroupManagemntPlugin', () => {
       expect(response).toMatchObject<SetGroupStatusResponse>({ data: { status } });
     });
 
+    it('throws ForbiddenError when status tried to go from delete_pending to active', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest
+        .fn()
+        .mockResolvedValue({ data: { status: 'delete_pending' } });
+
+      await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
+        ForbiddenError
+      );
+    });
+
     it('throws PluginConfigurationError when the ddb table doesnt exist', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new ResourceNotFoundException({ message: '', $metadata: {} }));
 
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
@@ -478,6 +509,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws TooManyRequestsError when the provisioned throughput is exceeded', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock
         .on(UpdateItemCommand)
         .rejects(new ProvisionedThroughputExceededException({ message: '', $metadata: {} }));
@@ -488,6 +520,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('throws TooManyRequestsError when the request limit is exceeded', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new RequestLimitExceeded({ message: '', $metadata: {} }));
 
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(
@@ -496,6 +529,7 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     it('rethrows an unexpected error', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockRejectedValue(new GroupNotFoundError());
       ddbMock.on(UpdateItemCommand).rejects(new Error());
 
       await expect(wbcGroupManagementPlugin.setGroupStatus({ groupId, status })).rejects.toThrow(Error);
