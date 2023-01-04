@@ -10,6 +10,7 @@ jest.mock('./dataSetMetadataPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
+  CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsResponse,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
@@ -20,7 +21,6 @@ import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workben
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
-import { PermissionsResponse } from './models/permissionsResponse';
 import { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
 describe('wbcDataSetsAuthorizationPlugin tests', () => {
@@ -90,6 +90,14 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
           action: 'UPDATE',
           subjectType: 'DataSet',
           subjectId: dataSetId
+        },
+        {
+          identityType: 'GROUP',
+          identityId: groupId,
+          effect: 'ALLOW',
+          action: 'READ',
+          subjectType: 'DataSet',
+          subjectId: dataSetId
         }
       ]
     }
@@ -142,10 +150,10 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
     jest
       .spyOn(DynamicAuthorizationService.prototype, 'createIdentityPermissions')
-      .mockImplementation(async (params) => {
+      .mockImplementation(async (params: CreateIdentityPermissionsRequest) => {
         if (params.identityPermissions[0].identityType === 'USER') {
           return mockUserPermissionResponse;
-        } else if (params.identityPermissions[0].action === 'UPDATE') {
+        } else if (params.identityPermissions.length === 2) {
           return mockReadWritePermissionsResponse;
         }
         return mockReadOnlyPermissionsResponse;
@@ -169,7 +177,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             accessLevel: 'read-only'
           }
         })
-      ).rejects.toThrow(new InvalidPermissionError('IdentityType just be "GROUP" or "USER".'));
+      ).rejects.toThrow(new InvalidPermissionError('IdentityType must be "GROUP" or "USER".'));
       expect(authzService.createIdentityPermissions).not.toBeCalled();
     });
 
@@ -199,10 +207,15 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
               identityType: 'GROUP',
               identity: groupId,
               accessLevel: 'read-write'
+            },
+            {
+              identityType: 'GROUP',
+              identity: groupId,
+              accessLevel: 'read-only'
             }
           ]
         }
-      } as PermissionsResponse);
+      });
       expect(authzService.createIdentityPermissions).toBeCalledTimes(1);
     });
 
@@ -218,7 +231,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             }
           ]
         }
-      } as PermissionsResponse);
+      });
       expect(authzService.createIdentityPermissions).toBeCalledTimes(1);
     });
   });

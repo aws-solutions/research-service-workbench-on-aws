@@ -4,11 +4,11 @@
  */
 
 import {
-  Action,
   CreateIdentityPermissionsResponse,
   DynamicAuthorizationService,
   Effect,
-  IdentityType
+  IdentityType,
+  IdentityPermission
 } from '@aws/workbench-core-authorization';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
@@ -31,30 +31,41 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     }
 
     if (params.permission.identityType !== 'GROUP' && params.permission.identityType !== 'USER') {
-      throw new InvalidPermissionError('IdentityType just be "GROUP" or "USER".');
+      throw new InvalidPermissionError('IdentityType must be "GROUP" or "USER".');
     }
 
     const permissionsEffect: Effect = 'ALLOW';
-    const permissionsAction: Action = params.permission.accessLevel === 'read-only' ? 'READ' : 'UPDATE';
     const subjectType: IdentityType = params.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
 
+    const identityPermissions: IdentityPermission[] = [
+      {
+        identityType: subjectType,
+        identityId: params.permission.identity,
+        action: 'READ',
+        effect: permissionsEffect,
+        subjectType: 'DataSet',
+        subjectId: params.dataSetId,
+        description: `${params.permission.accessLevel} access on DataSet ${params.dataSetId}`
+      }
+    ];
+    if (params.permission.accessLevel === 'read-write') {
+      identityPermissions.push({
+        identityType: subjectType,
+        identityId: params.permission.identity,
+        action: 'UPDATE',
+        effect: permissionsEffect,
+        subjectType: 'DataSet',
+        subjectId: params.dataSetId,
+        description: `read-write access on DataSet ${params.dataSetId}`
+      });
+    }
     const createdPermission: CreateIdentityPermissionsResponse =
       await this._authorizer.createIdentityPermissions({
         authenticatedUser: {
           id: params.authenticatedUserId,
           roles: params.roles
         },
-        identityPermissions: [
-          {
-            identityType: subjectType,
-            identityId: params.permission.identity,
-            action: permissionsAction as Action,
-            effect: permissionsEffect as Effect,
-            subjectType: 'DataSet',
-            subjectId: params.dataSetId,
-            description: `${params.permission.accessLevel} on DataSet ${params.dataSetId}`
-          }
-        ]
+        identityPermissions: identityPermissions
       });
 
     const newPermissions: DataSetPermission[] = createdPermission.data.identityPermissions.map((i) => {
