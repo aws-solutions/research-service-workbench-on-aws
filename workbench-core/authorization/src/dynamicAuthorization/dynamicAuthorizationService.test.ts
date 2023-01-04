@@ -473,7 +473,7 @@ describe('DynamicAuthorizationService', () => {
     expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
   });
   describe('getUserGroups', () => {
-    it('returns an array of userID in the data object for the requested group', async () => {
+    it('returns an array of groupID in the data object that the requested user is in', async () => {
       mockGroupManagementPlugin.getUserGroups = jest
         .fn()
         .mockResolvedValue({ data: { groupIds: [groupId] } });

@@ -250,15 +250,15 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       });
       expect(data.identityPermissions).toStrictEqual([mockIdentityPermission, mockIdentityPermission]);
     });
-    describe('deleteIdentityPermissions', () => {
-      it('throws a not implemented exception', async () => {
-        await expect(
-          dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
-            authenticatedUser: mockAuthenticatedUser,
-            identityPermissions: []
-          })
-        ).rejects.toThrow(Error);
-      });
+  });
+  describe('deleteIdentityPermissions', () => {
+    it('throws a not implemented exception', async () => {
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
+          authenticatedUser: mockAuthenticatedUser,
+          identityPermissions: []
+        })
+      ).rejects.toThrow(Error);
     });
   });
 });
