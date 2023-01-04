@@ -8,7 +8,8 @@ import { z } from 'zod';
 // eslint-disable-next-line @rushstack/typedef-var
 export const DataSetPermissionParser = z
   .object({
-    subject: z.string(),
+    identityType: z.union([z.literal('USER'), z.literal('GROUP')]),
+    identity: z.string(),
     accessLevel: z.union([z.literal('read-only'), z.literal('read-write')])
   })
   .strict();
