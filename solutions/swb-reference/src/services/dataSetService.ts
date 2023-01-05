@@ -15,6 +15,7 @@ import {
   PermissionsResponseParser
 } from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
+import { MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetMetadataPlugin,
   DataSetService as WorkbenchDataSetService
@@ -26,13 +27,15 @@ export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
   private _dataSetsAuthService: DataSetsAuthorizationPlugin;
   private _workbenchDataSetService: WorkbenchDataSetService;
+  private _metadataService: MetadataService;
 
   public constructor(
     dataSetStoragePlugin: DataSetStoragePlugin,
     auditService: AuditService,
     loggingService: LoggingService,
     dataSetMetadataPlugin: DataSetMetadataPlugin,
-    dataSetAuthService: DataSetsAuthorizationPlugin
+    dataSetAuthService: DataSetsAuthorizationPlugin,
+    metadataService: MetadataService
   ) {
     this._workbenchDataSetService = new WorkbenchDataSetService(
       auditService,
@@ -42,6 +45,7 @@ export class DataSetService implements DataSetPlugin {
     );
     this.storagePlugin = dataSetStoragePlugin;
     this._dataSetsAuthService = dataSetAuthService;
+    this._metadataService = metadataService;
   }
 
   public addDataSetExternalEndpoint(
@@ -98,5 +102,34 @@ export class DataSetService implements DataSetPlugin {
   public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
     const response = await this._dataSetsAuthService.removeAllAccessPermissions(datasetId);
     return PermissionsResponseParser.parse(response);
+  }
+
+  public async associateProjectWithDataSet(
+    addAccessPermissionRequest: AddRemoveAccessPermissionRequest
+  ): Promise<PermissionsResponse> {
+    const response = this.addAccessPermission(addAccessPermissionRequest);
+    const projectId = addAccessPermissionRequest.permission.subject;
+    await this._metadataService.updateRelationship(
+      resourceTypeToKey.dataset,
+      {
+        id: addAccessPermissionRequest.dataSetId,
+        data: {
+          id: projectId,
+          permission: addAccessPermissionRequest.permission.accessLevel
+        }
+      },
+      resourceTypeToKey.project,
+      [
+        {
+          id: projectId,
+          data: {
+            id: addAccessPermissionRequest.dataSetId,
+            permission: addAccessPermissionRequest.permission.accessLevel
+          }
+        }
+      ]
+    );
+
+    return response;
   }
 }

@@ -25,4 +25,8 @@ export interface DataSetPlugin {
   removeAccessPermissions(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse>;
   getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
   removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse>;
+
+  associateProjectWithDataSet(
+    addAccessPermissionRequest: AddRemoveAccessPermissionRequest
+  ): Promise<PermissionsResponse>;
 }

@@ -6,6 +6,10 @@
 import { resourceTypeToKey, uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
+import {
+  AddRemoveAccessPermissionRequest,
+  AddRemoveAccessPermissionRequestParser
+} from './dataSets/addRemoveAccessPermissionRequest';
 import { CreateDataSetRequest, CreateDataSetRequestParser } from './dataSets/createDataSetRequestParser';
 import {
   CreateExternalEndpointRequest,
@@ -95,6 +99,24 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
     wrapAsync(async (req: Request, res: Response) => {
       const response = await dataSetService.listDataSets();
       res.send(response);
+    })
+  );
+
+  router.put(
+    '/projects/:projectId/datasets/:datasetId/relationships',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
+        AddRemoveAccessPermissionRequestParser,
+        {
+          dataSetId: req.params.datasetId,
+          permission: {
+            subject: req.params.projectId,
+            accessLevel: req.body.accessLevel
+          }
+        }
+      );
+      await dataSetService.associateProjectWithDataSet(validatedRequest);
+      res.status(204).send();
     })
   );
 }
