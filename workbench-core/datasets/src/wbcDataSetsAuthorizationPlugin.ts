@@ -65,7 +65,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
           id: params.authenticatedUserId,
           roles: params.roles
         },
-        identityPermissions: identityPermissions
+        identityPermissions
       });
 
     const newPermissions: DataSetPermission[] = createdPermission.data.identityPermissions.map((i) => {
