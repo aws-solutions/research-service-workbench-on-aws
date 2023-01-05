@@ -21,6 +21,11 @@ import {
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
 import { GetGroupUsersRequest, GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import {
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityRequestParser,
+  GetIdentityPermissionsByIdentityResponse
+} from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
+import {
   GetIdentityPermissionsBySubjectRequest,
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
@@ -226,6 +231,21 @@ export class DynamicAuthorizationService {
   }
 
   /**
+   * Get all identity permissions associated to a specific identity
+   * @param getIdentityPermissionsByIdentityRequest - {@link GetIdentityPermissionsByIdentityRequest}
+   *
+   * @returns - {@link GetIdentityPermissionsByIdentityResponse}
+   */
+  public async getIdentityPermissionsByIdentity(
+    getIdentityPermissionsByIdentityRequest: GetIdentityPermissionsByIdentityRequest
+  ): Promise<GetIdentityPermissionsByIdentityResponse> {
+    const validatedRequest = GetIdentityPermissionsByIdentityRequestParser.parse(
+      getIdentityPermissionsByIdentityRequest
+    );
+    return this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsByIdentity(validatedRequest);
+  }
+
+  /**
    * Add a user to an authorization group
    * @param addUserToGroupRequest - {@link AddUserToGroupRequest}
    *
@@ -238,7 +258,29 @@ export class DynamicAuthorizationService {
    * @throws {@link TooManyRequestsError} - too many requests error
    */
   public async addUserToGroup(addUserToGroupRequest: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
-    return this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
+    const { authenticatedUser } = addUserToGroupRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.addUserToGroup.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: addUserToGroupRequest
+    };
+
+    try {
+      const response = await this._groupManagementPlugin.addUserToGroup(addUserToGroupRequest);
+      //Write audit entry when success
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
+
+      return response;
+    } catch (err) {
+      //Write audit entry when failure
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
   }
 
   /**

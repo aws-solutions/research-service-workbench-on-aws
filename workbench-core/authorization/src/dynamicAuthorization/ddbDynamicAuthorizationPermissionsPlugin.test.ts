@@ -8,8 +8,11 @@ import {
   ServiceInputTypes,
   ServiceOutputTypes,
   TransactWriteItemsCommand,
-  TransactionCanceledException
+  TransactionCanceledException,
+  QueryCommand,
+  AttributeValue
 } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
 import { Action } from '../action';
@@ -104,17 +107,6 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
   });
 
-  describe('getIdentityPermissionsByIdentity', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
-          identityId: '',
-          identityType: 'GROUP'
-        })
-      ).rejects.toThrow(Error);
-    });
-  });
-
   describe('getIdentityPermissionsBySubject', () => {
     it('throws a not implemented exception', async () => {
       await expect(
@@ -182,6 +174,82 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
   });
 
+  describe('getIdentityPermissionsByIdentity', () => {
+    let mockIdentityPermissionItem: Record<string, AttributeValue>;
+    let samplePartitionKey: string;
+    let sampleSortKey;
+    let sampleGroupIdentity;
+    beforeEach(() => {
+      samplePartitionKey = `${sampleSubjectType}|${sampleSubjectId}`;
+      sampleSortKey = `${sampleAction}|${sampleEffect}|${sampleGroupType}|${sampleGroupId}`;
+      sampleGroupIdentity = `${sampleGroupType}|${sampleGroupId}`;
+      mockIdentityPermissionItem = {
+        pk: { S: samplePartitionKey },
+        sk: { S: sampleSortKey },
+        action: { S: sampleAction },
+        effect: { S: sampleEffect },
+        subjectType: { S: sampleSubjectType },
+        subjectId: { S: sampleSubjectId },
+        identity: { S: sampleGroupIdentity },
+        conditions: { M: marshall(sampleConditions) },
+        fields: { L: [] },
+        description: { S: sampleDescription }
+      };
+    });
+    test('Get identity permissions by identity', async () => {
+      mockDDB.on(QueryCommand).resolvesOnce({
+        Items: [mockIdentityPermissionItem]
+      });
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+
+    test('Get identity permissions by identity with zero permissions', async () => {
+      mockDDB.on(QueryCommand).resolvesOnce({
+        Items: []
+      });
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType
+      });
+
+      expect(data.identityPermissions).toStrictEqual([]);
+    });
+
+    test('Get identity permissions by identity with pagination token', async () => {
+      const base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';
+      mockDDB
+        .on(QueryCommand, {
+          IndexName: 'getIdentityPermissionsByIdentity'
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem],
+          LastEvaluatedKey: { pk: { S: samplePartitionKey } }
+        })
+        .resolvesOnce({
+          Items: [mockIdentityPermissionItem]
+        });
+
+      const { data, paginationToken } =
+        await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+          identityId: sampleGroupId,
+          identityType: sampleGroupType
+        });
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(paginationToken).toStrictEqual(base64PaginationToken);
+      const nextResponse = await dynamoDBDynamicPermissionsPlugin.getIdentityPermissionsByIdentity({
+        identityId: sampleGroupId,
+        identityType: sampleGroupType,
+        paginationToken
+      });
+      expect(nextResponse.data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+      expect(nextResponse.paginationToken).toBeUndefined();
+    });
+  });
   describe('deleteIdentityPermissions', () => {
     it('throws a not implemented exception', async () => {
       await expect(

@@ -112,7 +112,6 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
     const { groupId, userId } = request;
 
     // ToDo: This requires a check to ensure status of group isn't in pending_delete
-    // ToDo: Will also require an audit trail after #725 is merged
     // ToDo: Audit authenticatedUser which actor is performing operation
 
     try {
