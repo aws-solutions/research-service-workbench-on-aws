@@ -6,6 +6,10 @@
 import { DataSetPermission } from './dataSetPermission';
 
 export interface AddRemoveAccessPermissionRequest {
+  /** the logged in User */
+  authenticatedUserId: string;
+  /** the logged in User Roles */
+  roles: string[];
   /** the ID of the dataset */
   dataSetId: string;
   /** the permission to add or remove */
