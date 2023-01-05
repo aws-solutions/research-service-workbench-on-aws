@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { AuthenticatedUser, IdentityPermission } from '@aws/workbench-core-authorization';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
@@ -93,6 +93,48 @@ describe('dynamic authorization identity permission integration tests ', () => {
           authenticatedUser: mockUser
         })
       ).rejects.toThrow(new HttpError(400, {}));
+    });
+  });
+
+  describe('getIdentityPermissionsByIdentity', () => {
+    let groupId: string;
+    beforeEach(async () => {
+      const { data } = await adminSession.resources.groups.create();
+      groupId = data.groupId;
+    });
+
+    test('get identity permissions by identity', async () => {
+      const identityPermission: IdentityPermission = {
+        identityId: groupId,
+        identityType: 'GROUP',
+        subjectId: 'sampleSubjectId',
+        subjectType: 'sampleSubjectType',
+        action: 'CREATE',
+        effect: 'ALLOW',
+        conditions: {},
+        fields: [],
+        description: 'sampleDescription'
+      };
+      const { data } = await adminSession.resources.identityPermissions.create(
+        {
+          identityPermissions: [identityPermission],
+          authenticatedUser: mockUser
+        },
+        false
+      );
+      const { identityPermissions } = data;
+      const response = await adminSession.resources.identityPermissions.getByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP'
+      });
+      expect(response.data.identityPermissions).toStrictEqual(identityPermissions);
+    });
+    test('get identity permissions by identity with no permission', async () => {
+      const response = await adminSession.resources.identityPermissions.getByIdentity({
+        identityId: groupId,
+        identityType: 'GROUP'
+      });
+      expect(response.data.identityPermissions).toStrictEqual([]);
     });
   });
 });

@@ -12,7 +12,9 @@ import {
   isIdentityPermissionCreationError,
   CreateIdentityPermissionsRequest,
   CreateIdentityPermissionsRequestParser,
-  isUserNotFoundError
+  isUserNotFoundError,
+  GetIdentityPermissionsByIdentityRequest,
+  GetIdentityPermissionsByIdentityRequestParser
 } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -126,7 +128,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
   );
 
   router.get(
-    '/authorization/groups/:groupId/getUsers',
+    '/authorization/groups/:groupId/get-users',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const { data } = await service.getGroupUsers({
@@ -138,13 +140,38 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.get(
+    '/authorization/groups/:groupId/is-user-assigned/:userId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const { data } = await service.isUserAssignedToGroup({
+          authenticatedUser: res.locals.user,
+          userId: req.params.userId,
+          groupId: req.params.groupId
+        });
+        res.status(200).send(data);
+      } catch (error) {
+        if (isUserNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isTooManyRequestsError(error)) {
+          throw Boom.tooManyRequests(error.message);
+        }
         throw error;
       }
     })
   );
 
   router.post(
-    '/authorization/identitypermissions',
+    '/authorization/permissions',
     wrapAsync(async (req: Request, res: Response) => {
       try {
         const authenticatedUser = res.locals.user;
@@ -156,9 +183,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           }
         );
 
-        const { data } = await service.createIdentityPermissions({
-          ...validatedRequest
-        });
+        const { data } = await service.createIdentityPermissions(validatedRequest);
         res.status(201).send(data);
       } catch (err) {
         if (isGroupNotFoundError(err)) throw Boom.badRequest('One or more groups are not found');
@@ -168,6 +193,17 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           throw Boom.badRequest('One or more permissions already exist');
         throw err;
       }
+    })
+  );
+  router.get(
+    '/authorization/permissions/identity',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<GetIdentityPermissionsByIdentityRequest>(
+        GetIdentityPermissionsByIdentityRequestParser,
+        req.query
+      );
+      const { data } = await service.getIdentityPermissionsByIdentity(validatedRequest);
+      res.status(201).send(data);
     })
   );
 }

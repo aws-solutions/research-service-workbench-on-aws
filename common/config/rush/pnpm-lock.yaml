@@ -761,6 +761,7 @@ importers:
       '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/types': ^3.212.0
+      '@aws-sdk/util-dynamodb': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-base': workspace:*
@@ -802,6 +803,7 @@ importers:
       '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/types': 3.226.0
+      '@aws-sdk/util-dynamodb': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -936,8 +938,10 @@ importers:
       '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@aws/workbench-core-user-management': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -973,6 +977,7 @@ importers:
       '@aws-sdk/client-s3-control': 3.226.0
       '@aws-sdk/types': 3.226.0
       '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
@@ -981,6 +986,7 @@ importers:
       uuid: 8.3.2
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/workbench-core-user-management': link:../user-management
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
@@ -1090,6 +1096,7 @@ importers:
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@aws/workbench-core-user-management': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -1137,6 +1144,7 @@ importers:
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-datasets': link:../datasets
       '@aws/workbench-core-logging': link:../logging
+      '@aws/workbench-core-user-management': link:../user-management
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
       jsonschema: 1.4.1
@@ -3704,7 +3712,6 @@ packages:
     engines: {node: '>=14.0.0'}
     dependencies:
       tslib: 2.4.1
-    dev: false
 
   /@aws-sdk/util-endpoints/3.226.0:
     resolution: {integrity: sha512-iqOkac/zLmyPBUJd7SLN0PeZMkOmlGgD5PHmmekTClOkce2eUjK9SNX1PzL73aXPoPTyhg9QGLH8uEZEQ8YUzg==}
@@ -13712,7 +13719,7 @@ packages:
     dev: true
 
   /mute-stream/0.0.5:
-    resolution: {integrity: sha1-j7+rsKmKJT0xhDMfno3rc3L6xsA=}
+    resolution: {integrity: sha512-EbrziT4s8cWPmzr47eYVW3wimS4HsvlnV5ri1xw1aR6JQo/OrJX5rkl32K/QQHdxeabJETtfeaROGhd8W7uBgg==}
     dev: false
 
   /mute-stream/0.0.8:
@@ -16428,7 +16435,7 @@ packages:
       bs-logger: 0.2.6
       esbuild: 0.14.42
       fast-json-stable-stringify: 2.1.0
-      jest: 27.5.1_ts-node@10.8.0
+      jest: 27.5.1
       jest-util: 27.5.1
       json5: 2.2.2
       lodash.memoize: 4.1.2
