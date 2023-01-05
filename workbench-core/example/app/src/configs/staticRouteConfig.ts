@@ -230,6 +230,14 @@ export const routesMap: RoutesMap = {
         subject: 'IdentityPermission'
       }
     ]
+  },
+  '/authorization/permissions/subject': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
   }
 };
 
