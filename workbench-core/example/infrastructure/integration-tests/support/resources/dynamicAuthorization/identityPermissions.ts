@@ -4,6 +4,7 @@ import {
   Identity,
   IdentityPermission as Permission
 } from '@aws/workbench-core-authorization';
+import { JSONValue } from '@aws/workbench-core-base';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -52,6 +53,10 @@ export default class IdentityPermissions extends CollectionResource {
 
   public async getByIdentity(bodyParams?: Record<string, string>): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/identity`, { params: bodyParams });
+  }
+
+  public async getBySubject(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/subject`, { params: bodyParams });
   }
 
   protected _buildDefaults(resource: CreateRequest): CreateIdentityPermissionsRequest {

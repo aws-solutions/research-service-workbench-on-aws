@@ -81,6 +81,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
 export {
   GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectRequestParser,
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
 export {
