@@ -119,7 +119,9 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       } = await this.getGroupStatus({ groupId });
 
       if (status === 'delete_pending') {
-        throw new ForbiddenError(`Cannot assign user to group '${groupId}'. It is pending delete.`);
+        throw new GroupNotFoundError(
+          `Cannot assign user to group '${groupId}'. The group is pending delete.`
+        );
       }
 
       await this._userManagementService.addUserToRole(userId, groupId);

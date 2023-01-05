@@ -265,16 +265,7 @@ describe('WBCGroupManagemntPlugin', () => {
 
   describe('addUserToGroup', () => {
     beforeEach(() => {
-      ddbMock.on(GetItemCommand).resolves({
-        Item: {
-          id: {
-            S: groupId
-          },
-          status: {
-            S: 'active'
-          }
-        }
-      });
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockReturnValue({ data: { status: 'active' } });
     });
 
     test('returns data about new group assignment on succesfull call', async () => {
@@ -288,16 +279,9 @@ describe('WBCGroupManagemntPlugin', () => {
     });
 
     test('throws exception when group is in delete_pending state', async () => {
-      ddbMock.on(GetItemCommand).resolves({
-        Item: {
-          id: {
-            S: groupId
-          },
-          status: {
-            S: 'delete_pending'
-          }
-        }
-      });
+      wbcGroupManagementPlugin.getGroupStatus = jest
+        .fn()
+        .mockReturnValue({ data: { status: 'delete_pending' } });
 
       await expect(
         wbcGroupManagementPlugin.addUserToGroup({
@@ -305,7 +289,7 @@ describe('WBCGroupManagemntPlugin', () => {
           userId,
           authenticatedUser: mockUser
         })
-      ).rejects.toThrow(ForbiddenError);
+      ).rejects.toThrow(GroupNotFoundError);
     });
 
     test.each([

@@ -9,7 +9,6 @@ import { UserNotFoundError } from '@aws/workbench-core-user-management';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
-import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
@@ -399,7 +398,10 @@ describe('DynamicAuthorizationService', () => {
 
     test.each([
       [GroupNotFoundError, new GroupNotFoundError('Group does not exist.')],
-      [ForbiddenError, new ForbiddenError(`Cannot assign user to group 'groupId'. It is pending delete.`)]
+      [
+        GroupNotFoundError,
+        new GroupNotFoundError(`Cannot assign user to group 'groupId'. It is pending delete.`)
+      ]
     ])(
       'throws exception %s and writes to audit service when user management plugin throws %s',
       async (exceptionType, exceptionInstance) => {
