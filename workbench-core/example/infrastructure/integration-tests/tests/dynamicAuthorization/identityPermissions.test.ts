@@ -242,7 +242,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
       expect(data.identityPermissions).toStrictEqual([]);
     });
 
-    test('get identity permissions by subject, filter on groupIds exceeds 100 should throw ThroughputExceededError', async () => {
+    test('get identity permissions by subject, filter on groupIds exceeds 100 should return a 429', async () => {
       const identities = Array(101).fill({ identityId: '1', identityType: groupType });
       await expect(
         adminSession.resources.identityPermissions.getBySubject({
