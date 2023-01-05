@@ -86,6 +86,7 @@ export interface GroupManagementPlugin {
    * @throws {@link UserNotFoundError} - user could not be found
    * @throws {@link GroupNotFoundError} - group could not be found
    * @throws {@link TooManyRequestsError} - too many requests error
+   * @throws {@link ForbiddenError} - group is in invalid state
    */
   addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse>;
 
