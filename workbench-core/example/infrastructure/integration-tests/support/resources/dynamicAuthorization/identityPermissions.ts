@@ -59,6 +59,10 @@ export default class IdentityPermissions extends CollectionResource {
     return this._axiosInstance.get(`${this._api}/subject`, { params: bodyParams });
   }
 
+  public async delete(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(`${this._api}`, { data: bodyParams });
+  }
+
   protected _buildDefaults(resource: CreateRequest): CreateIdentityPermissionsRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
 

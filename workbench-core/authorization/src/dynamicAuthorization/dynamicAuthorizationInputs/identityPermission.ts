@@ -29,7 +29,7 @@ export const JSONValueParser: z.ZodSchema<JSONValue> = z.lazy(() =>
 );
 
 // eslint-disable-next-line @rushstack/typedef-var
-export const IdentityPermissionsParser = z
+export const IdentityPermissionParser = z
   .object({
     /**
      * {@link IdentityType}
@@ -97,4 +97,4 @@ export const IdentityPermissionsParser = z
 /**
  * Represents an Identity Permission
  */
-export type IdentityPermission = z.infer<typeof IdentityPermissionsParser>;
+export type IdentityPermission = z.infer<typeof IdentityPermissionParser>;

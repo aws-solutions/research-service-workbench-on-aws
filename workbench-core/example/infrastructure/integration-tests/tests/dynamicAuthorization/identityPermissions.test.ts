@@ -9,6 +9,7 @@ import { JSONValue } from '@aws/workbench-core-base';
 import ClientSession from '../../support/clientSession';
 import Setup from '../../support/setup';
 import HttpError from '../../support/utils/HttpError';
+import RandomTextGenerator from '../../support/utils/randomTextGenerator';
 
 describe('dynamic authorization identity permission integration tests ', () => {
   const setup: Setup = new Setup();
@@ -144,13 +145,16 @@ describe('dynamic authorization identity permission integration tests ', () => {
     let mockDeleteIdentityPermission: IdentityPermission;
     let identityPermissions: IdentityPermission[];
 
+    let randomTextGenerator;
+
     beforeAll(async () => {
+      randomTextGenerator = new RandomTextGenerator('deleteIdentityPermissions');
       const { data: groupData } = await adminSession.resources.groups.create();
       const { data: secondGroupData } = await adminSession.resources.groups.create();
       groupId = groupData.groupId;
       secondGroupId = secondGroupData.groupId;
       groupType = 'GROUP';
-      subjectId = 'sampleSubjectId';
+      subjectId = randomTextGenerator.getFakeText('sampleSubjectId');
       subjectType = 'sampleSubjectType';
       effect = 'ALLOW';
       conditions = {};
@@ -235,6 +239,44 @@ describe('dynamic authorization identity permission integration tests ', () => {
           subjectType,
           subjectId,
           identities
+        })
+      ).rejects.toThrow(new HttpError(429, {}));
+    });
+  });
+  describe('deleteIdentityPermissions', () => {
+    let identityPermissions: IdentityPermission[];
+    beforeEach(async () => {
+      const { data } = await adminSession.resources.groups.create();
+      const { groupId } = data;
+
+      const response = await adminSession.resources.identityPermissions.create({
+        identities: [
+          {
+            identityId: groupId,
+            identityType: 'GROUP'
+          }
+        ],
+        authenticatedUser: mockUser
+      });
+
+      identityPermissions = response.data.identityPermissions;
+    });
+
+    test('delete identity permisions', async () => {
+      const { data } = await adminSession.resources.identityPermissions.delete({
+        identityPermissions,
+        authenticatedUser: mockUser
+      });
+
+      expect(data.identityPermissions).toStrictEqual(identityPermissions);
+    });
+
+    test('delete identity permissions, exceed over 100 deletions', async () => {
+      const exceededIdentityPermissions = Array(101).fill(identityPermissions[0]);
+      await expect(
+        adminSession.resources.identityPermissions.delete({
+          identityPermissions: exceededIdentityPermissions,
+          authenticatedUser: mockUser
         })
       ).rejects.toThrow(new HttpError(429, {}));
     });

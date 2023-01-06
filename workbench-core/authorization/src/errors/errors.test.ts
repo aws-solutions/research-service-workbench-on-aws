@@ -15,6 +15,7 @@ import {
   isIdentityPermissionCreationError
 } from './identityPermissionCreationError';
 import { isPermissionNotGrantedError, PermissionNotGrantedError } from './permissionNotGrantedError';
+import { isRetryError, RetryError } from './retryError';
 import { isRouteNotSecuredError, RouteNotSecuredError } from './routeNotSecuredError';
 import { isThroughputExceededError, ThroughputExceededError } from './throughputExceededError';
 
@@ -81,5 +82,13 @@ describe('custom error tests', () => {
   });
   test('not ThroughputExceededError', () => {
     expect(isThroughputExceededError(error)).toBe(false);
+  });
+
+  test('RetryError', () => {
+    const retryError = new RetryError();
+    expect(isRetryError(retryError)).toBe(true);
+  });
+  test('not RetryError', () => {
+    expect(isRetryError(error)).toBe(false);
   });
 });
