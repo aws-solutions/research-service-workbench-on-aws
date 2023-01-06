@@ -6,3 +6,5 @@
 import { generateRouter } from './generateRouter';
 
 export { generateRouter };
+
+export { AddRemoveAccessPermissionRequest } from './models/datasets/addRemoveAccessPermission';

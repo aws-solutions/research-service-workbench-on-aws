@@ -9,13 +9,16 @@ import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
 import CreatePresignedSinglePartFileUploadUrl from './schemas/createPresignedSinglePartFileUploadUrl';
 import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExternalBucketRoleSchema';
 
-export { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
+export {
+  AddRemoveAccessPermissionRequest,
+  AddRemoveAccessPermissionParser
+} from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 export { DataSet } from './dataSet';
 export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
-export { DataSetPermission } from './models/dataSetPermission';
-export { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
+export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
+export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
 export { DataSetService } from './dataSetService';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';

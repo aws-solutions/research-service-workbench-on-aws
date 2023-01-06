@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { uuidWithLowercasePrefixRegExp, validateAndParse } from '@aws/workbench-core-base';
 import {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleSchema,
@@ -21,6 +21,10 @@ import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { dataSetPrefix, endPointPrefix } from '../configs/constants';
+import {
+  AddRemoveAccessPermissionRequest,
+  AddRemoveAccessPermissionParser
+} from '../models/datasets/addRemoveAccessPermission';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -62,6 +66,23 @@ export function setUpDSRoutes(
         storageProvider: dataSetStoragePlugin
       });
       res.status(201).send(dataSet);
+    })
+  );
+
+  // add dataset access permission
+  router.post(
+    'datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
+        AddRemoveAccessPermissionParser,
+        req.body
+      );
+      const data = await dataSetService.addDataSetAccessPermissions({
+        authenticatedUserId: res.locals.user.authenticatedUserId,
+        roles: res.locals.user.roles,
+        ...validatedRequest
+      });
+      res.status(201).send(data);
     })
   );
 

@@ -35,11 +35,11 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     }
 
     const permissionsEffect: Effect = 'ALLOW';
-    const subjectType: IdentityType = params.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
+    const identityType: IdentityType = params.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
 
     const identityPermissions: IdentityPermission[] = [
       {
-        identityType: subjectType,
+        identityType: identityType,
         identityId: params.permission.identity,
         action: 'READ',
         effect: permissionsEffect,
@@ -50,7 +50,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     ];
     if (params.permission.accessLevel === 'read-write') {
       identityPermissions.push({
-        identityType: subjectType,
+        identityType: identityType,
         identityId: params.permission.identity,
         action: 'UPDATE',
         effect: permissionsEffect,

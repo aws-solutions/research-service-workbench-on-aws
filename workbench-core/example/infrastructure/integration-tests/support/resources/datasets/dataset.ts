@@ -3,17 +3,21 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { IdentityPermission as Permission } from '@aws/workbench-core-authorization';
+import { PermissionsResponse } from '@aws/workbench-core-datasets';
+import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-example-app';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
 import Resource from '../base/resource';
+import IdentityPermission from '../dynamicAuthorization/identityPermission';
 import Endpoint, { EndpointCreateParams } from './endpoint';
 
 export default class Dataset extends Resource {
   private _awsAccountId: string;
   private _children: Map<string, Endpoint>;
-
+  private _permissions: Map<string, IdentityPermission>;
   private _clientSession: ClientSession;
   public id: string;
   public storageName: string;
@@ -28,10 +32,46 @@ export default class Dataset extends Resource {
     this._api = `datasets/${params.id}`;
     this._clientSession = params.clientSession;
     this._children = new Map<string, Endpoint>();
+    this._permissions = new Map<string, IdentityPermission>();
+  }
+
+  public identityPermission(
+    identityPermission: Permission,
+    clientSession: ClientSession,
+    parentApi: string,
+    id: string
+  ): IdentityPermission {
+    return new IdentityPermission(identityPermission, clientSession, parentApi, id);
   }
 
   public endpoint(params: EndpointCreateParams): Endpoint {
     return new Endpoint(params);
+  }
+
+  public async addAccess(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
+    const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
+    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, params);
+    const permissionsCreated: PermissionsResponse = response.data;
+
+    const permissions: Permission[] = permissionsCreated.data.permissions.map((p) => {
+      return {
+        action: p.accessLevel === 'read-only' ? 'READ' : 'UPDATE',
+        effect: 'ALLOW',
+        subjectType: 'DataSet',
+        subjectId: this.id,
+        identityType: p.identityType === 'GROUP' ? 'GROUP' : 'USER',
+        identityId: p.identity
+      };
+    });
+
+    permissions.map((p) => {
+      const taskId = `dataset-permission-${randomTextGenerator.getFakeText('test-perm').toLowerCase()}`;
+      const resourceNode: IdentityPermission = this.identityPermission(p, this._clientSession, '', taskId);
+      this._permissions.set(resourceNode.id, resourceNode);
+      this._clientSession.addCleanupTask({ id: taskId, task: async () => resourceNode.cleanup() });
+    });
+
+    return permissionsCreated;
   }
 
   public async share(requestBody: {
