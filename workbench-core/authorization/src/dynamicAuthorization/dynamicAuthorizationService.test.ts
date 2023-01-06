@@ -343,18 +343,63 @@ describe('DynamicAuthorizationService', () => {
     });
   });
   describe('deleteIdentityPermissions', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.deleteIdentityPermissions({
-          identityPermissions: [],
-          authenticatedUser: mockUser
-        })
-      ).rejects.toThrow(Error);
+    beforeEach(() => {
+      auditAction = 'deleteIdentityPermissions';
+    });
+
+    test('delete identity permissions', async () => {
+      const mockReturnValue = {
+        data: {
+          identityPermissions: mockIdentityPermissions
+        },
+        authenticatedUser: mockUser
+      };
+      mockDynamicAuthorizationPermissionsPlugin.deleteIdentityPermissions = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const params = {
+        authenticatedUser: mockUser,
+        identityPermissions: mockIdentityPermissions
+      };
+      const response = await dynamicAuthzService.deleteIdentityPermissions(params);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        response
+      );
+    });
+
+    test('delete identity permissions, throws ThroughputExceededError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.deleteIdentityPermissions = jest
+        .fn()
+        .mockRejectedValueOnce(new ThroughputExceededError());
+      const params = {
+        authenticatedUser: mockUser,
+        identityPermissions: mockIdentityPermissions
+      };
+      await expect(dynamicAuthzService.deleteIdentityPermissions(params)).rejects.toThrow(
+        ThroughputExceededError
+      );
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ThroughputExceededError()
+      );
     });
   });
 
   describe('getIdentityPermissionsBySubject', () => {
-    it('get identity permissions by identity', async () => {
+    test('get identity permissions by subject', async () => {
       mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
         .fn()
         .mockResolvedValue({
