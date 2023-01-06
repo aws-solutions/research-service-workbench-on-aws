@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-authorization",
+      "comment": "AddUserToGroup to verify group is NOT being deleted",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/workbench-core-authorization"
+}
