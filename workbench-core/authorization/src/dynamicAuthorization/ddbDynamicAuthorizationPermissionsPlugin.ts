@@ -3,7 +3,9 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue, addPaginationToken } from '@aws/workbench-core-base';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { DynamoDBService, JSONValue, addPaginationToken, getPaginationToken } from '@aws/workbench-core-base';
+import _ from 'lodash';
 import { Action } from '../action';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
@@ -87,7 +89,50 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
-    throw new Error('Method not implemented.');
+    const { subjectId, subjectType } = getIdentityPermissionsBySubjectRequest;
+    const key = {
+      name: 'pk',
+      value: this._createIdentityPermissionsPartitionKey(subjectType, subjectId)
+    };
+
+    const query = this._dynamoDBService.query({
+      key
+    });
+
+    if (getIdentityPermissionsBySubjectRequest.action) {
+      query.sortKey('sk').begins({ S: `${getIdentityPermissionsBySubjectRequest.action}` });
+    }
+
+    //IN operator maxed out at 100
+    if (getIdentityPermissionsBySubjectRequest.identities) {
+      const { identities } = getIdentityPermissionsBySubjectRequest;
+      if (identities.length > 100) throw new ThroughputExceededError('Number of identities exceed 100');
+      const attributesValues: Record<string, AttributeValue> = {};
+      for (let i = 0; i < identities.length; i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const { identityType, identityId } = identities[i];
+        _.set(attributesValues, `:id${i}`, {
+          S: `${identityType}|${identityId}`
+        });
+      }
+      const idINFilterExp = `#id IN ( ${Object.keys(attributesValues).toString()} )`;
+      query.filter(idINFilterExp);
+      query.names({ '#id': 'identity' });
+      query.values(attributesValues);
+    }
+
+    const response = await query.execute();
+    const items = response.Items ?? [];
+    const identityPermissions: IdentityPermission[] = items.map((item) => {
+      return this._transformItemToIdentityPermission(item as unknown as Record<string, JSONValue>);
+    });
+
+    return {
+      data: {
+        identityPermissions
+      },
+      paginationToken: getPaginationToken(response)
+    };
   }
   public async createIdentityPermissions(
     createIdentityPermissionsRequest: CreateIdentityPermissionsRequest

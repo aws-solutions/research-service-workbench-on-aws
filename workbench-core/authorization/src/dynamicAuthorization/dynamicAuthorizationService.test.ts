@@ -354,14 +354,20 @@ describe('DynamicAuthorizationService', () => {
   });
 
   describe('getIdentityPermissionsBySubject', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.getIdentityPermissionsBySubject({
-          subjectType: '',
-          subjectId: '',
-          authenticatedUser: mockUser
-        })
-      ).rejects.toThrow(Error);
+    it('get identity permissions by identity', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      const request = {
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      };
+      const { data } = await dynamicAuthzService.getIdentityPermissionsBySubject(request);
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
     });
   });
 

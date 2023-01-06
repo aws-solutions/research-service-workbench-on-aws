@@ -27,6 +27,7 @@ import {
 } from './dynamicAuthorizationInputs/getIdentityPermissionsByIdentity';
 import {
   GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectRequestParser,
   GetIdentityPermissionsBySubjectResponse
 } from './dynamicAuthorizationInputs/getIdentityPermissionsBySubject';
 import { GetUserGroupsRequest, GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -227,7 +228,10 @@ export class DynamicAuthorizationService {
   public async getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = GetIdentityPermissionsBySubjectRequestParser.parse(
+      getIdentityPermissionsBySubjectRequest
+    );
+    return this._dynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject(validatedRequest);
   }
 
   /**
