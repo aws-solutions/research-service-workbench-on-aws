@@ -7,7 +7,7 @@ jest.mock('@aws/workbench-core-audit');
 jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
-jest.mock('./WbcDataSetsAuthorizationPlugin');
+jest.mock('./wbcDataSetsAuthorizationPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
