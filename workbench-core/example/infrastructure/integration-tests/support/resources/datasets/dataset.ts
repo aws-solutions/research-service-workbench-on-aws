@@ -5,7 +5,6 @@
 
 import { IdentityPermission as Permission } from '@aws/workbench-core-authorization';
 import { PermissionsResponse } from '@aws/workbench-core-datasets';
-import { AddRemoveAccessPermissionRequest } from '@aws/workbench-core-example-app';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
@@ -48,9 +47,9 @@ export default class Dataset extends Resource {
     return new Endpoint(params);
   }
 
-  public async addAccess(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
+  public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
-    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, params);
+    const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
     const permissionsCreated: PermissionsResponse = response.data;
 
     const permissions: Permission[] = permissionsCreated.data.permissions.map((p) => {

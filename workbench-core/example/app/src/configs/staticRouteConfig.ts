@@ -70,7 +70,7 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
-        subject: 'DataSetAccess'
+        subject: 'DatasetAccess'
       }
     ]
   },

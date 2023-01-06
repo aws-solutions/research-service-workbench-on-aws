@@ -8,8 +8,6 @@ import { z } from 'zod';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AddRemoveAccessPermissionParser = z.object({
-  /** the ID of the dataset */
-  dataSetId: z.string(),
   /** the permission to add or remove */
   permission: DataSetPermissionParser
 });

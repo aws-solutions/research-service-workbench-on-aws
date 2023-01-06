@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuditService } from '@aws/workbench-core-audit';
+import { AuditService, Metadata } from '@aws/workbench-core-audit';
 import { LoggingService } from '@aws/workbench-core-logging';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -52,16 +52,33 @@ export class DataSetService {
    * @returns the DataSet object which is stored in the backing datastore.
    */
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    const { storageProvider, ...dataSet } = request;
-
-    await storageProvider.createStorage(dataSet.storageName, dataSet.path);
-
-    const provisioned: DataSet = {
-      ...dataSet,
-      storageType: storageProvider.getStorageType()
+    const metadata: Metadata = {
+      actor: { id: '-', roles: [] },
+      action: this.provisionDataSet.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      requestBody: request
     };
 
-    return await this._dbProvider.addDataSet(provisioned);
+    try {
+      const { storageProvider, ...dataSet } = request;
+
+      await storageProvider.createStorage(dataSet.storageName, dataSet.path);
+
+      const provisioned: DataSet = {
+        ...dataSet,
+        storageType: storageProvider.getStorageType()
+      };
+      const response: DataSet = await this._dbProvider.addDataSet(provisioned);
+      metadata.statusCode = 200;
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._audit.write(metadata, error);
+      throw error;
+    }
   }
 
   /**
@@ -148,7 +165,24 @@ export class DataSetService {
    * @returns - the DataSet object associated with that DataSet.
    */
   public async getDataSet(dataSetId: string): Promise<DataSet> {
-    return await this._dbProvider.getDataSetMetadata(dataSetId);
+    const metadata: Metadata = {
+      actor: { id: '-', roles: [] },
+      action: this.getDataSet.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      requestBody: dataSetId
+    };
+    try {
+      const response: DataSet = await this._dbProvider.getDataSetMetadata(dataSetId);
+      metadata.statusCode = 200;
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._audit.write(metadata, error);
+      throw error;
+    }
   }
 
   /**
@@ -329,9 +363,27 @@ export class DataSetService {
   public async addDataSetAccessPermissions(
     params: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
-    // this will throw if the dataset is not found.
-    await this.getDataSet(params.dataSetId);
-    return this._authzPlugin.addAccessPermission(params);
+    const metadata: Metadata = {
+      actor: { id: params.authenticatedUserId, roles: params.roles },
+      action: this.addDataSetAccessPermissions.name,
+      source: {
+        serviceName: DataSetService.name
+      },
+      requestBody: params
+    };
+
+    try {
+      // this will throw if the dataset is not found.
+      await this.getDataSet(params.dataSetId);
+      const response: PermissionsResponse = await this._authzPlugin.addAccessPermission(params);
+      metadata.statusCode = 200;
+      await this._audit.write(metadata, response);
+      return response;
+    } catch (error) {
+      metadata.statusCode = 400;
+      await this._audit.write(metadata, error);
+      throw error;
+    }
   }
 
   private _generateMountObject(

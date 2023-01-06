@@ -15,7 +15,9 @@ import {
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError,
-  isInvalidIamRoleError
+  isInvalidIamRoleError,
+  isInvalidPermissionError,
+  PermissionsResponse
 } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -66,23 +68,6 @@ export function setUpDSRoutes(
         storageProvider: dataSetStoragePlugin
       });
       res.status(201).send(dataSet);
-    })
-  );
-
-  // add dataset access permission
-  router.post(
-    'datasets/:datasetId/permissions',
-    wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
-        AddRemoveAccessPermissionParser,
-        req.body
-      );
-      const data = await dataSetService.addDataSetAccessPermissions({
-        authenticatedUserId: res.locals.user.authenticatedUserId,
-        roles: res.locals.user.roles,
-        ...validatedRequest
-      });
-      res.status(201).send(data);
     })
   );
 
@@ -226,6 +211,35 @@ export function setUpDSRoutes(
       } catch (error) {
         if (isInvalidIamRoleError(error)) {
           throw Boom.badRequest('the roleString parameter does not represent a valid IAM role');
+        }
+        throw error;
+      }
+    })
+  );
+
+  // add dataset access permission
+  router.post(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
+        AddRemoveAccessPermissionParser,
+        req.body
+      );
+      let response: PermissionsResponse;
+      try {
+        response = await dataSetService.addDataSetAccessPermissions({
+          authenticatedUserId: res.locals.user.id,
+          roles: res.locals.user.roles,
+          dataSetId: req.params.datasetId,
+          ...validatedRequest
+        });
+        res.status(201).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
         }
         throw error;
       }
