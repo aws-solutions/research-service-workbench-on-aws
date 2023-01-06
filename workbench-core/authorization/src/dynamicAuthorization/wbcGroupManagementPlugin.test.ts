@@ -264,7 +264,11 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('addUserToGroup', () => {
-    test('returns added equal to true on succesfull call', async () => {
+    beforeEach(() => {
+      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockReturnValue({ data: { status: 'active' } });
+    });
+
+    test('returns data about new group assignment on succesfull call', async () => {
       const { data } = await wbcGroupManagementPlugin.addUserToGroup({
         groupId,
         userId,
@@ -274,7 +278,19 @@ describe('WBCGroupManagemntPlugin', () => {
       expect(data).toStrictEqual({ groupId, userId });
     });
 
-    // ToDo: add test for verifying throw role not found when role is pending delete
+    test('throws exception when group is in delete_pending state', async () => {
+      wbcGroupManagementPlugin.getGroupStatus = jest
+        .fn()
+        .mockReturnValue({ data: { status: 'delete_pending' } });
+
+      await expect(
+        wbcGroupManagementPlugin.addUserToGroup({
+          groupId,
+          userId,
+          authenticatedUser: mockUser
+        })
+      ).rejects.toThrow(GroupNotFoundError);
+    });
 
     test.each([
       [IdpUnavailableError, new IdpUnavailableError('test error')],

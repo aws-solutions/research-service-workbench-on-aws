@@ -402,30 +402,37 @@ describe('DynamicAuthorizationService', () => {
       );
     });
 
-    it('throws and writes to audit service when user cannnot be added to group', async () => {
-      mockGroupManagementPlugin.addUserToGroup = jest
-        .fn()
-        .mockRejectedValue(new GroupNotFoundError('Group does not exist.'));
+    test.each([
+      [GroupNotFoundError, new GroupNotFoundError('Group does not exist.')],
+      [
+        GroupNotFoundError,
+        new GroupNotFoundError(`Cannot assign user to group 'groupId'. It is pending delete.`)
+      ]
+    ])(
+      'throws exception %s and writes to audit service when user management plugin throws %s',
+      async (exceptionType, exceptionInstance) => {
+        mockGroupManagementPlugin.addUserToGroup = jest.fn().mockRejectedValue(exceptionInstance);
 
-      const requestBody = {
-        groupId,
-        userId,
-        authenticatedUser: mockUser
-      };
+        const requestBody = {
+          groupId,
+          userId,
+          authenticatedUser: mockUser
+        };
 
-      await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(GroupNotFoundError);
+        await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(exceptionType);
 
-      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
-        {
-          actor: mockUser,
-          source: auditSource,
-          action: auditAction,
-          requestBody,
-          statusCode: 400
-        },
-        new GroupNotFoundError('Group does not exist.')
-      );
-    });
+        expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+          {
+            actor: mockUser,
+            source: auditSource,
+            action: auditAction,
+            requestBody,
+            statusCode: 400
+          },
+          exceptionInstance
+        );
+      }
+    );
   });
 
   describe('removeUserFromGroup', () => {
