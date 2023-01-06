@@ -9,7 +9,8 @@ import { DataSetAccessLevelParser } from './dataSetAccessLevelParser';
 // eslint-disable-next-line @rushstack/typedef-var
 export const DataSetPermissionParser = z
   .object({
-    subject: z.string(),
+    identityType: z.union([z.literal('USER'), z.literal('GROUP')]),
+    identity: z.string(),
     accessLevel: DataSetAccessLevelParser
   })
   .strict();

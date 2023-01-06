@@ -7,6 +7,7 @@ import { DataSetHasEndpointError, isDataSetHasEndpointError } from './dataSetHas
 import { EndPointExistsError, isEndPointExistsError } from './endPointExistsError';
 import { InvalidIamRoleError, isInvalidIamRoleError } from './invalidIamRoleError';
 import { isNotAuthorizedError, NotAuthorizedError } from './notAuthorizedError';
+import { InvalidPermissionError, isInvalidPermissionError } from './invalidPermissionError';
 import { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './roleExistsOnEndpointError';
 
 const error = new Error();
@@ -55,5 +56,14 @@ describe('custom error tests', () => {
   });
   test('not NotAuthorizedError', () => {
     expect(isNotAuthorizedError(error)).toBe(false);
+  });
+  
+  test('InvalidPermissionError', () => {
+    const invalidPermissionError = new InvalidPermissionError();
+
+    expect(isInvalidPermissionError(invalidPermissionError)).toBe(true);
+  });
+  test('not InvalidPermissionError', () => {
+    expect(isInvalidPermissionError(error)).toBe(false);
   });
 });

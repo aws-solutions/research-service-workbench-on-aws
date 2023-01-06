@@ -313,7 +313,7 @@ export class ExampleStack extends Stack {
       gsis: [
         {
           indexName: 'getIdentityPermissionsByIdentity',
-          partitionKey: { name: 'Identity', type: AttributeType.STRING },
+          partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
       ]

@@ -215,10 +215,26 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/authorization/identity-permissions': {
+  '/authorization/permissions': {
     POST: [
       {
         action: 'CREATE',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/subject': {
+    GET: [
+      {
+        action: 'READ',
         subject: 'IdentityPermission'
       }
     ]

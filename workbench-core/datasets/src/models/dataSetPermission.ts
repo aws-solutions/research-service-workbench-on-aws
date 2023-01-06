@@ -7,7 +7,9 @@ import { DataSetsAccessLevel } from './dataSetsAccessLevel';
 
 export interface DataSetPermission {
   /** the user or group associated with the access level */
-  subject: string;
+  identity: string;
+  /** the type of subject (group or user) */
+  identityType: string;
   /** the access level (read-only or read-write) */
   accessLevel: DataSetsAccessLevel;
 }

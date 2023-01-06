@@ -111,11 +111,19 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
   public async addUserToGroup(request: AddUserToGroupRequest): Promise<AddUserToGroupResponse> {
     const { groupId, userId } = request;
 
-    // ToDo: This requires a check to ensure status of group isn't in pending_delete
-    // ToDo: Will also require an audit trail after #725 is merged
     // ToDo: Audit authenticatedUser which actor is performing operation
 
     try {
+      const {
+        data: { status }
+      } = await this.getGroupStatus({ groupId });
+
+      if (status === 'delete_pending') {
+        throw new GroupNotFoundError(
+          `Cannot assign user to group '${groupId}'. The group is pending delete.`
+        );
+      }
+
       await this._userManagementService.addUserToRole(userId, groupId);
       return { data: { userId, groupId } };
     } catch (error) {

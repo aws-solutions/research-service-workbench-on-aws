@@ -761,6 +761,7 @@ importers:
       '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/types': ^3.212.0
+      '@aws-sdk/util-dynamodb': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-base': workspace:*
@@ -802,6 +803,7 @@ importers:
       '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/types': 3.226.0
+      '@aws-sdk/util-dynamodb': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -3710,7 +3712,6 @@ packages:
     engines: {node: '>=14.0.0'}
     dependencies:
       tslib: 2.4.1
-    dev: false
 
   /@aws-sdk/util-endpoints/3.226.0:
     resolution: {integrity: sha512-iqOkac/zLmyPBUJd7SLN0PeZMkOmlGgD5PHmmekTClOkce2eUjK9SNX1PzL73aXPoPTyhg9QGLH8uEZEQ8YUzg==}
