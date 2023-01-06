@@ -71,13 +71,19 @@ export default class IdentityPermissions extends CollectionResource {
 
       const action = 'CREATE';
       const effect = 'ALLOW';
+      const fields: string[] = [];
+      const conditions = {};
+      const description = randomTextGenerator.getFakeText('randomDescription');
       identityPermissions.push({
         subjectId,
         subjectType,
         action,
         effect,
         identityId: identity.identityId,
-        identityType: identity.identityType
+        identityType: identity.identityType,
+        fields,
+        conditions,
+        description
       });
     });
     return {
