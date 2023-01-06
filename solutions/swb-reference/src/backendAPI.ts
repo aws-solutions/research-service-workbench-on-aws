@@ -81,7 +81,12 @@ const fakeDataSetsAuthorizationPlugin: DataSetsAuthorizationPlugin = {
     throw new Error('Not Implemented');
   },
   getAccessPermissions: ({ dataSetId, subject }) => {
-    return Promise.resolve({ data: { dataSetId, permissions: [{ subject, accessLevel: 'read-write' }] } });
+    return Promise.resolve({
+      data: {
+        dataSetId,
+        permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
+      }
+    });
   },
   removeAccessPermissions: (params) => {
     throw new Error('Not Implemented');

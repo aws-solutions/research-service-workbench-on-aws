@@ -476,11 +476,12 @@ describe('DataSetService', () => {
 
   describe('addDataSetExternalEndpoint', () => {
     it('returns the mount string for the DataSet mount point', async () => {
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValue({
-          data: { dataSetId: mockDataSetId, permissions: [{ subject: mockUserId, accessLevel: 'read-only' }] }
-        });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions').mockResolvedValue({
+        data: {
+          dataSetId: mockDataSetId,
+          permissions: [{ identity: mockUserId, identityType: 'USER', accessLevel: 'read-only' }]
+        }
+      });
       await expect(
         dataSetService.addDataSetExternalEndpointForUser({
           dataSetId: mockDataSetId,
@@ -502,14 +503,12 @@ describe('DataSetService', () => {
     });
 
     it('throws if the external endpoint already exists.', async () => {
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValue({
-          data: {
-            dataSetId: mockDataSetId,
-            permissions: [{ subject: mockUserId, accessLevel: 'read-write' }]
-          }
-        });
+      jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions').mockResolvedValue({
+        data: {
+          dataSetId: mockDataSetId,
+          permissions: [{ identity: mockUserId, identityType: 'USER', accessLevel: 'read-write' }]
+        }
+      });
       let response;
 
       try {
