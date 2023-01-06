@@ -13,7 +13,9 @@ import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { ExternalEndpoint } from './externalEndpoint';
+import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
+import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './storageLocation';
 
 export class DataSetService {
@@ -311,6 +313,25 @@ export class DataSetService {
    */
   public async listStorageLocations(): Promise<StorageLocation[]> {
     return await this._dbProvider.listStorageLocations();
+  }
+
+  //
+  // DataSet Permissions
+  //
+
+  /**
+   * Add AccessPermissions to a DataSet.
+   *
+   * @param params - a {@link AddRemoveAccessPermissionRequest} object indicating the datasetId and the
+   *                 requested permissions.
+   * @returns a {@link PermissionsResponse} object containing the permissions added.
+   */
+  public async addDataSetAccessPermissions(
+    params: AddRemoveAccessPermissionRequest
+  ): Promise<PermissionsResponse> {
+    // this will throw if the dataset is not found.
+    await this.getDataSet(params.dataSetId);
+    return this._authzPlugin.addAccessPermission(params);
   }
 
   private _generateMountObject(

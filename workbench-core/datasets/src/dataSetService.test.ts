@@ -7,6 +7,7 @@ jest.mock('@aws/workbench-core-audit');
 jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
+jest.mock('./WbcDataSetsAuthorizationPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
@@ -22,6 +23,8 @@ import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
+import { PermissionsResponse } from './models/permissionsResponse';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 import { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
@@ -40,6 +43,7 @@ describe('DataSetService', () => {
   let dataSetService: DataSetService;
 
   const mockDataSetId = 'sampleDataSetId';
+  const mockInvalidId = 'Sample-Invalid-Id';
   const mockDataSetName = 'Sample-DataSet';
   const mockDataSetPath = 'sample-s3-prefix';
   const mockAwsAccountId = 'Sample-AWS-Account';
@@ -52,10 +56,34 @@ describe('DataSetService', () => {
   const mockAlternateRoleArn = 'Another-Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
+  const mockNoRolesEndpointId = 'Sample-NoRoles-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
   const mockDataSetObject = 'datasetObjectId';
   const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
+  const mockUserId = 'sample-user-id';
+  const mockDataSetAddAccessParams: AddRemoveAccessPermissionRequest = {
+    authenticatedUserId: mockUserId,
+    roles: [],
+    dataSetId: mockDataSetId,
+    permission: {
+      accessLevel: 'read-only',
+      identityType: 'USER',
+      identity: mockUserId
+    }
+  };
+  const mockAddAccessResponse: PermissionsResponse = {
+    data: {
+      dataSetId: mockDataSetId,
+      permissions: [
+        {
+          identity: mockUserId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      ]
+    }
+  };
 
   beforeEach(() => {
     jest.resetAllMocks();
@@ -114,6 +142,8 @@ describe('DataSetService', () => {
             storageName: mockDataSetStorageName,
             externalEndpoints: [mockExistingEndpointName]
           };
+        } else if (id === mockInvalidId) {
+          throw Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`);
         }
         return {
           id: mockDataSetId,
@@ -163,7 +193,18 @@ describe('DataSetService', () => {
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'removeDataSet').mockImplementation(async () => {});
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
-      .mockImplementation(async () => {
+      .mockImplementation(async (dataSetId: string, endPointId: string) => {
+        if (endPointId === mockNoRolesEndpointId) {
+          return {
+            id: mockExistingEndpointId,
+            name: mockExistingEndpointName,
+            dataSetId: mockDataSetId,
+            dataSetName: mockDataSetName,
+            path: mockDataSetPath,
+            endPointUrl: mockEndPointUrl,
+            endPointAlias: mockAccessPointAlias
+          };
+        }
         return {
           id: mockExistingEndpointId,
           name: mockExistingEndpointName,
@@ -252,6 +293,10 @@ describe('DataSetService', () => {
 
     dataSetService = new DataSetService(audit, log, metaPlugin, authzPlugin);
     s3Plugin = new S3DataSetStoragePlugin(aws);
+
+    jest
+      .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+      .mockImplementation(async () => mockAddAccessResponse);
   });
 
   describe('constructor', () => {
@@ -463,6 +508,11 @@ describe('DataSetService', () => {
         storageName: mockDataSetStorageName
       });
     });
+    it('throws when an invalid dataset Id is given.', async () => {
+      await expect(dataSetService.getDataSet(mockInvalidId)).rejects.toThrow(
+        Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`)
+      );
+    });
   });
 
   describe('addDataSetExternalEndpoint', () => {
@@ -578,6 +628,12 @@ describe('DataSetService', () => {
         )
       ).resolves.toBeUndefined();
     });
+
+    it('completes if given an existing endpoint with no stored roles', async () => {
+      await expect(
+        dataSetService.addRoleToExternalEndpoint(mockDataSetId, mockNoRolesEndpointId, mockRoleArn, s3Plugin)
+      ).resolves.toBeUndefined();
+    });
   });
 
   describe('listStorageLocations', () => {
@@ -601,6 +657,23 @@ describe('DataSetService', () => {
       await expect(
         dataSetService.getPresignedSinglePartUploadUrl(mockDataSetId, fileName, ttlSeconds, s3Plugin)
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
+    });
+  });
+
+  describe('addDataSetAccessPermissions', () => {
+    it('returns access permissions added to a DataSet', async () => {
+      await expect(
+        dataSetService.addDataSetAccessPermissions(mockDataSetAddAccessParams)
+      ).resolves.toStrictEqual(mockAddAccessResponse);
+    });
+    it('throws when the dataSet does not exist', async () => {
+      const invalidAccessParams: AddRemoveAccessPermissionRequest = {
+        ...mockDataSetAddAccessParams,
+        dataSetId: mockInvalidId
+      };
+      await expect(dataSetService.addDataSetAccessPermissions(invalidAccessParams)).rejects.toThrow(
+        Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`)
+      );
     });
   });
 });
