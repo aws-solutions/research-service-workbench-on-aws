@@ -10,11 +10,27 @@ import _ from 'lodash';
 import { DataSet } from './dataSet';
 import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
-import { DataSetsStoragePlugin, EndpointConnectionStrings } from './dataSetsStoragePlugin';
+import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { ExternalEndpoint } from './externalEndpoint';
+import {
+  AddDataSetExternalEndpointForUserRequest,
+  AddDataSetExternalEndpointResponse
+} from './models/addDataSetExternalEndpoint';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 import { StorageLocation } from './storageLocation';
+
+export interface DataSetMountObject {
+  /** the name of the data set */
+  name: string;
+  /** the endpoint URL */
+  bucket: string;
+  /** the path to the data set storage */
+  prefix: string;
+  /** the endpoint's ID */
+  endpointId: string;
+}
 
 export class DataSetService {
   private _audit: AuditService;
@@ -108,12 +124,9 @@ export class DataSetService {
    * @param dataSetId - the ID of the DataSet.
    * @param endPointId - the ID of the endpoint to remove.
    *
-   * @returns the object needed to mount the Dataset in an external environment.
+   * @returns a {@link DataSetMountObject}
    */
-  public async getDataSetMountObject(
-    dataSetId: string,
-    endPointId: string
-  ): Promise<{ [key: string]: string }> {
+  public async getDataSetMountObject(dataSetId: string, endPointId: string): Promise<DataSetMountObject> {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
 
     if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
@@ -180,45 +193,50 @@ export class DataSetService {
   /**
    * Add an external endpoint to a DataSet.
    *
-   * @param dataSetId - the name of the DataSet to which the endpoint will be added.
-   * @param externalEndpointName - the name of the endpoint to add.
-   * @param externalRoleName - a role which will interact with the endpoint.
-   * @param storageProvider - an instance of {@link DataSetsStoragePlugin} initialized with permissions
-   * to modify the target DataSet's underlying storage.
-   * @param kmsKeyArn - an optional ARN of the KMS key used to encrypt the bucket.
-   * @param vpcId - an optional ID of the VPC interacting with the endpoint.
-   * @returns a JSON object which contains an alias to mount the storage, the DataSet's name, endpoint ID and the storage path.
+   * @param request - the {@link AddDataSetExternalEndpointForUserRequest} object
+   * @returns the {@link AddDataSetExternalEndpointResponse} object
    */
-  public async addDataSetExternalEndpoint(
-    dataSetId: string,
-    externalEndpointName: string,
-    storageProvider: DataSetsStoragePlugin,
-    externalRoleName?: string,
-    kmsKeyArn?: string,
-    vpcId?: string
-  ): Promise<{ [key: string]: string }> {
+  public async addDataSetExternalEndpointForUser(
+    request: AddDataSetExternalEndpointForUserRequest
+  ): Promise<AddDataSetExternalEndpointResponse> {
+    const { dataSetId, userId, externalEndpointName, storageProvider, externalRoleName, kmsKeyArn, vpcId } =
+      request;
+
+    const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
+      dataSetId,
+      subject: userId
+    });
+    if (!permissionsData.permissions.length) {
+      throw new NotAuthorizedError(
+        `User "${userId}" does not have permission to access dataset "${dataSetId}.`
+      );
+    }
+
+    const readOnly = permissionsData.permissions.some(({ accessLevel }) => accessLevel === 'read-only');
+
     const targetDS: DataSet = await this.getDataSet(dataSetId);
 
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
       throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
-    const connections: EndpointConnectionStrings = await storageProvider.addExternalEndpoint(
-      targetDS.storageName,
-      targetDS.path,
+    const { data: connectionsData } = await storageProvider.addExternalEndpoint({
+      name: targetDS.storageName,
+      path: targetDS.path,
       externalEndpointName,
-      targetDS.awsAccountId!,
+      ownerAccountId: targetDS.awsAccountId!,
+      accessLevel: readOnly ? 'read-only' : 'read-write',
       externalRoleName,
       kmsKeyArn,
       vpcId
-    );
+    });
 
     const endPointParam: ExternalEndpoint = {
       name: externalEndpointName,
       dataSetId: targetDS.id!,
       dataSetName: targetDS.name,
       path: targetDS.path,
-      endPointUrl: connections.endPointUrl,
-      endPointAlias: connections.endPointAlias
+      endPointUrl: connectionsData.connections.endPointUrl,
+      endPointAlias: connectionsData.connections.endPointAlias
     };
 
     if (externalRoleName) {
@@ -232,12 +250,15 @@ export class DataSetService {
     targetDS.externalEndpoints.push(endPoint.id!);
 
     await this._dbProvider.updateDataSet(targetDS);
-    return this._generateMountObject(
+
+    const mountObject = this._generateMountObject(
       endPoint.dataSetName,
       endPoint.endPointAlias!,
       endPoint.path,
       endPoint.id!
     );
+
+    return { data: { mountObject } };
   }
 
   /**
@@ -260,6 +281,7 @@ export class DataSetService {
       dataSetId,
       endPointId
     );
+
     endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
     if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) return;
 
@@ -318,7 +340,7 @@ export class DataSetService {
     endPointURL: string,
     path: string,
     endpointId: string
-  ): { [key: string]: string } {
+  ): DataSetMountObject {
     return {
       name: dataSetName,
       bucket: endPointURL,

@@ -12,13 +12,22 @@ import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExte
 export { DataSet } from './dataSet';
 export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
-export { DataSetService } from './dataSetService';
+export { DataSetService, DataSetMountObject } from './dataSetService';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExistsError';
-export { isRoleExistsOnEndpointError, RoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
+export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
 export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
+export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorizedError';
+export {
+  AddDataSetExternalEndpointForUserRequest as AddDataSetExternalEndpointRequest,
+  AddDataSetExternalEndpointResponse
+} from './models/addDataSetExternalEndpoint';
+export {
+  AddStorageExternalEndpointRequest,
+  AddStorageExternalEndpointResponse
+} from './models/addStorageExternalEndpoint';
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';

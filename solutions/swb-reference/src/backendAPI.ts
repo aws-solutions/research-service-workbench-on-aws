@@ -75,6 +75,25 @@ const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
 const projectService: ProjectService = new ProjectService({
   TABLE_NAME: process.env.STACK_NAME!
 });
+
+const fakeDataSetsAuthorizationPlugin: DataSetsAuthorizationPlugin = {
+  addAccessPermission: (params) => {
+    throw new Error('Not Implemented');
+  },
+  getAccessPermissions: ({ dataSetId, subject }) => {
+    return Promise.resolve({ data: { dataSetId, permissions: [{ subject, accessLevel: 'read-write' }] } });
+  },
+  removeAccessPermissions: (params) => {
+    throw new Error('Not Implemented');
+  },
+  getAllDataSetAccessPermissions: (datasetId) => {
+    throw new Error('Not Implemented');
+  },
+  removeAllAccessPermissions: (datasetId) => {
+    throw new Error('Not Implemented');
+  }
+};
+
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
     {
@@ -105,7 +124,7 @@ const apiRouteConfig: ApiRouteConfig = {
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
     logger,
     new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
-    {} as DataSetsAuthorizationPlugin //TODO: REPLACE WITH ACTUAL IMPLEMENTATION ONCE ITS AVAILABLE
+    fakeDataSetsAuthorizationPlugin //TODO: REPLACE WITH ACTUAL IMPLEMENTATION ONCE ITS AVAILABLE
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,

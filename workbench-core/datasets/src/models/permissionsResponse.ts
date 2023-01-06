@@ -12,5 +12,5 @@ export interface PermissionsResponse {
     /** dataset permissions */
     permissions: DataSetPermission[];
   };
-  pageToken: string;
+  pageToken?: string;
 }

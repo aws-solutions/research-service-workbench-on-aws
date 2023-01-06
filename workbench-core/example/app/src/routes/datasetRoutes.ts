@@ -73,12 +73,13 @@ export function setUpDSRoutes(
         throw Boom.badRequest('datasetid request parameter is invalid');
       }
       processValidatorResult(validate(req.body, CreateExternalEndpointSchema));
-      await dataSetService.addDataSetExternalEndpoint(
-        req.params.datasetId,
-        req.body.externalEndpointName,
-        dataSetStoragePlugin,
-        req.body.externalRoleName
-      );
+      await dataSetService.addDataSetExternalEndpointForUser({
+        dataSetId: req.params.datasetId,
+        externalEndpointName: req.body.externalEndpointName,
+        storageProvider: dataSetStoragePlugin,
+        userId: req.body.userId, // TODO get authenticated user instead?
+        externalRoleName: req.body.externalRoleName
+      });
       res.status(201).send();
     })
   );

@@ -7,6 +7,7 @@ import {
   AddRemoveAccessPermissionRequest,
   CreateProvisionDatasetRequest,
   DataSet,
+  DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
   DataSetStoragePlugin,
@@ -17,9 +18,9 @@ import {
 import { AuditService } from '@aws/workbench-core-audit';
 import {
   DataSetMetadataPlugin,
+  DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
-import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import { LoggingService } from '@aws/workbench-core-logging';
 
 export class DataSetService implements DataSetPlugin {
@@ -46,15 +47,11 @@ export class DataSetService implements DataSetPlugin {
 
   public addDataSetExternalEndpoint(
     request: DataSetExternalEndpointRequest
-  ): Promise<Record<string, string>> {
-    return this._workbenchDataSetService.addDataSetExternalEndpoint(
-      request.dataSetId,
-      request.externalEndpointName,
-      this.storagePlugin,
-      request.externalRoleName,
-      request.kmsKeyArn,
-      request.vpcId
-    );
+  ): Promise<DataSetAddExternalEndpointResponse> {
+    return this._workbenchDataSetService.addDataSetExternalEndpointForUser({
+      ...request,
+      storageProvider: this.storagePlugin
+    });
   }
 
   public getDataSet(dataSetId: string): Promise<DataSet> {
