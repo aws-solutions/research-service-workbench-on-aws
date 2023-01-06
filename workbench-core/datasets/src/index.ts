@@ -31,7 +31,7 @@ export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamR
 export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';
-export { PermissionsResponse } from './models/permissionsResponse';
+export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 export {
   AddDatasetPermissionsToRoleSchema,

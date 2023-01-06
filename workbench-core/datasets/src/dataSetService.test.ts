@@ -509,9 +509,12 @@ describe('DataSetService', () => {
       });
     });
     it('throws when an invalid dataset Id is given.', async () => {
-      await expect(dataSetService.getDataSet(mockInvalidId)).rejects.toThrow(
-        Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`)
-      );
+      try {
+        await dataSetService.getDataSet(mockInvalidId);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
     });
   });
 
@@ -671,9 +674,12 @@ describe('DataSetService', () => {
         ...mockDataSetAddAccessParams,
         dataSetId: mockInvalidId
       };
-      await expect(dataSetService.addDataSetAccessPermissions(invalidAccessParams)).rejects.toThrow(
-        Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`)
-      );
+      try {
+        await dataSetService.addDataSetAccessPermissions(invalidAccessParams);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
     });
   });
 });

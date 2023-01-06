@@ -64,7 +64,6 @@ describe('DataSets access permissions integration tests', () => {
     it('Adds a read-only and a read-write access permission when read-write is requested.', async () => {
       let response = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = response.data.id;
-      console.log(dataSetId);
       response = await adminSession.resources.groups.create({}, true);
       const { groupId } = response.data;
 

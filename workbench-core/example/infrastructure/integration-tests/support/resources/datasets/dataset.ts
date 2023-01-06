@@ -4,7 +4,8 @@
  */
 
 import { IdentityPermission as Permission } from '@aws/workbench-core-authorization';
-import { PermissionsResponse } from '@aws/workbench-core-datasets';
+import { validateAndParse } from '@aws/workbench-core-base';
+import { PermissionsResponse, PermissionsResponseParser } from '@aws/workbench-core-datasets';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import { DatasetHelper } from '../../complex/datasetHelper';
@@ -50,7 +51,10 @@ export default class Dataset extends Resource {
   public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
-    const permissionsCreated: PermissionsResponse = response.data;
+    const permissionsCreated: PermissionsResponse = validateAndParse(
+      PermissionsResponseParser,
+      response.data
+    );
 
     const permissions: Permission[] = permissionsCreated.data.permissions.map((p) => {
       return {

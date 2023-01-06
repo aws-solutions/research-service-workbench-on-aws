@@ -53,7 +53,6 @@ export class DataSetService {
    */
   public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
     const metadata: Metadata = {
-      actor: { id: '-', roles: [] },
       action: this.provisionDataSet.name,
       source: {
         serviceName: DataSetService.name
@@ -71,11 +70,9 @@ export class DataSetService {
         storageType: storageProvider.getStorageType()
       };
       const response: DataSet = await this._dbProvider.addDataSet(provisioned);
-      metadata.statusCode = 200;
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
-      metadata.statusCode = 400;
       await this._audit.write(metadata, error);
       throw error;
     }
@@ -171,15 +168,13 @@ export class DataSetService {
       source: {
         serviceName: DataSetService.name
       },
-      requestBody: dataSetId
+      params: { dataSetId }
     };
     try {
       const response: DataSet = await this._dbProvider.getDataSetMetadata(dataSetId);
-      metadata.statusCode = 200;
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
-      metadata.statusCode = 400;
       await this._audit.write(metadata, error);
       throw error;
     }
@@ -376,11 +371,9 @@ export class DataSetService {
       // this will throw if the dataset is not found.
       await this.getDataSet(params.dataSetId);
       const response: PermissionsResponse = await this._authzPlugin.addAccessPermission(params);
-      metadata.statusCode = 200;
       await this._audit.write(metadata, response);
       return response;
     } catch (error) {
-      metadata.statusCode = 400;
       await this._audit.write(metadata, error);
       throw error;
     }
