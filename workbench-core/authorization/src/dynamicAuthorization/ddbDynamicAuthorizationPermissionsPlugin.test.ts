@@ -20,13 +20,14 @@ import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
+import { RetryError } from '../errors/retryError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { DDBDynamicAuthorizationPermissionsPlugin } from './ddbDynamicAuthorizationPermissionsPlugin';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
 
 describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
   let region: string;
-  let ddbTableName;
+  let ddbTableName: string;
   let mockAuthenticatedUser: AuthenticatedUser;
 
   let dynamoDBDynamicPermissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
@@ -409,11 +410,91 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     });
   });
   describe('deleteIdentityPermissions', () => {
-    it('throws a not implemented exception', async () => {
+    test('Delete an identity permission', async () => {
+      mockDDB
+        .on(TransactWriteItemsCommand, {
+          TransactItems: [
+            {
+              Delete: {
+                Key: {
+                  pk: { S: `${sampleSubjectType}|${sampleSubjectId}` },
+                  sk: { S: [sampleAction, sampleEffect, sampleGroupType, sampleGroupId].join('|') }
+                },
+                TableName: ddbTableName
+              }
+            }
+          ]
+        })
+        .resolvesOnce({});
+
+      const { data } = await dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
+        identityPermissions: [mockIdentityPermission],
+        authenticatedUser: mockAuthenticatedUser
+      });
+
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
+    });
+
+    test('Delete an identity permission, transaction canceled should throw RetryError', async () => {
+      const mockTransactionCanceledException = new TransactionCanceledException({
+        message: 'Transaction cancelled',
+        $metadata: {}
+      });
+      mockDDB
+        .on(TransactWriteItemsCommand, {
+          TransactItems: [
+            {
+              Delete: {
+                Key: {
+                  pk: { S: `${sampleSubjectType}|${sampleSubjectId}` },
+                  sk: { S: [sampleAction, sampleEffect, sampleGroupType, sampleGroupId].join('|') }
+                },
+                TableName: ddbTableName
+              }
+            }
+          ]
+        })
+        .rejectsOnce(mockTransactionCanceledException);
+
       await expect(
         dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
-          authenticatedUser: mockAuthenticatedUser,
-          identityPermissions: []
+          identityPermissions: [mockIdentityPermission],
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrow(RetryError);
+    });
+    test('Delete an identity permission, exceeds 100 should throw ThroughputExceededError', async () => {
+      const exceededIdentities = Array(101).fill(mockIdentityPermission);
+
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
+          identityPermissions: exceededIdentities,
+          authenticatedUser: mockAuthenticatedUser
+        })
+      ).rejects.toThrow(ThroughputExceededError);
+    });
+
+    test('Delete an identity permission, random error encountered should be thrown', async () => {
+      mockDDB
+        .on(TransactWriteItemsCommand, {
+          TransactItems: [
+            {
+              Delete: {
+                Key: {
+                  pk: { S: `${sampleSubjectType}|${sampleSubjectId}` },
+                  sk: { S: [sampleAction, sampleEffect, sampleGroupType, sampleGroupId].join('|') }
+                },
+                TableName: ddbTableName
+              }
+            }
+          ]
+        })
+        .rejectsOnce(new Error());
+
+      await expect(
+        dynamoDBDynamicPermissionsPlugin.deleteIdentityPermissions({
+          identityPermissions: [mockIdentityPermission],
+          authenticatedUser: mockAuthenticatedUser
         })
       ).rejects.toThrow(Error);
     });
