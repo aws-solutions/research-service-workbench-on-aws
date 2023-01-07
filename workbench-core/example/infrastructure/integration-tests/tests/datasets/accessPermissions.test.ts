@@ -36,10 +36,10 @@ describe('DataSets access permissions integration tests', () => {
 
   describe('addDataSetAccessPermissions', () => {
     it('Adds a read-only access permission.', async () => {
-      let response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId: string = response.data.id;
-      response = await adminSession.resources.groups.create({}, true);
-      const { groupId } = response.data;
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
           permission: {
@@ -62,10 +62,10 @@ describe('DataSets access permissions integration tests', () => {
       });
     });
     it('Adds a read-only and a read-write access permission when read-write is requested.', async () => {
-      let response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId: string = response.data.id;
-      response = await adminSession.resources.groups.create({}, true);
-      const { groupId } = response.data;
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
 
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
@@ -94,10 +94,10 @@ describe('DataSets access permissions integration tests', () => {
       });
     });
     it('adds access permissions for a user.', async () => {
-      let response = await adminSession.resources.users.create(user);
-      const userData = response.data;
-      response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId = response.data.id;
+      const createUserResponse = await adminSession.resources.users.create(user);
+      const userData = createUserResponse.data;
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
 
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
@@ -121,10 +121,10 @@ describe('DataSets access permissions integration tests', () => {
       });
     });
     it('throws if "identityType" is not "GROUP" or "USER"', async () => {
-      let response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId = response.data.id;
-      response = await adminSession.resources.groups.create({}, true);
-      const { groupId } = response.data;
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
           permission: {
@@ -136,10 +136,10 @@ describe('DataSets access permissions integration tests', () => {
       ).rejects.toThrow(new HttpError(400, {}));
     });
     it('throws if "accessLevel" is not "read-only" or "read-write"', async () => {
-      let response = await adminSession.resources.datasets.create({}, true);
-      const dataSetId = response.data.id;
-      response = await adminSession.resources.groups.create({}, true);
-      const { groupId } = response.data;
+      const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
+      const dataSetId: string = createDataSetResponse.data.id;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
           permission: {
@@ -152,8 +152,8 @@ describe('DataSets access permissions integration tests', () => {
       ).rejects.toThrow(new HttpError(400, {}));
     });
     it('throws if the DataSet does not exist.', async () => {
-      const response = await adminSession.resources.groups.create({}, true);
-      const { groupId } = response.data;
+      const createGroupResponse = await adminSession.resources.groups.create({}, true);
+      const { groupId } = createGroupResponse.data;
 
       const fakeDataSet: Dataset = adminSession.resources.datasets.dataset({
         id: `${dataSetPrefix.toLowerCase()}-${uuidv4()}`,
