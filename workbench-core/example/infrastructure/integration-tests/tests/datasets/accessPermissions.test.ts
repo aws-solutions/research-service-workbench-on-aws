@@ -61,7 +61,7 @@ describe('DataSets access permissions integration tests', () => {
         }
       });
     });
-    it('Adds a read-only and a read-write access permission when read-write is requested.', async () => {
+    it('Adds a read-write access permission when read-write is requested.', async () => {
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
       const createGroupResponse = await adminSession.resources.groups.create({}, true);
@@ -79,11 +79,6 @@ describe('DataSets access permissions integration tests', () => {
         data: {
           dataSetId: dataSetId,
           permissions: [
-            {
-              identityType: 'GROUP',
-              identity: groupId,
-              accessLevel: 'read-only'
-            },
             {
               identityType: 'GROUP',
               identity: groupId,
