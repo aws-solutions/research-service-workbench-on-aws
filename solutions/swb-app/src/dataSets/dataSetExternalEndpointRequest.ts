@@ -6,7 +6,7 @@
 export interface DataSetExternalEndpointRequest {
   dataSetId: string;
   externalEndpointName: string;
-  userId: string;
+  groupId: string;
   externalRoleName?: string;
   kmsKeyArn?: string;
   vpcId?: string;

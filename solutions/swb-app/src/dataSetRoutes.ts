@@ -69,7 +69,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
       await dataSetService.addDataSetExternalEndpoint({
         dataSetId: req.params.id,
         externalEndpointName: validatedRequest.externalEndpointName,
-        userId: 'TODO',
+        groupId: 'TODO',
         externalRoleName: validatedRequest.externalRoleName,
         kmsKeyArn: validatedRequest.kmsKeyArn,
         vpcId: validatedRequest.vpcId

@@ -50,6 +50,7 @@ export class DataSetService implements DataSetPlugin {
   ): Promise<DataSetAddExternalEndpointResponse> {
     return this._workbenchDataSetService.addDataSetExternalEndpointForUser({
       ...request,
+      userId: request.groupId,
       storageProvider: this.storagePlugin
     });
   }

@@ -18,8 +18,11 @@ import {
   DDBDynamicAuthorizationPermissionsPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
-import { S3DataSetStoragePlugin, DdbDataSetMetadataPlugin } from '@aws/workbench-core-datasets';
-import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
+import {
+  S3DataSetStoragePlugin,
+  DataSetsAuthorizationPlugin,
+  DdbDataSetMetadataPlugin
+} from '@aws/workbench-core-datasets';
 import {
   EnvironmentService,
   EnvironmentTypeService,
