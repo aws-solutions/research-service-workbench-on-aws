@@ -531,6 +531,14 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "radix-router",
+      "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "radix3",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },

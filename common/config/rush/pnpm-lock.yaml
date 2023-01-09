@@ -788,6 +788,7 @@ importers:
       lodash: ^4.17.21
       npm-package-json-lint: ^6.3.0
       npm-package-json-lint-config-default: ^5.0.0
+      radix3: ^1.0.0
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
       zod: ^3.19.1
@@ -798,6 +799,7 @@ importers:
       '@aws/workbench-core-user-management': link:../user-management
       '@casl/ability': 5.4.4
       lodash: 4.17.21
+      radix3: 1.0.0
       zod: 3.19.1
     devDependencies:
       '@aws-sdk/client-dynamodb': 3.226.0
@@ -14771,6 +14773,10 @@ packages:
   /quick-lru/5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
+    dev: false
+
+  /radix3/1.0.0:
+    resolution: {integrity: sha512-6n3AEXth91ASapMVKiEh2wrbFJmI+NBilrWE0AbiGgfm0xet0QXC8+a3K19r1UVYjUjctUgB053c3V/J6V0kCQ==}
     dev: false
 
   /ramda/0.27.2:

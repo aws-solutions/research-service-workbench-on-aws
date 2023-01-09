@@ -35,6 +35,7 @@
     "@aws/workbench-core-user-management": "workspace:*",
     "@casl/ability": "^5.4.3",
     "lodash": "^4.17.21",
+    "radix3": "^1.0.0",
     "zod": "^3.19.1"
   },
   "devDependencies": {

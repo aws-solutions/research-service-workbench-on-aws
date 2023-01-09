@@ -3,28 +3,36 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HTTPMethod } from '../../routesMap';
+import { z } from 'zod';
+import { HTTPMethodParser } from '../../routesMap';
 import { DynamicOperation } from './dynamicOperation';
-/**
- * Request object for GetDynamicOperationsByRoute
- */
-export interface GetDynamicOperationsByRouteRequest {
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const GetDynamicOperationsByRouteRequestParser = z.object({
   /**
    * Route associated to the Dynamic Operations
    */
-  route: string;
+  route: z.string(),
+
   /**
    * Method associated to the route
    */
-  method: HTTPMethod;
-}
+  method: HTTPMethodParser
+});
+
+/**
+ * Request object for GetDynamicOperationsByRoute
+ */
+export type GetDynamicOperationsByRouteRequest = z.infer<typeof GetDynamicOperationsByRouteRequestParser>;
 
 /**
  * Response object for GetDynamicOperationsByRoute
  */
 export interface GetDynamicOperationsByRouteResponse {
-  /**
-   * {@link DynamicOperation} associated to the route
-   */
-  dynamicOperations: DynamicOperation[];
+  data: {
+    /**
+     * {@link DynamicOperation} associated to the route
+     */
+    dynamicOperations: DynamicOperation[];
+  };
 }
