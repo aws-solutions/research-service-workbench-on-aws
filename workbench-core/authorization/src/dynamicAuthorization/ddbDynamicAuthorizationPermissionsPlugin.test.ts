@@ -22,6 +22,7 @@ import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
+import { RouteMapError } from '../errors/routeMapError';
 import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
@@ -73,6 +74,7 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
   let routesIgnored: RoutesIgnored;
 
   beforeEach(() => {
+    expect.hasAssertions();
     jest.resetModules(); // Most important - it clears the cache
 
     ddbTableName = 'PermissionsTable';
@@ -170,6 +172,31 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       description: { S: sampleDescription }
     };
     base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';
+  });
+
+  describe('constructor', () => {
+    test('can not define protection and ignore for the same route + method', async () => {
+      const dynamicRoutesMap: DynamicRoutesMap = {
+        '/sampleRoute': {
+          GET: []
+        }
+      };
+
+      const routesIgnored: RoutesIgnored = {
+        '/sampleRoute': {
+          GET: true
+        }
+      };
+      try {
+        new DDBDynamicAuthorizationPermissionsPlugin({
+          dynamoDBService: awsService.helpers.ddb,
+          dynamicRoutesMap,
+          routesIgnored
+        });
+      } catch (err) {
+        expect(err).toBeInstanceOf(RouteMapError);
+      }
+    });
   });
 
   describe('isRouteIgnored', () => {

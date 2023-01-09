@@ -11,6 +11,7 @@ import { Action } from '../action';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
+import { RouteMapError } from '../errors/routeMapError';
 import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
@@ -60,15 +61,24 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     this._protectedRoutes = createRouter();
     this._ignoredRoutes = createRouter();
 
+    const routesSet = new Set();
+
     if (config.routesIgnored) {
-      for (const [key, value] of Object.entries(config.routesIgnored)) {
-        this._ignoredRoutes.insert(key, { httpMethods: value });
+      for (const [route, httpMethods] of Object.entries(config.routesIgnored)) {
+        this._ignoredRoutes.insert(route, { httpMethods });
+        Object.keys(httpMethods).forEach((method) => {
+          routesSet.add(`${method}:${route}`);
+        });
       }
     }
 
     if (config.dynamicRoutesMap) {
-      for (const [key, value] of Object.entries(config.dynamicRoutesMap)) {
-        this._protectedRoutes.insert(key, { methodToDynamicOperations: value });
+      for (const [route, methodToDynamicOperations] of Object.entries(config.dynamicRoutesMap)) {
+        this._protectedRoutes.insert(route, { methodToDynamicOperations });
+        Object.keys(methodToDynamicOperations).forEach((method) => {
+          if (routesSet.has(`${method}:${route}`))
+            throw new RouteMapError(`${method}:${route} was already ignored`);
+        });
       }
     }
   }
