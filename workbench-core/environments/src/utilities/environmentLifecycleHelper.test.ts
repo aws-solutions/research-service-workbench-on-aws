@@ -79,7 +79,7 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpointForUser = jest.fn();
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn();
     helper.dataSetService.getDataSet = jest.fn();
     helper.environmentService.addMetadata = jest.fn();
 
@@ -121,7 +121,7 @@ describe('EnvironmentLifecycleHelper', () => {
       type: '',
       dependency: ''
     };
-    helper.dataSetService.addDataSetExternalEndpointForUser = jest.fn(async () => {
+    helper.dataSetService.addDataSetExternalEndpointForGroup = jest.fn(async () => {
       return {
         data: {
           mountObject: {
