@@ -24,6 +24,8 @@ export { EndPointExistsError, isEndPointExistsError } from './errors/endPointExi
 export { RoleExistsOnEndpointError, isRoleExistsOnEndpointError } from './errors/roleExistsOnEndpointError';
 export { InvalidIamRoleError, isInvalidIamRoleError } from './errors/invalidIamRoleError';
 export { NotAuthorizedError, isNotAuthorizedError } from './errors/notAuthorizedError';
+export { DataSetNotFoundError, isDataSetNotFoundError } from './errors/dataSetNotFoundError';
+export { InvalidArnError, isInvalidArnError } from './errors/invalidArnError';
 export {
   AddDataSetExternalEndpointForUserRequest as AddDataSetExternalEndpointRequest,
   AddDataSetExternalEndpointResponse

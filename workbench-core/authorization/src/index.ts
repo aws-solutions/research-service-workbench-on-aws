@@ -14,7 +14,7 @@ export { Action } from './action';
 export { default as RoutesMap, HTTPMethod, RoutesIgnored, MethodToOperations } from './routesMap';
 export { default as AuthorizationService } from './authorizationService';
 export { default as withAuth, retrieveUser } from './authorizationMiddleware';
-export { AuthenticatedUser } from './authenticatedUser';
+export { AuthenticatedUser, AuthenticatedUserParser } from './authenticatedUser';
 export { ForbiddenError, isForbiddenError } from './errors/forbiddenError';
 export {
   AuthenticatedUserNotFoundError,

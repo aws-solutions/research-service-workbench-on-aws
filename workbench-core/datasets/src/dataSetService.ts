@@ -12,6 +12,7 @@ import { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { EndPointExistsError } from './errors/endPointExistsError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { ExternalEndpoint } from './externalEndpoint';
 import {
@@ -196,7 +197,14 @@ export class DataSetService {
    * Add an external endpoint to a DataSet for a given group.
    *
    * @param request - the {@link AddDataSetExternalEndpointForGroupRequest} object
+   *
    * @returns the {@link AddDataSetExternalEndpointResponse} object
+   *
+   * @throws {@link DataSetNotFoundError} - the dataset doesnt exist
+   * @throws {@link NotAuthorizedError} - the group doesnt have permission to access the dataset
+   * @throws {@link EndPointExistsError} - the requested endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName request parameter is invalid
+   * TODO add throws for authz get access permissions
    */
   public async addDataSetExternalEndpointForGroup(
     request: AddDataSetExternalEndpointForGroupRequest
@@ -208,7 +216,14 @@ export class DataSetService {
    * Add an external endpoint to a DataSet for a given user.
    *
    * @param request - the {@link AddDataSetExternalEndpointForUserRequest} object
+   *
    * @returns the {@link AddDataSetExternalEndpointResponse} object
+   *
+   * @throws {@link DataSetNotFoundError} - the dataset doesnt exist
+   * @throws {@link NotAuthorizedError} - the group doesnt have permission to access the dataset
+   * @throws {@link EndPointExistsError} - the requested endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName request parameter is invalid
+   * TODO add throws for authz get access permissions
    */
   public async addDataSetExternalEndpointForUser(
     request: AddDataSetExternalEndpointForUserRequest
@@ -325,7 +340,7 @@ export class DataSetService {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
 
     if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
-      throw Boom.badRequest(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
+      throw new EndPointExistsError(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
 
     const { data: connectionsData } = await storageProvider.addExternalEndpoint({
       name: targetDS.storageName,

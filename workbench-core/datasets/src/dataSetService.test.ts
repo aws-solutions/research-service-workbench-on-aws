@@ -17,11 +17,11 @@ import {
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
-import * as Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
+import { EndPointExistsError } from './errors/endPointExistsError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { AddDataSetExternalEndpointResponse } from './models/addDataSetExternalEndpoint';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
@@ -510,23 +510,16 @@ describe('DataSetService', () => {
           permissions: [{ identity: mockGroupId, identityType: 'GROUP', accessLevel: 'read-write' }]
         }
       });
-      let response;
 
-      try {
-        response = await dataSetService.addDataSetExternalEndpointForGroup({
+      await expect(
+        dataSetService.addDataSetExternalEndpointForGroup({
           dataSetId: mockDataSetWithEndpointId,
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           groupId: mockGroupId,
           externalRoleName: mockRoleArn
-        });
-      } catch (err) {
-        response = err;
-      }
-      expect(Boom.isBoom(response, 400)).toBe(true);
-      expect(response.message).toEqual(
-        `'${mockExistingEndpointName}' already exists in '${mockDataSetWithEndpointId}'.`
-      );
+        })
+      ).rejects.toThrow(EndPointExistsError);
     });
 
     it('throws if the subject doesnt have permission to access the dataset', async () => {
@@ -581,23 +574,16 @@ describe('DataSetService', () => {
           permissions: [{ identity: mockUserId, identityType: 'USER', accessLevel: 'read-write' }]
         }
       });
-      let response;
 
-      try {
-        response = await dataSetService.addDataSetExternalEndpointForUser({
+      await expect(
+        dataSetService.addDataSetExternalEndpointForUser({
           dataSetId: mockDataSetWithEndpointId,
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           userId: mockUserId,
           externalRoleName: mockRoleArn
-        });
-      } catch (err) {
-        response = err;
-      }
-      expect(Boom.isBoom(response, 400)).toBe(true);
-      expect(response.message).toEqual(
-        `'${mockExistingEndpointName}' already exists in '${mockDataSetWithEndpointId}'.`
-      );
+        })
+      ).rejects.toThrow(EndPointExistsError);
     });
 
     it('throws if the subject doesnt have permission to access the dataset', async () => {

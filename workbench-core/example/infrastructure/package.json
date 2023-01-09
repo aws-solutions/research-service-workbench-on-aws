@@ -48,7 +48,6 @@
     "@aws/workbench-core-authorization": "workspace:*",
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
-    "@aws/workbench-core-environments": "workspace:*",
     "@aws/workbench-core-example-app": "workspace:*",
     "@aws/workbench-core-infrastructure": "workspace:*",
     "@aws/workbench-core-user-management": "workspace:*",

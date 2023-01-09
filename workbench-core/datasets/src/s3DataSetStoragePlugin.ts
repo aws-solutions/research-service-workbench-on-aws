@@ -27,6 +27,7 @@ import { AwsService } from '@aws/workbench-core-base';
 import { IamHelper, InsertStatementResult } from './awsUtilities/iamHelper';
 import { DataSet } from './dataSet';
 import { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
+import { InvalidArnError } from './errors/invalidArnError';
 import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
@@ -429,11 +430,13 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
   private _awsAccountIdFromArn(arn: string): string {
     const arnParts = arn.split(':');
     if (arnParts.length < 6) {
-      throw new Error("Expected an arn with at least six ':' separated values.");
+      throw new InvalidArnError("Expected an arn with at least six ':' separated values.");
     }
 
     if (!arnParts[4] || arnParts[4] === '') {
-      throw new Error('Expected an arn with an AWS AccountID however AWS AccountID field is empty.');
+      throw new InvalidArnError(
+        'Expected an arn with an AWS AccountID however AWS AccountID field is empty.'
+      );
     }
 
     return arnParts[4];
