@@ -25,6 +25,7 @@ export { RouteNotSecuredError, isRouteNotSecuredError } from './errors/routeNotS
 export { GroupAlreadyExistsError, isGroupAlreadyExistsError } from './errors/groupAlreadyExistsError';
 export { GroupNotFoundError, isGroupNotFoundError } from './errors/groupNotFoundError';
 export { ThroughputExceededError, isThroughputExceededError } from './errors/throughputExceededError';
+export { RetryError, isRetryError } from './errors/retryError';
 export {
   IdentityPermissionCreationError,
   isIdentityPermissionCreationError
@@ -55,6 +56,7 @@ export {
 } from './dynamicAuthorization/dynamicAuthorizationInputs/deleteGroup';
 export {
   DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsRequestParser,
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorization/dynamicAuthorizationInputs/deleteIdentityPermissions';
 export {

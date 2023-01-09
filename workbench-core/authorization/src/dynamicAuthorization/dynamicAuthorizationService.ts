@@ -16,6 +16,7 @@ import {
 import { DeleteGroupRequest, DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
 import {
   DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsRequestParser,
   DeleteIdentityPermissionsResponse
 } from './dynamicAuthorizationInputs/deleteIdentityPermissions';
 import { DoesGroupExistRequest, DoesGroupExistResponse } from './dynamicAuthorizationInputs/doesGroupExist';
@@ -214,9 +215,31 @@ export class DynamicAuthorizationService {
   public async deleteIdentityPermissions(
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = DeleteIdentityPermissionsRequestParser.parse(deleteIdentityPermissionsRequest);
+    const { authenticatedUser } = validatedRequest;
+    const metadata: Metadata = {
+      actor: authenticatedUser,
+      action: this.deleteIdentityPermissions.name,
+      source: {
+        serviceName: DynamicAuthorizationService.name
+      },
+      requestBody: validatedRequest
+    };
+    try {
+      const response = await this._dynamicAuthorizationPermissionsPlugin.deleteIdentityPermissions(
+        validatedRequest
+      );
+      //Write audit entry when success
+      metadata.statusCode = 200;
+      await this._auditService.write(metadata, response);
 
-    // TODO audit
+      return response;
+    } catch (err) {
+      //Write audit entry when failure
+      metadata.statusCode = 400;
+      await this._auditService.write(metadata, err);
+      throw err;
+    }
   }
 
   /**

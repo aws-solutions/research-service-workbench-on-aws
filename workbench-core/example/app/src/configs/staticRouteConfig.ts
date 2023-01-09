@@ -221,6 +221,12 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'IdentityPermission'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
     ]
   },
   '/authorization/permissions/identity': {

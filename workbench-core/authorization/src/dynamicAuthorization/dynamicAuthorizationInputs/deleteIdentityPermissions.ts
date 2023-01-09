@@ -3,29 +3,38 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthenticatedUser } from '../../authenticatedUser';
-import { IdentityPermission } from './identityPermission';
+import { z } from 'zod';
+import { AuthenticatedUserParser } from '../../authenticatedUser';
+import { IdentityPermission, IdentityPermissionParser } from './identityPermission';
+
+// eslint-disable-next-line @rushstack/typedef-var
+export const DeleteIdentityPermissionsRequestParser = z.object({
+  /**
+   * {@link AuthenticatedUser}
+   */
+  authenticatedUser: AuthenticatedUserParser,
+  /**
+   * An array of {@link IdentityPermission} to be deleted
+   */
+  identityPermissions: z.array(IdentityPermissionParser)
+});
 
 /**
  * Request object for DeleteIdentityPermissions
  */
-export interface DeleteIdentityPermissionsRequest {
-  /**
-   * {@link AuthenticatedUser}
-   */
-  authenticatedUser: AuthenticatedUser;
-  /**
-   * An array of {@link IdentityPermission} to be deleted
-   */
-  identityPermissions: IdentityPermission[];
-}
+export type DeleteIdentityPermissionsRequest = z.infer<typeof DeleteIdentityPermissionsRequestParser>;
 
 /**
  * Response object for DeleteIdentityPermissions
  */
 export interface DeleteIdentityPermissionsResponse {
   /**
-   * States whether the {@link IdentityPermission}s were successfully deleted
+   * The data object returned
    */
-  deleted: boolean;
+  data: {
+    /**
+     * An array of {@link IdentityPermission}s deleted
+     */
+    identityPermissions: IdentityPermission[];
+  };
 }
