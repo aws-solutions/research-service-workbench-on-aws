@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { AuthenticatedUserParser } from '../../authenticatedUser';
-import { IdentityPermission, IdentityPermissionsParser } from './identityPermission';
+import { IdentityPermission, IdentityPermissionParser } from './identityPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const CreateIdentityPermissionsRequestParser = z.object({
@@ -16,7 +16,7 @@ export const CreateIdentityPermissionsRequestParser = z.object({
   /**
    * An array of {@link IdentityPermission} to be created
    */
-  identityPermissions: z.array(IdentityPermissionsParser)
+  identityPermissions: z.array(IdentityPermissionParser)
 });
 
 /**
@@ -33,7 +33,7 @@ export interface CreateIdentityPermissionsResponse {
    */
   data: {
     /**
-     * An array of {@link IdentityPermission}s created
+     * An array of {@link IdentityPermission}s deleted
      */
     identityPermissions: IdentityPermission[];
   };

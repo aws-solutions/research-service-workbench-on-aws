@@ -221,9 +221,23 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'IdentityPermission'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
     ]
   },
   '/authorization/permissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/subject': {
     GET: [
       {
         action: 'READ',

@@ -343,25 +343,76 @@ describe('DynamicAuthorizationService', () => {
     });
   });
   describe('deleteIdentityPermissions', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.deleteIdentityPermissions({
-          identityPermissions: [],
-          authenticatedUser: mockUser
-        })
-      ).rejects.toThrow(Error);
+    beforeEach(() => {
+      auditAction = 'deleteIdentityPermissions';
+    });
+
+    test('delete identity permissions', async () => {
+      const mockReturnValue = {
+        data: {
+          identityPermissions: mockIdentityPermissions
+        },
+        authenticatedUser: mockUser
+      };
+      mockDynamicAuthorizationPermissionsPlugin.deleteIdentityPermissions = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const params = {
+        authenticatedUser: mockUser,
+        identityPermissions: mockIdentityPermissions
+      };
+      const response = await dynamicAuthzService.deleteIdentityPermissions(params);
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 200
+        },
+        response
+      );
+    });
+
+    test('delete identity permissions, throws ThroughputExceededError', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.deleteIdentityPermissions = jest
+        .fn()
+        .mockRejectedValueOnce(new ThroughputExceededError());
+      const params = {
+        authenticatedUser: mockUser,
+        identityPermissions: mockIdentityPermissions
+      };
+      await expect(dynamicAuthzService.deleteIdentityPermissions(params)).rejects.toThrow(
+        ThroughputExceededError
+      );
+      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+        {
+          actor: mockUser,
+          source: auditSource,
+          action: auditAction,
+          requestBody: params,
+          statusCode: 400
+        },
+        new ThroughputExceededError()
+      );
     });
   });
 
   describe('getIdentityPermissionsBySubject', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamicAuthzService.getIdentityPermissionsBySubject({
-          subjectType: '',
-          subjectId: '',
-          authenticatedUser: mockUser
-        })
-      ).rejects.toThrow(Error);
+    test('get identity permissions by subject', async () => {
+      mockDynamicAuthorizationPermissionsPlugin.getIdentityPermissionsBySubject = jest
+        .fn()
+        .mockResolvedValue({
+          data: {
+            identityPermissions: [mockIdentityPermission]
+          }
+        });
+      const request = {
+        subjectId: sampleSubjectId,
+        subjectType: sampleSubjectType
+      };
+      const { data } = await dynamicAuthzService.getIdentityPermissionsBySubject(request);
+      expect(data.identityPermissions).toStrictEqual([mockIdentityPermission]);
     });
   });
 
@@ -396,30 +447,37 @@ describe('DynamicAuthorizationService', () => {
       );
     });
 
-    it('throws and writes to audit service when user cannnot be added to group', async () => {
-      mockGroupManagementPlugin.addUserToGroup = jest
-        .fn()
-        .mockRejectedValue(new GroupNotFoundError('Group does not exist.'));
+    test.each([
+      [GroupNotFoundError, new GroupNotFoundError('Group does not exist.')],
+      [
+        GroupNotFoundError,
+        new GroupNotFoundError(`Cannot assign user to group 'groupId'. It is pending delete.`)
+      ]
+    ])(
+      'throws exception %s and writes to audit service when user management plugin throws %s',
+      async (exceptionType, exceptionInstance) => {
+        mockGroupManagementPlugin.addUserToGroup = jest.fn().mockRejectedValue(exceptionInstance);
 
-      const requestBody = {
-        groupId,
-        userId,
-        authenticatedUser: mockUser
-      };
+        const requestBody = {
+          groupId,
+          userId,
+          authenticatedUser: mockUser
+        };
 
-      await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(GroupNotFoundError);
+        await expect(dynamicAuthzService.addUserToGroup(requestBody)).rejects.toThrow(exceptionType);
 
-      expect(auditServiceWriteSpy).toHaveBeenCalledWith(
-        {
-          actor: mockUser,
-          source: auditSource,
-          action: auditAction,
-          requestBody,
-          statusCode: 400
-        },
-        new GroupNotFoundError('Group does not exist.')
-      );
-    });
+        expect(auditServiceWriteSpy).toHaveBeenCalledWith(
+          {
+            actor: mockUser,
+            source: auditSource,
+            action: auditAction,
+            requestBody,
+            statusCode: 400
+          },
+          exceptionInstance
+        );
+      }
+    );
   });
 
   describe('removeUserFromGroup', () => {

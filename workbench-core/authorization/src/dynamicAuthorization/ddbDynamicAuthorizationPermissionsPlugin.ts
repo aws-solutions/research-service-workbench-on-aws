@@ -3,10 +3,13 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBService, JSONValue, addPaginationToken } from '@aws/workbench-core-base';
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+import { DynamoDBService, JSONValue, addPaginationToken, getPaginationToken } from '@aws/workbench-core-base';
+import _ from 'lodash';
 import { Action } from '../action';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
+import { RetryError } from '../errors/retryError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
 
 import {
@@ -87,7 +90,50 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async getIdentityPermissionsBySubject(
     getIdentityPermissionsBySubjectRequest: GetIdentityPermissionsBySubjectRequest
   ): Promise<GetIdentityPermissionsBySubjectResponse> {
-    throw new Error('Method not implemented.');
+    const { subjectId, subjectType } = getIdentityPermissionsBySubjectRequest;
+    const key = {
+      name: 'pk',
+      value: this._createIdentityPermissionsPartitionKey(subjectType, subjectId)
+    };
+
+    const query = this._dynamoDBService.query({
+      key
+    });
+
+    if (getIdentityPermissionsBySubjectRequest.action) {
+      query.sortKey('sk').begins({ S: `${getIdentityPermissionsBySubjectRequest.action}` });
+    }
+
+    //IN operator maxed out at 100
+    if (getIdentityPermissionsBySubjectRequest.identities) {
+      const { identities } = getIdentityPermissionsBySubjectRequest;
+      if (identities.length > 100) throw new ThroughputExceededError('Number of identities exceed 100');
+      const attributesValues: Record<string, AttributeValue> = {};
+      for (let i = 0; i < identities.length; i++) {
+        // eslint-disable-next-line security/detect-object-injection
+        const { identityType, identityId } = identities[i];
+        _.set(attributesValues, `:id${i}`, {
+          S: `${identityType}|${identityId}`
+        });
+      }
+      const idINFilterExp = `#id IN ( ${Object.keys(attributesValues).toString()} )`;
+      query.filter(idINFilterExp);
+      query.names({ '#id': 'identity' });
+      query.values(attributesValues);
+    }
+
+    const response = await query.execute();
+    const items = response.Items ?? [];
+    const identityPermissions: IdentityPermission[] = items.map((item) => {
+      return this._transformItemToIdentityPermission(item as unknown as Record<string, JSONValue>);
+    });
+
+    return {
+      data: {
+        identityPermissions
+      },
+      paginationToken: getPaginationToken(response)
+    };
   }
   public async createIdentityPermissions(
     createIdentityPermissionsRequest: CreateIdentityPermissionsRequest
@@ -128,7 +174,33 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
   public async deleteIdentityPermissions(
     deleteIdentityPermissionsRequest: DeleteIdentityPermissionsRequest
   ): Promise<DeleteIdentityPermissionsResponse> {
-    throw new Error('Method not implemented.');
+    const { identityPermissions } = deleteIdentityPermissionsRequest;
+    if (identityPermissions.length > 100)
+      throw new ThroughputExceededError('Can not perform over 100 deletions');
+
+    const keys = identityPermissions.map((identityPermission) => {
+      const { subjectType, subjectId, action, effect, identityType, identityId } = identityPermission;
+      const pk = this._createIdentityPermissionsPartitionKey(subjectType, subjectId);
+      const sk = this._createIdentityPermissionsSortKey(action, effect, identityType, identityId);
+      return {
+        pk,
+        sk
+      };
+    });
+    //transact delete items, should be fine if one or more fail, throw a retry error
+    try {
+      await this._dynamoDBService.commitTransaction({
+        addDeleteRequests: keys
+      });
+    } catch (err) {
+      if (err.name === 'TransactionCanceledException') throw new RetryError();
+      throw err;
+    }
+    return {
+      data: {
+        identityPermissions: deleteIdentityPermissionsRequest.identityPermissions
+      }
+    };
   }
 
   /**
@@ -183,7 +255,7 @@ export class DDBDynamicAuthorizationPermissionsPlugin implements DynamicAuthoriz
     identityType: IdentityType,
     identityId: string
   ): string {
-    return `${action}${this._delimiter}${effect}${this._delimiter}${identityType}${this._delimiter}${identityId}`;
+    return [action, effect, identityType, identityId].join(this._delimiter);
   }
   private _transformItemToIdentityPermission(item: Record<string, JSONValue>): IdentityPermission {
     const { pk, sk, conditions, fields, description } = item;

@@ -14,7 +14,12 @@ import {
   CreateIdentityPermissionsRequestParser,
   isUserNotFoundError,
   GetIdentityPermissionsByIdentityRequest,
-  GetIdentityPermissionsByIdentityRequestParser
+  GetIdentityPermissionsByIdentityRequestParser,
+  GetIdentityPermissionsBySubjectRequest,
+  GetIdentityPermissionsBySubjectRequestParser,
+  DeleteIdentityPermissionsRequest,
+  DeleteIdentityPermissionsRequestParser,
+  isRetryError
 } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -204,6 +209,49 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
       );
       const { data } = await service.getIdentityPermissionsByIdentity(validatedRequest);
       res.status(201).send(data);
+    })
+  );
+  router.get(
+    '/authorization/permissions/subject',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        if (req.query && req.query.identities) {
+          const identities: string[] = req.query.identities as string[];
+          req.query.identities = identities.map((identity) => JSON.parse(identity));
+        }
+        const validatedRequest = validateAndParse<GetIdentityPermissionsBySubjectRequest>(
+          GetIdentityPermissionsBySubjectRequestParser,
+          req.query
+        );
+        const { data } = await service.getIdentityPermissionsBySubject(validatedRequest);
+        res.status(201).send(data);
+      } catch (err) {
+        if (isThroughputExceededError(err)) throw Boom.tooManyRequests('Too many identities');
+        throw err;
+      }
+    })
+  );
+
+  router.delete(
+    '/authorization/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const authenticatedUser = res.locals.user;
+        const validatedRequest = validateAndParse<DeleteIdentityPermissionsRequest>(
+          DeleteIdentityPermissionsRequestParser,
+          {
+            ...req.body,
+            authenticatedUser
+          }
+        );
+        const { data } = await service.deleteIdentityPermissions(validatedRequest);
+        res.status(201).send(data);
+      } catch (err) {
+        if (isThroughputExceededError(err))
+          throw Boom.tooManyRequests('Exceed limit on deletion of permissions');
+        if (isRetryError(err)) throw Boom.serverUnavailable('Request a retry');
+        throw err;
+      }
     })
   );
 }
