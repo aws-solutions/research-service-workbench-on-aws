@@ -9,8 +9,8 @@ import {
   AwsAccountTemplateUrlsParser,
   UpdateAccountSchema,
   HostingAccountService,
-  CreateAccountData,
   UpdateAccountData,
+  CreateAccountRequestParser,
   ListAccountRequest,
   ListAccountsRequestParser
 } from '@aws/workbench-core-accounts';
@@ -48,16 +48,9 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateAccountSchema));
-      const { name, awsAccountId, envMgmtRoleArn, hostingAccountHandlerRoleArn, externalId } = req.body;
-      const createAccountMetadata: CreateAccountData = {
-        name: escape(name),
-        awsAccountId: escape(awsAccountId),
-        envMgmtRoleArn: escape(envMgmtRoleArn),
-        hostingAccountHandlerRoleArn: escape(hostingAccountHandlerRoleArn),
-        externalId: escape(externalId)
-      };
+      const validatedRequest = CreateAccountRequestParser.parse(req.body);
 
-      const createdAccount = await hostingAccountService.create(createAccountMetadata);
+      const createdAccount = await hostingAccountService.create(validatedRequest);
       res.status(201).send(createdAccount);
     })
   );

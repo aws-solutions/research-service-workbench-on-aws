@@ -21,6 +21,7 @@ import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
+import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import AccountService from '../services/accountService';
 
@@ -28,14 +29,6 @@ interface Arns {
   statusHandlerArn: string;
   artifactBucketArn: string;
   mainAcctEncryptionArn: string;
-}
-
-export interface CreateAccountData {
-  name: string;
-  awsAccountId: string;
-  envMgmtRoleArn: string;
-  hostingAccountHandlerRoleArn: string;
-  externalId: string;
 }
 
 export interface UpdateAccountData {
@@ -114,7 +107,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async createAccount(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
+  public async createAccount(accountMetadata: CreateAccountRequest): Promise<Record<string, string>> {
     const arns = await this._getArns();
 
     await this._attachAwsAccount({

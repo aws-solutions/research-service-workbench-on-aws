@@ -195,7 +195,7 @@ export default class AccountService {
       throw Boom.notFound(`Could not find account ${accountId}`);
     }
 
-    return accountEntry.Item! as unknown as Account;
+    return AccountParser.parse(accountEntry.Item);
   }
 
   private async _getAccountWithMetadata(accountId: string): Promise<Account> {

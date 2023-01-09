@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { AccountService, CreateAccountData } from '@aws/workbench-core-accounts';
+import { AccountService } from '@aws/workbench-core-accounts';
 import { Account } from '@aws/workbench-core-accounts/lib/models/accounts/account';
 import { resourceTypeToKey } from '@aws/workbench-core-base';
 import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
@@ -31,7 +31,7 @@ describe('multiStep awsAccount integration test', () => {
 
     const randomTextGenerator = new RandomTextGenerator(setup.getSettings().get('runId'));
 
-    const createAccountParams: CreateAccountData = {
+    const createAccountParams = {
       hostingAccountHandlerRoleArn: settings.get('hostingAccountHandlerRoleArn'),
       awsAccountId: settings.get('hostAwsAccountId'),
       envMgmtRoleArn: settings.get('envMgmtRoleArn'),

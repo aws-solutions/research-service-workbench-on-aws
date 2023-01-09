@@ -6,9 +6,9 @@
 import { PaginatedResponse } from '@aws/workbench-core-base';
 import { TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
+import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import HostingAccountLifecycleService, {
-  CreateAccountData,
   UpdateAccountData
 } from '../utilities/hostingAccountLifecycleService';
 
@@ -37,7 +37,7 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async create(accountMetadata: CreateAccountData): Promise<Record<string, string>> {
+  public async create(accountMetadata: CreateAccountRequest): Promise<Record<string, string>> {
     return await this._lifecycleService.createAccount(accountMetadata);
   }
 

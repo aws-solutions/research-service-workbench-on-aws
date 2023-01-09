@@ -87,6 +87,14 @@ describe('AccountService', () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
+        name: { S: 'fakeAccountName' },
+        envMgmtRoleArn: { S: 'fakeArn' },
+        hostingAccountHandlerRoleArn: { S: 'fakeArn' },
+        externalId: { S: 'fakeExternalId' },
+        stackName: { S: 'fakeStackName' },
+        status: { S: 'CURRENT' },
+        updatedAt: { S: '2023-01-09T19:45:12.397Z' },
+        createdAt: { S: '2023-01-09T19:45:12.397Z' },
         awsAccountId: { S: '123456789012' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },
@@ -133,6 +141,14 @@ describe('AccountService', () => {
     mockDDB.on(UpdateItemCommand).resolves({});
     mockDDB.on(GetItemCommand).resolves({
       Item: {
+        name: { S: 'fakeAccountName' },
+        envMgmtRoleArn: { S: 'fakeArn' },
+        hostingAccountHandlerRoleArn: { S: 'fakeArn' },
+        externalId: { S: 'fakeExternalId' },
+        stackName: { S: 'fakeStackName' },
+        status: { S: 'CURRENT' },
+        updatedAt: { S: '2023-01-09T19:45:12.397Z' },
+        createdAt: { S: '2023-01-09T19:45:12.397Z' },
         awsAccountId: { S: 'someOtherAwsAccountId' },
         targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
         portfolioId: { S: 'port-1234' },

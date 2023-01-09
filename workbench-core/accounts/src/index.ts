@@ -4,6 +4,7 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import { CreateAccountRequest, CreateAccountRequestParser } from './models/accounts/createAccountRequest';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
 import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
 import {
@@ -26,7 +27,6 @@ import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
 import HostingAccountLifecycleService, {
-  CreateAccountData,
   UpdateAccountData
 } from './utilities/hostingAccountLifecycleService';
 
@@ -48,8 +48,9 @@ export {
   UpdateAccountSchema,
   AwsAccountTemplateUrls,
   AwsAccountTemplateUrlsParser,
-  CreateAccountData,
   UpdateAccountData,
+  CreateAccountRequest,
+  CreateAccountRequestParser,
   ListAccountRequest,
   ListAccountsRequestParser
 };
