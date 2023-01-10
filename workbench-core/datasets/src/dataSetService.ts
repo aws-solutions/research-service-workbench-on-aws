@@ -181,13 +181,16 @@ export class DataSetService {
     const targetDS: DataSet = await this.getDataSet(dataSetId);
     const targetEndpoint = await this.getExternalEndPoint(dataSetId, externalEndpointId);
 
-    if (!targetDS.externalEndpoints || !_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointId))
+    if (
+      !targetDS.externalEndpoints ||
+      !_.find(targetDS.externalEndpoints, (ep) => ep === targetEndpoint.name)
+    )
       return;
 
     await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
 
     targetDS.externalEndpoints = _.remove(targetDS.externalEndpoints, (endpoint) => {
-      return endpoint === externalEndpointId;
+      return endpoint === targetEndpoint.name;
     });
 
     await this._dbProvider.updateDataSet(targetDS);
@@ -370,7 +373,7 @@ export class DataSetService {
 
     if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
 
-    targetDS.externalEndpoints.push(endPoint.id!);
+    targetDS.externalEndpoints.push(endPoint.name);
 
     await this._dbProvider.updateDataSet(targetDS);
 

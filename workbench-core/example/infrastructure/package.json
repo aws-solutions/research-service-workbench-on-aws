@@ -31,7 +31,7 @@
     "pkg-json-lint": "npmPkgJsonLint -c ../../../.npmpackagejsonlintrc.json .",
     "sort-package-json": "sort-package-json package.json",
     "test": "rushx test:only",
-    "test-cdk-deploy": "rush build && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
+    "test-cdk-deploy": "rush build -t @aws/workbench-core-example-infrastructure && rushx compile && cdk deploy --all --require-approval never --outputs-file src/config/testEnv.json",
     "test:only": "heft test -u --clean --no-build"
   },
   "dependencies": {
