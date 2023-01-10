@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { DataSetMountObject } from '../dataSetService';
 import { DataSetsStoragePlugin } from '../dataSetsStoragePlugin';
 
@@ -15,6 +16,8 @@ export interface AddDataSetExternalEndpointForUserRequest {
   storageProvider: DataSetsStoragePlugin;
   /** the userId to create the endpoint for */
   userId: string;
+  /** the user performing the action */
+  authenticatedUser: AuthenticatedUser;
   /** a role which will interact with the endpoint */
   externalRoleName?: string;
   /** an optional ARN of the KMS key used to encrypt the bucket */

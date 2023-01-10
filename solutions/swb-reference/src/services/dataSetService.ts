@@ -5,7 +5,6 @@
 
 import {
   AddRemoveAccessPermissionRequest,
-  CreateProvisionDatasetRequest,
   DataSet,
   DataSetAddExternalEndpointResponse,
   DataSetExternalEndpointRequest,
@@ -17,6 +16,7 @@ import {
 } from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
 import {
+  CreateProvisionDatasetRequest,
   DataSetMetadataPlugin,
   DataSetsAuthorizationPlugin,
   DataSetService as WorkbenchDataSetService
@@ -56,7 +56,7 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public getDataSet(dataSetId: string): Promise<DataSet> {
-    return this._workbenchDataSetService.getDataSet(dataSetId);
+    return this._workbenchDataSetService.getDataSet(dataSetId, { id: '', roles: [] });
   }
 
   public importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
@@ -64,7 +64,7 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public listDataSets(): Promise<DataSet[]> {
-    return this._workbenchDataSetService.listDataSets();
+    return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
   }
 
   public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {

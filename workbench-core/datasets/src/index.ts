@@ -9,14 +9,17 @@ import CreateExternalEndpointSchema from './schemas/createExternalEndpoint';
 import CreatePresignedSinglePartFileUploadUrl from './schemas/createPresignedSinglePartFileUploadUrl';
 import CreateRegisterExternalBucketRoleSchema from './schemas/createRegisterExternalBucketRoleSchema';
 
-export { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
+export {
+  AddRemoveAccessPermissionRequest,
+  AddRemoveAccessPermissionParser
+} from './models/addRemoveAccessPermissionRequest';
 export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
 export { DataSet } from './dataSet';
 export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
 export { DataSetService, DataSetMountObject } from './dataSetService';
-export { DataSetPermission } from './models/dataSetPermission';
-export { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
+export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
+export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';
 export { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
 export { DataSetHasEndpointError, isDataSetHasEndpointError } from './errors/dataSetHasEndpointError';
@@ -37,7 +40,7 @@ export { GetDataSetMountPointRequest } from './models/getDataSetMountPointReques
 export { InvalidPermissionError, isInvalidPermissionError } from './errors/invalidPermissionError';
 export { ExternalEndpoint } from './externalEndpoint';
 export { IamHelper } from './awsUtilities/iamHelper';
-export { PermissionsResponse } from './models/permissionsResponse';
+export { PermissionsResponse, PermissionsResponseParser } from './models/permissionsResponse';
 export { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 export {
   AddDatasetPermissionsToRoleSchema,
