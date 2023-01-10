@@ -23,7 +23,12 @@ export interface GetGroupUsersRequest {
  */
 export interface GetGroupUsersResponse {
   /**
-   * A list of user ids associated to the group
+   * The data object returned
    */
-  userIds: string[];
+  data: {
+    /**
+     * A list of user ids associated to the group
+     */
+    userIds: string[];
+  };
 }

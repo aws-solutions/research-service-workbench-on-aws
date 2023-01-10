@@ -3,42 +3,49 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { Action } from '../../action';
-import { AuthenticatedUser } from '../../authenticatedUser';
-import { Identity, IdentityPermission } from './identityPermission';
+import { z } from 'zod';
+import { ActionParser } from '../../action';
+import { IdentityParser, IdentityPermission } from './identityPermission';
 
-/**
- * Request object for GetIdentityPermissionsBySubject
- */
-export interface GetIdentityPermissionsBySubjectRequest {
-  /**
-   * {@link AuthenticatedUser}
-   */
-  authenticatedUser: AuthenticatedUser;
+// eslint-disable-next-line @rushstack/typedef-var
+export const GetIdentityPermissionsBySubjectRequestParser = z.object({
   /**
    * SubjectType associated to the {@link IdentityPermission}s
    */
-  subjectType: string;
+  subjectType: z.string(),
   /**
    * Subject id associated to the subject
    */
-  subjectId: string;
+  subjectId: z.string(),
   /**
    * Filter by {@link Action}
    */
-  action?: Action;
+  action: ActionParser.optional(),
   /**
    * Filter by identities
    */
-  identities?: Identity[];
-}
+  identities: z.array(IdentityParser).optional(),
+  /**
+   * Pagination token to retrieve the next set of results
+   */
+  paginationToken: z.string().optional()
+});
+/**
+ * Request object for GetIdentityPermissionsBySubject
+ */
+export type GetIdentityPermissionsBySubjectRequest = z.infer<
+  typeof GetIdentityPermissionsBySubjectRequestParser
+>;
 
 /**
  * Response object for GetIdentityPermissionsBySubject
  */
 export interface GetIdentityPermissionsBySubjectResponse {
-  /**
-   * An array of {@link IdentityPermission} associated to the subject
-   */
-  identityPermissions: IdentityPermission[];
+  data: {
+    /**
+     * An array of {@link IdentityPermission} associated to the subject
+     */
+    identityPermissions: IdentityPermission[];
+  };
+  paginationToken?: string;
 }
