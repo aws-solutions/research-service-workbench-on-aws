@@ -237,13 +237,13 @@ To run integration tests
                 "status": "AVAILABLE",
                 "createdAt": "2022-12-22T16:43:10.617Z",
                 "updatedAt": "2023-01-09T22:51:52.026Z",
-                "awsAccountId": "123456789123",
-                "envMgmtRoleArn": "arn:aws:iam::123456789123:role/swb-<stage>-<region>-env-mgmt",
-                "hostingAccountHandlerRoleArn": "arn:aws:iam::123456789123:role/    swb-<stage>-<region>-hosting-account-role",
+                "awsAccountId": "XXXXXXXXXXXX",
+                "envMgmtRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/swb-<stage>-<region>-env-mgmt",
+                "hostingAccountHandlerRoleArn": "arn:aws:iam::XXXXXXXXXXXX:role/    swb-<stage>-<region>-hosting-account-role",
                 "vpcId": "vpc-xxxxxxxxxxxxxxxxx",
                 "subnetId": "subnet-xxxxxxxxxxxxxxxxx",
                 "environmentInstanceFiles": "s3://swb-<stage>-<region>-s3artifactsXXXXXXXXXX/environment-files",
-                "encryptionKeyArn": "arn:aws:kms:us-east-2:123456789123:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+                "encryptionKeyArn": "arn:aws:kms:us-east-2:XXXXXXXXXXXX:key/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
                 "externalId": "workbench",
                 "accountId": "acc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 }
