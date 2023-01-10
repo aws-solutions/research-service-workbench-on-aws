@@ -3,11 +3,12 @@
   "collectCoverage": true,
   "coverageThreshold": {
     "global": {
-      "branches": 60,
-      "functions": 60,
-      "lines": 60,
-      "statements": 60
+      "branches": 97,
+      "functions": 97,
+      "lines": 97,
+      "statements": 97
     }
   },
+  "coveragePathIgnorePatterns": ["<rootDir>/src/index.ts"],
   "coverageReporters": ["json-summary", "json", "lcov", "text"]
 }

@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidRegExpAsString } from '@aws/workbench-core-base';
+import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
 import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
@@ -107,8 +107,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/roles/\\S+': {
-    // Roles use the role name (which can be any string), not a guid
+  [`/roles/${groupIDRegExpAsString}`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -184,11 +183,65 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  ['/authorization/groups/add-user']: {
-    POST: [
+  [`/authorization/groups/${groupIDRegExpAsString}/add-user`]: {
+    PUT: [
       {
         action: 'UPDATE',
         subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/remove-user`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/get-users`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/is-user-assigned/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  '/authorization/permissions': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'IdentityPermission'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/subject': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
       }
     ]
   }

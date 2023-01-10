@@ -30,7 +30,12 @@ export interface IsUserAssignedToGroupRequest {
  */
 export interface IsUserAssignedToGroupResponse {
   /**
-   * Describes if user assigned to group
+   * The data object returned
    */
-  isAssigned: boolean;
+  data: {
+    /**
+     * Describes if the user assigned to the group
+     */
+    isAssigned: boolean;
+  };
 }

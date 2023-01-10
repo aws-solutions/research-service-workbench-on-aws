@@ -91,7 +91,8 @@
     "globalOverrides": {
       "trim-newlines": ">=3.0.1",
       "got": ">=11.8.5",
-      "jsonwebtoken": ">=9.0.0"
+      "jsonwebtoken": ">=9.0.0",
+      "json5": ">=2.2.2"
     },
 
     /**
