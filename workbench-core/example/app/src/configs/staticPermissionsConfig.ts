@@ -38,6 +38,11 @@ const adminPermissions: Permission[] = [
   },
   {
     effect: 'ALLOW',
+    action: 'DELETE',
+    subject: 'DatasetAccess'
+  },
+  {
+    effect: 'ALLOW',
     action: 'READ',
     subject: 'Storage'
   },

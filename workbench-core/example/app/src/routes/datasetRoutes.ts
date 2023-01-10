@@ -249,4 +249,36 @@ export function setUpDSRoutes(
       }
     })
   );
+
+  // remove dataset access permission
+  router.delete(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      console.log('remove dataset permission');
+      console.log(JSON.stringify(req.params));
+      console.log(JSON.stringify(req.body));
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
+        AddRemoveAccessPermissionParser,
+        req.body
+      );
+      let response: PermissionsResponse;
+      try {
+        response = await dataSetService.removeDataSetAccessPermissions({
+          authenticatedUser: res.locals.user,
+          dataSetId: req.params.datasetId,
+          ...validatedRequest
+        });
+        res.status(200).send(response);
+      } catch (error) {
+        console.log(error);
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
+        }
+        throw error;
+      }
+    })
+  );
 }

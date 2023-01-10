@@ -8,7 +8,8 @@ import {
   DynamicAuthorizationService,
   Effect,
   IdentityType,
-  IdentityPermission
+  IdentityPermission,
+  DeleteIdentityPermissionsResponse
 } from '@aws/workbench-core-authorization';
 import _ from 'lodash';
 import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
@@ -26,39 +27,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
-    if (params.permission.accessLevel !== 'read-only' && params.permission.accessLevel !== 'read-write') {
-      throw new InvalidPermissionError("Access Level must be 'read-only' or 'read-write'.");
-    }
-
-    if (params.permission.identityType !== 'GROUP' && params.permission.identityType !== 'USER') {
-      throw new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'.");
-    }
-
-    const permissionsEffect: Effect = 'ALLOW';
-    const identityType: IdentityType = params.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
-
-    const identityPermissions: IdentityPermission[] = [
-      {
-        identityType: identityType,
-        identityId: params.permission.identity,
-        action: 'READ',
-        effect: permissionsEffect,
-        subjectType: 'DataSet',
-        subjectId: params.dataSetId,
-        description: `'${params.permission.accessLevel}' access on DataSet '${params.dataSetId}'`
-      }
-    ];
-    if (params.permission.accessLevel === 'read-write') {
-      identityPermissions.push({
-        identityType: identityType,
-        identityId: params.permission.identity,
-        action: 'UPDATE',
-        effect: permissionsEffect,
-        subjectType: 'DataSet',
-        subjectId: params.dataSetId,
-        description: "'read-write' access on DataSet '${params.dataSetId}'"
-      });
-    }
+    const identityPermissions: IdentityPermission[] = this._dataSetPermissionToIdentityPermissions(params);
     const createdPermission: CreateIdentityPermissionsResponse =
       await this._authorizer.createIdentityPermissions({
         authenticatedUser: params.authenticatedUser,
@@ -86,7 +55,26 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
   public async removeAccessPermissions(
     params: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
-    throw new Error('Method not implemented.');
+    const identityPermissions: IdentityPermission[] = this._dataSetPermissionToIdentityPermissions(params);
+
+    const removedPermissions: DeleteIdentityPermissionsResponse =
+      await this._authorizer.deleteIdentityPermissions({
+        authenticatedUser: params.authenticatedUser,
+        identityPermissions
+      });
+
+    const permissions: PermissionsResponse[] = this._identityPermissionsToPermissionsResponse(
+      removedPermissions.data.identityPermissions
+    );
+    const permissionsCount = permissions.length;
+
+    if (permissionsCount !== 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsCount}.`
+      );
+    }
+
+    return permissions[0];
   }
 
   public async getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
@@ -95,6 +83,53 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
 
   public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
     throw new Error('Method not implemented.');
+  }
+
+  private _dataSetPermissionToIdentityPermissions(
+    dataSetPermission: AddRemoveAccessPermissionRequest
+  ): IdentityPermission[] {
+    if (
+      dataSetPermission.permission.accessLevel !== 'read-only' &&
+      dataSetPermission.permission.accessLevel !== 'read-write'
+    ) {
+      throw new InvalidPermissionError("Access Level must be 'read-only' or 'read-write'.");
+    }
+
+    if (
+      dataSetPermission.permission.identityType !== 'GROUP' &&
+      dataSetPermission.permission.identityType !== 'USER'
+    ) {
+      throw new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'.");
+    }
+
+    const permissionsEffect: Effect = 'ALLOW';
+    const identityType: IdentityType =
+      dataSetPermission.permission.identityType === 'GROUP' ? 'GROUP' : 'USER';
+
+    const identityPermissions: IdentityPermission[] = [
+      {
+        identityType: identityType,
+        identityId: dataSetPermission.permission.identity,
+        action: 'READ',
+        effect: permissionsEffect,
+        subjectType: 'DataSet',
+        subjectId: dataSetPermission.dataSetId,
+        description: `'${dataSetPermission.permission.accessLevel}' access on DataSet '${dataSetPermission.dataSetId}'`
+      }
+    ];
+    if (dataSetPermission.permission.accessLevel === 'read-write') {
+      identityPermissions.push({
+        identityType: identityType,
+        identityId: dataSetPermission.permission.identity,
+        action: 'UPDATE',
+        effect: permissionsEffect,
+        subjectType: 'DataSet',
+        subjectId: dataSetPermission.dataSetId,
+        description: "'read-write' access on DataSet '${params.dataSetId}'"
+      });
+    }
+
+    return identityPermissions;
   }
 
   private _identityPermissionsToPermissionsResponse(

@@ -301,6 +301,10 @@ describe('DataSetService', () => {
     jest
       .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
       .mockImplementation(async () => mockAddAccessResponse);
+
+    jest
+      .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'removeAccessPermissions')
+      .mockImplementation(async () => mockAddAccessResponse);
   });
 
   describe('constructor', () => {
@@ -736,6 +740,26 @@ describe('DataSetService', () => {
       };
       try {
         await dataSetService.addDataSetAccessPermissions(invalidAccessParams);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
+    });
+  });
+
+  describe('removeDataSetAccessPermissions', () => {
+    it('returns access permissions removed from a DataSet', async () => {
+      await expect(
+        dataSetService.removeDataSetAccessPermissions(mockDataSetAddAccessParams)
+      ).resolves.toStrictEqual(mockAddAccessResponse);
+    });
+    it('throws when the dataSet does not exist', async () => {
+      const invalidAccessParams: AddRemoveAccessPermissionRequest = {
+        ...mockDataSetAddAccessParams,
+        dataSetId: mockInvalidId
+      };
+      try {
+        await dataSetService.removeDataSetAccessPermissions(invalidAccessParams);
       } catch (error) {
         expect(Boom.isBoom(error, 404)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);

@@ -72,6 +72,12 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'DatasetAccess'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'DatasetAccess'
+      }
     ]
   },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
