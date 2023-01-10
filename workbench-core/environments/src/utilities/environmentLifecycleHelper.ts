@@ -179,7 +179,11 @@ export default class EnvironmentLifecycleHelper {
         await this.dataSetService.removeDataSetExternalEndpoint(
           endpoint.dataSetId,
           endpoint.id,
-          new S3DataSetStoragePlugin(this.aws)
+          new S3DataSetStoragePlugin(this.aws),
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
@@ -212,11 +216,18 @@ export default class EnvironmentLifecycleHelper {
         const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
           datasetId,
           datasetEndPointName,
-          new S3DataSetStoragePlugin(this.aws)
+          new S3DataSetStoragePlugin(this.aws),
+          {
+            id: '',
+            roles: []
+          }
         );
 
-        const dataSet = await this.dataSetService.getDataSet(datasetId);
-        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId);
+        const dataSet = await this.dataSetService.getDataSet(datasetId, { id: '', roles: [] });
+        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId, {
+          id: '',
+          roles: []
+        });
         const endpointObj = {
           id: endpoint.id!,
           dataSetId: endpoint.dataSetId,
@@ -292,7 +303,11 @@ export default class EnvironmentLifecycleHelper {
           endpoint.dataSetId,
           endpoint.id,
           instanceRoleArn,
-          s3DataSetStoragePlugin
+          s3DataSetStoragePlugin,
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
