@@ -38,7 +38,15 @@ export default class EnvironmentLifecycleHelper {
       table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
     });
     const logger: LoggingService = new LoggingService();
-    const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
+    const requiredAuditValues: string[] = ['actor', 'source'];
+    const fieldsToMask: string[] = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
+
+    const auditService: AuditService = new AuditService(
+      new BaseAuditPlugin(new AuditLogger(logger)),
+      true,
+      requiredAuditValues,
+      fieldsToMask
+    );
     const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
       groupManagementPlugin: new WBCGroupManagementPlugin({
         userManagementService: new UserManagementService(

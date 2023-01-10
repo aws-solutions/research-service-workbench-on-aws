@@ -57,16 +57,18 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: SageMaker Notebook Instance
+      GroupDescription: Security Group for SageMaker Notebook Instance
       VpcId:
         Ref: VPC
       SecurityGroupEgress:
-        - IpProtocol: tcp
+        - Description: The outbound rules associated with the security group
+          IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
       SecurityGroupIngress:
-        - IpProtocol: tcp
+        - Description: The inbound rules associated with the security group
+          IpProtocol: tcp
           FromPort: 443
           ToPort: 443
           CidrIp: !Ref AccessFromCIDRBlock

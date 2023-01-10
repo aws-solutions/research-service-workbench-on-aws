@@ -37,6 +37,9 @@ import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemake
 import { DataSetService } from './services/dataSetService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
+const requiredAuditValues: string[] = ['actor', 'source'];
+const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
+
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
   region: process.env.AWS_REGION!,
@@ -104,7 +107,7 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
     logger,
     new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
     new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
