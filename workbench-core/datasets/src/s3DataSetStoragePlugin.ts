@@ -31,6 +31,7 @@ import {
   AddStorageExternalEndpointRequest,
   AddStorageExternalEndpointResponse
 } from './models/addStorageExternalEndpoint';
+import { DataSetsAccessLevel } from './models/dataSetsAccessLevel';
 
 /**
  * An implementation of the {@link DataSetStoragePlugin} to support DataSets stored in an S3 Bucket.
@@ -125,7 +126,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
         accessPointName: externalEndpointName,
         accessPointArn: response.endPointArn,
         externalRoleArn: externalRoleName,
-        readWrite: accessLevel === 'read-write'
+        accessLevel
       });
       if (kmsKeyArn) await this._configureKmsKey(kmsKeyArn, externalRoleName);
     }
@@ -273,9 +274,9 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     accessPointName: string;
     accessPointArn: string;
     externalRoleArn: string;
-    readWrite?: boolean;
+    accessLevel?: DataSetsAccessLevel;
   }): Promise<void> {
-    const { externalRoleArn, accessPointArn, dataSetPrefix, readWrite, accessPointName } = config;
+    const { externalRoleArn, accessPointArn, dataSetPrefix, accessLevel, accessPointName } = config;
 
     const listBucketPolicyStatement = PolicyStatement.fromJson(
       JSON.parse(`
@@ -308,7 +309,7 @@ export class S3DataSetStoragePlugin implements DataSetsStoragePlugin {
     `)
     );
 
-    if (readWrite) {
+    if (accessLevel !== 'read-only') {
       getPutBucketPolicyStatement.addActions('s3:PutObject');
     }
 

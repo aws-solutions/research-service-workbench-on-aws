@@ -17,7 +17,8 @@ export { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRe
 export { DataSet } from './dataSet';
 export { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
 export { DataSetMetadataPlugin } from './dataSetMetadataPlugin';
-export { DataSetService, DataSetMountObject } from './dataSetService';
+export { DataSetService } from './dataSetService';
+export { DataSetMountObject } from './models/dataSetMountObject';
 export { DataSetPermission, DataSetPermissionParser } from './models/dataSetPermission';
 export { DataSetsAccessLevel, DataSetsAccessLevelParser } from './models/dataSetsAccessLevel';
 export { DataSetsStoragePlugin } from './dataSetsStoragePlugin';

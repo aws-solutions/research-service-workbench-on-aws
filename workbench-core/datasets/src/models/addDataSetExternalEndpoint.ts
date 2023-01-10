@@ -4,8 +4,8 @@
  */
 
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import { DataSetMountObject } from '../dataSetService';
 import { DataSetsStoragePlugin } from '../dataSetsStoragePlugin';
+import { DataSetMountObject } from './dataSetMountObject';
 
 export interface AddDataSetExternalEndpointForUserRequest {
   /** the name of the DataSet to which the endpoint will be added */

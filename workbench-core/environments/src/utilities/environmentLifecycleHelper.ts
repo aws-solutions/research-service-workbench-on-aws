@@ -12,10 +12,10 @@ import {
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
-  DataSetsAuthorizationPlugin,
   DataSetService,
   DdbDataSetMetadataPlugin,
-  S3DataSetStoragePlugin
+  S3DataSetStoragePlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
@@ -39,8 +39,6 @@ export default class EnvironmentLifecycleHelper {
     });
     const logger: LoggingService = new LoggingService();
     const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
-    // TODO remove eslint-disable once WbcDataSetsAuthorizationPlugin is fully implemented
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
       groupManagementPlugin: new WBCGroupManagementPlugin({
         userManagementService: new UserManagementService(
@@ -55,35 +53,11 @@ export default class EnvironmentLifecycleHelper {
       auditService: auditService
     });
 
-    // TODO remove once WbcDataSetsAuthorizationPlugin is fully implemented
-    const fakeDataSetsAuthorizationPlugin: DataSetsAuthorizationPlugin = {
-      addAccessPermission: (params) => {
-        throw new Error('Not Implemented');
-      },
-      getAccessPermissions: ({ dataSetId, subject }) => {
-        return Promise.resolve({
-          data: {
-            dataSetId,
-            permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
-          }
-        });
-      },
-      removeAccessPermissions: (params) => {
-        throw new Error('Not Implemented');
-      },
-      getAllDataSetAccessPermissions: (datasetId) => {
-        throw new Error('Not Implemented');
-      },
-      removeAllAccessPermissions: (datasetId) => {
-        throw new Error('Not Implemented');
-      }
-    };
-
     this.dataSetService = new DataSetService(
       auditService,
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
-      fakeDataSetsAuthorizationPlugin // TODO replace with WbcDataSetsAuthorizationPlugin once fully implemented
+      new WbcDataSetsAuthorizationPlugin(authzService)
     );
     this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
   }

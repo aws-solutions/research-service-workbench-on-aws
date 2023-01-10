@@ -20,19 +20,9 @@ import {
 } from './models/addDataSetExternalEndpoint';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { CreateProvisionDatasetRequest } from './models/createProvisionDatasetRequest';
+import { DataSetMountObject } from './models/dataSetMountObject';
 import { PermissionsResponse } from './models/permissionsResponse';
 import { StorageLocation } from './storageLocation';
-
-export interface DataSetMountObject {
-  /** the name of the data set */
-  name: string;
-  /** the endpoint URL */
-  bucket: string;
-  /** the path to the data set storage */
-  prefix: string;
-  /** the endpoint's ID */
-  endpointId: string;
-}
 
 export class DataSetService {
   private _audit: AuditService;
