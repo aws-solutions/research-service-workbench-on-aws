@@ -27,6 +27,7 @@ describe('AccountService', () => {
   let accountMetadata: { [id: string]: string } = {};
   let mockDDB: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
   let accountService: AccountService;
+  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
   beforeEach(() => {
     jest.resetModules();
@@ -48,7 +49,7 @@ describe('AccountService', () => {
     accountService = new AccountService(new DynamoDBService({ region, table: stackName }));
 
     accountMetadata = {
-      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      id: accountId,
       name: 'fakeAccount',
       awsAccountId: '123456789012',
       externalId: 'workbench',
@@ -69,8 +70,6 @@ describe('AccountService', () => {
   afterAll(() => {
     process.env = ORIGINAL_ENV; // Restore old environment
   });
-
-  const accountId = `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`;
 
   test('create follows create account path as expected', async () => {
     mockDDB.on(UpdateItemCommand).resolves({
@@ -177,29 +176,6 @@ describe('AccountService', () => {
     ).rejects.toThrow(
       'This AWS Account was found in DDB. Please provide the correct id value in request body'
     );
-  });
-
-  test('create follows create account path as expected', async () => {
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(QueryCommand).resolves({ Count: 0 });
-
-    accountMetadata.awsAccountId = '123456789012';
-
-    // OPERATE
-    const response = await accountService.create({
-      name: 'fakeAccount',
-      awsAccountId: accountMetadata.awsAccountId,
-      envMgmtRoleArn: accountMetadata.envMgmtRoleArn,
-      hostingAccountHandlerRoleArn: accountMetadata.hostingAccountHandlerRoleArn,
-      externalId: accountMetadata.externalId,
-      environmentInstanceFiles: accountMetadata.environmentInstanceFiles
-    });
-
-    // CHECK
-    expect(response).toEqual({
-      ...accountMetadata,
-      id: accountId
-    });
   });
 
   test('getAllAccounts returns no Items attribute', async () => {
