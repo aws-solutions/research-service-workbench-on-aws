@@ -23,17 +23,13 @@ import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accoun
 import { Account } from '../models/accounts/account';
 import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
+import { UpdateAccountRequest } from '../models/accounts/updateAccountRequest';
 import AccountService from '../services/accountService';
 
 interface Arns {
   statusHandlerArn: string;
   artifactBucketArn: string;
   mainAcctEncryptionArn: string;
-}
-
-export interface UpdateAccountData {
-  id: string;
-  name?: string;
 }
 
 export default class HostingAccountLifecycleService {
@@ -123,9 +119,9 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateAccount(accountMetadata: UpdateAccountData): Promise<Account> {
+  public async updateAccount(updateAccountRequest: UpdateAccountRequest): Promise<Account> {
     return this._accountService.update({
-      ...accountMetadata
+      ...updateAccountRequest
     });
   }
 

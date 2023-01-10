@@ -6,7 +6,9 @@
     "<rootDir>/src/handlers/accountHandler.ts",
     "<rootDir>/src/schemas/createAccount.ts",
     "<rootDir>/src/services/hostingAccountService.ts",
-    "<rootDir>/src/index.ts"
+    "<rootDir>/src/index.ts",
+    "<rootDir>/src/models/accounts/createAccountRequest.ts",
+    "<rootDir>/src/models/accounts/updateAccountRequest.ts"
   ],
   "coverageThreshold": {
     "global": {

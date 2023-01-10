@@ -8,9 +8,8 @@ import { TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
 import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
-import HostingAccountLifecycleService, {
-  UpdateAccountData
-} from '../utilities/hostingAccountLifecycleService';
+import { UpdateAccountRequest } from '../models/accounts/updateAccountRequest';
+import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
 
 export default class HostingAccountService {
   private _lifecycleService: HostingAccountLifecycleService;
@@ -43,11 +42,11 @@ export default class HostingAccountService {
 
   /**
    * Update hosting account record in DDB
-   * @param accountMetadata - the attributes of the given hosting account
+   * @param updateAccountRequest - the attributes of the given hosting account
    *
    * @returns account record in DDB
    */
-  public async update(accountMetadata: UpdateAccountData): Promise<Account> {
-    return await this._lifecycleService.updateAccount(accountMetadata);
+  public async update(updateAccountRequest: UpdateAccountRequest): Promise<Account> {
+    return await this._lifecycleService.updateAccount(updateAccountRequest);
   }
 }

@@ -5,20 +5,18 @@
 
 // AWS Account management
 import {
-  CreateAccountSchema,
   AwsAccountTemplateUrlsParser,
-  UpdateAccountSchema,
   HostingAccountService,
-  UpdateAccountData,
   CreateAccountRequestParser,
   ListAccountRequest,
-  ListAccountsRequestParser
+  ListAccountsRequestParser,
+  CreateAccountRequest,
+  UpdateAccountRequest,
+  UpdateAccountRequestParser
 } from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
-import { escape } from 'lodash';
 import { wrapAsync } from './errorHandlers';
-import { processValidatorResult, validateAndParse } from './validatorHelper';
+import { validateAndParse } from './validatorHelper';
 
 export function setUpAccountRoutes(router: Router, hostingAccountService: HostingAccountService): void {
   router.get(
@@ -47,8 +45,7 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.post(
     '/awsAccounts',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateAccountSchema));
-      const validatedRequest = CreateAccountRequestParser.parse(req.body);
+      const validatedRequest = validateAndParse<CreateAccountRequest>(CreateAccountRequestParser, req.body);
 
       const createdAccount = await hostingAccountService.create(validatedRequest);
       res.status(201).send(createdAccount);
@@ -58,14 +55,18 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.patch(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateAccountSchema));
-      const { name } = req.body;
-      const updateAccountMetadata: UpdateAccountData = {
-        id: escape(req.params.id),
-        name: name!! ? escape(name) : undefined
-      };
+      // processValidatorResult(validate(req.body, UpdateAccountSchema));
+      // const { name } = req.body;
+      // const updateAccountMetadata: UpdateAccountData = {
+      //   id: escape(req.params.id),
+      //   name: name!! ? escape(name) : undefined
+      // };
+      const validatedRequest = validateAndParse<UpdateAccountRequest>(UpdateAccountRequestParser, {
+        id: req.params.id,
+        ...req.body
+      });
 
-      const updatedAccount = await hostingAccountService.update(updateAccountMetadata);
+      const updatedAccount = await hostingAccountService.update(validatedRequest);
       res.send(updatedAccount);
     })
   );
