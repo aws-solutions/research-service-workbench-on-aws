@@ -254,9 +254,6 @@ export function setUpDSRoutes(
   router.delete(
     '/datasets/:datasetId/permissions',
     wrapAsync(async (req: Request, res: Response) => {
-      console.log('remove dataset permission');
-      console.log(JSON.stringify(req.params));
-      console.log(JSON.stringify(req.body));
       if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('datasetid request parameter is invalid');
       }
@@ -273,7 +270,6 @@ export function setUpDSRoutes(
         });
         res.status(200).send(response);
       } catch (error) {
-        console.log(error);
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
         }

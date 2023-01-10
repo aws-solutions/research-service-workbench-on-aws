@@ -78,7 +78,9 @@ export default class Dataset extends Resource {
   }
 
   public async removeAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
-    const response: AxiosResponse = await this._axiosInstance.delete(`${this._api}/permissions`, requestBody);
+    const response: AxiosResponse = await this._axiosInstance.delete(`${this._api}/permissions`, {
+      data: requestBody
+    });
     const permissionsDeleted: PermissionsResponse = validateAndParse(
       PermissionsResponseParser,
       response.data

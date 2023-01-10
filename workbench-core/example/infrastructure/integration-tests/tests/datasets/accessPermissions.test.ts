@@ -4,7 +4,7 @@
  */
 
 import { dataSetPrefix } from '@aws/workbench-core-example-app/lib/configs/constants';
-import { CreateUser } from '@aws/workbench-core-user-management';
+import { CreateUser, User } from '@aws/workbench-core-user-management';
 import { v4 as uuidv4 } from 'uuid';
 import ClientSession from '../../support/clientSession';
 import Dataset from '../../support/resources/datasets/dataset';
@@ -16,6 +16,7 @@ describe('DataSets access permissions integration tests', () => {
   const mockBadValue: string = 'fake-data';
   let adminSession: ClientSession;
   let user: CreateUser;
+  let userData: User;
 
   beforeEach(() => {
     expect.hasAssertions();
@@ -28,6 +29,8 @@ describe('DataSets access permissions integration tests', () => {
       lastName: 'User',
       email: `success+create-user-${uuidv4()}@simulator.amazonses.com`
     };
+    const createUserResponse = await adminSession.resources.users.create(user);
+    userData = createUserResponse.data;
   });
 
   afterAll(async () => {
@@ -89,11 +92,8 @@ describe('DataSets access permissions integration tests', () => {
       });
     });
     it('adds access permissions for a user.', async () => {
-      const createUserResponse = await adminSession.resources.users.create(user);
-      const userData = createUserResponse.data;
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
-
       await expect(
         (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
           permission: {
@@ -237,8 +237,6 @@ describe('DataSets access permissions integration tests', () => {
       });
     });
     it('removes access permissions for a user.', async () => {
-      const createUserResponse = await adminSession.resources.users.create(user);
-      const userData = createUserResponse.data;
       const createDataSetResponse = await adminSession.resources.datasets.create({}, true);
       const dataSetId: string = createDataSetResponse.data.id;
       await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
@@ -276,7 +274,7 @@ describe('DataSets access permissions integration tests', () => {
       const { groupId } = createGroupResponse.data;
       await (adminSession.resources.datasets.children.get(dataSetId) as Dataset).addAccess({
         permission: {
-          identityType: mockBadValue,
+          identityType: 'GROUP',
           identity: groupId,
           accessLevel: 'read-only'
         }
@@ -301,7 +299,7 @@ describe('DataSets access permissions integration tests', () => {
           identityType: 'GROUP',
           identity: groupId,
           //@ts-ignore
-          accessLevel: mockBadValue
+          accessLevel: 'read-only'
         }
       });
       await expect(
