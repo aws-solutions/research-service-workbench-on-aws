@@ -66,6 +66,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
     POST: [
       {
