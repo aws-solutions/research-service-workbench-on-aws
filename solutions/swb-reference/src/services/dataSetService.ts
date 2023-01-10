@@ -5,7 +5,6 @@
 
 import {
   AddRemoveAccessPermissionRequest,
-  CreateProvisionDatasetRequest,
   DataSet,
   DataSetExternalEndpointRequest,
   DataSetPlugin,
@@ -16,6 +15,7 @@ import {
 } from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
 import {
+  CreateProvisionDatasetRequest,
   DataSetMetadataPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
@@ -37,7 +37,8 @@ export class DataSetService implements DataSetPlugin {
     this._workbenchDataSetService = new WorkbenchDataSetService(
       auditService,
       loggingService,
-      dataSetMetadataPlugin
+      dataSetMetadataPlugin,
+      dataSetAuthService
     );
     this.storagePlugin = dataSetStoragePlugin;
     this._dataSetsAuthService = dataSetAuthService;
@@ -50,6 +51,7 @@ export class DataSetService implements DataSetPlugin {
       request.dataSetId,
       request.externalEndpointName,
       this.storagePlugin,
+      { id: '', roles: [] },
       request.externalRoleName,
       request.kmsKeyArn,
       request.vpcId
@@ -57,7 +59,7 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public getDataSet(dataSetId: string): Promise<DataSet> {
-    return this._workbenchDataSetService.getDataSet(dataSetId);
+    return this._workbenchDataSetService.getDataSet(dataSetId, { id: '', roles: [] });
   }
 
   public importDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
@@ -65,7 +67,7 @@ export class DataSetService implements DataSetPlugin {
   }
 
   public listDataSets(): Promise<DataSet[]> {
-    return this._workbenchDataSetService.listDataSets();
+    return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
   }
 
   public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {

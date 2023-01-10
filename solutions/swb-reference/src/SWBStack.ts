@@ -20,7 +20,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
@@ -172,8 +172,17 @@ export class SWBStack extends Stack {
       FIELDS_TO_MASK_WHEN_AUDITING
     );
 
+    // Application DynamoDB Encryption Key
+    const applicationDDBTableEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-applicationDDBTableEncryptionKey`);
+
     // Create Application DynamoDB Table
-    this._createApplicationDDBTable(apiLambda, statusHandler, createAccountHandler);
+    this._createApplicationDDBTable(
+      applicationDDBTableEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
 
     // DynamicAuth DynamoDB Encryption Key
     const dynamicAuthDynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation =
@@ -861,7 +870,7 @@ export class SWBStack extends Stack {
       gsis: [
         {
           indexName: 'getIdentityPermissionsByIdentity',
-          partitionKey: { name: 'Identity', type: AttributeType.STRING },
+          partitionKey: { name: 'identity', type: AttributeType.STRING },
           sortKey: { name: 'pk', type: AttributeType.STRING }
         }
       ]
@@ -880,6 +889,7 @@ export class SWBStack extends Stack {
 
   // Application DynamoDB Table
   private _createApplicationDDBTable(
+    encryptionKey: Key,
     apiLambda: Function,
     statusHandler: Function,
     createAccountHandler: Function
@@ -889,7 +899,10 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       tableName: tableName,
-      billingMode: BillingMode.PAY_PER_REQUEST
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true,
+      encryption: TableEncryption.CUSTOMER_MANAGED,
+      encryptionKey: encryptionKey
     });
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({

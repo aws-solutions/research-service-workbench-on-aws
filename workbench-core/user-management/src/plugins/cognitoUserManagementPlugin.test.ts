@@ -24,11 +24,14 @@ import {
   ListUsersInGroupCommand,
   NotAuthorizedException,
   ResourceNotFoundException,
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  TooManyRequestsException,
   UsernameExistsException,
   UserNotFoundException
 } from '@aws-sdk/client-cognito-identity-provider';
 import { AwsService } from '@aws/workbench-core-base';
-import { mockClient } from 'aws-sdk-client-mock';
+import { AwsStub, mockClient } from 'aws-sdk-client-mock';
 import {
   CognitoUserManagementPlugin,
   IdpUnavailableError,
@@ -36,40 +39,42 @@ import {
   PluginConfigurationError,
   RoleAlreadyExistsError,
   RoleNotFoundError,
+  TooManyRequestsError,
   User,
   UserAlreadyExistsError,
   UserNotFoundError
 } from '..';
 import { Status } from '../user';
 
-const userInfo: Omit<User, 'roles'> = {
-  id: '123',
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'Sample-email-address',
-  status: Status.ACTIVE
-} as const;
-
-const region: string = 'us-east-1';
-const awsCreds = {
-  accessKeyId: 'fakeKey',
-  secretAccessKey: 'fakeSecret'
-} as const;
-
-const cognitoMock = mockClient(CognitoIdentityProviderClient);
-
 describe('CognitoUserManagementPlugin tests', () => {
+  let userInfo: Omit<User, 'roles'>;
+  let cognitoMock: AwsStub<ServiceInputTypes, ServiceOutputTypes>;
+
   let aws: AwsService;
   let plugin: CognitoUserManagementPlugin;
   let roles: string[];
 
+  beforeAll(() => {
+    cognitoMock = mockClient(CognitoIdentityProviderClient);
+  });
+
   beforeEach(() => {
     cognitoMock.reset();
     aws = new AwsService({
-      region,
-      credentials: awsCreds
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'fakeKey',
+        secretAccessKey: 'fakeSecret'
+      }
     });
     plugin = new CognitoUserManagementPlugin('us-west-2_fakeId', aws);
+    userInfo = {
+      id: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'Sample-email-address',
+      status: Status.ACTIVE
+    };
     roles = ['Role1', 'Role2'];
   });
 
@@ -282,10 +287,84 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.getUser(userInfo.id)).rejects.toThrow(UserNotFoundError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminGetUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUser(userInfo.id)).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminGetUserCommand).rejects(new Error());
 
       await expect(plugin.getUser(userInfo.id)).rejects.toThrow(Error);
+    });
+  });
+
+  describe('getUserRoles tests', () => {
+    it('should return the requested users roles when the user exists', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .resolves({ Groups: roles.map((role) => ({ GroupName: role })) });
+
+      const userRoles = await plugin.getUserRoles(userInfo.id);
+
+      expect(userRoles).toMatchObject([...roles]);
+    });
+
+    it('should return an empty array for the Users roles when no roles are assigned to it', async () => {
+      cognitoMock.on(AdminListGroupsForUserCommand).resolves({});
+
+      const userRoles = await plugin.getUserRoles(userInfo.id);
+
+      expect(userRoles).toMatchObject([]);
+    });
+
+    it('should throw IdpUnavailableError when Cognito is unavailable', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .rejects(new InternalErrorException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(IdpUnavailableError);
+    });
+
+    it('should throw PluginConfigurationError when the plugin is not authorized to perform the action', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .rejects(new NotAuthorizedException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(PluginConfigurationError);
+    });
+
+    it('should throw PluginConfigurationError when the user pool id is invalid', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(PluginConfigurationError);
+    });
+
+    it('should throw UserNotFoundError when the user doesnt exist in the user pool', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(UserNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminListGroupsForUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(TooManyRequestsError);
+    });
+
+    it('should rethrow an error when the error is unexpected', async () => {
+      cognitoMock.on(AdminListGroupsForUserCommand).rejects(new Error());
+
+      await expect(plugin.getUserRoles(userInfo.id)).rejects.toThrow(Error);
     });
   });
 
@@ -356,6 +435,14 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.createUser(userInfo)).rejects.toThrow(InvalidParameterError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminCreateUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.createUser(userInfo)).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminCreateUserCommand).rejects(new Error());
 
@@ -420,6 +507,16 @@ describe('CognitoUserManagementPlugin tests', () => {
       );
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminUpdateUserAttributesCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.updateUser(userInfo.id, { ...userInfo, roles })).rejects.toThrow(
+        TooManyRequestsError
+      );
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminUpdateUserAttributesCommand).rejects(new Error());
 
@@ -466,6 +563,14 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deleteUser(userInfo.id)).rejects.toThrow(UserNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminDeleteUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.deleteUser(userInfo.id)).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -516,6 +621,14 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.activateUser(userInfo.id)).rejects.toThrow(UserNotFoundError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminEnableUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.activateUser(userInfo.id)).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminEnableUserCommand).rejects(new Error());
 
@@ -562,6 +675,14 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.deactivateUser(userInfo.id)).rejects.toThrow(UserNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminDisableUserCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.deactivateUser(userInfo.id)).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -679,6 +800,12 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.listUsers()).rejects.toThrow(PluginConfigurationError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock.on(ListUsersCommand).rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.listUsers()).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(ListUsersCommand).rejects(new Error());
 
@@ -741,9 +868,17 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
       cognitoMock
         .on(ListUsersInGroupCommand)
-        .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: 'Group not found.' }));
 
       await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(RoleNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(ListUsersInGroupCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.listUsersForRole(roles[0])).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -801,6 +936,12 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.listRoles()).rejects.toThrow(PluginConfigurationError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock.on(ListGroupsCommand).rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.listRoles()).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(ListGroupsCommand).rejects(new Error());
 
@@ -855,6 +996,14 @@ describe('CognitoUserManagementPlugin tests', () => {
         .rejects(new UserNotFoundException({ $metadata: {}, message: '' }));
 
       await expect(plugin.addUserToRole(userInfo.id, roles[0])).rejects.toThrow(UserNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminAddUserToGroupCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.addUserToRole(userInfo.id, roles[0])).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {
@@ -917,6 +1066,14 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.removeUserFromRole(userInfo.id, roles[0])).rejects.toThrow(UserNotFoundError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(AdminRemoveUserFromGroupCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.removeUserFromRole(userInfo.id, roles[0])).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(AdminRemoveUserFromGroupCommand).rejects(new Error());
 
@@ -959,6 +1116,14 @@ describe('CognitoUserManagementPlugin tests', () => {
       await expect(plugin.createRole(roles[0])).rejects.toThrow(RoleAlreadyExistsError);
     });
 
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(CreateGroupCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.createRole(roles[0])).rejects.toThrow(TooManyRequestsError);
+    });
+
     it('should rethrow an error when the error is unexpected', async () => {
       cognitoMock.on(CreateGroupCommand).rejects(new Error());
 
@@ -998,9 +1163,17 @@ describe('CognitoUserManagementPlugin tests', () => {
     it('should throw RoleNotFoundError when the group doesnt exist in the user pool', async () => {
       cognitoMock
         .on(DeleteGroupCommand)
-        .rejects({ name: 'ResourceNotFoundException', message: 'Group not found.' });
+        .rejects(new ResourceNotFoundException({ $metadata: {}, message: 'Group not found.' }));
 
       await expect(plugin.deleteRole(roles[0])).rejects.toThrow(RoleNotFoundError);
+    });
+
+    it('should throw TooManyRequestsError when the RPS limit is exceeded', async () => {
+      cognitoMock
+        .on(DeleteGroupCommand)
+        .rejects(new TooManyRequestsException({ $metadata: {}, message: '' }));
+
+      await expect(plugin.deleteRole(roles[0])).rejects.toThrow(TooManyRequestsError);
     });
 
     it('should rethrow an error when the error is unexpected', async () => {

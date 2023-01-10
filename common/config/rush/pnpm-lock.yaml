@@ -4,6 +4,7 @@ overrides:
   trim-newlines: '>=3.0.1'
   got: '>=11.8.5'
   jsonwebtoken: '>=9.0.0'
+  json5: '>=2.2.2'
 
 importers:
 
@@ -650,7 +651,6 @@ importers:
   ../../workbench-core/audit:
     specifiers:
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
-      '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -671,7 +671,6 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
     dependencies:
-      '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-logging': link:../logging
       lodash: 4.17.21
     devDependencies:
@@ -762,7 +761,9 @@ importers:
       '@aws-sdk/client-dynamodb': ^3.212.0
       '@aws-sdk/client-s3': ^3.212.0
       '@aws-sdk/types': ^3.212.0
+      '@aws-sdk/util-dynamodb': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
+      '@aws/workbench-core-audit': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
       '@aws/workbench-core-user-management': workspace:*
@@ -791,6 +792,7 @@ importers:
       typescript: ^4.5.2
       zod: ^3.19.1
     dependencies:
+      '@aws/workbench-core-audit': link:../audit
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@aws/workbench-core-user-management': link:../user-management
@@ -801,6 +803,7 @@ importers:
       '@aws-sdk/client-dynamodb': 3.226.0
       '@aws-sdk/client-s3': 3.226.0
       '@aws-sdk/types': 3.226.0
+      '@aws-sdk/util-dynamodb': 3.226.0
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
@@ -935,8 +938,10 @@ importers:
       '@aws-sdk/types': ^3.212.0
       '@aws/eslint-config-workbench-core-eslint-custom': workspace:*
       '@aws/workbench-core-audit': workspace:*
+      '@aws/workbench-core-authorization': workspace:*
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@aws/workbench-core-user-management': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -964,6 +969,7 @@ importers:
       ts-jest: ^27.1.3
       typescript: ^4.5.2
       uuid: ^8.3.2
+      zod: ^3.19.1
     dependencies:
       '@aws-cdk/aws-iam': 1.159.0
       '@aws-sdk/client-dynamodb': 3.226.0
@@ -972,14 +978,17 @@ importers:
       '@aws-sdk/client-s3-control': 3.226.0
       '@aws-sdk/types': 3.226.0
       '@aws/workbench-core-audit': link:../audit
+      '@aws/workbench-core-authorization': link:../authorization
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-logging': link:../logging
       '@hapi/boom': 10.0.0
       jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
+      zod: 3.19.1
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../eslint-custom
+      '@aws/workbench-core-user-management': link:../user-management
       '@rushstack/eslint-config': 3.0.0_xztl6dhthcahlo6akmb2bmjmle
       '@rushstack/heft': 0.47.5
       '@rushstack/heft-jest-plugin': 0.3.28_@rushstack+heft@0.47.5
@@ -1089,6 +1098,7 @@ importers:
       '@aws/workbench-core-base': workspace:*
       '@aws/workbench-core-datasets': workspace:*
       '@aws/workbench-core-logging': workspace:*
+      '@aws/workbench-core-user-management': workspace:*
       '@hapi/boom': ^10.0.0
       '@rushstack/eslint-config': ^3.0.0
       '@rushstack/heft': ^0.47.5
@@ -1136,6 +1146,7 @@ importers:
       '@aws/workbench-core-base': link:../base
       '@aws/workbench-core-datasets': link:../datasets
       '@aws/workbench-core-logging': link:../logging
+      '@aws/workbench-core-user-management': link:../user-management
       '@hapi/boom': 10.0.0
       generate-password: 1.7.0
       jsonschema: 1.4.1
@@ -1316,6 +1327,7 @@ importers:
       sort-package-json: ^1.57.0
       typescript: ^4.5.2
       uuid: ^8.3.2
+      zod: ^3.19.1
     dependencies:
       '@aws/workbench-core-audit': link:../../audit
       '@aws/workbench-core-authentication': link:../../authentication
@@ -1331,6 +1343,7 @@ importers:
       jsonschema: 1.4.1
       lodash: 4.17.21
       uuid: 8.3.2
+      zod: 3.19.1
     devDependencies:
       '@aws/eslint-config-workbench-core-eslint-custom': link:../../eslint-custom
       '@rushstack/eslint-config': 3.0.0_vjep2yp2sits3sqnodefgcbnfi
@@ -3701,7 +3714,6 @@ packages:
     engines: {node: '>=14.0.0'}
     dependencies:
       tslib: 2.4.1
-    dev: false
 
   /@aws-sdk/util-endpoints/3.226.0:
     resolution: {integrity: sha512-iqOkac/zLmyPBUJd7SLN0PeZMkOmlGgD5PHmmekTClOkce2eUjK9SNX1PzL73aXPoPTyhg9QGLH8uEZEQ8YUzg==}
@@ -4092,7 +4104,7 @@ packages:
       convert-source-map: 1.8.0
       debug: 4.3.4
       gensync: 1.0.0-beta.2
-      json5: 2.2.1
+      json5: 2.2.2
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -6366,7 +6378,7 @@ packages:
       fast-deep-equal: 3.1.3
       graceful-fs: 4.2.4
       is-windows: 1.0.2
-      json5: 2.2.1
+      json5: 2.2.2
       parse-json: 5.2.0
       read-yaml-file: 2.1.0
       sort-keys: 4.2.0
@@ -6383,7 +6395,7 @@ packages:
     engines: {node: '>=10.16'}
     dependencies:
       '@pnpm/types': 6.4.0
-      json5: 2.2.1
+      json5: 2.2.2
       mz: 2.7.0
       write-file-atomic: 3.0.3
       write-yaml-file: 4.2.0
@@ -9382,7 +9394,7 @@ packages:
       ignore: 5.2.0
       is-core-module: 2.11.0
       js-yaml: 3.14.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash: 4.17.21
       minimatch: 3.1.2
       multimatch: 5.0.0
@@ -13068,15 +13080,8 @@ packages:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
     dev: true
 
-  /json5/1.0.1:
-    resolution: {integrity: sha512-aKS4WQjPenRxiQsC93MNfjx+nbF4PAdYzmd/1JIj8HYzqfbu86beTuNgXDzPknWk0n0uARlyewZo4s++ES36Ow==}
-    hasBin: true
-    dependencies:
-      minimist: 1.2.6
-    dev: false
-
-  /json5/2.2.1:
-    resolution: {integrity: sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==}
+  /json5/2.2.2:
+    resolution: {integrity: sha512-46Tk9JiOL2z7ytNQWFLpj99RZkVgeHf87yGQKsIkaPz1qSH9UczKH1rO7K3wgRselo0tYMUNfecYpm/p1vC7tQ==}
     engines: {node: '>=6'}
     hasBin: true
 
@@ -13716,7 +13721,7 @@ packages:
     dev: true
 
   /mute-stream/0.0.5:
-    resolution: {integrity: sha1-j7+rsKmKJT0xhDMfno3rc3L6xsA=}
+    resolution: {integrity: sha512-EbrziT4s8cWPmzr47eYVW3wimS4HsvlnV5ri1xw1aR6JQo/OrJX5rkl32K/QQHdxeabJETtfeaROGhd8W7uBgg==}
     dev: false
 
   /mute-stream/0.0.8:
@@ -16366,7 +16371,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16399,7 +16404,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16434,7 +16439,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16467,7 +16472,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16501,7 +16506,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16537,7 +16542,7 @@ packages:
       fast-json-stable-stringify: 2.1.0
       jest: 27.5.1
       jest-util: 27.5.1
-      json5: 2.2.1
+      json5: 2.2.2
       lodash.memoize: 4.1.2
       make-error: 1.3.6
       semver: 7.3.7
@@ -16580,7 +16585,7 @@ packages:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}
     dependencies:
       '@types/json5': 0.0.29
-      json5: 1.0.1
+      json5: 2.2.2
       minimist: 1.2.6
       strip-bom: 3.0.0
     dev: false

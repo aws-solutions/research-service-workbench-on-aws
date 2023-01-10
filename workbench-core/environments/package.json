@@ -58,6 +58,7 @@
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "generate-password": "^1.7.0",
     "jsonschema": "^1.4.1",

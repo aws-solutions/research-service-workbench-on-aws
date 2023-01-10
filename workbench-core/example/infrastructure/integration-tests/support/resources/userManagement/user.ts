@@ -5,6 +5,7 @@
 
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
+import { CognitoHelper } from '../../complex/cognitoHelper';
 import Resource from '../base/resource';
 
 export default class User extends Resource {
@@ -20,14 +21,16 @@ export default class User extends Resource {
     return this._axiosInstance.put(`${this._api}/deactivate`);
   }
 
+  public async getRoles(): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/roles`);
+  }
+
   public async cleanup(): Promise<void> {
     try {
-      const defAdminSession = await this._setup.getDefaultAdminSession();
-
-      // delete the user
-      await defAdminSession.resources.users.user(this.id).delete();
-    } catch (e) {
-      console.error(e);
+      const userManagementHelper = new CognitoHelper();
+      await userManagementHelper.deleteUser(this.id);
+    } catch (error) {
+      console.warn(`Error caught in cleanup of Cognito user '${this.id}': ${error}.`);
     }
   }
 }

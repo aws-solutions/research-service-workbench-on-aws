@@ -32,6 +32,15 @@ workbench-core/example/infrastructure/integration-tests/tests/users/activateDeac
 workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
 workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
+workbench-core/example/infrastructure/integration-tests/tests/users/getUserRoles.test.ts:29
+# Fake emails for DynamicAuthorizationService integ tests
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:90
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:122
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:147
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:199
+workbench-core/example/infrastructure/integration-tests/tests/dynamicAuthorization/group.test.ts:241
+# Fake email for DataSetsService integration tests
+workbench-core/example/infrastructure/integration-tests/tests/datasets/accessPermissions.test.ts:29
 #Fake email used
 workbench-core/example/infrastructure/scripts/setupCognito.sh:43
 workbench-core/example/infrastructure/scripts/setupCognito.sh:44

@@ -9,6 +9,10 @@ import { DataSetPermissionParser } from './dataSetPermissionParser';
 // eslint-disable-next-line @rushstack/typedef-var
 export const AddRemoveAccessPermissionRequestParser = z
   .object({
+    authenticatedUser: z.object({
+      id: z.string(),
+      roles: z.array(z.string())
+    }),
     dataSetId: z.string(),
     permission: DataSetPermissionParser
   })
