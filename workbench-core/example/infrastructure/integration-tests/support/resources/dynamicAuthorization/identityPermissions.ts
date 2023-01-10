@@ -4,6 +4,7 @@ import {
   Identity,
   IdentityPermission as Permission
 } from '@aws/workbench-core-authorization';
+import { JSONValue } from '@aws/workbench-core-base';
 import { AxiosResponse } from 'axios';
 import ClientSession from '../../clientSession';
 import RandomTextGenerator from '../../utils/randomTextGenerator';
@@ -54,6 +55,14 @@ export default class IdentityPermissions extends CollectionResource {
     return this._axiosInstance.get(`${this._api}/identity`, { params: bodyParams });
   }
 
+  public async getBySubject(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.get(`${this._api}/subject`, { params: bodyParams });
+  }
+
+  public async delete(bodyParams?: Record<string, JSONValue>): Promise<AxiosResponse> {
+    return this._axiosInstance.delete(`${this._api}`, { data: bodyParams });
+  }
+
   protected _buildDefaults(resource: CreateRequest): CreateIdentityPermissionsRequest {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
 
@@ -66,13 +75,19 @@ export default class IdentityPermissions extends CollectionResource {
 
       const action = 'CREATE';
       const effect = 'ALLOW';
+      const fields: string[] = [];
+      const conditions = {};
+      const description = randomTextGenerator.getFakeText('randomDescription');
       identityPermissions.push({
         subjectId,
         subjectType,
         action,
         effect,
         identityId: identity.identityId,
-        identityType: identity.identityType
+        identityType: identity.identityType,
+        fields,
+        conditions,
+        description
       });
     });
     return {

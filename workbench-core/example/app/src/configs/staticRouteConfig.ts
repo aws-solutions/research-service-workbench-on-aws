@@ -66,6 +66,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
     POST: [
       {
@@ -221,9 +229,23 @@ export const routesMap: RoutesMap = {
         action: 'CREATE',
         subject: 'IdentityPermission'
       }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
     ]
   },
   '/authorization/permissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/subject': {
     GET: [
       {
         action: 'READ',
