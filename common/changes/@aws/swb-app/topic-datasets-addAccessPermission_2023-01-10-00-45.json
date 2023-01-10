@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "basic updates to avoid error when dealing with new dataset authenticated user parameters",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

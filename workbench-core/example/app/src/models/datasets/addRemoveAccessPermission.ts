@@ -3,18 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { DataSetPermissionParser } from '@aws/workbench-core-datasets';
 import { z } from 'zod';
-import { DataSetPermissionParser } from './dataSetPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AddRemoveAccessPermissionParser = z.object({
-  /** the logged in user */
-  authenticatedUser: z.object({
-    id: z.string(),
-    roles: z.array(z.string())
-  }),
-  /** the ID of the dataset */
-  dataSetId: z.string(),
   /** the permission to add or remove */
   permission: DataSetPermissionParser
 });

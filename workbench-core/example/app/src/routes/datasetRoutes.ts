@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { uuidWithLowercasePrefixRegExp } from '@aws/workbench-core-base';
+import { uuidWithLowercasePrefixRegExp, validateAndParse } from '@aws/workbench-core-base';
 import {
   addDatasetPermissionsToRole,
   AddDatasetPermissionsToRoleSchema,
@@ -15,12 +15,18 @@ import {
   DataSetService,
   DataSetsStoragePlugin,
   isDataSetHasEndpointError,
-  isInvalidIamRoleError
+  isInvalidIamRoleError,
+  isInvalidPermissionError,
+  PermissionsResponse
 } from '@aws/workbench-core-datasets';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
 import { dataSetPrefix, endPointPrefix } from '../configs/constants';
+import {
+  AddRemoveAccessPermissionRequest,
+  AddRemoveAccessPermissionParser
+} from '../models/datasets/addRemoveAccessPermission';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -42,7 +48,8 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetStoragePlugin,
+        authenticatedUser: res.locals.user
       });
       res.status(201).send(dataSet);
     })
@@ -59,7 +66,8 @@ export function setUpDSRoutes(
         path: req.body.path,
         awsAccountId: req.body.awsAccountId,
         region: req.body.region,
-        storageProvider: dataSetStoragePlugin
+        storageProvider: dataSetStoragePlugin,
+        authenticatedUser: res.locals.user
       });
       res.status(201).send(dataSet);
     })
@@ -77,6 +85,7 @@ export function setUpDSRoutes(
         req.params.datasetId,
         req.body.externalEndpointName,
         dataSetStoragePlugin,
+        res.locals.user,
         req.body.externalRoleName
       );
       res.status(201).send();
@@ -97,7 +106,8 @@ export function setUpDSRoutes(
       await dataSetService.removeDataSetExternalEndpoint(
         req.params.datasetId,
         req.params.endpointId,
-        dataSetStoragePlugin
+        dataSetStoragePlugin,
+        res.locals.user
       );
       res.status(204).send();
     })
@@ -116,7 +126,8 @@ export function setUpDSRoutes(
         req.params.datasetId,
         req.body.fileName,
         timeToLiveSeconds,
-        dataSetStoragePlugin
+        dataSetStoragePlugin,
+        res.locals.user
       );
       res.status(200).send({ url });
     })
@@ -126,7 +137,7 @@ export function setUpDSRoutes(
   router.get(
     '/datasets/storage',
     wrapAsync(async (req: Request, res: Response) => {
-      const locations = await dataSetService.listStorageLocations();
+      const locations = await dataSetService.listStorageLocations(res.locals.user);
       res.send(locations);
     })
   );
@@ -138,7 +149,7 @@ export function setUpDSRoutes(
       if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
         throw Boom.badRequest('datasetId request parameter is invalid');
       }
-      const ds = await dataSetService.getDataSet(req.params.datasetId);
+      const ds = await dataSetService.getDataSet(req.params.datasetId, res.locals.user);
       res.send(ds);
     })
   );
@@ -147,7 +158,7 @@ export function setUpDSRoutes(
   router.get(
     '/datasets',
     wrapAsync(async (req: Request, res: Response) => {
-      const response = await dataSetService.listDataSets();
+      const response = await dataSetService.listDataSets(res.locals.user);
       res.send(response);
     })
   );
@@ -161,7 +172,7 @@ export function setUpDSRoutes(
       }
 
       try {
-        await dataSetService.removeDataSet(req.params.datasetId, () => Promise.resolve());
+        await dataSetService.removeDataSet(req.params.datasetId, () => Promise.resolve(), res.locals.user);
       } catch (error) {
         if (isDataSetHasEndpointError(error)) {
           throw Boom.badRequest(error.message);
@@ -205,6 +216,34 @@ export function setUpDSRoutes(
       } catch (error) {
         if (isInvalidIamRoleError(error)) {
           throw Boom.badRequest('the roleString parameter does not represent a valid IAM role');
+        }
+        throw error;
+      }
+    })
+  );
+
+  // add dataset access permission
+  router.post(
+    '/datasets/:datasetId/permissions',
+    wrapAsync(async (req: Request, res: Response) => {
+      if (req.params.datasetId.match(uuidWithLowercasePrefixRegExp(dataSetPrefix)) === null) {
+        throw Boom.badRequest('datasetid request parameter is invalid');
+      }
+      const validatedRequest = validateAndParse<AddRemoveAccessPermissionRequest>(
+        AddRemoveAccessPermissionParser,
+        req.body
+      );
+      let response: PermissionsResponse;
+      try {
+        response = await dataSetService.addDataSetAccessPermissions({
+          authenticatedUser: res.locals.user,
+          dataSetId: req.params.datasetId,
+          ...validatedRequest
+        });
+        res.status(201).send(response);
+      } catch (error) {
+        if (isInvalidPermissionError(error)) {
+          throw Boom.badRequest(error.message);
         }
         throw error;
       }

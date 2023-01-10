@@ -55,4 +55,10 @@ export interface CreateProvisionDatasetRequest {
 
   /** the intial permissions to set on the dataset. */
   permissions?: DataSetPermission[];
+
+  /** the user requesting the action */
+  authenticatedUser: {
+    id: string;
+    roles: string[];
+  };
 }
