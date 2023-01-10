@@ -28,6 +28,7 @@ import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './const
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
+import { ProjectEnvService } from './services/projectEnvService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
 const logger: LoggingService = new LoggingService();
@@ -57,6 +58,7 @@ const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuth
 });
 
 const accountService: AccountService = new AccountService(aws.helpers.ddb);
+const environmentService: EnvironmentService = new EnvironmentService(aws.helpers.ddb);
 const envTypeService: EnvironmentTypeService = new EnvironmentTypeService(aws.helpers.ddb);
 const envTypeConfigService: EnvironmentTypeConfigService = new EnvironmentTypeConfigService(
   envTypeService,
@@ -90,7 +92,6 @@ const apiRouteConfig: ApiRouteConfig = {
   account: new HostingAccountService(
     new HostingAccountLifecycleService(process.env.STACK_NAME!, aws, accountService)
   ),
-  environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
     new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
@@ -107,6 +108,7 @@ const apiRouteConfig: ApiRouteConfig = {
   ),
   costCenterService: new CostCenterService(aws.helpers.ddb),
   metadataService: metadataService,
+  projectEnvPlugin: new ProjectEnvService(dynamicAuthorizationService, environmentService, projectService),
   projectEnvTypeConfigPlugin: new ProjectEnvTypeConfigService(
     metadataService,
     projectService,

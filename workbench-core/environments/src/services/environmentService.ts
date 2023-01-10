@@ -21,10 +21,11 @@ import {
 } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
+import { env } from 'process';
 import { EnvironmentStatus } from '../constants/environmentStatus';
 
 export interface Environment {
-  id: string | undefined;
+  id: string;
   instanceId: string | undefined;
   cidr: string;
   description: string;
@@ -326,7 +327,11 @@ export class EnvironmentService {
     }
   ): Promise<Environment> {
     try {
-      await this.getEnvironment(envId);
+      await this.getEnvironment(envId).then((env) => {
+        if (env.type === 'terminated_environment') {
+          throw Boom.badRequest();
+        }
+      });
     } catch (e) {
       if (Boom.isBoom(e) && e.output.statusCode === Boom.notFound().output.statusCode) {
         console.log('message', e.message);

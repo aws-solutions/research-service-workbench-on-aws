@@ -13,6 +13,7 @@ import { DataSetStoragePlugin } from './dataSets/dataSetStoragePlugin';
 import { GetAccessPermissionRequest } from './dataSets/getAccessPermissionRequestParser';
 import { PermissionsResponse, PermissionsResponseParser } from './dataSets/permissionsResponseParser';
 import { generateRouter } from './generateRouter';
+import { ProjectEnvPlugin } from './projectEnvs/projectEnvPlugin';
 import {
   ListProjectEnvTypeConfigsRequest,
   ListProjectEnvTypeConfigsRequestParser
@@ -35,5 +36,6 @@ export {
   ListProjectEnvTypeConfigsRequestParser,
   PermissionsResponse,
   PermissionsResponseParser,
+  ProjectEnvPlugin,
   ProjectEnvTypeConfigPlugin
 };

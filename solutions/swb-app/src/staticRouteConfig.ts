@@ -117,7 +117,7 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  '/environments': {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}/environments`]: {
     GET: [
       {
         action: 'READ',
@@ -131,7 +131,8 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
+    /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
         action: 'READ',
@@ -139,7 +140,8 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
+      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/connections`]: {
     GET: [
       {
         action: 'READ',
@@ -147,7 +149,8 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
+      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/start`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -155,7 +158,8 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
+      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/stop`]: {
     PUT: [
       {
         action: 'UPDATE',
@@ -163,7 +167,8 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
-  [`/environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
+  [`/projects/${resourceTypeToKey.project.toLowerCase()}-${uuidRegExpAsString}
+      /environments/${resourceTypeToKey.environment.toLowerCase()}-${uuidRegExpAsString}/terminate`]: {
     PUT: [
       {
         action: 'UPDATE',
