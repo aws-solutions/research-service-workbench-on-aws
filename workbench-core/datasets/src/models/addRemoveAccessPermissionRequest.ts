@@ -8,10 +8,11 @@ import { DataSetPermissionParser } from './dataSetPermission';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const AddRemoveAccessPermissionParser = z.object({
-  /** the logged in User */
-  authenticatedUserId: z.string(),
-  /** the logged in User Roles */
-  roles: z.array(z.string()),
+  /** the logged in user */
+  authenticatedUser: z.object({
+    id: z.string(),
+    roles: z.array(z.string())
+  }),
   /** the ID of the dataset */
   dataSetId: z.string(),
   /** the permission to add or remove */

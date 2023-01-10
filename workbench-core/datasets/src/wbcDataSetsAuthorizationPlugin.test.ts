@@ -41,11 +41,14 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   const userId: string = 'fake-user-id';
   const groupId: string = 'fake-group-id';
   const fakeData: string = 'fake-data';
+  const authenticatedUser = {
+    id: userId,
+    roles: []
+  };
 
   const readOnlyAccessPermission: AddRemoveAccessPermissionRequest = {
     dataSetId: dataSetId,
-    authenticatedUserId: userId,
-    roles: [],
+    authenticatedUser,
     permission: {
       identityType: 'USER',
       identity: groupId,
@@ -55,8 +58,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
   const readWriteAccessPermission: AddRemoveAccessPermissionRequest = {
     dataSetId: dataSetId,
-    authenticatedUserId: userId,
-    roles: [],
+    authenticatedUser,
     permission: {
       identityType: 'GROUP',
       identity: groupId,
@@ -197,8 +199,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       await expect(
         plugin.addAccessPermission({
           dataSetId: dataSetId,
-          authenticatedUserId: userId,
-          roles: [],
+          authenticatedUser,
           permission: {
             identityType: fakeData,
             identity: groupId,

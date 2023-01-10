@@ -61,10 +61,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     }
     const createdPermission: CreateIdentityPermissionsResponse =
       await this._authorizer.createIdentityPermissions({
-        authenticatedUser: {
-          id: params.authenticatedUserId,
-          roles: params.roles
-        },
+        authenticatedUser: params.authenticatedUser,
         identityPermissions
       });
 
