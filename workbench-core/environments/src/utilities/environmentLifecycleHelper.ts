@@ -60,6 +60,7 @@ export default class EnvironmentLifecycleHelper {
       }),
       auditService: auditService
     });
+
     this.dataSetService = new DataSetService(
       auditService,
       logger,
@@ -219,20 +220,21 @@ export default class EnvironmentLifecycleHelper {
     const endpointsCreated: { [key: string]: string }[] = [];
 
     const datasetsToMount = await Promise.all(
-      _.map(datasetIds, async (datasetId) => {
-        const datasetEndPointName = `${datasetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
-        const mountObject = await this.dataSetService.addDataSetExternalEndpoint(
-          datasetId,
-          datasetEndPointName,
-          new S3DataSetStoragePlugin(this.aws),
-          {
-            id: '',
-            roles: []
-          }
-        );
+      _.map(datasetIds, async (dataSetId) => {
+        const datasetEndPointName = `${dataSetId.slice(0, 13)}-mounted-on-${envId.slice(0, 12)}`;
+        const {
+          data: { mountObject }
+        } = await this.dataSetService.addDataSetExternalEndpointForUser({
+          // TODO use ForGroup version when implemented
+          dataSetId,
+          externalEndpointName: datasetEndPointName,
+          storageProvider: new S3DataSetStoragePlugin(this.aws),
+          userId: `${envMetadata.projectId}#Researcher`,
+          authenticatedUser: { id: '', roles: [] }
+        });
 
-        const dataSet = await this.dataSetService.getDataSet(datasetId, { id: '', roles: [] });
-        const endpoint = await this.dataSetService.getExternalEndPoint(datasetId, mountObject.endpointId, {
+        const dataSet = await this.dataSetService.getDataSet(dataSetId, { id: '', roles: [] });
+        const endpoint = await this.dataSetService.getExternalEndPoint(dataSetId, mountObject.endpointId, {
           id: '',
           roles: []
         });

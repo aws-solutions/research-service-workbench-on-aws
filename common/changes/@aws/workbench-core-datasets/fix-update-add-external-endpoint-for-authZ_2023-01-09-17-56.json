@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/workbench-core-datasets",
+      "comment": "Renamed AddExternalEndpoint to AddExternalEndpointForUser and updated for AuthZ.",
+      "type": "major"
+    }
+  ],
+  "packageName": "@aws/workbench-core-datasets"
+}
