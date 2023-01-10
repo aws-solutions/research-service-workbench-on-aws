@@ -33,12 +33,12 @@ export default class HostingAccountService {
 
   /**
    * Create hosting account record in DDB
-   * @param accountMetadata - the attributes of the given hosting account
+   * @param createAccountRequest - the attributes of the given hosting account
    *
    * @returns account record in DDB
    */
-  public async create(accountMetadata: CreateAccountRequest): Promise<Record<string, string>> {
-    return await this._lifecycleService.createAccount(accountMetadata);
+  public async create(createAccountRequest: CreateAccountRequest): Promise<Account> {
+    return await this._lifecycleService.createAccount(createAccountRequest);
   }
 
   /**
@@ -47,7 +47,7 @@ export default class HostingAccountService {
    *
    * @returns account record in DDB
    */
-  public async update(accountMetadata: UpdateAccountData): Promise<Record<string, string>> {
+  public async update(accountMetadata: UpdateAccountData): Promise<Account> {
     return await this._lifecycleService.updateAccount(accountMetadata);
   }
 }

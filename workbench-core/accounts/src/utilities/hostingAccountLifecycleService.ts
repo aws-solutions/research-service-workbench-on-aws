@@ -107,7 +107,7 @@ export default class HostingAccountLifecycleService {
    *
    * @returns account record in DDB
    */
-  public async createAccount(accountMetadata: CreateAccountRequest): Promise<Record<string, string>> {
+  public async createAccount(accountMetadata: CreateAccountRequest): Promise<Account> {
     const arns = await this._getArns();
 
     await this._attachAwsAccount({
@@ -123,7 +123,7 @@ export default class HostingAccountLifecycleService {
     });
   }
 
-  public async updateAccount(accountMetadata: UpdateAccountData): Promise<{ [key: string]: string }> {
+  public async updateAccount(accountMetadata: UpdateAccountData): Promise<Account> {
     return this._accountService.update({
       ...accountMetadata
     });

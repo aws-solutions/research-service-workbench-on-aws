@@ -1292,7 +1292,7 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/awsAccounts?Authorization={{ACCESS_TOKEN}}",
+              "raw": "{{API_URL}}/awsAccounts",
               "host": ["{{API_URL}}"],
               "path": ["awsAccounts"]
             }
@@ -1355,9 +1355,9 @@
               }
             },
             "url": {
-              "raw": "{{API_URL}}/awsAccount/:accountId",
+              "raw": "{{API_URL}}/awsAccounts/:accountId",
               "host": ["{{API_URL}}"],
-              "path": ["awsAccount", ":accountId"],
+              "path": ["awsAccounts", ":accountId"],
               "variable": [
                 {
                   "key": "accountId",
