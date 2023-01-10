@@ -37,7 +37,8 @@ import {
 } from '@aws-sdk/client-service-catalog';
 import { SSMClient, ModifyDocumentPermissionCommand } from '@aws-sdk/client-ssm';
 import { SdkStream } from '@aws-sdk/types';
-import { AwsService } from '@aws/workbench-core-base';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { AwsService, resourceTypeToKey } from '@aws/workbench-core-base';
 import S3Service from '@aws/workbench-core-base/lib/aws/helpers/s3Service';
 import * as Boom from '@hapi/boom';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
@@ -50,6 +51,7 @@ const artifactBucketArn = 'arn:aws:s3:::sampleArtifactsBucketName';
 describe('HostingAccountLifecycleService', () => {
   const ORIGINAL_ENV = process.env;
   let hostingAccountLifecycleService: HostingAccountLifecycleService;
+  let accountMetadata = {};
 
   beforeEach(() => {
     jest.resetModules(); // Most important - it clears the cache
@@ -76,6 +78,24 @@ describe('HostingAccountLifecycleService', () => {
       mainAccountAwsService,
       accountService
     );
+
+    accountMetadata = {
+      id: `${resourceTypeToKey.account.toLowerCase()}-sampleAccId`,
+      name: 'fakeAccount',
+      awsAccountId: '123456789012',
+      externalId: 'workbench',
+      envMgmtRoleArn: 'sampleEnvMgmtRoleArn',
+      hostingAccountHandlerRoleArn: 'sampleHostingAccountHandlerRoleArn',
+      vpcId: 'vpc-123',
+      subnetId: 'subnet-123',
+      encryptionKeyArn: 'sampleEncryptionKeyArn',
+      environmentInstanceFiles: '',
+      stackName: `${process.env.STACK_NAME!}-hosting-account`,
+      status: 'CURRENT',
+      resourceType: 'account',
+      updatedAt: '2023-01-09T23:17:44.806Z',
+      createdAt: '2023-01-09T23:17:44.252Z'
+    };
   });
 
   afterAll(() => {
@@ -136,14 +156,8 @@ describe('HostingAccountLifecycleService', () => {
     mockCloudformationOutputs(cfnMock);
 
     const mockDDB = mockClient(DynamoDBClient);
-    mockDDB.on(UpdateItemCommand).resolves({});
-    mockDDB.on(GetItemCommand).resolves({
-      Item: {
-        awsAccountId: { S: '123456789012' },
-        targetAccountStackName: { S: 'swb-dev-va-hosting-account' },
-        portfolioId: { S: 'port-1234' },
-        accountId: { S: 'abc-xyz' }
-      }
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
     });
 
     await expect(
@@ -162,7 +176,9 @@ describe('HostingAccountLifecycleService', () => {
     mockCloudformationOutputs(cfnMock);
 
     const mockDDB = mockClient(DynamoDBClient);
-    mockDDB.on(UpdateItemCommand).resolves({});
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
     mockDDB.on(QueryCommand).resolves({
       Count: 0,
       Items: []
@@ -314,6 +330,11 @@ describe('HostingAccountLifecycleService', () => {
     );
 
     hostingAccountLifecycleService.cloneRole = jest.fn();
+
+    const mockDDB = mockClient(DynamoDBClient);
+    mockDDB.on(UpdateItemCommand).resolves({
+      Attributes: marshall(accountMetadata)
+    });
 
     await expect(
       hostingAccountLifecycleService.updateHostingAccountData({
