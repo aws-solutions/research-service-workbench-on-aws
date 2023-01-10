@@ -720,8 +720,8 @@ describe('HostingAccountLifecycleService', () => {
   });
 
   test('buildTemplateURLForAccount basic unit test', async () => {
-    const sampleExternalId = 'sample';
     const region = process.env.AWS_REGION!;
+    const externalId = 'exampleExternalId';
 
     hostingAccountLifecycleService['_aws'].clients.s3 = new S3({
       region: region,
@@ -741,14 +741,15 @@ describe('HostingAccountLifecycleService', () => {
         }
       );
 
-    const expectedCreateUrl =
-      'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=sample&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*';
+    const expectedCreateUrl = `https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/review/?templateURL=https%3A%2F%2Ftesturl.com&stackName=swb-swbv2-va-hosting-account&param_Namespace=swb-swbv2-va&param_MainAccountId=123456789012&param_ExternalId=${externalId}&param_AccountHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-accountHandlerLambdaServiceRole-XXXXXXXXXXE88&param_ApiHandlerRoleArn=arn:aws:iam::123456789012:role/swb-swbv2-va-apiLambdaServiceRoleXXXXXXXX-XXXXXXXX&param_StatusHandlerRoleArn=arn:aws:events:us-east-1:123456789012:event-bus/swb-swbv2-va&param_EnableFlowLogs=true&param_LaunchConstraintRolePrefix=*&param_LaunchConstraintPolicyPrefix=*`;
     const expectedUpdateUrl =
       'https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/update/template?stackId=swb-swbv2-va-hosting-account&templateURL=https%3A%2F%2Ftesturl.com';
 
     const cfnMock = mockClient(CloudFormationClient);
     mockCloudformationOutputs(cfnMock);
-    const actual = await hostingAccountLifecycleService.buildTemplateUrlsForAccount(sampleExternalId);
+    const actual = await hostingAccountLifecycleService.buildTemplateUrlsForAccount({
+      externalId
+    });
 
     expect(actual.createUrl).toEqual(expectedCreateUrl);
     expect(actual.updateUrl).toEqual(expectedUpdateUrl);

@@ -6,7 +6,9 @@
 import { PaginatedResponse } from '@aws/workbench-core-base';
 import { TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
+import { AwsAccountTemplateUrlsRequest } from '../models/accounts/awsAccountTemplateUrlsRequest';
 import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
+import { GetAccountRequest } from '../models/accounts/getAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import { UpdateAccountRequest } from '../models/accounts/updateAccountRequest';
 import HostingAccountLifecycleService from '../utilities/hostingAccountLifecycleService';
@@ -22,12 +24,14 @@ export default class HostingAccountService {
     return await this._lifecycleService.listAccounts(listAccountsRequest);
   }
 
-  public async get(accountId: string): Promise<Account> {
-    return await this._lifecycleService.getAccount(accountId, true);
+  public async get(getAccountRequest: GetAccountRequest): Promise<Account> {
+    return await this._lifecycleService.getAccount(getAccountRequest, true);
   }
 
-  public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
-    return await this._lifecycleService.buildTemplateUrlsForAccount(externalId);
+  public async buildTemplateUrlsForAccount(
+    request: AwsAccountTemplateUrlsRequest
+  ): Promise<TemplateResponse> {
+    return await this._lifecycleService.buildTemplateUrlsForAccount(request);
   }
 
   /**

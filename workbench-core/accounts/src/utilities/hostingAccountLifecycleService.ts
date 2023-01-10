@@ -21,7 +21,9 @@ import _ from 'lodash';
 import { HostingAccountStatus } from '../constants/hostingAccountStatus';
 import { AccountCfnTemplateParameters, TemplateResponse } from '../models/accountCfnTemplate';
 import { Account } from '../models/accounts/account';
+import { AwsAccountTemplateUrlsRequest } from '../models/accounts/awsAccountTemplateUrlsRequest';
 import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
+import { GetAccountRequest } from '../models/accounts/getAccountRequest';
 import { ListAccountRequest } from '../models/accounts/listAccountsRequest';
 import { UpdateAccountRequest } from '../models/accounts/updateAccountRequest';
 import AccountService from '../services/accountService';
@@ -52,18 +54,20 @@ export default class HostingAccountLifecycleService {
     return this._accountService.getPaginatedAccounts(queryParams);
   }
 
-  public getAccount(accountId: string, includeMetadata: boolean): Promise<Account> {
-    return this._accountService.getAccount(accountId, includeMetadata);
+  public getAccount(request: GetAccountRequest, includeMetadata: boolean): Promise<Account> {
+    return this._accountService.getAccount(request.id, includeMetadata);
   }
 
   /**
    * Create/Upload template and return its URL
    *
-   * @param externalId - unique ID to represent account
+   * @param request - AwsAccountTemplateUrlsRequest
    *
    * @returns A URL to a prepopulated template for onboarding the hosting account.
    */
-  public async buildTemplateUrlsForAccount(externalId: string): Promise<TemplateResponse> {
+  public async buildTemplateUrlsForAccount(
+    request: AwsAccountTemplateUrlsRequest
+  ): Promise<TemplateResponse> {
     // Share the artifacts bucket with the new hosting account
     const {
       [process.env.ACCT_HANDLER_ARN_OUTPUT_KEY!]: accountHandlerRoleArn,
@@ -81,7 +85,7 @@ export default class HostingAccountLifecycleService {
       accountHandlerRole: accountHandlerRoleArn,
       apiHandlerRole: apiHandlerRoleArn,
       enableFlowLogs: 'true',
-      externalId: externalId,
+      externalId: request.externalId,
       launchConstraintPolicyPrefix: '*', // We can do better, get from stack outputs?
       launchConstraintRolePrefix: '*', // We can do better, get from stack outputs?
       mainAccountId: process.env.MAIN_ACCT_ID!,

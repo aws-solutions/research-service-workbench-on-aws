@@ -4,7 +4,12 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import {
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser
+} from './models/accounts/awsAccountTemplateUrlsRequest';
 import { CreateAccountRequest, CreateAccountRequestParser } from './models/accounts/createAccountRequest';
+import { GetAccountRequest, GetAccountRequestParser } from './models/accounts/getAccountRequest';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
 import { UpdateAccountRequest, UpdateAccountRequestParser } from './models/accounts/updateAccountRequest';
 import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
@@ -20,7 +25,6 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
-import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
@@ -41,12 +45,14 @@ export {
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
   DeleteCostCenterRequestParser,
-  AwsAccountTemplateUrls,
-  AwsAccountTemplateUrlsParser,
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
   CreateAccountRequest,
   CreateAccountRequestParser,
   ListAccountRequest,
   ListAccountsRequestParser,
   UpdateAccountRequestParser,
-  UpdateAccountRequest
+  UpdateAccountRequest,
+  GetAccountRequestParser,
+  GetAccountRequest
 };

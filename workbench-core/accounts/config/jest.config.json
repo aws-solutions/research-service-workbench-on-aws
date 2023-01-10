@@ -8,7 +8,9 @@
     "<rootDir>/src/services/hostingAccountService.ts",
     "<rootDir>/src/index.ts",
     "<rootDir>/src/models/accounts/createAccountRequest.ts",
-    "<rootDir>/src/models/accounts/updateAccountRequest.ts"
+    "<rootDir>/src/models/accounts/updateAccountRequest.ts",
+    "<rootDir>/src/models/accounts/getAccountRequest.ts",
+    "<rootDir>/src/models/accounts/awsAccountTemplateUrlsRequest.ts"
   ],
   "coverageThreshold": {
     "global": {

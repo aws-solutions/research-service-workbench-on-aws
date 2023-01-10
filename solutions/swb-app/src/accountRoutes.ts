@@ -5,14 +5,17 @@
 
 // AWS Account management
 import {
-  AwsAccountTemplateUrlsParser,
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
   HostingAccountService,
   CreateAccountRequestParser,
   ListAccountRequest,
   ListAccountsRequestParser,
   CreateAccountRequest,
   UpdateAccountRequest,
-  UpdateAccountRequestParser
+  UpdateAccountRequestParser,
+  GetAccountRequest,
+  GetAccountRequestParser
 } from '@aws/workbench-core-accounts';
 import { Request, Response, Router } from 'express';
 import { wrapAsync } from './errorHandlers';
@@ -30,15 +33,21 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.get(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      res.send(await hostingAccountService.get(req.params.id));
+      const validatedRequest = validateAndParse<GetAccountRequest>(GetAccountRequestParser, {
+        id: req.params.id
+      });
+      res.send(await hostingAccountService.get(validatedRequest));
     })
   );
 
   router.post(
     '/awsAccountTemplateUrls',
     wrapAsync(async (req: Request, res: Response) => {
-      const validatedRequest = AwsAccountTemplateUrlsParser.parse(req.body);
-      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest.externalId));
+      const validatedRequest = validateAndParse<AwsAccountTemplateUrlsRequest>(
+        AwsAccountTemplateUrlsRequestParser,
+        req.body
+      );
+      res.send(await hostingAccountService.buildTemplateUrlsForAccount(validatedRequest));
     })
   );
 
