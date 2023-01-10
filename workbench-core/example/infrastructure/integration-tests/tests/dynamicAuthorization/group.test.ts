@@ -22,7 +22,6 @@ describe('dynamic authorization group integration tests', () => {
   let adminSession: ClientSession;
 
   beforeEach(() => {
-    expect.hasAssertions();
     fakeUserId = '00000000-0000-0000-0000-000000000000';
     fakeGroupId = '00000000-0000-0000-0000-000000000000';
   });
@@ -36,6 +35,10 @@ describe('dynamic authorization group integration tests', () => {
   });
 
   describe('createGroup', () => {
+    beforeEach(() => {
+      expect.hasAssertions();
+    });
+
     it('creates a group', async () => {
       const { data } = await adminSession.resources.groups.create();
 
@@ -89,6 +92,8 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+get-user-groups-${uuidv4()}@simulator.amazonses.com`
       };
+
+      expect.hasAssertions();
     });
 
     it('get the groups a user is in', async () => {
@@ -121,6 +126,8 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+get-group-users-${uuidv4()}@simulator.amazonses.com`
       };
+
+      expect.hasAssertions();
     });
 
     it('get all the users of a group', async () => {
@@ -146,6 +153,8 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+add-user-to-group-${uuidv4()}@simulator.amazonses.com`
       };
+
+      expect.hasAssertions();
     });
 
     it('assigns user to exiting group', async () => {
@@ -198,6 +207,8 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+is-user-assigned-to-group-${uuidv4()}@simulator.amazonses.com`
       };
+
+      expect.hasAssertions();
     });
 
     it('returns true when the user is in the group', async () => {
@@ -240,6 +251,8 @@ describe('dynamic authorization group integration tests', () => {
         lastName: 'User',
         email: `success+remove-user-from-group-${uuidv4()}@simulator.amazonses.com`
       };
+
+      expect.hasAssertions();
     });
 
     it('removes a user from a group', async () => {
@@ -288,5 +301,23 @@ describe('dynamic authorization group integration tests', () => {
         );
       }
     );
+  });
+
+  describe('deleteGroup', () => {
+    it('deletes existing group', async () => {
+      const {
+        data: { groupId }
+      } = await adminSession.resources.groups.create();
+      const group = adminSession.resources.groups.group(groupId);
+
+      await group.delete();
+    });
+
+    it('returns a 404 error when trying to delete a group that doesn not exists', async () => {
+      expect.hasAssertions();
+      const group = adminSession.resources.groups.group('invalidUserId');
+
+      await expect(group.delete()).rejects.toThrow(new HttpError(404, {}));
+    });
   });
 });

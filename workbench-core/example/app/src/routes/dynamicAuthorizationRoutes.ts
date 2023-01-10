@@ -106,6 +106,28 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     })
   );
 
+  router.delete(
+    '/authorization/groups/:groupId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        await service.deleteGroup({
+          groupId: req.params.groupId,
+          authenticatedUser: res.locals.user
+        });
+
+        res.status(204).send();
+      } catch (error) {
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isRetryError(error)) {
+          throw Boom.serverUnavailable('Request a retry');
+        }
+        throw error;
+      }
+    })
+  );
+
   router.put(
     '/authorization/groups/:groupId/remove-user',
     wrapAsync(async (req: Request, res: Response) => {

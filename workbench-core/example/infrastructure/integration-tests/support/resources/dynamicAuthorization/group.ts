@@ -9,8 +9,10 @@ import { DynamicAuthorizationHelper } from '../../complex/dynamicAuthorizationHe
 import Resource from '../base/resource';
 
 export default class Group extends Resource {
+  private readonly _clientSession: ClientSession;
   public constructor(id: string, clientSession: ClientSession, parentApi: string) {
     super(clientSession, 'group', id, parentApi);
+    this._clientSession = clientSession;
   }
 
   public addUser(body: AddUserToGroupRequest): Promise<AxiosResponse> {
@@ -27,6 +29,11 @@ export default class Group extends Resource {
 
   public async isUserAssigned(userId: string): Promise<AxiosResponse> {
     return this._axiosInstance.get(`${this._api}/is-user-assigned/${userId}`);
+  }
+
+  public async delete(): Promise<void> {
+    this._clientSession.removeCleanupTask(`group-${this.id}`);
+    return super.delete();
   }
 
   public async cleanup(): Promise<void> {
