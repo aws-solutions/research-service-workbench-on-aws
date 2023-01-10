@@ -64,12 +64,6 @@ export function setUpAccountRoutes(router: Router, hostingAccountService: Hostin
   router.patch(
     '/awsAccounts/:id',
     wrapAsync(async (req: Request, res: Response) => {
-      // processValidatorResult(validate(req.body, UpdateAccountSchema));
-      // const { name } = req.body;
-      // const updateAccountMetadata: UpdateAccountData = {
-      //   id: escape(req.params.id),
-      //   name: name!! ? escape(name) : undefined
-      // };
       const validatedRequest = validateAndParse<UpdateAccountRequest>(UpdateAccountRequestParser, {
         id: req.params.id,
         ...req.body

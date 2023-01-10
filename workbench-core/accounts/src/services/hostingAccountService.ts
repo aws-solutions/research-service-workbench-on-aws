@@ -36,7 +36,7 @@ export default class HostingAccountService {
 
   /**
    * Create hosting account record in DDB
-   * @param createAccountRequest - the attributes of the given hosting account
+   * @param createAccountRequest - request to update Account
    *
    * @returns account record in DDB
    */
@@ -46,7 +46,7 @@ export default class HostingAccountService {
 
   /**
    * Update hosting account record in DDB
-   * @param updateAccountRequest - the attributes of the given hosting account
+   * @param updateAccountRequest - request to update account
    *
    * @returns account record in DDB
    */
