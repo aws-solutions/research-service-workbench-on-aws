@@ -80,7 +80,14 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
   }
 
   public async getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse> {
-    throw new Error('Method not implemented.');
+    // TODO implement
+    const { dataSetId, subject } = params;
+    return {
+      data: {
+        dataSetId,
+        permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
+      }
+    };
   }
 
   public async removeAccessPermissions(
