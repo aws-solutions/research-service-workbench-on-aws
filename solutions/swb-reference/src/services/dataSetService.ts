@@ -15,19 +15,22 @@ import {
   PermissionsResponseParser
 } from '@aws/swb-app';
 import { AuditService } from '@aws/workbench-core-audit';
-import { MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
+import { DynamicAuthorizationService } from '@aws/workbench-core-authorization';
+import { resourceTypeToKey } from '@aws/workbench-core-base';
 import {
   DataSetMetadataPlugin,
   DataSetService as WorkbenchDataSetService
 } from '@aws/workbench-core-datasets';
 import { DataSetsAuthorizationPlugin } from '@aws/workbench-core-datasets/lib/dataSetsAuthorizationPlugin';
 import { LoggingService } from '@aws/workbench-core-logging';
+import { Associable, DatabaseServicePlugin } from './databaseService';
 
 export class DataSetService implements DataSetPlugin {
   public readonly storagePlugin: DataSetStoragePlugin;
   private _dataSetsAuthService: DataSetsAuthorizationPlugin;
   private _workbenchDataSetService: WorkbenchDataSetService;
-  private _metadataService: MetadataService;
+  private _databaseService: DatabaseServicePlugin;
+  private _dynamicAuthService: DynamicAuthorizationService;
 
   public constructor(
     dataSetStoragePlugin: DataSetStoragePlugin,
@@ -35,7 +38,8 @@ export class DataSetService implements DataSetPlugin {
     loggingService: LoggingService,
     dataSetMetadataPlugin: DataSetMetadataPlugin,
     dataSetAuthService: DataSetsAuthorizationPlugin,
-    metadataService: MetadataService
+    databaseService: DatabaseServicePlugin,
+    dynamicAuthService: DynamicAuthorizationService
   ) {
     this._workbenchDataSetService = new WorkbenchDataSetService(
       auditService,
@@ -45,7 +49,8 @@ export class DataSetService implements DataSetPlugin {
     );
     this.storagePlugin = dataSetStoragePlugin;
     this._dataSetsAuthService = dataSetAuthService;
-    this._metadataService = metadataService;
+    this._databaseService = databaseService;
+    this._dynamicAuthService = dynamicAuthService;
   }
 
   public addDataSetExternalEndpoint(
@@ -73,8 +78,27 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets();
   }
 
-  public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    return this._workbenchDataSetService.provisionDataSet(request);
+  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    //add permissions in AuthZ for user to read, write, update, delete, and update read/write permissions
+    const dataset = await this._workbenchDataSetService.provisionDataSet(request);
+    const projectId = dataset.owner!;
+    const projectAdmin = `${projectId}#PA`;
+
+    await this._addAuthZCRUDPermissionsForDataset(
+      'DATASET',
+      dataset.id!,
+      [projectAdmin],
+      ['read', 'update', 'delete']
+    );
+
+    await this._addAuthZCRUDPermissionsForDataset(
+      'DATASET_ACCESS_LEVELS',
+      `${projectId}-${dataset.id!}`,
+      [projectAdmin],
+      ['read', 'update']
+    );
+
+    return dataset;
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
@@ -104,32 +128,50 @@ export class DataSetService implements DataSetPlugin {
     return PermissionsResponseParser.parse(response);
   }
 
-  public async associateProjectWithDataSet(
+  public async addAccessForProject(
     addAccessPermissionRequest: AddRemoveAccessPermissionRequest
   ): Promise<PermissionsResponse> {
-    const response = this.addAccessPermission(addAccessPermissionRequest);
+    const datasetId = addAccessPermissionRequest.dataSetId;
     const projectId = addAccessPermissionRequest.permission.subject;
-    await this._metadataService.updateRelationship(
-      resourceTypeToKey.dataset,
-      {
-        id: addAccessPermissionRequest.dataSetId,
-        data: {
-          id: projectId,
-          permission: addAccessPermissionRequest.permission.accessLevel
-        }
-      },
-      resourceTypeToKey.project,
-      [
-        {
-          id: projectId,
-          data: {
-            id: addAccessPermissionRequest.dataSetId,
-            permission: addAccessPermissionRequest.permission.accessLevel
-          }
-        }
-      ]
+    const projectAdmin = `${projectId}#PA`;
+    const projectResearcher = `${projectId}#Researcher`;
+
+    await this._addAuthZPermissionsForDataset(
+      'DATASET',
+      datasetId,
+      [projectAdmin, projectResearcher],
+      ['read']
     );
+
+    const response = await this.addAccessPermission(addAccessPermissionRequest);
+
+    const dataset: Associable = {
+      type: resourceTypeToKey.dataset,
+      id: addAccessPermissionRequest.dataSetId,
+      data: {
+        id: projectId,
+        permission: addAccessPermissionRequest.permission.accessLevel
+      }
+    };
+
+    const project: Associable = {
+      type: resourceTypeToKey.project,
+      id: projectId,
+      data: {
+        id: addAccessPermissionRequest.dataSetId,
+        permission: addAccessPermissionRequest.permission.accessLevel
+      }
+    };
+
+    await this._databaseService.storeAssociations(dataset, [project]);
 
     return response;
   }
+
+  private async _addAuthZPermissionsForDataset(
+    subject: string,
+    subjectId: string,
+    roles: string[],
+    actions: string[]
+  ): Promise<void> {}
 }

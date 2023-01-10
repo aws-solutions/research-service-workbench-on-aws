@@ -22,7 +22,7 @@ import { validateAndParse } from './validatorHelper';
 export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): void {
   // creates new prefix in S3 (assumes S3 bucket exist already)
   router.post(
-    '/datasets',
+    '/projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const validatedRequest = validateAndParse<CreateDataSetRequest>(CreateDataSetRequestParser, req.body);
       const dataSet = await dataSetService.provisionDataSet({
@@ -95,7 +95,7 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
 
   // List dataSets
   router.get(
-    '/datasets',
+    'projects/:projectId/datasets',
     wrapAsync(async (req: Request, res: Response) => {
       const response = await dataSetService.listDataSets();
       res.send(response);
@@ -115,7 +115,8 @@ export function setUpDSRoutes(router: Router, dataSetService: DataSetPlugin): vo
           }
         }
       );
-      await dataSetService.associateProjectWithDataSet(validatedRequest);
+      await dataSetService.addAccessForProject(validatedRequest);
+
       res.status(204).send();
     })
   );

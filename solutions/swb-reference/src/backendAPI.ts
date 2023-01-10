@@ -34,6 +34,7 @@ import { Express } from 'express';
 import { authorizationGroupPrefix, dataSetPrefix, endPointPrefix } from './constants';
 import SagemakerNotebookEnvironmentConnectionService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService';
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
+import { DatabaseService } from './services/databaseService';
 import { DataSetService } from './services/dataSetService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
 
@@ -109,7 +110,7 @@ const apiRouteConfig: ApiRouteConfig = {
     logger,
     new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
     new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService),
-    metadataService
+    new DatabaseService()
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,
