@@ -967,6 +967,39 @@
           "response": []
         },
         {
+          "name": "Create project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Example Project 1\",\n    \"description\": \"Example Project 1\",\n    \"costCenterId\": \"cc-exampleCostCenterId\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects",
+              "host": ["{{API_URL}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Associate project with EnvTypeConfig",
           "request": {
             "method": "PUT",
