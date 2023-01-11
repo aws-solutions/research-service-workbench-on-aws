@@ -21,7 +21,7 @@ import {
 import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
 import CreateProjectRequest from './models/createProjectRequest';
 import GetProjectRequest from './models/getProjectRequest';
-import ListProjectsRequest from './models/listProjectsRequest';
+import { ListProjectsRequest } from './models/listProjectsRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';

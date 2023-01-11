@@ -4,6 +4,7 @@
  */
 
 // Schema for ListProjects API
+import { QueryParameterFilterSchema } from '@aws/workbench-core-base';
 import { Schema } from 'jsonschema';
 
 const ListProjectsSchema: Schema = {
@@ -12,7 +13,27 @@ const ListProjectsSchema: Schema = {
   properties: {
     user: { type: 'AuthenticatedUser' },
     pageSize: { type: 'number' },
-    paginationToken: { type: 'string' }
+    paginationToken: { type: 'string' },
+    filter: {
+      type: 'object',
+      properties: {
+        name: QueryParameterFilterSchema,
+        status: QueryParameterFilterSchema,
+        createdAt: QueryParameterFilterSchema,
+        dependency: QueryParameterFilterSchema
+      },
+      additionalProperties: false
+    },
+    sort: {
+      type: 'object',
+      properties: {
+        name: { enum: ['asc', 'desc'] },
+        status: { enum: ['asc', 'desc'] },
+        createdAt: { enum: ['asc', 'desc'] },
+        dependency: { enum: ['asc', 'desc'] }
+      },
+      additionalProperties: false
+    }
   },
   additionalProperties: false,
   required: ['user']

@@ -7,6 +7,8 @@ const projId = `proj-${expectedUuid}`;
 jest.mock('uuid', () => ({ v4: () => expectedUuid }));
 
 import {
+  BatchGetItemCommand,
+  BatchGetItemCommandOutput,
   DynamoDBClient,
   GetItemCommand,
   GetItemCommandOutput,
@@ -17,6 +19,7 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import { mockClient } from 'aws-sdk-client-mock';
+import { ProjectStatus } from '../constants/projectStatus';
 import Project from '../models/project';
 import ProjectService from './projectService';
 
@@ -26,6 +29,89 @@ describe('ProjectService', () => {
   const projService = new ProjectService({ TABLE_NAME });
   const timestamp = '2022-05-18T20:33:42.608Z';
   const mockDateObject = new Date(timestamp);
+  let projects: Project[];
+  const project1: Project = {
+    id: 'proj-123',
+    name: 'name1',
+    description: '',
+    costCenterId: 'cc-1',
+    status: ProjectStatus.AVAILABLE,
+    createdAt: '2022-11-10T04:19:00.000Z',
+    updatedAt: '',
+    awsAccountId: '',
+    envMgmtRoleArn: '',
+    hostingAccountHandlerRoleArn: '',
+    vpcId: '',
+    subnetId: '',
+    environmentInstanceFiles: '',
+    encryptionKeyArn: '',
+    externalId: '',
+    accountId: ''
+  };
+  const project2: Project = {
+    id: 'proj-456',
+    name: 'name2',
+    description: '',
+    costCenterId: 'cc-2',
+    status: ProjectStatus.SUSPENDED,
+    createdAt: '2022-11-10T04:20:00.000Z',
+    updatedAt: '',
+    awsAccountId: '',
+    envMgmtRoleArn: '',
+    hostingAccountHandlerRoleArn: '',
+    vpcId: '',
+    subnetId: '',
+    environmentInstanceFiles: '',
+    encryptionKeyArn: '',
+    externalId: '',
+    accountId: ''
+  };
+  const project3: Project = {
+    id: 'proj-789',
+    name: 'name3',
+    description: '',
+    costCenterId: 'cc-3',
+    status: ProjectStatus.DELETED,
+    createdAt: '2022-11-10T04:21:00.000Z',
+    updatedAt: '',
+    awsAccountId: '',
+    envMgmtRoleArn: '',
+    hostingAccountHandlerRoleArn: '',
+    vpcId: '',
+    subnetId: '',
+    environmentInstanceFiles: '',
+    encryptionKeyArn: '',
+    externalId: '',
+    accountId: ''
+  };
+
+  // DDB object for project1
+  const projItem1: Record<string, string> = {
+    ...project1,
+    pk: `PROJ#proj-123`,
+    sk: `PROJ#proj-123`,
+    resourceType: 'project',
+    dependency: project1.costCenterId
+  };
+  delete projItem1.costCenterId;
+  // DDB object for project2
+  const projItem2: Record<string, string> = {
+    ...project2,
+    pk: `PROJ#proj-456`,
+    sk: `PROJ#proj-456`,
+    resourceType: 'project',
+    dependency: project2.costCenterId
+  };
+  delete projItem2.costCenterId;
+  // DDB object for project3
+  const projItem3: Record<string, string> = {
+    ...project3,
+    pk: `PROJ#proj-789`,
+    sk: `PROJ#proj-789`,
+    resourceType: 'project',
+    dependency: project3.costCenterId
+  };
+  delete projItem3.costCenterId;
 
   beforeAll(() => {
     process.env.AWS_REGION = 'us-east-1';
@@ -33,6 +119,7 @@ describe('ProjectService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
+    projects = [project1, project2, project3];
   });
 
   // Project object
@@ -52,11 +139,11 @@ describe('ProjectService', () => {
     subnetId: 'subnet-07f475d83291a3603',
     updatedAt: timestamp,
     vpcId: 'vpc-0b0bc7ae01d82e7b3',
-    status: 'AVAILABLE'
+    status: ProjectStatus.AVAILABLE
   };
 
   // DDB object for project item
-  const projItem: { [key: string]: string } = {
+  const projItem: Record<string, string> = {
     ...proj,
     pk: `PROJ#${projId}`,
     sk: `PROJ#${projId}`,
@@ -86,9 +173,28 @@ describe('ProjectService', () => {
   };
 
   describe('listProjects', () => {
+    test('should fail on list projects for negative pageSize', async () => {
+      // BUILD
+      const pageSize = -1;
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // OPERATE n CHECK
+      await expect(() => projService.listProjects({ user, pageSize })).rejects.toThrow(
+        'Please supply a non-negative page size.'
+      );
+    });
+
     test('list all projects with no group membership', async () => {
       // BUILD
-
       const user: AuthenticatedUser = {
         id: 'user-123',
         roles: []
@@ -180,6 +286,390 @@ describe('ProjectService', () => {
 
       // OPERATE
       const actualResponse = await projService.listProjects({ user });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with filter on createdAt', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByCreatedAt',
+          KeyConditionExpression:
+            '#resourceType = :resourceType AND #createdAt BETWEEN :createdAt1 AND :createdAt2',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#createdAt': 'createdAt'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':createdAt1': {
+              S: 'date1'
+            },
+            ':createdAt2': {
+              S: 'date2'
+            }
+          },
+          Limit: 50
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { createdAt: { between: { value1: 'date1', value2: 'date2' } } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with filter on dependency', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByDependency',
+          KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#dependency': 'dependency'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':dependency': {
+              S: 'cc-123'
+            }
+          },
+          Limit: 50
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { dependency: { eq: 'cc-123' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with filter on status', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByStatus',
+          KeyConditionExpression: '#resourceType = :resourceType AND #status = :status',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#status': 'status'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':status': {
+              S: 'AVAILABLE'
+            }
+          },
+          Limit: 50
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { status: { eq: 'AVAILABLE' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with filter on name', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#name': 'name'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':name': {
+              S: 'Example project'
+            }
+          },
+          Limit: 50
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { name: { eq: 'Example project' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with sort on createdAt', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByCreatedAt',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            }
+          },
+          Limit: 50,
+          ScanIndexForward: true
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { createdAt: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with sort on dependency', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByDependency',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            }
+          },
+          Limit: 50,
+          ScanIndexForward: true
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { dependency: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with sort on status', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByStatus',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            }
+          },
+          Limit: 50,
+          ScanIndexForward: true
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { status: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([proj]);
+    });
+
+    test('list all projects as IT Admin on 1 page with sort on name', async () => {
+      // BUILD
+      const items = [projItem];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: items.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            }
+          },
+          Limit: 50,
+          ScanIndexForward: true
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { name: 'asc' }
+      });
 
       // CHECK
       expect(actualResponse.data).toEqual([proj]);
@@ -325,16 +815,9 @@ describe('ProjectService', () => {
 
     test('list all projects as user in multiple groups on 1 page when pageSize > number of projects', async () => {
       // BUILD
-      const items = [projItem, projItem];
-      const pageSize = 3;
-      const expectedResponse = { data: [proj, proj], paginationToken: undefined };
-      const queryItemResponse: QueryCommandOutput = {
-        Items: items.map((item) => {
-          return marshall(item);
-        }),
-        Count: 2,
-        $metadata: {}
-      };
+      const items = [projItem1, projItem2, projItem3];
+      const pageSize = 4;
+      const expectedResponse = { data: projects, paginationToken: undefined };
       const user: AuthenticatedUser = {
         id: 'user-123',
         roles: ['PA']
@@ -344,27 +827,18 @@ describe('ProjectService', () => {
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-123#PA']);
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
 
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: {
-            '#resourceType': 'resourceType'
-          },
-          ExpressionAttributeValues: {
-            ':resourceType': {
-              S: 'project'
-            },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2',
-          Limit: pageSize
-        })
-        .resolves(queryItemResponse);
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
       const actualResponse = await projService.listProjects({ user, pageSize });
@@ -375,24 +849,343 @@ describe('ProjectService', () => {
 
     test('list all projects as user in multiple groups on 1 page exactly', async () => {
       // BUILD
-      const items = [projItem, projItem];
+      const items = [projItem1, projItem2, projItem3];
       const lastEvaluatedKey = {
-        pk: projItem.pk,
-        sk: projItem.sk,
-        resourceType: projItem.resourceType,
-        createdAt: projItem.createdAt
+        pk: projItem3.pk,
+        sk: projItem3.sk
+      };
+      const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
+      const pageSize = 3;
+      const expectedResponse = { data: projects, paginationToken: paginationToken };
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({ user, pageSize });
+
+      // CHECK
+      expect(actualResponse).toEqual(expectedResponse);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with filter on createdAt', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: {
+          createdAt: { between: { value1: '2022-11-10T04:19:00.000Z', value2: '2022-11-10T04:20:00.000Z' } }
+        }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1, project2]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with filter on dependency', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock getBatchItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { dependency: { eq: 'cc-1' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1]);
+    });
+
+    test('list all projects as user of mutliple groups on 1 page with filter on status', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { status: { eq: 'AVAILABLE' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with filter on name', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        filter: { name: { begins: 'name' } }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1, project2, project3]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with sort on createdAt', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { createdAt: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1, project2, project3]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with sort on dependency', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { dependency: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1, project2, project3]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with sort on status', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { status: 'asc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project1, project3, project2]);
+    });
+
+    test('list all projects as user of multiple groups on 1 page with sort on name', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({
+        user,
+        sort: { name: 'desc' }
+      });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([project3, project2, project1]);
+    });
+
+    test('list all projects as user in multiple groups on next page with pagination token', async () => {
+      // BUILD
+      const items = [projItem1, projItem2, projItem3];
+      const lastEvaluatedKey = {
+        pk: projItem2.pk,
+        sk: projItem2.sk
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 2;
-      const expectedResponse = { data: [proj, proj], paginationToken: paginationToken };
-      const queryItemResponse: QueryCommandOutput = {
-        Items: items.map((item) => {
-          return marshall(item);
-        }),
-        LastEvaluatedKey: marshall(lastEvaluatedKey),
-        Count: 2,
-        $metadata: {}
-      };
+      const expectedResponse = { data: [project3], paginationToken: undefined };
       const user: AuthenticatedUser = {
         id: 'user-123',
         roles: ['PA']
@@ -402,63 +1195,40 @@ describe('ProjectService', () => {
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-123#PA']);
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
 
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: {
-            '#resourceType': 'resourceType'
-          },
-          ExpressionAttributeValues: {
-            ':resourceType': {
-              S: 'project'
-            },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2',
-          Limit: pageSize
-        })
-        .resolves(queryItemResponse);
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
     });
 
-    test('list all projects as user in multiple groups on 1 page -- getting first page when filter returns less than 1 page', async () => {
+    test('list all projects as user in multiple groups on next page with pagination token with more to get', async () => {
       // BUILD
-      const itemsP1 = [projItem, projItem];
-      const itemsP2 = [projItem];
+      const items = [projItem1, projItem1, projItem2, projItem3, projItem3];
       const lastEvaluatedKey = {
-        pk: projItem.pk,
-        sk: projItem.sk,
-        resourceType: projItem.resourceType,
-        createdAt: projItem.createdAt
+        pk: projItem2.pk,
+        sk: projItem2.sk
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
-      const pageSize = 3;
-      const expectedResponse = { data: [proj, proj, proj], paginationToken: paginationToken };
-      const queryItemResponse1: QueryCommandOutput = {
-        Items: itemsP1.map((item) => {
-          return marshall(item);
-        }),
-        LastEvaluatedKey: marshall(lastEvaluatedKey),
-        Count: 2,
-        $metadata: {}
-      };
-      const queryItemResponse2: QueryCommandOutput = {
-        Items: itemsP2.map((item) => {
-          return marshall(item);
-        }),
-        LastEvaluatedKey: marshall(lastEvaluatedKey),
-        Count: 1,
-        $metadata: {}
+      const pageSize = 1;
+      const expectedResponse = {
+        data: [project3],
+        paginationToken: Buffer.from(JSON.stringify({ pk: projItem3.pk, sk: projItem3.sk })).toString(
+          'base64'
+        )
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -469,81 +1239,68 @@ describe('ProjectService', () => {
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-123#PA', 'proj-123#PA']);
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
 
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: {
-            '#resourceType': 'resourceType'
-          },
-          ExpressionAttributeValues: {
-            ':resourceType': {
-              S: 'project'
-            },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' },
-            ':proj3': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2 OR id = :proj3',
-          Limit: pageSize
-        })
-        .resolvesOnce(queryItemResponse1);
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: { '#resourceType': 'resourceType' },
-          ExpressionAttributeValues: {
-            ':resourceType': { S: 'project' },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' },
-            ':proj3': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2 OR id = :proj3',
-          Limit: pageSize,
-          ExclusiveStartKey: marshall(lastEvaluatedKey)
-        })
-        .resolvesOnce(queryItemResponse2);
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user, pageSize, paginationToken });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);
     });
 
-    test('list all projects as user in multiple groups on 1 page -- getting second page when filter returns more than 1 page the second time', async () => {
+    test('should fail on list projects for use of multiple projects with invalid paginationToken', async () => {
       // BUILD
-      const itemsP1 = [projItem, projItem];
-      const itemsP2 = [projItem, projItem];
+      const items = [projItem1, projItem2, projItem3];
       const lastEvaluatedKey = {
-        pk: projItem.pk,
-        sk: projItem.sk,
-        resourceType: projItem.resourceType,
-        createdAt: projItem.createdAt
+        pk: 'notPk',
+        sk: 'notSk'
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
-      const pageSize = 3;
-      const expectedResponse = { data: [proj, proj, proj], paginationToken: paginationToken };
-      const queryItemResponse1: QueryCommandOutput = {
-        Items: itemsP1.map((item) => {
-          return marshall(item);
-        }),
-        LastEvaluatedKey: marshall(lastEvaluatedKey),
-        Count: 2,
+      const pageSize = 1;
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['PA']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
+
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: {
+          exampleDDBTable: items.map((item) => {
+            return marshall(item);
+          })
+        },
         $metadata: {}
       };
-      const queryItemResponse2: QueryCommandOutput = {
-        Items: itemsP2.map((item) => {
-          return marshall(item);
-        }),
-        LastEvaluatedKey: marshall(lastEvaluatedKey),
-        Count: 2,
-        $metadata: {}
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
+
+      // OPERATE n CHECK
+      await expect(() => projService.listProjects({ user, pageSize, paginationToken })).rejects.toThrow(
+        'Pagination token is invalid.'
+      );
+    });
+
+    test('list all projects as user in multiple groups but nothing is returned from DDB', async () => {
+      // BUILD
+      const expectedResponse = {
+        data: [],
+        paginationToken: undefined
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -554,50 +1311,17 @@ describe('ProjectService', () => {
       jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(ProjectService.prototype as any, '_mockGetUserGroups')
-        .mockImplementation(() => ['proj-123#PA', 'proj-123#PA', 'proj-123#PA', 'proj-123#PA']);
+        .mockImplementation(() => ['proj-123#PA', 'proj-456#PA', 'proj-789#PA']);
 
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: {
-            '#resourceType': 'resourceType'
-          },
-          ExpressionAttributeValues: {
-            ':resourceType': {
-              S: 'project'
-            },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' },
-            ':proj3': { S: 'proj-123' },
-            ':proj4': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2 OR id = :proj3 OR id = :proj4',
-          Limit: pageSize
-        })
-        .resolvesOnce(queryItemResponse1);
-      ddbMock
-        .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
-          IndexName: 'getResourceByCreatedAt',
-          KeyConditionExpression: '#resourceType = :resourceType',
-          ExpressionAttributeNames: { '#resourceType': 'resourceType' },
-          ExpressionAttributeValues: {
-            ':resourceType': { S: 'project' },
-            ':proj1': { S: 'proj-123' },
-            ':proj2': { S: 'proj-123' },
-            ':proj3': { S: 'proj-123' },
-            ':proj4': { S: 'proj-123' }
-          },
-          FilterExpression: 'id = :proj1 OR id = :proj2 OR id = :proj3 OR id = :proj4',
-          Limit: pageSize,
-          ExclusiveStartKey: marshall(lastEvaluatedKey)
-        })
-        .resolvesOnce(queryItemResponse2);
+      // mock batchGetItems call
+      const batchGetItems: BatchGetItemCommandOutput = {
+        Responses: undefined,
+        $metadata: {}
+      };
+      ddbMock.on(BatchGetItemCommand).resolves(batchGetItems);
 
       // OPERATE
-      const actualResponse = await projService.listProjects({ user, pageSize });
+      const actualResponse = await projService.listProjects({ user });
 
       // CHECK
       expect(actualResponse).toEqual(expectedResponse);

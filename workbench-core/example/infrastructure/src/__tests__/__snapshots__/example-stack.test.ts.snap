@@ -1,0 +1,1928 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TestExampleStack Infrastructure Test 1`] = `
+Object {
+  "Metadata": Object {
+    "cdk_nag": Object {
+      "rules_to_suppress": Array [
+        Object {
+          "id": "AwsSolutions-APIG3",
+          "reason": "I am ok with not using WAFv2, this is an example App",
+        },
+        Object {
+          "id": "AwsSolutions-APIG6",
+          "reason": "I am ok with not enabling Cloudwatch logging at stage level, this is an example App",
+        },
+        Object {
+          "id": "AwsSolutions-APIG4",
+          "reason": "@aws/workbench-core-authentication implemented",
+        },
+        Object {
+          "id": "AwsSolutions-COG4",
+          "reason": "@aws/workbench-core-authentication implemented",
+        },
+      ],
+    },
+  },
+  "Outputs": Object {
+    "AwsRegion": Object {
+      "Value": Object {
+        "Ref": "AWS::Region",
+      },
+    },
+    "ExampleAPIEndpoint": Object {
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "https://",
+            Object {
+              "Ref": "ExampleRestApi66BED094",
+            },
+            ".execute-api.",
+            Object {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            Object {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            Object {
+              "Ref": "ExampleRestApiDeploymentStagedev13679C38",
+            },
+            "/",
+          ],
+        ],
+      },
+    },
+    "ExampleCognitoDomainName": Object {
+      "Export": Object {
+        "Name": "ExampleCognitoDomain",
+      },
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "https://",
+            Object {
+              "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F",
+            },
+            ".auth.",
+            Object {
+              "Ref": "AWS::Region",
+            },
+            ".amazoncognito.com",
+          ],
+        ],
+      },
+    },
+    "ExampleCognitoUserPoolClientId": Object {
+      "Export": Object {
+        "Name": "ExampleCognitoUserPoolClientId",
+      },
+      "Value": Object {
+        "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolClient73980675",
+      },
+    },
+    "ExampleCognitoUserPoolId": Object {
+      "Export": Object {
+        "Name": "ExampleUserPoolId",
+      },
+      "Value": Object {
+        "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+      },
+    },
+    "ExampleDynamoDBTableOutput": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ExampleStackF2AEB7EA",
+          "Arn",
+        ],
+      },
+    },
+    "ExampleEncryptionKeyEncryptionKeyOutput172B0370": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ExampleEncryptionKey83E707EA",
+          "Arn",
+        ],
+      },
+    },
+    "ExampleLambdaRoleOutput": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ExampleLambdaServiceServiceRole83FF9D48",
+          "Arn",
+        ],
+      },
+    },
+    "ExampleRestApiEndpoint9C6D55BB": Object {
+      "Value": Object {
+        "Fn::Join": Array [
+          "",
+          Array [
+            "https://",
+            Object {
+              "Ref": "ExampleRestApi66BED094",
+            },
+            ".execute-api.",
+            Object {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            Object {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            Object {
+              "Ref": "ExampleRestApiDeploymentStagedev13679C38",
+            },
+            "/",
+          ],
+        ],
+      },
+    },
+    "ExampleS3BucketAccessLogsNameOutput": Object {
+      "Export": Object {
+        "Name": "ExampleS3BucketAccessLogsNameOutput",
+      },
+      "Value": Object {
+        "Ref": "ExampleS3AccessLogs4CD1BB55",
+      },
+    },
+    "ExampleS3BucketExampleS3BucketDatasetsArnOutput393A6D8B": Object {
+      "Value": Object {
+        "Fn::GetAtt": Array [
+          "ExampleS3Bucketexamples3datasets657A5691",
+          "Arn",
+        ],
+      },
+    },
+  },
+  "Parameters": Object {
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": Object {
+    "AWS679f53fac002430cb0da5b7982bd22872D164C4C": Object {
+      "DependsOn": Array [
+        "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-L1",
+              "reason": "Should be fixed in the @aws/workbench-core-infrastructure package",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "864aa5eb2d6ca4e0d4d65c940bc9e4d5a29db1e4f3f3a098ddb56f76b2129ac4.zip",
+        },
+        "Handler": "index.handler",
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs14.x",
+        "Timeout": 120,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+              "id": "AwsSolutions-IAM4",
+              "reason": "I am OK with this, this is part of the Custom resource defined in the @aws/workbench-core-infrastructure package",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "Alias325C5727": Object {
+      "Properties": Object {
+        "FunctionName": Object {
+          "Ref": "ExampleLambdaServiceB41FF26F",
+        },
+        "FunctionVersion": Object {
+          "Fn::GetAtt": Array [
+            "ExampleLambdaServiceCurrentVersionDB4EDA2B0a38d5e814c6060a297db4219639d2a5",
+            "Version",
+          ],
+        },
+        "Name": "live",
+        "ProvisionedConcurrencyConfig": Object {
+          "ProvisionedConcurrentExecutions": 1,
+        },
+      },
+      "Type": "AWS::Lambda::Alias",
+    },
+    "ExampleAPIGatewayAccessLogs5DEC7E98": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "RetentionInDays": 731,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleEncryptionKey83E707EA": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "EnableKeyRotation": true,
+        "KeyPolicy": Object {
+          "Statement": Array [
+            Object {
+              "Action": "kms:*",
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:",
+                      Object {
+                        "Ref": "AWS::Partition",
+                      },
+                      ":iam::",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":root",
+                    ],
+                  ],
+                },
+              },
+              "Resource": "*",
+              "Sid": "main-key-share-statement",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::KMS::Key",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleLambdaPolicy2109B1D9": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "I am OK with using wildcard here",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "events:DescribeRule",
+                "events:Put*",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:aws:events:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":event-bus/default",
+                  ],
+                ],
+              },
+              "Sid": "EventBridgeAccess",
+            },
+            Object {
+              "Action": Array [
+                "cloudformation:DescribeStacks",
+                "cloudformation:DescribeStackEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:aws:cloudformation:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":*:stack/ExampleStack*",
+                  ],
+                ],
+              },
+              "Sid": "CfnAccess",
+            },
+            Object {
+              "Action": "cognito-idp:DescribeUserPoolClient",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:aws:cognito-idp:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":userpool/*",
+                  ],
+                ],
+              },
+              "Sid": "CognitoAccess",
+            },
+            Object {
+              "Action": Array [
+                "kms:GetKeyPolicy",
+                "kms:PutKeyPolicy",
+                "kms:GenerateDataKey",
+              ],
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    "arn:aws:kms:",
+                    Object {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    Object {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":key/*",
+                  ],
+                ],
+              },
+              "Sid": "KMSAccess",
+            },
+            Object {
+              "Action": Array [
+                "events:DescribeRule",
+                "events:Put*",
+                "events:RemovePermission",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "EventbridgeAccess",
+            },
+            Object {
+              "Action": Array [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            Object {
+              "Action": Array [
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:GetObjectTagging",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+                "s3:GetBucketPolicy",
+                "s3:PutBucketPolicy",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging",
+                "s3:ListBucket",
+                "s3:PutAccessPointPolicy",
+                "s3:GetAccessPointPolicy",
+                "s3:CreateAccessPoint",
+                "s3:DeleteAccessPoint",
+              ],
+              "Effect": "Allow",
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleS3Bucketexamples3datasets657A5691",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleS3Bucketexamples3datasets657A5691",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      "arn:aws:s3:",
+                      Object {
+                        "Ref": "AWS::Region",
+                      },
+                      ":",
+                      Object {
+                        "Ref": "AWS::AccountId",
+                      },
+                      ":accesspoint/*",
+                    ],
+                  ],
+                },
+              ],
+              "Sid": "datasetS3Access",
+            },
+            Object {
+              "Action": Array [
+                "cognito-idp:AdminAddUserToGroup",
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:AdminDeleteUser",
+                "cognito-idp:AdminGetUser",
+                "cognito-idp:AdminListGroupsForUser",
+                "cognito-idp:AdminRemoveUserFromGroup",
+                "cognito-idp:AdminUpdateUserAttributes",
+                "cognito-idp:CreateGroup",
+                "cognito-idp:DeleteGroup",
+                "cognito-idp:ListGroups",
+                "cognito-idp:ListUsers",
+                "cognito-idp:ListUsersInGroup",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+              "Sid": "cognitoAccess",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "ExampleLambdaPolicy2109B1D9",
+        "Roles": Array [
+          Object {
+            "Ref": "ExampleLambdaServiceServiceRole83FF9D48",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "ExampleLambdaServiceB41FF26F": Object {
+      "DependsOn": Array [
+        "ExampleLambdaServiceServiceRoleDefaultPolicy4DFEF645",
+        "ExampleLambdaServiceServiceRole83FF9D48",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+              "id": "AwsSolutions-IAM4",
+              "reason": "I am OK with using AWSLambdaBasicExecutionRole here",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Code": Object {
+          "S3Bucket": Object {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "22ab098f88044125e9204bbbcd04824f2babd01e0696d7a78c9cc57774053913.zip",
+        },
+        "Environment": Object {
+          "Variables": Object {
+            "CLIENT_ID": Object {
+              "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolClient73980675",
+            },
+            "CLIENT_SECRET": Object {
+              "Fn::GetAtt": Array [
+                "ExampleServiceWorkbenchCognitoDescribeCognitoUserPoolClient1AEACEBB",
+                "UserPoolClient.ClientSecret",
+              ],
+            },
+            "COGNITO_DOMAIN": Object {
+              "Fn::Join": Array [
+                "",
+                Array [
+                  "https://",
+                  Object {
+                    "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F",
+                  },
+                  ".auth.",
+                  Object {
+                    "Ref": "AWS::Region",
+                  },
+                  ".amazoncognito.com",
+                ],
+              ],
+            },
+            "STACK_NAME": Object {
+              "Ref": "AWS::StackName",
+            },
+            "USER_POOL_ID": Object {
+              "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+            },
+          },
+        },
+        "FunctionName": "ExampleLambda",
+        "Handler": "buildLambda.handler",
+        "MemorySize": 832,
+        "Role": Object {
+          "Fn::GetAtt": Array [
+            "ExampleLambdaServiceServiceRole83FF9D48",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs16.x",
+        "Timeout": 29,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "ExampleLambdaServiceCurrentVersionDB4EDA2B0a38d5e814c6060a297db4219639d2a5": Object {
+      "Properties": Object {
+        "FunctionName": Object {
+          "Ref": "ExampleLambdaServiceB41FF26F",
+        },
+      },
+      "Type": "AWS::Lambda::Version",
+    },
+    "ExampleLambdaServiceServiceRole83FF9D48": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+              "id": "AwsSolutions-IAM4",
+              "reason": "I am OK with using AWSLambdaBasicExecutionRole here",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "ExampleLambdaServiceServiceRoleDefaultPolicy4DFEF645": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-IAM5",
+              "reason": "I am OK with using wildcard here",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": Array [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
+              ],
+              "Effect": "Allow",
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleStackF2AEB7EA",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleStackF2AEB7EA",
+                          "Arn",
+                        ],
+                      },
+                      "/index/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "ExampleLambdaServiceServiceRoleDefaultPolicy4DFEF645",
+        "Roles": Array [
+          Object {
+            "Ref": "ExampleLambdaServiceServiceRole83FF9D48",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "ExampleRestApi66BED094": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Description": "Example Rest API",
+        "Name": "ExampleRestAPI",
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+    },
+    "ExampleRestApiANY9694097B": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "ANY",
+        "Integration": Object {
+          "Type": "MOCK",
+        },
+        "ResourceId": Object {
+          "Fn::GetAtt": Array [
+            "ExampleRestApi66BED094",
+            "RootResourceId",
+          ],
+        },
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "ExampleRestApiAccountFC8F61F8": Object {
+      "DependsOn": Array [
+        "ExampleRestApi66BED094",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "CloudWatchRoleArn": Object {
+          "Fn::GetAtt": Array [
+            "ExampleRestApiCloudWatchRoleBA3B7471",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ApiGateway::Account",
+    },
+    "ExampleRestApiCloudWatchRoleBA3B7471": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-IAM4",
+              "reason": "I am OK with using managed Policy here",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AssumeRolePolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "apigateway.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": Array [
+          Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "ExampleRestApiDeployment10B028B13f152292fba52d790e02ed44106514fc": Object {
+      "DependsOn": Array [
+        "ExampleRestApiproxyANY021C44AD",
+        "ExampleRestApiproxyOPTIONSFCAA263B",
+        "ExampleRestApiproxyFEEC3449",
+        "ExampleRestApiANY9694097B",
+        "ExampleRestApiOPTIONS7EA42E70",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Description": "Automatically created by the RestApi construct",
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+    },
+    "ExampleRestApiDeploymentStagedev13679C38": Object {
+      "DependsOn": Array [
+        "ExampleRestApiAccountFC8F61F8",
+      ],
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AccessLogSetting": Object {
+          "DestinationArn": Object {
+            "Fn::GetAtt": Array [
+              "ExampleAPIGatewayAccessLogs5DEC7E98",
+              "Arn",
+            ],
+          },
+          "Format": "{\\"stage\\":\\"$context.stage\\",\\"requestId\\":\\"$context.requestId\\",\\"integrationRequestId\\":\\"$context.integration.requestId\\",\\"status\\":\\"$context.status\\",\\"apiId\\":\\"$context.apiId\\",\\"resourcePath\\":\\"$context.resourcePath\\",\\"path\\":\\"$context.path\\",\\"resourceId\\":\\"$context.resourceId\\",\\"httpMethod\\":\\"$context.httpMethod\\",\\"sourceIp\\":\\"$context.identity.sourceIp\\",\\"userAgent\\":\\"$context.identity.userAgent\\"}",
+        },
+        "DeploymentId": Object {
+          "Ref": "ExampleRestApiDeployment10B028B13f152292fba52d790e02ed44106514fc",
+        },
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+        "StageName": "dev",
+      },
+      "Type": "AWS::ApiGateway::Stage",
+    },
+    "ExampleRestApiOPTIONS7EA42E70": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": Object {
+          "IntegrationResponses": Array [
+            Object {
+              "ResponseParameters": Object {
+                "method.response.header.Access-Control-Allow-Credentials": "'true'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,CSRF-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,PATCH,DELETE'",
+                "method.response.header.Access-Control-Allow-Origin": "'http://localhost:3000/'",
+                "method.response.header.Vary": "'Origin'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": Object {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Access-Control-Allow-Credentials": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Vary": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": Object {
+          "Fn::GetAtt": Array [
+            "ExampleRestApi66BED094",
+            "RootResourceId",
+          ],
+        },
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "ExampleRestApiproxyANY021C44AD": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "ANY",
+        "Integration": Object {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": Object {
+            "Fn::Join": Array [
+              "",
+              Array [
+                "arn:",
+                Object {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                Object {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                Object {
+                  "Ref": "Alias325C5727",
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": Object {
+          "Ref": "ExampleRestApiproxyFEEC3449",
+        },
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "ExampleRestApiproxyANYApiPermissionExampleStackExampleRestApiE6A8AAF4ANYproxy55183220": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": Object {
+          "Ref": "Alias325C5727",
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              Object {
+                "Ref": "ExampleRestApi66BED094",
+              },
+              "/",
+              Object {
+                "Ref": "ExampleRestApiDeploymentStagedev13679C38",
+              },
+              "/*/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "ExampleRestApiproxyANYApiPermissionTestExampleStackExampleRestApiE6A8AAF4ANYproxyEE24A7C5": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": Object {
+          "Ref": "Alias325C5727",
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "arn:",
+              Object {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              Object {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              Object {
+                "Ref": "ExampleRestApi66BED094",
+              },
+              "/test-invoke-stage/*/*",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "ExampleRestApiproxyFEEC3449": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "ParentId": Object {
+          "Fn::GetAtt": Array [
+            "ExampleRestApi66BED094",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "ExampleRestApiproxyOPTIONSFCAA263B": Object {
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+            Object {
+              "applies_to": Array [
+                "Policy::arn:<AWS::Partition>:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+              "id": "AwsSolutions-APIG2",
+              "reason": "I am OK with not enabling request validation for Rest API, this is an example App",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": Object {
+          "IntegrationResponses": Array [
+            Object {
+              "ResponseParameters": Object {
+                "method.response.header.Access-Control-Allow-Credentials": "'true'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,CSRF-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST,PUT,PATCH,DELETE'",
+                "method.response.header.Access-Control-Allow-Origin": "'http://localhost:3000/'",
+                "method.response.header.Vary": "'Origin'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": Object {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": Array [
+          Object {
+            "ResponseParameters": Object {
+              "method.response.header.Access-Control-Allow-Credentials": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Vary": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": Object {
+          "Ref": "ExampleRestApiproxyFEEC3449",
+        },
+        "RestApiId": Object {
+          "Ref": "ExampleRestApi66BED094",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "ExampleS3AccessLogs4CD1BB55": Object {
+      "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-S1",
+              "reason": "I am OK with this, This is the access log bucket for DataSet s3Bucket: Example-S3Bucket",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AccessControl": "LogDeliveryWrite",
+        "BucketEncryption": Object {
+          "ServerSideEncryptionConfiguration": Array [
+            Object {
+              "ServerSideEncryptionByDefault": Object {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "PublicAccessBlockConfiguration": Object {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleS3AccessLogsPolicy5AE379EC": Object {
+      "Properties": Object {
+        "Bucket": Object {
+          "Ref": "ExampleS3AccessLogs4CD1BB55",
+        },
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "Bool": Object {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleS3AccessLogs4CD1BB55",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleS3AccessLogs4CD1BB55",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            Object {
+              "Action": "s3:PutObject",
+              "Condition": Object {
+                "StringEquals": Object {
+                  "aws:SourceAccount": Object {
+                    "Ref": "AWS::AccountId",
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "Service": "logging.s3.amazonaws.com",
+              },
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "ExampleS3AccessLogs4CD1BB55",
+                        "Arn",
+                      ],
+                    },
+                    "/example-access-log*",
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "ExampleS3Bucketexamples3datasets657A5691": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "AccessControl": "LogDeliveryWrite",
+        "BucketEncryption": Object {
+          "ServerSideEncryptionConfiguration": Array [
+            Object {
+              "ServerSideEncryptionByDefault": Object {
+                "KMSMasterKeyID": Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleEncryptionKey83E707EA",
+                    "Arn",
+                  ],
+                },
+                "SSEAlgorithm": "aws:kms",
+              },
+            },
+          ],
+        },
+        "LoggingConfiguration": Object {
+          "DestinationBucketName": Object {
+            "Ref": "ExampleS3AccessLogs4CD1BB55",
+          },
+          "LogFilePrefix": "example-access-log",
+        },
+        "PublicAccessBlockConfiguration": Object {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true,
+        },
+        "VersioningConfiguration": Object {
+          "Status": "Enabled",
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleS3Bucketexamples3datasetsPolicy8F1A54DC": Object {
+      "Properties": Object {
+        "Bucket": Object {
+          "Ref": "ExampleS3Bucketexamples3datasets657A5691",
+        },
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "Bool": Object {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleS3Bucketexamples3datasets657A5691",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleS3Bucketexamples3datasets657A5691",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "Bool": Object {
+                  "aws:SecureTransport": "false",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleS3Bucketexamples3datasets657A5691",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleS3Bucketexamples3datasets657A5691",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+              "Sid": "Deny requests that do not use TLS/HTTPS",
+            },
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "StringNotEquals": Object {
+                  "s3:signatureversion": "AWS4-HMAC-SHA256",
+                },
+              },
+              "Effect": "Deny",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "ExampleS3Bucketexamples3datasets657A5691",
+                        "Arn",
+                      ],
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+              "Sid": "Deny requests that do not use SigV4",
+            },
+            Object {
+              "Action": "s3:*",
+              "Condition": Object {
+                "StringEquals": Object {
+                  "s3:DataAccessPointAccount": Object {
+                    "Ref": "AWS::AccountId",
+                  },
+                },
+              },
+              "Effect": "Allow",
+              "Principal": Object {
+                "AWS": "*",
+              },
+              "Resource": Array [
+                Object {
+                  "Fn::GetAtt": Array [
+                    "ExampleS3Bucketexamples3datasets657A5691",
+                    "Arn",
+                  ],
+                },
+                Object {
+                  "Fn::Join": Array [
+                    "",
+                    Array [
+                      Object {
+                        "Fn::GetAtt": Array [
+                          "ExampleS3Bucketexamples3datasets657A5691",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+    "ExampleServiceWorkbenchCognitoDescribeCognitoUserPoolClient1AEACEBB": Object {
+      "DeletionPolicy": "Delete",
+      "DependsOn": Array [
+        "ExampleServiceWorkbenchCognitoDescribeCognitoUserPoolClientCustomResourcePolicyC268CADB",
+      ],
+      "Properties": Object {
+        "Create": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "{\\"region\\":\\"",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              "\\",\\"service\\":\\"CognitoIdentityServiceProvider\\",\\"action\\":\\"describeUserPoolClient\\",\\"parameters\\":{\\"UserPoolId\\":\\"",
+              Object {
+                "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+              },
+              "\\",\\"ClientId\\":\\"",
+              Object {
+                "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolClient73980675",
+              },
+              "\\"},\\"physicalResourceId\\":{\\"id\\":\\"",
+              Object {
+                "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPoolClient73980675",
+              },
+              "\\"}}",
+            ],
+          ],
+        },
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": Object {
+          "Fn::GetAtt": Array [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::DescribeCognitoUserPoolClient",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ExampleServiceWorkbenchCognitoDescribeCognitoUserPoolClientCustomResourcePolicyC268CADB": Object {
+      "Properties": Object {
+        "PolicyDocument": Object {
+          "Statement": Array [
+            Object {
+              "Action": "cognito-idp:DescribeUserPoolClient",
+              "Effect": "Allow",
+              "Resource": Object {
+                "Fn::GetAtt": Array [
+                  "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "ExampleServiceWorkbenchCognitoDescribeCognitoUserPoolClientCustomResourcePolicyC268CADB",
+        "Roles": Array [
+          Object {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C": Object {
+      "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-COG1",
+              "reason": "Should be fixed in @aws/workbench-core-infrastructure package",
+            },
+            Object {
+              "id": "AwsSolutions-COG2",
+              "reason": "This is an example package for integration test, selecting default MFA Optional",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AccountRecoverySetting": Object {
+          "RecoveryMechanisms": Array [
+            Object {
+              "Name": "verified_email",
+              "Priority": 1,
+            },
+          ],
+        },
+        "AdminCreateUserConfig": Object {
+          "AllowAdminCreateUserOnly": true,
+        },
+        "AutoVerifiedAttributes": Array [
+          "email",
+        ],
+        "EmailVerificationMessage": "The verification code to your new account is {####}",
+        "EmailVerificationSubject": "Verify your new account",
+        "EnabledMfas": Array [
+          "SOFTWARE_TOKEN_MFA",
+        ],
+        "MfaConfiguration": "OPTIONAL",
+        "Schema": Array [
+          Object {
+            "Mutable": true,
+            "Name": "given_name",
+            "Required": true,
+          },
+          Object {
+            "Mutable": true,
+            "Name": "family_name",
+            "Required": true,
+          },
+          Object {
+            "Mutable": true,
+            "Name": "email",
+            "Required": true,
+          },
+        ],
+        "SmsVerificationMessage": "The verification code to your new account is {####}",
+        "UserPoolAddOns": Object {
+          "AdvancedSecurityMode": "ENFORCED",
+        },
+        "UserPoolName": "example-express-userPool",
+        "UsernameAttributes": Array [
+          "email",
+        ],
+        "UsernameConfiguration": Object {
+          "CaseSensitive": false,
+        },
+        "VerificationMessageTemplate": Object {
+          "DefaultEmailOption": "CONFIRM_WITH_CODE",
+          "EmailMessage": "The verification code to your new account is {####}",
+          "EmailSubject": "Verify your new account",
+          "SmsMessage": "The verification code to your new account is {####}",
+        },
+      },
+      "Type": "AWS::Cognito::UserPool",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "ExampleServiceWorkbenchCognitoWorkbenchUserPoolClient73980675": Object {
+      "Properties": Object {
+        "AccessTokenValidity": 60,
+        "AllowedOAuthFlows": Array [
+          "code",
+        ],
+        "AllowedOAuthFlowsUserPoolClient": true,
+        "AllowedOAuthScopes": Array [
+          "openid",
+        ],
+        "CallbackURLs": Array [
+          "http://localhost:3000/",
+        ],
+        "ClientName": "example-express-userPoolClient",
+        "EnableTokenRevocation": true,
+        "ExplicitAuthFlows": Array [
+          "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+          "ALLOW_CUSTOM_AUTH",
+          "ALLOW_USER_SRP_AUTH",
+          "ALLOW_REFRESH_TOKEN_AUTH",
+        ],
+        "GenerateSecret": true,
+        "IdTokenValidity": 15,
+        "LogoutURLs": Array [
+          "http://localhost:3000/",
+        ],
+        "PreventUserExistenceErrors": "ENABLED",
+        "RefreshTokenValidity": 10080,
+        "SupportedIdentityProviders": Array [
+          "COGNITO",
+        ],
+        "TokenValidityUnits": Object {
+          "AccessToken": "minutes",
+          "IdToken": "minutes",
+          "RefreshToken": "minutes",
+        },
+        "UserPoolId": Object {
+          "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+        },
+      },
+      "Type": "AWS::Cognito::UserPoolClient",
+    },
+    "ExampleServiceWorkbenchCognitoWorkbenchUserPoolDomainF6EC455F": Object {
+      "Properties": Object {
+        "Domain": "example-express-domain",
+        "UserPoolId": Object {
+          "Ref": "ExampleServiceWorkbenchCognitoWorkbenchUserPool039EDB9C",
+        },
+      },
+      "Type": "AWS::Cognito::UserPoolDomain",
+    },
+    "ExampleStackF2AEB7EA": Object {
+      "DeletionPolicy": "Retain",
+      "Metadata": Object {
+        "cdk_nag": Object {
+          "rules_to_suppress": Array [
+            Object {
+              "id": "AwsSolutions-DDB3",
+              "reason": "I am OK with not having Point-in-time Recovery enabled for DynamoDB",
+            },
+          ],
+        },
+      },
+      "Properties": Object {
+        "AttributeDefinitions": Array [
+          Object {
+            "AttributeName": "pk",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "sk",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "resourceType",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "name",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "status",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "createdAt",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "dependency",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "owner",
+            "AttributeType": "S",
+          },
+          Object {
+            "AttributeName": "type",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "GlobalSecondaryIndexes": Array [
+          Object {
+            "IndexName": "getResourceByName",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "name",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+          Object {
+            "IndexName": "getResourceByStatus",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "status",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+          Object {
+            "IndexName": "getResourceByCreatedAt",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "createdAt",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+          Object {
+            "IndexName": "getResourceByDependency",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "dependency",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+          Object {
+            "IndexName": "getResourceByOwner",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "owner",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+          Object {
+            "IndexName": "getResourceByType",
+            "KeySchema": Array [
+              Object {
+                "AttributeName": "resourceType",
+                "KeyType": "HASH",
+              },
+              Object {
+                "AttributeName": "type",
+                "KeyType": "RANGE",
+              },
+            ],
+            "Projection": Object {
+              "ProjectionType": "ALL",
+            },
+          },
+        ],
+        "KeySchema": Array [
+          Object {
+            "AttributeName": "pk",
+            "KeyType": "HASH",
+          },
+          Object {
+            "AttributeName": "sk",
+            "KeyType": "RANGE",
+          },
+        ],
+        "TableName": "ExampleStack",
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

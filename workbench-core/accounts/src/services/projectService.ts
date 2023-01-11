@@ -5,7 +5,7 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { AttributeValue, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, BatchGetItemCommandOutput, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -15,16 +15,23 @@ import {
   uuidWithLowercasePrefix,
   DEFAULT_API_PAGE_SIZE,
   addPaginationToken,
-  getPaginationToken
+  getPaginationToken,
+  toPaginationToken,
+  fromPaginationToken,
+  validateSingleSortAndFilter,
+  getFilterQueryParams,
+  getSortQueryParams
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
+import { ProjectStatus } from '../constants/projectStatus';
 import CostCenter from '../models/costCenter';
 import CreateProjectRequest from '../models/createProjectRequest';
 import GetProjectRequest from '../models/getProjectRequest';
-import ListProjectsRequest from '../models/listProjectsRequest';
+import { listProjectGSINames, ListProjectsRequest } from '../models/listProjectsRequest';
 import ListProjectsResponse from '../models/listProjectsResponse';
 import Project from '../models/project';
+import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
 
 export default class ProjectService {
@@ -69,7 +76,7 @@ export default class ProjectService {
     if (item === undefined) {
       throw Boom.notFound(`Could not find project ${request.projectId}`);
     } else {
-      return this._formatFromDDB(item);
+      return this._mapToProjectFromDDBItem(item);
     }
   }
 
@@ -84,10 +91,16 @@ export default class ProjectService {
    * @param request - the request object for listing projects
    * @returns Project entries in DDB
    */
-  // TODO--add filter support
   public async listProjects(request: ListProjectsRequest): Promise<ListProjectsResponse> {
-    const pageSize = request.pageSize && request.pageSize >= 0 ? request.pageSize : DEFAULT_API_PAGE_SIZE;
-    let paginationToken = request.paginationToken;
+    // Get the values from request
+    const { filter, sort } = request;
+    let { pageSize, paginationToken } = request;
+    if (pageSize && pageSize < 0) {
+      throw Boom.badRequest('Please supply a non-negative page size.');
+    }
+    pageSize = pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE;
+    validateSingleSortAndFilter(filter, sort);
+
     // Get user groups--TODO implement after dynamic AuthZ
     // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
     const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
@@ -106,6 +119,10 @@ export default class ProjectService {
           limit: pageSize
         };
 
+        const filterQuery = getFilterQueryParams(filter, listProjectGSINames);
+        const sortQuery = getSortQueryParams(sort, listProjectGSINames);
+        queryParams = { ...queryParams, ...filterQuery, ...sortQuery };
+
         queryParams = addPaginationToken(paginationToken, queryParams);
 
         const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
@@ -113,7 +130,7 @@ export default class ProjectService {
         paginationToken = getPaginationToken(projectsResponse);
 
         if (projectsResponse.Items) {
-          const items = projectsResponse.Items.map((item) => this._formatFromDDB(item));
+          const items = projectsResponse.Items.map((item) => this._mapToProjectFromDDBItem(item));
           return { data: items, paginationToken: paginationToken };
         } else {
           return { data: [], paginationToken: undefined };
@@ -126,91 +143,35 @@ export default class ProjectService {
       return { data: [project], paginationToken: undefined };
     }
 
-    // Else, member of more than 1 group, query for project items with pagination
-    // welcome to party town
+    // Else, member of more than 1 group, batch get items and manually filter, sort, and paginate
     const projectIds: string[] = userGroupsForCurrentUser.map(
       (projectGroup: string) => projectGroup.split('#')[0]
     );
-
-    // i = 0
-    let filterExpression = 'id = :proj1';
-    const expressionAttributeValues: { [key: string]: string } = { ':proj1': projectIds[0] };
-    for (let i = 1; i < projectIds.length; i++) {
-      // build filter string "id = :proj1 OR id = :proj2 OR ... OR id = projN+1"
-      filterExpression = filterExpression + ` OR id = :proj${i + 1}`;
-      // build expressionAttributeValues object {":proj1": "projectId1", ..., ":projN+1": "projectIdN"}
-      expressionAttributeValues[`:proj${i + 1}`] = projectIds[i];
+    const keys: Record<string, unknown>[] = projectIds.map((projectId) =>
+      buildDynamoDBPkSk(projectId, resourceTypeToKey.project)
+    );
+    const projectsResponse = (await this._aws.helpers.ddb.get(keys).execute()) as BatchGetItemCommandOutput;
+    if (!projectsResponse.Responses) {
+      return { data: [], paginationToken: undefined };
     }
-
-    // TODO--extend to other GSIs after filtering is added
-    let queryParams: QueryParams = {
-      key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByCreatedAt',
-      limit: pageSize,
-      filter: filterExpression,
-      values: expressionAttributeValues
-    };
-
-    let projects: Project[] = [];
-
-    let returnedCount = 0;
-    while (returnedCount < pageSize && returnedCount < projectIds.length) {
-      queryParams = addPaginationToken(paginationToken, queryParams);
-
-      const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
-
-      returnedCount += projectsResponse.Count!;
-
-      // nothing returned
-      if (projectsResponse.Items === undefined || _.isEmpty(projectsResponse.Items)) {
-        paginationToken = getPaginationToken(projectsResponse);
-        console.log(paginationToken);
-      }
-
-      // nothing else to get from DDB
-      else if (projectsResponse.LastEvaluatedKey === undefined) {
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-        paginationToken = undefined;
-      }
-
-      // too little--while loop continues
-      else if (returnedCount < pageSize) {
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-        paginationToken = getPaginationToken(projectsResponse);
-      }
-
-      // juuuust the right amount--getPaginationToken from response and exit loop
-      else if (returnedCount === pageSize) {
-        paginationToken = getPaginationToken(projectsResponse);
-        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
-      }
-
-      // too much--take enough to fill and manually get pagination token from reponse and exit loop
-      else if (returnedCount > pageSize) {
-        const leftoverAmount = returnedCount - pageSize;
-        const totalProjectsFromResponse = projectsResponse.Items.map((item) => this._formatFromDDB(item));
-        projects = projects.concat(totalProjectsFromResponse.slice(0, -leftoverAmount));
-        const manualLastEvaluatedItem =
-          projectsResponse.Items[projectsResponse.Items.length - (leftoverAmount + 1)]; // this will be the whole entry
-        // If we query on GSI, then the LastEvaluatedKey will be the compose of GSI partition key, GSI sort key, primary partition key and primary sort key.
-        // TODO--extend to other GSIs after filtering is added
-        const manualLastEvaluatedKey = {
-          pk: manualLastEvaluatedItem.pk,
-          sk: manualLastEvaluatedItem.sk,
-          resourceType: manualLastEvaluatedItem.resourceType,
-          createdAt: manualLastEvaluatedItem.createdAt
-        };
-        paginationToken = Buffer.from(JSON.stringify(manualLastEvaluatedKey)).toString('base64');
-      }
-      if (paginationToken === undefined) {
-        break;
-      }
+    // parse responses from DDB
+    const projects: Project[] = projectsResponse.Responses[this._tableName].map((item) =>
+      this._mapToProjectFromDDBItem(item)
+    );
+    // apply sort or filter
+    let projectsOnPage: Project[] = projects;
+    if (filter) {
+      projectsOnPage = manualFilterProjects(filter, projects);
     }
-
-    return {
-      data: projects,
-      paginationToken: paginationToken
-    };
+    if (sort) {
+      projectsOnPage = manualSortProjects(sort, projects);
+    }
+    if (filter === undefined && sort === undefined) {
+      // default sort is by createdAt
+      projectsOnPage = manualSortProjects({ createdAt: 'asc' }, projects);
+    }
+    // build page and pagination token
+    return this._buildPageAndPaginationTokenAfterGetItems(paginationToken, projectsOnPage, pageSize);
   }
 
   /**
@@ -292,7 +253,7 @@ export default class ProjectService {
       description: params.description,
       name: params.name,
       updatedAt: currentTime,
-      status: 'AVAILABLE',
+      status: ProjectStatus.AVAILABLE,
       // Acc Metadata (get from cost center)
       subnetId: costCenter.subnetId,
       vpcId: costCenter.vpcId,
@@ -307,7 +268,7 @@ export default class ProjectService {
     try {
       await this._aws.helpers.ddb
         .update(buildDynamoDBPkSk(projectId, resourceTypeToKey.project), {
-          item: this._formatForDDB(newProject)
+          item: this._mapToDDBItemFromProject(newProject)
         })
         .execute();
     } catch (e) {
@@ -324,8 +285,8 @@ export default class ProjectService {
    * @param project - The Project object to prepare for DDB
    * @returns an object containing project data as well as pertinent DDB attributes based on project data
    */
-  private _formatForDDB(project: Project): { [key: string]: string } {
-    const dynamoItem: { [key: string]: string } = {
+  private _mapToDDBItemFromProject(project: Project): Record<string, string> {
+    const dynamoItem: Record<string, string> = {
       ...project,
       resourceType: 'project',
       dependency: project.costCenterId
@@ -342,12 +303,51 @@ export default class ProjectService {
    * @param item - the DDB item to conver to a Project object
    * @returns a Project object containing only project data from DDB attributes
    */
-  private _formatFromDDB(item: Record<string, AttributeValue>): Project {
+  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue>): Project {
     const copyItem = { ...item };
     const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
     itemWithoutValues.costCenterId = copyItem.dependency;
     const project: Project = itemWithoutValues as unknown as Project;
     return project;
+  }
+
+  /**
+   * Builds the Page and Pagination Token after GetItems call has been used to
+   * get project information from DDB.=
+   *
+   * @param paginationToken - string pagination token if need to display not the first page. Otherwise, undefined
+   * @param projectsOnPage - list of {@link Project}s to build a page from
+   * @param pageSize - number of projects to include in the page
+   * @returns a {@link ListProjectsResponse} object containing a list of Projects and the pagination token
+   */
+  private async _buildPageAndPaginationTokenAfterGetItems(
+    paginationToken: string | undefined,
+    projectsOnPage: Project[],
+    pageSize: number
+  ): Promise<ListProjectsResponse> {
+    if (paginationToken) {
+      const manualExclusiveStartKey = fromPaginationToken(paginationToken);
+      const exclusiveStartProjectId = manualExclusiveStartKey.pk.split('#')[1];
+      const exclusiveStartProject = projectsOnPage.find((project) => project.id === exclusiveStartProjectId);
+      if (exclusiveStartProject === undefined) {
+        throw Boom.badRequest('Pagination token is invalid.');
+      }
+      const indexOfExclusiveStartProject = projectsOnPage.indexOf(exclusiveStartProject);
+      projectsOnPage = projectsOnPage.slice(indexOfExclusiveStartProject + 1);
+    }
+    if (projectsOnPage.length < pageSize) {
+      return {
+        data: projectsOnPage,
+        paginationToken: undefined
+      };
+    } else {
+      projectsOnPage = projectsOnPage.slice(0, pageSize);
+      const manualLastEvaluatedKey = buildDynamoDBPkSk(
+        projectsOnPage[pageSize - 1].id,
+        resourceTypeToKey.project
+      );
+      return { data: projectsOnPage, paginationToken: toPaginationToken(manualLastEvaluatedKey) };
+    }
   }
 
   private async _isProjectNameInUse(projectName: string): Promise<void> {

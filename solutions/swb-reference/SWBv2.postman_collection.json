@@ -1003,6 +1003,51 @@
                   "key": "pageSize",
                   "value": "50",
                   "disabled": true
+                },
+                {
+                  "key": "filter[name][begins]",
+                  "value": "Project",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value1]",
+                  "value": "date1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[createdAt][between][value2]",
+                  "value": "date2",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[dependency][eq]",
+                  "value": "cc-1",
+                  "disabled": true
+                },
+                {
+                  "key": "filter[status][lte]",
+                  "value": "AVAILABLE",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[createdAt]",
+                  "value": "asc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[dependency]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[name]",
+                  "value": "desc",
+                  "disabled": true
+                },
+                {
+                  "key": "sort[status]",
+                  "value": "asc",
+                  "disabled": true
                 }
               ]
             }
