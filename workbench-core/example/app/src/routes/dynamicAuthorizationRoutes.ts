@@ -115,7 +115,7 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
           authenticatedUser: res.locals.user
         });
 
-        res.status(200).send(response);
+        res.status(200).send(response.data);
       } catch (error) {
         if (isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);

@@ -22,14 +22,14 @@ describe('dynamic authorization group integration tests', () => {
   let adminSession: ClientSession;
 
   beforeEach(() => {
+    expect.hasAssertions();
+
     fakeUserId = '00000000-0000-0000-0000-000000000000';
     fakeGroupId = '00000000-0000-0000-0000-000000000000';
   });
 
   beforeAll(async () => {
     adminSession = await setup.getDefaultAdminSession();
-
-    expect.hasAssertions();
   });
 
   afterAll(async () => {
@@ -298,7 +298,9 @@ describe('dynamic authorization group integration tests', () => {
       } = await adminSession.resources.groups.create();
       const group = adminSession.resources.groups.group(groupId);
 
-      expect(() => group.delete()).not.toThrow();
+      const { data } = await group.delete();
+
+      expect(data).toMatchObject({ groupId });
     });
 
     it('returns a 404 error when trying to delete a group that does not exists', async () => {
