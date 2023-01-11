@@ -24,7 +24,12 @@ export interface DeleteGroupRequest {
  */
 export interface DeleteGroupResponse {
   /**
-   * States whether the group was successfully deleted
+   * The data object returned
    */
-  deleted: boolean;
+  data: {
+    /**
+     * The deleted group ID
+     */
+    groupId: string;
+  };
 }

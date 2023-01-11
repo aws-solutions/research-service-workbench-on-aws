@@ -433,10 +433,17 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   });
 
   describe('getAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.getAccessPermissions(getAccessPermission)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
+    it('needs to be implemented', async () => {
+      await expect(
+        plugin.getAccessPermissions(getAccessPermission)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.subject, identityType: 'USER', accessLevel: 'read-write' }
+          ]
+        }
+      });
     });
   });
 

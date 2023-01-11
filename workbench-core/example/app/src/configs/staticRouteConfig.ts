@@ -223,6 +223,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/authorization/groups/${groupIDRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
   '/authorization/permissions': {
     POST: [
       {
@@ -250,6 +258,22 @@ export const routesMap: RoutesMap = {
       {
         action: 'READ',
         subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/routes/ignored': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
+      }
+    ]
+  },
+  '/authorization/routes/protected': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
       }
     ]
   }
