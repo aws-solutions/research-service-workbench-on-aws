@@ -3,29 +3,35 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HTTPMethod } from '../../routesMap';
+import { z } from 'zod';
+import { HTTPMethodParser } from '../../routesMap';
 
-/**
- * Request object for IsRouteProtected
- */
-export interface IsRouteProtectedRequest {
+// eslint-disable-next-line @rushstack/typedef-var
+export const IsRouteProtectedRequestParser = z.object({
   /**
    * Route being checked
    */
-  route: string;
+  route: z.string(),
 
   /**
    * {@link HTTPMethod}
    */
-  method: HTTPMethod;
-}
+  method: HTTPMethodParser
+});
+
+/**
+ * Request object for IsRouteProtected
+ */
+export type IsRouteProtectedRequest = z.infer<typeof IsRouteProtectedRequestParser>;
 
 /**
  * Response object for IsRouteProtected
  */
 export interface IsRouteProtectedResponse {
-  /**
-   * Describes if route is protected
-   */
-  routeProtected: boolean;
+  data: {
+    /**
+     * Describes if route is protected
+     */
+    routeProtected: boolean;
+  };
 }

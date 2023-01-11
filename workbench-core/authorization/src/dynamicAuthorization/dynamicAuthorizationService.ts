@@ -37,9 +37,14 @@ import { IdentityPermission } from './dynamicAuthorizationInputs/identityPermiss
 import { InitRequest, InitResponse } from './dynamicAuthorizationInputs/init';
 import { IsAuthorizedOnRouteRequest } from './dynamicAuthorizationInputs/isAuthorizedOnRoute';
 import { IsAuthorizedOnSubjectRequest } from './dynamicAuthorizationInputs/isAuthorizedOnSubject';
-import { IsRouteIgnoredRequest, IsRouteIgnoredResponse } from './dynamicAuthorizationInputs/isRouteIgnored';
+import {
+  IsRouteIgnoredRequest,
+  IsRouteIgnoredRequestParser,
+  IsRouteIgnoredResponse
+} from './dynamicAuthorizationInputs/isRouteIgnored';
 import {
   IsRouteProtectedRequest,
+  IsRouteProtectedRequestParser,
   IsRouteProtectedResponse
 } from './dynamicAuthorizationInputs/isRouteProtected';
 import {
@@ -97,7 +102,8 @@ export class DynamicAuthorizationService {
    * @returns - {@link IsRouteIgnoredResponse}
    */
   public async isRouteIgnored(isRouteIgnoredRequest: IsRouteIgnoredRequest): Promise<IsRouteIgnoredResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsRouteIgnoredRequestParser.parse(isRouteIgnoredRequest);
+    return this._dynamicAuthorizationPermissionsPlugin.isRouteIgnored(validatedRequest);
   }
   /**
    * Checks if a route is protected
@@ -108,7 +114,8 @@ export class DynamicAuthorizationService {
   public async isRouteProtected(
     isRouteProtectedRequest: IsRouteProtectedRequest
   ): Promise<IsRouteProtectedResponse> {
-    throw new Error('Not implemented');
+    const validatedRequest = IsRouteProtectedRequestParser.parse(isRouteProtectedRequest);
+    return this._dynamicAuthorizationPermissionsPlugin.isRouteProtected(validatedRequest);
   }
   /**
    * Checks whether a {@link AuthenticatedUser} is authorized on a route
