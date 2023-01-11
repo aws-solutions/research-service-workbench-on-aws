@@ -53,7 +53,7 @@ describe('DynamoDBService', () => {
       // BUILD
       const key = { pk: 'samplePK', sk: 'sampleSK' };
       // OPERATE
-      const result = await dbService.getItem(key);
+      const result = await dbService.getItem({ key });
       // CHECK
       expect(result).toEqual(unmarshalledData);
     });
