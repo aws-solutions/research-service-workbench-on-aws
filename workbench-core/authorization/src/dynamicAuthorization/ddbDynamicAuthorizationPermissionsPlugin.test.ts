@@ -15,14 +15,19 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AwsService, JSONValue } from '@aws/workbench-core-base';
 import { mockClient, AwsStub } from 'aws-sdk-client-mock';
+import { fc, itProp } from 'jest-fast-check';
 import _ from 'lodash';
 import { Action } from '../action';
 import { AuthenticatedUser } from '../authenticatedUser';
 import { Effect } from '../effect';
 import { IdentityPermissionCreationError } from '../errors/identityPermissionCreationError';
 import { RetryError } from '../errors/retryError';
+import { RouteMapError } from '../errors/routeMapError';
+import { RouteNotFoundError } from '../errors/routeNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
+import { DynamicRoutesMap, MethodToDynamicOperations, RoutesIgnored } from '../routesMap';
 import { DDBDynamicAuthorizationPermissionsPlugin } from './ddbDynamicAuthorizationPermissionsPlugin';
+import { DynamicOperation } from './dynamicAuthorizationInputs/dynamicOperation';
 import { IdentityPermission, IdentityType } from './dynamicAuthorizationInputs/identityPermission';
 
 describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
@@ -52,7 +57,24 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
   let sampleGroupIdentity: string;
 
   let base64PaginationToken: string;
+
+  let dynamicRoutesMap: DynamicRoutesMap;
+  let sampleStaticRouteName: string;
+  let sampleStaticRouteMap: MethodToDynamicOperations;
+  let sampleStaticRouteGet: DynamicOperation[];
+
+  let sampleDynamicRouteName: string;
+  let sampleDynamicRouteMap: MethodToDynamicOperations;
+  let sampleDynamicRouteDelete: DynamicOperation[];
+
+  let getStaticRouteIgnoredName: string;
+
+  let getDynamicRouteIgnoredName: string;
+
+  let routesIgnored: RoutesIgnored;
+
   beforeEach(() => {
+    expect.hasAssertions();
     jest.resetModules(); // Most important - it clears the cache
 
     ddbTableName = 'PermissionsTable';
@@ -61,10 +83,54 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
       id: 'sampleUserId',
       roles: []
     };
+    sampleStaticRouteName = '/simple/route';
+    sampleStaticRouteGet = [
+      {
+        action: 'CREATE',
+        subject: {
+          subjectId: 'sampleSubjectId',
+          subjectType: 'sampleSubjectType'
+        }
+      }
+    ];
+    sampleStaticRouteMap = {
+      GET: sampleStaticRouteGet
+    };
+
+    sampleDynamicRouteName = '/dynamic/:type/:id';
+    sampleDynamicRouteDelete = [
+      {
+        action: 'DELETE',
+        subject: {
+          subjectId: 'sampleSubjectId',
+          subjectType: 'sampleSubjectType'
+        }
+      }
+    ];
+    sampleDynamicRouteMap = {
+      DELETE: sampleDynamicRouteDelete
+    };
+    dynamicRoutesMap = {};
+    dynamicRoutesMap[`${sampleStaticRouteName}`] = sampleStaticRouteMap;
+    dynamicRoutesMap[`${sampleDynamicRouteName}`] = sampleDynamicRouteMap;
+
+    getStaticRouteIgnoredName = 'path/ignored';
+
+    getDynamicRouteIgnoredName = 'path/ignored/:name';
+
+    routesIgnored = {};
+    routesIgnored[`${getStaticRouteIgnoredName}`] = {
+      GET: true
+    };
+    routesIgnored[`${getDynamicRouteIgnoredName}`] = {
+      GET: true
+    };
 
     awsService = new AwsService({ region, ddbTableName });
     dynamoDBDynamicPermissionsPlugin = new DDBDynamicAuthorizationPermissionsPlugin({
-      dynamoDBService: awsService.helpers.ddb
+      dynamoDBService: awsService.helpers.ddb,
+      dynamicRoutesMap,
+      routesIgnored
     });
 
     mockDDB = mockClient(DynamoDBClient);
@@ -108,28 +174,141 @@ describe('DDB Dynamic Authorization Permissions Plugin tests', () => {
     base64PaginationToken = 'eyJwayI6InNhbXBsZVN1YmplY3RUeXBlfHNhbXBsZVN1YmplY3RJZCJ9';
   });
 
+  describe('constructor', () => {
+    test('can not define protection and ignore for the same route + method', async () => {
+      const dynamicRoutesMap: DynamicRoutesMap = {
+        '/sampleRoute': {
+          GET: []
+        }
+      };
+
+      const routesIgnored: RoutesIgnored = {
+        '/sampleRoute': {
+          GET: true
+        }
+      };
+      try {
+        new DDBDynamicAuthorizationPermissionsPlugin({
+          dynamoDBService: awsService.helpers.ddb,
+          dynamicRoutesMap,
+          routesIgnored
+        });
+      } catch (err) {
+        expect(err).toBeInstanceOf(RouteMapError);
+      }
+    });
+  });
+
   describe('isRouteIgnored', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamoDBDynamicPermissionsPlugin.isRouteIgnored({ route: '', method: 'GET' })
-      ).rejects.toThrow(Error);
+    test(`${getStaticRouteIgnoredName} should be ignored on GET`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteIgnored({
+        route: getStaticRouteIgnoredName,
+        method: 'GET'
+      });
+      expect(data.routeIgnored).toBeTruthy();
+    });
+
+    test(`${getDynamicRouteIgnoredName} should be ignored on GET`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteIgnored({
+        route: 'path/ignored/testname',
+        method: 'GET'
+      });
+      expect(data.routeIgnored).toBeTruthy();
+    });
+    //Test operation on random string
+    test(`${getDynamicRouteIgnoredName} should be ignored on DELETE`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteIgnored({
+        route: 'path/ignored/testname',
+        method: 'GET'
+      });
+      expect(data.routeIgnored).toBeTruthy();
+    });
+
+    itProp('random path input should not be ignored on GET', [fc.string()], async (route) => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteIgnored({
+        route,
+        method: 'GET'
+      });
+      expect(data.routeIgnored).toBeFalsy();
     });
   });
 
   describe('isRouteProtected', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamoDBDynamicPermissionsPlugin.isRouteProtected({ route: '', method: 'GET' })
-      ).rejects.toThrow(Error);
+    test(`${sampleStaticRouteName} should be protected on GET`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteProtected({
+        route: sampleStaticRouteName,
+        method: 'GET'
+      });
+      expect(data.routeProtected).toBeTruthy();
+    });
+
+    test(`${sampleDynamicRouteName} should be protected on GET`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteProtected({
+        route: '/dynamic/sampleSubjectType/sampleSubjectId',
+        method: 'DELETE'
+      });
+      expect(data.routeProtected).toBeTruthy();
+    });
+
+    itProp('random path input should not be protected on GET', [fc.string()], async (route) => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.isRouteProtected({
+        route,
+        method: 'GET'
+      });
+      expect(data.routeProtected).toBeFalsy();
     });
   });
 
   describe('getDynamicOperationsByRoute', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(
-        dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({ route: '', method: 'GET' })
-      ).rejects.toThrow(Error);
+    test(`get operations by route ${sampleStaticRouteName}`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
+        route: sampleStaticRouteName,
+        method: 'GET'
+      });
+      expect(data.dynamicOperations).toStrictEqual(sampleStaticRouteGet);
     });
+
+    test(`get operations by route ${sampleDynamicRouteName}`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
+        route: '/dynamic/sampleSubjectType/sampleSubjectId',
+        method: 'DELETE'
+      });
+      expect(data.dynamicOperations).toStrictEqual(sampleDynamicRouteDelete);
+    });
+
+    test(`get operations by route ${sampleDynamicRouteName}`, async () => {
+      const { data } = await dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
+        route: '/dynamic/sampleSubjectType/sampleSubjectId',
+        method: 'DELETE'
+      });
+      expect(data.dynamicOperations).toStrictEqual(sampleDynamicRouteDelete);
+    });
+
+    itProp(
+      `get operations by route with an invalid route should throw RouteNotFoundError`,
+      [fc.string()],
+      async (route) => {
+        await expect(
+          dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
+            route,
+            method: 'DELETE'
+          })
+        ).rejects.toThrow(RouteNotFoundError);
+      }
+    );
+
+    itProp(
+      `get operations by route with a valid route but invalid method should throw RouteNotFoundError`,
+      [fc.string()],
+      async (route) => {
+        await expect(
+          dynamoDBDynamicPermissionsPlugin.getDynamicOperationsByRoute({
+            route: '/dynamic/sampleSubjectType/sampleSubjectId',
+            method: 'GET'
+          })
+        ).rejects.toThrow(RouteNotFoundError);
+      }
+    );
   });
 
   describe('getIdentityPermissionsBySubject', () => {
