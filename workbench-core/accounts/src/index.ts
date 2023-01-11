@@ -19,6 +19,8 @@ import {
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
 import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
+import CreateProjectRequest from './models/createProjectRequest';
+import ListProjectsRequest from './models/listProjectsRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
@@ -51,5 +53,7 @@ export {
   CreateAccountData,
   UpdateAccountData,
   ListAccountRequest,
-  ListAccountsRequestParser
+  ListAccountsRequestParser,
+  CreateProjectRequest,
+  ListProjectsRequest
 };

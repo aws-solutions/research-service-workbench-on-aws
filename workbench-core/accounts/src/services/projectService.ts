@@ -12,11 +12,17 @@ import {
   buildDynamoDBPkSk,
   QueryParams,
   resourceTypeToKey,
-  uuidWithLowercasePrefix
+  uuidWithLowercasePrefix,
+  DEFAULT_API_PAGE_SIZE,
+  addPaginationToken,
+  getPaginationToken
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
+import _ from 'lodash';
 import CostCenter from '../models/costCenter';
 import CreateProjectRequest from '../models/createProjectRequest';
+import ListProjectsRequest from '../models/listProjectsRequest';
+import ListProjectsResponse from '../models/listProjectsResponse';
 import Project from '../models/project';
 import CostCenterService from './costCenterService';
 
@@ -56,20 +62,139 @@ export default class ProjectService {
     }
   }
 
+  // TODO--delete after dynamic Authz
+  private _mockGetUserGroups(): string[] {
+    return [];
+  }
+
   /**
    * List projects
    *
+   * @param request - the optional fields to list projects
+   * @param user - authenticated user listing the projects
    * @returns Project entries in DDB
    */
-  public async listProjects(): Promise<{ data: Project[] }> {
-    const queryParams = {
+  // TODO--add filter support
+  public async listProjects(request: ListProjectsRequest): Promise<ListProjectsResponse> {
+    const pageSize = request.pageSize;
+    let paginationToken = request.paginationToken;
+    // Get user groups--TODO implement after dynamic AuthZ
+    // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
+    const userGroupsForCurrentUser: string[] = this._mockGetUserGroups(); // mock so the tests work
+
+    // If no group membership, return
+    if (_.isEmpty(userGroupsForCurrentUser)) {
+      return { data: [], paginationToken: undefined };
+    }
+
+    // If IT Admin, return all with pagination
+    if (userGroupsForCurrentUser.length === 1) {
+      if (userGroupsForCurrentUser[0] === 'ITAdmin') {
+        let queryParams: QueryParams = {
+          key: { name: 'resourceType', value: this._resourceType },
+          index: 'getResourceByCreatedAt',
+          limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+        };
+
+        queryParams = addPaginationToken(paginationToken, queryParams);
+
+        const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+
+        paginationToken = getPaginationToken(projectsResponse);
+
+        return {
+          data: projectsResponse.Items as unknown as Project[],
+          paginationToken: paginationToken
+        };
+      }
+
+      // If member of 1 group, get project item
+      const projectId = userGroupsForCurrentUser[0].split('#')[0];
+      const project = await this.getProject(projectId);
+      return { data: [project], paginationToken: undefined };
+    }
+
+    // Else, member of more than 1 group, query for project items with pagination
+    // welcome to party town
+    const projectIds: string[] = userGroupsForCurrentUser.map(
+      (projectGroup: string) => projectGroup.split('#')[0]
+    );
+
+    // i = 0
+    let filterExpression = 'id = :proj1';
+    const expressionAttributeValues: { [key: string]: string } = { ':proj1': projectIds[0] };
+    for (let i = 1; i < projectIds.length; i++) {
+      // build filter string "id = :proj1 OR id = :proj2 OR ... OR id = projN+1"
+      filterExpression = filterExpression + ` OR id = :proj${i + 1}`;
+      // build expressionAttributeValues object {":proj1": "projectId1", ..., ":projN+1": "projectIdN"}
+      expressionAttributeValues[`:proj${i + 1}`] = projectIds[i];
+    }
+
+    const pageSizeLimit = pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE;
+
+    // TODO--extend to other GSIs after filtering is added
+    let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
-      index: 'getResourceByCreatedAt'
+      index: 'getResourceByCreatedAt',
+      limit: pageSizeLimit,
+      filter: filterExpression,
+      values: expressionAttributeValues
     };
 
-    const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+    let projects: Project[] = [];
 
-    return Promise.resolve({ data: projectsResponse.Items as unknown as Project[] });
+    let returnedCount = 0;
+    while (returnedCount < pageSizeLimit && returnedCount < projectIds.length) {
+      queryParams = addPaginationToken(paginationToken, queryParams);
+
+      const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
+
+      returnedCount += projectsResponse.Count!;
+
+      // nothing else to get from DDB
+      if (projectsResponse.LastEvaluatedKey === undefined) {
+        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+        paginationToken = undefined;
+      }
+
+      // too little--while loop continues
+      else if (returnedCount < pageSizeLimit) {
+        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+        paginationToken = getPaginationToken(projectsResponse);
+      }
+
+      // juuuust the right amount--getPaginationToken from response and exit loop
+      else if (returnedCount === pageSizeLimit) {
+        paginationToken = getPaginationToken(projectsResponse);
+        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+      }
+
+      // too much--take enough to fill and manually get pagination token from reponse and exit loop
+      else if (returnedCount > pageSizeLimit) {
+        const leftoverAmount = returnedCount - pageSizeLimit;
+        const totalProjectsFromResponse = projectsResponse.Items as unknown as Project[];
+        projects = projects.concat(totalProjectsFromResponse.slice(0, -leftoverAmount));
+        const manualLastEvaluatedItem =
+          projectsResponse.Items![totalProjectsFromResponse.length - (leftoverAmount + 1)]; // this will be the whole entry
+        // If we query on GSI, then the LastEvaluatedKey will be the compose of GSI partition key, GSI sort key, primary partition key and primary sort key.
+        // TODO--extend to other GSIs after filtering is added
+        const manualLastEvaluatedKey = {
+          pk: manualLastEvaluatedItem.pk,
+          sk: manualLastEvaluatedItem.sk,
+          resourceType: manualLastEvaluatedItem.resourceType,
+          createdAt: manualLastEvaluatedItem.createdAt
+        };
+        paginationToken = Buffer.from(JSON.stringify(manualLastEvaluatedKey)).toString('base64');
+      }
+      if (paginationToken === undefined) {
+        break;
+      }
+    }
+
+    return {
+      data: projects,
+      paginationToken: paginationToken
+    };
   }
 
   /**

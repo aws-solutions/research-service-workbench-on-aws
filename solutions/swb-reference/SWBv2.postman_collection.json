@@ -961,7 +961,19 @@
             "url": {
               "raw": "{{API_URL}}/projects",
               "host": ["{{API_URL}}"],
-              "path": ["projects"]
+              "path": ["projects"],
+              "query": [
+                {
+                  "key": "paginationToken",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pageSize",
+                  "value": "50",
+                  "disabled": true
+                }
+              ]
             }
           },
           "response": []
