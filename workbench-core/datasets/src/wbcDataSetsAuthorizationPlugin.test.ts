@@ -14,6 +14,7 @@ import {
   CreateIdentityPermissionsResponse,
   DDBDynamicAuthorizationPermissionsPlugin,
   DynamicAuthorizationService,
+  IdentityPermission,
   WBCGroupManagementPlugin
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
@@ -21,6 +22,7 @@ import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workben
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { GetAccessPermissionRequest } from './models/getAccessPermissionRequest';
+import { PermissionsResponse } from './models/permissionsResponse';
 import { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
 describe('wbcDataSetsAuthorizationPlugin tests', () => {
@@ -32,16 +34,21 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
   let permissionsPlugin: DDBDynamicAuthorizationPermissionsPlugin;
   let authzService: DynamicAuthorizationService;
   let plugin: WbcDataSetsAuthorizationPlugin;
-
+  let testMethod: (i: IdentityPermission[]) => PermissionsResponse[];
+  let createPermissionsSpy: jest.SpyInstance;
   const dataSetId: string = 'fake-dataset-id';
+  const anotherDataSetId: string = 'fake-another-dataset-id';
   const userId: string = 'fake-user-id';
   const groupId: string = 'fake-group-id';
   const fakeData: string = 'fake-data';
+  const authenticatedUser = {
+    id: userId,
+    roles: []
+  };
 
   const readOnlyAccessPermission: AddRemoveAccessPermissionRequest = {
     dataSetId: dataSetId,
-    authenticatedUserId: userId,
-    roles: [],
+    authenticatedUser,
     permission: {
       identityType: 'USER',
       identity: groupId,
@@ -51,8 +58,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
 
   const readWriteAccessPermission: AddRemoveAccessPermissionRequest = {
     dataSetId: dataSetId,
-    authenticatedUserId: userId,
-    roles: [],
+    authenticatedUser,
     permission: {
       identityType: 'GROUP',
       identity: groupId,
@@ -118,6 +124,29 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     }
   };
 
+  const mockMultiDatasetPermissionsResponse: CreateIdentityPermissionsResponse = {
+    data: {
+      identityPermissions: [
+        {
+          identityType: 'GROUP',
+          identityId: groupId,
+          effect: 'ALLOW',
+          action: 'UPDATE',
+          subjectType: 'DataSet',
+          subjectId: dataSetId
+        },
+        {
+          identityType: 'GROUP',
+          identityId: groupId,
+          effect: 'ALLOW',
+          action: 'UPDATE',
+          subjectType: 'DataSet',
+          subjectId: anotherDataSetId
+        }
+      ]
+    }
+  };
+
   beforeAll(() => {
     jest.resetAllMocks();
     writer = {
@@ -148,16 +177,17 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     });
     plugin = new WbcDataSetsAuthorizationPlugin(authzService);
 
-    jest
-      .spyOn(DynamicAuthorizationService.prototype, 'createIdentityPermissions')
-      .mockImplementation(async (params: CreateIdentityPermissionsRequest) => {
-        if (params.identityPermissions[0].identityType === 'USER') {
-          return mockUserPermissionResponse;
-        } else if (params.identityPermissions.length === 2) {
-          return mockReadWritePermissionsResponse;
-        }
-        return mockReadOnlyPermissionsResponse;
-      });
+    createPermissionsSpy = jest.spyOn(DynamicAuthorizationService.prototype, 'createIdentityPermissions');
+    createPermissionsSpy.mockImplementation(async (params: CreateIdentityPermissionsRequest) => {
+      if (params.identityPermissions[0].identityType === 'USER') {
+        return mockUserPermissionResponse;
+      } else if (params.identityPermissions.length === 2) {
+        return mockReadWritePermissionsResponse;
+      }
+      return mockReadOnlyPermissionsResponse;
+    });
+    //@ts-ignore - get the private method under test.
+    testMethod = plugin._identityPermissionsToPermissionsResponse;
   });
 
   beforeEach(() => {
@@ -169,15 +199,14 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       await expect(
         plugin.addAccessPermission({
           dataSetId: dataSetId,
-          authenticatedUserId: userId,
-          roles: [],
+          authenticatedUser,
           permission: {
             identityType: fakeData,
             identity: groupId,
             accessLevel: 'read-only'
           }
         })
-      ).rejects.toThrow(new InvalidPermissionError('IdentityType must be "GROUP" or "USER".'));
+      ).rejects.toThrow(new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'."));
       expect(authzService.createIdentityPermissions).not.toBeCalled();
     });
 
@@ -194,7 +223,7 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
             accessLevel: fakeData
           }
         })
-      ).rejects.toThrow(new InvalidPermissionError('Access Level must be "read-only" or "read-write".'));
+      ).rejects.toThrow(new InvalidPermissionError("Access Level must be 'read-only' or 'read-write'."));
       expect(authzService.createIdentityPermissions).not.toBeCalled();
     });
 
@@ -207,11 +236,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
               identityType: 'GROUP',
               identity: groupId,
               accessLevel: 'read-write'
-            },
-            {
-              identityType: 'GROUP',
-              identity: groupId,
-              accessLevel: 'read-only'
             }
           ]
         }
@@ -234,13 +258,192 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       });
       expect(authzService.createIdentityPermissions).toBeCalledTimes(1);
     });
+
+    it('throws if result contains more than one PermissionsResponse object', async () => {
+      createPermissionsSpy.mockImplementationOnce(async () => mockMultiDatasetPermissionsResponse);
+
+      // arguement should be irrelevant due to mockImplementationOnce above.
+      await expect(plugin.addAccessPermission(readOnlyAccessPermission)).rejects.toThrowError(
+        new InvalidPermissionError(`Expected a single permissions response, but got 2.`)
+      );
+    });
+  });
+
+  describe('_identityPermissionsToPermissionsResponse', () => {
+    it('throws if empty input is given', () => {
+      expect(() => testMethod([])).toThrowError(new InvalidPermissionError('No permissions found.'));
+    });
+
+    it('throws if input is undefined', () => {
+      //@ts-ignore - to allow checking undefined input
+      expect(() => testMethod()).toThrowError(new InvalidPermissionError('No permissions found.'));
+    });
+
+    it('throws if input contains an action that is not "READ" or "UPDATE"', () => {
+      expect(() =>
+        testMethod([
+          {
+            action: 'DELETE',
+            effect: 'ALLOW',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          }
+        ])
+      ).toThrowError(
+        new InvalidPermissionError(
+          "Unsupported actions found in permissions. Only 'READ' and 'UPDATE' are currently supported."
+        )
+      );
+    });
+
+    it('throws if input contains a "DENY" effect.', () => {
+      expect(() =>
+        testMethod([
+          {
+            action: 'READ',
+            effect: 'DENY',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          }
+        ])
+      ).toThrowError(new InvalidPermissionError("Only 'ALLOW' effect is supported."));
+    });
+
+    it('returns two permissions for a single dataset if two identities are given.', () => {
+      expect(
+        testMethod([
+          {
+            action: 'READ',
+            effect: 'ALLOW',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          },
+          {
+            action: 'READ',
+            effect: 'ALLOW',
+            identityId: userId,
+            identityType: 'USER',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          }
+        ])
+      ).toMatchObject([
+        {
+          data: {
+            dataSetId: dataSetId,
+            permissions: [
+              {
+                identity: groupId,
+                identityType: 'GROUP',
+                accessLevel: 'read-only'
+              },
+              {
+                identity: userId,
+                identityType: 'USER',
+                accessLevel: 'read-only'
+              }
+            ]
+          }
+        }
+      ]);
+    });
+
+    it('returns a "read-write" permission over a "read-only" permission if both "READ" and "UPDATE" actions are given.', () => {
+      expect(
+        testMethod([
+          {
+            action: 'READ',
+            effect: 'ALLOW',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          },
+          {
+            action: 'UPDATE',
+            effect: 'ALLOW',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          }
+        ])
+      ).toMatchObject([
+        {
+          data: {
+            dataSetId: dataSetId,
+            permissions: [
+              {
+                identity: groupId,
+                identityType: 'GROUP',
+                accessLevel: 'read-write'
+              }
+            ]
+          }
+        }
+      ]);
+    });
+
+    it('returns a read-write permission for one identity and read-only for another', () => {
+      expect(
+        testMethod([
+          {
+            action: 'READ',
+            effect: 'ALLOW',
+            identityId: groupId,
+            identityType: 'GROUP',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          },
+          {
+            action: 'UPDATE',
+            effect: 'ALLOW',
+            identityId: userId,
+            identityType: 'USER',
+            subjectId: dataSetId,
+            subjectType: 'DataSet'
+          }
+        ])
+      ).toMatchObject([
+        {
+          data: {
+            dataSetId: dataSetId,
+            permissions: [
+              {
+                identity: groupId,
+                identityType: 'GROUP',
+                accessLevel: 'read-only'
+              },
+              {
+                identity: userId,
+                identityType: 'USER',
+                accessLevel: 'read-write'
+              }
+            ]
+          }
+        }
+      ]);
+    });
   });
 
   describe('getAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.getAccessPermissions(getAccessPermission)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
+    it('needs to be implemented', async () => {
+      await expect(
+        plugin.getAccessPermissions(getAccessPermission)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.subject, identityType: 'USER', accessLevel: 'read-write' }
+          ]
+        }
+      });
     });
   });
 

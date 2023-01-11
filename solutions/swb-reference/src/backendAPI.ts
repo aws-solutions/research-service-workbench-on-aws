@@ -20,8 +20,8 @@ import {
 import { AwsService, MetadataService } from '@aws/workbench-core-base';
 import {
   S3DataSetStoragePlugin,
-  DataSetsAuthorizationPlugin,
-  DdbDataSetMetadataPlugin
+  DdbDataSetMetadataPlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import {
   EnvironmentService,
@@ -36,6 +36,9 @@ import SagemakerNotebookEnvironmentConnectionService from './environment/sagemak
 import SagemakerNotebookEnvironmentLifecycleService from './environment/sagemakerNotebook/sagemakerNotebookEnvironmentLifecycleService';
 import { DataSetService } from './services/dataSetService';
 import { ProjectEnvTypeConfigService } from './services/projectEnvTypeConfigService';
+
+const requiredAuditValues: string[] = ['actor', 'source'];
+const fieldsToMask: string[] = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
 
 const logger: LoggingService = new LoggingService();
 const aws: AwsService = new AwsService({
@@ -60,8 +63,6 @@ const ddbDynamicAuthorizationPermissionsPlugin: DDBDynamicAuthorizationPermissio
   new DDBDynamicAuthorizationPermissionsPlugin({
     dynamoDBService: dynamicAuthAws.helpers.ddb
   });
-// Commenting it for now, it will be integrated with SWB's definition of DynamicAuthorizationService
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
   groupManagementPlugin: wbcGroupManagementPlugin,
   dynamicAuthorizationPermissionsPlugin: ddbDynamicAuthorizationPermissionsPlugin,
@@ -78,29 +79,6 @@ const metadataService: MetadataService = new MetadataService(aws.helpers.ddb);
 const projectService: ProjectService = new ProjectService({
   TABLE_NAME: process.env.STACK_NAME!
 });
-
-const fakeDataSetsAuthorizationPlugin: DataSetsAuthorizationPlugin = {
-  addAccessPermission: (params) => {
-    throw new Error('Not Implemented');
-  },
-  getAccessPermissions: ({ dataSetId, subject }) => {
-    return Promise.resolve({
-      data: {
-        dataSetId,
-        permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
-      }
-    });
-  },
-  removeAccessPermissions: (params) => {
-    throw new Error('Not Implemented');
-  },
-  getAllDataSetAccessPermissions: (datasetId) => {
-    throw new Error('Not Implemented');
-  },
-  removeAllAccessPermissions: (datasetId) => {
-    throw new Error('Not Implemented');
-  }
-};
 
 const apiRouteConfig: ApiRouteConfig = {
   routes: [
@@ -129,10 +107,10 @@ const apiRouteConfig: ApiRouteConfig = {
   environmentService: new EnvironmentService(aws.helpers.ddb),
   dataSetService: new DataSetService(
     new S3DataSetStoragePlugin(aws),
-    new AuditService(new BaseAuditPlugin(new AuditLogger(logger))),
+    new AuditService(new BaseAuditPlugin(new AuditLogger(logger)), true, requiredAuditValues, fieldsToMask),
     logger,
     new DdbDataSetMetadataPlugin(aws, dataSetPrefix, endPointPrefix),
-    fakeDataSetsAuthorizationPlugin //TODO: REPLACE WITH ACTUAL IMPLEMENTATION ONCE ITS AVAILABLE
+    new WbcDataSetsAuthorizationPlugin(dynamicAuthorizationService)
   ),
   allowedOrigins: JSON.parse(process.env.ALLOWED_ORIGINS || '[]'),
   environmentTypeService: envTypeService,

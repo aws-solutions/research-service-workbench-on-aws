@@ -7,6 +7,7 @@ jest.mock('@aws/workbench-core-audit');
 jest.mock('@aws/workbench-core-authorization');
 jest.mock('@aws/workbench-core-logging');
 jest.mock('./dataSetMetadataPlugin');
+jest.mock('./wbcDataSetsAuthorizationPlugin');
 
 import { AuditService, BaseAuditPlugin, Writer } from '@aws/workbench-core-audit';
 import {
@@ -17,6 +18,7 @@ import {
 import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
+import * as Boom from '@hapi/boom';
 import { DataSet } from './dataSet';
 import { DataSetService } from './dataSetService';
 import { DdbDataSetMetadataPlugin } from './ddbDataSetMetadataPlugin';
@@ -24,6 +26,8 @@ import { DataSetHasEndpointError } from './errors/dataSetHasEndpointError';
 import { EndPointExistsError } from './errors/endPointExistsError';
 import { NotAuthorizedError } from './errors/notAuthorizedError';
 import { AddDataSetExternalEndpointResponse } from './models/addDataSetExternalEndpoint';
+import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
+import { PermissionsResponse } from './models/permissionsResponse';
 import { S3DataSetStoragePlugin } from './s3DataSetStoragePlugin';
 import { WbcDataSetsAuthorizationPlugin } from './wbcDataSetsAuthorizationPlugin';
 
@@ -42,6 +46,7 @@ describe('DataSetService', () => {
   let dataSetService: DataSetService;
 
   const mockDataSetId = 'sampleDataSetId';
+  const mockInvalidId = 'Sample-Invalid-Id';
   const mockDataSetName = 'Sample-DataSet';
   const mockDataSetPath = 'sample-s3-prefix';
   const mockAwsAccountId = 'Sample-AWS-Account';
@@ -54,15 +59,44 @@ describe('DataSetService', () => {
   const mockAlternateRoleArn = 'Another-Sample-Role-Arn';
   const mockExistingEndpointName = 'Sample-Existing-AP';
   const mockExistingEndpointId = 'Sample-Endpoint-Id';
+  const mockNoRolesEndpointId = 'Sample-NoRoles-Endpoint-Id';
   const mockDataSetWithEndpointId = 'sampleDataSetWithEndpointId';
   const mockEndPointUrl = `s3://arn:s3:us-east-1:${mockAwsAccountId}:accesspoint/${mockAccessPointName}/${mockDataSetPath}/`;
   const mockDataSetObject = 'datasetObjectId';
   const mockPresignedSinglePartUploadURL = 'Sample-Presigned-Single-Part-Upload-Url';
   const mockGroupId = 'Sample-Group-Id';
-  const mockUserId = 'Sample-User-Id';
+  const mockUserId = 'sample-user-id';
+  const mockAuthenticatedUser = {
+    id: mockUserId,
+    roles: []
+  };
+
+  const mockDataSetAddAccessParams: AddRemoveAccessPermissionRequest = {
+    authenticatedUser: mockAuthenticatedUser,
+    dataSetId: mockDataSetId,
+    permission: {
+      accessLevel: 'read-only',
+      identityType: 'USER',
+      identity: mockUserId
+    }
+  };
+  const mockAddAccessResponse: PermissionsResponse = {
+    data: {
+      dataSetId: mockDataSetId,
+      permissions: [
+        {
+          identity: mockUserId,
+          identityType: 'USER',
+          accessLevel: 'read-only'
+        }
+      ]
+    }
+  };
 
   beforeEach(() => {
     jest.resetAllMocks();
+    expect.hasAssertions();
+
     writer = {
       prepare: jest.fn(),
       write: jest.fn()
@@ -118,6 +152,8 @@ describe('DataSetService', () => {
             storageName: mockDataSetStorageName,
             externalEndpoints: [mockExistingEndpointName]
           };
+        } else if (id === mockInvalidId) {
+          throw Boom.notFound(`Could not find DataSet '${mockInvalidId}'.`);
         }
         return {
           id: mockDataSetId,
@@ -167,7 +203,18 @@ describe('DataSetService', () => {
     jest.spyOn(DdbDataSetMetadataPlugin.prototype, 'removeDataSet').mockImplementation(async () => {});
     jest
       .spyOn(DdbDataSetMetadataPlugin.prototype, 'getDataSetEndPointDetails')
-      .mockImplementation(async () => {
+      .mockImplementation(async (dataSetId: string, endPointId: string) => {
+        if (endPointId === mockNoRolesEndpointId) {
+          return {
+            id: mockExistingEndpointId,
+            name: mockExistingEndpointName,
+            dataSetId: mockDataSetId,
+            dataSetName: mockDataSetName,
+            path: mockDataSetPath,
+            endPointUrl: mockEndPointUrl,
+            endPointAlias: mockAccessPointAlias
+          };
+        }
         return {
           id: mockExistingEndpointId,
           name: mockExistingEndpointName,
@@ -261,7 +308,9 @@ describe('DataSetService', () => {
     dataSetService = new DataSetService(audit, log, metaPlugin, authzPlugin);
     s3Plugin = new S3DataSetStoragePlugin(aws);
 
-    expect.hasAssertions();
+    jest
+      .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'addAccessPermission')
+      .mockImplementation(async () => mockAddAccessResponse);
   });
 
   describe('constructor', () => {
@@ -282,7 +331,8 @@ describe('DataSetService', () => {
           path: mockDataSetPath,
           awsAccountId: mockAwsAccountId,
           region: mockAwsBucketRegion,
-          storageProvider: s3Plugin
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser
         })
       ).resolves.toEqual({
         id: mockDataSetId,
@@ -306,7 +356,8 @@ describe('DataSetService', () => {
           path: 'path',
           awsAccountId: 'accountId',
           region: 'bucketRegion',
-          storageProvider: s3Plugin
+          storageProvider: s3Plugin,
+          authenticatedUser: mockAuthenticatedUser
         })
       ).resolves.toEqual({
         id: mockDataSetId,
@@ -324,13 +375,17 @@ describe('DataSetService', () => {
   describe('removeDataset', () => {
     it('returns nothing when the dataset is removed', async () => {
       await expect(
-        dataSetService.removeDataSet(mockDataSetId, () => Promise.resolve())
+        dataSetService.removeDataSet(mockDataSetId, () => Promise.resolve(), mockAuthenticatedUser)
       ).resolves.not.toThrow();
     });
 
     it('throws when an external endpoint exists on the DataSet.', async () => {
       await expect(
-        dataSetService.removeDataSet(mockDataSetWithEndpointId, () => Promise.resolve())
+        dataSetService.removeDataSet(
+          mockDataSetWithEndpointId,
+          () => Promise.resolve(),
+          mockAuthenticatedUser
+        )
       ).rejects.toThrow(
         new DataSetHasEndpointError(
           'External endpoints found on Dataset must be removed before DataSet can be removed.'
@@ -340,18 +395,22 @@ describe('DataSetService', () => {
 
     it('throws when preconditions are not met', async () => {
       await expect(
-        dataSetService.removeDataSet(mockDataSetId, async () => {
-          await Promise.reject(new Error('Preconditions are not met'));
-        })
+        dataSetService.removeDataSet(
+          mockDataSetId,
+          async () => {
+            await Promise.reject(new Error('Preconditions are not met'));
+          },
+          mockAuthenticatedUser
+        )
       ).rejects.toThrow('Preconditions are not met');
     });
   });
 
   describe('getDataSetMountObject', () => {
     it("throws when called with a name that doesn't exists.", async () => {
-      await expect(dataSetService.getDataSetMountObject('name', 'endPointName')).rejects.toThrow(
-        new Error(`'endPointName' not found on DataSet 'name'.`)
-      );
+      await expect(
+        dataSetService.getDataSetMountObject('name', 'endPointName', mockAuthenticatedUser)
+      ).rejects.toThrow(new Error(`'endPointName' not found on DataSet 'name'.`));
     });
 
     it('returns endpoint attributes when called with a name that exists.', async () => {
@@ -380,7 +439,7 @@ describe('DataSetService', () => {
       });
 
       await expect(
-        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)
+        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId, mockAuthenticatedUser)
       ).resolves.toEqual({
         name: mockDataSetName,
         prefix: mockDataSetPath,
@@ -414,7 +473,7 @@ describe('DataSetService', () => {
       });
 
       await expect(
-        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)
+        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId, mockAuthenticatedUser)
       ).rejects.toThrow(new Error('Endpoint has missing information'));
     });
 
@@ -442,14 +501,14 @@ describe('DataSetService', () => {
       });
 
       await expect(
-        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId)
+        dataSetService.getDataSetMountObject(mockDataSetId, mockExistingEndpointId, mockAuthenticatedUser)
       ).rejects.toThrow(new Error('Endpoint has missing information'));
     });
   });
 
   describe('listDataSets', () => {
     it('returns an array of known DataSets.', async () => {
-      await expect(dataSetService.listDataSets()).resolves.toEqual([
+      await expect(dataSetService.listDataSets(mockAuthenticatedUser)).resolves.toEqual([
         {
           id: mockDataSetId,
           name: mockDataSetName,
@@ -464,7 +523,7 @@ describe('DataSetService', () => {
 
   describe('getDataSet', () => {
     it('returns a the details of a DataSet.', async () => {
-      await expect(dataSetService.getDataSet(mockDataSetName)).resolves.toEqual({
+      await expect(dataSetService.getDataSet(mockDataSetName, mockAuthenticatedUser)).resolves.toEqual({
         id: mockDataSetId,
         name: mockDataSetName,
         path: mockDataSetPath,
@@ -472,6 +531,14 @@ describe('DataSetService', () => {
         storageType: mockDataSetStorageType,
         storageName: mockDataSetStorageName
       });
+    });
+    it('throws when an invalid dataset Id is given.', async () => {
+      try {
+        await dataSetService.getDataSet(mockInvalidId, mockAuthenticatedUser);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
     });
   });
 
@@ -489,6 +556,7 @@ describe('DataSetService', () => {
           externalEndpointName: mockAccessPointName,
           storageProvider: s3Plugin,
           groupId: mockGroupId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).resolves.toMatchObject<AddDataSetExternalEndpointResponse>({
@@ -517,6 +585,7 @@ describe('DataSetService', () => {
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           groupId: mockGroupId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(EndPointExistsError);
@@ -533,6 +602,7 @@ describe('DataSetService', () => {
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           groupId: mockGroupId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(NotAuthorizedError);
@@ -553,6 +623,7 @@ describe('DataSetService', () => {
           externalEndpointName: mockAccessPointName,
           storageProvider: s3Plugin,
           userId: mockUserId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).resolves.toMatchObject<AddDataSetExternalEndpointResponse>({
@@ -581,6 +652,7 @@ describe('DataSetService', () => {
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           userId: mockUserId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(EndPointExistsError);
@@ -597,6 +669,24 @@ describe('DataSetService', () => {
           externalEndpointName: mockExistingEndpointName,
           storageProvider: s3Plugin,
           userId: mockUserId,
+          authenticatedUser: mockAuthenticatedUser,
+          externalRoleName: mockRoleArn
+        })
+      ).rejects.toThrow(NotAuthorizedError);
+    });
+
+    it('throws if the subject doesnt have permission to access the dataset', async () => {
+      jest
+        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
+        .mockResolvedValue({ data: { dataSetId: mockDataSetId, permissions: [] } });
+
+      await expect(
+        dataSetService.addDataSetExternalEndpointForUser({
+          dataSetId: mockDataSetWithEndpointId,
+          externalEndpointName: mockExistingEndpointName,
+          storageProvider: s3Plugin,
+          userId: mockUserId,
+          authenticatedUser: mockAuthenticatedUser,
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(NotAuthorizedError);
@@ -606,7 +696,12 @@ describe('DataSetService', () => {
   describe('removeDataSetExternalEndpoint', () => {
     it('returns nothing after removing DataSet mount point', async () => {
       await expect(
-        dataSetService.removeDataSetExternalEndpoint(mockDataSetId, mockAccessPointName, s3Plugin)
+        dataSetService.removeDataSetExternalEndpoint(
+          mockDataSetId,
+          mockAccessPointName,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.not.toThrow();
     });
 
@@ -624,7 +719,12 @@ describe('DataSetService', () => {
       });
 
       await expect(
-        dataSetService.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, s3Plugin)
+        dataSetService.removeDataSetExternalEndpoint(
+          mockDataSetId,
+          mockExistingEndpointId,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.not.toThrow();
     });
 
@@ -642,7 +742,12 @@ describe('DataSetService', () => {
       });
 
       await expect(
-        dataSetService.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, s3Plugin)
+        dataSetService.removeDataSetExternalEndpoint(
+          mockDataSetId,
+          mockExistingEndpointId,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.not.toThrow();
     });
 
@@ -661,7 +766,12 @@ describe('DataSetService', () => {
       s3Plugin.removeExternalEndpoint = jest.fn();
 
       await expect(
-        dataSetService.removeDataSetExternalEndpoint(mockDataSetId, mockExistingEndpointId, s3Plugin)
+        dataSetService.removeDataSetExternalEndpoint(
+          mockDataSetId,
+          mockExistingEndpointId,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.not.toThrow();
     });
   });
@@ -669,7 +779,13 @@ describe('DataSetService', () => {
   describe('addRoleToExternalEndpoint', () => {
     it('no-op if the role has already been added to the endpoint.', async () => {
       await expect(
-        dataSetService.addRoleToExternalEndpoint(mockDataSetId, mockExistingEndpointId, mockRoleArn, s3Plugin)
+        dataSetService.addRoleToExternalEndpoint(
+          mockDataSetId,
+          mockExistingEndpointId,
+          mockRoleArn,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.toBeUndefined();
     });
 
@@ -679,7 +795,20 @@ describe('DataSetService', () => {
           mockDataSetId,
           mockExistingEndpointId,
           mockAlternateRoleArn,
-          s3Plugin
+          s3Plugin,
+          mockAuthenticatedUser
+        )
+      ).resolves.toBeUndefined();
+    });
+
+    it('completes if given an existing endpoint with no stored roles', async () => {
+      await expect(
+        dataSetService.addRoleToExternalEndpoint(
+          mockDataSetId,
+          mockNoRolesEndpointId,
+          mockRoleArn,
+          s3Plugin,
+          mockAuthenticatedUser
         )
       ).resolves.toBeUndefined();
     });
@@ -687,7 +816,7 @@ describe('DataSetService', () => {
 
   describe('listStorageLocations', () => {
     it('returns an array of known StorageLocations.', async () => {
-      await expect(dataSetService.listStorageLocations()).resolves.toEqual([
+      await expect(dataSetService.listStorageLocations(mockAuthenticatedUser)).resolves.toEqual([
         {
           name: mockDataSetStorageName,
           awsAccountId: mockAwsAccountId,
@@ -704,8 +833,34 @@ describe('DataSetService', () => {
       const fileName = 'test.txt';
 
       await expect(
-        dataSetService.getPresignedSinglePartUploadUrl(mockDataSetId, fileName, ttlSeconds, s3Plugin)
+        dataSetService.getPresignedSinglePartUploadUrl(
+          mockDataSetId,
+          fileName,
+          ttlSeconds,
+          s3Plugin,
+          mockAuthenticatedUser
+        )
       ).resolves.toEqual(mockPresignedSinglePartUploadURL);
+    });
+  });
+
+  describe('addDataSetAccessPermissions', () => {
+    it('returns access permissions added to a DataSet', async () => {
+      await expect(
+        dataSetService.addDataSetAccessPermissions(mockDataSetAddAccessParams)
+      ).resolves.toStrictEqual(mockAddAccessResponse);
+    });
+    it('throws when the dataSet does not exist', async () => {
+      const invalidAccessParams: AddRemoveAccessPermissionRequest = {
+        ...mockDataSetAddAccessParams,
+        dataSetId: mockInvalidId
+      };
+      try {
+        await dataSetService.addDataSetAccessPermissions(invalidAccessParams);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
     });
   });
 });

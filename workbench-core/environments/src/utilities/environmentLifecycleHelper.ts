@@ -12,10 +12,10 @@ import {
 } from '@aws/workbench-core-authorization';
 import { AwsService, DynamoDBService, resourceTypeToKey } from '@aws/workbench-core-base';
 import {
-  DataSetsAuthorizationPlugin,
   DataSetService,
   DdbDataSetMetadataPlugin,
-  S3DataSetStoragePlugin
+  S3DataSetStoragePlugin,
+  WbcDataSetsAuthorizationPlugin
 } from '@aws/workbench-core-datasets';
 import { LoggingService } from '@aws/workbench-core-logging';
 import { CognitoUserManagementPlugin, UserManagementService } from '@aws/workbench-core-user-management';
@@ -38,9 +38,15 @@ export default class EnvironmentLifecycleHelper {
       table: process.env.DYNAMIC_AUTH_DDB_TABLE_NAME!
     });
     const logger: LoggingService = new LoggingService();
-    const auditService: AuditService = new AuditService(new BaseAuditPlugin(new AuditLogger(logger)));
-    // TODO remove eslint-disable once WbcDataSetsAuthorizationPlugin is fully implemented
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const requiredAuditValues: string[] = ['actor', 'source'];
+    const fieldsToMask: string[] = ['user', 'password', 'accessKey', 'code', 'codeVerifier'];
+
+    const auditService: AuditService = new AuditService(
+      new BaseAuditPlugin(new AuditLogger(logger)),
+      true,
+      requiredAuditValues,
+      fieldsToMask
+    );
     const authzService: DynamicAuthorizationService = new DynamicAuthorizationService({
       groupManagementPlugin: new WBCGroupManagementPlugin({
         userManagementService: new UserManagementService(
@@ -55,35 +61,11 @@ export default class EnvironmentLifecycleHelper {
       auditService: auditService
     });
 
-    // TODO remove once WbcDataSetsAuthorizationPlugin is fully implemented
-    const fakeDataSetsAuthorizationPlugin: DataSetsAuthorizationPlugin = {
-      addAccessPermission: (params) => {
-        throw new Error('Not Implemented');
-      },
-      getAccessPermissions: ({ dataSetId, subject }) => {
-        return Promise.resolve({
-          data: {
-            dataSetId,
-            permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
-          }
-        });
-      },
-      removeAccessPermissions: (params) => {
-        throw new Error('Not Implemented');
-      },
-      getAllDataSetAccessPermissions: (datasetId) => {
-        throw new Error('Not Implemented');
-      },
-      removeAllAccessPermissions: (datasetId) => {
-        throw new Error('Not Implemented');
-      }
-    };
-
     this.dataSetService = new DataSetService(
       auditService,
       logger,
       new DdbDataSetMetadataPlugin(this.aws, 'DATASET', 'ENDPOINT'),
-      fakeDataSetsAuthorizationPlugin // TODO replace with WbcDataSetsAuthorizationPlugin once fully implemented
+      new WbcDataSetsAuthorizationPlugin(authzService)
     );
     this.environmentService = new EnvironmentService(this.aws.helpers.ddb);
   }
@@ -206,7 +188,11 @@ export default class EnvironmentLifecycleHelper {
         await this.dataSetService.removeDataSetExternalEndpoint(
           endpoint.dataSetId,
           endpoint.id,
-          new S3DataSetStoragePlugin(this.aws)
+          new S3DataSetStoragePlugin(this.aws),
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
@@ -242,11 +228,15 @@ export default class EnvironmentLifecycleHelper {
           dataSetId,
           externalEndpointName: datasetEndPointName,
           storageProvider: new S3DataSetStoragePlugin(this.aws),
-          groupId: `${envMetadata.projectId}#Researcher`
+          groupId: `${envMetadata.projectId}#Researcher`,
+          authenticatedUser: { id: '', roles: [] }
         });
 
-        const dataSet = await this.dataSetService.getDataSet(dataSetId);
-        const endpoint = await this.dataSetService.getExternalEndPoint(dataSetId, mountObject.endpointId);
+        const dataSet = await this.dataSetService.getDataSet(dataSetId, { id: '', roles: [] });
+        const endpoint = await this.dataSetService.getExternalEndPoint(dataSetId, mountObject.endpointId, {
+          id: '',
+          roles: []
+        });
         const endpointObj = {
           id: endpoint.id!,
           dataSetId: endpoint.dataSetId,
@@ -322,7 +312,11 @@ export default class EnvironmentLifecycleHelper {
           endpoint.dataSetId,
           endpoint.id,
           instanceRoleArn,
-          s3DataSetStoragePlugin
+          s3DataSetStoragePlugin,
+          {
+            id: '',
+            roles: []
+          }
         );
       })
     );
