@@ -9,7 +9,8 @@ import { z } from 'zod';
 export const GetAccessPermissionRequestParser = z
   .object({
     dataSetId: z.string(),
-    subject: z.string()
+    identity: z.string(),
+    identityType: z.union([z.literal('USER'), z.literal('GROUP')])
   })
   .strict();
 
