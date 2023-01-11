@@ -5,7 +5,7 @@
 
 /* eslint-disable security/detect-object-injection */
 
-import { GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, GetItemCommandOutput } from '@aws-sdk/client-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import {
   AwsService,
@@ -21,6 +21,7 @@ import Boom from '@hapi/boom';
 import _ from 'lodash';
 import CostCenter from '../models/costCenter';
 import CreateProjectRequest from '../models/createProjectRequest';
+import GetProjectRequest from '../models/getProjectRequest';
 import ListProjectsRequest from '../models/listProjectsRequest';
 import ListProjectsResponse from '../models/listProjectsResponse';
 import Project from '../models/project';
@@ -43,40 +44,49 @@ export default class ProjectService {
 
   /**
    * Get project
-   * @param projectId - Project Id of project to retrieve
+   * @param request - the request object for getting a project
    *
    * @returns Project entry in DDB
    */
-  public async getProject(projectId: string): Promise<Project> {
+  public async getProject(request: GetProjectRequest): Promise<Project> {
+    // Check permissions--TODO implement after dynamic AuthZ
+    // const dynamicOperation: DynamicOperation = {
+    //   action: 'READ',
+    //   subjectType: 'Project',
+    //   subjectId: `${projectId}`, // TODO--verify that this is correct for the full projectId since it will be proj-<uuid>
+    // };
+    // const authRequest: IsAuthorizedOnSubjectRequest = {
+    //   dynamicOperation: dynamicOperation
+    // };
+    // Will throw error if not authorized
+    // await this._dynamicAuthorizationService.isAuthorizedOnSubject(request.user, authRequest);
     const response = await this._aws.helpers.ddb
-      .get(buildDynamoDBPkSk(projectId, resourceTypeToKey.project))
+      .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
       .execute();
 
     const item = (response as GetItemCommandOutput).Item;
 
     if (item === undefined) {
-      throw Boom.notFound(`Could not find project ${projectId}`);
+      throw Boom.notFound(`Could not find project ${request.projectId}`);
     } else {
-      const project = item as unknown as Project;
-      return Promise.resolve(project);
+      return this._formatFromDDB(item);
     }
   }
 
   // TODO--delete after dynamic Authz
   private _mockGetUserGroups(): string[] {
-    return [];
+    return ['ITAdmin'];
   }
 
   /**
    * List projects
    *
-   * @param request - the optional fields to list projects
-   * @param user - authenticated user listing the projects
+   * @param request - the request object for listing projects
    * @returns Project entries in DDB
    */
   // TODO--add filter support
   public async listProjects(request: ListProjectsRequest): Promise<ListProjectsResponse> {
-    const pageSize = request.pageSize;
+    const pageSize = request.pageSize && request.pageSize >= 0 ? request.pageSize : DEFAULT_API_PAGE_SIZE;
     let paginationToken = request.paginationToken;
     // Get user groups--TODO implement after dynamic AuthZ
     // const userGroupsForCurrentUser: string[] = await this._dynamicAuthorizationService.getUserGroups(request.user.id);
@@ -93,7 +103,7 @@ export default class ProjectService {
         let queryParams: QueryParams = {
           key: { name: 'resourceType', value: this._resourceType },
           index: 'getResourceByCreatedAt',
-          limit: pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE
+          limit: pageSize
         };
 
         queryParams = addPaginationToken(paginationToken, queryParams);
@@ -102,15 +112,17 @@ export default class ProjectService {
 
         paginationToken = getPaginationToken(projectsResponse);
 
-        return {
-          data: projectsResponse.Items as unknown as Project[],
-          paginationToken: paginationToken
-        };
+        if (projectsResponse.Items) {
+          const items = projectsResponse.Items.map((item) => this._formatFromDDB(item));
+          return { data: items, paginationToken: paginationToken };
+        } else {
+          return { data: [], paginationToken: undefined };
+        }
       }
 
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
-      const project = await this.getProject(projectId);
+      const project = await this.getProject({ user: request.user, projectId: projectId });
       return { data: [project], paginationToken: undefined };
     }
 
@@ -130,13 +142,11 @@ export default class ProjectService {
       expressionAttributeValues[`:proj${i + 1}`] = projectIds[i];
     }
 
-    const pageSizeLimit = pageSize && pageSize >= 0 ? pageSize : DEFAULT_API_PAGE_SIZE;
-
     // TODO--extend to other GSIs after filtering is added
     let queryParams: QueryParams = {
       key: { name: 'resourceType', value: this._resourceType },
       index: 'getResourceByCreatedAt',
-      limit: pageSizeLimit,
+      limit: pageSize,
       filter: filterExpression,
       values: expressionAttributeValues
     };
@@ -144,38 +154,44 @@ export default class ProjectService {
     let projects: Project[] = [];
 
     let returnedCount = 0;
-    while (returnedCount < pageSizeLimit && returnedCount < projectIds.length) {
+    while (returnedCount < pageSize && returnedCount < projectIds.length) {
       queryParams = addPaginationToken(paginationToken, queryParams);
 
       const projectsResponse = await this._aws.helpers.ddb.query(queryParams).execute();
 
       returnedCount += projectsResponse.Count!;
 
+      // nothing returned
+      if (projectsResponse.Items === undefined || _.isEmpty(projectsResponse.Items)) {
+        paginationToken = getPaginationToken(projectsResponse);
+        console.log(paginationToken);
+      }
+
       // nothing else to get from DDB
-      if (projectsResponse.LastEvaluatedKey === undefined) {
-        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+      else if (projectsResponse.LastEvaluatedKey === undefined) {
+        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
         paginationToken = undefined;
       }
 
       // too little--while loop continues
-      else if (returnedCount < pageSizeLimit) {
-        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+      else if (returnedCount < pageSize) {
+        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
         paginationToken = getPaginationToken(projectsResponse);
       }
 
       // juuuust the right amount--getPaginationToken from response and exit loop
-      else if (returnedCount === pageSizeLimit) {
+      else if (returnedCount === pageSize) {
         paginationToken = getPaginationToken(projectsResponse);
-        projects = projects.concat(projectsResponse.Items as unknown as Project[]);
+        projects = projects.concat(projectsResponse.Items.map((item) => this._formatFromDDB(item)));
       }
 
       // too much--take enough to fill and manually get pagination token from reponse and exit loop
-      else if (returnedCount > pageSizeLimit) {
-        const leftoverAmount = returnedCount - pageSizeLimit;
-        const totalProjectsFromResponse = projectsResponse.Items as unknown as Project[];
+      else if (returnedCount > pageSize) {
+        const leftoverAmount = returnedCount - pageSize;
+        const totalProjectsFromResponse = projectsResponse.Items.map((item) => this._formatFromDDB(item));
         projects = projects.concat(totalProjectsFromResponse.slice(0, -leftoverAmount));
         const manualLastEvaluatedItem =
-          projectsResponse.Items![totalProjectsFromResponse.length - (leftoverAmount + 1)]; // this will be the whole entry
+          projectsResponse.Items[projectsResponse.Items.length - (leftoverAmount + 1)]; // this will be the whole entry
         // If we query on GSI, then the LastEvaluatedKey will be the compose of GSI partition key, GSI sort key, primary partition key and primary sort key.
         // TODO--extend to other GSIs after filtering is added
         const manualLastEvaluatedKey = {
@@ -302,16 +318,36 @@ export default class ProjectService {
     return newProject;
   }
 
+  /**
+   * This method formats a Project object as a DDB item containing project data
+   *
+   * @param project - The Project object to prepare for DDB
+   * @returns an object containing project data as well as pertinent DDB attributes based on project data
+   */
   private _formatForDDB(project: Project): { [key: string]: string } {
     const dynamoItem: { [key: string]: string } = {
       ...project,
       resourceType: 'project',
-      depdency: project.accountId
+      dependency: project.costCenterId
     };
 
-    delete dynamoItem.accountId;
+    delete dynamoItem.costCenterId;
 
     return dynamoItem;
+  }
+
+  /**
+   * This method formats a DDB item containing project data as a Project object
+   *
+   * @param item - the DDB item to conver to a Project object
+   * @returns a Project object containing only project data from DDB attributes
+   */
+  private _formatFromDDB(item: Record<string, AttributeValue>): Project {
+    const copyItem = { ...item };
+    const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
+    itemWithoutValues.costCenterId = copyItem.dependency;
+    const project: Project = itemWithoutValues as unknown as Project;
+    return project;
   }
 
   private async _isProjectNameInUse(projectName: string): Promise<void> {
@@ -331,7 +367,6 @@ export default class ProjectService {
         `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
       );
     }
-
     // no error so do not do anything
   }
 

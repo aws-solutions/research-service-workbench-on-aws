@@ -59,9 +59,11 @@ describe('ProjectService', () => {
   const projItem: { [key: string]: string } = {
     ...proj,
     pk: `PROJ#${projId}`,
-    sk: `PROJ#${projId}`
+    sk: `PROJ#${projId}`,
+    resourceType: 'project',
+    dependency: proj.costCenterId
   };
-  delete projItem.accountId;
+  delete projItem.costCenterId;
 
   // DDB object for cost item
   const costCenterItem = {
@@ -103,6 +105,44 @@ describe('ProjectService', () => {
       expect(actualResponse).toEqual({ data: [] });
     });
 
+    test('list projects as IT Admin when no projects exist', async () => {
+      // BUILD
+      const queryItemResponse: QueryCommandOutput = {
+        $metadata: {}
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock getUserGroups--TODO update after dynamic AuthZ intergration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      jest.spyOn(ProjectService.prototype as any, '_mockGetUserGroups').mockImplementation(() => ['ITAdmin']);
+
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByCreatedAt',
+          KeyConditionExpression: '#resourceType = :resourceType',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            }
+          },
+          Limit: 50
+        })
+        .resolves(queryItemResponse);
+
+      // OPERATE
+      const actualResponse = await projService.listProjects({ user });
+
+      // CHECK
+      expect(actualResponse.data).toEqual([]);
+    });
+
     test('list all projects as IT Admin on 1 page', async () => {
       // BUILD
       const items = [projItem];
@@ -142,7 +182,7 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects({ user });
 
       // CHECK
-      expect(actualResponse.data).toEqual(items);
+      expect(actualResponse.data).toEqual([proj]);
     });
 
     test('list all projects as IT Admin on more than 1 page -- getting first page', async () => {
@@ -151,11 +191,12 @@ describe('ProjectService', () => {
       const lastEvaluatedKey = {
         pk: projItem.pk,
         sk: projItem.sk,
+        resourceType: projItem.resourceType,
         createdAt: projItem.createdAt
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 2;
-      const expectedResponse = { data: items, paginationToken: paginationToken };
+      const expectedResponse = { data: [proj, proj], paginationToken: paginationToken };
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -202,11 +243,12 @@ describe('ProjectService', () => {
       const lastEvaluatedKey = {
         pk: projItem.pk,
         sk: projItem.sk,
+        resourceType: projItem.resourceType,
         createdAt: projItem.createdAt
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 2;
-      const expectedResponse = { data: items, paginationToken: paginationToken };
+      const expectedResponse = { data: [proj, proj], paginationToken: paginationToken };
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -249,7 +291,6 @@ describe('ProjectService', () => {
 
     test('list projects when user is only part of 1 groups', async () => {
       // BUILD
-      const items = [projItem];
       const user: AuthenticatedUser = {
         id: 'user-123',
         roles: ['PA']
@@ -279,14 +320,14 @@ describe('ProjectService', () => {
       const actualResponse = await projService.listProjects({ user });
 
       // CHECK
-      expect(actualResponse.data).toEqual(items);
+      expect(actualResponse.data).toEqual([proj]);
     });
 
     test('list all projects as user in multiple groups on 1 page when pageSize > number of projects', async () => {
       // BUILD
       const items = [projItem, projItem];
       const pageSize = 3;
-      const expectedResponse = { data: items, paginationToken: undefined };
+      const expectedResponse = { data: [proj, proj], paginationToken: undefined };
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -338,11 +379,12 @@ describe('ProjectService', () => {
       const lastEvaluatedKey = {
         pk: projItem.pk,
         sk: projItem.sk,
+        resourceType: projItem.resourceType,
         createdAt: projItem.createdAt
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 2;
-      const expectedResponse = { data: items, paginationToken: paginationToken };
+      const expectedResponse = { data: [proj, proj], paginationToken: paginationToken };
       const queryItemResponse: QueryCommandOutput = {
         Items: items.map((item) => {
           return marshall(item);
@@ -396,11 +438,12 @@ describe('ProjectService', () => {
       const lastEvaluatedKey = {
         pk: projItem.pk,
         sk: projItem.sk,
+        resourceType: projItem.resourceType,
         createdAt: projItem.createdAt
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 3;
-      const expectedResponse = { data: [...itemsP1, ...itemsP2], paginationToken: paginationToken };
+      const expectedResponse = { data: [proj, proj, proj], paginationToken: paginationToken };
       const queryItemResponse1: QueryCommandOutput = {
         Items: itemsP1.map((item) => {
           return marshall(item);
@@ -480,11 +523,12 @@ describe('ProjectService', () => {
       const lastEvaluatedKey = {
         pk: projItem.pk,
         sk: projItem.sk,
+        resourceType: projItem.resourceType,
         createdAt: projItem.createdAt
       };
       const paginationToken = Buffer.from(JSON.stringify(lastEvaluatedKey)).toString('base64');
       const pageSize = 3;
-      const expectedResponse = { data: [...itemsP1, itemsP2[0]], paginationToken: paginationToken };
+      const expectedResponse = { data: [proj, proj, proj], paginationToken: paginationToken };
       const queryItemResponse1: QueryCommandOutput = {
         Items: itemsP1.map((item) => {
           return marshall(item);
@@ -561,6 +605,13 @@ describe('ProjectService', () => {
   });
 
   describe('getProject', () => {
+    let user: AuthenticatedUser;
+    beforeAll(() => {
+      user = {
+        id: 'user-123',
+        roles: []
+      };
+    });
     test('getting 1 project', async () => {
       // BUILD
       const getItemResponse: GetItemCommandOutput = {
@@ -578,10 +629,10 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject('proj-123');
+      const actualResponse = await projService.getProject({ user, projectId: 'proj-123' });
 
       // CHECK
-      expect(actualResponse).toEqual(getItemResponse.Item);
+      expect(actualResponse).toEqual(proj);
     });
 
     test('getting no object', async () => {
@@ -601,7 +652,9 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject('proj-123')).rejects.toThrow('Could not find project proj-123');
+      await expect(projService.getProject({ user, projectId: 'proj-123' })).rejects.toThrow(
+        'Could not find project proj-123'
+      );
     });
   });
 
@@ -609,9 +662,9 @@ describe('ProjectService', () => {
     test('create a project with valid name', async () => {
       // BUILD
       const params = {
-        name: projItem.name,
-        description: projItem.description,
-        costCenterId: projItem.costCenterId
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -686,9 +739,9 @@ describe('ProjectService', () => {
     test('fail on create a project with name already in use', async () => {
       // BUILD
       const params = {
-        name: projItem.name,
-        description: projItem.description,
-        costCenterId: projItem.costCenterId
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -745,9 +798,9 @@ describe('ProjectService', () => {
     test('fail on create a project with invalid cost center id', async () => {
       // BUILD
       const params = {
-        name: projItem.name,
-        description: projItem.description,
-        costCenterId: projItem.costCenterId
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
       };
       const user: AuthenticatedUser = {
         id: 'user-123',
@@ -794,6 +847,65 @@ describe('ProjectService', () => {
       await expect(projService.createProject(params, user)).rejects.toThrow(
         'Could not find cost center cc-123'
       );
+    });
+
+    test('fail on update to DDB call', async () => {
+      // BUILD
+      const params = {
+        name: proj.name,
+        description: proj.description,
+        costCenterId: proj.costCenterId
+      };
+      const user: AuthenticatedUser = {
+        id: 'user-123',
+        roles: ['ITAdmin']
+      };
+
+      // mock isProjectNameInUse call
+      const isProjectNameValidQueryItemResponse: QueryCommandOutput = {
+        Count: 0,
+        $metadata: {}
+      };
+      ddbMock
+        .on(QueryCommand, {
+          TableName: 'exampleDDBTable',
+          IndexName: 'getResourceByName',
+          KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
+          ExpressionAttributeNames: {
+            '#resourceType': 'resourceType',
+            '#name': 'name'
+          },
+          ExpressionAttributeValues: {
+            ':resourceType': {
+              S: 'project'
+            },
+            ':name': {
+              S: 'Example project'
+            }
+          }
+        })
+        .resolves(isProjectNameValidQueryItemResponse);
+
+      // mock getCostCenter call
+      const getCostCenterGetItemResponse: GetItemCommandOutput = {
+        Item: marshall(costCenterItem),
+        $metadata: {}
+      };
+      ddbMock
+        .on(GetItemCommand, {
+          TableName: 'exampleDDBTable',
+          Key: marshall({
+            pk: 'CC#cc-123',
+            sk: 'CC#cc-123'
+          })
+        })
+        .resolves(getCostCenterGetItemResponse);
+
+      // mock update to DDB
+      ddbMock.on(UpdateItemCommand).rejects('Failed to update DDB');
+
+      // OPERATE n CHECK
+      await expect(projService.createProject(params, user)).rejects.toThrow('Failed to create project');
     });
   });
 });
