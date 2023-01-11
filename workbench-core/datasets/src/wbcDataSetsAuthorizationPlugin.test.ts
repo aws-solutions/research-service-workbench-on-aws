@@ -543,4 +543,43 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
       ]);
     });
   });
+
+  describe('getAccessPermissions tests', () => {
+    it('needs to be implemented', async () => {
+      await expect(
+        plugin.getAccessPermissions(getAccessPermission)
+      ).resolves.toMatchObject<PermissionsResponse>({
+        data: {
+          dataSetId: getAccessPermission.dataSetId,
+          permissions: [
+            { identity: getAccessPermission.subject, identityType: 'USER', accessLevel: 'read-write' }
+          ]
+        }
+      });
+    });
+  });
+
+  describe('removeAccessPermission tests', () => {
+    it('throws a notimplemented exception', async () => {
+      await expect(plugin.removeAccessPermissions(readOnlyAccessPermission)).rejects.toThrow(
+        new Error('Method not implemented.')
+      );
+    });
+  });
+
+  describe('getAllDataSetAccessPermissions tests', () => {
+    it('throws a notimplemented exception', async () => {
+      await expect(plugin.getAllDataSetAccessPermissions(dataSetId)).rejects.toThrow(
+        new Error('Method not implemented.')
+      );
+    });
+  });
+
+  describe('removeAllAccessPermissions tests', () => {
+    it('throws a notimplemented exception', async () => {
+      await expect(plugin.removeAllAccessPermissions(dataSetId)).rejects.toThrow(
+        new Error('Method not implemented.')
+      );
+    });
+  });
 });

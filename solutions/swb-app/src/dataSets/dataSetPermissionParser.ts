@@ -4,13 +4,14 @@
  */
 
 import { z } from 'zod';
+import { DataSetAccessLevelParser } from './dataSetAccessLevelParser';
 
 // eslint-disable-next-line @rushstack/typedef-var
 export const DataSetPermissionParser = z
   .object({
     identityType: z.union([z.literal('USER'), z.literal('GROUP')]),
     identity: z.string(),
-    accessLevel: z.union([z.literal('read-only'), z.literal('read-write')])
+    accessLevel: DataSetAccessLevelParser
   })
   .strict();
 
