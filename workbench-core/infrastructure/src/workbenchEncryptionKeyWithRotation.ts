@@ -34,8 +34,7 @@ export class WorkbenchEncryptionKeyWithRotation extends Construct {
     });
 
     new CfnOutput(this, id, {
-      value: this.key.keyArn,
-      exportName: id
+      value: this.key.keyArn
     });
   }
 }

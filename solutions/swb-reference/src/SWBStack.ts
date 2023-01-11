@@ -157,13 +157,11 @@ export class SWBStack extends Stack {
     this._s3AccessLogsPrefix = S3_ACCESS_BUCKET_PREFIX;
     this._accessLogsBucket = this._createAccessLogsBucket(S3_ACCESS_LOGS_BUCKET_NAME_OUTPUT_KEY);
 
-    const S3DatasetEncryptionKey: WorkbenchEncryptionKeyWithRotation = new WorkbenchEncryptionKeyWithRotation(
-      this,
-      S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY
-    );
+    const S3DatasetsEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, S3_DATASETS_ENCRYPTION_KEY_ARN_OUTPUT_KEY);
     const datasetBucket = this._createS3DatasetsBuckets(
       S3_DATASETS_BUCKET_ARN_OUTPUT_KEY,
-      S3DatasetEncryptionKey.key
+      S3DatasetsEncryptionKey.key
     );
 
     const S3ArtifactEncryptionKey: WorkbenchEncryptionKeyWithRotation =
@@ -458,12 +456,12 @@ export class SWBStack extends Stack {
     );
   }
 
-  private _createS3ArtifactsBuckets(s3ArtifactName: string, encryptionKey: Key): Bucket {
-    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, encryptionKey);
+  private _createS3ArtifactsBuckets(s3ArtifactName: string, s3ArtifactsEncryptionKey: Key): Bucket {
+    return this._createSecureS3Bucket('s3-artifacts', s3ArtifactName, s3ArtifactsEncryptionKey);
   }
 
-  private _createS3DatasetsBuckets(s3DatasetsName: string, encryptionKey: Key): Bucket {
-    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, encryptionKey);
+  private _createS3DatasetsBuckets(s3DatasetsName: string, s3DatasetsEncryptionKey: Key): Bucket {
+    const bucket: Bucket = this._createSecureS3Bucket('s3-datasets', s3DatasetsName, s3DatasetsEncryptionKey);
     this._addAccessPointDelegationStatement(bucket);
 
     new CfnOutput(this, 'DataSetsBucketName', {
