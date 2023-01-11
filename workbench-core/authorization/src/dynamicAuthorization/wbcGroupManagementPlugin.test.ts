@@ -172,9 +172,6 @@ describe('WBCGroupManagemntPlugin', () => {
       [TooManyRequestsError, new TooManyRequestsError('test error')],
       [Error, new Error('test error')]
     ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
-      wbcGroupManagementPlugin.getGroupStatus = jest.fn().mockResolvedValue({
-        data: { status: 'active' }
-      });
       mockUserManagementPlugin.deleteRole = jest.fn().mockRejectedValue(error);
 
       await expect(

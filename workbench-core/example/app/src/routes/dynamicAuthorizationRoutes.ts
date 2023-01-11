@@ -110,18 +110,18 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
     '/authorization/groups/:groupId',
     wrapAsync(async (req: Request, res: Response) => {
       try {
-        await service.deleteGroup({
+        const response = await service.deleteGroup({
           groupId: req.params.groupId,
           authenticatedUser: res.locals.user
         });
 
-        res.status(204).send();
+        res.status(200).send(response);
       } catch (error) {
         if (isGroupNotFoundError(error)) {
           throw Boom.notFound(error.message);
         }
         if (isRetryError(error)) {
-          throw Boom.serverUnavailable('Request a retry');
+          throw Boom.serverUnavailable('Failed to delete group permissions. Please request a retry');
         }
         throw error;
       }

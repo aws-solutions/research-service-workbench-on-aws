@@ -32,8 +32,8 @@ export default class Group extends Resource {
   }
 
   public async delete(): Promise<void> {
+    await super.delete();
     this._clientSession.removeCleanupTask(`group-${this.id}`);
-    return super.delete();
   }
 
   public async cleanup(): Promise<void> {
