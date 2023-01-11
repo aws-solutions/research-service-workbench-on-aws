@@ -282,14 +282,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
     });
   });
 
-  describe('getAccessPermissions tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.getAccessPermissions(getAccessPermission)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
-    });
-  });
-
   describe('removeAccessPermission tests', () => {
     it('throws a invalidPermission exception when identityType is not USER or GROUP', async () => {
       await expect(
@@ -556,14 +548,6 @@ describe('wbcDataSetsAuthorizationPlugin tests', () => {
           ]
         }
       });
-    });
-  });
-
-  describe('removeAccessPermission tests', () => {
-    it('throws a notimplemented exception', async () => {
-      await expect(plugin.removeAccessPermissions(readOnlyAccessPermission)).rejects.toThrow(
-        new Error('Method not implemented.')
-      );
     });
   });
 
