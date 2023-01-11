@@ -100,7 +100,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     const permissionsResponse = this._identityPermissionsToPermissionsResponse(identityPermissions);
 
     const permissionsCount = permissionsResponse.length;
-    if (permissionsCount !== 1) {
+    if (permissionsCount > 1) {
       throw new InvalidPermissionError(
         `Expected a single permissions response, but got ${permissionsCount}.`
       );
@@ -130,7 +130,7 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     const permissionsResponse = this._identityPermissionsToPermissionsResponse(identityPermissions);
 
     const permissionsCount = permissionsResponse.length;
-    if (permissionsCount !== 1) {
+    if (permissionsCount > 1) {
       throw new InvalidPermissionError(
         `Expected a single permissions response, but got ${permissionsCount}.`
       );

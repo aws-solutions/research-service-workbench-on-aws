@@ -48,6 +48,26 @@ export default class Dataset extends Resource {
     return new Endpoint(params);
   }
 
+  public async getAllAccess(): Promise<PermissionsResponse> {
+    const response: AxiosResponse = await this._axiosInstance.get(`${this._api}/permissions`);
+    return validateAndParse(PermissionsResponseParser, response.data);
+  }
+
+  public async getAccess(identityType: 'GROUP' | 'USER', identity: string): Promise<PermissionsResponse> {
+    let routeId: string;
+    if (identityType === 'GROUP') {
+      routeId = 'roles';
+    } else if (identityType === 'USER') {
+      routeId = 'users';
+    } else {
+      throw new Error('identity type must be "USER" or "GROUP"');
+    }
+    const response: AxiosResponse = await this._axiosInstance.get(
+      `${this._api}/permissions/${routeId}/${identity}}`
+    );
+    return validateAndParse(PermissionsResponseParser, response.data);
+  }
+
   public async addAccess(requestBody: Record<string, unknown>): Promise<PermissionsResponse> {
     const randomTextGenerator = new RandomTextGenerator(this._settings.get('runId'));
     const response: AxiosResponse = await this._axiosInstance.post(`${this._api}/permissions`, requestBody);
