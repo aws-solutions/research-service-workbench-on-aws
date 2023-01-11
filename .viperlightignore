@@ -49,32 +49,3 @@ solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivat
 solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
 solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
-
-# Test files
-#SecretAccessKey=\'sampleSecretAccessKey\' is not real secret
-solutions/swb-reference/src/environment/sagemakerNotebook/sagemakerNotebookEnvironmentConnectionService.test.ts:26
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:168
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:228
-# SecretAccessKey: 'sampleSecretAccessKey' is not real secret
-workbench-core/environments/src/utilities/environmentLifecycleHelper.test.ts:271
-# email: 'john@doe.com' is not real email
-workbench-core/authentication/src/plugins/cognitoUserManagementPlugin.test.ts:46
-# email: 'sample.user@amazon.com' is not real email
-solutions/example-ui-app/src/models/User.ts:19
-# "email": "hello@cypress.io" is not real email
-solutions/swb-ui/ui/end-to-end-tests/cypress/fixtures/example.json:3
-# Fake emails for UserManagementService integ tests
-workbench-core/example/infrastructure/integration-tests/tests/users/activateDeactivateUser.test.ts:30
-workbench-core/example/infrastructure/integration-tests/tests/users/createUser.test.ts:23
-workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:31
-workbench-core/example/infrastructure/integration-tests/tests/users/listUsers.test.ts:37
-#Fake email used
-workbench-core/example/infrastructure/scripts/setupCognito.sh:43
-workbench-core/example/infrastructure/scripts/setupCognito.sh:44
-# Fake emails for UserManagementService integ tests
-solutions/swb-reference/integration-tests/tests/isolated/users/activateDeactivateUser.test.ts:31
-solutions/swb-reference/integration-tests/tests/isolated/users/createUser.test.ts:24
-solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:29
-solutions/swb-reference/integration-tests/tests/multiStep/userApi.test.ts:83
