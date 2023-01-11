@@ -4,6 +4,7 @@
  */
 
 import { DataSet } from './dataSet';
+import { DataSetAccessLevel } from './dataSetAccessLevelParser';
 import { EndpointConnectionStrings } from './endpointConnectionStrings';
 
 export interface DataSetStoragePlugin {
@@ -50,15 +51,16 @@ export interface DataSetStoragePlugin {
    *
    * @returns an object containing the endpoint's URL and an optional alias which can be used to find the endpoint.
    */
-  addExternalEndpoint(
-    name: string,
-    path: string,
-    externalEndpointName: string,
-    ownerAccountId: string,
-    externalRoleName?: string,
-    kmsKeyArn?: string,
-    vpcId?: string
-  ): Promise<EndpointConnectionStrings>;
+  addExternalEndpoint(request: {
+    name: string;
+    path: string;
+    externalEndpointName: string;
+    ownerAccountId: string;
+    accessLevel: DataSetAccessLevel;
+    externalRoleName?: string;
+    kmsKeyArn?: string;
+    vpcId?: string;
+  }): Promise<{ data: { connections: EndpointConnectionStrings } }>;
 
   /**
    * Removes an existing dataset connection which was used for access by an external environment
