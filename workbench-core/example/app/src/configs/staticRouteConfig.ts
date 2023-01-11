@@ -258,6 +258,22 @@ export const routesMap: RoutesMap = {
         subject: 'IdentityPermission'
       }
     ]
+  },
+  '/authorization/routes/ignored': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
+      }
+    ]
+  },
+  '/authorization/routes/protected': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
+      }
+    ]
   }
 };
 

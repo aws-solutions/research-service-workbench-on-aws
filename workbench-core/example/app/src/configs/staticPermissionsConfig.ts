@@ -145,6 +145,11 @@ const adminPermissions: Permission[] = [
     effect: 'ALLOW',
     action: 'DELETE',
     subject: 'IdentityPermission'
+  },
+  {
+    effect: 'ALLOW',
+    action: 'READ',
+    subject: 'Routes'
   }
 ];
 

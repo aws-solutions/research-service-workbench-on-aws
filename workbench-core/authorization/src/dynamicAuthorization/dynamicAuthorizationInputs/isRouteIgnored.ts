@@ -3,28 +3,35 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { HTTPMethod } from '../../routesMap';
+import { z } from 'zod';
+import { HTTPMethodParser } from '../../routesMap';
 
-/**
- * Request object for IsRouteIgnored
- */
-export interface IsRouteIgnoredRequest {
+// eslint-disable-next-line @rushstack/typedef-var
+export const IsRouteIgnoredRequestParser = z.object({
   /**
    * Route being checked
    */
-  route: string;
+  route: z.string(),
 
   /**
    * {@link HTTPMethod}
    */
-  method: HTTPMethod;
-}
+  method: HTTPMethodParser
+});
+
+/**
+ * Request object for IsRouteIgnored
+ */
+export type IsRouteIgnoredRequest = z.infer<typeof IsRouteIgnoredRequestParser>;
+
 /**
  * Response object for IsRouteIgnored
  */
 export interface IsRouteIgnoredResponse {
-  /**
-   * Describes if route is ignored
-   */
-  routeIgnored: boolean;
+  data: {
+    /**
+     * Describes if route is ignored
+     */
+    routeIgnored: boolean;
+  };
 }

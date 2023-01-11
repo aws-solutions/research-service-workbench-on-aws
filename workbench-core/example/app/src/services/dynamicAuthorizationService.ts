@@ -10,6 +10,7 @@ import {
   WBCGroupManagementPlugin
 } from '@aws/workbench-core-authorization';
 import { authorizationGroupPrefix } from '../configs/constants';
+import { dynamicRoutesMap, routesIgnored } from '../configs/dynamicRouteConfig';
 import { auditService } from './auditService';
 import { dynamicAuthAws } from './awsService';
 import { userManagementService } from './userManagementService';
@@ -22,7 +23,9 @@ const wbcGroupManagementPlugin: WBCGroupManagementPlugin = new WBCGroupManagemen
 
 const ddbDynamicAuthorizationPermissionsPlugin: DynamicAuthorizationPermissionsPlugin =
   new DDBDynamicAuthorizationPermissionsPlugin({
-    dynamoDBService: dynamicAuthAws.helpers.ddb
+    dynamoDBService: dynamicAuthAws.helpers.ddb,
+    routesIgnored: routesIgnored,
+    dynamicRoutesMap: dynamicRoutesMap
   });
 
 export const dynamicAuthorizationService: DynamicAuthorizationService = new DynamicAuthorizationService({
