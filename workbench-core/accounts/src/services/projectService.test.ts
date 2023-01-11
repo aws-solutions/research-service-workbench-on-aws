@@ -20,12 +20,14 @@ import {
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
+import Query from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/query';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { ProjectStatus } from '../constants/projectStatus';
 import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
 import { Project } from '../models/projects/project';
+import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
@@ -1638,6 +1640,281 @@ describe('ProjectService', () => {
     });
   });
 
+  describe('updateProject', () => {
+    let projectName: string;
+    let projectDescription: string;
+    let updatedProject1: Project;
+    let updatedProjItem1: typeof projItem1;
+
+    let projectId: string;
+    let updatedValues: Record<string, string>;
+    let request: UpdateProjectRequest;
+
+    beforeEach(() => {
+      projectName = project1.name;
+      projectDescription = project1.description;
+      request = { projectId, updatedValues };
+      updatedProject1 = {
+        ...project1,
+        name: projectName,
+        description: projectDescription
+      };
+
+      updatedProjItem1 = {
+        ...updatedProject1,
+        pk: `PROJ#${project1.id}`,
+        sk: `PROJ#${project1.id}`,
+        resourceType: 'project',
+        dependency: updatedProject1.costCenterId
+      };
+    });
+
+    describe('if empty string was passed', () => {
+      beforeEach(() => {
+        request.projectId = updatedProject1.id;
+        request.updatedValues = { name: '', description: '' };
+      });
+
+      test('it should fail', async () => {
+        await expect(() => projService.updateProject(request)).rejects.toThrow(
+          'You must supply a new nonempty name and/or description to update the project.'
+        );
+      });
+    });
+
+    describe('if nothing was passed to update', () => {
+      beforeEach(() => {
+        request.projectId = updatedProject1.id;
+        request.updatedValues = {};
+      });
+
+      test('it should fail', async () => {
+        await expect(() => projService.updateProject(request)).rejects.toThrow(
+          'You must supply a new nonempty name and/or description to update the project.'
+        );
+      });
+    });
+
+    describe('trying to update project name', () => {
+      let updateItemResponse: UpdateItemCommandOutput;
+
+      describe('if project does not exist', () => {
+        beforeEach(() => {
+          projectName = 'New Project Name';
+          updatedProject1.name = projectName;
+          request.projectId = 'Invalid project id';
+          request.updatedValues = { name: projectName };
+
+          // mock get project ddb call
+          const getItemResponse: GetItemCommandOutput = {
+            Item: undefined,
+            $metadata: {}
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+
+          // mock query name ddb call
+          const queryItemResponse: QueryCommandOutput = {
+            Items: [],
+            $metadata: {},
+            Count: 0
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          jest.spyOn(Query.prototype as any, 'execute').mockImplementationOnce(() => queryItemResponse);
+        });
+
+        test('it should fail', async () => {
+          await expect(() => projService.updateProject(request)).rejects.toThrow(
+            `Could not find project ${request.projectId}`
+          );
+        });
+      });
+
+      describe('if project exists', () => {
+        beforeEach(() => {
+          projectName = 'New Project Name';
+          updatedProject1.name = projectName;
+          request.projectId = 'Invalid project id';
+          request.updatedValues = { name: projectName };
+
+          // mock get project ddb call
+          const getItemResponse: GetItemCommandOutput = {
+            Item: marshall(projItem1),
+            $metadata: {}
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+        });
+
+        describe('and name is already in use', () => {
+          beforeEach(() => {
+            projectName = 'Existing Project Name';
+            updatedProject1.name = projectName;
+            request.projectId = updatedProject1.id;
+            request.updatedValues = { name: projectName };
+
+            // mock query name ddb call
+            const queryItemResponse: QueryCommandOutput = {
+              Items: [marshall(projItem1)],
+              $metadata: {}
+            };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            jest.spyOn(Query.prototype as any, 'execute').mockImplementationOnce(() => queryItemResponse);
+          });
+
+          test('it should fail', async () => {
+            await expect(() => projService.updateProject(request)).rejects.toThrow(
+              `Project name "${projectName}" is in use by a non deleted project. Please use another name.`
+            );
+          });
+        });
+
+        describe('and name is not in use', () => {
+          beforeEach(() => {
+            projectName = 'New Project Name';
+            updatedProject1.name = projectName;
+            updatedProjItem1.name = projectName;
+            request.projectId = updatedProject1.id;
+            request.updatedValues = { name: projectName };
+
+            // mock query name ddb call
+            const queryItemResponse: QueryCommandOutput = {
+              Items: [],
+              $metadata: {},
+              Count: 0
+            };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            jest.spyOn(Query.prototype as any, 'execute').mockImplementationOnce(() => queryItemResponse);
+
+            jest
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .spyOn(Updater.prototype as any, 'execute')
+              .mockImplementationOnce(() => updateItemResponse);
+          });
+
+          describe('and update succeeds', () => {
+            beforeEach(() => {
+              // mock update project ddb call
+              updateItemResponse = {
+                Attributes: marshall(updatedProjItem1),
+                $metadata: {}
+              };
+            });
+
+            test('it should pass', async () => {
+              // OPERATE
+              const actualResponse = await projService.updateProject(request);
+
+              // CHECK
+              expect(actualResponse).toEqual(updatedProject1);
+            });
+          });
+
+          describe('and update fails', () => {
+            beforeEach(() => {
+              // mock update project ddb call
+              updateItemResponse = {
+                Attributes: undefined,
+                $metadata: {}
+              };
+            });
+
+            test('it should fail', async () => {
+              // OPERATE n CHECK
+              await expect(() => projService.updateProject(request)).rejects.toThrow(
+                'Could not update project.'
+              );
+            });
+          });
+        });
+      });
+    });
+
+    describe('trying to update project description', () => {
+      beforeEach(() => {
+        projectDescription = 'New Project Description';
+        updatedProject1.description = projectDescription;
+        updatedProjItem1.description = projectDescription;
+        request.updatedValues = { description: projectDescription };
+      });
+
+      describe('if projectId is invalid', () => {
+        beforeEach(() => {
+          request.projectId = 'Invalid project id';
+
+          // mock get project ddb call
+          const getItemResponse: GetItemCommandOutput = {
+            Item: undefined,
+            $metadata: {}
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+        });
+
+        test('it should fail', async () => {
+          await expect(() => projService.updateProject(request)).rejects.toThrow(
+            `Could not find project ${request.projectId}`
+          );
+        });
+      });
+
+      describe('if projectId is valid', () => {
+        let updateItemResponse: UpdateItemCommandOutput;
+        beforeEach(() => {
+          request.projectId = updatedProject1.id;
+
+          // mock get project ddb call
+          const getItemResponse: GetItemCommandOutput = {
+            Item: marshall(projItem1),
+            $metadata: {}
+          };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+
+          jest
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .spyOn(Updater.prototype as any, 'execute')
+            .mockImplementationOnce(() => updateItemResponse);
+        });
+
+        describe('and update succeeds', () => {
+          beforeEach(() => {
+            // mock update project ddb call
+            updateItemResponse = {
+              Attributes: marshall(updatedProjItem1),
+              $metadata: {}
+            };
+          });
+
+          test('it should pass', async () => {
+            // OPERATE
+            const actualResponse = await projService.updateProject(request);
+
+            // CHECK
+            expect(actualResponse).toEqual(updatedProject1);
+          });
+        });
+
+        describe('and update fails', () => {
+          beforeEach(() => {
+            // mock update project ddb call
+            updateItemResponse = {
+              Attributes: undefined,
+              $metadata: {}
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.updateProject(request)).rejects.toThrow(
+              'Could not update project.'
+            );
+          });
+        });
+      });
+    });
+  });
+
   describe('softDeleteProject', () => {
     const deletedProject1: Project = {
       ...project1,
@@ -1750,29 +2027,29 @@ describe('ProjectService', () => {
             );
           });
         });
+      });
 
-        describe('if dependencies do not exist', () => {
-          let updateItemResponse: UpdateItemCommandOutput;
+      describe('if dependencies do not exist', () => {
+        let updateItemResponse: UpdateItemCommandOutput;
+        beforeEach(() => {
+          jest
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .spyOn(Updater.prototype as any, 'execute')
+            .mockImplementationOnce(() => updateItemResponse);
+        });
+
+        describe('and DDB update succeeds', () => {
           beforeEach(() => {
-            jest
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              .spyOn(Updater.prototype as any, 'execute')
-              .mockImplementationOnce(() => updateItemResponse);
+            // mock update project ddb call
+            updateItemResponse = {
+              Attributes: marshall(deletedProjItem1),
+              $metadata: {}
+            };
           });
 
-          describe('and DDB update succeeds', () => {
-            beforeEach(() => {
-              // mock update project ddb call
-              updateItemResponse = {
-                Attributes: marshall(deletedProjItem1),
-                $metadata: {}
-              };
-            });
-
-            test('it should pass', async () => {
-              // OPERATE n CHECK
-              await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
-            });
+          test('it should pass', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
           });
         });
       });

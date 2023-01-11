@@ -1119,6 +1119,44 @@
           "response": []
         },
         {
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"New name\",\n    \"description\": \"New description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "proj-123"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Associate project with EnvTypeConfig",
           "request": {
             "method": "PUT",

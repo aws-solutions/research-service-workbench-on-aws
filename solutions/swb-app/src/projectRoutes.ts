@@ -8,6 +8,8 @@ import {
   CreateProjectRequest,
   ListProjectsRequest,
   ListProjectsRequestParser,
+  UpdateProjectRequest,
+  UpdateProjectRequestParser,
   GetProjectRequest,
   DeleteProjectRequest,
   DeleteProjectRequestParser
@@ -140,6 +142,19 @@ export function setUpProjectRoutes(
       // delete project
       await projectService.softDeleteProject(validatedRequest, checkDependencies);
       res.status(204).send();
+    })
+  );
+
+  // Update project
+  router.patch(
+    '/projects/:projectId',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<UpdateProjectRequest>(UpdateProjectRequestParser, {
+        projectId: req.params.projectId,
+        updatedValues: { ...req.body }
+      });
+
+      res.send(await projectService.updateProject(validatedRequest));
     })
   );
 }

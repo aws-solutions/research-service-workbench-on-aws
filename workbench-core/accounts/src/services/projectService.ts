@@ -32,6 +32,7 @@ import GetProjectRequest from '../models/projects/getProjectRequest';
 import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
 import ListProjectsResponse from '../models/projects/listProjectsResponse';
 import { Project } from '../models/projects/project';
+import { UpdateProjectRequest } from '../models/projects/updateProjectRequest';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
 
@@ -271,6 +272,47 @@ export default class ProjectService {
   }
 
   /**
+   * Update the name or description of an existing project.
+   *
+   * @param request - a {@link UpdateProjectRequest} object that contains the id of the project to update
+   *                  as well as the new field values
+   * @returns a {@link Project} object that reflects the changes requested
+   */
+  public async updateProject(request: UpdateProjectRequest): Promise<Project> {
+    const { projectId, updatedValues } = request;
+
+    // verify at least one attribute is being updated
+    if (!updatedValues.name && !updatedValues.description) {
+      throw Boom.badRequest('You must supply a new nonempty name and/or description to update the project.');
+    }
+
+    // if updating name, verify it is not in use and project exists
+    if (updatedValues.name) {
+      await Promise.all([this._isProjectNameInUse(updatedValues.name), this.getProject({ projectId })]);
+    } else {
+      // else, verify project still exists
+      await this.getProject({ projectId });
+    }
+
+    // update project DDB item
+    try {
+      const updateResponse = await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(projectId, resourceTypeToKey.project),
+        params: { item: updatedValues, return: 'ALL_NEW' }
+      });
+
+      if (!updateResponse.Attributes) {
+        throw Boom.badImplementation('Could not update project.');
+      }
+
+      return this._mapToProjectFromDDBItem(updateResponse.Attributes);
+    } catch (e) {
+      console.error(`Failed to update project ${request.projectId}}`, e);
+      throw Boom.internal('Could not update project.');
+    }
+  }
+
+  /**
    * Soft deletes a project from the database.
    *
    * @param request - a {@link DeleteProjectRequest} object that contains the id of the project to delete
@@ -353,7 +395,6 @@ export default class ProjectService {
     const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
     itemWithoutValues.costCenterId = copyItem.dependency;
     const project: Project = itemWithoutValues as unknown as Project;
-    console.log(project);
     return project;
   }
 

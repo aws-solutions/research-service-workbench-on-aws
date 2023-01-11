@@ -23,6 +23,7 @@ import CreateProjectRequest from './models/projects/createProjectRequest';
 import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
 import GetProjectRequest from './models/projects/getProjectRequest';
 import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
+import { UpdateProjectRequest, UpdateProjectRequestParser } from './models/projects/updateProjectRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
@@ -43,6 +44,14 @@ export {
   ProjectService,
   CreateAccountSchema,
   CreateCostCenterRequest,
+  CreateProjectRequest,
+  ListProjectsRequest,
+  ListProjectsRequestParser,
+  UpdateProjectRequest,
+  UpdateProjectRequestParser,
+  GetProjectRequest,
+  DeleteProjectRequest,
+  DeleteProjectRequestParser,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
   UpdateCostCenterRequest,
@@ -55,11 +64,5 @@ export {
   CreateAccountData,
   UpdateAccountData,
   ListAccountRequest,
-  ListAccountsRequestParser,
-  CreateProjectRequest,
-  ListProjectsRequest,
-  ListProjectsRequestParser,
-  GetProjectRequest,
-  DeleteProjectRequest,
-  DeleteProjectRequestParser
+  ListAccountsRequestParser
 };
