@@ -181,4 +181,21 @@ const dataSetPrefix: string = 'DATASET';
 const endPointPrefix: string = 'ENDPOINT';
 const authorizationGroupPrefix: string = 'GROUP';
 
-export { getConstants, getConstantsWithSecrets, dataSetPrefix, endPointPrefix, authorizationGroupPrefix };
+const enum SwbAuthZSubject {
+  SWB_DATASET = 'SWB_DATASET',
+  SWB_ENVIRONMENT = 'SWB_ENVIRONMENT',
+  SWB_ENVIRONMENT_TYPE = 'SWB_ENVIRONMENT_TYPE',
+  SWB_ETC = 'SWB_ETC',
+  SWB_PROJECT = 'SWB_PROJECT',
+  SWB_SSH_KEY = 'SWB_SSH_KEY',
+  SWB_USER = 'SWB_USER'
+}
+
+export {
+  getConstants,
+  getConstantsWithSecrets,
+  dataSetPrefix,
+  endPointPrefix,
+  authorizationGroupPrefix,
+  SwbAuthZSubject
+};
