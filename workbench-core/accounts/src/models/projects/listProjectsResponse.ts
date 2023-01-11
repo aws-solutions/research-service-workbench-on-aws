@@ -3,7 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import Project from './project';
+import { Project } from './project';
 
 interface ListProjectsResponse {
   data: Project[];

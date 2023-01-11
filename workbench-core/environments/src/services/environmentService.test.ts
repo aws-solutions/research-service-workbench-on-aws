@@ -1192,4 +1192,42 @@ describe('EnvironmentService', () => {
       );
     });
   });
+
+  describe('doesDependencyHaveEnvironments', () => {
+    describe('when dependencies exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: ['someDependency'] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to true', async () => {
+        // OPERATE
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
+
+        // CHECK
+        expect(result).toEqual(true);
+      });
+    });
+
+    describe('when dependencies do not exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: [] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to false', async () => {
+        // OPERATE
+        const result = await envService.doesDependencyHaveEnvironments('dependency');
+
+        // CHECK
+        expect(result).toEqual(false);
+      });
+    });
+  });
 });

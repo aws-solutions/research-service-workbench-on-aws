@@ -14,13 +14,19 @@ import {
   GetItemCommandOutput,
   QueryCommand,
   QueryCommandOutput,
-  UpdateItemCommand
+  UpdateItemCommand,
+  UpdateItemCommandOutput
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
+import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
+import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
+import Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { ProjectStatus } from '../constants/projectStatus';
-import Project from '../models/project';
+import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
+import { Project } from '../models/projects/project';
 import ProjectService from './projectService';
 
 describe('ProjectService', () => {
@@ -1353,7 +1359,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE
-      const actualResponse = await projService.getProject({ user, projectId: 'proj-123' });
+      const actualResponse = await projService.getProject({ projectId: 'proj-123' });
 
       // CHECK
       expect(actualResponse).toEqual(proj);
@@ -1376,7 +1382,7 @@ describe('ProjectService', () => {
         .resolves(getItemResponse);
 
       // OPERATE & CHECk
-      await expect(projService.getProject({ user, projectId: 'proj-123' })).rejects.toThrow(
+      await expect(projService.getProject({ projectId: 'proj-123' })).rejects.toThrow(
         'Could not find project proj-123'
       );
     });
@@ -1630,6 +1636,186 @@ describe('ProjectService', () => {
 
       // OPERATE n CHECK
       await expect(projService.createProject(params, user)).rejects.toThrow('Failed to create project');
+    });
+  });
+
+  describe('softDeleteProject', () => {
+    const deletedProject1: Project = {
+      ...project1,
+      status: ProjectStatus.DELETED
+    };
+
+    const deletedProjItem1 = {
+      ...deletedProject1,
+      pk: `PROJ#${project1.id}`,
+      sk: `PROJ#${project1.id}`,
+      resourceType: 'deleted_project',
+      dependency: deletedProject1.costCenterId
+    };
+
+    let projectId: string;
+    let request: DeleteProjectRequest;
+    let checkDependency = async function (projectId: string): Promise<void> {
+      return;
+    };
+
+    beforeEach(() => {
+      request = { projectId };
+      checkDependency = async function (projectId: string): Promise<void> {
+        return;
+      };
+    });
+
+    describe('if project does not exist', () => {
+      beforeEach(() => {
+        request.projectId = 'invalid-proj-id';
+
+        // mock get project ddb call
+        const getItemResponse: GetItemCommandOutput = {
+          Item: undefined,
+          $metadata: {}
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+      });
+
+      test('it should fail', async () => {
+        // OPERATE n CHECK
+        await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+          `Could not find project ${request.projectId}`
+        );
+      });
+    });
+
+    describe('if projectId is valid', () => {
+      beforeEach(() => {
+        request.projectId = deletedProject1.id;
+
+        // mock get project ddb call
+        const getItemResponse: GetItemCommandOutput = {
+          Item: marshall(deletedProjItem1),
+          $metadata: {}
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        jest.spyOn(Getter.prototype as any, 'execute').mockImplementationOnce(() => getItemResponse);
+      });
+
+      describe('if dependencies exist', () => {
+        describe('of type environment', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environments(s) associated with it`
+            );
+          });
+        });
+
+        describe('of type dataset', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has dataset(s) associated with it`
+            );
+          });
+        });
+
+        describe('of type environment type config', () => {
+          beforeEach(() => {
+            checkDependency = async function (projectId: string): Promise<void> {
+              throw Boom.conflict(
+                `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
+              );
+            };
+          });
+
+          test('it should fail', async () => {
+            // OPERATE n CHECK
+            await expect(() => projService.softDeleteProject(request, checkDependency)).rejects.toThrow(
+              `Project ${request.projectId} cannot be deleted because it has environment type config(s) associated with it`
+            );
+          });
+        });
+
+        describe('if dependencies do not exist', () => {
+          let updateItemResponse: UpdateItemCommandOutput;
+          beforeEach(() => {
+            jest
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              .spyOn(Updater.prototype as any, 'execute')
+              .mockImplementationOnce(() => updateItemResponse);
+          });
+
+          describe('and DDB update succeeds', () => {
+            beforeEach(() => {
+              // mock update project ddb call
+              updateItemResponse = {
+                Attributes: marshall(deletedProjItem1),
+                $metadata: {}
+              };
+            });
+
+            test('it should pass', async () => {
+              // OPERATE n CHECK
+              await expect(() => projService.softDeleteProject(request, checkDependency)).resolves;
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('checkDependency', () => {
+    const projectId = 'proj-123';
+
+    describe('when dependency exists', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: ['someEnvironment'] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+
+      test('evaluates to true', async () => {
+        // OPERATE
+        const result = await projService.checkDependency('environment', projectId);
+
+        // CHECK
+        expect(result).toEqual(true);
+      });
+    });
+
+    describe('when dependency does not exist', () => {
+      beforeEach(() => {
+        const queryMockResponse = { data: [] };
+        jest
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
+          .mockImplementationOnce(() => queryMockResponse);
+      });
+      test('evaluates to false', async () => {
+        // OPERATE
+        const result = await projService.checkDependency('environment', projectId);
+
+        // CHECK
+        expect(result).toEqual(false);
+      });
     });
   });
 });

@@ -10,11 +10,10 @@ const GetProjectSchema: Schema = {
   id: '/getProject',
   type: 'object',
   properties: {
-    user: { type: 'AuthenticatedUser' },
     projectId: { type: 'string' }
   },
   additionalProperties: false,
-  required: ['user', 'projectId']
+  required: ['projectId']
 };
 
 export default GetProjectSchema;

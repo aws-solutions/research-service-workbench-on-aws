@@ -20,17 +20,19 @@ import {
   fromPaginationToken,
   validateSingleSortAndFilter,
   getFilterQueryParams,
-  getSortQueryParams
+  getSortQueryParams,
+  buildDynamoDbKey
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
 import { ProjectStatus } from '../constants/projectStatus';
 import CostCenter from '../models/costCenter';
-import CreateProjectRequest from '../models/createProjectRequest';
-import GetProjectRequest from '../models/getProjectRequest';
-import { listProjectGSINames, ListProjectsRequest } from '../models/listProjectsRequest';
-import ListProjectsResponse from '../models/listProjectsResponse';
-import Project from '../models/project';
+import CreateProjectRequest from '../models/projects/createProjectRequest';
+import { DeleteProjectRequest } from '../models/projects/deleteProjectRequest';
+import GetProjectRequest from '../models/projects/getProjectRequest';
+import { listProjectGSINames, ListProjectsRequest } from '../models/projects/listProjectsRequest';
+import ListProjectsResponse from '../models/projects/listProjectsResponse';
+import { Project } from '../models/projects/project';
 import { manualFilterProjects, manualSortProjects } from '../utilities/projectUtils';
 import CostCenterService from './costCenterService';
 
@@ -49,6 +51,7 @@ export default class ProjectService {
     // this._dynamicAuthorizationService = new DynamicAuthorizationService();
   }
 
+  // TODO--fix tests
   /**
    * Get project
    * @param request - the request object for getting a project
@@ -56,17 +59,6 @@ export default class ProjectService {
    * @returns Project entry in DDB
    */
   public async getProject(request: GetProjectRequest): Promise<Project> {
-    // Check permissions--TODO implement after dynamic AuthZ
-    // const dynamicOperation: DynamicOperation = {
-    //   action: 'READ',
-    //   subjectType: 'Project',
-    //   subjectId: `${projectId}`, // TODO--verify that this is correct for the full projectId since it will be proj-<uuid>
-    // };
-    // const authRequest: IsAuthorizedOnSubjectRequest = {
-    //   dynamicOperation: dynamicOperation
-    // };
-    // Will throw error if not authorized
-    // await this._dynamicAuthorizationService.isAuthorizedOnSubject(request.user, authRequest);
     const response = await this._aws.helpers.ddb
       .get(buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project))
       .execute();
@@ -139,7 +131,7 @@ export default class ProjectService {
 
       // If member of 1 group, get project item
       const projectId = userGroupsForCurrentUser[0].split('#')[0];
-      const project = await this.getProject({ user: request.user, projectId: projectId });
+      const project = await this.getProject({ projectId: projectId });
       return { data: [project], paginationToken: undefined };
     }
 
@@ -232,7 +224,7 @@ export default class ProjectService {
     // }
 
     // Create Permissions for the groups--TODO implement after dynamic AuthZ
-    // const identityPermissions: IdentityPermission[] = this._createIdentityPermissionsForProject(projectId);
+    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
     // const createIdentityPermissionsResponse = this._dynamicAuthorizationService.createIdentityPermissions(
     //   user,
     //   identityPermissions
@@ -280,6 +272,84 @@ export default class ProjectService {
   }
 
   /**
+   * Soft deletes a project from the database.
+   *
+   * @param request - a {@link DeleteProjectRequest} object that contains the id of the project to delete
+   * @param checkDependencies - an async function that checks if there are dependencies associated with the project
+   */
+  public async softDeleteProject(
+    request: DeleteProjectRequest,
+    checkDependencies: (projectId: string) => Promise<void>
+  ): Promise<void> {
+    // verify all dependencies are empty
+    await checkDependencies(request.projectId);
+
+    // verify project exists
+    await this.getProject({ projectId: request.projectId });
+
+    // Delete Permissions for the groups--TODO implement after dynamic AuthZ
+    // const identityPermissions: IdentityPermission[] = this._generateIdentityPermissionsForProject(projectId);
+    // const deleteIdentityPermissionsResponse = this._dynamicAuthorizationService.deleteIdentityPermissions(
+    //   identityPermissions
+    // );
+    // if (!createIdentityPermissionsResponse.deleted) {
+    //   throw Boom.badImplementation(
+    //     'Failed to delete batch identity permissions for project with dyamic authorization service.'
+    //   );
+    // }
+
+    // Delete ProjectAdmin and Researcher groups--TODO implement after dynamic AuthZ
+    // const deleteProjectAdminGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
+    //   groupId: `${projId}#PA`
+    // });
+    // const deleteResearcherGroupResponse = this._dynamicAuthorizationService.deleteGroup(user, {
+    //   groupId: `${projId}#Researcher`
+    // });
+    // if (!deleteProjectAdminGroupResponse.created || !deleteResearcherGroupResponse.created) {
+    //   throw Boom.badImplementation(
+    //     'Failed to delete Project Admin group or Researcher group with dynamic authorization service.'
+    //   );
+    // }
+
+    // delete from DDB
+    try {
+      await this._aws.helpers.ddb.updateExecuteAndFormat({
+        key: buildDynamoDBPkSk(request.projectId, resourceTypeToKey.project),
+        params: {
+          item: { resourceType: `${this._resourceType}_deleted`, status: ProjectStatus.DELETED }
+        }
+      });
+    } catch (e) {
+      console.error(`Failed to delete project ${request.projectId}}`, e);
+      throw Boom.internal('Could not delete Project');
+    }
+  }
+
+  /**
+   * Checks if project has a dependency in the PROJ#projId collection.
+   * Specifically, checks for items that match pk = PROJ#projId and sk.beginsWith(resourceType)
+   *
+   * @param resourceType - the string that should be a resource that is a key in {@link resourceTypeToKey} object
+   * @param projectId - the project id to check for dependencies
+   * @returns true if there are dependencies on the project that match the resource type, false otherwise
+   */
+  public async checkDependency(
+    resourceType: keyof typeof resourceTypeToKey,
+    projectId: string
+  ): Promise<boolean> {
+    const queryParams: QueryParams = {
+      key: { name: 'pk', value: buildDynamoDbKey(projectId, resourceTypeToKey.project) },
+      sortKey: 'sk',
+      begins: { S: resourceTypeToKey[resourceType] },
+      limit: 1
+    };
+
+    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
+
+    return response.data.length > 0;
+  }
+
+  /**
    * This method formats a Project object as a DDB item containing project data
    *
    * @param project - The Project object to prepare for DDB
@@ -303,17 +373,18 @@ export default class ProjectService {
    * @param item - the DDB item to conver to a Project object
    * @returns a Project object containing only project data from DDB attributes
    */
-  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue>): Project {
+  private _mapToProjectFromDDBItem(item: Record<string, AttributeValue> | Record<string, string>): Project {
     const copyItem = { ...item };
     const itemWithoutValues = _.omit(copyItem, ['pk', 'sk', 'dependency', 'resourceType']);
     itemWithoutValues.costCenterId = copyItem.dependency;
     const project: Project = itemWithoutValues as unknown as Project;
+    console.log(project);
     return project;
   }
 
   /**
    * Builds the Page and Pagination Token after GetItems call has been used to
-   * get project information from DDB.=
+   * get project information from DDB.
    *
    * @param paginationToken - string pagination token if need to display not the first page. Otherwise, undefined
    * @param projectsOnPage - list of {@link Project}s to build a page from
@@ -381,7 +452,7 @@ export default class ProjectService {
   }
 
   // TODO--implement after dynamic AuthZ
-  // private _createIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
+  // private _generateIdentityPermissionsForProject(projectId: string): IdentityPermissions[] {
   //   return [
   //     {
   //       // create for PA

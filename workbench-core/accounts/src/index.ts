@@ -19,9 +19,10 @@ import {
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
 import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
-import CreateProjectRequest from './models/createProjectRequest';
-import GetProjectRequest from './models/getProjectRequest';
-import { ListProjectsRequest } from './models/listProjectsRequest';
+import CreateProjectRequest from './models/projects/createProjectRequest';
+import { DeleteProjectRequest, DeleteProjectRequestParser } from './models/projects/deleteProjectRequest';
+import GetProjectRequest from './models/projects/getProjectRequest';
+import { ListProjectsRequest, ListProjectsRequestParser } from './models/projects/listProjectsRequest';
 import CreateAccountSchema from './schemas/createAccount';
 import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
@@ -57,5 +58,8 @@ export {
   ListAccountsRequestParser,
   CreateProjectRequest,
   ListProjectsRequest,
-  GetProjectRequest
+  ListProjectsRequestParser,
+  GetProjectRequest,
+  DeleteProjectRequest,
+  DeleteProjectRequestParser
 };

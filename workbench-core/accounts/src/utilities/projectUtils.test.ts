@@ -5,7 +5,7 @@
 
 import { ProjectStatus } from '../constants/projectStatus';
 import { ProjectFilter, ProjectSort } from '../models/listProjectsRequest';
-import Project from '../models/project';
+import { Project } from '../models/projects/project';
 import { manualFilterProjects, manualSortProjects } from './projectUtils';
 
 describe('projectUtils', () => {
@@ -82,7 +82,7 @@ describe('projectUtils', () => {
       // BUILD
       sortRequest = { createdAt: 'asc', name: 'asc' };
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(() => manualSortProjects(sortRequest, projects)).toThrow(
         'Cannot sort by more than one attribute.'
       );
@@ -92,7 +92,7 @@ describe('projectUtils', () => {
       // BUILD
       sortRequest = { createdAt: undefined };
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(() => manualSortProjects(sortRequest, projects)).toThrow('Sort contains invalid format');
     });
 
@@ -100,7 +100,7 @@ describe('projectUtils', () => {
       // BUILD
       sortRequest = { notAnAttribute: 'asc' };
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(() => manualSortProjects(sortRequest, projects)).toThrow(
         `No notAnAttribute on Project. Please sort by another attribute.`
       );
@@ -111,7 +111,7 @@ describe('projectUtils', () => {
       sortRequest = { createdAt: 'asc' };
       expectedProjects = projects;
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -120,7 +120,7 @@ describe('projectUtils', () => {
       sortRequest = { createdAt: 'desc' };
       expectedProjects = projects.reverse();
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -129,7 +129,7 @@ describe('projectUtils', () => {
       sortRequest = { dependency: 'asc' };
       expectedProjects = projects;
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -138,7 +138,7 @@ describe('projectUtils', () => {
       sortRequest = { dependency: 'desc' };
       expectedProjects = projects.reverse();
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -147,7 +147,7 @@ describe('projectUtils', () => {
       sortRequest = { name: 'asc' };
       expectedProjects = projects;
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -156,7 +156,7 @@ describe('projectUtils', () => {
       sortRequest = { createdAt: 'desc' };
       expectedProjects = projects.reverse();
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -165,7 +165,7 @@ describe('projectUtils', () => {
       sortRequest = { status: 'asc' };
       expectedProjects = [projects[0], projects[2], projects[1]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -174,7 +174,7 @@ describe('projectUtils', () => {
       sortRequest = { status: 'desc' };
       expectedProjects = [projects[1], projects[2], projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualSortProjects(sortRequest, projects)).toEqual(expectedProjects);
     });
   });
@@ -191,7 +191,7 @@ describe('projectUtils', () => {
       // BUILD
       filterRequest = { createdAt: { eq: 'date1' }, name: { eq: 'name1' } };
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(() => manualFilterProjects(filterRequest, projects)).toThrow(
         'Cannot filter by more than one attribute.'
       );
@@ -209,7 +209,7 @@ describe('projectUtils', () => {
       // BUILD
       filterRequest = { notAnAttribute: { eq: 'blah' } };
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(() => manualFilterProjects(filterRequest, projects)).toThrow(
         `No notAnAttribute on Project. Please filter by another attribute.`
       );
@@ -222,7 +222,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -233,7 +233,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -244,7 +244,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -255,7 +255,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -266,7 +266,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -277,7 +277,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = projects;
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -288,7 +288,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -299,7 +299,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -310,7 +310,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -321,7 +321,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -332,7 +332,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -343,7 +343,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -354,7 +354,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -365,7 +365,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -376,7 +376,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -387,7 +387,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -398,7 +398,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -409,7 +409,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -420,7 +420,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -431,7 +431,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = projects;
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -442,7 +442,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1], projects[2]];
 
-      /// TEST n CHECK
+      /// OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -453,7 +453,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -464,7 +464,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -475,7 +475,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -486,7 +486,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -497,7 +497,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -508,7 +508,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
 
@@ -519,7 +519,7 @@ describe('projectUtils', () => {
       };
       expectedProjects = [projects[0], projects[1], projects[2]];
 
-      // TEST n CHECK
+      // OPERATE n CHECK
       expect(manualFilterProjects(filterRequest, projects)).toEqual(expectedProjects);
     });
   });
