@@ -24,6 +24,8 @@ interface Constants {
   AMI_IDS_TO_SHARE: string;
   USER_POOL_CLIENT_NAME: string;
   USER_POOL_NAME: string;
+  ACCT_HANDLER_ARN_OUTPUT_KEY: string;
+  API_HANDLER_ARN_OUTPUT_KEY: string;
   STATUS_HANDLER_ARN_OUTPUT_KEY: string;
   ALLOWED_ORIGINS: string;
   AWS_REGION_SHORT_NAME: string;
@@ -48,6 +50,7 @@ interface Constants {
   HOSTED_ZONE_ID: string;
   DOMAIN_NAME: string;
   USE_CLOUD_FRONT: boolean;
+  FIELDS_TO_MASK_WHEN_AUDITING: string[];
 }
 
 interface SecretConstants {
@@ -87,6 +90,9 @@ function getConstants(): Constants {
     uiClientURL = getUiClientUrl();
   }
   if (uiClientURL) allowedOrigins.push(uiClientURL);
+
+  const FIELDS_TO_MASK_WHEN_AUDITING: string[] = config.fieldsToMaskWhenAuditing;
+
   const AMI_IDS: string[] = [];
 
   // These are the OutputKey for the SWB Main Account CFN stack
@@ -95,6 +101,8 @@ function getConstants(): Constants {
   const S3_ARTIFACT_BUCKET_ARN_OUTPUT_KEY = 'S3BucketArtifactsArnOutput';
   const S3_DATASETS_BUCKET_ARN_OUTPUT_KEY = 'S3BucketDatasetsArnOutput';
   const LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY = 'LaunchConstraintIamRoleNameOutput';
+  const ACCT_HANDLER_ARN_OUTPUT_KEY = 'AccountHandlerLambdaRoleOutput';
+  const API_HANDLER_ARN_OUTPUT_KEY = 'ApiLambdaRoleOutput';
   const STATUS_HANDLER_ARN_OUTPUT_KEY = 'StatusHandlerLambdaArnOutput';
   const MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY = 'MainAccountEncryptionKeyOutput';
   const MAIN_ACCT_ALB_ARN_OUTPUT_KEY = 'MainAccountLoadBalancerArnOutput';
@@ -124,6 +132,8 @@ function getConstants(): Constants {
     ALLOWED_ORIGINS: JSON.stringify(allowedOrigins),
     AWS_REGION_SHORT_NAME: AWS_REGION_SHORT_NAME,
     UI_CLIENT_URL: uiClientURL,
+    ACCT_HANDLER_ARN_OUTPUT_KEY,
+    API_HANDLER_ARN_OUTPUT_KEY,
     STATUS_HANDLER_ARN_OUTPUT_KEY,
     COGNITO_DOMAIN,
     WEBSITE_URLS,
@@ -144,7 +154,8 @@ function getConstants(): Constants {
     ECS_SUBNET_IDS,
     ECS_SUBNET_IDS_OUTPUT_KEY,
     ECS_SUBNET_AZS_OUTPUT_KEY,
-    ALB_INTERNET_FACING
+    ALB_INTERNET_FACING,
+    FIELDS_TO_MASK_WHEN_AUDITING
   };
 }
 
@@ -175,6 +186,7 @@ interface Config {
   albInternetFacing?: boolean;
   hostedZoneId?: string;
   domainName?: string;
+  fieldsToMaskWhenAuditing: string[];
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getConfig(): Config {
@@ -216,4 +228,25 @@ function getUiClientUrl(): string {
   }
 }
 
-export { getConstants, getConstantsWithSecrets };
+const dataSetPrefix: string = 'DATASET';
+const endPointPrefix: string = 'ENDPOINT';
+const authorizationGroupPrefix: string = 'GROUP';
+
+const enum SwbAuthZSubject {
+  SWB_DATASET = 'SWB_DATASET',
+  SWB_ENVIRONMENT = 'SWB_ENVIRONMENT',
+  SWB_ENVIRONMENT_TYPE = 'SWB_ENVIRONMENT_TYPE',
+  SWB_ETC = 'SWB_ETC',
+  SWB_PROJECT = 'SWB_PROJECT',
+  SWB_SSH_KEY = 'SWB_SSH_KEY',
+  SWB_USER = 'SWB_USER'
+}
+
+export {
+  getConstants,
+  getConstantsWithSecrets,
+  dataSetPrefix,
+  endPointPrefix,
+  authorizationGroupPrefix,
+  SwbAuthZSubject
+};

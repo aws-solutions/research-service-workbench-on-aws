@@ -18,7 +18,8 @@ import {
   UpdateItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import Boom from '@hapi/boom';
+import { DynamoDBService, JSONValue } from '@aws/workbench-core-base';
+import * as Boom from '@hapi/boom';
 import { mockClient } from 'aws-sdk-client-mock';
 import { EnvironmentService } from './environmentService';
 
@@ -27,13 +28,10 @@ describe('EnvironmentService', () => {
     process.env.AWS_REGION = 'us-east-1';
   });
   const ddbMock = mockClient(DynamoDBClient);
-  beforeEach(() => {
-    jest.clearAllMocks();
-    ddbMock.reset();
-  });
   const isoRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
-  const TABLE_NAME = 'exampleDDBTable';
-  const envService = new EnvironmentService({ TABLE_NAME });
+  const tableName = 'exampleDDBTable';
+  const dynamoDBService = new DynamoDBService({ region: process.env.AWS_REGION!, table: tableName });
+  const envService = new EnvironmentService(dynamoDBService);
 
   const envTypeConfigItem = {
     provisioningArtifactId: 'pa-3cwcuxmksf2xy',
@@ -59,6 +57,8 @@ describe('EnvironmentService', () => {
     productId: 'prod-t5q2vqlgvd76o'
   };
 
+  const projectId = 'proj-123';
+
   const env = {
     pk: `ENV#${envId}`,
     sk: `ENV#${envId}`,
@@ -73,7 +73,7 @@ describe('EnvironmentService', () => {
     name: 'testEnv',
     outputs: [],
     owner: 'owner-123',
-    projectId: 'proj-123',
+    projectId: projectId,
     status: 'PENDING',
     studyIds: ['study-123'],
     type: envTypeConfigItem.sk,
@@ -81,10 +81,11 @@ describe('EnvironmentService', () => {
     resourceType: 'environment',
     instanceId: 'instance-123',
     provisionedProductId: '',
-    dependency: 'proj-123',
-    createdBy: 'user-1',
-    updatedBy: 'user-1'
+    dependency: projectId
   };
+
+  const dataSetKey = 'DATASET#dataset-123';
+  const environmentKey = `ENV#${envId}`;
 
   const datasetItem = {
     resources: [
@@ -94,8 +95,8 @@ describe('EnvironmentService', () => {
     ],
     updatedAt: '2022-05-18T20:33:42.608Z',
     createdAt: '2022-05-18T20:33:42.608Z',
-    sk: 'DATASET#dataset-123',
-    pk: `ENV#${envId}`,
+    sk: dataSetKey,
+    pk: environmentKey,
     id: 'dataset-123',
     name: 'Study 1'
   };
@@ -122,10 +123,18 @@ describe('EnvironmentService', () => {
     encryptionKeyArn: 'arn:aws:kms:us-east-1:123456789012:key/123',
     externalId: 'workbench',
     updatedAt: '2022-05-18T20:33:42.608Z',
-    sk: 'PROJ#proj-123',
+    sk: `PROJ#${projectId}`,
     pk: 'ENV#44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
-    id: 'proj-123'
+    id: projectId
   };
+
+  const mockDateObject = new Date('2021-02-26T22:42:16.652Z');
+  beforeEach(() => {
+    jest.clearAllMocks();
+    ddbMock.reset();
+
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => mockDateObject.getTime());
+  });
 
   describe('getEnvironment', () => {
     test('includeMetadata = false', async () => {
@@ -136,7 +145,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -163,7 +172,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           KeyConditionExpression: '#pk = :pk',
           ExpressionAttributeNames: {
             '#pk': 'pk'
@@ -187,7 +196,9 @@ describe('EnvironmentService', () => {
         PROJ: projItem,
         ...env,
         provisionedProductId: '',
-        error: undefined
+        error: undefined,
+        createdBy: '',
+        updatedBy: ''
       });
     });
 
@@ -200,7 +211,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           KeyConditionExpression: '#pk = :pk',
           ExpressionAttributeNames: {
             '#pk': 'pk'
@@ -227,7 +238,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -253,7 +264,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByStatus',
           KeyConditionExpression: '#resourceType = :resourceType AND #status = :status',
           ExpressionAttributeNames: {
@@ -293,7 +304,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType AND #name = :name',
           ExpressionAttributeNames: {
@@ -333,7 +344,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression:
             '#resourceType = :resourceType AND #createdAt BETWEEN :createdAt1 AND :createdAt2',
@@ -378,7 +389,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByDependency',
           KeyConditionExpression: '#resourceType = :resourceType AND #dependency = :dependency',
           ExpressionAttributeNames: {
@@ -390,7 +401,7 @@ describe('EnvironmentService', () => {
               S: 'environment'
             },
             ':dependency': {
-              S: 'proj-123'
+              S: projectId
             }
           }
         })
@@ -399,7 +410,7 @@ describe('EnvironmentService', () => {
       // OPERATE
       const actualResponse = await envService.listEnvironments(
         { roles: ['Admin'], id: 'owner-123' },
-        { project: 'proj-123' }
+        { project: projectId }
       );
 
       // CHECK
@@ -418,7 +429,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType AND #owner = :owner',
           ExpressionAttributeNames: {
@@ -458,7 +469,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByType',
           KeyConditionExpression: '#resourceType = :resourceType AND #type = :type',
           ExpressionAttributeNames: {
@@ -508,7 +519,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByStatus',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -548,7 +559,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -588,7 +599,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByName',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -628,7 +639,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -668,7 +679,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByDependency',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -708,7 +719,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -748,7 +759,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByType',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -798,7 +809,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -831,7 +842,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByOwner',
           KeyConditionExpression: '#resourceType = :resourceType AND #owner = :owner',
           ExpressionAttributeNames: {
@@ -876,7 +887,7 @@ describe('EnvironmentService', () => {
 
       ddbMock
         .on(QueryCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           IndexName: 'getResourceByCreatedAt',
           KeyConditionExpression: '#resourceType = :resourceType',
           ExpressionAttributeNames: {
@@ -932,7 +943,7 @@ describe('EnvironmentService', () => {
       };
       ddbMock
         .on(GetItemCommand, {
-          TableName: 'exampleDDBTable',
+          TableName: tableName,
           Key: marshall({
             pk: `ENV#${envId}`,
             sk: `ENV#${envId}`
@@ -952,7 +963,7 @@ describe('EnvironmentService', () => {
       // CHECK
       const updateCall = ddbMock.commandCalls(UpdateItemCommand)[0];
       expect(updateCall.args[0].input).toMatchObject({
-        TableName: 'exampleDDBTable',
+        TableName: tableName,
         Key: {
           pk: {
             S: `ENV#${envId}`
@@ -995,7 +1006,7 @@ describe('EnvironmentService', () => {
       outputs: [],
       envTypeId: 'envType-123',
       envTypeConfigId: 'envTypeConfig-123',
-      projectId: 'proj-123',
+      projectId: projectId,
       datasetIds: ['dataset-123'],
       status: 'PENDING'
     };
@@ -1016,15 +1027,99 @@ describe('EnvironmentService', () => {
         });
       return {
         Responses: {
-          [TABLE_NAME]: batchResponses // Order is important
+          [dynamoDBService.getTableName()]: batchResponses // Order is important
         }
       };
     }
 
-    test('successfully', async () => {
+    describe('with a valid request', () => {
+      beforeEach(() => {
+        // BUILD
+        // Get env metadata
+        const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project', 'dataset']);
+        ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+
+        // Write data to DDB
+        ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+        // Get environment from DDB
+        const metaData = [datasetItem, envTypeConfigItem, projItem];
+        const envWithMetadata = [env, ...metaData];
+        const queryItemResponse: QueryCommandOutput = {
+          Items: envWithMetadata.map((item) => {
+            return marshall(item);
+          }),
+          $metadata: {}
+        };
+        ddbMock.on(QueryCommand).resolves(queryItemResponse);
+      });
+
+      test('creates a new environment', async () => {
+        // OPERATE
+        const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
+
+        // CHECK
+        expect(actualResponse).toEqual({
+          DATASETS: [datasetItem],
+          ENDPOINTS: [],
+          ETC: envTypeConfigItem,
+          PROJ: projItem,
+          ...env,
+          provisionedProductId: '',
+          error: undefined,
+          createdBy: '',
+          updatedBy: ''
+        });
+      });
+
+      test('creates association objects for the mounted datasets', async () => {
+        jest.spyOn(DynamoDBService.prototype, 'commitTransaction').mockImplementation(
+          (
+            params:
+              | {
+                  addPutRequests?: {
+                    item: Record<string, JSONValue | Set<JSONValue>>;
+                    conditionExpression?: string;
+                    expressionAttributeNames?: Record<string, string>;
+                    expressionAttributeValues?: Record<string, JSONValue | Set<JSONValue>>;
+                  }[];
+                  addPutItems?: Record<string, JSONValue | Set<JSONValue>>[];
+                  addDeleteRequests?: Record<string, JSONValue | Set<JSONValue>>[];
+                }
+              | undefined
+          ): Promise<void> => {
+            const dataSetWithEnvironment = params!.addPutItems!.find((item) => {
+              const pk = item.pk as string;
+              const sk = item.sk as string;
+
+              return pk === dataSetKey && sk === environmentKey;
+            });
+
+            expect(dataSetWithEnvironment).toEqual({
+              pk: dataSetKey,
+              sk: environmentKey,
+              id: 'env-44fd3490-2cdb-43fb-8459-4f08b3e6cd00',
+              projectId,
+              createdAt: mockDateObject.toISOString(),
+              updatedAt: mockDateObject.toISOString()
+            });
+
+            return Promise.resolve();
+          }
+        );
+
+        try {
+          await envService.createEnvironment(createEnvReq, authenticateUser);
+        } catch (e) {
+          console.error(e);
+          throw new Error('Failed to create expected Dataset With Environment object');
+        }
+      });
+    });
+
+    test('failed because ETC does not exist', async () => {
       // BUILD
-      // Get env metadata
-      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project', 'dataset']);
+      const filteredBatchItems = getBatchItemsWith(['project', 'dataset']);
       ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
 
       // Write data to DDB
@@ -1041,19 +1136,60 @@ describe('EnvironmentService', () => {
       };
       ddbMock.on(QueryCommand).resolves(queryItemResponse);
 
-      // OPERATE
-      const actualResponse = await envService.createEnvironment(createEnvReq, authenticateUser);
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        Boom.badRequest('envTypeId envType-123 with envTypeConfigId envTypeConfig-123 does not exist')
+      );
+    });
 
-      // CHECK
-      expect(actualResponse).toEqual({
-        DATASETS: [datasetItem],
-        ENDPOINTS: [],
-        ETC: envTypeConfigItem,
-        PROJ: projItem,
-        ...env,
-        provisionedProductId: '',
-        error: undefined
-      });
+    test('failed because Project does not exist', async () => {
+      // BUILD
+      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'dataset']);
+      // @ts-ignore
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+
+      // Write data to DDB
+      ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+      // Get environment from DDB
+      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const envWithMetadata = [env, ...metaData];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: envWithMetadata.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        Boom.badRequest(`projectId ${projectId} does not exist`)
+      );
+    });
+    test('failed because Dataset does not exist', async () => {
+      // BUILD
+      const filteredBatchItems = getBatchItemsWith(['envTypeConfig', 'project']);
+      ddbMock.on(BatchGetItemCommand).resolves(filteredBatchItems);
+
+      // Write data to DDB
+      ddbMock.on(TransactWriteItemsCommand).resolves({});
+
+      // Get environment from DDB
+      const metaData = [datasetItem, envTypeConfigItem, projItem];
+      const envWithMetadata = [env, ...metaData];
+      const queryItemResponse: QueryCommandOutput = {
+        Items: envWithMetadata.map((item) => {
+          return marshall(item);
+        }),
+        $metadata: {}
+      };
+      ddbMock.on(QueryCommand).resolves(queryItemResponse);
+
+      // OPERATE && CHECK
+      await expect(envService.createEnvironment(createEnvReq, authenticateUser)).rejects.toThrow(
+        Boom.badRequest('datasetIds dataset-123 do not exist')
+      );
     });
     test('failed because ETC does not exist', async () => {
       // BUILD

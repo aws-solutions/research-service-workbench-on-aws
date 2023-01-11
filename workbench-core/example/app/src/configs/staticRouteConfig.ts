@@ -4,7 +4,7 @@
  */
 
 import { RoutesIgnored, RoutesMap } from '@aws/workbench-core-authorization';
-import { uuidRegExpAsString } from '@aws/workbench-core-base';
+import { groupIDRegExpAsString, uuidRegExpAsString } from '@aws/workbench-core-base';
 import { dataSetPrefix, endPointPrefix } from './constants';
 
 export const routesMap: RoutesMap = {
@@ -38,6 +38,20 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  '/datasets/iam': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetRole'
+      }
+    ],
+    PATCH: [
+      {
+        action: 'UPDATE',
+        subject: 'DatasetRole'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}`]: {
     GET: [
       {
@@ -52,11 +66,27 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/permissions`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetAccess'
+      }
+    ]
+  },
   [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/share`]: {
     POST: [
       {
         action: 'CREATE',
         subject: 'Endpoint'
+      }
+    ]
+  },
+  [`/datasets/${dataSetPrefix.toLowerCase()}-${uuidRegExpAsString}/presignedUpload`]: {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'DatasetFile'
       }
     ]
   },
@@ -81,6 +111,14 @@ export const routesMap: RoutesMap = {
     POST: [
       {
         action: 'CREATE',
+        subject: 'Role'
+      }
+    ]
+  },
+  [`/roles/${groupIDRegExpAsString}`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
         subject: 'Role'
       }
     ]
@@ -126,6 +164,116 @@ export const routesMap: RoutesMap = {
       {
         action: 'UPDATE',
         subject: 'User'
+      }
+    ]
+  },
+  [`/users/${uuidRegExpAsString}/roles`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'User'
+      }
+    ]
+  },
+  '/authorization/groups': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/users/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationUser'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/add-user`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/remove-user`]: {
+    PUT: [
+      {
+        action: 'UPDATE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/get-users`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}/is-user-assigned/${uuidRegExpAsString}`]: {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  [`/authorization/groups/${groupIDRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
+  '/authorization/permissions': {
+    POST: [
+      {
+        action: 'CREATE',
+        subject: 'IdentityPermission'
+      }
+    ],
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/identity': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/permissions/subject': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'IdentityPermission'
+      }
+    ]
+  },
+  '/authorization/routes/ignored': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
+      }
+    ]
+  },
+  '/authorization/routes/protected': {
+    GET: [
+      {
+        action: 'READ',
+        subject: 'Routes'
       }
     ]
   }

@@ -63,6 +63,7 @@ jspm_packages/
 common/deploy/
 common/temp/
 common/autoinstallers/*/.npmrc
+common/autoinstallers/*/.pnpm-store
 **/.rush/temp/
 **/temp/
 workbench-core/environments/temp/

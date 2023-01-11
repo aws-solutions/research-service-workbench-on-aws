@@ -18,20 +18,9 @@ Follow instructions [here](../swb-reference/SETUP_v2p1.md##installation) to setu
 
 ### Deploy static website
 
-#### ECS
+Project `swb-ui` can be deployed as a static website using S3 Bucket and CloudFront by following the next steps:
 
-Project `swb-ui` can be deployed on ECS in a VPC and Subnets that were created/used in swb-reference. Make sure to have deployed swb-reference before beginning the following steps.
-
-1. Navigate to `solutions/swb-ui/ui`
-
-2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`. Once this succeeds, the UI will be hosted at the domainName that was provided to swb-reference, which can also be found in the CloudFormation Output `WebsiteURL`.
-
-
-#### CloudFront (not recommended)
-
-Project `swb-ui` can be deployed as a static website using S3 Bucket and CloudFront by following the next steps (note in order to use this option, swb-reference must be deployed with `useCloudFront: true` defined in `src/config/<STAGE>.yaml`):
-
-1. Navigate to `solutions/swb-ui/ui`
+1. Navigate to `solutions/swb-ui`
 
 2. Run command `STAGE=<STAGE> rushx deploy-ui-and-api`
 

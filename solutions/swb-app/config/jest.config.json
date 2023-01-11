@@ -1,6 +1,52 @@
 {
   "extends": "@rushstack/heft-node-rig/profiles/default/config/jest.config.json",
   "collectCoverage": true,
+  "transform": {
+    "\\.(ts)$": "ts-jest"
+  },
+  "moduleFileExtensions": ["ts", "js"],
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/src/accountRoutes.ts",
+    "<rootDir>/src/apiRouteConfig.ts",
+    "<rootDir>/src/authRoutes.ts",
+    "<rootDir>/src/costCenterRoutes.ts",
+    "<rootDir>/src/datasetRoutes.ts",
+    "<rootDir>/src/environmentRoutes.ts",
+    "<rootDir>/src/environmentTypeConfigRoutes.ts",
+    "<rootDir>/src/environmentTypeRoutes.ts",
+    "<rootDir>/src/generateRouter.ts",
+    "<rootDir>/src/index.ts",
+    "<rootDir>/src/projectRoutes.ts",
+    "<rootDir>/src/staticPermissionsConfig.ts",
+    "<rootDir>/src/staticRouteConfig.ts",
+    "<rootDir>/src/userRoutes.ts",
+
+    "<rootDir>/src/dataSets/addRemoveAccessPermissionRequest.ts",
+    "<rootDir>/src/dataSets/createProvisionDatasetRequest.ts",
+    "<rootDir>/src/dataSets/createExternalEndpointRequestParser.ts",
+    "<rootDir>/src/dataSets/createProvisionDataRequest.ts",
+    "<rootDir>/src/dataSets/dataSet.ts",
+    "<rootDir>/src/dataSets/dataSetAccessLevelParser.ts",
+    "<rootDir>/src/dataSets/dataSetAddExternalEndpointResponseParser.ts",
+    "<rootDir>/src/dataSets/dataSetExternalEndpointRequest.ts",
+    "<rootDir>/src/dataSets/dataSetMountObjectParser.ts",
+    "<rootDir>/src/dataSets/dataSetPermissionParser.ts",
+    "<rootDir>/src/dataSets/dataSetPlugin.ts",
+    "<rootDir>/src/dataSets/dataSetStoragePlugin.ts",
+    "<rootDir>/src/dataSets/endpointConnectionStrings.ts",
+    "<rootDir>/src/dataSets/externalEndpoint.ts",
+    "<rootDir>/src/dataSets/getAccessPermissionRequestParser.ts",
+    "<rootDir>/src/dataSets/permissionResponseParser.ts",
+    "<rootDir>/src/dataSets/storageLocation.ts",
+    "<rootDir>/src/dataSetRoutes.ts",
+    "<rootDir>/src/projectEnvTypeConfigRoutes.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/environmentTypeConfig.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigPlugin.ts",
+    "<rootDir>/src/projectEnvTypeConfigs/projectEnvTypeConfigRoutes.ts",
+
+    "<rootDir>/src/validatorHelper.ts",
+    "<rootDir>/src/errorHandlers.ts"
+  ],
   "coverageThreshold": {
     "global": {
       "branches": 0,

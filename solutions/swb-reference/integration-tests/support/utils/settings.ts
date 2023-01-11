@@ -46,9 +46,13 @@ interface Setting {
 
   // Configs for AWS Account onboard test
   hostAwsAccountId: string;
+  hostAwsAccountIdParamStorePath: string;
   envMgmtRoleArn: string;
+  envMgmtRoleArnParamStorePath: string;
   hostingAccountHandlerRoleArn: string;
+  hostingAccountHandlerRoleArnParamStorePath: string;
   encryptionKeyArn: string;
+  encryptionKeyArnParamStorePath: string;
 
   // Derived
   mainAccountId: string;

@@ -167,6 +167,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-user-management",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -251,6 +255,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@next/eslint-plugin-next",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -297,6 +305,10 @@
     {
       "name": "@testing-library/user-event",
       "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "allowedCategories": [ "production" ]
     },
     {
       "name": "@vendia/serverless-express",
@@ -399,7 +411,19 @@
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
+      "name": "eslint-import-resolver-typescript",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "eslint-plugin-import",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
     {
@@ -507,6 +531,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "radix3",
+      "allowedCategories": [ "production" ]
+    },
+    {
       "name": "react",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -583,8 +611,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "zod",
+      "name": "yaml-cfn",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "zod",
+      "allowedCategories": [ "production", "prototypes" ]
     }
   ]
 }

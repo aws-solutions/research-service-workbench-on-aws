@@ -12,3 +12,6 @@ albInternetFacing: true
 # TODO: once this branch in dev, provide appropriate values
 #hostZoneId: ''
 #domainName: ''
+
+# Auditing
+fieldsToMaskWhenAuditing: ['user', 'password', 'accessKey', 'code', 'codeVerifier']

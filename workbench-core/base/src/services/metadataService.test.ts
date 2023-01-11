@@ -114,10 +114,9 @@ describe('metadata service', () => {
 
       await metadataService.updateRelationship(
         resourceTypeToKey.environment,
-        'id',
+        { id: 'id', data: { a: 1 } },
         resourceTypeToKey.dataset,
-        [],
-        { a: 1 }
+        []
       );
 
       expect(ddbService.transactEdit).toBeCalledTimes(0);
@@ -132,10 +131,11 @@ describe('metadata service', () => {
       await expect(
         metadataService.updateRelationship(
           resourceTypeToKey.environment,
-          'id',
+          { id: 'id', data: { a: 1 } },
           resourceTypeToKey.dataset,
-          Array.from({ length: 51 }),
-          { a: 1 }
+          Array.from({ length: 51 }, (v, k) => {
+            return { id: k.toString() };
+          })
         )
       ).rejects.toThrow('Cannot add more than 50 dependencies in single transaction.');
     });
@@ -148,12 +148,10 @@ describe('metadata service', () => {
 
       await metadataService.updateRelationship(
         resourceTypeToKey.environment,
-        'id',
+        { id: 'id', data: { a: 1 } },
         resourceTypeToKey.dataset,
-        ['dependentId1', 'dependentId2'],
-        { a: 1 }
+        [{ id: 'dependentId1' }, { id: 'dependentId2' }]
       );
-
       expect(edit.execute).toBeCalledTimes(1);
     });
   });

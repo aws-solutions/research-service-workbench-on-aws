@@ -21,7 +21,7 @@ export default class SagemakerNotebookEnvironmentLifecycleService implements Env
   public constructor() {
     this.helper = new EnvironmentLifecycleHelper();
     this.aws = new AwsService({ region: process.env.AWS_REGION!, ddbTableName: process.env.STACK_NAME! });
-    this.envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
+    this.envService = new EnvironmentService(this.aws.helpers.ddb);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async launch(envMetadata: any): Promise<{ [id: string]: string }> {

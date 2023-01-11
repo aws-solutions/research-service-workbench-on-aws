@@ -22,3 +22,5 @@
 
 #hostZoneId: ''
 #domainName: ''
+# Auditing
+#fieldsToMaskWhenAuditing: ["user", "password", "accessKey", "code", "codeVerifier"]

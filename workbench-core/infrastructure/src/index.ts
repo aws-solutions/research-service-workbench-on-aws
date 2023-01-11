@@ -8,3 +8,9 @@ export {
   WorkbenchCognitoProps,
   WorkbenchUserPoolOidcIdentityProvider
 } from './workbenchCognito';
+
+export * from './workbenchDynamodb';
+
+export * from './workbenchEncryptionKeyWithRotation';
+
+export * from './workbenchSecureS3Bucket';
