@@ -15,6 +15,10 @@ terminatedEnvId: 'env-b44262fb-ed34-47ae-a4a4-d2d9d9c7a5d5' # id of an environme
 rootUserNameParamStorePath: '/swb/testEnv/rootUser/email'
 rootPasswordParamStorePath: '/swb/testEnv/rootUser/password'
 
+## For running project integration tests
+costCenterId: ''
+projectName: 'Project 1'
+
 ## Default Hosting Account
 defaultHostingAccountId: 'acc-827e79f0-f007-4b6a-9640-937abbb98e0d'
 
