@@ -12,6 +12,7 @@ import { Effect } from '../effect';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { ThroughputExceededError } from '../errors/throughputExceededError';
+import { HTTPMethod } from '../routesMap';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -139,21 +140,57 @@ describe('DynamicAuthorizationService', () => {
       await expect(
         dynamicAuthzService.isAuthorizedOnSubject({
           user: mockUser,
-          dynamicOperation: { action: 'CREATE', subjectId: '', subjectType: '' }
+          dynamicOperation: {
+            action: 'CREATE',
+            subject: {
+              subjectId: '',
+              subjectType: ''
+            }
+          }
         })
       ).rejects.toThrow(Error);
     });
   });
 
   describe('isRouteIgnored', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(dynamicAuthzService.isRouteIgnored({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    test('check is route ignored', async () => {
+      const mockReturnValue = {
+        data: {
+          routeIgnored: true
+        }
+      };
+      const route = '/sampleRoute';
+      const method: HTTPMethod = 'GET';
+      const params = {
+        route,
+        method
+      };
+      mockDynamicAuthorizationPermissionsPlugin.isRouteIgnored = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const response = await dynamicAuthzService.isRouteIgnored(params);
+      expect(response).toStrictEqual(mockReturnValue);
     });
   });
 
   describe('isRouteProtected', () => {
-    it('throws a not implemented exception', async () => {
-      await expect(dynamicAuthzService.isRouteProtected({ route: '', method: 'GET' })).rejects.toThrow(Error);
+    test('check is route protected', async () => {
+      const mockReturnValue = {
+        data: {
+          routeProtected: true
+        }
+      };
+      const route = '/sampleRoute';
+      const method: HTTPMethod = 'GET';
+      const params = {
+        route,
+        method
+      };
+      mockDynamicAuthorizationPermissionsPlugin.isRouteProtected = jest
+        .fn()
+        .mockResolvedValueOnce(mockReturnValue);
+      const response = await dynamicAuthzService.isRouteProtected(params);
+      expect(response).toStrictEqual(mockReturnValue);
     });
   });
 

@@ -19,7 +19,11 @@ import {
   GetIdentityPermissionsBySubjectRequestParser,
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsRequestParser,
-  isRetryError
+  isRetryError,
+  IsRouteProtectedRequest,
+  IsRouteProtectedRequestParser,
+  IsRouteIgnoredRequest,
+  IsRouteIgnoredRequestParser
 } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -252,6 +256,30 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isRetryError(err)) throw Boom.serverUnavailable('Request a retry');
         throw err;
       }
+    })
+  );
+
+  router.get(
+    '/authorization/routes/protected',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<IsRouteProtectedRequest>(
+        IsRouteProtectedRequestParser,
+        req.query
+      );
+      const { data } = await service.isRouteProtected(validatedRequest);
+      res.status(201).send(data);
+    })
+  );
+
+  router.get(
+    '/authorization/routes/ignored',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<IsRouteIgnoredRequest>(
+        IsRouteIgnoredRequestParser,
+        req.query
+      );
+      const { data } = await service.isRouteIgnored(validatedRequest);
+      res.status(201).send(data);
     })
   );
 }
