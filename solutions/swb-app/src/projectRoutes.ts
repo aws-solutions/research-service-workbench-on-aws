@@ -13,6 +13,7 @@ import {
   DeleteProjectRequestParser
 } from '@aws/workbench-core-accounts';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
+import { validateAndParse, MetadataService, resourceTypeToKey } from '@aws/workbench-core-base';
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
@@ -21,12 +22,19 @@ import { wrapAsync } from './errorHandlers';
 import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
 import ListProjectsSchema from './schemas/projects/listProjectsSchema';
+import {
+  ProjectDatasetMetadata,
+  ProjectDatasetMetadataParser,
+  ProjectEnvTypeConfigMetadata,
+  ProjectEnvTypeConfigMetadataParser
+} from './schemas/projects/projectMetadataParser';
 import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectRoutes(
   router: Router,
   projectService: ProjectService,
-  environmentService: EnvironmentService
+  environmentService: EnvironmentService,
+  metadataService: MetadataService
 ): void {
   // Get project
   router.get(
@@ -82,26 +90,44 @@ export function setUpProjectRoutes(
       async function checkDependencies(projectId: string): Promise<void> {
         // environments
         const projectHasEnvironments = environmentService.doesDependencyHaveEnvironments(projectId);
+
         // datasets
-        const projectHasDatasets = projectService.checkDependency('dataset', projectId);
+        const datasetDependency = metadataService.listDependentMetadata<ProjectDatasetMetadata>(
+          resourceTypeToKey.project,
+          projectId,
+          resourceTypeToKey.dataset,
+          ProjectDatasetMetadataParser,
+          { pageSize: 1 }
+        );
+
         // etcs
-        const projectHasEnvTypeConfigs = projectService.checkDependency('envTypeConfig', projectId);
-        const [envBoolean, datasetBoolean, envTypeConfigBoolean] = await Promise.all([
+        const envTypeConfigDepedency = metadataService.listDependentMetadata<ProjectEnvTypeConfigMetadata>(
+          resourceTypeToKey.project,
+          projectId,
+          resourceTypeToKey.envTypeConfig,
+          ProjectEnvTypeConfigMetadataParser,
+          { pageSize: 1 }
+        );
+
+        const [hasEnvironments, { data: datasets }, { data: envTypeConfigs }] = await Promise.all([
           projectHasEnvironments,
-          projectHasDatasets,
-          projectHasEnvTypeConfigs
+          datasetDependency,
+          envTypeConfigDepedency
         ]);
-        if (envBoolean) {
+
+        if (hasEnvironments) {
           throw Boom.conflict(
             `Project ${projectId} cannot be deleted because it has environments(s) associated with it`
           );
         }
-        if (datasetBoolean) {
+
+        if (datasets.length) {
           throw Boom.conflict(
             `Project ${projectId} cannot be deleted because it has dataset(s) associated with it`
           );
         }
-        if (envTypeConfigBoolean) {
+
+        if (envTypeConfigs.length) {
           throw Boom.conflict(
             `Project ${projectId} cannot be deleted because it has environment type config(s) associated with it`
           );

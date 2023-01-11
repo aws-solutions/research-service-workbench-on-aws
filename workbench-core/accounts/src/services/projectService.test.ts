@@ -19,7 +19,6 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { AuthenticatedUser } from '@aws/workbench-core-authorization';
-import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/dynamoDBService';
 import Getter from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/getter';
 import Updater from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/updater';
 import Boom from '@hapi/boom';
@@ -1776,45 +1775,6 @@ describe('ProjectService', () => {
             });
           });
         });
-      });
-    });
-  });
-
-  describe('checkDependency', () => {
-    const projectId = 'proj-123';
-
-    describe('when dependency exists', () => {
-      beforeEach(() => {
-        const queryMockResponse = { data: ['someEnvironment'] };
-        jest
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
-          .mockImplementationOnce(() => queryMockResponse);
-      });
-
-      test('evaluates to true', async () => {
-        // OPERATE
-        const result = await projService.checkDependency('environment', projectId);
-
-        // CHECK
-        expect(result).toEqual(true);
-      });
-    });
-
-    describe('when dependency does not exist', () => {
-      beforeEach(() => {
-        const queryMockResponse = { data: [] };
-        jest
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .spyOn(DynamoDBService.prototype as any, 'getPaginatedItems')
-          .mockImplementationOnce(() => queryMockResponse);
-      });
-      test('evaluates to false', async () => {
-        // OPERATE
-        const result = await projService.checkDependency('environment', projectId);
-
-        // CHECK
-        expect(result).toEqual(false);
       });
     });
   });

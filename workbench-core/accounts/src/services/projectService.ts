@@ -20,8 +20,7 @@ import {
   fromPaginationToken,
   validateSingleSortAndFilter,
   getFilterQueryParams,
-  getSortQueryParams,
-  buildDynamoDbKey
+  getSortQueryParams
 } from '@aws/workbench-core-base';
 import Boom from '@hapi/boom';
 import _ from 'lodash';
@@ -323,30 +322,6 @@ export default class ProjectService {
       console.error(`Failed to delete project ${request.projectId}}`, e);
       throw Boom.internal('Could not delete Project');
     }
-  }
-
-  /**
-   * Checks if project has a dependency in the PROJ#projId collection.
-   * Specifically, checks for items that match pk = PROJ#projId and sk.beginsWith(resourceType)
-   *
-   * @param resourceType - the string that should be a resource that is a key in {@link resourceTypeToKey} object
-   * @param projectId - the project id to check for dependencies
-   * @returns true if there are dependencies on the project that match the resource type, false otherwise
-   */
-  public async checkDependency(
-    resourceType: keyof typeof resourceTypeToKey,
-    projectId: string
-  ): Promise<boolean> {
-    const queryParams: QueryParams = {
-      key: { name: 'pk', value: buildDynamoDbKey(projectId, resourceTypeToKey.project) },
-      sortKey: 'sk',
-      begins: { S: resourceTypeToKey[resourceType] },
-      limit: 1
-    };
-
-    const response = await this._aws.helpers.ddb.getPaginatedItems(queryParams);
-
-    return response.data.length > 0;
   }
 
   /**
