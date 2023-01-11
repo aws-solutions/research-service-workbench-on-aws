@@ -18,8 +18,6 @@ export default class Dataset extends Resource {
   private _awsAccountId: string;
   private _children: Map<string, Endpoint>;
   private _permissions: Map<string, IdentityPermission>;
-  private _clientSession: ClientSession;
-  public id: string;
   public storageName: string;
   public storagePath: string;
 
@@ -28,9 +26,7 @@ export default class Dataset extends Resource {
     this._awsAccountId = params.awsAccountId;
     this.storageName = params.storageName;
     this.storagePath = params.storagePath;
-    this.id = params.id;
     this._api = `datasets/${params.id}`;
-    this._clientSession = params.clientSession;
     this._children = new Map<string, Endpoint>();
     this._permissions = new Map<string, IdentityPermission>();
   }

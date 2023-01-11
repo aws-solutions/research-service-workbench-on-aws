@@ -165,10 +165,14 @@ export class DataSetService {
    * @param endPointId - the ID of the endpoint to remove.
    *
    * @returns a {@link DataSetMountObject}
+   *
+   * @throws {@link NotAuthorizedError} - subject doesnt have permission to access the dataset
+   * // TODO more throws
    */
   public async getDataSetMountObject(
     dataSetId: string,
     endPointId: string,
+    subject: string,
     authenticatedUser: {
       id: string;
       roles: string[];
@@ -184,10 +188,12 @@ export class DataSetService {
       endPointid: endPointId
     };
     try {
+      const readOnly = await this._arePermissionsReadOnly(dataSetId, subject);
+
       const targetDS: DataSet = await this.getDataSet(dataSetId, authenticatedUser);
 
       if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
-        throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
+        throw new EndpointNotFoundError(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
 
       const endPoint = await this.getExternalEndPoint(dataSetId, endPointId, authenticatedUser);
       if (!endPoint.endPointAlias || !endPoint.id) throw Boom.notFound('Endpoint has missing information');
@@ -341,17 +347,7 @@ export class DataSetService {
     };
 
     try {
-      const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
-        dataSetId,
-        subject: userId
-      });
-      if (!permissionsData.permissions.length) {
-        throw new NotAuthorizedError(
-          `User "${userId}" does not have permission to access dataset "${dataSetId}.`
-        );
-      }
-
-      const readOnly = permissionsData.permissions.some(({ accessLevel }) => accessLevel === 'read-only');
+      const readOnly = await this._arePermissionsReadOnly(dataSetId, userId);
 
       const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
 
@@ -605,5 +601,19 @@ export class DataSetService {
       prefix: path,
       endpointId
     };
+  }
+
+  private async _arePermissionsReadOnly(dataSetId: string, subject: string): Promise<boolean> {
+    const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
+      dataSetId,
+      subject
+    });
+    if (!permissionsData.permissions.length) {
+      throw new NotAuthorizedError(
+        `Subject "${subject}" does not have permission to access dataset "${dataSetId}.`
+      );
+    }
+
+    return permissionsData.permissions.some(({ accessLevel }) => accessLevel === 'read-only');
   }
 }
