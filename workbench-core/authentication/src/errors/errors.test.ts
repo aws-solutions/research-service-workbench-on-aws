@@ -8,26 +8,16 @@ import {
   InvalidAuthorizationCodeError,
   InvalidCodeVerifierError,
   InvalidJWTError,
-  InvalidParameterError,
   InvalidTokenError,
   InvalidTokenTypeError,
   isIdpUnavailableError,
   isInvalidAuthorizationCodeError,
   isInvalidCodeVerifierError,
   isInvalidJWTError,
-  isInvalidParameterError,
   isInvalidTokenError,
   isInvalidTokenTypeError,
   isPluginConfigurationError,
-  isRoleAlreadyExistsError,
-  isRoleNotFoundError,
-  isUserAlreadyExistsError,
-  isUserNotFoundError,
-  PluginConfigurationError,
-  RoleAlreadyExistsError,
-  RoleNotFoundError,
-  UserAlreadyExistsError,
-  UserNotFoundError
+  PluginConfigurationError
 } from '../';
 
 describe('custom error tests', () => {
@@ -87,20 +77,6 @@ describe('custom error tests', () => {
     });
   });
 
-  describe('InvalidParameterError tests', () => {
-    it('should be an instance of itself', () => {
-      const error = new InvalidParameterError();
-
-      expect(isInvalidParameterError(error)).toBe(true);
-    });
-
-    it('should be an instance of Error', () => {
-      const error = new InvalidParameterError();
-
-      expect(error instanceof Error).toBe(true);
-    });
-  });
-
   describe('InvalidTokenError tests', () => {
     it('should be an instance of itself', () => {
       const error = new InvalidTokenError();
@@ -138,62 +114,6 @@ describe('custom error tests', () => {
 
     it('should be an instance of Error', () => {
       const error = new PluginConfigurationError();
-
-      expect(error instanceof Error).toBe(true);
-    });
-  });
-
-  describe('RoleAlreadyExistsError tests', () => {
-    it('should be an instance of itself', () => {
-      const error = new RoleAlreadyExistsError();
-
-      expect(isRoleAlreadyExistsError(error)).toBe(true);
-    });
-
-    it('should be an instance of Error', () => {
-      const error = new RoleAlreadyExistsError();
-
-      expect(error instanceof Error).toBe(true);
-    });
-  });
-
-  describe('RoleNotFoundError tests', () => {
-    it('should be an instance of itself', () => {
-      const error = new RoleNotFoundError();
-
-      expect(isRoleNotFoundError(error)).toBe(true);
-    });
-
-    it('should be an instance of Error', () => {
-      const error = new RoleNotFoundError();
-
-      expect(error instanceof Error).toBe(true);
-    });
-  });
-
-  describe('UserAlreadyExistsError tests', () => {
-    it('should be an instance of itself', () => {
-      const error = new UserAlreadyExistsError();
-
-      expect(isUserAlreadyExistsError(error)).toBe(true);
-    });
-
-    it('should be an instance of Error', () => {
-      const error = new UserAlreadyExistsError();
-
-      expect(error instanceof Error).toBe(true);
-    });
-  });
-
-  describe('UserNotFoundError tests', () => {
-    it('should be an instance of itself', () => {
-      const error = new UserNotFoundError();
-
-      expect(isUserNotFoundError(error)).toBe(true);
-    });
-
-    it('should be an instance of Error', () => {
-      const error = new UserNotFoundError();
 
       expect(error instanceof Error).toBe(true);
     });

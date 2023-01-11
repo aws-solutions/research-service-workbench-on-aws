@@ -4,15 +4,16 @@
  */
 
 import { ServiceCatalogClient, DescribeRecordCommand } from '@aws-sdk/client-service-catalog';
-import { AwsService } from '@aws/workbench-core-base';
+import { AwsService, DynamoDBService } from '@aws/workbench-core-base';
 import { mockClient } from 'aws-sdk-client-mock';
-import EventBridgeEventToDDB from '../interfaces/eventBridgeEventToDDB';
+import EventBridgeEventToDDB from '../models/eventBridgeEventToDDB';
 import { EnvironmentService, Environment } from '../services/environmentService';
 import EnvironmentLifecycleHelper from '../utilities/environmentLifecycleHelper';
 import StatusHandler from './statusHandler';
 
 describe('StatusHandler', () => {
   const ORIGINAL_ENV = process.env;
+  let envService: EnvironmentService;
   let environment: Environment;
   let ebToDDB: EventBridgeEventToDDB;
   beforeEach(() => {
@@ -65,6 +66,12 @@ describe('StatusHandler', () => {
       updatedBy: 'blah',
       createdBy: 'blah'
     };
+
+    const dynamoDBService = new DynamoDBService({
+      table: process.env.STACK_NAME!,
+      region: process.env.AWS_REGION
+    });
+    envService = new EnvironmentService(dynamoDBService);
   });
 
   afterAll(() => {
@@ -73,7 +80,6 @@ describe('StatusHandler', () => {
   test('execute short-circuits if event does not contain a valid status', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     ebToDDB.status = 'INVALID_STATUS';
     envService.getEnvironment = jest.fn();
     envService.updateEnvironment = jest.fn();
@@ -90,7 +96,6 @@ describe('StatusHandler', () => {
   test('execute short-circuits if event does not contain envId nor instanceId', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     ebToDDB.envId = undefined;
     ebToDDB.instanceId = undefined;
     envService.getEnvironment = jest.fn();
@@ -109,7 +114,6 @@ describe('StatusHandler', () => {
     // BUILD
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
 
     const ebToDDB: EventBridgeEventToDDB = {
       envId: '6e185c8c-caeb-4305-8f08-d408b316dca7',
@@ -169,7 +173,6 @@ describe('StatusHandler', () => {
     // BUILD
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
 
     const ebToDDB: EventBridgeEventToDDB = {
       status: 'COMPLETED',
@@ -229,7 +232,6 @@ describe('StatusHandler', () => {
   test('execute updates with recent status on non-Launch operation', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.status = 'COMPLETED';
     envService.getEnvironment = jest.fn(async () => environment);
     envService.updateEnvironment = jest.fn();
@@ -250,7 +252,6 @@ describe('StatusHandler', () => {
   test('execute updates with failure status', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.status = 'COMPLETED';
     ebToDDB.errorMsg = 'Instance ran into error and cannot be terminated';
     ebToDDB.status = 'TERMINATING_FAILED';
@@ -274,7 +275,6 @@ describe('StatusHandler', () => {
   test('execute skips update if env status same as event status during a non-Launch event', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.status = 'TERMINATING';
 
     envService.getEnvironment = jest.fn(async () => environment);
@@ -293,7 +293,6 @@ describe('StatusHandler', () => {
   test('execute skips update if event is older than last update time during a non-Launch event', async () => {
     // BUILD
     const statusHandler = new StatusHandler();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.status = 'COMPLETED';
     environment.updatedAt = '2022-05-05T19:43:57.143Z';
 
@@ -314,7 +313,6 @@ describe('StatusHandler', () => {
     // BUILD
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.status = 'COMPLETED';
 
     const ebToDDB: EventBridgeEventToDDB = {
@@ -376,7 +374,6 @@ describe('StatusHandler', () => {
     // BUILD
     const statusHandler = new StatusHandler();
     const environmentLifecycleHelper = new EnvironmentLifecycleHelper();
-    const envService = new EnvironmentService({ TABLE_NAME: process.env.STACK_NAME! });
     environment.updatedAt = '2022-05-05T19:43:57.143Z';
 
     const ebToDDB: EventBridgeEventToDDB = {

@@ -4,7 +4,7 @@
  */
 
 import { Action } from '../action';
-import { Effect } from '../permission';
+import { Effect } from '../effect';
 
 /**
  * The type of identity requesting access

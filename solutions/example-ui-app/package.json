@@ -14,7 +14,8 @@
   },
   "scripts": {
     "add-license-header": "license-check-and-add add -f license-add-config.json",
-    "build": "next build && rushx lint",
+    "prebuild": "next telemetry disable",
+    "build": "rushx prebuild && next build && rushx lint",
     "build:test": "rushx build && rushx test",
     "check-license-header": "license-check-and-add check -f license-add-config.json",
     "depcheck": "depcheck",

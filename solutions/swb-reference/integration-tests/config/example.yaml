@@ -21,13 +21,9 @@
 ## For running project integration tests
 costCenterId: '' # ex: 'cc-320991c4-9457-4bf4-b21e-9ffbc224740b'
 projectName: ''
-
 ## Pre-requisite for running aws-accounts integration test
 ## Create the onboard_account stack in an external AWS account, and populate the following values below:
-#awsAccountId: ''
-#envMgmtRoleArn: ''
-#hostingAccountHandlerRoleArn: ''
-#encryptionKeyArn: ''
-
-## Hosting account used for Account Creation tests
 # hostAwsAccountIdParamStorePath: ''
+# hostingAccountHandlerRoleArnParamStorePath: ''
+# envMgmtRoleArnParamStorePath: ''
+# encryptionKeyArnParamStorePath: ''

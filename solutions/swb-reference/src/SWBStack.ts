@@ -6,7 +6,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-new */
 import { join } from 'path';
-import { WorkbenchCognito, WorkbenchCognitoProps } from '@aws/workbench-core-infrastructure';
+import {
+  WorkbenchCognito,
+  WorkbenchCognitoProps,
+  WorkbenchDynamodb,
+  WorkbenchEncryptionKeyWithRotation
+} from '@aws/workbench-core-infrastructure';
 
 import { App, CfnOutput, Duration, Stack } from 'aws-cdk-lib';
 import {
@@ -15,7 +20,7 @@ import {
   LogGroupLogDestination,
   RestApi
 } from 'aws-cdk-lib/aws-apigateway';
-import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import {
@@ -89,7 +94,8 @@ export class SWBStack extends Stack {
       USER_POOL_ID,
       CLIENT_ID,
       CLIENT_SECRET,
-      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY
+      MAIN_ACCT_ENCRYPTION_KEY_ARN_OUTPUT_KEY,
+      FIELDS_TO_MASK_WHEN_AUDITING
     } = getConstants();
 
     super(app, STACK_NAME, {
@@ -160,8 +166,41 @@ export class SWBStack extends Stack {
     const lcRole = this._createLaunchConstraintIAMRole(LAUNCH_CONSTRAINT_ROLE_OUTPUT_KEY, artifactS3Bucket);
     const createAccountHandler = this._createAccountHandlerLambda(lcRole, artifactS3Bucket, AMI_IDS_TO_SHARE);
     const statusHandler = this._createStatusHandlerLambda(datasetBucket);
-    const apiLambda: Function = this._createAPILambda(datasetBucket, artifactS3Bucket);
-    this._createDDBTable(apiLambda, statusHandler, createAccountHandler);
+    const apiLambda: Function = this._createAPILambda(
+      datasetBucket,
+      artifactS3Bucket,
+      FIELDS_TO_MASK_WHEN_AUDITING
+    );
+
+    // Application DynamoDB Encryption Key
+    const applicationDDBTableEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-applicationDDBTableEncryptionKey`);
+
+    // Create Application DynamoDB Table
+    this._createApplicationDDBTable(
+      applicationDDBTableEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
+    // DynamicAuth DynamoDB Encryption Key
+    const dynamicAuthDynamodbEncryptionKey: WorkbenchEncryptionKeyWithRotation =
+      new WorkbenchEncryptionKeyWithRotation(this, `${this.stackName}-dynamicAuthDynamodbEncryptionKey`);
+
+    // Create DynamicAuth DynamoDB Table
+    const dynamicAuthTable = this._createDynamicAuthDDBTable(
+      dynamicAuthDynamodbEncryptionKey.key,
+      apiLambda,
+      statusHandler,
+      createAccountHandler
+    );
+
+    // Add DynamicAuth DynamoDB Table name to lambda environment variable
+    _.map([apiLambda, statusHandler, createAccountHandler], (lambda) => {
+      lambda.addEnvironment('DYNAMIC_AUTH_DDB_TABLE_NAME', dynamicAuthTable.tableName);
+    });
+
     this._createRestApi(apiLambda);
 
     const workflow = new Workflow(this);
@@ -355,7 +394,7 @@ export class SWBStack extends Stack {
    * Create bucket for S3 access logs.
    * Note this bucket does not have sigv4/https policies because these restrict access log delivery.
    * Note this bucket uses S3 Managed encryption as a requirement for access logging.
-   * @param bucketName - Name of Access Logs Bucket.
+   * @param bucketNameOutput - Name of Access Logs Bucket.
    * @returns S3Bucket
    */
   private _createAccessLogsBucket(bucketNameOutput: string): Bucket {
@@ -553,6 +592,26 @@ export class SWBStack extends Stack {
           resources: [`arn:aws:servicecatalog:${this.region}:${this.account}:*/*`]
         }),
         new PolicyStatement({
+          sid: 'SearchProductsAsAdmin',
+          actions: ['servicecatalog:SearchProductsAsAdmin'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:portfolio/*`]
+        }),
+        new PolicyStatement({
+          sid: 'ListProvisioningArtifacts',
+          actions: ['servicecatalog:ListProvisioningArtifacts'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:product/*`]
+        }),
+        new PolicyStatement({
+          sid: 'DescribeProvisioningArtifact',
+          actions: ['servicecatalog:DescribeProvisioningArtifact'],
+          resources: [`arn:aws:catalog:${this.region}:${this.account}:product/*`]
+        }),
+        new PolicyStatement({
+          sid: 'GetObject',
+          actions: ['s3:GetObject'],
+          resources: [`arn:aws:s3:::${this.lambdaEnvVars.STACK_NAME}*`]
+        }),
+        new PolicyStatement({
           actions: ['kms:Decrypt', 'kms:GenerateDataKey', 'kms:GetKeyPolicy', 'kms:PutKeyPolicy'],
           resources: [`arn:aws:kms:${this.region}:${this.account}:key/*`],
           sid: 'KMSAccess'
@@ -618,14 +677,21 @@ export class SWBStack extends Stack {
     return lambda;
   }
 
-  private _createAPILambda(datasetBucket: Bucket, artifactS3Bucket: Bucket): Function {
+  private _createAPILambda(
+    datasetBucket: Bucket,
+    artifactS3Bucket: Bucket,
+    fieldsToMaskWhenAuditing: string[]
+  ): Function {
     const { AWS_REGION } = getConstants();
 
     const apiLambda = new Function(this, 'apiLambda', {
       code: Code.fromAsset(join(__dirname, '../../build/backendAPI')),
       handler: 'backendAPILambda.handler',
       runtime: Runtime.NODEJS_14_X,
-      environment: this.lambdaEnvVars,
+      environment: {
+        ...this.lambdaEnvVars,
+        FIELDS_TO_MASK_WHEN_AUDITING: JSON.stringify(fieldsToMaskWhenAuditing)
+      },
       timeout: Duration.seconds(29), // Integration timeout should be 29 seconds https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
       memorySize: 832
     });
@@ -736,14 +802,15 @@ export class SWBStack extends Stack {
   private _createRestApi(apiLambda: Function): void {
     const logGroup = new LogGroup(this, 'APIGatewayAccessLogs');
     const API: RestApi = new RestApi(this, `API-Gateway API`, {
-      restApiName: 'Backend API Name',
-      description: 'Backend API',
+      restApiName: this.stackName,
+      description: 'SWB API',
       deployOptions: {
         stageName: 'dev',
         accessLogDestination: new LogGroupLogDestination(logGroup),
         accessLogFormat: AccessLogFormat.custom(
           JSON.stringify({
             stage: '$context.stage',
+            requestTime: '$context.requestTime',
             requestId: '$context.requestId',
             integrationRequestId: '$context.integration.requestId',
             status: '$context.status',
@@ -787,8 +854,42 @@ export class SWBStack extends Stack {
     }
   }
 
-  // DynamoDB Table
-  private _createDDBTable(
+  //DynamicAuth DynamoDB Table
+  // Create DynamicAuthDDBTable
+  private _createDynamicAuthDDBTable(
+    encryptionKey: Key,
+    apiLambda: Function,
+    statusHandler: Function,
+    createAccountHandler: Function
+  ): Table {
+    const dynamicAuthDDBTable = new WorkbenchDynamodb(this, `${this.stackName}-dynamic-auth`, {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      encryptionKey: encryptionKey,
+      lambdas: [apiLambda, statusHandler, createAccountHandler],
+      gsis: [
+        {
+          indexName: 'getIdentityPermissionsByIdentity',
+          partitionKey: { name: 'identity', type: AttributeType.STRING },
+          sortKey: { name: 'pk', type: AttributeType.STRING }
+        }
+      ]
+    });
+
+    new CfnOutput(this, 'dynamicAuthDDBTableArn', {
+      value: dynamicAuthDDBTable.table.tableArn
+    });
+
+    new CfnOutput(this, 'dynamicAuthDDBTableName', {
+      value: dynamicAuthDDBTable.table.tableName
+    });
+
+    return dynamicAuthDDBTable.table;
+  }
+
+  // Application DynamoDB Table
+  private _createApplicationDDBTable(
+    encryptionKey: Key,
     apiLambda: Function,
     statusHandler: Function,
     createAccountHandler: Function
@@ -798,7 +899,10 @@ export class SWBStack extends Stack {
       partitionKey: { name: 'pk', type: AttributeType.STRING },
       sortKey: { name: 'sk', type: AttributeType.STRING },
       tableName: tableName,
-      billingMode: BillingMode.PAY_PER_REQUEST
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      pointInTimeRecovery: true,
+      encryption: TableEncryption.CUSTOMER_MANAGED,
+      encryptionKey: encryptionKey
     });
     // Add GSI for get resource by name
     table.addGlobalSecondaryIndex({

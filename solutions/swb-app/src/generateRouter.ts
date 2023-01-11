@@ -3,6 +3,7 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
+import { AuditService, BaseAuditPlugin, WithAudit, Writer } from '@aws/workbench-core-audit';
 import {
   csurf,
   verifyToken,
@@ -25,13 +26,17 @@ import cors from 'cors';
 import express, { Router, Express, Request, Response, json } from 'express';
 import { setUpAccountRoutes } from './accountRoutes';
 import { ApiRoute, ApiRouteConfig } from './apiRouteConfig';
+import SwbAuditExtractor from './audit/swbAuditExtractor';
+import SwbAuditLogger from './audit/swbAuditLogger';
+import SwbAuditPlugin from './audit/swbAuditPlugin';
 import { setUpAuthRoutes } from './authRoutes';
 import { setUpCostCenterRoutes } from './costCenterRoutes';
-import { setUpDSRoutes } from './datasetRoutes';
+import { setUpDSRoutes } from './dataSetRoutes';
 import { setUpEnvRoutes } from './environmentRoutes';
 import { setUpEnvTypeConfigRoutes } from './environmentTypeConfigRoutes';
 import { setUpEnvTypeRoutes } from './environmentTypeRoutes';
 import { boomErrorHandler, unknownErrorHandler } from './errorHandlers';
+import { setUpProjectEnvTypeConfigRoutes } from './projectEnvTypeConfigRoutes';
 import { setUpProjectRoutes } from './projectRoutes';
 import * as StaticPermissionsConfig from './staticPermissionsConfig';
 import * as StaticRoutesConfig from './staticRouteConfig';
@@ -84,6 +89,16 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
   app.use(verifyToken(authenticationService, { ignoredRoutes: staticRoutesIgnored, loggingService: logger }));
   app.use(withAuth(authorizationService, { logger: logger }));
 
+  // Auditing
+  const continueOnError = false;
+  const requiredAuditValues = ['actor', 'source'];
+  const fieldsToMask = JSON.parse(process.env.FIELDS_TO_MASK_WHEN_AUDITING!);
+  const writer: Writer = new SwbAuditLogger();
+  const swbAuditPlugin: BaseAuditPlugin = new SwbAuditPlugin(writer);
+  const auditService = new AuditService(swbAuditPlugin, continueOnError, requiredAuditValues, fieldsToMask);
+  const excludePaths: string[] = [];
+  app.use(WithAudit({ auditService, excludePaths, extractor: new SwbAuditExtractor() }));
+
   // Dynamic routes
   apiRouteConfig.routes.forEach((apiRoute: ApiRoute) => {
     // Config setting is provided by developer, and not external user request
@@ -98,19 +113,23 @@ export function generateRouter(apiRouteConfig: ApiRouteConfig): Express {
 
   setUpCostCenterRoutes(router, apiRouteConfig.costCenterService, apiRouteConfig.projectService);
   setUpEnvRoutes(router, apiRouteConfig.environments, apiRouteConfig.environmentService);
-  setUpDSRoutes(router, apiRouteConfig.dataSetService, apiRouteConfig.dataSetsStoragePlugin);
+  setUpDSRoutes(router, apiRouteConfig.dataSetService);
   setUpAccountRoutes(router, apiRouteConfig.account);
   setUpAuthRoutes(router, authenticationService, logger);
   setUpUserRoutes(router, apiRouteConfig.userManagementService);
   setUpEnvTypeRoutes(router, apiRouteConfig.environmentTypeService);
-  setUpEnvTypeConfigRoutes(router, apiRouteConfig.environmentTypeConfigService);
+  setUpEnvTypeConfigRoutes(
+    router,
+    apiRouteConfig.environmentTypeConfigService,
+    apiRouteConfig.environmentService
+  );
   setUpProjectRoutes(
     router,
     apiRouteConfig.projectService,
     apiRouteConfig.environmentService,
     apiRouteConfig.metadataService
   );
-
+  setUpProjectEnvTypeConfigRoutes(router, apiRouteConfig.projectEnvTypeConfigPlugin);
   // Error handling. Order of the error handlers is important
   router.use(boomErrorHandler);
   router.use(unknownErrorHandler);

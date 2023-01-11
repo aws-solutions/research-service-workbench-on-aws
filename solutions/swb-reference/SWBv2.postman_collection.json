@@ -242,7 +242,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n}",
+              "raw": "{\n    \"datasetName\": \"testDs\",\n    \"storageName\": \"datasetBucketNameInMainAccount\",\n    \"path\": \"folderName\",\n    \"awsAccountId\": \"mainAccountId\"\n,\n    \"type\": \"internal\"\n,\n    \"owner\": \"proj-123#PA\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -630,42 +630,9 @@
       "name": "envType",
       "item": [
         {
-          "name": "Create envType",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
-                "type": "text"
-              },
-              {
-                "key": "csrf-token",
-                "value": "{{CSRF_TOKEN}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"productId\": \"prod-abcd1234\",\n    \"provisioningArtifactId\": \"pa-abcd1234\",\n    \"description\": \"An Amazon SageMaker Jupyter Notebook\",\n    \"name\": \"Jupyter Notebook\",\n    \"type\": \"sagemakerNotebook\",\n    \"params\": [\n        {\n            \"DefaultValue\": \"ml.t3.xlarge\",\n            \"Description\": \"EC2 instance type to launch\",\n            \"IsNoEcho\": false,\n            \"ParameterConstraints\": {\n                \"AllowedValues\": []\n            },\n            \"ParameterKey\": \"InstanceType\",\n            \"ParameterType\": \"String\"\n        }\n    ],\n    \"status\": \"NOT_APPROVED\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{API_URL}}/environmentTypes",
-              "host": ["{{API_URL}}"],
-              "path": ["environmentTypes"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update envType",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
@@ -779,7 +746,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"type\": \"sagemakerNotebook\",\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"estimatedCost\": \"estimated cost\",\n    \"params\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -793,7 +760,7 @@
               "variable": [
                 {
                   "key": "envTypeId",
-                  "value": "9a115bda-ab83-464b-ae94-c258370beeb6",
+                  "value": "",
                   "description": "ID of environment type associated with this config"
                 }
               ]
@@ -804,7 +771,7 @@
         {
           "name": "Update envTypeConfig",
           "request": {
-            "method": "PUT",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Cookie",
@@ -819,7 +786,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"allowRoleIds\": [],\n    \"description\": \"Example config 1\",\n    \"name\": \"config 1\",\n    \"params\": []\n}",
+              "raw": "{\n    \"description\": \"Example config 1\",\n    \"estimatedCost\": \"estimatedCost\",\n  }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -862,6 +829,51 @@
                 "type": "text"
               }
             ],
+            "url": {
+              "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
+              "host": ["{{API_URL}}"],
+              "path": ["environmentTypes", ":envTypeId", "configurations", ":envTypeConfigId"],
+              "variable": [
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with this config"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to update"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Soft Delete envTypeConfig",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{API_URL}}/environmentTypes/:envTypeId/configurations/:envTypeConfigId",
               "host": ["{{API_URL}}"],
@@ -1076,7 +1088,7 @@
           "response": []
         },
         {
-          "name": "Delete project",
+          "name": "Associate project with EnvTypeConfig",
           "request": {
             "method": "PUT",
             "header": [
@@ -1092,14 +1104,32 @@
               }
             ],
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId/softDelete",
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId", "softDelete"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
               "variable": [
                 {
                   "key": "projectId",
-                  "value": null,
-                  "description": "ID of project to SOFT DELETE"
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
                 }
               ]
             }
@@ -1107,9 +1137,9 @@
           "response": []
         },
         {
-          "name": "Update Project",
+          "name": "Delete Association between project and EnvTypeConfig",
           "request": {
-            "method": "PATCH",
+            "method": "DELETE",
             "header": [
               {
                 "key": "Cookie",
@@ -1122,23 +1152,69 @@
                 "type": "text"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"New name\",\n    \"description\": \"New description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "{{API_URL}}/projects/:projectId",
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations/:envTypeConfigId/relationships",
               "host": ["{{API_URL}}"],
-              "path": ["projects", ":projectId"],
+              "path": [
+                "projects",
+                ":projectId",
+                "environmentTypes",
+                ":envTypeId",
+                "configurations",
+                ":envTypeConfigId",
+                "relationships"
+              ],
               "variable": [
                 {
                   "key": "projectId",
-                  "value": "proj-123"
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
+                },
+                {
+                  "key": "envTypeConfigId",
+                  "value": "",
+                  "description": "ID of environment type config to associate"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get EnvTypeConfigs associated with Project",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "access_token={{ACCESS_TOKEN}};_csrf={{CSRF_COOKIE}}",
+                "type": "text"
+              },
+              {
+                "key": "csrf-token",
+                "value": "{{CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/projects/:projectId/environmentTypes/:envTypeId/configurations",
+              "host": ["{{API_URL}}"],
+              "path": ["projects", ":projectId", "environmentTypes", ":envTypeId", "configurations"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "",
+                  "description": "ID of project to associate"
+                },
+                {
+                  "key": "envTypeId",
+                  "value": "",
+                  "description": "ID of environment type associated with environment Type Configuration"
                 }
               ]
             }

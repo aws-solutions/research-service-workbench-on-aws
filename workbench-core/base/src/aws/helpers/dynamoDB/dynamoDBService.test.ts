@@ -3,11 +3,11 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DynamoDBClient, GetItemCommand, QueryCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, QueryCommand, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { mockClient } from 'aws-sdk-client-mock';
 import JSONValue from '../../../types/json';
-import { buildDynamoDBPkSk } from './ddbUtil';
+import { buildDynamoDBPkSk, MAX_GET_ITEMS_SIZE } from './ddbUtil';
 import DynamoDBService from './dynamoDBService';
 
 describe('DynamoDBService', () => {
@@ -15,6 +15,49 @@ describe('DynamoDBService', () => {
   const isoStringRegex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
   const dbService = new DynamoDBService({ region: 'some-region', table: 'some-table' });
+
+  describe('getItems', () => {
+    test('fails when retrieving more than allowed', async () => {
+      // BUILD
+      const keys = Array.from({ length: MAX_GET_ITEMS_SIZE + 1 }, (v, k) => {
+        return { pk: k, sk: k };
+      });
+
+      // CHECK
+      await expect(dbService.getItems(keys)).rejects.toThrow(
+        `Cannot retrieve more than ${MAX_GET_ITEMS_SIZE} items by request.`
+      );
+    });
+  });
+
+  describe('getItem', () => {
+    let unmarshalledData: Record<string, JSONValue>;
+
+    beforeEach(() => {
+      unmarshalledData = {
+        accountId: 'sampleAccId',
+        awsAccountId: '123456789012',
+        id: 'sampleAccId',
+        portfolioId: 'port-1234',
+        targetAccountStackName: 'swb-dev-va-hosting-account'
+      };
+
+      const mockDDB = mockClient(DynamoDBClient);
+
+      mockDDB.on(GetItemCommand).resolves({
+        Item: marshall(unmarshalledData)
+      });
+    });
+    // Get Item
+    test('returns unmarshalled item', async () => {
+      // BUILD
+      const key = { pk: 'samplePK', sk: 'sampleSK' };
+      // OPERATE
+      const result = await dbService.getItem(key);
+      // CHECK
+      expect(result).toEqual(unmarshalledData);
+    });
+  });
 
   describe('getPaginatedItems', () => {
     let unmarshalledData: Record<string, JSONValue>;

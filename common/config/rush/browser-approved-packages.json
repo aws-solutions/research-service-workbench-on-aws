@@ -167,6 +167,10 @@
       "allowedCategories": [ "production" ]
     },
     {
+      "name": "@aws/workbench-core-user-management",
+      "allowedCategories": [ "production", "prototypes" ]
+    },
+    {
       "name": "@awsui/collection-hooks",
       "allowedCategories": [ "production", "prototypes" ]
     },
@@ -599,8 +603,12 @@
       "allowedCategories": [ "production" ]
     },
     {
-      "name": "zod",
+      "name": "yaml-cfn",
       "allowedCategories": [ "production" ]
+    },
+    {
+      "name": "zod",
+      "allowedCategories": [ "production", "prototypes" ]
     }
   ]
 }

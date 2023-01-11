@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@aws/swb-app",
+      "comment": "Added DataSetsAuthorizationPlugin methods to DataSetPlugin",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@aws/swb-app"
+}

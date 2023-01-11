@@ -58,12 +58,14 @@
     "@aws/workbench-core-base": "workspace:*",
     "@aws/workbench-core-datasets": "workspace:*",
     "@aws/workbench-core-logging": "workspace:*",
+    "@aws/workbench-core-user-management": "workspace:*",
     "@hapi/boom": "^10.0.0",
     "generate-password": "^1.7.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",
     "md5-file": "^5.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.212.0",

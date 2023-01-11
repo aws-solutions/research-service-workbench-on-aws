@@ -4,19 +4,22 @@
  */
 
 // User management
+import { validateAndParse } from '@aws/workbench-core-base';
 import {
   CreateRoleSchema,
   CreateUserSchema,
   isInvalidParameterError,
+  isRoleAlreadyExistsError,
+  isRoleNotFoundError,
+  isTooManyRequestsError,
   isUserAlreadyExistsError,
   isUserNotFoundError,
-  UpdateRoleSchema,
   UserManagementService
-} from '@aws/workbench-core-authentication';
+} from '@aws/workbench-core-user-management';
 import * as Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
 import { validate } from 'jsonschema';
-import _ from 'lodash';
+import { AddUserToRoleRequest, AddUserToRoleRequestParser } from '../models/user/addUserToRole';
 import { wrapAsync } from '../utilities/errorHandlers';
 import { processValidatorResult } from '../utilities/validatorHelper';
 
@@ -32,6 +35,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserAlreadyExistsError(e) || isInvalidParameterError(e)) {
           throw Boom.badRequest(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -40,8 +46,15 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
   router.get(
     '/users',
     wrapAsync(async (req: Request, res: Response) => {
-      const users = await service.listUsers();
-      res.status(200).json(users);
+      try {
+        const users = await service.listUsers();
+        res.status(200).json(users);
+      } catch (e) {
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
+        throw e;
+      }
     })
   );
 
@@ -54,6 +67,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -70,6 +86,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -84,6 +103,9 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
       } catch (e) {
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
         }
         throw e;
       }
@@ -100,6 +122,27 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
         if (isUserNotFoundError(e)) {
           throw Boom.notFound(e.message);
         }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
+        throw e;
+      }
+    })
+  );
+
+  router.get(
+    '/users/:userId/roles',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const roles = await service.getUserRoles(req.params.userId);
+        res.status(200).json(roles);
+      } catch (e) {
+        if (isUserNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
         throw e;
       }
     })
@@ -109,20 +152,40 @@ export function setUpUserRoutes(router: Router, service: UserManagementService):
     '/roles',
     wrapAsync(async (req: Request, res: Response) => {
       processValidatorResult(validate(req.body, CreateRoleSchema));
-      const response = await service.createRole(req.body.roleName);
-      res.status(201).send(response);
+      try {
+        const response = await service.createRole(req.body.roleName);
+        res.status(201).send(response);
+      } catch (e) {
+        if (isRoleAlreadyExistsError(e)) {
+          throw Boom.badRequest(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
+        throw e;
+      }
     })
   );
 
   router.put(
     '/roles/:roleName',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, UpdateRoleSchema));
-      if (!_.isString(req.params.roleName)) {
-        throw Boom.badRequest('roleName must be a string.');
+      try {
+        const addUserToRoleRequest = validateAndParse<AddUserToRoleRequest>(
+          AddUserToRoleRequestParser,
+          req.body
+        );
+        const response = await service.addUserToRole(addUserToRoleRequest.userId, req.params.roleName);
+        res.send(response);
+      } catch (e) {
+        if (isUserNotFoundError(e) || isRoleNotFoundError(e)) {
+          throw Boom.notFound(e.message);
+        }
+        if (isTooManyRequestsError(e)) {
+          throw Boom.tooManyRequests(e.message);
+        }
+        throw e;
       }
-      const response = await service.addUserToRole(req.body.username, req.params.roleName);
-      res.send(response);
     })
   );
 }

@@ -35,9 +35,7 @@
     "aws-jwt-verify": "^3.0.0",
     "axios": "^0.27.1",
     "csurf": "^1.11.0",
-    "jsonschema": "^1.4.1",
-    "lodash": "^4.17.21",
-    "zod": "^3.19.1"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.212.0",
