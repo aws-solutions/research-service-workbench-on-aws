@@ -543,7 +543,7 @@ describe('DataSetService', () => {
   });
 
   describe('addDataSetExternalEndpointForGroup', () => {
-    it('returns the mount string for the DataSet mount point', async () => {
+    it('returns the mount object for the DataSet mount point', async () => {
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions').mockResolvedValue({
         data: {
           dataSetId: mockDataSetId,
@@ -610,7 +610,7 @@ describe('DataSetService', () => {
   });
 
   describe('addDataSetExternalEndpointForUser', () => {
-    it('returns the mount string for the DataSet mount point', async () => {
+    it('returns the mount object for the DataSet mount point', async () => {
       jest.spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions').mockResolvedValue({
         data: {
           dataSetId: mockDataSetId,
@@ -656,23 +656,6 @@ describe('DataSetService', () => {
           externalRoleName: mockRoleArn
         })
       ).rejects.toThrow(EndPointExistsError);
-    });
-
-    it('throws if the subject doesnt have permission to access the dataset', async () => {
-      jest
-        .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
-        .mockResolvedValue({ data: { dataSetId: mockDataSetId, permissions: [] } });
-
-      await expect(
-        dataSetService.addDataSetExternalEndpointForUser({
-          dataSetId: mockDataSetWithEndpointId,
-          externalEndpointName: mockExistingEndpointName,
-          storageProvider: s3Plugin,
-          userId: mockUserId,
-          authenticatedUser: mockAuthenticatedUser,
-          externalRoleName: mockRoleArn
-        })
-      ).rejects.toThrow(NotAuthorizedError);
     });
 
     it('throws if the subject doesnt have permission to access the dataset', async () => {

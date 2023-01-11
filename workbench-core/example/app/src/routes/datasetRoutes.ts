@@ -106,17 +106,17 @@ export function setUpDSRoutes(
             groupId: validatedRequest.groupId,
             authenticatedUser
           });
-          res.status(201).send(data);
-        } else {
-          const { data } = await dataSetService.addDataSetExternalEndpointForUser({
-            ...validatedRequest,
-            dataSetId: req.params.datasetId,
-            storageProvider: dataSetStoragePlugin,
-            userId: authenticatedUser.id,
-            authenticatedUser
-          });
-          res.status(201).send(data);
+          return res.status(201).send(data);
         }
+
+        const { data } = await dataSetService.addDataSetExternalEndpointForUser({
+          ...validatedRequest,
+          dataSetId: req.params.datasetId,
+          storageProvider: dataSetStoragePlugin,
+          userId: authenticatedUser.id,
+          authenticatedUser
+        });
+        res.status(201).send(data);
       } catch (error) {
         if (isDataSetNotFoundError(error)) {
           throw Boom.notFound(error.message);

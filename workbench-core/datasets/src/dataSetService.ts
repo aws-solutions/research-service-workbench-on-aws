@@ -189,11 +189,14 @@ export class DataSetService {
     try {
       const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
 
-      if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId))
+      if (!_.find(targetDS.externalEndpoints, (ep) => ep === endPointId)) {
         throw Boom.notFound(`'${endPointId}' not found on DataSet '${dataSetId}'.`);
+      }
 
       const endPoint = await this.getExternalEndPoint(dataSetId, endPointId, authenticatedUser);
-      if (!endPoint.endPointAlias || !endPoint.id) throw Boom.notFound('Endpoint has missing information');
+      if (!endPoint.endPointAlias || !endPoint.id) {
+        throw Boom.notFound('Endpoint has missing information');
+      }
 
       const response = this._generateMountObject(
         endPoint.dataSetName,
@@ -293,8 +296,9 @@ export class DataSetService {
       if (
         !targetDS.externalEndpoints ||
         !_.find(targetDS.externalEndpoints, (ep) => ep === targetEndpoint.name)
-      )
+      ) {
         return;
+      }
 
       await storageProvider.removeExternalEndpoint(targetEndpoint.name, targetDS.awsAccountId!);
 
@@ -418,7 +422,9 @@ export class DataSetService {
       );
 
       endPointDetails.allowedRoles = endPointDetails.allowedRoles || [];
-      if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) return;
+      if (_.find(endPointDetails.allowedRoles, (r) => r === externalRoleArn)) {
+        return;
+      }
 
       await storageProvider.addRoleToExternalEndpoint(
         endPointDetails.dataSetName,
@@ -610,8 +616,9 @@ export class DataSetService {
 
     const targetDS = await this.getDataSet(dataSetId, authenticatedUser);
 
-    if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName))
+    if (_.find(targetDS.externalEndpoints, (ep) => ep === externalEndpointName)) {
       throw new EndPointExistsError(`'${externalEndpointName}' already exists in '${dataSetId}'.`);
+    }
 
     const { data: connectionsData } = await storageProvider.addExternalEndpoint({
       name: targetDS.storageName,
@@ -639,7 +646,9 @@ export class DataSetService {
 
     const endPoint: ExternalEndpoint = await this._dbProvider.addExternalEndpoint(endPointParam);
 
-    if (!targetDS.externalEndpoints) targetDS.externalEndpoints = [];
+    if (!targetDS.externalEndpoints) {
+      targetDS.externalEndpoints = [];
+    }
 
     targetDS.externalEndpoints.push(endPoint.id!);
 
