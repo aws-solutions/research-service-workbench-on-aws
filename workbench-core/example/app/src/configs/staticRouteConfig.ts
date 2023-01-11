@@ -223,6 +223,14 @@ export const routesMap: RoutesMap = {
       }
     ]
   },
+  [`/authorization/groups/${groupIDRegExpAsString}`]: {
+    DELETE: [
+      {
+        action: 'DELETE',
+        subject: 'AuthorizationGroup'
+      }
+    ]
+  },
   '/authorization/permissions': {
     POST: [
       {

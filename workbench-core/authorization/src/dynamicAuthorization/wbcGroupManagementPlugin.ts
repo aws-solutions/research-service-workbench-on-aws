@@ -78,8 +78,17 @@ export class WBCGroupManagementPlugin implements GroupManagementPlugin {
       throw error;
     }
   }
-  public async deleteGroup(request: DeleteGroupRequest): Promise<DeleteGroupResponse> {
-    throw new Error('Method not implemented.');
+  public async deleteGroup({ groupId }: DeleteGroupRequest): Promise<DeleteGroupResponse> {
+    try {
+      await this._userManagementService.deleteRole(groupId);
+
+      return { data: { groupId } };
+    } catch (error) {
+      if (isRoleNotFoundError(error)) {
+        throw new GroupNotFoundError(error.message);
+      }
+      throw error;
+    }
   }
   public async getUserGroups(request: GetUserGroupsRequest): Promise<GetUserGroupsResponse> {
     const { userId } = request;

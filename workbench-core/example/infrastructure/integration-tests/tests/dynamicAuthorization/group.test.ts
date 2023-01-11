@@ -23,6 +23,7 @@ describe('dynamic authorization group integration tests', () => {
 
   beforeEach(() => {
     expect.hasAssertions();
+
     fakeUserId = '00000000-0000-0000-0000-000000000000';
     fakeGroupId = '00000000-0000-0000-0000-000000000000';
   });
@@ -288,5 +289,24 @@ describe('dynamic authorization group integration tests', () => {
         );
       }
     );
+  });
+
+  describe('deleteGroup', () => {
+    it('deletes existing group', async () => {
+      const {
+        data: { groupId }
+      } = await adminSession.resources.groups.create();
+      const group = adminSession.resources.groups.group(groupId);
+
+      const { data } = await group.delete();
+
+      expect(data).toMatchObject({ groupId });
+    });
+
+    it('returns a 404 error when trying to delete a group that does not exists', async () => {
+      const group = adminSession.resources.groups.group('invalidUserId');
+
+      await expect(group.delete()).rejects.toThrow(new HttpError(404, {}));
+    });
   });
 });
