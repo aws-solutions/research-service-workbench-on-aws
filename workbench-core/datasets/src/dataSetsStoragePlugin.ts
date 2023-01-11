@@ -61,6 +61,9 @@ export interface DataSetsStoragePlugin {
    * @param request - a {@link AddStorageExternalEndpointRequest} object
    *
    * @returns a {@link AddStorageExternalEndpointResponse} object
+   *
+   * @throws {@link EndPointExistsError} - the endpoint already exists
+   * @throws {@link InvalidArnError} - the externalRoleName is not in a valid format
    */
   addExternalEndpoint(
     request: AddStorageExternalEndpointRequest

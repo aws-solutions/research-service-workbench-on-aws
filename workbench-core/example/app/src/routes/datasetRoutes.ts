@@ -295,6 +295,9 @@ export function setUpDSRoutes(
         if (isInvalidPermissionError(error)) {
           throw Boom.badRequest(error.message);
         }
+        if (isDataSetNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
         throw error;
       }
     })
