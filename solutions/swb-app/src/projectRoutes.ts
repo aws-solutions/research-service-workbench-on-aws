@@ -6,11 +6,13 @@
 import {
   ProjectService,
   CreateProjectRequest,
+  CreateProjectRequestParser,
   ListProjectsRequest,
   ListProjectsRequestParser,
   UpdateProjectRequest,
   UpdateProjectRequestParser,
   GetProjectRequest,
+  GetProjectRequestParser,
   DeleteProjectRequest,
   DeleteProjectRequestParser
 } from '@aws/workbench-core-accounts';
@@ -19,7 +21,6 @@ import { validateAndParse, MetadataService, resourceTypeToKey } from '@aws/workb
 import { EnvironmentService } from '@aws/workbench-core-environments';
 import Boom from '@hapi/boom';
 import { Request, Response, Router } from 'express';
-import { validate } from 'jsonschema';
 import { wrapAsync } from './errorHandlers';
 import CreateProjectSchema from './schemas/projects/createProjectSchema';
 import GetProjectSchema from './schemas/projects/getProjectSchema';
@@ -30,7 +31,6 @@ import {
   ProjectEnvTypeConfigMetadata,
   ProjectEnvTypeConfigMetadataParser
 } from './schemas/projects/projectMetadataParser';
-import { processValidatorResult } from './validatorHelper';
 
 export function setUpProjectRoutes(
   router: Router,
@@ -42,14 +42,10 @@ export function setUpProjectRoutes(
   router.get(
     '/projects/:projectId',
     wrapAsync(async (req: Request, res: Response) => {
-      const objectToValidate = {
-        user: res.locals.user as AuthenticatedUser,
+      const validatedRequest = validateAndParse<GetProjectRequest>(GetProjectRequestParser, {
         projectId: req.params.projectId
-      };
-      processValidatorResult(validate(objectToValidate, GetProjectSchema));
-      const request: GetProjectRequest = objectToValidate as GetProjectRequest;
-
-      res.send(await projectService.getProject(request));
+      });
+      res.send(await projectService.getProject(validatedRequest));
     })
   );
 
@@ -75,13 +71,10 @@ export function setUpProjectRoutes(
   router.post(
     '/projects',
     wrapAsync(async (req: Request, res: Response) => {
-      processValidatorResult(validate(req.body, CreateProjectSchema));
-      const request: CreateProjectRequest = {
-        name: req.body.name,
-        description: req.body.description,
-        costCenterId: req.body.costCenterId
-      };
-      res.send(await projectService.createProject(request, res.locals.user));
+      const validatedRequest = validateAndParse<CreateProjectRequest>(CreateProjectRequestParser, {
+        ...req.body
+      });
+      res.send(await projectService.createProject(validatedRequest, res.locals.user));
     })
   );
 
