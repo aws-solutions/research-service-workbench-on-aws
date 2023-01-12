@@ -149,16 +149,6 @@ export class DynamicAuthorizationService {
     };
 
     try {
-      const currentStatus = await this._groupManagementPlugin.getGroupStatus(createGroupRequest);
-
-      metadata.statusCode = 201;
-      await this._auditService.write(metadata, currentStatus);
-    } catch (err) {
-      metadata.statusCode = 401;
-      await this._auditService.write(metadata, err);
-    }
-
-    try {
       const response = await this._groupManagementPlugin.createGroup(createGroupRequest);
 
       metadata.statusCode = 200;
