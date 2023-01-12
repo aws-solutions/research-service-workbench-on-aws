@@ -67,8 +67,17 @@ export class DataSetService implements DataSetPlugin {
     return this._workbenchDataSetService.listDataSets({ id: '', roles: [] });
   }
 
-  public provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
-    return this._workbenchDataSetService.provisionDataSet(request);
+  public async provisionDataSet(request: CreateProvisionDatasetRequest): Promise<DataSet> {
+    const response = await this._workbenchDataSetService.provisionDataSet(request);
+    // TODO: remove once addAccessPermissions on ProvisionDataSet is complete.
+    if (response.id && request.permissions && request.permissions.length) {
+      await this._workbenchDataSetService.addDataSetAccessPermissions({
+        authenticatedUser: request.authenticatedUser,
+        permission: request.permissions[0],
+        dataSetId: response.id
+      });
+    }
+    return response;
   }
 
   public async addAccessPermission(params: AddRemoveAccessPermissionRequest): Promise<PermissionsResponse> {
