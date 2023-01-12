@@ -341,11 +341,20 @@ export class DataSetService {
     };
 
     try {
-      const { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
+      let { data: permissionsData } = await this._authzPlugin.getAccessPermissions({
         dataSetId,
         identity: userId,
         identityType: 'USER'
       });
+      // TODO: Remove if-block after AddExternalEndpontforGroup is complete.
+      if (!permissionsData.permissions.length) {
+        const permissionResponse = await this._authzPlugin.getAccessPermissions({
+          dataSetId,
+          identity: userId,
+          identityType: 'GROUP'
+        });
+        permissionsData = permissionResponse.data;
+      }
       if (!permissionsData.permissions.length) {
         throw new NotAuthorizedError(
           `User "${userId}" does not have permission to access dataset "${dataSetId}.`
