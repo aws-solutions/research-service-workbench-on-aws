@@ -276,7 +276,7 @@ describe('dynamic authorization identity permission integration tests ', () => {
       user = {
         firstName: 'Test',
         lastName: 'User',
-        email: `success+get-user-groups-${uuidv4()}@simulator.amazonses.com`
+        email: `success+is-authorized-on-subject-${uuidv4()}@simulator.amazonses.com`
       };
       randomTextGenerator = new RandomTextGenerator('isAuthorizedOnSubject');
       const { data: userData } = await adminSession.resources.users.create(user);
