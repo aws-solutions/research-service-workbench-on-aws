@@ -862,7 +862,6 @@ importers:
       '@types/lodash': ^4.14.181
       '@types/node': ^14
       '@types/uuid': ^8.3.4
-      aws-jwt-verify: ^3.0.0
       aws-sdk-client-mock: ^0.6.2
       depcheck: ^1.4.3
       eslint: ^8.7.0
@@ -901,7 +900,6 @@ importers:
       '@aws-sdk/types': 3.226.0
       '@aws-sdk/util-dynamodb': 3.226.0
       '@hapi/boom': 10.0.0
-      aws-jwt-verify: 3.3.0
       aws-sdk-client-mock: 0.6.2_cwkxfrna7puklz7zoyvroifl5e
       js-yaml: 4.1.0
       jsonschema: 1.4.1
