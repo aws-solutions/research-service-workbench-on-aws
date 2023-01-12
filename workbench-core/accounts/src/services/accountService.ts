@@ -15,6 +15,7 @@ import DynamoDBService from '@aws/workbench-core-base/lib/aws/helpers/dynamoDB/d
 import * as Boom from '@hapi/boom';
 import _ from 'lodash';
 import { Account, AccountParser } from '../models/accounts/account';
+import { CreateAccountRequest } from '../models/accounts/createAccountRequest';
 import { CostCenterParser } from '../models/costCenters/costCenter';
 
 export default class AccountService {
@@ -81,17 +82,17 @@ export default class AccountService {
    *
    * @returns Account entry in DDB
    */
-  public async create(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
+  public async create(
+    accountMetadata: CreateAccountRequest & { environmentInstanceFiles: string }
+  ): Promise<Account> {
     await this._validateCreate(accountMetadata);
     const id = uuidWithLowercasePrefix(resourceTypeToKey.account);
 
-    await this._storeToDdb({
+    return this._storeToDdb({
       id,
       status: 'PENDING',
       ...accountMetadata
     });
-
-    return { id, status: 'PENDING', ...accountMetadata };
   }
 
   /**
@@ -100,19 +101,13 @@ export default class AccountService {
    *
    * @returns Account entry in DDB
    */
-  public async update(accountMetadata: { [key: string]: string }): Promise<{ [key: string]: string }> {
+  public async update(accountMetadata: { [key: string]: string }): Promise<Account> {
     await this._validateUpdate(accountMetadata);
 
-    const id = await this._storeToDdb(accountMetadata);
-
-    return { ...accountMetadata, id };
+    return AccountParser.parse(await this._storeToDdb(accountMetadata));
   }
 
   public async _validateCreate(accountMetadata: Record<string, string>): Promise<void> {
-    // Verify awsAccountId is specified
-    if (_.isUndefined(accountMetadata.awsAccountId))
-      throw Boom.badRequest('Missing AWS Account ID in request body');
-
     // Check if AWS account ID already exists in DDB
     const key = { key: { name: 'pk', value: `AWSACC#${accountMetadata.awsAccountId}` } };
     const ddbEntries = await this._dynamoDBService.query(key).execute();
@@ -137,7 +132,7 @@ export default class AccountService {
   /*
    * Store hosting account information in DDB
    */
-  private async _storeToDdb(accountMetadata: { [key: string]: string }): Promise<string> {
+  private async _storeToDdb(accountMetadata: { [key: string]: string }): Promise<Account> {
     const accountKey = { pk: `ACC#${accountMetadata.id}`, sk: `ACC#${accountMetadata.id}` };
     const accountParams: { item: { [key: string]: string } } = {
       item: {
@@ -152,15 +147,16 @@ export default class AccountService {
         environmentInstanceFiles: accountMetadata.environmentInstanceFiles,
         stackName: `${process.env.STACK_NAME!}-hosting-account`,
         status: accountMetadata.status,
+        externalId: accountMetadata.externalId,
         resourceType: 'account'
       }
     };
 
-    // We add the only optional attribute for account
-    if (accountMetadata.externalId) accountParams.item.externalId = accountMetadata.externalId;
-
     // Store Account row in DDB
-    await this._dynamoDBService.updateExecuteAndFormat({ key: accountKey, params: accountParams });
+    const account = AccountParser.parse(
+      (await this._dynamoDBService.updateExecuteAndFormat({ key: accountKey, params: accountParams }))
+        .Attributes
+    );
 
     if (accountMetadata.awsAccountId) {
       const awsAccountKey = {
@@ -180,7 +176,7 @@ export default class AccountService {
       await this._dynamoDBService.updateExecuteAndFormat({ key: awsAccountKey, params: awsAccountParams });
     }
 
-    return accountMetadata.id;
+    return account;
   }
 
   private async _getAccountWithoutMetadata(accountId: string): Promise<Account> {
@@ -195,7 +191,7 @@ export default class AccountService {
       throw Boom.notFound(`Could not find account ${accountId}`);
     }
 
-    return accountEntry.Item! as unknown as Account;
+    return AccountParser.parse(accountEntry.Item);
   }
 
   private async _getAccountWithMetadata(accountId: string): Promise<Account> {
