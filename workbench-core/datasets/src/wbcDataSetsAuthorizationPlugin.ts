@@ -12,7 +12,7 @@ import {
   DeleteIdentityPermissionsResponse
 } from '@aws/workbench-core-authorization';
 import _ from 'lodash';
-import { DataSetsAuthorizationPlugin } from './dataSetsAuthorizationPlugin';
+import { DataSetsAuthorizationPlugin, dataSetSubjectType } from './dataSetsAuthorizationPlugin';
 import { InvalidPermissionError } from './errors/invalidPermissionError';
 import { AddRemoveAccessPermissionRequest } from './models/addRemoveAccessPermissionRequest';
 import { DataSetPermission } from './models/dataSetPermission';
@@ -37,6 +37,11 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     const permissions: PermissionsResponse[] = this._identityPermissionsToPermissionsResponse(
       createdPermission.data.identityPermissions
     );
+
+    if (_.isEmpty(permissions)) {
+      throw new InvalidPermissionError('No permissions found.');
+    }
+
     const permissionsCount = permissions.length;
 
     if (permissionsCount !== 1) {
@@ -49,14 +54,41 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
   }
 
   public async getAccessPermissions(params: GetAccessPermissionRequest): Promise<PermissionsResponse> {
-    // TODO implement
-    const { dataSetId, subject } = params;
-    return {
-      data: {
-        dataSetId,
-        permissions: [{ identity: subject, identityType: 'USER', accessLevel: 'read-write' }]
-      }
-    };
+    if (params.identityType !== 'GROUP' && params.identityType !== 'USER') {
+      throw new InvalidPermissionError("IdentityType must be 'GROUP' or 'USER'.");
+    }
+    const identityResponse = await this._authorizer.getIdentityPermissionsBySubject({
+      subjectId: params.dataSetId,
+      subjectType: dataSetSubjectType,
+      identities: [
+        {
+          identityId: params.identity,
+          identityType: params.identityType
+        }
+      ]
+    });
+    const identityPermissions = _.filter(
+      identityResponse.data.identityPermissions,
+      (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
+    );
+    const permissionsResponse = this._identityPermissionsToPermissionsResponse(identityPermissions);
+
+    const permissionsCount = permissionsResponse.length;
+    if (permissionsCount > 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsCount}.`
+      );
+    }
+
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: params.dataSetId,
+          permissions: []
+        }
+      };
+    }
+    return permissionsResponse[0];
   }
 
   public async removeAccessPermissions(
@@ -84,8 +116,39 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
     return permissions[0];
   }
 
-  public async getAllDataSetAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
-    throw new Error('Method not implemented.');
+  public async getAllDataSetAccessPermissions(
+    datasetId: string,
+    pageToken?: string
+  ): Promise<PermissionsResponse> {
+    const identityResponse = await this._authorizer.getIdentityPermissionsBySubject({
+      subjectId: datasetId,
+      subjectType: dataSetSubjectType,
+      paginationToken: pageToken
+    });
+    const identityPermissions = _.filter(
+      identityResponse.data.identityPermissions,
+      (v: IdentityPermission) => v.action === 'READ' || v.action === 'UPDATE'
+    );
+    const permissionsResponse = this._identityPermissionsToPermissionsResponse(identityPermissions);
+
+    const permissionsCount = permissionsResponse.length;
+    if (permissionsCount > 1) {
+      throw new InvalidPermissionError(
+        `Expected a single permissions response, but got ${permissionsCount}.`
+      );
+    }
+
+    if (_.isEmpty(permissionsResponse)) {
+      return {
+        data: {
+          dataSetId: datasetId,
+          permissions: []
+        },
+        pageToken: identityResponse.paginationToken
+      };
+    }
+    permissionsResponse[0].pageToken = identityResponse.paginationToken;
+    return permissionsResponse[0];
   }
 
   public async removeAllAccessPermissions(datasetId: string): Promise<PermissionsResponse> {
@@ -146,7 +209,8 @@ export class WbcDataSetsAuthorizationPlugin implements DataSetsAuthorizationPlug
 
     // validate
     if (_.isEmpty(dataSetIdentityPermissions)) {
-      throw new InvalidPermissionError('No permissions found.');
+      // return the empty array if there is nothing to do.
+      return permissions;
     } else if (
       _.some(
         dataSetIdentityPermissions,

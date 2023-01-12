@@ -313,6 +313,14 @@ describe('DataSetService', () => {
     jest
       .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'removeAccessPermissions')
       .mockImplementation(async () => mockAddAccessResponse);
+
+    jest
+      .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAccessPermissions')
+      .mockImplementation(async () => mockAddAccessResponse);
+
+    jest
+      .spyOn(WbcDataSetsAuthorizationPlugin.prototype, 'getAllDataSetAccessPermissions')
+      .mockImplementation(async () => mockAddAccessResponse);
   });
 
   describe('constructor', () => {
@@ -782,6 +790,52 @@ describe('DataSetService', () => {
       };
       try {
         await dataSetService.addDataSetAccessPermissions(invalidAccessParams);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
+    });
+  });
+
+  describe('getDataSetAllAccessPermissions', () => {
+    it('returns permssions on a dataset.', async () => {
+      await expect(
+        dataSetService.getAllDataSetAccessPermissions(mockDataSetId, mockAuthenticatedUser)
+      ).resolves.toMatchObject(mockAddAccessResponse);
+    });
+    it('throws when an invalid dataset Id is given.', async () => {
+      try {
+        await dataSetService.getAllDataSetAccessPermissions(mockInvalidId, mockAuthenticatedUser);
+      } catch (error) {
+        expect(Boom.isBoom(error, 404)).toBe(true);
+        expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
+      }
+    });
+  });
+
+  describe('getDataSetAccessPermissions', () => {
+    it('returns permsissions for the user on the dataset', async () => {
+      await expect(
+        dataSetService.getDataSetAccessPermissions(
+          {
+            dataSetId: mockDataSetId,
+            identity: mockUserId,
+            identityType: 'USER'
+          },
+          mockAuthenticatedUser
+        )
+      ).resolves.toMatchObject(mockAddAccessResponse);
+    });
+    it('throws when an invalid dataset Id is given.', async () => {
+      try {
+        await dataSetService.getDataSetAccessPermissions(
+          {
+            dataSetId: mockInvalidId,
+            identity: mockUserId,
+            identityType: 'USER'
+          },
+          mockAuthenticatedUser
+        );
       } catch (error) {
         expect(Boom.isBoom(error, 404)).toBe(true);
         expect(error.message).toBe(`Could not find DataSet '${mockInvalidId}'.`);
