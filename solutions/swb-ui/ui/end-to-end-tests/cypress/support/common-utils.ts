@@ -22,7 +22,11 @@ export function selectItemCard(componentTestId: string, itemToSelect: string): v
   ).click();
 }
 
-export function selectItemDropDown(componentTestId: string, itemsToSelect: string[]): void {
+export function selectItemDropDown(
+  componentTestId: string,
+  itemsToSelect: string[],
+  closeAfterSelection: boolean = false
+): void {
   cy.get(`[data-testid="${componentTestId}"] button`).click();
   itemsToSelect.forEach((item): void => {
     const itemRegex = `^${escapeRegex(item)}$`;
@@ -31,6 +35,7 @@ export function selectItemDropDown(componentTestId: string, itemsToSelect: strin
       .contains(new RegExp(itemRegex))
       .click();
   });
+  if (closeAfterSelection) cy.focused().blur();
 }
 
 export function selectItemGrid(componentTestId: string, itemToSelect: string): void {
