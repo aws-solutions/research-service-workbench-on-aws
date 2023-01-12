@@ -3,14 +3,16 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSetPermission } from './dataSetPermission';
+import { z } from 'zod';
+import { DataSetPermissionParser } from './dataSetPermission';
 
-export interface PermissionsResponse {
-  data: {
-    /** the ID of the dataset for which the permissions are associated. */
-    dataSetId: string;
-    /** dataset permissions */
-    permissions: DataSetPermission[];
-  };
-  pageToken?: string;
-}
+// eslint-disable-next-line @rushstack/typedef-var
+export const PermissionsResponseParser = z.object({
+  data: z.object({
+    dataSetId: z.string(),
+    permissions: z.array(DataSetPermissionParser)
+  }),
+  pageToken: z.string().optional()
+});
+
+export type PermissionsResponse = z.infer<typeof PermissionsResponseParser>;

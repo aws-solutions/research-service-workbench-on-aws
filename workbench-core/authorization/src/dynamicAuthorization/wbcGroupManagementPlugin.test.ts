@@ -30,6 +30,7 @@ import { ForbiddenError } from '../errors/forbiddenError';
 import { GroupAlreadyExistsError } from '../errors/groupAlreadyExistsError';
 import { GroupNotFoundError } from '../errors/groupNotFoundError';
 import { CreateGroupResponse } from './dynamicAuthorizationInputs/createGroup';
+import { DeleteGroupResponse } from './dynamicAuthorizationInputs/deleteGroup';
 import { GetGroupStatusResponse } from './dynamicAuthorizationInputs/getGroupStatus';
 import { GetGroupUsersResponse } from './dynamicAuthorizationInputs/getGroupUsers';
 import { GetUserGroupsResponse } from './dynamicAuthorizationInputs/getUserGroups';
@@ -158,10 +159,24 @@ describe('WBCGroupManagemntPlugin', () => {
   });
 
   describe('deleteGroup', () => {
-    it('throws a not implemented exception', async () => {
+    it('returns the groupID in the data object when the group was successfully deleted', async () => {
+      const response = await wbcGroupManagementPlugin.deleteGroup({ groupId, authenticatedUser: mockUser });
+
+      expect(response).toMatchObject<DeleteGroupResponse>({ data: { groupId } });
+    });
+
+    test.each([
+      [IdpUnavailableError, new IdpUnavailableError('test error')],
+      [PluginConfigurationError, new PluginConfigurationError('test error')],
+      [GroupNotFoundError, new RoleNotFoundError('test error')],
+      [TooManyRequestsError, new TooManyRequestsError('test error')],
+      [Error, new Error('test error')]
+    ])('throws exception %s when UserManagementService throws exception %s', async (expected, error) => {
+      mockUserManagementPlugin.deleteRole = jest.fn().mockRejectedValue(error);
+
       await expect(
         wbcGroupManagementPlugin.deleteGroup({ groupId, authenticatedUser: mockUser })
-      ).rejects.toThrow(Error);
+      ).rejects.toThrow(expected);
     });
   });
 

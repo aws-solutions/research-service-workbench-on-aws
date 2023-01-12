@@ -19,7 +19,11 @@ import {
   GetIdentityPermissionsBySubjectRequestParser,
   DeleteIdentityPermissionsRequest,
   DeleteIdentityPermissionsRequestParser,
-  isRetryError
+  isRetryError,
+  IsRouteProtectedRequest,
+  IsRouteProtectedRequestParser,
+  IsRouteIgnoredRequest,
+  IsRouteIgnoredRequestParser
 } from '@aws/workbench-core-authorization';
 import { validateAndParse } from '@aws/workbench-core-base';
 import * as Boom from '@hapi/boom';
@@ -100,6 +104,28 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         }
         if (isTooManyRequestsError(error)) {
           throw Boom.tooManyRequests(error.message);
+        }
+        throw error;
+      }
+    })
+  );
+
+  router.delete(
+    '/authorization/groups/:groupId',
+    wrapAsync(async (req: Request, res: Response) => {
+      try {
+        const response = await service.deleteGroup({
+          groupId: req.params.groupId,
+          authenticatedUser: res.locals.user
+        });
+
+        res.status(200).send(response.data);
+      } catch (error) {
+        if (isGroupNotFoundError(error)) {
+          throw Boom.notFound(error.message);
+        }
+        if (isRetryError(error)) {
+          throw Boom.serverUnavailable('Failed to delete group permissions. Please request a retry');
         }
         throw error;
       }
@@ -252,6 +278,30 @@ export function setUpDynamicAuthorizationRoutes(router: Router, service: Dynamic
         if (isRetryError(err)) throw Boom.serverUnavailable('Request a retry');
         throw err;
       }
+    })
+  );
+
+  router.get(
+    '/authorization/routes/protected',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<IsRouteProtectedRequest>(
+        IsRouteProtectedRequestParser,
+        req.query
+      );
+      const { data } = await service.isRouteProtected(validatedRequest);
+      res.status(201).send(data);
+    })
+  );
+
+  router.get(
+    '/authorization/routes/ignored',
+    wrapAsync(async (req: Request, res: Response) => {
+      const validatedRequest = validateAndParse<IsRouteIgnoredRequest>(
+        IsRouteIgnoredRequestParser,
+        req.query
+      );
+      const { data } = await service.isRouteIgnored(validatedRequest);
+      res.status(201).send(data);
     })
   );
 }

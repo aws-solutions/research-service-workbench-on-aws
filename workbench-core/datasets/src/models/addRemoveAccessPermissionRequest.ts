@@ -3,15 +3,20 @@
  *  SPDX-License-Identifier: Apache-2.0
  */
 
-import { DataSetPermission } from './dataSetPermission';
+import { z } from 'zod';
+import { DataSetPermissionParser } from './dataSetPermission';
 
-export interface AddRemoveAccessPermissionRequest {
-  /** the logged in User */
-  authenticatedUserId: string;
-  /** the logged in User Roles */
-  roles: string[];
+// eslint-disable-next-line @rushstack/typedef-var
+export const AddRemoveAccessPermissionParser = z.object({
+  /** the logged in user */
+  authenticatedUser: z.object({
+    id: z.string(),
+    roles: z.array(z.string())
+  }),
   /** the ID of the dataset */
-  dataSetId: string;
+  dataSetId: z.string(),
   /** the permission to add or remove */
-  permission: DataSetPermission;
-}
+  permission: DataSetPermissionParser
+});
+
+export type AddRemoveAccessPermissionRequest = z.infer<typeof AddRemoveAccessPermissionParser>;
