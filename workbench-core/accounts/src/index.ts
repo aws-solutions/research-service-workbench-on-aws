@@ -4,7 +4,14 @@
  */
 
 import AccountHandler from './handlers/accountHandler';
+import {
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser
+} from './models/accounts/awsAccountTemplateUrlsRequest';
+import { CreateAccountRequest, CreateAccountRequestParser } from './models/accounts/createAccountRequest';
+import { GetAccountRequest, GetAccountRequestParser } from './models/accounts/getAccountRequest';
 import { ListAccountRequest, ListAccountsRequestParser } from './models/accounts/listAccountsRequest';
+import { UpdateAccountRequest, UpdateAccountRequestParser } from './models/accounts/updateAccountRequest';
 import CreateCostCenterRequest from './models/costCenters/createCostCenterRequest';
 import {
   DeleteCostCenterRequestParser,
@@ -18,17 +25,11 @@ import {
   UpdateCostCenterRequest,
   UpdateCostCenterRequestParser
 } from './models/costCenters/updateCostCenterRequest';
-import { AwsAccountTemplateUrls, AwsAccountTemplateUrlsParser } from './schemas/awsAccountTemplateUrls';
-import CreateAccountSchema from './schemas/createAccount';
-import UpdateAccountSchema from './schemas/updateAccount';
 import AccountService from './services/accountService';
 import CostCenterService from './services/costCenterService';
 import HostingAccountService from './services/hostingAccountService';
 import ProjectService from './services/projectService';
-import HostingAccountLifecycleService, {
-  CreateAccountData,
-  UpdateAccountData
-} from './utilities/hostingAccountLifecycleService';
+import HostingAccountLifecycleService from './utilities/hostingAccountLifecycleService';
 
 export {
   HostingAccountService,
@@ -37,7 +38,6 @@ export {
   AccountService,
   CostCenterService,
   ProjectService,
-  CreateAccountSchema,
   CreateCostCenterRequest,
   ListCostCentersRequest,
   ListCostCentersRequestParser,
@@ -45,11 +45,14 @@ export {
   UpdateCostCenterRequestParser,
   DeleteCostCenterRequest,
   DeleteCostCenterRequestParser,
-  UpdateAccountSchema,
-  AwsAccountTemplateUrls,
-  AwsAccountTemplateUrlsParser,
-  CreateAccountData,
-  UpdateAccountData,
+  AwsAccountTemplateUrlsRequest,
+  AwsAccountTemplateUrlsRequestParser,
+  CreateAccountRequest,
+  CreateAccountRequestParser,
   ListAccountRequest,
-  ListAccountsRequestParser
+  ListAccountsRequestParser,
+  UpdateAccountRequestParser,
+  UpdateAccountRequest,
+  GetAccountRequestParser,
+  GetAccountRequest
 };
